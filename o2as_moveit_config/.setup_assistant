@@ -1,0 +1,10 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: o2as_scene_description
+    relative_path: urdf/asm_task_scene.urdf.xacro
+  SRDF:
+    relative_path: config/asm_task_scene.srdf
+  CONFIG:
+    author_name: Felix von Drigalski
+    author_email: fvdrigalski@gmail.com
+    generated_timestamp: 1529403859
