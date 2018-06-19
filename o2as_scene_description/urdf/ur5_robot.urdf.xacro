@@ -2,6 +2,7 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro"
        name="ur5" >
 
+  <xacro:arg name="parent" default="world"/>
   <xacro:arg name="prefix" default=""/>
   <xacro:arg name="origin_xyz" default="0.0 0.0 0.0"/>
   <xacro:arg name="origin_rpy" default="0.0 0.0 0.0"/>
@@ -15,11 +16,11 @@
   <!-- arm -->
   <xacro:ur5_robot prefix="$(arg prefix)" joint_limited="false"/>
 
-  <link name="world" />
-
-  <joint name="world_joint" type="fixed">
-    <parent link="world" />
-    <child link = "$(arg prefix)base_link" />
+  <link name="$(arg parent)" />
+  
+  <joint name="$(arg parent)_joint" type="fixed">
+    <parent link="$(arg parent)" />
+    <child link ="$(arg prefix)base_link" />
     <origin xyz="$(arg origin_xyz)" rpy="$(arg origin_rpy)" />
   </joint>
 
