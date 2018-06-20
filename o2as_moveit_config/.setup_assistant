@@ -7,4 +7,4 @@ moveit_setup_assistant_config:
   CONFIG:
     author_name: Felix von Drigalski
     author_email: fvdrigalski@gmail.com
-    generated_timestamp: 1529403859
+    generated_timestamp: 1529481364

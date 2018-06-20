@@ -7,12 +7,11 @@ roslaunch o2as_moveit_config o2as_moveit_planning_execution.launch sim:=true
 
 This opens gazebo and rviz in two windows. In rviz, you can:
 
-- In the MotionPlanning box in the bottom left of the window, click on "Unspecified" under "OMPL" and select "RRTkConfigDefault", or any other planner.
-- Click the tab "Planning", move the robot to another position via the interactive marker, and click "Plan and Execute". The robot will move in MoveIt and Gazebo.
-- By selecting a different Planning Group under "Motion Planning/Planning Request" in the Displays box, you can plan motions for different robots.
+- Select "all_bots" in the Displays box, under "Motion Planning/Planning Request/Planning Group". Then, click the tab "Planning", select "home_all" in the "Select Goal State" area, click "Update", then "Plan and Execute", and the robots will move to the default pose.
+- By selecting a different Planning Group under "Motion Planning/Planning Request/Planning Group" in the Displays box, you can plan motions for different robots using the interactive marker. The robot will move in MoveIt and Gazebo when you execute the plan.
 
 
 # ToDo
 
-- Add the scene(s) (parts trays, bins, assembly areas)
 - Add the gripper, at least for path planning.
+- Set default pose for the robots in gazebo
