@@ -19,7 +19,11 @@
   <!-- <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -file $(find o2as_scene_description)/urdf/asm_task_scene.urdf.xacro -model o2as_bots" respawn="false" output="screen" /> -->
   <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model o2as_bots" respawn="false" output="screen" />
   <include file="$(find o2as_gazebo)/launch/controller_utils.launch"/>
-  <rosparam file="$(find o2as_gazebo)/controller/all_bot_ur_controller.yaml" command="load"/>
-  <node name="arm_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn arm_controller" respawn="false" output="screen"/>
+  
+  <!-- spawn controllers -->
+  <rosparam file="$(find o2as_gazebo)/controller/3_bot_controllers.yaml" command="load"/>
+  <node name="a_bot_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn a_bot_controller" respawn="false" output="screen"/>
+  <node name="b_bot_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn b_bot_controller" respawn="false" output="screen"/>
+  <node name="c_bot_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn c_bot_controller" respawn="false" output="screen"/>
 
 </launch>
