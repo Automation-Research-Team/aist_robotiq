@@ -2,6 +2,16 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro"
        name="asm_task_scene" >
 
+
+  <xacro:property name="a_bot_x" value="0.0"/>
+  <xacro:property name="a_bot_y" value="0.5"/>
+  <xacro:property name="b_bot_x" value="0.0"/>
+  <xacro:property name="b_bot_y" value="-0.5"/>
+  <xacro:property name="c_bot_x" value="-0.5"/>
+  <xacro:property name="c_bot_y" value="0.0"/>
+
+  <xacro:property name="bots_z" value="0.75"/>
+
   <!-- common stuff -->
   <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro" />
 
@@ -14,7 +24,40 @@
   <!-- grippers -->
   <!-- <xacro:include filename="$(find robotiq_c2_model_visualization)/urdf/robotiq_c2_model_macro.xacro" /> -->
 
-  <!-- arms -->
+  <!-- Scene items (trays, bins...) -->
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" /> -->
+
+  <!-- Robot bases -->
+  <!-- Putting these at height 0.0 makes them intersect with the ground, so they are elevated. -->
+  <!-- There are some instabilities when the box is big, for some reason. -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_base.xacro" />
+  <xacro:o2as_base boxname="a_bot_base_smfl">
+    <origin xyz="${a_bot_x-.65/2} ${a_bot_y-.65/2} 0.65" rpy="0 0 0" />   
+  </xacro:o2as_base>
+  <xacro:o2as_base boxname="b_bot_base_smfl">
+    <origin xyz="${b_bot_x-.65/2} ${b_bot_y-.65/2} 0.65" rpy="0 0 0" />   
+  </xacro:o2as_base>
+  <xacro:o2as_base boxname="c_bot_base_smfl">
+    <origin xyz="${c_bot_x-.65/2-.22} ${c_bot_y-.65/2-.22} 0.65" rpy="0 0 0" />   
+  </xacro:o2as_base>
+
+  <!-- Main workspace -->
+  <!-- The top surface is at 0.01 m below the robot bases. -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro" />
+  <xacro:property name="plate_w" value="0.8"/>
+  <xacro:property name="plate_l" value="0.8"/>
+  <xacro:o2as_box boxname="workbox" box_w="${plate_w}" box_l="${plate_l}" box_h=".05">
+    <origin xyz="${-plate_w/2} ${-plate_l/2} ${bots_z-.06}" rpy="0 0 0" />   
+  </xacro:o2as_box>
+
+  <link name="workspace_center" />
+  <joint name="world_to_workspace" type="fixed">
+    <parent link="world" />
+    <child link="workspace_center" />
+    <origin xyz="0.0 0.0 ${bots_z}" rpy="0.0 0.0 0.0" />
+  </joint>
+  
+  <!-- robot arms -->
   <xacro:ur10_robot prefix="a_bot_" joint_limited="true"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
@@ -44,19 +87,19 @@
   <joint name="world_a_bot_joint" type="fixed">
     <parent link="world" />
     <child link="a_bot_base_link" />
-    <origin xyz="0.0 0.5 0.5" rpy="0.0 0.0 0.0" />
+    <origin xyz="${a_bot_x} ${a_bot_y} ${bots_z}" rpy="0.0 0.0 0.0" />
   </joint>
 
   <joint name="world_b_bot_joint" type="fixed">
     <parent link="world" />
     <child link = "b_bot_base_link" />
-    <origin xyz="0.0 -0.5 0.5" rpy="0.0 0.0 0.0" />
+    <origin xyz="${b_bot_x} ${b_bot_y} ${bots_z}" rpy="0.0 0.0 0.0" />
   </joint>
 
   <joint name="world_c_bot_joint" type="fixed">
     <parent link="world" />
     <child link = "c_bot_base_link" />
-    <origin xyz="-0.5 0.0 0.5" rpy="0.0 0.0 0.0" />
+    <origin xyz="${c_bot_x} ${c_bot_y} ${bots_z}" rpy="0.0 0.0 0.0" />
   </joint>
 
   <!-- attach grippers -->
