@@ -5,23 +5,39 @@
   
   <xacro:property name="bin_width" value=".15"/>
 
-  <!-- A few arranged bins -->
-  <xacro:property name="set1_x" value=".15"/>
-  <xacro:property name="set1_y" value="0"/>
-  <xacro:property name="set1_z" value=".95"/>
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_base.xacro" />
+  <xacro:o2as_base boxname="test_bot_base_smfl">
+    <origin xyz="0.0 0.0 0.2" rpy="0 0 0" />   
+  </xacro:o2as_base> -->
 
-  <xacro:kitting_bin binname="set1_bin1">
+  <!-- A row of bins -->
+  <xacro:property name="set1_x" value=".25"/>
+  <xacro:property name="set1_y" value="${-bin_width}"/>
+  <xacro:property name="set1_z" value=".05"/>
+
+  <xacro:kitting_bin binname="set1_bin1" parent="workspace_center">
     <origin xyz="${set1_x} ${set1_y} ${set1_z}" rpy="0 0 0" />   
   </xacro:kitting_bin>
-  <xacro:kitting_bin binname="set1_bin2">
+  <xacro:kitting_bin binname="set1_bin2" parent="workspace_center">
     <origin xyz="${set1_x} ${set1_y + bin_width*1} ${set1_z}" rpy="0 0 0" />   
   </xacro:kitting_bin>
-  <xacro:kitting_bin binname="set1_bin3">
+  <xacro:kitting_bin binname="set1_bin3" parent="workspace_center">
     <origin xyz="${set1_x} ${set1_y + bin_width*2} ${set1_z}" rpy="0 0 0" />   
   </xacro:kitting_bin>
 
-  <xacro:property name="set2_x" value=".25"/>
-  <xacro:property name="set2_y" value="0"/>
-  <xacro:property name="set2_z" value=".85"/>
+  <!-- Another row of bins -->
+  <xacro:property name="set2_x" value=".45"/>
+  <xacro:property name="set2_y" value="${-bin_width}"/>
+  <xacro:property name="set2_z" value=".15"/>
+
+  <xacro:kitting_bin binname="set2_bin1" parent="workspace_center">
+    <origin xyz="${set2_x} ${set2_y} ${set2_z}" rpy="0 0 0" />   
+  </xacro:kitting_bin>
+  <xacro:kitting_bin binname="set2_bin2" parent="workspace_center">
+    <origin xyz="${set2_x} ${set2_y + bin_width*1} ${set2_z}" rpy="0 0 0" />   
+  </xacro:kitting_bin>
+  <xacro:kitting_bin binname="set2_bin3" parent="workspace_center">
+    <origin xyz="${set2_x} ${set2_y + bin_width*2} ${set2_z}" rpy="0 0 0" />   
+  </xacro:kitting_bin>
   
 </robot> 

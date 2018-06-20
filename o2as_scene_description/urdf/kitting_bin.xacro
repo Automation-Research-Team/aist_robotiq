@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="kitting_bin">
 
-  <xacro:macro name="kitting_bin" params="binname *origin">
+  <xacro:macro name="kitting_bin" params="binname parent *origin">
   <!-- This creates a box with the origin in the bottom corner, connected to the world link. -->
     
   <xacro:property name="mesh_file" value="$(find o2as_scene_description)/mesh/bin1_EA661CA-11.stl" />
@@ -11,27 +11,29 @@
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <mass value="1.0"/>
-      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      <inertia ixx="1.0" ixy="0" ixz="0" iyy="1.0" iyz="0" izz="1.0"/>
     </inertial>
     <visual>
       <origin rpy="1.5707 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="${mesh_file}" scale="0.001 0.001 0.001"/>
+        <!-- <mesh filename="${mesh_file}" scale="0.001 0.001 0.001"/> -->
+        <mesh filename="package://ur_description/meshes/ur5/visual/shoulder.dae"/>
       </geometry>
-       <material name="white">
+      <material name="white">
         <color rgba="1 1 1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="1.5707 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="${mesh_file_col}" scale="0.001 0.001 0.001"/>
+        <!-- <mesh filename="${mesh_file_col}" scale="0.001 0.001 0.001"/> -->
+        <mesh filename="package://ur_description/meshes/ur5/collision/shoulder.stl"/>
       </geometry>
     </collision>
   </link>
 
   <joint name="${binname}" type="fixed">
-      <parent link="world" />
+      <parent link="${parent}" />
       <child link = "${binname}" />
       <xacro:insert_block name="origin"/>
     </joint>

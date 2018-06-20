@@ -12,20 +12,21 @@
 
   <xacro:property name="bots_z" value="0.75"/>
 
+  <!-- This is the main file defining our robot arrangement and physical environment. -->
+
   <!-- common stuff -->
   <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro" />
 
   <!-- robots -->
-
-  <xacro:include filename="$(find o2as_scene_description)/urdf/ur3.urdf.xacro" />
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur10.urdf.xacro" />
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur5.urdf.xacro" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/ur3.urdf.xacro" />
 
   <!-- grippers -->
   <!-- <xacro:include filename="$(find robotiq_c2_model_visualization)/urdf/robotiq_c2_model_macro.xacro" /> -->
 
   <!-- Scene items (trays, bins...) -->
-  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" /> -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" />
 
   <!-- Robot bases -->
   <!-- Putting these at height 0.0 makes them intersect with the ground, so they are elevated. -->
