@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot_base_smfl">
+  
+  <xacro:macro name="robot_base_smfl" params="basename *origin">
+    <!-- This creates a box with the origin in the bottom corner, connected to the world link. -->
+    
+    <xacro:property name="base_w" value=".65"/>
+    <xacro:property name="base_l" value=".65"/>
+    <xacro:property name="base_h" value=".05"/>
+
+    <xacro:property name="mass" value="30"/>
+
+    <link name="${basename}">
+      <!-- w is in x, l is in y, h is in z -->
+      <visual>
+        <origin xyz="${base_w/2} ${base_l/2} ${base_h/2}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${base_w} ${base_l} ${base_h}"/> 
+        </geometry>
+        <material name="LightGrey">
+          <color rgba="0.7 0.7 0.7 1.0"/>
+        </material>
+        <!-- <material name="LightGrey"/> -->
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${base_w} ${base_l} ${base_h}"/> 
+        </geometry>
+      </collision>
+
+      <!-- This is required for Gazebo. -->
+      <inertial>
+        <mass value="${mass}" />
+        <!-- <origin xyz="${base_w/2} ${base_l} ${base_h/2}" rpy="0 0 0"/> -->
+        <inertia ixx="0.0" ixy="0.0" ixz="0.0"
+          iyy="0.0" iyz="0.0"
+          izz="0.0" />
+        <!-- <material name="LightGrey"/> -->
+      </inertial>
+      
+    </link>
+    <joint name="${basename}" type="fixed">
+      <parent link="world" />
+      <child link = "${basename}" />
+      <xacro:insert_block name="origin"/>
+    </joint>
+  </xacro:macro>
+</robot> 
