@@ -13,5 +13,6 @@ This opens gazebo and rviz in two windows. In rviz, you can:
 
 # ToDo
 
+- Fix the bugs complaining about the composite groups (front_bots, all_bots) not being a chain.
 - Add the gripper, at least for path planning.
 - Set default pose for the robots in gazebo
