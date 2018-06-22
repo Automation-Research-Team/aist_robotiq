@@ -1,15 +1,15 @@
 <?xml version="1.0" ?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="kitting_bin">
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="kitting_bin3">
 
-  <xacro:macro name="kitting_bin" params="binname parent *origin">
+  <xacro:macro name="kitting_bin3" params="binname parent *origin">
   <!-- This creates a box with the origin in the bottom corner, connected to the world link. -->
 
   
-  <!-- <xacro:property name="mesh_file" value="$(find o2as_scene_description)/meshes/bin1_EA661CA-11.stl" />
-  <xacro:property name="mesh_file_col" value="$(find o2as_scene_description)/meshes/bin1_EA661CA-11.vhacd.obj" /> -->
+  <!-- <xacro:property name="mesh_file" value="$(find o2as_scene_description)/meshes/bin3_T3-YG.stl" />
+  <xacro:property name="mesh_file_col" value="$(find o2as_scene_description)/meshes/bin3_T3-YG.vhacd.obj" /> -->
   <!-- The lines above don't work, the lines below do. Why?? This seems like a bug. -->
-  <xacro:property name="mesh_file" value="package://o2as_scene_description/meshes/bin1_EA661CA-11.stl" />
-  <xacro:property name="mesh_file_col" value="package://o2as_scene_description/meshes/bin1_EA661CA-11.vhacd.obj" />
+  <xacro:property name="mesh_file" value="package://o2as_scene_description/meshes/bin3_T3-YG.stl" />
+  <xacro:property name="mesh_file_col" value="package://o2as_scene_description/meshes/bin3_T3-YG.vhacd.obj" />
 
   <link name="${binname}">
     <inertial>
