@@ -22,9 +22,6 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur5.urdf.xacro" />
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur3.urdf.xacro" />
 
-  <!-- grippers -->
-  <!-- <xacro:include filename="$(find robotiq_c2_model_visualization)/urdf/robotiq_c2_model_macro.xacro" /> -->
-
   <!-- Scene items (trays, bins...) -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" />
 
@@ -103,11 +100,16 @@
     <origin xyz="${c_bot_x} ${c_bot_y} ${bots_z}" rpy="0.0 0.0 0.0" />
   </joint>
 
-  <!-- attach grippers -->
-    <!-- <joint name="a_bot_gripper_link" type="fixed">
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <parent link="a_bot_tool0" />
-      <child link="a_bot_eef_link" />
-    </joint> -->
+  <!-- spawn and attach grippers -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_c2_model_macro.xacro" />
+  <xacro:robotiq_c2_model prefix="a_bot_"/>
+
+  <joint name="a_bot_gripper_link" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="a_bot_ee_link" />
+    <child link="a_bot_robotiq_85_adapter_link" />
+  </joint>
+  
+  
 
 </robot>
