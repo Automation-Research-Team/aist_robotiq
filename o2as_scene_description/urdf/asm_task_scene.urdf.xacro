@@ -101,15 +101,11 @@
   </joint>
 
   <!-- spawn and attach grippers -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_c2_model_macro.xacro" />
-  <xacro:robotiq_c2_model prefix="a_bot_"/>
-
-  <joint name="a_bot_gripper_link" type="fixed">
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <parent link="a_bot_ee_link" />
-    <child link="a_bot_robotiq_85_adapter_link" />
-  </joint>
-  
+  <xacro:include filename="$(find robotiq_description)/urdf/robotiq_85_gripper.urdf.xacro" />
+  <xacro:robotiq_85_gripper prefix="a_bot_" parent = "a_bot_ee_link">
+    <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
+  </xacro:robotiq_85_gripper>
+ 
   
 
 </robot>
