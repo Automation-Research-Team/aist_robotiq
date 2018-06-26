@@ -35,6 +35,9 @@
       </geometry>
     </collision>
   </link>
+  <gazebo reference="${binname}">
+    <material>Gazebo/Orange</material>
+  </gazebo>
 
   <joint name="${binname}" type="fixed">
       <parent link="${parent}" />

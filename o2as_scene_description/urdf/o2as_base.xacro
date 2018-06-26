@@ -34,11 +34,12 @@
           iyy="0.0" iyz="0.0"
           izz="0.0" />
       </inertial>
-      <!-- <gazebo reference="${boxname}">
-        <material>Gazebo/DarkGrey</material>
-      </gazebo> -->
       
     </link>
+    <gazebo reference="${boxname}">
+      <material>Gazebo/FlatBlack</material>
+    </gazebo>
+
     <joint name="${boxname}" type="fixed">
       <parent link="world" />
       <child link = "${boxname}" />
