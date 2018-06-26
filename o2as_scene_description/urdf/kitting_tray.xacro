@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="kitting_bin">
+
+  <xacro:macro name="kitting_tray" params="binname parent *origin">
+  <!-- This creates a box with the origin in the bottom corner, connected to the world link. -->
+
+  
+  <!-- <xacro:property name="mesh_file" value="$(find o2as_scene_description)/meshes/bin1_EA661CA-11.stl" />
+  <xacro:property name="mesh_file_col" value="$(find o2as_scene_description)/meshes/bin1_EA661CA-11.vhacd.obj" /> -->
+  <!-- The lines above don't work, the lines below do. Why?? This seems like a bug. -->
+  <xacro:property name="mesh_file" value="package://o2as_scene_description/meshes/tray_PZ-0006-B.stl" />
+  <xacro:property name="mesh_file_col" value="package://o2as_scene_description/meshes/tray_PZ-0006-B.vhacd.obj" />
+
+  <link name="${binname}">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1.0"/>
+      <inertia ixx="1.0" ixy="0" ixz="0" iyy="1.0" iyz="0" izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin rpy="${pi/2} 0 ${pi/2}" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="${mesh_file}" scale="0.001 0.001 0.001"/>
+        <!-- <mesh filename="package://ur_description/meshes/ur5/visual/shoulder.dae"/> -->
+      </geometry>
+      <material name="white">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="${pi/2} 0 ${pi/2}" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="${mesh_file_col}" scale="0.001 0.001 0.001"/>
+        <!-- <mesh filename="package://ur_description/meshes/ur5/collision/shoulder.stl"/> -->
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="${binname}" type="fixed">
+      <parent link="${parent}" />
+      <child link = "${binname}" />
+      <xacro:insert_block name="origin"/>
+    </joint>
+  </xacro:macro>
+</robot>
