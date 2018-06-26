@@ -16,13 +16,15 @@
         <link name="a_bot_wrist_1_link" />
         <link name="a_bot_wrist_2_link" />
         <link name="a_bot_wrist_3_link" />
+        <link name="a_bot_robotiq_85_base_link" />
+        <link name="a_bot_robotiq_85_tip_link" />
         <joint name="a_bot_shoulder_pan_joint" />
         <joint name="a_bot_shoulder_lift_joint" />
         <joint name="a_bot_elbow_joint" />
         <joint name="a_bot_wrist_1_joint" />
         <joint name="a_bot_wrist_2_joint" />
         <joint name="a_bot_wrist_3_joint" />
-        <chain base_link="a_bot_base_link" tip_link="a_bot_ee_link" />
+        <chain base_link="a_bot_base_link" tip_link="a_bot_robotiq_85_tip_link" />
     </group>
     <group name="b_bot">
         <link name="b_bot_shoulder_link" />
@@ -31,13 +33,15 @@
         <link name="b_bot_wrist_1_link" />
         <link name="b_bot_wrist_2_link" />
         <link name="b_bot_wrist_3_link" />
+        <link name="b_bot_robotiq_85_base_link" />
+        <link name="b_bot_robotiq_85_tip_link" />
         <joint name="b_bot_shoulder_pan_joint" />
         <joint name="b_bot_shoulder_lift_joint" />
         <joint name="b_bot_elbow_joint" />
         <joint name="b_bot_wrist_1_joint" />
         <joint name="b_bot_wrist_2_joint" />
         <joint name="b_bot_wrist_3_joint" />
-        <chain base_link="b_bot_base_link" tip_link="b_bot_ee_link" />
+        <chain base_link="b_bot_base_link" tip_link="b_bot_robotiq_85_tip_link" />
     </group>
     <group name="c_bot">
         <link name="c_bot_shoulder_link" />
@@ -46,13 +50,15 @@
         <link name="c_bot_wrist_1_link" />
         <link name="c_bot_wrist_2_link" />
         <link name="c_bot_wrist_3_link" />
+        <link name="c_bot_robotiq_85_base_link" />
+        <link name="c_bot_robotiq_85_tip_link" />
         <joint name="c_bot_shoulder_pan_joint" />
         <joint name="c_bot_shoulder_lift_joint" />
         <joint name="c_bot_elbow_joint" />
         <joint name="c_bot_wrist_1_joint" />
         <joint name="c_bot_wrist_2_joint" />
         <joint name="c_bot_wrist_3_joint" />
-        <chain base_link="c_bot_base_link" tip_link="c_bot_ee_link" />
+        <chain base_link="c_bot_base_link" tip_link="c_bot_robotiq_85_tip_link" />
     </group>
     <group name="front_bots">
         <group name="a_bot" />
@@ -123,9 +129,9 @@
         <joint name="c_bot_wrist_3_joint" value="0" />
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
-    <end_effector name="a_bot_gripper" parent_link="a_bot_ee_link" group="a_bot" />
-    <end_effector name="b_bot_gripper" parent_link="b_bot_ee_link" group="b_bot" />
-    <end_effector name="c_bot_gripper" parent_link="c_bot_ee_link" group="c_bot" />
+    <end_effector name="a_bot_gripper" parent_link="a_bot_robotiq_85_tip_link" group="a_bot" />
+    <end_effector name="b_bot_gripper" parent_link="b_bot_robotiq_85_tip_link" group="b_bot" />
+    <end_effector name="c_bot_gripper" parent_link="c_bot_robotiq_85_tip_link" group="c_bot" />
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
     <virtual_joint name="o2as_to_world" type="fixed" parent_frame="world" child_link="o2as_ground" />
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<!-- This macro adds a convenient TF frame at the tip of the closed gripper. -->
+<!-- The position of the TF frame has not been measured at all and needs to be calibrated. -->
+
+<robot name="robotiq_85_gripper_o2as" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="robotiq_85_gripper_o2as" params="prefix parent *origin">
+    <xacro:include filename="$(find robotiq_description)/urdf/robotiq_85_gripper.urdf.xacro" />
+    
+    <xacro:robotiq_85_gripper prefix="${prefix}" parent="${parent}">
+        <xacro:insert_block name="origin"/>
+    </xacro:robotiq_85_gripper>
+
+    <joint name="${prefix}robotiq_85_tip_link_joint" type="fixed">
+      <parent link="${prefix}robotiq_85_base_link"/>
+      <child link="${prefix}robotiq_85_tip_link"/>
+      <origin rpy="0.0 0.0 0.0" xyz=".16 0.0 0.0"/>
+    </joint>
+    <link name="${prefix}robotiq_85_tip_link"/>
+
+  </xacro:macro>
+</robot>
