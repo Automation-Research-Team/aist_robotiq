@@ -2,7 +2,7 @@
 
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="o2as_box">
   
-  <xacro:macro name="o2as_box" params="boxname box_w box_l box_h *origin">
+  <xacro:macro name="o2as_box" params="boxname box_w box_l box_h parent *origin">
     <!-- This creates a box with the origin in the bottom corner, fixed to the world link. -->
     
     <link name="${boxname}">
@@ -36,7 +36,7 @@
     </gazebo>
 
     <joint name="${boxname}" type="fixed">
-      <parent link="world" />
+      <parent link="${parent}" />
       <child link = "${boxname}" />
       <xacro:insert_block name="origin"/>
     </joint>

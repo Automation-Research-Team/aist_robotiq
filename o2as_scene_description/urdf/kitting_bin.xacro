@@ -23,8 +23,8 @@
         <mesh filename="${mesh_file}" scale="0.001 0.001 0.001"/>
         <!-- <mesh filename="package://ur_description/meshes/ur5/visual/shoulder.dae"/> -->
       </geometry>
-      <material name="white">
-        <color rgba="1 1 1 1"/>
+      <material name="orange">
+        <color rgba="1 0.5088 0.0468 1"/>
       </material>
     </visual>
     <collision>
