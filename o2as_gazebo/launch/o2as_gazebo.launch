@@ -3,7 +3,7 @@
   <arg name="limited" default="false"/>
   <arg name="paused" default="false"/>
   <arg name="gui" default="true"/>
-  <arg name="task" defualt="asm" />
+  <arg name="task" default="asm" />
   
   <!-- startup simulated world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
