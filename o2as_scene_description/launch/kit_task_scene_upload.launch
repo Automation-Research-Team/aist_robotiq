@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="scene" default="1" />
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find o2as_scene_description)/urdf/kit_task_scene_1.urdf.xacro'" />
+</launch>
