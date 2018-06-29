@@ -80,10 +80,10 @@ class MoveGroupPythonInterfaceTutorial(object):
                     anonymous=True)
 
     robot = moveit_commander.RobotCommander()
-    scene = moveit_commander.PlanningSceneInterface()
-
-    group_name = "a_bot"
-    # rospy.get_param(group_name, "a_bot")
+    group_name = rospy.get_param("move_group_name", "a_bot")
+    rospy.loginfo(group_name)
+    ee_link = rospy.get_param("ee_link", "a_bot_robotiq_85_tip_link")
+    rospy.loginfo(ee_link)
     group = moveit_commander.MoveGroupCommander(group_name)
 
     display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
@@ -101,12 +101,8 @@ class MoveGroupPythonInterfaceTutorial(object):
     print ""
 
     # Misc variables
-    self.box_name = ''
     self.robot = robot
-    self.scene = scene
     self.group = group
-    self.display_trajectory_publisher = display_trajectory_publisher
-    self.planning_frame = planning_frame
     self.eef_link = eef_link
     self.group_names = group_names
 
@@ -127,22 +123,6 @@ class MoveGroupPythonInterfaceTutorial(object):
     current_pose = self.group.get_current_pose().pose
     return all_close(pose_goal_stamped.pose, current_pose, 0.01)
 
-
-  def display_trajectory(self, plan):
-    robot = self.robot
-    display_trajectory_publisher = self.display_trajectory_publisher
-
-    display_trajectory = moveit_msgs.msg.DisplayTrajectory()
-    display_trajectory.trajectory_start = robot.get_current_state()
-    display_trajectory.trajectory.append(plan)
-    # Publish
-    display_trajectory_publisher.publish(display_trajectory);
-
-    ## END_SUB_TUTORIAL
-
-  def execute_plan(self, plan):
-    self.group.execute(plan, wait=True)
-
   def cycle_through_bins(self):
     # Define the pose in each bin for the end effector
     pose_goal = geometry_msgs.msg.PoseStamped()
@@ -161,12 +141,12 @@ class MoveGroupPythonInterfaceTutorial(object):
         rospy.loginfo(pose_goal)
         if self.go_to_pose_goal(pose_goal):
           rospy.sleep(4)
+        if rospy.is_shutdown():
+          break
 
 
 def main():
   try:
-    print "============ Press `Enter` to begin the tutorial by setting up the moveit_commander (press ctrl-d to exit) ..."
-    raw_input()
     tutorial = MoveGroupPythonInterfaceTutorial()
 
     print "============ Press `Enter` to go to different bin positions ..."
@@ -181,39 +161,3 @@ def main():
 
 if __name__ == '__main__':
   main()
-
-## BEGIN_TUTORIAL
-## .. _moveit_commander:
-##    http://docs.ros.org/kinetic/api/moveit_commander/html/namespacemoveit__commander.html
-##
-## .. _MoveGroupCommander:
-##    http://docs.ros.org/kinetic/api/moveit_commander/html/classmoveit__commander_1_1move__group_1_1MoveGroupCommander.html
-##
-## .. _RobotCommander:
-##    http://docs.ros.org/kinetic/api/moveit_commander/html/classmoveit__commander_1_1robot_1_1RobotCommander.html
-##
-## .. _PlanningSceneInterface:
-##    http://docs.ros.org/kinetic/api/moveit_commander/html/classmoveit__commander_1_1planning__scene__interface_1_1PlanningSceneInterface.html
-##
-## .. _DisplayTrajectory:
-##    http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/DisplayTrajectory.html
-##
-## .. _RobotTrajectory:
-##    http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/RobotTrajectory.html
-##
-## .. _rospy:
-##    http://docs.ros.org/kinetic/api/rospy/html/
-## CALL_SUB_TUTORIAL imports
-## CALL_SUB_TUTORIAL setup
-## CALL_SUB_TUTORIAL basic_info
-## CALL_SUB_TUTORIAL plan_to_joint_state
-## CALL_SUB_TUTORIAL plan_to_pose
-## CALL_SUB_TUTORIAL plan_cartesian_path
-## CALL_SUB_TUTORIAL display_trajectory
-## CALL_SUB_TUTORIAL execute_plan
-## CALL_SUB_TUTORIAL add_box
-## CALL_SUB_TUTORIAL wait_for_scene_update
-## CALL_SUB_TUTORIAL attach_object
-## CALL_SUB_TUTORIAL detach_object
-## CALL_SUB_TUTORIAL remove_object
-## END_TUTORIAL
