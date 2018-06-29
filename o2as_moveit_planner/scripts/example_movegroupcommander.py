@@ -144,6 +144,61 @@ class MoveGroupPythonInterfaceTutorial(object):
         if rospy.is_shutdown():
           break
 
+  def check_all_bins(self):
+    # Moves a_bot and b_bot to different bins and records success
+    
+    # Define the pose in the bin for the end effector
+    pose_goal = geometry_msgs.msg.PoseStamped()
+    pose_goal.pose.orientation.x = -0.5
+    pose_goal.pose.orientation.y = 0.5
+    pose_goal.pose.orientation.z = 0.5
+    pose_goal.pose.orientation.w = 0.5
+    pose_goal.pose.position.z = 0.02
+
+    # First use a_bot
+    self.group = moveit_commander.MoveGroupCommander("a_bot")
+    success = True
+
+    # bin_header_ids = ['/set2_bin1', '/set2_bin2', '/set2_bin3', '/set2_bin4', '/set1_bin1', '/set1_bin2', '/set1_bin3']
+    bin_header_ids = ['/set2_bin1', '/set2_bin2']
+    for bin_id in bin_header_ids:
+      pose_goal.header.frame_id = bin_id
+      rospy.loginfo("Trying to move a_bot to bin:" + bin_id)
+      if self.go_to_pose_goal(pose_goal):
+        rospy.sleep(2)
+      else:
+        success = False
+    
+    if not success:
+      # Add a line to the log here
+      rospy.loginfo("Something went wrong")
+    
+    # Move the robot back (there will be a more convenient function for this later)
+    home_pose = geometry_msgs.msg.PoseStamped()
+    home_pose.pose = pose_goal.pose.orientation
+    home_pose.pose.position.x = -0.4
+    home_pose.pose.position.y = 0.4
+    home_pose.pose.position.z = 0.4
+    home_pose.header.frame_id = "a_bot_base_link"
+    self.go_to_pose_goal(home_pose)
+
+    # Now check with b_bot
+    self.group = moveit_commander.MoveGroupCommander("b_bot")
+    success = True
+
+    bin_header_ids = ['/set2_bin1', '/set2_bin2', '/set2_bin3']
+    for bin_id in bin_header_ids:
+      pose_goal.header.frame_id = bin_id
+      rospy.loginfo("Trying to move b_bot to bin:" + bin_id)
+      if self.go_to_pose_goal(pose_goal):
+        rospy.sleep(2)
+      else:
+        success = False
+  
+    if not success:
+      # Add a line to the log here
+      rospy.loginfo("Something went wrong")
+
 
 def main():
   try:
@@ -151,7 +206,8 @@ def main():
 
     print "============ Press `Enter` to go to different bin positions ..."
     raw_input()
-    tutorial.cycle_through_bins()
+    # tutorial.cycle_through_bins()
+    tutorial.check_all_bins()
 
     print "============ Python tutorial demo complete!"
   except rospy.ROSInterruptException:
