@@ -2,7 +2,7 @@
 <launch>
   <!-- Parameters to pass to the ROS node -->
   <arg name="move_group" default="a_bot"/>
-  <arg name="ee_link" default="a_bot_ee_link"/>
+  <arg name="ee_link" default="a_bot_robotiq_85_tip_link"/>
   <arg name="ros_rate" default="0.1"/>
   
   <!--  This loads the robot description and starts up moveit -->
