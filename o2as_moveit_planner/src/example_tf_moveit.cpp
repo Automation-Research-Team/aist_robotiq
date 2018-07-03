@@ -26,7 +26,7 @@ int main (int argc, char **argv) {
   
   // Dynamic parameters. Last arg is the default value. You can assign these from a launch file.
   nh.param<std::string>("move_group", movegroup_name, "a_bot");
-  nh.param<std::string>("ee_link", ee_link, "a_bot_ee_link");
+  nh.param<std::string>("ee_link", ee_link, "a_bot_robotiq_85_tip_link");
   
   // Dynamic parameter to choose the rate at wich this node should run
   double ros_rate;
@@ -60,7 +60,7 @@ int main (int argc, char **argv) {
       if (bin == 4) {bin_header = "/set2_bin4";}
 
       geometry_msgs::PoseStamped ps;
-      ps.pose = makePose(0, 0, .1);
+      ps.pose = makePose(0, 0, .02);
       ps.header.frame_id = bin_header;
       transform_pose_now(ps, "/a_bot_base_link", tflistener);
       // The above line is an example of an easy way to transform between frames, 
