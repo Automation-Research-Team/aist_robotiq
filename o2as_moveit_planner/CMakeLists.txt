@@ -9,9 +9,11 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  rospy
   tf
   tf_conversions
   moveit_core 
+  moveit_commander
   moveit_ros_planning
   moveit_ros_planning_interface
 )
@@ -111,6 +113,10 @@ target_link_libraries(example_tf_moveit ${catkin_LIBRARIES})
 # target_link_libraries(o2as_moveit_planner ${catkin_LIBRARIES})
 
 
+catkin_install_python(PROGRAMS scripts/example_movegroupcommander.py
+                      DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -138,3 +144,4 @@ target_link_libraries(example_tf_moveit ${catkin_LIBRARIES})
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+

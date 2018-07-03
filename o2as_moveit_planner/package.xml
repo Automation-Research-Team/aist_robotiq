@@ -10,6 +10,7 @@
 
   <run_depend>ur_description</run_depend>
   <run_depend>moveit_core</run_depend>
+  <run_depend>moveit_commander</run_depend>
   <run_depend>moveit_ros_planning_interface</run_depend>
   <run_depend>moveit_ros_planning</run_depend>
   
