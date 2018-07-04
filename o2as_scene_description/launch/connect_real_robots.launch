@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!--
+  This file is supposed to launch the drivers of the real robots instead of the simulation.
+-->
+<launch>
+
+  <!-- Publish robot model -->
+  <include file="$(find o2as_scene_description)/launch/asm_task_scene_upload.launch" />
+
+  <!-- robot_ip: IP-address of the robot's socket-messaging server -->
+  <arg name="robot_ip_a" default="192.168.0.43"/>
+  <arg name="robot_ip_b" default="192.168.0.42"/>
+  <arg name="robot_ip_c" default="192.168.0.41"/>
+  <arg name="limited" default="false"/>
+  <arg name="min_payload"  default="0.0"/>
+  <arg name="max_payload"  default="3.0"/>
+  <arg name="servoj_time" default="0.008" />
+  <arg name="shutdown_on_disconnect" default="true" />
+  <!-- require_activation defines when the service /ur_driver/robot_enable needs to be called. -->
+  <arg name="require_activation" default="Never" /> <!-- Never, Always, OnStartup -->
+    
+  <!-- The max_velocity parameter is only used for debugging in the ur_driver. It's not related to actual velocity limits -->
+  <arg name="max_velocity" default="10.0"/> <!-- [rad/s] -->
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+  <!-- driver -->
+  <!-- <node name="b_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen">
+    <param name="prefix" type="str" value="b_bot_" />
+    <param name="robot_ip_address" type="str" value="$(arg robot_ip_b)" />
+    <param name="min_payload" type="double" value="$(arg min_payload)" />
+    <param name="max_payload" type="double" value="$(arg max_payload)" />
+    <param name="max_velocity" type="double" value="$(arg max_velocity)" />
+    <param name="servoj_time" type="double" value="$(arg servoj_time)" />
+    <param name="base_frame" type="str" value="b_bot_base" />
+    <param name="tool_frame" type="str" value="b_bot_ee_link" />
+    <param name="require_activation" type="str" value="$(arg require_activation)" />
+    <param name="shutdown_on_disconnect" type="bool" value="$(arg shutdown_on_disconnect)"/>
+  </node> -->
+
+    <!-- driver -->
+  <node name="c_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen">
+    <param name="prefix" type="str" value="c_bot_" />
+    <param name="robot_ip_address" type="str" value="$(arg robot_ip_c)" />
+    <param name="min_payload" type="double" value="$(arg min_payload)" />
+    <param name="max_payload" type="double" value="$(arg max_payload)" />
+    <param name="max_velocity" type="double" value="$(arg max_velocity)" />
+    <param name="servoj_time" type="double" value="$(arg servoj_time)" />
+    <param name="base_frame" type="str" value="c_bot_base" />
+    <param name="tool_frame" type="str" value="c_bot_ee_link" />
+    <param name="require_activation" type="str" value="$(arg require_activation)" />
+    <param name="shutdown_on_disconnect" type="bool" value="$(arg shutdown_on_disconnect)"/>
+  </node>
+
+</launch>
