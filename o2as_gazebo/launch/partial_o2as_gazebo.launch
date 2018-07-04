@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="subns" default="gazebotest"/>
+  <remap from="/$(arg subns)/gazebo" to="/gazebo"/>
+  <remap from="/$(arg subns)/joint_states" to="/joint_states"/>
+ 
+  <arg name="paused" default="false"/>
+  <arg name="gui" default="true"/>
+  
+  <!-- startup simulated world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" default="worlds/empty.world"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="gui" value="$(arg gui)"/>
+  </include>
+
+  <group ns="$(arg subns)">
+  <!-- send robot urdf to param server -->
+  <!-- In this case the "robot" is the ensemble of the 3 arms -->
+  <!-- <include file="$(find o2as_scene_description)/launch/asm_task_scene_upload.launch" /> -->
+  <include file="$(find o2as_scene_description)/launch/asm_partial_scene_upload.launch" />
+
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+  <!-- <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -file $(find o2as_scene_description)/urdf/asm_task_scene.urdf.xacro -model o2as_bots" respawn="false" output="screen" /> -->
+  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model o2as_bots" respawn="false" output="screen" />
+  
+  <include file="$(find o2as_gazebo)/launch/controller_utils.launch"/>
+
+
+  <!-- spawn controllers -->
+  <rosparam file="$(find o2as_gazebo)/controller/partial_3_bot_controllers.yaml" command="load"/>
+  <node name="a_bot_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn a_bot_controller" respawn="false" output="screen"/>
+  <node name="b_bot_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn b_bot_controller" respawn="false" output="screen"/>
+
+  </group> 
+
+  <!-- <remap from="/a_bot_controller" to="/$(arg subns)/a_bot_controller"/>
+  <remap from="/b_bot_controller" to="/$(arg subns)/b_bot_controller"/> -->
+  <remap from="/$(arg subns)/a_bot_controller" to="/a_bot_controller"/>
+  <remap from="/$(arg subns)/b_bot_controller" to="/b_bot_controller"/> 
+
+</launch>

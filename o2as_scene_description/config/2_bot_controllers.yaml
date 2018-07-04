@@ -1,0 +1,161 @@
+# Same as 3_bot_controllers.yaml, but without the b_bot
+
+# Settings for ros_control control loop
+hardware_control_loop:
+   loop_hz: 125
+
+# Settings for ros_control hardware interface
+hardware_interface:
+   joints:
+     - a_bot_shoulder_pan_joint
+     - a_bot_shoulder_lift_joint
+     - a_bot_elbow_joint
+     - a_bot_wrist_1_joint
+     - a_bot_wrist_2_joint
+     - a_bot_wrist_3_joint
+     - c_bot_shoulder_pan_joint
+     - c_bot_shoulder_lift_joint
+     - c_bot_elbow_joint
+     - c_bot_wrist_1_joint
+     - c_bot_wrist_2_joint
+     - c_bot_wrist_3_joint
+
+# Publish all joint states ----------------------------------
+joint_state_controller:
+   type:         joint_state_controller/JointStateController
+   publish_rate: 125
+
+# Publish wrench ----------------------------------
+force_torque_sensor_controller:
+   type:         force_torque_sensor_controller/ForceTorqueSensorController
+   publish_rate: 125
+
+
+### A_BOT controllers (UR5)
+
+# Joint Trajectory Controller - position based -------------------------------
+# For detailed explanations of parameter see http://wiki.ros.org/joint_trajectory_controller
+a_bot_pos_based_pos_traj_controller:
+   type: position_controllers/JointTrajectoryController
+   joints:
+     - a_bot_shoulder_pan_joint
+     - a_bot_shoulder_lift_joint
+     - a_bot_elbow_joint
+     - a_bot_wrist_1_joint
+     - a_bot_wrist_2_joint
+     - a_bot_wrist_3_joint
+   constraints:
+      goal_time: 0.6
+      stopped_velocity_tolerance: 0.05
+      a_bot_shoulder_pan_joint: {trajectory: 0.1, goal: 0.1}
+      a_bot_shoulder_lift_joint: {trajectory: 0.1, goal: 0.1}
+      a_bot_elbow_joint: {trajectory: 0.1, goal: 0.1}
+      a_bot_wrist_1_joint: {trajectory: 0.1, goal: 0.1}
+      a_bot_wrist_2_joint: {trajectory: 0.1, goal: 0.1}
+      a_bot_wrist_3_joint: {trajectory: 0.1, goal: 0.1}
+   stop_trajectory_duration: 0.5
+   state_publish_rate:  125
+   action_monitor_rate: 10
+
+   # state_publish_rate:  50 # Defaults to 50
+   # action_monitor_rate: 20 # Defaults to 20
+   #hold_trajectory_duration: 0 # Defaults to 0.5
+
+# Joint Trajectory Controller - velocity based -------------------------------
+# For detailed explanations of parameter see http://wiki.ros.org/joint_trajectory_controller
+a_bot_vel_based_pos_traj_controller:
+   type: velocity_controllers/JointTrajectoryController
+   joints:
+     - a_bot_shoulder_pan_joint
+     - a_bot_shoulder_lift_joint
+     - a_bot_elbow_joint
+     - a_bot_wrist_1_joint
+     - a_bot_wrist_2_joint
+     - a_bot_wrist_3_joint
+   constraints:
+      goal_time: 0.6
+      stopped_velocity_tolerance: 0.05
+      a_bot_shoulder_pan_joint: {trajectory: 0.1, goal: 0.1}
+      a_bot_shoulder_lift_joint: {trajectory: 0.1, goal: 0.1}
+      a_bot_elbow_joint: {trajectory: 0.1, goal: 0.1}
+      a_bot_wrist_1_joint: {trajectory: 0.1, goal: 0.1}
+      a_bot_wrist_2_joint: {trajectory: 0.1, goal: 0.1}
+      a_bot_wrist_3_joint: {trajectory: 0.1, goal: 0.1}
+   stop_trajectory_duration: 0.5
+   state_publish_rate:  125
+   action_monitor_rate: 10
+   gains:
+      #!!These values have not been optimized!!
+      a_bot_shoulder_pan_joint: {p: 1.2,  i: 0.0, d: 0.1, i_clamp: 1}
+      a_bot_shoulder_lift_joint: {p: 1.2,  i: 0.0, d: 0.1, i_clamp: 1}
+      a_bot_elbow_joint: {p: 1.2,  i: 0.0, d: 0.1, i_clamp: 1}
+      a_bot_wrist_1_joint: {p: 1.2,  i: 0.0, d: 0.1, i_clamp: 1}
+      a_bot_wrist_2_joint: {p: 1.2,  i: 0.0, d: 0.1, i_clamp: 1}
+      a_bot_wrist_3_joint: {p: 1.2,  i: 0.0, d: 0.1, i_clamp: 1}
+
+
+### C_BOT controllers (UR3)
+
+# Joint Trajectory Controller - position based -------------------------------
+# For detailed explanations of parameter see http://wiki.ros.org/joint_trajectory_controller
+c_bot_pos_based_pos_traj_controller:
+   type: position_controllers/JointTrajectoryController
+   joints:
+     - c_bot_shoulder_pan_joint
+     - c_bot_shoulder_lift_joint
+     - c_bot_elbow_joint
+     - c_bot_wrist_1_joint
+     - c_bot_wrist_2_joint
+     - c_bot_wrist_3_joint
+   constraints:
+      goal_time: 0.6
+      stopped_velocity_tolerance: 0.05
+      c_bot_shoulder_pan_joint: {trajectory: 0.1, goal: 0.1}
+      c_bot_shoulder_lift_joint: {trajectory: 0.1, goal: 0.1}
+      c_bot_elbow_joint: {trajectory: 0.1, goal: 0.1}
+      c_bot_wrist_1_joint: {trajectory: 0.1, goal: 0.1}
+      c_bot_wrist_2_joint: {trajectory: 0.1, goal: 0.1}
+      c_bot_wrist_3_joint: {trajectory: 0.1, goal: 0.1}
+   stop_trajectory_duration: 0.5
+   state_publish_rate:  125
+   action_monitor_rate: 10
+
+   # state_publish_rate:  50 # Defaults to 50
+   # action_monitor_rate: 20 # Defaults to 20
+   #hold_trajectory_duration: 0 # Defaults to 0.5
+
+# Joint Trajectory Controller - velocity based -------------------------------
+# For detailed explanations of parameter see http://wiki.ros.org/joint_trajectory_controller
+c_bot_vel_based_pos_traj_controller:
+   type: velocity_controllers/JointTrajectoryController
+   joints:
+     - c_bot_shoulder_pan_joint
+     - c_bot_shoulder_lift_joint
+     - c_bot_elbow_joint
+     - c_bot_wrist_1_joint
+     - c_bot_wrist_2_joint
+     - c_bot_wrist_3_joint
+   constraints:
+      goal_time: 0.6
+      stopped_velocity_tolerance: 0.05
+      c_bot_shoulder_pan_joint: {trajectory: 0.1, goal: 0.1}
+      c_bot_shoulder_lift_joint: {trajectory: 0.1, goal: 0.1}
+      c_bot_elbow_joint: {trajectory: 0.1, goal: 0.1}
+      c_bot_wrist_1_joint: {trajectory: 0.1, goal: 0.1}
+      c_bot_wrist_2_joint: {trajectory: 0.1, goal: 0.1}
+      c_bot_wrist_3_joint: {trajectory: 0.1, goal: 0.1}
+   stop_trajectory_duration: 0.5
+   state_publish_rate:  125
+   action_monitor_rate: 10
+   gains:
+      #!!These values have not been optimized!!
+      c_bot_shoulder_pan_joint: {p: 50.0,  i: 0.0, d: 0.1, i_clamp: 1}
+      c_bot_shoulder_lift_joint: {p: 50.0,  i: 0.0, d: 0.1, i_clamp: 1}
+      c_bot_elbow_joint: {p: 50.0,  i: 0.0, d: 0.1, i_clamp: 1}
+      c_bot_wrist_1_joint: {p: 50.0,  i: 0.0, d: 0.1, i_clamp: 1}
+      c_bot_wrist_2_joint: {p: 50.0,  i: 0.0, d: 0.1, i_clamp: 1}
+      c_bot_wrist_3_joint: {p: 50.0,  i: 0.0, d: 0.1, i_clamp: 1}
+
+   # state_publish_rate:  50 # Defaults to 50
+   # action_monitor_rate: 20 # Defaults to 20
+   #hold_trajectory_duration: 0 # Defaults to 0.5
