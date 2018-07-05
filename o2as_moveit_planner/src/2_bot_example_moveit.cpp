@@ -73,8 +73,8 @@ int main (int argc, char **argv) {
       //                 << "; " << ps.pose.orientation.x << ", " << ps.pose.orientation.y << ", " << ps.pose.orientation.z << ", " << ps.pose.orientation.w);
 
       group.setStartStateToCurrentState();
-      group.setPoseTarget(ps1, ee_link1);
-      // group.setPoseTarget(ps2, ee_link2);
+      group.setPoseTarget(ps2, ee_link1);
+      group.setPoseTarget(ps1, ee_link2);
       success_plan = group.plan(myplan);
       if (success_plan == moveit_msgs::MoveItErrorCodes::SUCCESS) {
         motion_done = group.execute(myplan);
