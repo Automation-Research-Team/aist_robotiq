@@ -16,6 +16,8 @@
 
   <!-- common stuff -->
   <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/asm_task_scene.gazebo" />
+  <xacro:include filename="$(find realsense2_camera)/urdf/_r410.urdf.xacro" />
 
   <!-- robots -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur10.urdf.xacro" />
@@ -114,6 +116,21 @@
     <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
   </xacro:robotiq_85_gripper_o2as>
 
+
+  <!-- Add cameras -->
+  <link name="b_bot_cam_holder_link" />
+  <joint name="b_bot_cam_holder_joint" type="fixed">
+    <parent link="b_bot_wrist_3_link" />
+    <child link = "b_bot_cam_holder_link" />
+    <origin xyz="0.0 -0.06 0.06" rpy="0.0 0.0 ${pi/2}" />
+  </joint>
+  
+  <xacro:sensor_r410 prefix="b_bot_" parent = "b_bot_cam_holder_link">
+    <origin xyz="0 0.05 0" rpy="0 0 0"/>
+  </xacro:sensor_r410>
+  
+  
+  
 
   <!-- I meant to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world" />
