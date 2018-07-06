@@ -42,17 +42,17 @@
   <!-- Main workspace -->
   <!-- The surface is 0.01 m below the robot bases and the "workspace_center" frame. -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro" />
-  <xacro:property name="plate_w" value="0.8"/>
-  <xacro:property name="plate_l" value="0.8"/>
+  <xacro:property name="plate_w" value="0.84"/>
+  <xacro:property name="plate_l" value="0.62"/>
   <xacro:o2as_box boxname="workbox" box_w="${plate_w}" box_l="${plate_l}" box_h=".01" parent="o2as_ground">
-    <origin xyz="${-plate_w/2} ${-plate_l/2} ${bots_z-.02}" rpy="0 0 0" />   
+    <origin xyz="${-plate_w/2} ${-plate_l/2} ${bots_z+.09}" rpy="0 0 0" />   
   </xacro:o2as_box>
 
   <link name="workspace_center" />
   <joint name="world_to_workspace" type="fixed">
     <parent link="o2as_ground" />
     <child link="workspace_center" />
-    <origin xyz="0.0 0.0 ${bots_z}" rpy="0.0 0.0 0.0" />
+    <origin xyz="0.0 0.0 ${bots_z+.1}" rpy="0.0 0.0 0.0" />
   </joint>
   
   <!-- robot arms -->
@@ -64,7 +64,7 @@
     wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
     wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
   
-  <xacro:ur5_robot prefix="b_bot_" joint_limited="true"
+  <!-- <xacro:ur5_robot prefix="b_bot_" joint_limited="true"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
     elbow_joint_lower_limit="0.0" elbow_joint_upper_limit="${pi}"
@@ -78,7 +78,7 @@
     elbow_joint_lower_limit="0.0" elbow_joint_upper_limit="${pi}"
     wrist_1_lower_limit="${-pi}" wrist_1_upper_limit="${pi}"
     wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
-    wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
+    wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/> -->
 
   <link name="o2as_ground" />
 
@@ -88,7 +88,7 @@
     <origin xyz="${a_bot_x} ${a_bot_y} ${bots_z}" rpy="0.0 0.0 0.0" />
   </joint>
 
-  <joint name="world_b_bot_joint" type="fixed">
+  <!-- <joint name="world_b_bot_joint" type="fixed">
     <parent link="o2as_ground" />
     <child link = "b_bot_base_link" />
     <origin xyz="${b_bot_x} ${b_bot_y} ${bots_z}" rpy="0.0 0.0 0.0" />
@@ -98,7 +98,7 @@
     <parent link="o2as_ground" />
     <child link = "c_bot_base_link" />
     <origin xyz="${c_bot_x} ${c_bot_y} ${bots_z}" rpy="0.0 0.0 0.0" />
-  </joint>
+  </joint> -->
 
   <!-- spawn and attach grippers -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_85_gripper.urdf.xacro" />
@@ -106,13 +106,13 @@
     <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
   </xacro:robotiq_85_gripper_o2as>
 
-  <xacro:robotiq_85_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link">
+  <!-- <xacro:robotiq_85_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link">
     <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
   </xacro:robotiq_85_gripper_o2as>
 
   <xacro:robotiq_85_gripper_o2as prefix="c_bot_" parent = "c_bot_ee_link">
     <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
-  </xacro:robotiq_85_gripper_o2as>
+  </xacro:robotiq_85_gripper_o2as> -->
 
 
   <!-- I meant to remove the "world" link definition, but apparently it is necessary for Gazebo -->
