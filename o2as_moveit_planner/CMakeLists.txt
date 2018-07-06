@@ -105,6 +105,12 @@ add_dependencies(example_tf_moveit
   	${catkin_EXPORTED_TARGETS})
 target_link_libraries(example_tf_moveit ${catkin_LIBRARIES})
 
+add_executable(2_bot_example_moveit src/2_bot_example_moveit.cpp)
+add_dependencies(2_bot_example_moveit 
+	${${PROJECT_NAME}_EXPORTED_TARGETS}
+  	${catkin_EXPORTED_TARGETS})
+target_link_libraries(2_bot_example_moveit ${catkin_LIBRARIES})
+
 # add_executable(o2as_moveit_planner src/o2as_moveit_planner.cpp)
 # add_dependencies(o2as_moveit_planner
 # 	${${PROJECT_NAME}_EXPORTED_TARGETS}
@@ -112,10 +118,8 @@ target_link_libraries(example_tf_moveit ${catkin_LIBRARIES})
 # )
 # target_link_libraries(o2as_moveit_planner ${catkin_LIBRARIES})
 
-
 catkin_install_python(PROGRAMS scripts/example_movegroupcommander.py
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
