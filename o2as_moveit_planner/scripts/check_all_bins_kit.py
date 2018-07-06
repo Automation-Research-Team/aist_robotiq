@@ -128,7 +128,7 @@ class MoveGroupPythonInterfaceTutorial(object):
     # Define the pose in each bin for the end effector
     pose_goal = geometry_msgs.msg.PoseStamped()
     # This pose points downward.
-    pose_goal.pose.orientation.x = -0.5
+    pose_goal.pose.orientation.x = 0.5
     pose_goal.pose.orientation.y = 0.5
     pose_goal.pose.orientation.z = 0.5
     pose_goal.pose.orientation.w = 0.5
@@ -154,7 +154,7 @@ class MoveGroupPythonInterfaceTutorial(object):
     pose_goal.pose.orientation.y = 0.5
     pose_goal.pose.orientation.z = 0.5
     pose_goal.pose.orientation.w = 0.5
-    pose_goal.pose.position.z = 0.02
+    pose_goal.pose.position.z = 0.025
 
     # First use a_bot
     self.group = moveit_commander.MoveGroupCommander("a_bot")
