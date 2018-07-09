@@ -15,11 +15,11 @@
 
   <!-- send robot urdf to param server -->
   <!-- In this case the "robot" is the ensemble of the 3 arms -->
-  <include file="$(find o2as_scene_description)/launch/asm_task_scene_upload.launch" />
+  <include file="$(find o2as_scene_description)/launch/o2as_base_scene_upload.launch" />
 
   <!-- push robot_description to factory and spawn robot in gazebo -->
   <!-- Initial pose modified on 9 July 2018 -->
-  <!-- Do not change this without updating the home pose in asm_task_scene.srdf accordingly. -->
+  <!-- Do not change this without updating the home pose in o2as_base_scene.srdf accordingly. -->
   <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" 
         args="-urdf -param robot_description -model o2as_bots 
         -J a_bot_elbow_joint 1.4      -J a_bot_shoulder_lift_joint -2.1  -J a_bot_shoulder_pan_joint 1.57 

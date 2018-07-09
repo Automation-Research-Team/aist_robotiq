@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro"
-       name="asm_task_scene" >
+       name="o2as_base_scene" >
 
 
   <xacro:property name="a_bot_x" value="0.0"/>
