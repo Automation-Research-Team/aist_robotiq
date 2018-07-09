@@ -28,6 +28,7 @@
   <node name="a_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen" ns="a_bot_controller">
     <param name="prefix" type="str" value="a_bot_" />
     <param name="robot_ip_address" type="str" value="$(arg robot_ip_a)" />
+    <param name="reverse_port" type="int" value="50003" /> 
     <param name="min_payload" type="double" value="$(arg min_payload)" />
     <param name="max_payload" type="double" value="$(arg max_payload)" />
     <param name="max_velocity" type="double" value="$(arg max_velocity)" />
@@ -42,6 +43,7 @@
   <node name="b_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen" ns="b_bot_controller">
     <param name="prefix" type="str" value="b_bot_" />
     <param name="robot_ip_address" type="str" value="$(arg robot_ip_b)" />
+    <param name="reverse_port" type="int" value="50002" /> 
     <param name="min_payload" type="double" value="$(arg min_payload)" />
     <param name="max_payload" type="double" value="$(arg max_payload)" />
     <param name="max_velocity" type="double" value="$(arg max_velocity)" />
@@ -56,6 +58,7 @@
   <node name="c_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen" ns="c_bot_controller">
     <param name="prefix" type="str" value="c_bot_" />
     <param name="robot_ip_address" type="str" value="$(arg robot_ip_c)" />
+    <param name="reverse_port" type="int" value="50001" /> 
     <param name="min_payload" type="double" value="$(arg min_payload)" />
     <param name="max_payload" type="double" value="$(arg max_payload)" />
     <param name="max_velocity" type="double" value="$(arg max_velocity)" />
