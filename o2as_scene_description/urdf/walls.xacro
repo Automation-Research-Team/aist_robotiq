@@ -6,7 +6,6 @@
     <xacro:property name="wall_thickness" value=".1"/>
     <xacro:property name="wall_height" value="2.0"/>
 
-
     <xacro:macro name="o2as_wall" params="wall_name wall_w wall_l wall_h *origin">    
     <link name="${wall_name}">
       <visual>
@@ -45,7 +44,7 @@
   <!-- ############################# -->
 
   <xacro:o2as_wall wall_name="wall_b" wall_w="${wall_width}" wall_l="${wall_thickness}" wall_h="${wall_height}">
-    <origin xyz="0.0 -0.9 0.0" rpy="0.0 0.0 0.0" />  
+    <origin xyz="0.0 -1.0 0.0" rpy="0.0 0.0 0.0" />  
   </xacro:o2as_wall>
 
   <xacro:o2as_wall wall_name="wall_c" wall_w="${wall_width}" wall_l="${wall_thickness}" wall_h="${wall_height}">

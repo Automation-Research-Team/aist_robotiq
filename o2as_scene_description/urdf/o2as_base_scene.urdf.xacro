@@ -4,9 +4,9 @@
 
 
   <xacro:property name="a_bot_x" value="0.0"/>
-  <xacro:property name="a_bot_y" value="-0.5"/>
+  <xacro:property name="a_bot_y" value="-0.6"/>
   <xacro:property name="b_bot_x" value="0.0"/>
-  <xacro:property name="b_bot_y" value="0.5"/>
+  <xacro:property name="b_bot_y" value="0.6"/>
   <xacro:property name="c_bot_x" value="-0.5"/>
   <xacro:property name="c_bot_y" value="0.0"/>
 
@@ -23,7 +23,7 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur3.urdf.xacro" />
 
   <!-- Scene items (trays, bins...) -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/walls.xacro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/walls.xacro" /> -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" />
 
   <!-- Robot bases -->
@@ -57,6 +57,12 @@
   </joint>
   
   <!-- robot arms -->
+    <xacro:ur5_robot prefix="a_bot_" joint_limited="false"/>
+  
+  <xacro:ur5_robot prefix="b_bot_" joint_limited="false"/>
+  
+  <xacro:ur3_robot prefix="c_bot_" joint_limited="false"/>
+<!--     
   <xacro:ur5_robot prefix="a_bot_" joint_limited="true"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
@@ -79,7 +85,7 @@
     elbow_joint_lower_limit="0.0" elbow_joint_upper_limit="${pi}"
     wrist_1_lower_limit="${-pi}" wrist_1_upper_limit="${pi}"
     wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
-    wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
+    wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/> -->
 
   <link name="o2as_ground" />
 
