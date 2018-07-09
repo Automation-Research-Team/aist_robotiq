@@ -23,6 +23,7 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur3.urdf.xacro" />
 
   <!-- Scene items (trays, bins...) -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/walls.xacro" />
   <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" />
 
   <!-- Robot bases -->
