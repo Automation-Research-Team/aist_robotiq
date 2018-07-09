@@ -42,17 +42,17 @@
   <!-- Main workspace -->
   <!-- The surface is 0.01 m below the robot bases and the "workspace_center" frame. -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro" />
-  <xacro:property name="plate_w" value="0.8"/>
-  <xacro:property name="plate_l" value="0.8"/>
+  <xacro:property name="plate_w" value="0.84"/>
+  <xacro:property name="plate_l" value="0.62"/>
   <xacro:o2as_box boxname="workbox" box_w="${plate_w}" box_l="${plate_l}" box_h=".01" parent="o2as_ground">
-    <origin xyz="${-plate_w/2} ${-plate_l/2} ${bots_z-.02}" rpy="0 0 0" />   
+    <origin xyz="${-plate_w/2} ${-plate_l/2} ${bots_z+.09}" rpy="0 0 0" />   
   </xacro:o2as_box>
 
   <link name="workspace_center" />
   <joint name="world_to_workspace" type="fixed">
     <parent link="o2as_ground" />
     <child link="workspace_center" />
-    <origin xyz="0.0 0.0 ${bots_z}" rpy="0.0 0.0 0.0" />
+    <origin xyz="0.0 0.0 ${bots_z+.1}" rpy="0.0 0.0 0.0" />
   </joint>
   
   <!-- robot arms -->
