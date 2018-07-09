@@ -4,9 +4,9 @@
 
 
   <xacro:property name="a_bot_x" value="0.0"/>
-  <xacro:property name="a_bot_y" value="0.5"/>
+  <xacro:property name="a_bot_y" value="-0.5"/>
   <xacro:property name="b_bot_x" value="0.0"/>
-  <xacro:property name="b_bot_y" value="-0.5"/>
+  <xacro:property name="b_bot_y" value="0.5"/>
   <xacro:property name="c_bot_x" value="-0.5"/>
   <xacro:property name="c_bot_y" value="0.0"/>
 
@@ -91,13 +91,13 @@
   <joint name="world_b_bot_joint" type="fixed">
     <parent link="o2as_ground" />
     <child link = "b_bot_base_link" />
-    <origin xyz="${b_bot_x} ${b_bot_y} ${bots_z}" rpy="0.0 0.0 0.0" />
+    <origin xyz="${b_bot_x} ${b_bot_y} ${bots_z}" rpy="0.0 0.0 ${-pi}" />
   </joint>
 
   <joint name="world_c_bot_joint" type="fixed">
     <parent link="o2as_ground" />
     <child link = "c_bot_base_link" />
-    <origin xyz="${c_bot_x} ${c_bot_y} ${bots_z}" rpy="0.0 0.0 0.0" />
+    <origin xyz="${c_bot_x} ${c_bot_y} ${bots_z}" rpy="0.0 0.0 ${-pi/2}" />
   </joint>
 
   <!-- spawn and attach grippers -->
