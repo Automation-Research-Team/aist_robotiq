@@ -4,7 +4,7 @@
 
   <xacro:macro name="kitting_bin_internal" params="binname parent filename *origin">
     <xacro:property name="mesh_file" value="package://o2as_scene_description/meshes/${filename}.stl" />
-    <xacro:property name="mesh_file_col" value="package://o2as_scene_description/meshes/${filename}.vhacd.obj" />
+    <xacro:property name="mesh_file_col" value="package://o2as_scene_description/meshes/${filename}.vhacd.dae" />
 
     <link name="${binname}">
       <inertial>
