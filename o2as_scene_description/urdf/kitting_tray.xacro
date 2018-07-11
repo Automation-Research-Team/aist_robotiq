@@ -6,10 +6,10 @@
 
   
   <!-- <xacro:property name="mesh_file" value="$(find o2as_scene_description)/meshes/bin1_EA661CA-11.stl" />
-  <xacro:property name="mesh_file_col" value="$(find o2as_scene_description)/meshes/bin1_EA661CA-11.vhacd.obj" /> -->
+  <xacro:property name="mesh_file_col" value="$(find o2as_scene_description)/meshes/bin1_EA661CA-11.vhacd.dae" /> -->
   <!-- The lines above don't work, the lines below do. Why?? This seems like a bug. -->
   <xacro:property name="mesh_file" value="package://o2as_scene_description/meshes/tray_PZ-0006-B.stl" />
-  <xacro:property name="mesh_file_col" value="package://o2as_scene_description/meshes/tray_PZ-0006-B.vhacd.obj" />
+  <xacro:property name="mesh_file_col" value="package://o2as_scene_description/meshes/tray_PZ-0006-B.vhacd.dae" />
 
   <link name="${binname}">
     <inertial>

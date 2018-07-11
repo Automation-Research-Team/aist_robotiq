@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro"
-       name="asm_task_scene" >
+       name="o2as_base_scene" >
 
 
   <xacro:property name="a_bot_x" value="0.0"/>
-  <xacro:property name="a_bot_y" value="0.5"/>
+  <xacro:property name="a_bot_y" value="-0.6"/>
   <xacro:property name="b_bot_x" value="0.0"/>
-  <xacro:property name="b_bot_y" value="-0.5"/>
+  <xacro:property name="b_bot_y" value="0.6"/>
   <xacro:property name="c_bot_x" value="-0.5"/>
   <xacro:property name="c_bot_y" value="0.0"/>
 
@@ -20,11 +20,12 @@
   <xacro:include filename="$(find realsense2_camera)/urdf/_r410.urdf.xacro" />
 
   <!-- robots -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/ur10.urdf.xacro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/ur10.urdf.xacro" /> -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur5.urdf.xacro" />
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur3.urdf.xacro" />
 
   <!-- Scene items (trays, bins...) -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/walls.xacro" />
   <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" />
 
   <!-- Robot bases -->
@@ -44,20 +45,20 @@
   <!-- Main workspace -->
   <!-- The surface is 0.01 m below the robot bases and the "workspace_center" frame. -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro" />
-  <xacro:property name="plate_w" value="0.8"/>
-  <xacro:property name="plate_l" value="0.8"/>
+  <xacro:property name="plate_w" value="0.84"/>
+  <xacro:property name="plate_l" value="0.62"/>
   <xacro:o2as_box boxname="workbox" box_w="${plate_w}" box_l="${plate_l}" box_h=".01" parent="o2as_ground">
-    <origin xyz="${-plate_w/2} ${-plate_l/2} ${bots_z-.02}" rpy="0 0 0" />   
+    <origin xyz="${-plate_w/2} ${-plate_l/2} ${bots_z+.09}" rpy="0 0 0" />   
   </xacro:o2as_box>
 
   <link name="workspace_center" />
   <joint name="world_to_workspace" type="fixed">
     <parent link="o2as_ground" />
     <child link="workspace_center" />
-    <origin xyz="0.0 0.0 ${bots_z}" rpy="0.0 0.0 0.0" />
+    <origin xyz="0.0 0.0 ${bots_z+.1}" rpy="0.0 0.0 0.0" />
   </joint>
   
-  <!-- robot arms -->
+  <!-- robot arms -->    
   <xacro:ur5_robot prefix="a_bot_" joint_limited="true"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
@@ -93,13 +94,13 @@
   <joint name="world_b_bot_joint" type="fixed">
     <parent link="o2as_ground" />
     <child link = "b_bot_base_link" />
-    <origin xyz="${b_bot_x} ${b_bot_y} ${bots_z}" rpy="0.0 0.0 0.0" />
+    <origin xyz="${b_bot_x} ${b_bot_y} ${bots_z}" rpy="0.0 0.0 ${-pi}" />
   </joint>
 
   <joint name="world_c_bot_joint" type="fixed">
     <parent link="o2as_ground" />
     <child link = "c_bot_base_link" />
-    <origin xyz="${c_bot_x} ${c_bot_y} ${bots_z}" rpy="0.0 0.0 0.0" />
+    <origin xyz="${c_bot_x} ${c_bot_y} ${bots_z}" rpy="0.0 0.0 ${-pi/2}" />
   </joint>
 
   <!-- spawn and attach grippers -->

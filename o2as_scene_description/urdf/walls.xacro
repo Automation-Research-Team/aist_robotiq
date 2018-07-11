@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kitting_scene">
+  
+    <xacro:property name="wall_width" value="1.0"/>
+    <xacro:property name="wall_thickness" value=".1"/>
+    <xacro:property name="wall_height" value="2.0"/>
+
+    <xacro:macro name="o2as_wall" params="wall_name wall_w wall_l wall_h *origin">    
+    <link name="${wall_name}">
+      <visual>
+        <origin xyz="0 ${wall_l/2} ${wall_h/2}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${wall_w} ${wall_l} ${wall_h}"/> 
+        </geometry>
+        <material name="Brick">
+          <color rgba="0.8 0.255 0.33 1.0"/>
+        </material>
+      </visual>
+      <collision>
+      <origin xyz="0 ${wall_l/2} ${wall_h/2}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${wall_w} ${wall_l} ${wall_h}"/> 
+        </geometry>
+      </collision>
+      <!-- Tall objects seem to be instable in Gazebo, so we ignore the walls for the physical simulation. -->
+      <!-- <inertial>
+        <mass value="1.0" />
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+          iyy="1.0" iyz="0.0"
+          izz="1.0" />
+      </inertial> -->
+    </link>
+    <!-- <gazebo reference="${wall_name}">
+      <material>Gazebo/Brick</material>
+    </gazebo> -->
+
+    <joint name="${wall_name}" type="fixed">
+      <parent link="world" />
+      <child link = "${wall_name}" />
+      <xacro:insert_block name="origin"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- ############################# -->
+
+  <xacro:o2as_wall wall_name="wall_b" wall_w="${wall_width}" wall_l="${wall_thickness}" wall_h="${wall_height}">
+    <origin xyz="0.0 -1.0 0.0" rpy="0.0 0.0 0.0" />  
+  </xacro:o2as_wall>
+
+  <xacro:o2as_wall wall_name="wall_c" wall_w="${wall_width}" wall_l="${wall_thickness}" wall_h="${wall_height}">
+    <origin xyz="-1.0 0.0 0.0" rpy="0.0 0.0 ${pi/2}" />  
+  </xacro:o2as_wall>
+
+  
+</robot>
