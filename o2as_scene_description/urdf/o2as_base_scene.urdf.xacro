@@ -16,7 +16,7 @@
 
   <!-- common stuff -->
   <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro" />
-  <xacro:include filename="$(find o2as_scene_description)/urdf/asm_task_scene.gazebo" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_base_scene.gazebo" />
   <xacro:include filename="$(find realsense2_camera)/urdf/_r410.urdf.xacro" />
 
   <!-- robots -->
