@@ -125,8 +125,8 @@
     <child link = "b_bot_cam_holder_link" />
     <origin xyz="0.0 -0.06 0.16" rpy="0.0 0.0 ${pi/2}" />
   </joint>
-  <!-- prefix="b_bot_"  -->
-  <xacro:sensor_d435 parent = "b_bot_cam_holder_link">
+
+  <xacro:sensor_d435 prefix="b_bot_" parent="b_bot_cam_holder_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:sensor_d435>
   
