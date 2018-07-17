@@ -111,6 +111,12 @@ add_dependencies(2_bot_example_moveit
   	${catkin_EXPORTED_TARGETS})
 target_link_libraries(2_bot_example_moveit ${catkin_LIBRARIES})
 
+add_executable(example_osaka_u src/example_osaka_u.cpp)
+add_dependencies(example_osaka_u 
+	${${PROJECT_NAME}_EXPORTED_TARGETS}
+  	${catkin_EXPORTED_TARGETS})
+target_link_libraries(example_osaka_u ${catkin_LIBRARIES})
+
 # add_executable(o2as_moveit_planner src/o2as_moveit_planner.cpp)
 # add_dependencies(o2as_moveit_planner
 # 	${${PROJECT_NAME}_EXPORTED_TARGETS}
