@@ -39,8 +39,7 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "pc2depth_server");
     ros::NodeHandle nh("~");
 
-    nh.advertiseService("pc2depth", callback);
-
+    ros::ServiceServer srv = nh.advertiseService("pc2depth_service", callback);
     std::cout << "Ready!" << std::endl;
     ros::spin();
     return 0;
