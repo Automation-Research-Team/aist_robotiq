@@ -1,0 +1,9 @@
+# Request
+geometry_msgs/PoseStamped target_pose
+string gripper
+---
+# Result
+bool success
+---
+# Feedback
+float32 progress
