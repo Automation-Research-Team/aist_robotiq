@@ -116,8 +116,8 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-${catkin_INCLUDE_DIRS}
+  include
+  ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -134,11 +134,14 @@ ${catkin_INCLUDE_DIRS}
 # With catkin_make all packages are built within a single CMake context
 # The recommended prefix ensures that target names across packages don't collide
 add_executable(o2as_relay_server
-	       src/o2as_relay_server.cpp)
+	       src/o2as_relay_server.cpp
+	       src/USBDevice.cpp
+	       src/USBHub.cpp
+	       src/USBHid.cpp)
 add_dependencies(o2as_relay_server 
 	${${PROJECT_NAME}_EXPORTED_TARGETS}
   	${catkin_EXPORTED_TARGETS})
-target_link_libraries(o2as_relay_server ${catkin_LIBRARIES} TUUSB++ usb)
+target_link_libraries(o2as_relay_server ${catkin_LIBRARIES} usb)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

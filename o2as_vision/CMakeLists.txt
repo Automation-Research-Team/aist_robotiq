@@ -8,6 +8,7 @@ project(o2as_vision)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED
+  rospy
   std_srvs
   phoxi_camera
 )
@@ -148,6 +149,8 @@ include_directories(
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
+catkin_install_python(PROGRAMS scripts/phoxi_camera_actual_example.py
+                      DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 #############
 ## Install ##
