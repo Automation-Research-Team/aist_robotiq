@@ -7,7 +7,7 @@ $ sh RUN-DOCKER-CONTAINER.sh
 $ roslaunch o2as_gazebo o2as_gazebo.launch
 
 # In another terminal in the container
-$ rosrun o2as_pc2depth test_pc2depth.py
+$ rosrun o2as_pc2depth o2as_pc2depth.py
 """
 
 import rospy
