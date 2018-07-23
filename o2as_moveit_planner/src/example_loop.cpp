@@ -13,6 +13,7 @@ int main (int argc, char **argv) {
   ros::AsyncSpinner spinner(1);
   spinner.start();
   
+  geometry_msgs::PoseStamped command_cartesian_position;
   std::string movegroup_name, ee_link;
   
   // Dynamic parameters. Last arg is the default value. You can assign these from a launch file.
