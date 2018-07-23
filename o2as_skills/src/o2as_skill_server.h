@@ -22,9 +22,9 @@
 // Actions
 #include <actionlib/server/simple_action_server.h>
 #include "o2as_skills/pickAction.h"
-// #include "o2as_skills/placeAction.h"
-// #include "o2as_skills/insertAction.h"
-// #include "o2as_skills/screwAction.h"
+#include "o2as_skills/placeAction.h"
+#include "o2as_skills/insertAction.h"
+#include "o2as_skills/screwAction.h"
 
 class SkillServer
 {
@@ -46,10 +46,10 @@ public:
                         o2as_skills::goToNamedPose::Response &res);
 
   // Actions
-  void execute(const o2as_skills::pickGoalConstPtr& goal);
-  // void execute(const o2as_skills::placeGoalConstPtr& goal);
-  // void execute(const o2as_skills::insertGoalConstPtr& goal);
-  // void execute(const o2as_skills::screwGoalConstPtr& goal);
+  void executePick(const o2as_skills::pickGoalConstPtr& goal);
+  void executePlace(const o2as_skills::placeGoalConstPtr& goal);
+  void executeInsert(const o2as_skills::insertGoalConstPtr& goal);
+  void executeScrew(const o2as_skills::screwGoalConstPtr& goal);
   
 
 private:
@@ -60,9 +60,9 @@ private:
   
   // Action declarations
   actionlib::SimpleActionServer<o2as_skills::pickAction> pickActionServer_;
-  // actionlib::SimpleActionServer<o2as_skills::placeAction> placeActionServer_;
-  // actionlib::SimpleActionServer<o2as_skills::insertAction> insertActionServer_;
-  // actionlib::SimpleActionServer<o2as_skills::screwAction> screwActionServer_;  
+  actionlib::SimpleActionServer<o2as_skills::placeAction> placeActionServer_;
+  actionlib::SimpleActionServer<o2as_skills::insertAction> insertActionServer_;
+  actionlib::SimpleActionServer<o2as_skills::screwAction> screwActionServer_;  
 
 };//End of class SkillServer
 

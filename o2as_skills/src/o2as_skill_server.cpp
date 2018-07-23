@@ -1,6 +1,10 @@
 #include "o2as_skill_server.h"
 
-SkillServer::SkillServer() : pickActionServer_(n_, "o2as_skills/pick", boost::bind(&SkillServer::execute, this, _1),false)
+SkillServer::SkillServer() : 
+                  pickActionServer_(n_, "o2as_skills/pick", boost::bind(&SkillServer::executePick, this, _1),false),
+                  placeActionServer_(n_, "o2as_skills/place", boost::bind(&SkillServer::executePlace, this, _1),false),
+                  insertActionServer_(n_, "o2as_skills/insert", boost::bind(&SkillServer::executeInsert, this, _1),false),
+                  screwActionServer_(n_, "o2as_skills/screw", boost::bind(&SkillServer::executeScrew, this, _1),false)
 { 
   // Topics to publish
 
@@ -10,9 +14,9 @@ SkillServer::SkillServer() : pickActionServer_(n_, "o2as_skills/pick", boost::bi
 
   // Actions we serve
   pickActionServer_.start();
-  // placeActionServer_.start();
-  // insertActionServer_.start();
-  // screwActionServer_.start();
+  placeActionServer_.start();
+  insertActionServer_.start();
+  screwActionServer_.start();
 }
 
 // TODO: Write this function/decide if it is needed
@@ -81,7 +85,7 @@ bool SkillServer::goToNamedPoseCallback(o2as_skills::goToNamedPose::Request &req
 // ----------- Action servers
 
 // pickAction
-void SkillServer::execute(const o2as_skills::pickGoalConstPtr& goal)
+void SkillServer::executePick(const o2as_skills::pickGoalConstPtr& goal)
 {
   ROS_INFO("pickAction was called");
   // TODO: Insert commands to do the action
@@ -90,35 +94,35 @@ void SkillServer::execute(const o2as_skills::pickGoalConstPtr& goal)
   pickActionServer_.setSucceeded();
 }
 
-// // placeAction
-// void SkillServer::execute(const o2as_skills::placeGoalConstPtr& goal)
-// {
-//   ROS_INFO("placeAction was called");
-//   // TODO: Insert commands to do the action
-//   std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-//   ROS_INFO("placeAction is set as succeeded");
-//   placeActionServer_.setSucceeded();
-// }
+// placeAction
+void SkillServer::executePlace(const o2as_skills::placeGoalConstPtr& goal)
+{
+  ROS_INFO("placeAction was called");
+  // TODO: Insert commands to do the action
+  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  ROS_INFO("placeAction is set as succeeded");
+  placeActionServer_.setSucceeded();
+}
 
-// // insertAction
-// void SkillServer::execute(const o2as_skills::insertGoalConstPtr& goal)
-// {
-//   ROS_INFO("insertAction was called");
-//   // TODO: Insert commands to do the action
-//   std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-//   ROS_INFO("insertAction is set as succeeded");
-//   insertActionServer_.setSucceeded();
-// }
+// insertAction
+void SkillServer::executeInsert(const o2as_skills::insertGoalConstPtr& goal)
+{
+  ROS_INFO("insertAction was called");
+  // TODO: Insert commands to do the action
+  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  ROS_INFO("insertAction is set as succeeded");
+  insertActionServer_.setSucceeded();
+}
 
-// // screwAction
-// void SkillServer::execute(const o2as_skills::screwGoalConstPtr& goal)
-// {
-//   ROS_INFO("screwAction was called");
-//   // TODO: Insert commands to do the action
-//   std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-//   ROS_INFO("screwAction is set as succeeded");
-//   screwActionServer_.setSucceeded();
-// }
+// screwAction
+void SkillServer::executeScrew(const o2as_skills::screwGoalConstPtr& goal)
+{
+  ROS_INFO("screwAction was called");
+  // TODO: Insert commands to do the action
+  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  ROS_INFO("screwAction is set as succeeded");
+  screwActionServer_.setSucceeded();
+}
 
 
 // ----------- End of the class definitions
