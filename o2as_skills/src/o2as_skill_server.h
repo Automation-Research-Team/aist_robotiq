@@ -14,16 +14,17 @@
 #include <tf/transform_listener.h>    // Includes the TF conversions
 
 #include <chrono>
+#include <thread>
 
 // Services
 #include "o2as_skills/goToNamedPose.h"
 
 // Actions
 #include <actionlib/server/simple_action_server.h>
-#include "o2as_skills/pick.h"
-#include "o2as_skills/place.h"
-#include "o2as_skills/insert.h"
-#include "o2as_skills/screw.h"
+#include "o2as_skills/pickAction.h"
+// #include "o2as_skills/placeAction.h"
+// #include "o2as_skills/insertAction.h"
+// #include "o2as_skills/screwAction.h"
 
 class SkillServer
 {
@@ -46,9 +47,9 @@ public:
 
   // Actions
   void execute(const o2as_skills::pickGoalConstPtr& goal);
-  void execute(const o2as_skills::placeGoalConstPtr& goal);
-  void execute(const o2as_skills::insertGoalConstPtr& goal);
-  void execute(const o2as_skills::screwGoalConstPtr& goal);
+  // void execute(const o2as_skills::placeGoalConstPtr& goal);
+  // void execute(const o2as_skills::insertGoalConstPtr& goal);
+  // void execute(const o2as_skills::screwGoalConstPtr& goal);
   
 
 private:
@@ -59,9 +60,9 @@ private:
   
   // Action declarations
   actionlib::SimpleActionServer<o2as_skills::pickAction> pickActionServer_;
-  actionlib::SimpleActionServer<o2as_skills::placeAction> placeActionServer_;
-  actionlib::SimpleActionServer<o2as_skills::insertAction> insertActionServer_;
-  actionlib::SimpleActionServer<o2as_skills::screwAction> screwActionServer_;  
+  // actionlib::SimpleActionServer<o2as_skills::placeAction> placeActionServer_;
+  // actionlib::SimpleActionServer<o2as_skills::insertAction> insertActionServer_;
+  // actionlib::SimpleActionServer<o2as_skills::screwAction> screwActionServer_;  
 
 };//End of class SkillServer
 
