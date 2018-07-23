@@ -117,6 +117,12 @@ add_dependencies(3_bot_example
   	${catkin_EXPORTED_TARGETS})
 target_link_libraries(3_bot_example ${catkin_LIBRARIES})
 
+add_executable(grasp_example src/grasp_example.cpp)
+add_dependencies(grasp_example 
+	${${PROJECT_NAME}_EXPORTED_TARGETS}
+  	${catkin_EXPORTED_TARGETS})
+target_link_libraries(grasp_example ${catkin_LIBRARIES})
+
 # add_executable(o2as_moveit_planner src/o2as_moveit_planner.cpp)
 # add_dependencies(o2as_moveit_planner
 # 	${${PROJECT_NAME}_EXPORTED_TARGETS}
