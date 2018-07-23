@@ -39,7 +39,26 @@ void closedGripper(trajectory_msgs::JointTrajectory& posture)
 
 void pick(moveit::planning_interface::MoveGroupInterface& move_group)
 {
-  // BEGIN_SUB_TUTORIAL pick1
+  // ROS_INFO("Moving to a pre-set pose to check validity.");
+  // // Start by moving the robot to a nearby pose to check if the pose works at all.
+  // geometry_msgs::PoseStamped ps;
+  // ps.header.frame_id = "set3_tray_2";
+  // ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI/4, M_PI);
+  // ps.pose.position.x = 0.1;
+  // ps.pose.position.y = 0;
+  // ps.pose.position.z = 0.15;
+
+  // moveit::planning_interface::MoveGroupInterface::Plan myplan;
+  // move_group.setStartStateToCurrentState();
+  // move_group.setPoseTarget(ps, "a_bot_robotiq_85_tip_link");
+  // moveit::planning_interface::MoveItErrorCode success_plan = moveit_msgs::MoveItErrorCodes::FAILURE, motion_done = moveit_msgs::MoveItErrorCodes::FAILURE;
+  // success_plan = move_group.plan(myplan);
+  // if (success_plan == moveit_msgs::MoveItErrorCodes::SUCCESS) {
+  //   motion_done = move_group.execute(myplan);
+  // }
+  // else{ROS_WARN("Did not manage to plan to the pose.");}
+
+
   // Create a vector of grasps to be attempted, currently only creating single grasp.
   // This is essentially useful when using a grasp generator to generate and test multiple grasps.
   std::vector<moveit_msgs::Grasp> grasps;
@@ -47,20 +66,20 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group)
 
   // Setting grasp pose
   // ++++++++++++++++++++++
-  // This is the pose of robotiq_85_tip_link of the robot.
+  // This is the pose of the parent link of the robot's end effector.
   // The orientation is not tested yet, but hopefully looks down.
   grasps[0].grasp_pose.header.frame_id = "set3_tray_2";
-  grasps[0].grasp_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(-M_PI / 2, -M_PI / 4, -M_PI / 2);
-  grasps[0].grasp_pose.pose.position.x = 0;
-  grasps[0].grasp_pose.pose.position.y = 0;
-  grasps[0].grasp_pose.pose.position.z = 0.05;
+  grasps[0].grasp_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI/4, M_PI);
+  grasps[0].grasp_pose.pose.position.x = 0.05;
+  grasps[0].grasp_pose.pose.position.y = 0.0;
+  grasps[0].grasp_pose.pose.position.z = 0.15;
 
   // Setting pre-grasp approach
   // ++++++++++++++++++++++++++
   /* Defined with respect to frame_id */
   grasps[0].pre_grasp_approach.direction.header.frame_id = "set3_tray_2";
-  /* Direction is set as positive x axis */
-  grasps[0].pre_grasp_approach.direction.vector.z = -1.0;
+  /* Direction is set as negative x axis */
+  grasps[0].pre_grasp_approach.direction.vector.x = -1.0;
   grasps[0].pre_grasp_approach.min_distance = 0.095;
   grasps[0].pre_grasp_approach.desired_distance = 0.115;
 
@@ -75,21 +94,16 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group)
 
   // Fill the Grasp msg with the eef posture before grasp
   // +++++++++++++++++++++++++++++++++++
-  openGripper(grasps[0].pre_grasp_posture);
-  // END_SUB_TUTORIAL
+  // openGripper(grasps[0].pre_grasp_posture);
 
-  // BEGIN_SUB_TUTORIAL pick2
   // Fill the Grasp msg with the eef posture during grasp
   // +++++++++++++++++++++++++++++++++++
-  closedGripper(grasps[0].grasp_posture);
-  // END_SUB_TUTORIAL
+  // closedGripper(grasps[0].grasp_posture);
 
-  // BEGIN_SUB_TUTORIAL pick3
   // Set support surface as table1.
   move_group.setSupportSurfaceName("set3_tray_2");  // TODO: This might have to be an object in the planning scene, not the robot definition
   // Call pick to pick up the object using the grasps given
   move_group.pick("object", grasps);
-  // END_SUB_TUTORIAL
 }
 
 void place(moveit::planning_interface::MoveGroupInterface& group)
@@ -108,8 +122,8 @@ void place(moveit::planning_interface::MoveGroupInterface& group)
 
   /* This pose refers to the center of the object. */
   place_location[0].place_pose.pose.position.x = 0;
-  place_location[0].place_pose.pose.position.y = 0.5;
-  place_location[0].place_pose.pose.position.z = 0.5;
+  place_location[0].place_pose.pose.position.y = 0;
+  place_location[0].place_pose.pose.position.z = 0.2;
 
   // Setting pre-place approach
   // ++++++++++++++++++++++++++
@@ -135,7 +149,7 @@ void place(moveit::planning_interface::MoveGroupInterface& group)
   openGripper(place_location[0].post_place_posture);
 
   // Set support surface as table2.
-  group.setSupportSurfaceName("set3_tray_1");
+  group.setSupportSurfaceName("set3_tray_1"); // TODO: This might have to be an object in the planning scene, not the robot definition
   // Call place to place the object using the place locations given.
   group.place("object", place_location);
 }
@@ -203,7 +217,6 @@ int main (int argc, char **argv) {
   moveit::planning_interface::MoveGroupInterface::Plan myplan;
   
   // Configure planner 
-  group_a.setPlanningTime(0.5);
   group_a.setPlannerId("RRTConnectkConfigDefault");
   group_a.setEndEffectorLink(ee_link);
   moveit::planning_interface::MoveItErrorCode success_plan = moveit_msgs::MoveItErrorCodes::FAILURE, 
@@ -223,10 +236,10 @@ int main (int argc, char **argv) {
 
   pick(group_a);
 
-  ROS_INFO("Attempting to place the object.");
-  ros::WallDuration(1.0).sleep();
+  // ROS_INFO("Attempting to place the object.");
+  // ros::WallDuration(1.0).sleep();
 
-  place(group_a);
+  // place(group_a);
     
   ros::waitForShutdown();
   return 0;   
