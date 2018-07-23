@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
 <launch>
   <!-- Parameters to pass to the ROS node -->
-  <arg name="move_group" default="front_bots"/>
-  <arg name="ee_link1" default="a_bot_robotiq_85_tip_link"/>
-  <arg name="ee_link2" default="b_bot_robotiq_85_tip_link"/>
+  <arg name="move_group" default="a_bot"/>
+  <arg name="ee_link" default="a_bot_robotiq_85_tip_link"/>
   <arg name="ros_rate" default="0.1"/>
   
   <!--  This loads the robot description and starts up moveit -->
@@ -12,10 +11,9 @@
   </include> -->
     
   <!-- This calls the ROS node we have written, using the parameters above -->
-  <node name="ExampleLoopMoveit" pkg="o2as_moveit_planner" type="2_bot_example_moveit" respawn="false" output="screen">
+  <node name="ExampleLoopMoveit" pkg="o2as_moveit_planner" type="example_tf" respawn="false" output="screen">
     <param name="move_group" value="$(arg move_group)"/>
-    <param name="ee_link1" value="$(arg ee_link1)"/>
-    <param name="ee_link2" value="$(arg ee_link2)"/>
+    <param name="ee_link" value="$(arg ee_link)"/>
     <param name="ros_rate" value="$(arg ros_rate)"/>
   </node>
   
