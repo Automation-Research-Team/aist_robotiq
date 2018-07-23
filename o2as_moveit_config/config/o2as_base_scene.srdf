@@ -10,14 +10,6 @@
     <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
     <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
     <group name="a_bot">
-        <link name="a_bot_shoulder_link" />
-        <link name="a_bot_upper_arm_link" />
-        <link name="a_bot_forearm_link" />
-        <link name="a_bot_wrist_1_link" />
-        <link name="a_bot_wrist_2_link" />
-        <link name="a_bot_wrist_3_link" />
-        <link name="a_bot_robotiq_85_base_link" />
-        <link name="a_bot_robotiq_85_tip_link" />
         <joint name="a_bot_shoulder_pan_joint" />
         <joint name="a_bot_shoulder_lift_joint" />
         <joint name="a_bot_elbow_joint" />
@@ -27,14 +19,6 @@
         <chain base_link="a_bot_base_link" tip_link="a_bot_robotiq_85_tip_link" />
     </group>
     <group name="b_bot">
-        <link name="b_bot_shoulder_link" />
-        <link name="b_bot_upper_arm_link" />
-        <link name="b_bot_forearm_link" />
-        <link name="b_bot_wrist_1_link" />
-        <link name="b_bot_wrist_2_link" />
-        <link name="b_bot_wrist_3_link" />
-        <link name="b_bot_robotiq_85_base_link" />
-        <link name="b_bot_robotiq_85_tip_link" />
         <joint name="b_bot_shoulder_pan_joint" />
         <joint name="b_bot_shoulder_lift_joint" />
         <joint name="b_bot_elbow_joint" />
@@ -44,14 +28,6 @@
         <chain base_link="b_bot_base_link" tip_link="b_bot_robotiq_85_tip_link" />
     </group>
     <group name="c_bot">
-        <link name="c_bot_shoulder_link" />
-        <link name="c_bot_upper_arm_link" />
-        <link name="c_bot_forearm_link" />
-        <link name="c_bot_wrist_1_link" />
-        <link name="c_bot_wrist_2_link" />
-        <link name="c_bot_wrist_3_link" />
-        <link name="c_bot_robotiq_85_base_link" />
-        <link name="c_bot_robotiq_85_tip_link" />
         <joint name="c_bot_shoulder_pan_joint" />
         <joint name="c_bot_shoulder_lift_joint" />
         <joint name="c_bot_elbow_joint" />
