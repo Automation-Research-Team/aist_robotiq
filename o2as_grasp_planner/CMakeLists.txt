@@ -14,7 +14,10 @@ find_package(catkin REQUIRED COMPONENTS
   o2as_moveit_config 
   o2as_scene_description
   o2as_parts_description
-  moveit
+  moveit_core 
+  moveit_commander
+  moveit_ros_planning
+  moveit_ros_planning_interface
   tf
 )
 

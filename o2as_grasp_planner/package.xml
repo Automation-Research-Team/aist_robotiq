@@ -67,10 +67,13 @@
   <exec_depend>o2as_scene_description</exec_depend>
   <exec_depend>o2as_parts_description</exec_depend>
 
-  <run_depend>moveit</run_depend>
+  <exec_depend>moveit_core</exec_depend>
+  <exec_depend>moveit_commander</exec_depend>
+  <exec_depend>moveit_ros_planning_interface</exec_depend>
+  <exec_depend>moveit_ros_planning</exec_depend>
 
   <build_depend>tf</build_depend>
-  <run_depend>tf</run_depend>
+  <exec_depend>tf</exec_depend>
 
   <exec_depend>message_generation</exec_depend>
 

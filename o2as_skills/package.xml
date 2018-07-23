@@ -61,10 +61,10 @@
   <build_depend>std_srvs</build_depend>
   <exec_depend>message_generation</exec_depend>
 
-  <run_depend>moveit_core</run_depend>
-  <run_depend>moveit_commander</run_depend>
-  <run_depend>moveit_ros_planning_interface</run_depend>
-  <run_depend>moveit_ros_planning</run_depend>
+  <exec_depend>moveit_core</exec_depend>
+  <exec_depend>moveit_commander</exec_depend>
+  <exec_depend>moveit_ros_planning_interface</exec_depend>
+  <exec_depend>moveit_ros_planning</exec_depend>
   
   <!-- The export tag contains other, unspecified, tags -->
   <export>

@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(o2as_skills)
 
-## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+# Compile as C++11, supported in ROS Kinetic and newer
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -72,6 +72,7 @@ generate_messages(
   std_srvs
   std_msgs
   actionlib_msgs
+  geometry_msgs
 )
 
 ################################################
