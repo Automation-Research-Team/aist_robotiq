@@ -154,35 +154,38 @@ void place(moveit::planning_interface::MoveGroupInterface& group)
   group.place("object", place_location);
 }
 
-void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& planning_scene_interface)
+void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& planning_scene_interface, bool already_published_object)
 {
-  // Creating Environment
-  // ^^^^^^^^^^^^^^^^^^^^
-  // Create vector to hold a collision object.
-  std::vector<moveit_msgs::CollisionObject> collision_objects;
-  collision_objects.resize(1);
+  if (!already_published_object)
+  {
+    // Creating Environment
+    // ^^^^^^^^^^^^^^^^^^^^
+    // Create vector to hold a collision object.
+    std::vector<moveit_msgs::CollisionObject> collision_objects;
+    collision_objects.resize(1);
 
-  // Define the object that we will be manipulating
-  collision_objects[0].header.frame_id = "set3_tray_2";
-  collision_objects[0].id = "object";
+    // Define the object that we will be manipulating
+    collision_objects[0].header.frame_id = "set3_tray_2";
+    collision_objects[0].id = "object";
 
-  /* Define the primitive and its dimensions. */
-  collision_objects[0].primitives.resize(1);
-  collision_objects[0].primitives[0].type = collision_objects[0].primitives[0].BOX;
-  collision_objects[0].primitives[0].dimensions.resize(3);
-  collision_objects[0].primitives[0].dimensions[0] = 0.02;
-  collision_objects[0].primitives[0].dimensions[1] = 0.02;
-  collision_objects[0].primitives[0].dimensions[2] = 0.2;
+    /* Define the primitive and its dimensions. */
+    collision_objects[0].primitives.resize(1);
+    collision_objects[0].primitives[0].type = collision_objects[0].primitives[0].BOX;
+    collision_objects[0].primitives[0].dimensions.resize(3);
+    collision_objects[0].primitives[0].dimensions[0] = 0.02;
+    collision_objects[0].primitives[0].dimensions[1] = 0.02;
+    collision_objects[0].primitives[0].dimensions[2] = 0.2;
 
-  /* Define the pose of the object. */
-  collision_objects[0].primitive_poses.resize(1);
-  collision_objects[0].primitive_poses[0].position.x = 0;
-  collision_objects[0].primitive_poses[0].position.y = 0;
-  collision_objects[0].primitive_poses[0].position.z = 0.21;
+    /* Define the pose of the object. */
+    collision_objects[0].primitive_poses.resize(1);
+    collision_objects[0].primitive_poses[0].position.x = 0;
+    collision_objects[0].primitive_poses[0].position.y = 0;
+    collision_objects[0].primitive_poses[0].position.z = 0.21;
 
-  collision_objects[0].operation = collision_objects[0].ADD;
+    collision_objects[0].operation = collision_objects[0].ADD;
 
-  planning_scene_interface.applyCollisionObjects(collision_objects);
+    planning_scene_interface.applyCollisionObjects(collision_objects);
+  }
 }
 
 // ################################################################
@@ -200,8 +203,10 @@ int main (int argc, char **argv) {
   tf::TransformListener tflistener;
   
   std::string movegroup_name, ee_link;
+  bool already_published_object;
   nh.param<std::string>("move_group", movegroup_name, "a_bot");
   nh.param<std::string>("ee_link", ee_link, "a_bot_robotiq_85_tip_link");
+  nh.param<bool>("already_published_object", already_published_object, false);
   
   // Dynamic parameter to choose the rate at which this node should run
   double ros_rate;
@@ -217,6 +222,7 @@ int main (int argc, char **argv) {
   moveit::planning_interface::MoveGroupInterface::Plan myplan;
   
   // Configure planner 
+  // group_a.setPlanningTime(0.5);
   group_a.setPlannerId("RRTConnectkConfigDefault");
   group_a.setEndEffectorLink(ee_link);
   moveit::planning_interface::MoveItErrorCode success_plan = moveit_msgs::MoveItErrorCodes::FAILURE, 
@@ -228,7 +234,7 @@ int main (int argc, char **argv) {
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
   group_a.setPlanningTime(45.0);
 
-  addCollisionObjects(planning_scene_interface);
+  addCollisionObjects(planning_scene_interface, already_published_object);
 
   ROS_INFO("Attempting to pick the object.");
   // Wait a bit for ROS things to initialize
