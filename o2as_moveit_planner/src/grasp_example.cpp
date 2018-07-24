@@ -43,8 +43,8 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group)
   // // Start by moving the robot to a nearby pose to check if the pose works at all.
   // geometry_msgs::PoseStamped ps;
   // ps.header.frame_id = "set3_tray_2";
-  // ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI/4, M_PI);
-  // ps.pose.position.x = 0.1;
+  // ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI/12, M_PI);
+  // ps.pose.position.x = 0;
   // ps.pose.position.y = 0;
   // ps.pose.position.z = 0.15;
 
@@ -62,15 +62,15 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group)
   // Create a vector of grasps to be attempted, currently only creating single grasp.
   // This is essentially useful when using a grasp generator to generate and test multiple grasps.
   std::vector<moveit_msgs::Grasp> grasps;
-  grasps.resize(1);
+  grasps.resize(10);
 
   // Setting grasp pose
   // ++++++++++++++++++++++
   // This is the pose of the parent link of the robot's end effector.
   // The orientation is not tested yet, but hopefully looks down.
   grasps[0].grasp_pose.header.frame_id = "set3_tray_2";
-  grasps[0].grasp_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI/4, M_PI);
-  grasps[0].grasp_pose.pose.position.x = 0.05;
+  grasps[0].grasp_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI/12, M_PI);
+  grasps[0].grasp_pose.pose.position.x = 0.06;
   grasps[0].grasp_pose.pose.position.y = 0.0;
   grasps[0].grasp_pose.pose.position.z = 0.15;
 
@@ -94,11 +94,21 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group)
 
   // Fill the Grasp msg with the eef posture before grasp
   // +++++++++++++++++++++++++++++++++++
-  // openGripper(grasps[0].pre_grasp_posture);
+  openGripper(grasps[0].pre_grasp_posture);
 
   // Fill the Grasp msg with the eef posture during grasp
   // +++++++++++++++++++++++++++++++++++
-  // closedGripper(grasps[0].grasp_posture);
+  closedGripper(grasps[0].grasp_posture);
+
+  for (int i=1;i<10;i++)
+  {
+    ROS_INFO_STREAM("i is " << i);
+    grasps[i] = grasps[0];
+    // grasps[i].grasp_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI/8 + rand()*M_PI/12, M_PI);
+    // grasps[i].grasp_pose.pose.position.x = grasps[i].grasp_pose.pose.position.x + rand()*.02;
+    // grasps[i].grasp_pose.pose.position.y = grasps[i].grasp_pose.pose.position.y;
+    // grasps[i].grasp_pose.pose.position.z = grasps[i].grasp_pose.pose.position.z + rand()*.02;
+  }
 
   // Set support surface as table1.
   move_group.setSupportSurfaceName("set3_tray_2");  // TODO: This might have to be an object in the planning scene, not the robot definition
