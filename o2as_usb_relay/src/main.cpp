@@ -25,6 +25,8 @@ struct USBHubAdaptor : public USBHub
 	{
 	    res.success = false;
 	    res.message = err.what();
+
+	    return false;
 	}
 		    
 	res.success = true;
@@ -42,9 +44,9 @@ main(int argc, char** argv)
     ros::init(argc, argv, "o2as_usb_relay_server");
 
     auto		hub = boost::make_shared<TU::USBHubAdaptor>();
-    ros::NodeHandle	node;
+    ros::NodeHandle	node("~");
     auto		service = node.advertiseService(
-					"turn_on_gripper_suction",
+					"set_power",
 					&TU::USBHubAdaptor::setPower, hub);
     ROS_INFO("o2as_usb_relay_server is active.");
 

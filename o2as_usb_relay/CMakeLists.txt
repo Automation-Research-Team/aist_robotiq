@@ -134,7 +134,7 @@ include_directories(
 # With catkin_make all packages are built within a single CMake context
 # The recommended prefix ensures that target names across packages don't collide
 add_executable(o2as_relay_server
-	       src/o2as_relay_server.cpp
+	       src/main.cpp
 	       src/USBDevice.cpp
 	       src/USBHub.cpp
 	       src/USBHid.cpp)
