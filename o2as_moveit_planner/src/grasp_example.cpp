@@ -70,16 +70,16 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group)
   // ++++++++++++++++++++++
   // This is the pose of the parent link of the robot's end effector.
   // The orientation is not tested yet, but hopefully looks down.
-  grasps[0].grasp_pose.header.frame_id = "set3_tray_2";
+  grasps[0].grasp_pose.header.frame_id = "set2_bin2_4";
   grasps[0].grasp_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI/12, M_PI);
-  grasps[0].grasp_pose.pose.position.x = 0.0;
+  grasps[0].grasp_pose.pose.position.x = -0.01;
   grasps[0].grasp_pose.pose.position.y = 0.0;
-  grasps[0].grasp_pose.pose.position.z = 0.15;
+  grasps[0].grasp_pose.pose.position.z = 0.1;
 
   // Setting pre-grasp approach
   // ++++++++++++++++++++++++++
   /* Defined with respect to frame_id */
-  grasps[0].pre_grasp_approach.direction.header.frame_id = "set3_tray_2";
+  grasps[0].pre_grasp_approach.direction.header.frame_id = "set2_bin2_4";
   /* Direction is set as negative x axis */
   grasps[0].pre_grasp_approach.direction.vector.x = -1.0;
   grasps[0].pre_grasp_approach.min_distance = 0.095;
@@ -88,7 +88,7 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group)
   // Setting post-grasp retreat
   // ++++++++++++++++++++++++++
   /* Defined with respect to frame_id */
-  grasps[0].post_grasp_retreat.direction.header.frame_id = "set3_tray_2";
+  grasps[0].post_grasp_retreat.direction.header.frame_id = "set2_bin2_4";
   /* Direction is set as positive z axis */
   grasps[0].post_grasp_retreat.direction.vector.z = 1.0;
   grasps[0].post_grasp_retreat.min_distance = 0.1;
@@ -112,7 +112,7 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group)
   }
 
   // Set support surface as table1.
-  move_group.setSupportSurfaceName("set3_tray_2");  // TODO: This might have to be an object in the planning scene, not the robot definition
+  move_group.setSupportSurfaceName("set2_bin2_4");  // TODO: This might have to be an object in the planning scene, not the robot definition
   // Call pick to pick up the object using the grasps given
   move_group.pick("object", grasps);
 }
@@ -135,7 +135,7 @@ void place(moveit::planning_interface::MoveGroupInterface& group)
   /* This pose refers to the center of the object. */
   place_location[0].place_pose.pose.position.x = 0;
   place_location[0].place_pose.pose.position.y = 0;
-  place_location[0].place_pose.pose.position.z = 0.22;
+  place_location[0].place_pose.pose.position.z = 0.05;
 
   // Setting pre-place approach
   // ++++++++++++++++++++++++++
@@ -182,7 +182,7 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
     collision_objects.resize(1);
 
     // Define the object that we will be manipulating
-    collision_objects[0].header.frame_id = "set3_tray_2";
+    collision_objects[0].header.frame_id = "set2_bin2_4";
     collision_objects[0].id = "object";
 
     /* Define the primitive and its dimensions. */
@@ -191,13 +191,13 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
     collision_objects[0].primitives[0].dimensions.resize(3);
     collision_objects[0].primitives[0].dimensions[0] = 0.02;
     collision_objects[0].primitives[0].dimensions[1] = 0.02;
-    collision_objects[0].primitives[0].dimensions[2] = 0.2;
+    collision_objects[0].primitives[0].dimensions[2] = 0.1;
 
     /* Define the pose of the object. */
     collision_objects[0].primitive_poses.resize(1);
     collision_objects[0].primitive_poses[0].position.x = 0;
     collision_objects[0].primitive_poses[0].position.y = 0;
-    collision_objects[0].primitive_poses[0].position.z = 0.21;
+    collision_objects[0].primitive_poses[0].position.z = 0.06;
 
     collision_objects[0].operation = collision_objects[0].ADD;
 
