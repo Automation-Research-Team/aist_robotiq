@@ -23,6 +23,7 @@ void openGripper(trajectory_msgs::JointTrajectory& posture)
   posture.points.resize(1);
   posture.points[0].positions.resize(1);
   posture.points[0].positions[0] = 0.04;
+  posture.points[0].time_from_start = ros::Duration(0.5);
 }
 
 void closedGripper(trajectory_msgs::JointTrajectory& posture)
@@ -35,6 +36,7 @@ void closedGripper(trajectory_msgs::JointTrajectory& posture)
   posture.points.resize(1);
   posture.points[0].positions.resize(1);
   posture.points[0].positions[0] = 0.5;
+  posture.points[0].time_from_start = ros::Duration(0.5);
 }
 
 void pick(moveit::planning_interface::MoveGroupInterface& move_group)
