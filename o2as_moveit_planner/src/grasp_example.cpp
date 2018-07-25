@@ -34,7 +34,7 @@ void closedGripper(trajectory_msgs::JointTrajectory& posture)
   /* Set to closed. */
   posture.points.resize(1);
   posture.points[0].positions.resize(1);
-  posture.points[0].positions[0] = 0.00;
+  posture.points[0].positions[0] = 0.5;
 }
 
 void pick(moveit::planning_interface::MoveGroupInterface& move_group)
@@ -62,7 +62,7 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group)
   // Create a vector of grasps to be attempted, currently only creating single grasp.
   // This is essentially useful when using a grasp generator to generate and test multiple grasps.
   std::vector<moveit_msgs::Grasp> grasps;
-  grasps.resize(10);
+  grasps.resize(20);
 
   // Setting grasp pose
   // ++++++++++++++++++++++
@@ -70,7 +70,7 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group)
   // The orientation is not tested yet, but hopefully looks down.
   grasps[0].grasp_pose.header.frame_id = "set3_tray_2";
   grasps[0].grasp_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI/12, M_PI);
-  grasps[0].grasp_pose.pose.position.x = 0.06;
+  grasps[0].grasp_pose.pose.position.x = 0.0;
   grasps[0].grasp_pose.pose.position.y = 0.0;
   grasps[0].grasp_pose.pose.position.z = 0.15;
 
@@ -100,9 +100,8 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group)
   // +++++++++++++++++++++++++++++++++++
   closedGripper(grasps[0].grasp_posture);
 
-  for (int i=1;i<10;i++)
+  for (int i=1;i<20;i++)
   {
-    ROS_INFO_STREAM("i is " << i);
     grasps[i] = grasps[0];
     // grasps[i].grasp_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI/8 + rand()*M_PI/12, M_PI);
     // grasps[i].grasp_pose.pose.position.x = grasps[i].grasp_pose.pose.position.x + rand()*.02;
@@ -123,22 +122,23 @@ void place(moveit::planning_interface::MoveGroupInterface& group)
   // verbose mode." This is a known issue and we are working on fixing it. |br|
   // Create a vector of placings to be attempted, currently only creating single place location.
   std::vector<moveit_msgs::PlaceLocation> place_location;
-  place_location.resize(1);
+  place_location.resize(20);
 
   // Setting place location pose
   // +++++++++++++++++++++++++++
-  place_location[0].place_pose.header.frame_id = "set3_tray_1";
-  place_location[0].place_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, M_PI / 2);
+  place_location[0].place_pose.header.frame_id = "set3_tray_2";
+  place_location[0].place_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI/2, 0.0, -M_PI/2);
+  rotatePoseByRPY(0.0, 0.0, M_PI/2.0, place_location[0].place_pose.pose);
 
   /* This pose refers to the center of the object. */
   place_location[0].place_pose.pose.position.x = 0;
   place_location[0].place_pose.pose.position.y = 0;
-  place_location[0].place_pose.pose.position.z = 0.2;
+  place_location[0].place_pose.pose.position.z = 0.22;
 
   // Setting pre-place approach
   // ++++++++++++++++++++++++++
   /* Defined with respect to frame_id */
-  place_location[0].pre_place_approach.direction.header.frame_id = "set3_tray_1";
+  place_location[0].pre_place_approach.direction.header.frame_id = "set3_tray_2";
   /* Direction is set as negative z axis */
   place_location[0].pre_place_approach.direction.vector.z = -1.0;
   place_location[0].pre_place_approach.min_distance = 0.095;
@@ -147,7 +147,7 @@ void place(moveit::planning_interface::MoveGroupInterface& group)
   // Setting post-grasp retreat
   // ++++++++++++++++++++++++++
   /* Defined with respect to frame_id */
-  place_location[0].post_place_retreat.direction.header.frame_id = "set3_tray_1";
+  place_location[0].post_place_retreat.direction.header.frame_id = "set3_tray_2";
   /* Direction is set as z axis */
   place_location[0].post_place_retreat.direction.vector.z = 1.0;
   place_location[0].post_place_retreat.min_distance = 0.1;
@@ -158,8 +158,13 @@ void place(moveit::planning_interface::MoveGroupInterface& group)
   /* Similar to the pick case */
   openGripper(place_location[0].post_place_posture);
 
+  for (int i=1;i<20;i++)
+  {
+    place_location[i] = place_location[0];
+  }
+
   // Set support surface as table2.
-  group.setSupportSurfaceName("set3_tray_1"); // TODO: This might have to be an object in the planning scene, not the robot definition
+  group.setSupportSurfaceName("set3_tray_2"); // TODO: This might have to be an object in the planning scene, not the robot definition
   // Call place to place the object using the place locations given.
   group.place("object", place_location);
 }
@@ -252,10 +257,10 @@ int main (int argc, char **argv) {
 
   pick(group_a);
 
-  // ROS_INFO("Attempting to place the object.");
-  // ros::WallDuration(1.0).sleep();
+  ROS_INFO("Attempting to place the object.");
+  ros::WallDuration(1.0).sleep();
 
-  // place(group_a);
+  place(group_a);
     
   ros::waitForShutdown();
   return 0;   
