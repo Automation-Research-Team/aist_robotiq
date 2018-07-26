@@ -121,7 +121,7 @@ planner_configs:
     dense_delta_fraction: 0.001  # delta fraction for interface detection. default: 0.001
     max_failures: 5000  # maximum consecutive failure limit. default: 5000
 a_bot:
-  default_planner_config: kConfigDefaultkConfigDefaultkConfigDefaultkConfigDefault
+  default_planner_config: kConfigDefaultkConfigDefaultkConfigDefaultkConfigDefaultkConfigDefaultkConfigDefaultkConfigDefault
   planner_configs:
     - SBLkConfigDefault
     - ESTkConfigDefault
@@ -149,7 +149,7 @@ a_bot:
   projection_evaluator: joints(a_bot_shoulder_pan_joint,a_bot_shoulder_lift_joint)
   longest_valid_segment_fraction: 0.005
 b_bot:
-  default_planner_config: kConfigDefaultkConfigDefaultkConfigDefaultkConfigDefault
+  default_planner_config: kConfigDefaultkConfigDefaultkConfigDefaultkConfigDefaultkConfigDefaultkConfigDefaultkConfigDefault
   planner_configs:
     - SBLkConfigDefault
     - ESTkConfigDefault
@@ -177,7 +177,7 @@ b_bot:
   projection_evaluator: joints(b_bot_shoulder_pan_joint,b_bot_shoulder_lift_joint)
   longest_valid_segment_fraction: 0.005
 c_bot:
-  default_planner_config: kConfigDefaultkConfigDefaultkConfigDefaultkConfigDefault
+  default_planner_config: kConfigDefaultkConfigDefaultkConfigDefaultkConfigDefaultkConfigDefaultkConfigDefaultkConfigDefault
   planner_configs:
     - SBLkConfigDefault
     - ESTkConfigDefault
@@ -233,7 +233,7 @@ front_bots:
   projection_evaluator: joints(a_bot_shoulder_pan_joint,a_bot_shoulder_lift_joint)
   longest_valid_segment_fraction: 0.005
 all_bots:
-  default_planner_config: kConfigDefaultkConfigDefaultkConfigDefaultkConfigDefault
+  default_planner_config: kConfigDefault
   planner_configs:
     - SBLkConfigDefault
     - ESTkConfigDefault

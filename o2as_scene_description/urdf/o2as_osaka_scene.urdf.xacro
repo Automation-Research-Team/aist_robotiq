@@ -41,7 +41,7 @@
   <xacro:property name="plate_w" value="0.84"/>
   <xacro:property name="plate_l" value="0.62"/>
   <xacro:o2as_box boxname="workbox" box_w="${plate_w}" box_l="${plate_l}" box_h=".01" parent="o2as_ground">
-    <origin xyz="${-plate_w/2} ${-plate_l/2} ${bots_z-.5}" rpy="0 0 0" />   
+    <origin xyz="${-plate_w/2} ${-plate_l/2} ${bots_z-.6}" rpy="0 0 0" />   
   </xacro:o2as_box>
 
   <link name="workspace_center" />
@@ -52,7 +52,7 @@
   </joint>
   
   <!-- robot arms -->    
-  <xacro:ur3_robot prefix="a_bot_" joint_limited="true"
+  <xacro:ur3_robot prefix="a_bot_" joint_limited="false"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
     elbow_joint_lower_limit="0.0" elbow_joint_upper_limit="${pi}"
@@ -60,7 +60,7 @@
     wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
     wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
   
-  <xacro:ur3_robot prefix="b_bot_" joint_limited="true"
+  <xacro:ur3_robot prefix="b_bot_" joint_limited="false"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
     elbow_joint_lower_limit="0.0" elbow_joint_upper_limit="${pi}"
@@ -68,7 +68,7 @@
     wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
     wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
   
-  <xacro:ur3_robot prefix="c_bot_" joint_limited="true"
+  <xacro:ur3_robot prefix="c_bot_" joint_limited="false"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
     elbow_joint_lower_limit="0.0" elbow_joint_upper_limit="${pi}"
@@ -81,13 +81,13 @@
   <joint name="world_a_bot_joint" type="fixed">
     <parent link="o2as_ground" />
     <child link="a_bot_base_link" />
-    <origin xyz="${a_bot_x} ${a_bot_y} ${bots_z}" rpy="${-pi*1/4} ${pi*5/4} ${-pi}" />
+    <origin xyz="${a_bot_x} ${a_bot_y} ${bots_z}" rpy="${-pi*1/4} ${pi} ${-pi}" />
   </joint>
 
   <joint name="world_b_bot_joint" type="fixed">
     <parent link="o2as_ground" />
     <child link = "b_bot_base_link" />
-    <origin xyz="${b_bot_x} ${b_bot_y} ${bots_z}" rpy="${-pi*1/4} ${-pi*5/4} 0.0" />
+    <origin xyz="${b_bot_x} ${b_bot_y} ${bots_z}" rpy="${-pi*1/4} ${-pi} 0.0" />
   </joint>
 
   <joint name="world_c_bot_joint" type="fixed">
