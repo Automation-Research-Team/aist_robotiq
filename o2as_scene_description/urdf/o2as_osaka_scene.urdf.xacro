@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro"
-       name="o2as_base_scene" >
+       name="o2as_osaka_scene" >
 
 
   <xacro:property name="a_bot_x" value="0.0"/>
@@ -25,18 +25,15 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur3.urdf.xacro" />
 
   <!-- Scene items (trays, bins...) -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/walls.xacro" />
   <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" />
 
-  <!-- Robot bases -->
-  <!-- Putting these at height 0.0 makes them intersect with the ground, so they are elevated. -->
-  <!-- There are some instabilities when the box is big, for some reason. -->
+  <!-- Robot base -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro" />
   <xacro:o2as_box boxname="bot_base_column" box_w=".1" box_l=".1" box_h="1.5" parent="o2as_ground">
-    <origin xyz="${-.05} ${-.05} .75" rpy="0 0 0" />   
+    <origin xyz="${-.05} ${-.05} 0" rpy="0 0 0" />   
   </xacro:o2as_box>
-  <xacro:o2as_box boxname="bot_base_tee" box_w=".1" box_l=".5" box_h=".1" parent="o2as_ground">
-    <origin xyz="${-.05} ${-.05} 1.6" rpy="0 0 0" />   
+  <xacro:o2as_box boxname="bot_base_tee" box_w=".1" box_l=".4" box_h=".1" parent="o2as_ground">
+    <origin xyz="${-.05} ${-.2} 1.5" rpy="0 0 0" />   
   </xacro:o2as_box>
 
   <!-- Main workspace -->
@@ -96,7 +93,7 @@
   <joint name="world_c_bot_joint" type="fixed">
     <parent link="o2as_ground" />
     <child link = "c_bot_base_link" />
-    <origin xyz="${c_bot_x} ${c_bot_y} ${bots_z}" rpy="0.0 0.0 ${-pi/2}" />
+    <origin xyz="${c_bot_x} ${c_bot_y} 0" rpy="0.0 0.0 0.0" />
   </joint>
 
   <!-- spawn and attach grippers -->
