@@ -9,8 +9,6 @@ Panels:
         - /MotionPlanning1
         - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
-        - /TF1
-        - /PointCloud21
       Splitter Ratio: 0.5
     Tree Height: 221
   - Class: rviz/Selection
@@ -31,7 +29,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: PointCloud2
+    SyncSource: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -211,6 +209,14 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          b_bot_camera_fisheye_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_bot_camera_fisheye_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_bot_camera_left_ir_frame:
             Alpha: 1
             Show Axes: false
@@ -225,10 +231,6 @@ Visualization Manager:
             Show Trail: false
             Value: true
           b_bot_camera_right_ir_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_bot_camera_right_ir_optical_frame:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -422,6 +424,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          camera_right_ir_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           o2as_ground:
             Alpha: 1
             Show Axes: false
@@ -527,7 +533,7 @@ Visualization Manager:
         TextHeight: 0.0799999982
       Planning Request:
         Colliding Link Color: 255; 0; 0
-        Goal State Alpha: 0.200000003
+        Goal State Alpha: 0.400000006
         Goal State Color: 250; 128; 0
         Interactive Marker Size: 0.150000006
         Joint Violation Color: 255; 0; 255
@@ -682,6 +688,14 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          b_bot_camera_fisheye_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_bot_camera_fisheye_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_bot_camera_left_ir_frame:
             Alpha: 1
             Show Axes: false
@@ -696,10 +710,6 @@ Visualization Manager:
             Show Trail: false
             Value: true
           b_bot_camera_right_ir_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_bot_camera_right_ir_optical_frame:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -893,6 +903,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          camera_right_ir_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           o2as_ground:
             Alpha: 1
             Show Axes: false
@@ -980,361 +994,9 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-        Robot Alpha: 0.899999976
+        Robot Alpha: 1
         Show Robot Collision: false
         Show Robot Visual: true
-      Value: true
-    - Class: rviz/TF
-      Enabled: true
-      Frame Timeout: 15
-      Frames:
-        All Enabled: true
-        a_bot_base:
-          Value: true
-        a_bot_base_link:
-          Value: true
-        a_bot_base_smfl:
-          Value: true
-        a_bot_ee_link:
-          Value: true
-        a_bot_forearm_link:
-          Value: true
-        a_bot_robotiq_85_base_link:
-          Value: true
-        a_bot_robotiq_85_left_finger_link:
-          Value: true
-        a_bot_robotiq_85_left_finger_tip_link:
-          Value: true
-        a_bot_robotiq_85_left_inner_knuckle_link:
-          Value: true
-        a_bot_robotiq_85_left_knuckle_link:
-          Value: true
-        a_bot_robotiq_85_right_finger_link:
-          Value: true
-        a_bot_robotiq_85_right_finger_tip_link:
-          Value: true
-        a_bot_robotiq_85_right_inner_knuckle_link:
-          Value: true
-        a_bot_robotiq_85_right_knuckle_link:
-          Value: true
-        a_bot_robotiq_85_tip_link:
-          Value: true
-        a_bot_shoulder_link:
-          Value: true
-        a_bot_tool0:
-          Value: true
-        a_bot_upper_arm_link:
-          Value: true
-        a_bot_wrist_1_link:
-          Value: true
-        a_bot_wrist_2_link:
-          Value: true
-        a_bot_wrist_3_link:
-          Value: true
-        b_bot_base:
-          Value: true
-        b_bot_base_link:
-          Value: true
-        b_bot_base_smfl:
-          Value: true
-        b_bot_cam_holder_link:
-          Value: true
-        b_bot_camera_depth_frame:
-          Value: true
-        b_bot_camera_depth_optical_frame:
-          Value: true
-        b_bot_camera_left_ir_frame:
-          Value: true
-        b_bot_camera_left_ir_optical_frame:
-          Value: true
-        b_bot_camera_link:
-          Value: true
-        b_bot_camera_right_ir_frame:
-          Value: true
-        b_bot_camera_right_ir_optical_frame:
-          Value: true
-        b_bot_ee_link:
-          Value: true
-        b_bot_forearm_link:
-          Value: true
-        b_bot_robotiq_85_base_link:
-          Value: true
-        b_bot_robotiq_85_left_finger_link:
-          Value: true
-        b_bot_robotiq_85_left_finger_tip_link:
-          Value: true
-        b_bot_robotiq_85_left_inner_knuckle_link:
-          Value: true
-        b_bot_robotiq_85_left_knuckle_link:
-          Value: true
-        b_bot_robotiq_85_right_finger_link:
-          Value: true
-        b_bot_robotiq_85_right_finger_tip_link:
-          Value: true
-        b_bot_robotiq_85_right_inner_knuckle_link:
-          Value: true
-        b_bot_robotiq_85_right_knuckle_link:
-          Value: true
-        b_bot_robotiq_85_tip_link:
-          Value: true
-        b_bot_shoulder_link:
-          Value: true
-        b_bot_tool0:
-          Value: true
-        b_bot_upper_arm_link:
-          Value: true
-        b_bot_wrist_1_link:
-          Value: true
-        b_bot_wrist_2_link:
-          Value: true
-        b_bot_wrist_3_link:
-          Value: true
-        c_bot_base:
-          Value: true
-        c_bot_base_link:
-          Value: true
-        c_bot_base_smfl:
-          Value: true
-        c_bot_ee_link:
-          Value: true
-        c_bot_forearm_link:
-          Value: true
-        c_bot_robotiq_85_base_link:
-          Value: true
-        c_bot_robotiq_85_left_finger_link:
-          Value: true
-        c_bot_robotiq_85_left_finger_tip_link:
-          Value: true
-        c_bot_robotiq_85_left_inner_knuckle_link:
-          Value: true
-        c_bot_robotiq_85_left_knuckle_link:
-          Value: true
-        c_bot_robotiq_85_right_finger_link:
-          Value: true
-        c_bot_robotiq_85_right_finger_tip_link:
-          Value: true
-        c_bot_robotiq_85_right_inner_knuckle_link:
-          Value: true
-        c_bot_robotiq_85_right_knuckle_link:
-          Value: true
-        c_bot_robotiq_85_tip_link:
-          Value: true
-        c_bot_shoulder_link:
-          Value: true
-        c_bot_tool0:
-          Value: true
-        c_bot_upper_arm_link:
-          Value: true
-        c_bot_wrist_1_link:
-          Value: true
-        c_bot_wrist_2_link:
-          Value: true
-        c_bot_wrist_3_link:
-          Value: true
-        o2as_ground:
-          Value: true
-        set1_bin1_1:
-          Value: true
-        set1_bin1_2:
-          Value: true
-        set1_bin1_3:
-          Value: true
-        set1_bin1_4:
-          Value: true
-        set1_bin1_5:
-          Value: true
-        set2_bin2_1:
-          Value: true
-        set2_bin2_2:
-          Value: true
-        set2_bin2_3:
-          Value: true
-        set2_bin2_4:
-          Value: true
-        set2_bin3:
-          Value: true
-        set3_tray_1:
-          Value: true
-        set3_tray_2:
-          Value: true
-        wall_b:
-          Value: true
-        wall_c:
-          Value: true
-        workbox:
-          Value: true
-        workspace_center:
-          Value: true
-        world:
-          Value: true
-      Marker Scale: 0.150000006
-      Name: TF
-      Show Arrows: true
-      Show Axes: true
-      Show Names: true
-      Tree:
-        world:
-          o2as_ground:
-            a_bot_base_link:
-              a_bot_base:
-                {}
-              a_bot_shoulder_link:
-                a_bot_upper_arm_link:
-                  a_bot_forearm_link:
-                    a_bot_wrist_1_link:
-                      a_bot_wrist_2_link:
-                        a_bot_wrist_3_link:
-                          a_bot_ee_link:
-                            a_bot_robotiq_85_base_link:
-                              a_bot_robotiq_85_left_inner_knuckle_link:
-                                a_bot_robotiq_85_left_finger_tip_link:
-                                  {}
-                              a_bot_robotiq_85_left_knuckle_link:
-                                a_bot_robotiq_85_left_finger_link:
-                                  {}
-                              a_bot_robotiq_85_right_inner_knuckle_link:
-                                a_bot_robotiq_85_right_finger_tip_link:
-                                  {}
-                              a_bot_robotiq_85_right_knuckle_link:
-                                a_bot_robotiq_85_right_finger_link:
-                                  {}
-                              a_bot_robotiq_85_tip_link:
-                                {}
-                          a_bot_tool0:
-                            {}
-            a_bot_base_smfl:
-              {}
-            b_bot_base_link:
-              b_bot_base:
-                {}
-              b_bot_shoulder_link:
-                b_bot_upper_arm_link:
-                  b_bot_forearm_link:
-                    b_bot_wrist_1_link:
-                      b_bot_wrist_2_link:
-                        b_bot_wrist_3_link:
-                          b_bot_cam_holder_link:
-                            b_bot_camera_link:
-                              b_bot_camera_depth_frame:
-                                b_bot_camera_depth_optical_frame:
-                                  {}
-                                b_bot_camera_left_ir_frame:
-                                  b_bot_camera_left_ir_optical_frame:
-                                    {}
-                                b_bot_camera_right_ir_frame:
-                                  b_bot_camera_right_ir_optical_frame:
-                                    {}
-                          b_bot_ee_link:
-                            b_bot_robotiq_85_base_link:
-                              b_bot_robotiq_85_left_inner_knuckle_link:
-                                b_bot_robotiq_85_left_finger_tip_link:
-                                  {}
-                              b_bot_robotiq_85_left_knuckle_link:
-                                b_bot_robotiq_85_left_finger_link:
-                                  {}
-                              b_bot_robotiq_85_right_inner_knuckle_link:
-                                b_bot_robotiq_85_right_finger_tip_link:
-                                  {}
-                              b_bot_robotiq_85_right_knuckle_link:
-                                b_bot_robotiq_85_right_finger_link:
-                                  {}
-                              b_bot_robotiq_85_tip_link:
-                                {}
-                          b_bot_tool0:
-                            {}
-            b_bot_base_smfl:
-              {}
-            c_bot_base_link:
-              c_bot_base:
-                {}
-              c_bot_shoulder_link:
-                c_bot_upper_arm_link:
-                  c_bot_forearm_link:
-                    c_bot_wrist_1_link:
-                      c_bot_wrist_2_link:
-                        c_bot_wrist_3_link:
-                          c_bot_ee_link:
-                            c_bot_robotiq_85_base_link:
-                              c_bot_robotiq_85_left_inner_knuckle_link:
-                                c_bot_robotiq_85_left_finger_tip_link:
-                                  {}
-                              c_bot_robotiq_85_left_knuckle_link:
-                                c_bot_robotiq_85_left_finger_link:
-                                  {}
-                              c_bot_robotiq_85_right_inner_knuckle_link:
-                                c_bot_robotiq_85_right_finger_tip_link:
-                                  {}
-                              c_bot_robotiq_85_right_knuckle_link:
-                                c_bot_robotiq_85_right_finger_link:
-                                  {}
-                              c_bot_robotiq_85_tip_link:
-                                {}
-                          c_bot_tool0:
-                            {}
-            c_bot_base_smfl:
-              {}
-            workbox:
-              {}
-            workspace_center:
-              set1_bin1_1:
-                {}
-              set1_bin1_2:
-                {}
-              set1_bin1_3:
-                {}
-              set1_bin1_4:
-                {}
-              set1_bin1_5:
-                {}
-              set2_bin2_1:
-                {}
-              set2_bin2_2:
-                {}
-              set2_bin2_3:
-                {}
-              set2_bin2_4:
-                {}
-              set2_bin3:
-                {}
-              set3_tray_1:
-                {}
-              set3_tray_2:
-                {}
-          wall_b:
-            {}
-          wall_c:
-            {}
-      Update Interval: 0
-      Value: true
-    - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
-        Value: true
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz/PointCloud2
-      Color: 255; 255; 255
-      Color Transformer: RGB8
-      Decay Time: 0
-      Enabled: true
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Max Intensity: 4096
-      Min Color: 0; 0; 0
-      Min Intensity: 0
-      Name: PointCloud2
-      Position Transformer: XYZ
-      Queue Size: 10
-      Selectable: true
-      Size (Pixels): 3
-      Size (m): 0.00999999978
-      Style: Flat Squares
-      Topic: /b_bot_camera/depth/points
-      Unreliable: false
-      Use Fixed Frame: true
-      Use rainbow: true
       Value: true
   Enabled: true
   Global Options:
@@ -1361,25 +1023,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.27943134
+      Distance: 2.55779266
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.0521295704
-        Y: 0.115828007
-        Z: 1.33610904
+        X: -0.015371209
+        Y: -0.0602318086
+        Z: 1.34766304
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.580398142
+      Pitch: 0.570397675
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.21039629
+      Yaw: 0.650392532
     Saved: ~
 Window Geometry:
   Displays:
