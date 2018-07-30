@@ -93,23 +93,35 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 ## Declare a C++ executable
 
-add_executable(example_loop_moveit src/example_loop_moveit.cpp)
-add_dependencies(example_loop_moveit 
+add_executable(example_loop src/example_loop.cpp)
+add_dependencies(example_loop 
 	${${PROJECT_NAME}_EXPORTED_TARGETS}
   	${catkin_EXPORTED_TARGETS})
-target_link_libraries(example_loop_moveit ${catkin_LIBRARIES})
+target_link_libraries(example_loop ${catkin_LIBRARIES})
 
-add_executable(example_tf_moveit src/example_tf_moveit.cpp)
-add_dependencies(example_tf_moveit 
+add_executable(example_tf src/example_tf.cpp)
+add_dependencies(example_tf 
 	${${PROJECT_NAME}_EXPORTED_TARGETS}
   	${catkin_EXPORTED_TARGETS})
-target_link_libraries(example_tf_moveit ${catkin_LIBRARIES})
+target_link_libraries(example_tf ${catkin_LIBRARIES})
 
-add_executable(2_bot_example_moveit src/2_bot_example_moveit.cpp)
-add_dependencies(2_bot_example_moveit 
+add_executable(2_bot_example src/2_bot_example.cpp)
+add_dependencies(2_bot_example 
 	${${PROJECT_NAME}_EXPORTED_TARGETS}
   	${catkin_EXPORTED_TARGETS})
-target_link_libraries(2_bot_example_moveit ${catkin_LIBRARIES})
+target_link_libraries(2_bot_example ${catkin_LIBRARIES})
+
+add_executable(3_bot_example src/3_bot_example.cpp)
+add_dependencies(3_bot_example 
+	${${PROJECT_NAME}_EXPORTED_TARGETS}
+  	${catkin_EXPORTED_TARGETS})
+target_link_libraries(3_bot_example ${catkin_LIBRARIES})
+
+add_executable(grasp_example src/grasp_example.cpp)
+add_dependencies(grasp_example 
+	${${PROJECT_NAME}_EXPORTED_TARGETS}
+  	${catkin_EXPORTED_TARGETS})
+target_link_libraries(grasp_example ${catkin_LIBRARIES})
 
 # add_executable(o2as_moveit_planner src/o2as_moveit_planner.cpp)
 # add_dependencies(o2as_moveit_planner
