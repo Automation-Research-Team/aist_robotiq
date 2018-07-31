@@ -39,30 +39,9 @@ void closedGripper(trajectory_msgs::JointTrajectory& posture)
   posture.points[0].time_from_start = ros::Duration(0.5);
 }
 
-void pick(moveit::planning_interface::MoveGroupInterface& move_group)
-{
-  // ROS_INFO("Moving to a pre-set pose to check validity.");
-  // // Start by moving the robot to a nearby pose to check if the pose works at all.
-  // geometry_msgs::PoseStamped ps;
-  // ps.header.frame_id = "set3_tray_2";
-  // ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI/12, M_PI);
-  // ps.pose.position.x = 0;
-  // ps.pose.position.y = 0;
-  // ps.pose.position.z = 0.15;
-
-  // moveit::planning_interface::MoveGroupInterface::Plan myplan;
-  // move_group.setStartStateToCurrentState();
-  // move_group.setPoseTarget(ps, "a_bot_robotiq_85_tip_link");
-  // moveit::planning_interface::MoveItErrorCode success_plan = moveit_msgs::MoveItErrorCodes::FAILURE, motion_done = moveit_msgs::MoveItErrorCodes::FAILURE;
-  // success_plan = move_group.plan(myplan);
-  // if (success_plan == moveit_msgs::MoveItErrorCodes::SUCCESS) {
-  //   motion_done = move_group.execute(myplan);
-  // }
-  // else{ROS_WARN("Did not manage to plan to the pose.");}
-
-
-  // Create a vector of grasps to be attempted, currently only creating single grasp.
-  // This is essentially useful when using a grasp generator to generate and test multiple grasps.
+void pick(moveit::planning_interface::MoveGroupInterface &move_group) {
+  // Create a vector of grasps to be attempted.
+  // This can test multiple grasps supplied by a grasp generator.
   std::vector<moveit_msgs::Grasp> grasps;
   grasps.resize(20);
 
@@ -102,35 +81,40 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group)
   // +++++++++++++++++++++++++++++++++++
   closedGripper(grasps[0].grasp_posture);
 
-  for (int i=1;i<20;i++)
+  for (int i = 1; i < 20; i++) 
   {
     grasps[i] = grasps[0];
-    // grasps[i].grasp_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI/8 + rand()*M_PI/12, M_PI);
-    // grasps[i].grasp_pose.pose.position.x = grasps[i].grasp_pose.pose.position.x + rand()*.02;
-    // grasps[i].grasp_pose.pose.position.y = grasps[i].grasp_pose.pose.position.y;
-    // grasps[i].grasp_pose.pose.position.z = grasps[i].grasp_pose.pose.position.z + rand()*.02;
+
+    // Alternative:
+    // grasps[i].grasp_pose.pose.orientation =
+    // tf::createQuaternionMsgFromRollPitchYaw(0, M_PI/8 + rand()*M_PI/12, M_PI);
+    // grasps[i].grasp_pose.pose.position.x =
+    // grasps[i].grasp_pose.pose.position.x + rand()*.02;
+    // grasps[i].grasp_pose.pose.position.y =
+    // grasps[i].grasp_pose.pose.position.y;
+    // grasps[i].grasp_pose.pose.position.z =
+    // grasps[i].grasp_pose.pose.position.z + rand()*.02;
   }
 
-  // Set support surface as table1.
-  move_group.setSupportSurfaceName("set2_bin2_4");  // TODO: This might have to be an object in the planning scene, not the robot definition
+  // Set support surface
+  move_group.setSupportSurfaceName("set2_bin2_4"); // TODO: This might have to
+                                                   // be an object in the
+                                                   // planning scene, not the
+                                                   // robot definition
   // Call pick to pick up the object using the grasps given
   move_group.pick("object", grasps);
 }
 
-void place(moveit::planning_interface::MoveGroupInterface& group)
-{
-  // TODO(@ridhwanluthra) - Calling place function may lead to "All supplied place locations failed. Retrying last
-  // location in
-  // verbose mode." This is a known issue and we are working on fixing it. |br|
-  // Create a vector of placings to be attempted, currently only creating single place location.
+void place(moveit::planning_interface::MoveGroupInterface &group) {
   std::vector<moveit_msgs::PlaceLocation> place_location;
   place_location.resize(20);
 
   // Setting place location pose
   // +++++++++++++++++++++++++++
   place_location[0].place_pose.header.frame_id = "set3_tray_2";
-  place_location[0].place_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI/2, 0.0, -M_PI/2);
-  rotatePoseByRPY(0.0, 0.0, M_PI/2.0, place_location[0].place_pose.pose);
+  place_location[0].place_pose.pose.orientation =
+      tf::createQuaternionMsgFromRollPitchYaw(M_PI / 2, 0.0, -M_PI / 2);
+  rotatePoseByRPY(0.0, 0.0, M_PI / 2.0, place_location[0].place_pose.pose);
 
   /* This pose refers to the center of the object. */
   place_location[0].place_pose.pose.position.x = 0;
@@ -140,7 +124,8 @@ void place(moveit::planning_interface::MoveGroupInterface& group)
   // Setting pre-place approach
   // ++++++++++++++++++++++++++
   /* Defined with respect to frame_id */
-  place_location[0].pre_place_approach.direction.header.frame_id = "set3_tray_2";
+  place_location[0].pre_place_approach.direction.header.frame_id =
+      "set3_tray_2";
   /* Direction is set as negative z axis */
   place_location[0].pre_place_approach.direction.vector.z = -1.0;
   place_location[0].pre_place_approach.min_distance = 0.095;
@@ -149,7 +134,8 @@ void place(moveit::planning_interface::MoveGroupInterface& group)
   // Setting post-grasp retreat
   // ++++++++++++++++++++++++++
   /* Defined with respect to frame_id */
-  place_location[0].post_place_retreat.direction.header.frame_id = "set3_tray_2";
+  place_location[0].post_place_retreat.direction.header.frame_id =
+      "set3_tray_2";
   /* Direction is set as z axis */
   place_location[0].post_place_retreat.direction.vector.z = 1.0;
   place_location[0].post_place_retreat.min_distance = 0.1;
@@ -160,21 +146,20 @@ void place(moveit::planning_interface::MoveGroupInterface& group)
   /* Similar to the pick case */
   openGripper(place_location[0].post_place_posture);
 
-  for (int i=1;i<20;i++)
-  {
+  for (int i = 1; i < 20; i++) {
     place_location[i] = place_location[0];
   }
 
-  // Set support surface as table2.
-  group.setSupportSurfaceName("set3_tray_2"); // TODO: This might have to be an object in the planning scene, not the robot definition
+  // Set support surface
+  group.setSupportSurfaceName("set3_tray_2");
   // Call place to place the object using the place locations given.
   group.place("object", place_location);
 }
 
-void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& planning_scene_interface, bool already_published_object)
-{
-  if (!already_published_object)
-  {
+void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface
+                             &planning_scene_interface,
+                         bool already_published_object) {
+  if (!already_published_object) {
     // Creating Environment
     // ^^^^^^^^^^^^^^^^^^^^
     // Create vector to hold a collision object.
@@ -187,7 +172,8 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
 
     /* Define the primitive and its dimensions. */
     collision_objects[0].primitives.resize(1);
-    collision_objects[0].primitives[0].type = collision_objects[0].primitives[0].BOX;
+    collision_objects[0].primitives[0].type =
+        collision_objects[0].primitives[0].BOX;
     collision_objects[0].primitives[0].dimensions.resize(3);
     collision_objects[0].primitives[0].dimensions[0] = 0.02;
     collision_objects[0].primitives[0].dimensions[1] = 0.02;
@@ -207,47 +193,42 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
 
 // ################################################################
 
-int main (int argc, char **argv) {
-  
+int main(int argc, char **argv) {
+
   // Initialize ROS
   ros::init(argc, argv, "CommandRobotMoveit");
   ros::NodeHandle nh("~");
-  
+
   // ROS spinner.
   ros::AsyncSpinner spinner(1);
   spinner.start();
-  
+
   tf::TransformListener tflistener;
-  
+
   std::string movegroup_name, ee_link;
   bool already_published_object;
   nh.param<std::string>("move_group", movegroup_name, "a_bot");
   nh.param<std::string>("ee_link", ee_link, "a_bot_robotiq_85_tip_link");
   nh.param<bool>("already_published_object", already_published_object, false);
-  
+
   // Dynamic parameter to choose the rate at which this node should run
   double ros_rate;
   nh.param("ros_rate", ros_rate, 0.2); // 0.2 Hz = 5 seconds
-  ros::Rate* loop_rate_ = new ros::Rate(ros_rate);
-    
+  ros::Rate *loop_rate_ = new ros::Rate(ros_rate);
+
   std::string bin_header;
 
-  ros::Duration(1.0).sleep(); // 1 second
-  
   // Create MoveGroup
   moveit::planning_interface::MoveGroupInterface group_a(movegroup_name);
   moveit::planning_interface::MoveGroupInterface::Plan myplan;
-  
-  // Configure planner 
-  // group_a.setPlanningTime(0.5);
+
+  // Configure planner
   group_a.setPlannerId("RRTConnectkConfigDefault");
   group_a.setEndEffectorLink(ee_link);
-  moveit::planning_interface::MoveItErrorCode success_plan = moveit_msgs::MoveItErrorCodes::FAILURE, 
-  motion_done = moveit_msgs::MoveItErrorCodes::FAILURE;
+  moveit::planning_interface::MoveItErrorCode
+      success_plan = moveit_msgs::MoveItErrorCodes::FAILURE,
+      motion_done = moveit_msgs::MoveItErrorCodes::FAILURE;
 
-  ros::Duration(2.0).sleep(); // 2 seconds
-
-  ///////
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
   group_a.setPlanningTime(45.0);
 
@@ -263,7 +244,7 @@ int main (int argc, char **argv) {
   ros::WallDuration(1.0).sleep();
 
   place(group_a);
-    
+
   ros::waitForShutdown();
-  return 0;   
-}; 
+  return 0;
+};
