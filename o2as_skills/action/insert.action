@@ -1,7 +1,12 @@
-# z-axis points into the hole
-geometry_msgs/PoseStamped target_hole  # If 0, the insertion is started without moving to the target
+# z-axis points into the hole. If not, the gripper simply moves forward.
+geometry_msgs/PoseStamped target_hole   # If 0, the insertion is started without moving to the target
 float64 maximum_insertion_distance
-string gripper
+float64 maximum_force
+float64 speed                           # Unit to be decided. For now: 1.0 = full speed, 0.0 = No movement.
+string gripper                          # The gripper holding the part to be inserted
+bool second_gripper_used
+string second_gripper                   # Optional: A second gripper holding another part that needs to be shifted around as well
+                                        # E.g. Gripper1 holding a screw, Gripper2 holding the plate to be fixed on the base.
 ---
 # Result
 bool success

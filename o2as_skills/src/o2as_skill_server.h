@@ -5,6 +5,7 @@
 
 #include "ros/ros.h"
 #include <vector>
+#include <string>
 #include "std_msgs/String.h"
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/PoseStamped.h"
@@ -21,6 +22,7 @@
 
 // Actions
 #include <actionlib/server/simple_action_server.h>
+#include "o2as_skills/alignAction.h"
 #include "o2as_skills/pickAction.h"
 #include "o2as_skills/placeAction.h"
 #include "o2as_skills/insertAction.h"
@@ -46,6 +48,7 @@ public:
                         o2as_skills::goToNamedPose::Response &res);
 
   // Actions
+  void executeAlign(const o2as_skills::alignGoalConstPtr& goal);
   void executePick(const o2as_skills::pickGoalConstPtr& goal);
   void executePlace(const o2as_skills::placeGoalConstPtr& goal);
   void executeInsert(const o2as_skills::insertGoalConstPtr& goal);
@@ -59,10 +62,16 @@ private:
   ros::ServiceServer goToNamedPoseService;
   
   // Action declarations
+  actionlib::SimpleActionServer<o2as_skills::alignAction> alignActionServer_;
   actionlib::SimpleActionServer<o2as_skills::pickAction> pickActionServer_;
   actionlib::SimpleActionServer<o2as_skills::placeAction> placeActionServer_;
   actionlib::SimpleActionServer<o2as_skills::insertAction> insertActionServer_;
   actionlib::SimpleActionServer<o2as_skills::screwAction> screwActionServer_;  
+
+  // Status variables
+  bool holding_object;
+  std::string held_object_id;
+  int held_screwing_tool_size;    // 0 = None. 4, 5, 6 = M4, M5, M6.
 
 };//End of class SkillServer
 

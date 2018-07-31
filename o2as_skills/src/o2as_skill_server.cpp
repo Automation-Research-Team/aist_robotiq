@@ -1,6 +1,7 @@
 #include "o2as_skill_server.h"
 
 SkillServer::SkillServer() : 
+                  alignActionServer_(n_, "o2as_skills/align", boost::bind(&SkillServer::executeAlign, this, _1),false),
                   pickActionServer_(n_, "o2as_skills/pick", boost::bind(&SkillServer::executePick, this, _1),false),
                   placeActionServer_(n_, "o2as_skills/place", boost::bind(&SkillServer::executePlace, this, _1),false),
                   insertActionServer_(n_, "o2as_skills/insert", boost::bind(&SkillServer::executeInsert, this, _1),false),
@@ -13,6 +14,7 @@ SkillServer::SkillServer() :
                                         this);
 
   // Actions we serve
+  alignActionServer_.start();
   pickActionServer_.start();
   placeActionServer_.start();
   insertActionServer_.start();
@@ -84,12 +86,32 @@ bool SkillServer::goToNamedPoseCallback(o2as_skills::goToNamedPose::Request &req
 
 // ----------- Action servers
 
+// alignAction
+void SkillServer::executeAlign(const o2as_skills::alignGoalConstPtr& goal)
+{
+  ROS_INFO("alignAction was called");
+  // TODO: Insert commands to do the action
+  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  ROS_INFO("alignAction is set as succeeded");
+  alignActionServer_.setSucceeded();
+}
+
 // pickAction
 void SkillServer::executePick(const o2as_skills::pickGoalConstPtr& goal)
 {
   ROS_INFO("pickAction was called");
   // TODO: Insert commands to do the action
   std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+  if (goal->gripper == "a_bot")
+  {;}
+  else if (goal->gripper == "b_bot")
+  {;}
+  else if (goal->gripper == "c_bot")
+  {;}
+  else if (goal->gripper == "suction")
+  {;}
+
   ROS_INFO("pickAction is set as succeeded");
   pickActionServer_.setSucceeded();
 }

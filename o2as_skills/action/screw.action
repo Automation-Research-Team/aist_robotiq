@@ -4,7 +4,7 @@
 # Request
 # z points into the screw hole
 geometry_msgs/PoseStamped target_hole
-string gripper
+string gripper                          
 ---
 # Result
 bool success
