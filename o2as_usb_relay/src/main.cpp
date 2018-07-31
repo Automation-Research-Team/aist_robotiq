@@ -1,26 +1,25 @@
 /*!
- *   \file	main.cpp
+ *   \file	o2as_relay_server.cpp
  */
-#include <ros/ros.h>
+#include "ros/ros.h"
 #include "o2as_usb_relay/SetPower.h"
 #include "TU/USB++.h"
 
-namespace o2as_usb_relay
+namespace TU
 {
-struct USBHub : public TU::USBHub
+struct USBHubAdaptor : public USBHub
 {
-    using	super = TU::USBHub;
-    
-    USBHub()	:super()				{}
+    USBHubAdaptor()	:USBHub()				{}
 
     bool
-    setPower(SetPower::Request& req, SetPower::Response& res)
+    setPower(o2as_usb_relay::SetPower::Request&  req,
+	     o2as_usb_relay::SetPower::Response& res)
     {
 	ROS_INFO("Turning port %d %s.", req.port, (req.on ? "on" : "off"));
 
 	try
 	{
-	    super::setPower(req.port, req.on);
+	    USBHub::setPower(req.port, req.on);
 	}
 	catch (const std::exception& err)
 	{
@@ -37,19 +36,18 @@ struct USBHub : public TU::USBHub
 	return true;
     }
 };
-}	// namespace o2as_usb_relay
+}	// namespace TU
 
 int
 main(int argc, char** argv)
 {
     ros::init(argc, argv, "o2as_usb_relay_server");
 
-    auto		hub = boost::make_shared<o2as_usb_relay::USBHub>();
+    auto		hub = boost::make_shared<TU::USBHubAdaptor>();
     ros::NodeHandle	node("~");
     auto		service = node.advertiseService(
 					"set_power",
-					&o2as_usb_relay::USBHub::setPower,
-					hub);
+					&TU::USBHubAdaptor::setPower, hub);
     ROS_INFO("o2as_usb_relay_server is active.");
 
     ros::spin();
