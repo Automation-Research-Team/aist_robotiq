@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   moveit_commander
   moveit_ros_planning
   moveit_ros_planning_interface
+  robotiq_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -122,6 +123,12 @@ add_dependencies(grasp_example
 	${${PROJECT_NAME}_EXPORTED_TARGETS}
   	${catkin_EXPORTED_TARGETS})
 target_link_libraries(grasp_example ${catkin_LIBRARIES})
+
+add_executable(action_example src/action_example.cpp)
+add_dependencies(action_example 
+	${${PROJECT_NAME}_EXPORTED_TARGETS}
+  	${catkin_EXPORTED_TARGETS})
+target_link_libraries(action_example ${catkin_LIBRARIES})
 
 # add_executable(o2as_moveit_planner src/o2as_moveit_planner.cpp)
 # add_dependencies(o2as_moveit_planner
