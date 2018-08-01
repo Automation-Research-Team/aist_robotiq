@@ -21,12 +21,6 @@ SkillServer::SkillServer() :
   screwActionServer_.start();
 }
 
-// TODO: Write this function/decide if it is needed
-bool SkillServer::waitUntilArrived()
-{
-    ROS_INFO("Waiting for robot to reach its destination");
-    return true;
-}
 
 // TODO: Write this function/decide if it is needed
 bool SkillServer::moveToJointAnglesPTP(const double& j1, const double& j2, 

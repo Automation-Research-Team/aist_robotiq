@@ -13,6 +13,7 @@
 #include "geometry_msgs/WrenchStamped.h"
 
 #include <tf/transform_listener.h>    // Includes the TF conversions
+#include "o2as_helper_functions.h"
 
 #include <chrono>
 #include <thread>
@@ -35,7 +36,6 @@ public:
   SkillServer();
 
   //Helpers
-  bool waitUntilArrived();      // Returns true if KUKA has arrived at destination
   bool moveToJointAnglesPTP(const double& j1, const double& j2, 
     const double& j3, const double& j4, const double& j5, const double& j6);
   bool moveToCartPosePTP(const double& x, const double& y, const double& z, 
@@ -71,7 +71,7 @@ private:
   // Status variables
   bool holding_object;
   std::string held_object_id;
-  int held_screwing_tool_size;    // 0 = None. 4, 5, 6 = M4, M5, M6.
+  int held_screw_tool_size;    // 0 = None. 4, 5, 6 = M4, M5, M6.
 
 };//End of class SkillServer
 
