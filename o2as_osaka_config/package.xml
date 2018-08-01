@@ -1,9 +1,9 @@
 <package>
 
-  <name>o2as_moveit_config</name>
+  <name>o2as_osaka_config</name>
   <version>0.3.0</version>
   <description>
-     An automatically generated package with all the configuration and launch files for using the o2as_base_scene with the MoveIt! Motion Planning Framework
+     An automatically generated package with all the configuration and launch files for using the asm_task_scene with the MoveIt! Motion Planning Framework
   </description>
   <author email="fvdrigalski@gmail.com">Felix von Drigalski</author>
   <maintainer email="fvdrigalski@gmail.com">Felix von Drigalski</maintainer>
