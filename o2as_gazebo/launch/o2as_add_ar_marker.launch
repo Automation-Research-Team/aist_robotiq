@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<launch>
+  <!-- Register the model of the marker in parameter server -->
+  <param name="marker_description"
+         textfile="$(find o2as_gazebo)/models/marker26_8cm_massless/marker26_8cm_massless.sdf"/>
+
+
+  <!-- Spawn the model -->
+  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model"
+        args="-sdf -param marker_description -model o2as_marker"/>
+</launch>
