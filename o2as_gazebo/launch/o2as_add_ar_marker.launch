@@ -13,4 +13,10 @@
         args="-urdf -param d_bot_camera_description -model o2as_d_bot
                -unpause" respawn="false" output="screen"/>
 
+  <!-- Camera state publisher -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher"
+        name="d_bot_st_pub">
+    <remap from="robot_description" to="d_bot_camera_description"/>
+  </node>
+
 </launch>
