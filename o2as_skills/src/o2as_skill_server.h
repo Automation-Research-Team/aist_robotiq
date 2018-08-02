@@ -18,6 +18,9 @@
 #include <chrono>
 #include <thread>
 
+#include <moveit/move_group_interface/move_group_interface.h>
+#include <moveit/planning_scene_interface/planning_scene_interface.h>
+
 // Services
 #include "o2as_skills/goToNamedPose.h"
 
@@ -35,13 +38,19 @@ public:
   //Constructor
   SkillServer();
 
-  //Helpers
+  //Helpers (convenience functions)
   bool moveToJointAnglesPTP(const double& j1, const double& j2, 
     const double& j3, const double& j4, const double& j5, const double& j6);
   bool moveToCartPosePTP(const double& x, const double& y, const double& z, 
   const double& u, const double& v, const double& w); // uvw = roll,pitch,yaw
   bool moveToCartPosePTP(geometry_msgs::Pose pose);
   bool stop();                  // Stops the robot at the current position
+
+  // Internal functions (longer routines)
+  bool equipScrewTool(int screw_tool_size);
+  bool putBackScrewTool();
+  bool spawnTool(int screw_tool_size);
+  bool despawnTool(int screw_tool_size);
 
   // Callback declarations
   bool goToNamedPoseCallback(o2as_skills::goToNamedPose::Request &req,
@@ -72,6 +81,10 @@ private:
   bool holding_object;
   std::string held_object_id;
   int held_screw_tool_size;    // 0 = None. 4, 5, 6 = M4, M5, M6.
+
+  // Misc
+  moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+  moveit::planning_interface::MoveGroupInterface a_bot_group, b_bot_group, c_bot_group, front_bots_group, all_bots_group;
 
 };//End of class SkillServer
 

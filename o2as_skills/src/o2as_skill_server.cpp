@@ -5,7 +5,9 @@ SkillServer::SkillServer() :
                   pickActionServer_(n_, "o2as_skills/pick", boost::bind(&SkillServer::executePick, this, _1),false),
                   placeActionServer_(n_, "o2as_skills/place", boost::bind(&SkillServer::executePlace, this, _1),false),
                   insertActionServer_(n_, "o2as_skills/insert", boost::bind(&SkillServer::executeInsert, this, _1),false),
-                  screwActionServer_(n_, "o2as_skills/screw", boost::bind(&SkillServer::executeScrew, this, _1),false)
+                  screwActionServer_(n_, "o2as_skills/screw", boost::bind(&SkillServer::executeScrew, this, _1),false),
+                  a_bot_group("a_bot"), b_bot_group("b_bot"), c_bot_group("c_bot"),
+                  front_bots_group("front_bots"), all_bots_group("all_bots")
 { 
   // Topics to publish
 
@@ -64,6 +66,71 @@ bool SkillServer::moveToCartPosePTP(geometry_msgs::Pose pose)
 bool SkillServer::stop()
 {
   return true;
+}
+
+
+// ----------- Internal functions
+
+bool SkillServer::equipScrewTool(int screw_tool_size)
+{
+  ;
+  // --- THE PLAN:
+  // Spawn the tool 
+  // Make sure no item is held
+  // Plan & execute motion to in front of holder
+  // Open gripper the correct amount
+  // Plan & execute LINEAR motion to the tool change position
+  // Close gripper, attach the tool object to the gripper in the Planning Scene
+  // MAYBE: Set the ACM in the planning scene up
+  // Plan & execute LINEAR motion away from the tool change position
+  // Optional: Move back to home
+}
+
+bool SkillServer::putBackScrewTool()
+{
+  ;
+  // --- THE PLAN:
+  // Make sure no item is held
+  // Plan & execute motion to in front of the correct holder (check the member variable of the size)
+  // Plan & execute LINEAR motion to the tool change position
+  // Open gripper, detach the tool object from the gripper in the Planning Scene
+  // MAYBE: Set the ACM in the planning scene up to allow collisions between the gripper and everything (to avoid unnecessary calculations)
+  // OR: Delete the tool from the scene
+  // Plan & execute LINEAR motion away from the tool change position
+  // Optional: Move back to home
+}
+
+// Add the screw tool as a Collision Object to the scene, so that it can be attached to the robot
+bool SkillServer::spawnTool(int screw_tool_size)
+{
+    std::vector<moveit_msgs::CollisionObject> collision_objects;
+    collision_objects.resize(1);
+
+    // Define the object
+    collision_objects[0].header.frame_id = "c_bot_base_smfl";
+    collision_objects[0].id = "screw_tool_m5"; //TODO: Switch name
+
+    collision_objects[0].primitives.resize(1);
+    collision_objects[0].primitives[0].type =
+        collision_objects[0].primitives[0].BOX;
+    collision_objects[0].primitives[0].dimensions.resize(3);
+    collision_objects[0].primitives[0].dimensions[0] = 0.04;
+    collision_objects[0].primitives[0].dimensions[1] = 0.025;
+    collision_objects[0].primitives[0].dimensions[2] = 0.155;
+
+    collision_objects[0].primitive_poses.resize(1);
+    collision_objects[0].primitive_poses[0].position.x = .6;
+    collision_objects[0].primitive_poses[0].position.y = .8;
+    collision_objects[0].primitive_poses[0].position.z = 0.06;
+    collision_objects[0].operation = collision_objects[0].ADD;
+
+    planning_scene_interface.applyCollisionObjects(collision_objects);;
+}
+
+// Remove the tool from the scene so it does not cause unnecessary collision calculations
+bool SkillServer::despawnTool(int screw_tool_size)
+{
+  ;
 }
 
 

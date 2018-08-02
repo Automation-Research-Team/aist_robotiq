@@ -2,17 +2,17 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro"
        name="o2as_base_scene" >
 
+  <!-- This is the main file defining our robot arrangement and physical environment. -->
 
+  <!-- These values are still not fixed -->
   <xacro:property name="a_bot_x" value="0.0"/>
-  <xacro:property name="a_bot_y" value="-0.6"/>
+  <xacro:property name="a_bot_y" value="-0.65"/>
   <xacro:property name="b_bot_x" value="0.0"/>
-  <xacro:property name="b_bot_y" value="0.6"/>
+  <xacro:property name="b_bot_y" value="0.65"/>
   <xacro:property name="c_bot_x" value="-0.5"/>
   <xacro:property name="c_bot_y" value="0.0"/>
 
   <xacro:property name="bots_z" value="0.75"/>
-
-  <!-- This is the main file defining our robot arrangement and physical environment. -->
 
   <!-- common stuff -->
   <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro" />
@@ -33,31 +33,46 @@
   <!-- There are some instabilities when the box is big, for some reason. -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_base.xacro" />
   <xacro:o2as_base boxname="a_bot_base_smfl" parent="o2as_ground">
-    <origin xyz="${a_bot_x-.65/2} ${a_bot_y-.65/2} 0.65" rpy="0 0 0" />   
+    <origin xyz="${a_bot_x-.65/2} ${a_bot_y-.65/2} ${bots_z-.06}" rpy="0 0 0" />   
   </xacro:o2as_base>
   <xacro:o2as_base boxname="b_bot_base_smfl" parent="o2as_ground">
-    <origin xyz="${b_bot_x-.65/2} ${b_bot_y-.65/2} 0.65" rpy="0 0 0" />   
+    <origin xyz="${b_bot_x-.65/2} ${b_bot_y-.65/2} ${bots_z-.06}" rpy="0 0 0" />   
   </xacro:o2as_base>
   <xacro:o2as_base boxname="c_bot_base_smfl" parent="o2as_ground">
-    <origin xyz="${c_bot_x-.65/2-.22} ${c_bot_y-.65/2-.22} 0.65" rpy="0 0 0" />   
+    <origin xyz="${c_bot_x-.65/2-.16} ${c_bot_y-.65/2-.1} ${bots_z-.06}" rpy="0 0 0" />   
   </xacro:o2as_base>
 
   <!-- Main workspace -->
   <!-- The surface is 0.01 m below the robot bases and the "workspace_center" frame. -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro" />
-  <xacro:property name="plate_w" value="0.84"/>
-  <xacro:property name="plate_l" value="0.62"/>
+  <xacro:property name="plate_w" value="0.9"/>
+  <xacro:property name="plate_l" value="0.75"/>
   <xacro:o2as_box boxname="workbox" box_w="${plate_w}" box_l="${plate_l}" box_h=".01" parent="o2as_ground">
-    <origin xyz="${-plate_w/2} ${-plate_l/2} ${bots_z+.09}" rpy="0 0 0" />   
+    <origin xyz="${-plate_w/2+.1} ${-plate_l/2} ${bots_z}" rpy="0 0 0" />   
   </xacro:o2as_box>
 
   <link name="workspace_center" />
   <joint name="world_to_workspace" type="fixed">
     <parent link="o2as_ground" />
     <child link="workspace_center" />
-    <origin xyz="0.0 0.0 ${bots_z+.1}" rpy="0.0 0.0 0.0" />
+    <origin xyz="0.0 0.0 ${bots_z+.01}" rpy="0.0 0.0 0.0" />
   </joint>
-  
+
+  <!-- Screw holder & screw tool visual -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/screw_tools.xacro" />
+
+  <!-- Feeders -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/screw_feeder.xacro" />
+  <xacro:screw_feeder feedername="m3_feeder" parent="a_bot_base_smfl">
+    <origin xyz=".1 .4 .05" rpy="0 0 ${pi/2}" />   
+  </xacro:screw_feeder>
+  <xacro:screw_feeder feedername="m4_feeder" parent="c_bot_base_smfl">
+    <origin xyz=".45 .05 .05" rpy="0 0 0" />   
+  </xacro:screw_feeder>
+  <xacro:screw_feeder feedername="m5_feeder" parent="c_bot_base_smfl">
+    <origin xyz=".45 .2 .05" rpy="0 0 0" />   
+  </xacro:screw_feeder>
+
   <!-- robot arms -->    
   <xacro:ur5_robot prefix="a_bot_" joint_limited="true"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
@@ -129,11 +144,8 @@
   <xacro:sensor_d435 prefix="b_bot_" parent="b_bot_cam_holder_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:sensor_d435>
-  
-  
-  
 
-  <!-- I meant to remove the "world" link definition, but apparently it is necessary for Gazebo -->
+  <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world" />
   <joint name="world_o2as_joint" type="fixed">
     <parent link="world" />
