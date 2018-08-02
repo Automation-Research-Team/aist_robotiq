@@ -1,8 +1,9 @@
 <?xml version="1.0" ?>
 <sdf version="1.4">
   <model name="marker26_8cm">
-    <static>0</static>
+    <static>1</static>
     <link name="marker">
+      <pose>0.07 0.05 1.1 0 0 0</pose>
       <gravity>false</gravity>
       <visual name="visual">
         <geometry>
