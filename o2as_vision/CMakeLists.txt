@@ -1,23 +1,16 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(o2as_vision)
 
-# Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+## Compile as C++11, supported in ROS Kinetic and newer
+# add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED
-	rospy
-	roscpp
-	actionlib_msgs
-	std_msgs
-	std_srvs
-	moveit_core
-	moveit_commander
-	moveit_ros_planning_interface
-	moveit_ros_planning
-	tf
+  rospy
+  std_srvs
+  phoxi_camera
 )
 
 ## System dependencies are found with CMake's conventions
@@ -60,20 +53,25 @@ find_package(catkin REQUIRED
 #   Message2.msg
 # )
 
-# Generate services in the 'srv' folder
-add_service_files( DIRECTORY srv )
+## Generate services in the 'srv' folder
+# add_service_files(
+#   FILES
+#   Service1.srv
+#   Service2.srv
+# )
 
-# Generate actions in the 'action' folder
-add_action_files( DIRECTORY action )
+## Generate actions in the 'action' folder
+# add_action_files(
+#   FILES
+#   Action1.action
+#   Action2.action
+# )
 
-# Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_srvs
-  std_msgs
-  actionlib_msgs
-  geometry_msgs
-)
+## Generate added messages and services with any dependencies listed here
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -119,7 +117,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
 # include
-${catkin_INCLUDE_DIRS}
+# ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -132,14 +130,10 @@ ${catkin_INCLUDE_DIRS}
 ## either from message generation or dynamic reconfigure
 # add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-# Declare a C++ executable
-# With catkin_make all packages are built within a single CMake context
-# The recommended prefix ensures that target names across packages don't collide
-add_executable(o2as_vision_server src/o2as_vision_server.cpp)
-add_dependencies(o2as_vision_server 
-	${${PROJECT_NAME}_EXPORTED_TARGETS}
-  	${catkin_EXPORTED_TARGETS})
-target_link_libraries(o2as_vision_server ${catkin_LIBRARIES})
+## Declare a C++ executable
+## With catkin_make all packages are built within a single CMake context
+## The recommended prefix ensures that target names across packages don't collide
+# add_executable(${PROJECT_NAME}_node src/o2as_vision_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -155,6 +149,8 @@ target_link_libraries(o2as_vision_server ${catkin_LIBRARIES})
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
+catkin_install_python(PROGRAMS scripts/phoxi_camera_actual_example.py
+                      DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 #############
 ## Install ##
@@ -196,7 +192,7 @@ target_link_libraries(o2as_vision_server ${catkin_LIBRARIES})
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_o2as_usb_relay.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_o2as_vision.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
