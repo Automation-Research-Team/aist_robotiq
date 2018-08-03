@@ -26,11 +26,11 @@ SkillServer::SkillServer() :
   screwActionServer_.start();
 
   // Action clients
-  ROS_INFO("Waiting for action servers to start.");
+  // ROS_INFO("Waiting for action servers to start.");
   // // a_bot_gripper_client.waitForServer(); 
   // b_bot_gripper_client_.waitForServer();
   // c_bot_gripper_client_.waitForServer();
-  ROS_INFO("Action servers started.");
+  // ROS_INFO("Action servers started.");
 
   // Set up MoveGroups
   a_bot_group_.setPlanningTime(1.0);
@@ -46,6 +46,49 @@ SkillServer::SkillServer() :
   front_bots_group_.setPlannerId("RRTConnectkConfigDefault");
   all_bots_group_.setPlanningTime(3.0);
   all_bots_group_.setPlannerId("RRTConnectkConfigDefault");
+
+  // --- Define the screw tools.
+  
+  // Define one of the tools as a collision object
+  screw_tool_m5.header.frame_id = "screw_tool_m5_link";
+  screw_tool_m5.id = "screw_tool_m5";
+
+  screw_tool_m5.primitives.resize(3);
+  screw_tool_m5.primitive_poses.resize(3);
+  // The bit cushion and motor
+  screw_tool_m5.primitives[0].type = screw_tool_m5.primitives[0].BOX;
+  screw_tool_m5.primitives[0].dimensions.resize(3);
+  screw_tool_m5.primitives[0].dimensions[0] = 0.026;
+  screw_tool_m5.primitives[0].dimensions[1] = 0.04;
+  screw_tool_m5.primitives[0].dimensions[2] = 0.055;
+  screw_tool_m5.primitive_poses[0].position.x = 0;
+  screw_tool_m5.primitive_poses[0].position.y = -0.009;
+  screw_tool_m5.primitive_poses[0].position.z = 0.0275;
+
+  // The "shaft" + suction attachment
+  screw_tool_m5.primitives[1].type = screw_tool_m5.primitives[1].BOX;
+  screw_tool_m5.primitives[1].dimensions.resize(3);
+  screw_tool_m5.primitives[1].dimensions[0] = 0.02;
+  screw_tool_m5.primitives[1].dimensions[1] = 0.028;
+  screw_tool_m5.primitives[1].dimensions[2] = 0.08;
+  screw_tool_m5.primitive_poses[1].position.x = 0;
+  screw_tool_m5.primitive_poses[1].position.y = -0.0055;  // 21 mm distance from axis
+  screw_tool_m5.primitive_poses[1].position.z = -0.04;
+
+  // The cylinder representing the tip
+  screw_tool_m5.primitives[2].type = screw_tool_m5.primitives[2].CYLINDER;
+  screw_tool_m5.primitives[2].dimensions.resize(2);
+  screw_tool_m5.primitives[2].dimensions[0] = 0.02;    // Cylinder height
+  screw_tool_m5.primitives[2].dimensions[1] = 0.0035;   // Cylinder radius
+  screw_tool_m5.primitive_poses[2].position.x = 0;
+  screw_tool_m5.primitive_poses[2].position.y = 0;  // 21 mm distance from axis
+  screw_tool_m5.primitive_poses[2].position.z = -0.09;
+
+  screw_tool_m5.operation = screw_tool_m5.ADD;
+  
+  // The other tools
+  screw_tool_m4 = screw_tool_m5;
+  screw_tool_m3 = screw_tool_m5;
 }
 
 
@@ -62,13 +105,11 @@ bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string
 
   group_pointer->setStartStateToCurrentState();
   group_pointer->setPoseTarget(pose);
-  
-  ROS_INFO("Planning.");
+
+  ROS_DEBUG_STREAM("Planning motion for robot " << robot_name << ".");
   success_plan = group_pointer->plan(myplan);
-  ROS_INFO("Done planning.");
   if (success_plan) 
   {
-    ROS_WARN("Failed to perform motion.");
     if (wait) motion_done = group_pointer->execute(myplan);
     else motion_done = group_pointer->asyncExecute(myplan);
     if (motion_done) {
@@ -97,23 +138,27 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   geometry_msgs::PoseStamped start_pose;
   start_pose.header.frame_id = robot_name + "_robotiq_85_tip_link";
   start_pose.pose = makePose();
-  transform_pose_now(start_pose, "world", tflistener_);
-  transform_pose_now(pose, "world", tflistener_);
+  start_pose = transform_pose_now(start_pose, "world", tflistener_);
+  pose = transform_pose_now(pose, "world", tflistener_);
   waypoints.push_back(start_pose.pose);
   waypoints.push_back(pose.pose);
 
   group_pointer->setMaxVelocityScalingFactor(0.1);
+  b_bot_group_.setPlanningTime(5.0);
 
   moveit_msgs::RobotTrajectory trajectory;
   const double jump_threshold = 0.0;
   const double eef_step = 0.01;
   double cartesian_success = group_pointer->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
-  ROS_INFO("Visualizing cartesian motion into screw holder (%.2f%% achieved)", cartesian_success * 100.0);
+  ROS_INFO("Cartesian motion plan was %.2f%% successful.", cartesian_success * 100.0);
 
   // //----- Visualize the plan in RViz
+  // ROS_INFO("Visualizing cartesian motion into screw holder (%.2f%% achieved)", cartesian_success * 100.0);
   // namespace rvt = rviz_visual_tools;
   // moveit_visual_tools::MoveItVisualTools visual_tools(robot_name + "_base_link");
   // visual_tools.deleteAllMarkers();
+  // Eigen::Affine3d text_pose = Eigen::Affine3d::Identity();
+  // text_pose.translation().z() = 1.75;
   // visual_tools.publishText(text_pose, "Joint Space Goal", rvt::WHITE, rvt::XLARGE);
   // visual_tools.publishPath(waypoints, rvt::LIME_GREEN, rvt::SMALL);
   // for (std::size_t i = 0; i < waypoints.size(); ++i)
@@ -123,18 +168,47 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
 
   // Does the start state of the plan need to be set?
   myplan.trajectory_ = trajectory;
-  if (cartesian_success > .95) 
+  // if (cartesian_success > .95) 
+  if (true) 
   {
     if (wait) motion_done = group_pointer->execute(myplan);
     else motion_done = group_pointer->asyncExecute(myplan);
     if (motion_done) 
     {
       group_pointer->setMaxVelocityScalingFactor(1.0); // Reset the velocity
+      b_bot_group_.setPlanningTime(1.0);
       return true;
     }
   }
   group_pointer->setMaxVelocityScalingFactor(1.0); // Reset the velocity
+  b_bot_group_.setPlanningTime(1.0);
   return false;
+}
+
+bool SkillServer::goToNamedPose(std::string robot_name, std::string pose_name)
+{
+  ROS_INFO_STREAM("Going to named pose " << robot_name << " with robot group " << pose_name << ".");
+  // TODO: Test this.
+  moveit::planning_interface::MoveGroupInterface* group_pointer;
+  group_pointer = robotNameToMoveGroup(pose_name);
+
+  group_pointer->setStartStateToCurrentState();
+  group_pointer->setNamedTarget(robot_name);
+
+  moveit::planning_interface::MoveGroupInterface::Plan myplan;
+  moveit::planning_interface::MoveItErrorCode 
+    success_plan = moveit_msgs::MoveItErrorCodes::FAILURE, 
+    motion_done = moveit_msgs::MoveItErrorCodes::FAILURE;
+  
+  success_plan = group_pointer->plan(myplan);
+  if (success_plan) 
+  {
+    motion_done = group_pointer->execute(myplan);
+    if (motion_done) {
+      return true;
+      }
+  }
+  return true;
 }
 
 // TODO: Write this function/decide if it is needed
@@ -166,27 +240,38 @@ bool SkillServer::equipScrewTool(std::string robot_name, std::string screw_tool_
     return false;
   }
   ROS_INFO("Spawning tool.");
-  spawnTool("screw_tool_m5");
+  spawnTool(screw_tool_id);
   
   // Plan & execute motion to in front of holder
   geometry_msgs::PoseStamped ps_approach, ps_pickup;
-  ps_approach.header.frame_id = "screw_tool_m5_link";
+  ps_approach.header.frame_id = screw_tool_id + "_link";
   // ps_approach.pose.position.y = .1;
   // ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -M_PI / 2);
 
-  ps_approach.pose.position.y = .4;
-  ps_approach.pose.position.z = .4;
+  ps_approach.pose.position.y = .3;
+  ps_approach.pose.position.z = .0;
   ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -M_PI / 2);
-  ROS_INFO("Moving to pose.");
-  moveToCartPosePTP(ps_approach, "b_bot");
+  ROS_INFO("Moving to approach pose PTP.");
+  moveToCartPosePTP(ps_approach, robot_name);
 
   // Open gripper the correct amount
-  openGripper("b_bot");
-  
+  openGripper(robot_name);
+  // TODO: Set the collision matrix to allow movement into the tool
+
   // Plan & execute LINEAR motion to the tool change position
+  ps_pickup = ps_approach;
+  ps_pickup.pose.position.y -= .1;
+  ROS_INFO("Moving to pickup pose LIN.");
+  moveToCartPoseLIN(ps_pickup, robot_name);
+
   // Close gripper, attach the tool object to the gripper in the Planning Scene
-  // MAYBE: Set the ACM in the planning scene up
+  closeGripper(robot_name);
+  // attachTool(screw_tool_id, robot_name);
+
   // Plan & execute LINEAR motion away from the tool change position
+  ROS_INFO("Moving back to approach pose LIN.");
+  moveToCartPoseLIN(ps_approach, robot_name);
+
   // Optional: Move back to home
   return true;
 }
@@ -245,47 +330,18 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
 // Add the screw tool as a Collision Object to the scene, so that it can be attached to the robot
 bool SkillServer::spawnTool(std::string screw_tool_id)
 {
-    std::vector<moveit_msgs::CollisionObject> collision_objects;
-    collision_objects.resize(1);
+  std::vector<moveit_msgs::CollisionObject> collision_objects;
+  collision_objects.resize(1);
 
-    // Define the holder as a collision object
-    collision_objects[0].header.frame_id = "c_bot_base_smfl";
-    collision_objects[0].id = screw_tool_id;
+  if (screw_tool_id == "screw_tool_m5") collision_objects[0] = screw_tool_m5;
+  else if (screw_tool_id == "screw_tool_m4") collision_objects[0] = screw_tool_m4;
+  else if (screw_tool_id == "screw_tool_m3") collision_objects[0] = screw_tool_m3;
+  
+  collision_objects[0].operation = collision_objects[0].ADD;
 
-    collision_objects[0].primitives.resize(3);
-    collision_objects[0].primitive_poses.resize(3);
-    // The bit cushion and motor
-    collision_objects[0].primitives[0].type = collision_objects[0].primitives[0].BOX;
-    collision_objects[0].primitives[0].dimensions.resize(2);
-    collision_objects[0].primitives[0].dimensions[0] = 0.026;
-    collision_objects[0].primitives[0].dimensions[1] = 0.04;
-    collision_objects[0].primitives[0].dimensions[2] = 0.055;
-    collision_objects[0].primitive_poses[0].position.x = 0;
-    collision_objects[0].primitive_poses[0].position.y = -0.01;
-    collision_objects[0].primitive_poses[0].position.z = 0.0275;
+  planning_scene_interface_.applyCollisionObjects(collision_objects);
 
-    // The "shaft" + suction attachment
-    collision_objects[0].primitives[1].type = collision_objects[0].primitives[1].BOX;
-    collision_objects[0].primitives[1].dimensions.resize(2);
-    collision_objects[0].primitives[1].dimensions[0] = 0.02;
-    collision_objects[0].primitives[1].dimensions[1] = 0.028;
-    collision_objects[0].primitives[1].dimensions[2] = 0.08;
-    collision_objects[0].primitive_poses[1].position.x = 0;
-    collision_objects[0].primitive_poses[1].position.y = -0.0115;  // 21 mm distance from axis
-    collision_objects[0].primitive_poses[1].position.z = -0.04;
-
-    // The cylinder representing the tip
-    collision_objects[0].primitives[2].type = collision_objects[0].primitives[2].CYLINDER;
-    collision_objects[0].primitives[2].dimensions.resize(2);
-    collision_objects[0].primitives[2].dimensions[0] = 0.02;    // Cylinder height
-    collision_objects[0].primitives[2].dimensions[1] = 0.0035;   // Cylinder radius
-    collision_objects[0].primitive_poses[2].position.x = 0;
-    collision_objects[0].primitive_poses[2].position.y = 0;  // 21 mm distance from axis
-    collision_objects[0].primitive_poses[2].position.z = -0.09;
-
-    collision_objects[0].operation = collision_objects[0].ADD;
-
-    planning_scene_interface_.applyCollisionObjects(collision_objects);;
+  return true;
 }
 
 // Remove the tool from the scene so it does not cause unnecessary collision calculations
@@ -296,7 +352,38 @@ bool SkillServer::despawnTool(std::string screw_tool_id)
 
     collision_objects[0].id = screw_tool_id;
     collision_objects[0].operation = collision_objects[0].REMOVE;
-    planning_scene_interface_.applyCollisionObjects(collision_objects);;
+    planning_scene_interface_.applyCollisionObjects(collision_objects);
+
+    return true;
+}
+
+bool SkillServer::attachTool(std::string screw_tool_id, std::string robot_name)
+{
+  return attachDetachTool(screw_tool_id, robot_name, "attach");
+}
+
+bool SkillServer::detachTool(std::string screw_tool_id, std::string robot_name)
+{
+  return attachDetachTool(screw_tool_id, robot_name, "detach");
+}
+
+bool SkillServer::attachDetachTool(std::string screw_tool_id, std::string robot_name, std::string attach_or_detach)
+{
+  moveit_msgs::AttachedCollisionObject att_coll_object;
+
+  if (screw_tool_id == "screw_tool_m5") att_coll_object.object = screw_tool_m5;
+  else if (screw_tool_id == "screw_tool_m4") att_coll_object.object = screw_tool_m4;
+  else if (screw_tool_id == "screw_tool_m3") att_coll_object.object = screw_tool_m3;
+  else { ROS_WARN_STREAM("No screw tool specified to " << attach_or_detach); }
+
+  att_coll_object.link_name = robot_name + "_robotiq_85_tip_link";
+
+  if (attach_or_detach == "attach") att_coll_object.object.operation = att_coll_object.object.ADD;
+  else if (attach_or_detach == "detach") att_coll_object.object.operation = att_coll_object.object.REMOVE;
+  
+  ROS_INFO_STREAM(attach_or_detach << "ing tool " << screw_tool_id);
+  planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);
+  return true;
 }
 
 
@@ -304,29 +391,7 @@ bool SkillServer::despawnTool(std::string screw_tool_id)
 bool SkillServer::goToNamedPoseCallback(o2as_skills::goToNamedPose::Request &req,
                                            o2as_skills::goToNamedPose::Response &res)
 {
-  ROS_INFO_STREAM("Going to named pose " << req.named_pose << " with robot group " << req.planning_group << ".");
-  // TODO: Test.
-  moveit::planning_interface::MoveGroupInterface* group_pointer;
-  group_pointer = robotNameToMoveGroup(req.planning_group);
-
-  group_pointer->setStartStateToCurrentState();
-  group_pointer->setNamedTarget(req.named_pose);
-
-  moveit::planning_interface::MoveGroupInterface::Plan myplan;
-  moveit::planning_interface::MoveItErrorCode 
-    success_plan = moveit_msgs::MoveItErrorCodes::FAILURE, 
-    motion_done = moveit_msgs::MoveItErrorCodes::FAILURE;
-  
-  success_plan = group_pointer->plan(myplan);
-  if (success_plan) 
-  {
-    motion_done = group_pointer->execute(myplan);
-    if (motion_done) {
-      res.success = true;
-      return true;
-      }
-  }
-  res.success = false;
+  res.success = goToNamedPose(req.planning_group, req.named_pose);
   return true;
 }
 
@@ -408,7 +473,7 @@ int main(int argc, char **argv)
   ROS_INFO("O2AS skill server started");
 
   ROS_INFO("Testing the screw tool mounting.");
-  o2as_skill_server.equipScrewTool("b_bot", "m5");
+  o2as_skill_server.equipScrewTool("b_bot", "screw_tool_m5");
 
   ROS_INFO("Testing the screw tool unmounting.");
   o2as_skill_server.putBackScrewTool("b_bot");

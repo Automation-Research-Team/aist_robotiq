@@ -40,6 +40,7 @@ public:
   //Helpers (convenience functions)
   bool moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true);
   bool moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true);
+  bool goToNamedPose(std::string robot_name, std::string pose_name);
   bool stop();                  // Stops the robot at the current position
   moveit::planning_interface::MoveGroupInterface* robotNameToMoveGroup(std::string robot_name);
 
@@ -48,6 +49,9 @@ public:
   bool putBackScrewTool(std::string robot_name);
   bool spawnTool(std::string screw_tool_id);
   bool despawnTool(std::string screw_tool_id);
+  bool attachTool(std::string screw_tool_id, std::string link_name);
+  bool detachTool(std::string screw_tool_id, std::string link_name);
+  bool attachDetachTool(std::string screw_tool_id, std::string link_name, std::string attach_or_detach);
 
   bool openGripper(std::string robot_name);
   bool closeGripper(std::string robot_name);
@@ -92,6 +96,8 @@ private:
   // MoveGroup connections
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
   moveit::planning_interface::MoveGroupInterface a_bot_group_, b_bot_group_, c_bot_group_, front_bots_group_, all_bots_group_;
+
+  moveit_msgs::CollisionObject screw_tool_m5, screw_tool_m4, screw_tool_m3;
 
 };//End of class SkillServer
 
