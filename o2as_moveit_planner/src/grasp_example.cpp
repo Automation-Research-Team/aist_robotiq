@@ -5,7 +5,6 @@
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 
 #include <moveit_msgs/Grasp.h>
-#include <moveit_msgs/Grasp.h>
 
 // This example spawns an object in the scene and tries to pick and place it. Based on:
 // http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/planning_scene_ros_api/planning_scene_ros_api_tutorial.html

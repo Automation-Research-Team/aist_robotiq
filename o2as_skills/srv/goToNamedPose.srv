@@ -2,7 +2,7 @@
 
 # Request
 string named_pose       # ex: "home_all"
-string planning_group   # ex: "all_bots"
+string planning_group   #  "a_bot", "b_bot", "c_bot", "front_bots", "all_bots"
 ---
 # Response
 bool success
