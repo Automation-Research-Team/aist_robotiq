@@ -7,7 +7,10 @@ SkillServer::SkillServer() :
                   insertActionServer_(n_, "o2as_skills/insert", boost::bind(&SkillServer::executeInsert, this, _1),false),
                   screwActionServer_(n_, "o2as_skills/screw", boost::bind(&SkillServer::executeScrew, this, _1),false),
                   a_bot_group("a_bot"), b_bot_group("b_bot"), c_bot_group("c_bot"),
-                  front_bots_group("front_bots"), all_bots_group("all_bots")
+                  front_bots_group("front_bots"), all_bots_group("all_bots"),
+                  b_bot_gripper_client("/b_bot_gripper/gripper_action_controller", true),
+                  c_bot_gripper_client("/c_bot_gripper/gripper_action_controller", true)
+                  // a_bot_gripper_client("/a_bot_gripper/gripper_action_controller", true),
 { 
   // Topics to publish
 
@@ -21,45 +24,53 @@ SkillServer::SkillServer() :
   placeActionServer_.start();
   insertActionServer_.start();
   screwActionServer_.start();
+
+  // Action clients
+  ROS_INFO("Waiting for action servers to start.");
+  // a_bot_gripper_client.waitForServer(); 
+  b_bot_gripper_client.waitForServer();
+  c_bot_gripper_client.waitForServer();
+  ROS_INFO("Action servers started.");
+
+  // Set up MoveGroups
+  a_bot_group.setPlanningTime(0.5);
+  a_bot_group.setPlannerId("RRTConnectkConfigDefault");
+  a_bot_group.setEndEffectorLink("a_bot_robotiq_85_tip_link");
+  b_bot_group.setPlanningTime(0.5);
+  b_bot_group.setPlannerId("RRTConnectkConfigDefault");
+  b_bot_group.setEndEffectorLink("b_bot_robotiq_85_tip_link");
+  c_bot_group.setPlanningTime(0.5);
+  c_bot_group.setPlannerId("RRTConnectkConfigDefault");
+  c_bot_group.setEndEffectorLink("c_bot_robotiq_85_tip_link");
+  front_bots_group.setPlanningTime(2.0);
+  front_bots_group.setPlannerId("RRTConnectkConfigDefault");
+  all_bots_group.setPlanningTime(3.0);
+  all_bots_group.setPlannerId("RRTConnectkConfigDefault");
 }
 
 
-// TODO: Write this function/decide if it is needed
-bool SkillServer::moveToJointAnglesPTP(const double& j1, const double& j2, 
-    const double& j3, const double& j4, const double& j5, const double& j6)
+// This works only for a single robot.
+bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait)
 {
-  return true;
-}
+  moveit::planning_interface::MoveGroupInterface::Plan myplan;
+  moveit::planning_interface::MoveItErrorCode 
+    success_plan = moveit_msgs::MoveItErrorCodes::FAILURE, 
+    motion_done = moveit_msgs::MoveItErrorCodes::FAILURE;
 
+  moveit::planning_interface::MoveGroupInterface* group_pointer;
+  group_pointer = robotNameToMoveGroup(robot_name);
 
-// Publishes a cartesian pose for the robot to move to.
-bool SkillServer::moveToCartPosePTP(const double& x, const double& y, const double& z, 
-  const double& u, const double& v, const double& w)
-{
-  // Create the pose from the input parameters
-  // Prepare components
-  geometry_msgs::Point p;
-  p.x = x;
-  p.y = y;
-  p.z = z;
-
-  geometry_msgs::Quaternion q;
-  tf::Quaternion qt;
-  qt.setRPY(u, v, w);
-  tf::quaternionTFToMsg(qt, q);
-
-  // Create the pose
-  geometry_msgs::Pose pose;
-  pose.position = p;
-  pose.orientation = q;
+  group_pointer->setStartStateToCurrentState();
+  group_pointer->setPoseTarget(pose);
   
-  return moveToCartPosePTP(pose);
-}
-
-// TODO: Write this function/decide if it is needed
-bool SkillServer::moveToCartPosePTP(geometry_msgs::Pose pose)
-{
-  return true;
+  success_plan = group_pointer->plan(myplan);
+  if (success_plan) 
+  {
+    if (wait) motion_done = group_pointer->execute(myplan);
+    else motion_done = group_pointer->asyncExecute(myplan);
+    if (motion_done) {return true;}
+  }
+  return false;
 }
 
 // TODO: Write this function/decide if it is needed
@@ -68,25 +79,49 @@ bool SkillServer::stop()
   return true;
 }
 
+moveit::planning_interface::MoveGroupInterface* SkillServer::robotNameToMoveGroup(std::string robot_name)
+{
+  // This function converts the name of the robot to a pointer to the member variable containing the move group
+  // Returning the move group itself does not seem to work, sadly.
+  if (robot_name == "a_bot") return &a_bot_group;
+  if (robot_name == "b_bot") return &b_bot_group;
+  if (robot_name == "c_bot") return &c_bot_group;
+  if (robot_name == "front_bots") return &front_bots_group;
+  if (robot_name == "all_bots") return &all_bots_group;
+}
+
 
 // ----------- Internal functions
 
-bool SkillServer::equipScrewTool(int screw_tool_size)
+bool SkillServer::equipScrewTool(std::string robot_name, std::string screw_tool_id)
 {
-  ;
-  // --- THE PLAN:
-  // Spawn the tool 
-  // Make sure no item is held
+  if (holding_object) 
+  {
+    ROS_INFO("Robot already holds an object. Cannot pick up screw tool.");
+    return false;
+  }
+
+  spawnTool("screw_tool_m5");
+  
   // Plan & execute motion to in front of holder
+  geometry_msgs::PoseStamped ps_approach, ps_pickup;
+  ps_approach.header.frame_id = "screw_tool_m5_link";
+  ps_approach.pose.position.y = .1;
+  ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -M_PI / 2);
+  moveToCartPosePTP(ps_approach, "b_bot");
+
   // Open gripper the correct amount
+  openGripper("b_bot");
+  
   // Plan & execute LINEAR motion to the tool change position
   // Close gripper, attach the tool object to the gripper in the Planning Scene
   // MAYBE: Set the ACM in the planning scene up
   // Plan & execute LINEAR motion away from the tool change position
   // Optional: Move back to home
+  return true;
 }
 
-bool SkillServer::putBackScrewTool()
+bool SkillServer::putBackScrewTool(std::string robot_name)
 {
   ;
   // --- THE PLAN:
@@ -100,37 +135,98 @@ bool SkillServer::putBackScrewTool()
   // Optional: Move back to home
 }
 
+bool SkillServer::openGripper(std::string robot_name)
+{
+  return sendGripperCommand(robot_name, 0.085);
+}
+
+bool SkillServer::closeGripper(std::string robot_name)
+{
+  return sendGripperCommand(robot_name, 0.0);
+}
+
+bool SkillServer::sendGripperCommand(std::string robot_name, double opening_width)
+{
+  bool finished_before_timeout;
+  if ((robot_name == "b_bot") || (robot_name == "c_bot"))
+  {
+    // Send a goal to the action
+    robotiq_msgs::CModelCommandGoal goal;
+    goal.position = opening_width;    // Opening width. 0 to close, 0.085 to open the gripper.
+    if (robot_name == "b_bot")
+    {
+      b_bot_gripper_client.sendGoal(goal);
+      finished_before_timeout = b_bot_gripper_client.waitForResult(ros::Duration(5.0));
+    }
+    else if (robot_name == "c_bot")
+    {
+      c_bot_gripper_client.sendGoal(goal);
+      finished_before_timeout = c_bot_gripper_client.waitForResult(ros::Duration(5.0));
+    }
+  }
+  else
+  {
+    ROS_WARN("The gripper you specified is not defined.");
+    return false;
+  }
+  return finished_before_timeout;
+}
+
 // Add the screw tool as a Collision Object to the scene, so that it can be attached to the robot
-bool SkillServer::spawnTool(int screw_tool_size)
+bool SkillServer::spawnTool(std::string screw_tool_id)
 {
     std::vector<moveit_msgs::CollisionObject> collision_objects;
     collision_objects.resize(1);
 
-    // Define the object
+    // Define the holder as a collision object
     collision_objects[0].header.frame_id = "c_bot_base_smfl";
-    collision_objects[0].id = "screw_tool_m5"; //TODO: Switch name
+    collision_objects[0].id = screw_tool_id;
 
-    collision_objects[0].primitives.resize(1);
-    collision_objects[0].primitives[0].type =
-        collision_objects[0].primitives[0].BOX;
-    collision_objects[0].primitives[0].dimensions.resize(3);
-    collision_objects[0].primitives[0].dimensions[0] = 0.04;
-    collision_objects[0].primitives[0].dimensions[1] = 0.025;
-    collision_objects[0].primitives[0].dimensions[2] = 0.155;
+    collision_objects[0].primitives.resize(3);
+    collision_objects[0].primitive_poses.resize(3);
+    // The bit cushion and motor
+    collision_objects[0].primitives[0].type = collision_objects[0].primitives[0].BOX;
+    collision_objects[0].primitives[0].dimensions.resize(2);
+    collision_objects[0].primitives[0].dimensions[0] = 0.026;
+    collision_objects[0].primitives[0].dimensions[1] = 0.04;
+    collision_objects[0].primitives[0].dimensions[2] = 0.055;
+    collision_objects[0].primitive_poses[0].position.x = 0;
+    collision_objects[0].primitive_poses[0].position.y = -0.01;
+    collision_objects[0].primitive_poses[0].position.z = 0.0275;
 
-    collision_objects[0].primitive_poses.resize(1);
-    collision_objects[0].primitive_poses[0].position.x = .6;
-    collision_objects[0].primitive_poses[0].position.y = .8;
-    collision_objects[0].primitive_poses[0].position.z = 0.06;
+    // The "shaft" + suction attachment
+    collision_objects[0].primitives[1].type = collision_objects[0].primitives[1].BOX;
+    collision_objects[0].primitives[1].dimensions.resize(2);
+    collision_objects[0].primitives[1].dimensions[0] = 0.02;
+    collision_objects[0].primitives[1].dimensions[1] = 0.028;
+    collision_objects[0].primitives[1].dimensions[2] = 0.08;
+    collision_objects[0].primitive_poses[1].position.x = 0;
+    collision_objects[0].primitive_poses[1].position.y = -0.0115;  // 21 mm distance from axis
+    collision_objects[0].primitive_poses[1].position.z = -0.04;
+
+    // The cylinder representing the tip
+    collision_objects[0].primitives[2].type = collision_objects[0].primitives[2].CYLINDER;
+    collision_objects[0].primitives[2].dimensions.resize(2);
+    collision_objects[0].primitives[2].dimensions[0] = 0.02;    // Cylinder height
+    collision_objects[0].primitives[2].dimensions[1] = 0.0035;   // Cylinder radius
+    collision_objects[0].primitive_poses[2].position.x = 0;
+    collision_objects[0].primitive_poses[2].position.y = 0;  // 21 mm distance from axis
+    collision_objects[0].primitive_poses[2].position.z = -0.09;
+
     collision_objects[0].operation = collision_objects[0].ADD;
 
     planning_scene_interface.applyCollisionObjects(collision_objects);;
 }
 
 // Remove the tool from the scene so it does not cause unnecessary collision calculations
-bool SkillServer::despawnTool(int screw_tool_size)
+bool SkillServer::despawnTool(std::string screw_tool_id)
 {
-  ;
+    std::vector<moveit_msgs::CollisionObject> collision_objects;
+    collision_objects.resize(1);
+
+    collision_objects[0].id = screw_tool_id;
+    collision_objects[0].operation = collision_objects[0].REMOVE;
+    planning_scene_interface.applyCollisionObjects(collision_objects);;
 }
 
 

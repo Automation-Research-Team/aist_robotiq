@@ -12,6 +12,8 @@ find_package(catkin REQUIRED
 	roscpp
 	actionlib_msgs
 	std_msgs
+	control_msgs
+	robotiq_msgs
 	std_srvs
 	moveit_core
 	moveit_commander

@@ -1,5 +1,3 @@
-
-
 #ifndef O2AS_SKILL_SERVER_H
 #define O2AS_SKILL_SERVER_H
 
@@ -7,10 +5,7 @@
 #include <vector>
 #include <string>
 #include "std_msgs/String.h"
-#include "geometry_msgs/Pose.h"
 #include "geometry_msgs/PoseStamped.h"
-#include "geometry_msgs/Wrench.h"
-#include "geometry_msgs/WrenchStamped.h"
 
 #include <tf/transform_listener.h>    // Includes the TF conversions
 #include "o2as_helper_functions.h"
@@ -32,6 +27,9 @@
 #include "o2as_skills/insertAction.h"
 #include "o2as_skills/screwAction.h"
 
+#include <actionlib/client/simple_action_client.h>
+#include <robotiq_msgs/CModelCommandAction.h>
+
 class SkillServer
 {
 public:
@@ -39,18 +37,19 @@ public:
   SkillServer();
 
   //Helpers (convenience functions)
-  bool moveToJointAnglesPTP(const double& j1, const double& j2, 
-    const double& j3, const double& j4, const double& j5, const double& j6);
-  bool moveToCartPosePTP(const double& x, const double& y, const double& z, 
-  const double& u, const double& v, const double& w); // uvw = roll,pitch,yaw
-  bool moveToCartPosePTP(geometry_msgs::Pose pose);
+  bool moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true);
   bool stop();                  // Stops the robot at the current position
+  moveit::planning_interface::MoveGroupInterface* robotNameToMoveGroup(std::string robot_name);
 
-  // Internal functions (longer routines)
-  bool equipScrewTool(int screw_tool_size);
-  bool putBackScrewTool();
-  bool spawnTool(int screw_tool_size);
-  bool despawnTool(int screw_tool_size);
+  // Internal functions
+  bool equipScrewTool(std::string robot_name, std::string screw_tool_id);
+  bool putBackScrewTool(std::string robot_name);
+  bool spawnTool(std::string screw_tool_id);
+  bool despawnTool(std::string screw_tool_id);
+
+  bool openGripper(std::string robot_name);
+  bool closeGripper(std::string robot_name);
+  bool sendGripperCommand(std::string robot_name, double opening_width);
 
   // Callback declarations
   bool goToNamedPoseCallback(o2as_skills::goToNamedPose::Request &req,
@@ -77,12 +76,17 @@ private:
   actionlib::SimpleActionServer<o2as_skills::insertAction> insertActionServer_;
   actionlib::SimpleActionServer<o2as_skills::screwAction> screwActionServer_;  
 
+  // Action clients
+  // actionlib::SimpleActionClient<control_msgs::GripperCommandAction> a_bot_gripper_client;
+  actionlib::SimpleActionClient<robotiq_msgs::CModelCommandAction> b_bot_gripper_client, c_bot_gripper_client;
+  
+
   // Status variables
   bool holding_object;
   std::string held_object_id;
-  int held_screw_tool_size;    // 0 = None. 4, 5, 6 = M4, M5, M6.
+  std::string held_screw_tool;    // "m3", "m4", "m5", "nut"...
 
-  // Misc
+  // MoveGroup connections
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
   moveit::planning_interface::MoveGroupInterface a_bot_group, b_bot_group, c_bot_group, front_bots_group, all_bots_group;
 
