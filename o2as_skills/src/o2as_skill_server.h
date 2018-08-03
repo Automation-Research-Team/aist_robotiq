@@ -15,6 +15,7 @@
 
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
+// #include <moveit_visual_tools/moveit_visual_tools.h>
 
 // Services
 #include "o2as_skills/goToNamedPose.h"
@@ -38,6 +39,7 @@ public:
 
   //Helpers (convenience functions)
   bool moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true);
+  bool moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true);
   bool stop();                  // Stops the robot at the current position
   moveit::planning_interface::MoveGroupInterface* robotNameToMoveGroup(std::string robot_name);
 
@@ -67,7 +69,7 @@ private:
   ros::NodeHandle n_;
 
   // Service declarations
-  ros::ServiceServer goToNamedPoseService;
+  ros::ServiceServer goToNamedPoseService_;
   
   // Action declarations
   actionlib::SimpleActionServer<o2as_skills::alignAction> alignActionServer_;
@@ -77,18 +79,19 @@ private:
   actionlib::SimpleActionServer<o2as_skills::screwAction> screwActionServer_;  
 
   // Action clients
-  // actionlib::SimpleActionClient<control_msgs::GripperCommandAction> a_bot_gripper_client;
-  actionlib::SimpleActionClient<robotiq_msgs::CModelCommandAction> b_bot_gripper_client, c_bot_gripper_client;
+  // actionlib::SimpleActionClient<control_msgs::GripperCommandAction> a_bot_gripper_client_;
+  actionlib::SimpleActionClient<robotiq_msgs::CModelCommandAction> b_bot_gripper_client_, c_bot_gripper_client_;
   
 
   // Status variables
-  bool holding_object;
-  std::string held_object_id;
-  std::string held_screw_tool;    // "m3", "m4", "m5", "nut"...
+  tf::TransformListener tflistener_;
+  bool holding_object_ = false;
+  std::string held_object_id_ = "";
+  std::string held_screw_tool_ = "";    // "m3", "m4", "m5", "nut"...
 
   // MoveGroup connections
-  moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
-  moveit::planning_interface::MoveGroupInterface a_bot_group, b_bot_group, c_bot_group, front_bots_group, all_bots_group;
+  moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
+  moveit::planning_interface::MoveGroupInterface a_bot_group_, b_bot_group_, c_bot_group_, front_bots_group_, all_bots_group_;
 
 };//End of class SkillServer
 
