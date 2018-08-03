@@ -10,8 +10,8 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
-  message_generation
   sensor_msgs
+  o2as_msgs
   pcl_ros
 )
 
@@ -56,7 +56,7 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
-add_service_files(FILES pc2depth.srv)
+# add_service_files(FILES pc2depth.srv)
 #   FILES
 #   Service1.srv
 #   Service2.srv
@@ -70,10 +70,10 @@ add_service_files(FILES pc2depth.srv)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  sensor_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   sensor_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
