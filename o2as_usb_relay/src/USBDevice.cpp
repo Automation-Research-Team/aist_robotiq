@@ -15,7 +15,7 @@ usb_get_handle(uint16_t idVendor, uint16_t idProduct, uint8_t deviceClass)
 {
     for (usb_bus* bus = usb_get_busses(); bus; bus = bus->next)
 	for (struct usb_device* dev = bus->devices; dev; dev = dev->next)
-	    if (dev->descriptor.bDeviceClass == deviceClass &&
+	    if (//dev->descriptor.bDeviceClass == deviceClass &&
 		dev->descriptor.idVendor     == idVendor    &&
 		dev->descriptor.idProduct    == idProduct)
 		return usb_open(dev);
