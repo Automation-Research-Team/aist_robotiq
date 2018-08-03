@@ -399,6 +399,8 @@ void SkillServer::executeScrew(const o2as_skills::screwGoalConstPtr& goal)
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "o2as_skills");
+  ros::AsyncSpinner spinner(1); // Needed for MoveIt to work.
+  spinner.start();
 
   // Create an object of class SkillServer that will take care of everything
   SkillServer o2as_skill_server;
@@ -412,6 +414,5 @@ int main(int argc, char **argv)
   o2as_skill_server.putBackScrewTool("b_bot");
   ROS_INFO("Done.");
 
-  ros::spin();
   return 0;
 }
