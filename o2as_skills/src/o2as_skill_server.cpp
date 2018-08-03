@@ -248,8 +248,8 @@ bool SkillServer::equipScrewTool(std::string robot_name, std::string screw_tool_
   // ps_approach.pose.position.y = .1;
   // ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -M_PI / 2);
 
-  ps_approach.pose.position.y = .3;
-  ps_approach.pose.position.z = .0;
+  ps_approach.pose.position.y = .1;
+  ps_approach.pose.position.z = .015;
   ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -M_PI / 2);
   ROS_INFO("Moving to approach pose PTP.");
   moveToCartPosePTP(ps_approach, robot_name);
@@ -260,7 +260,7 @@ bool SkillServer::equipScrewTool(std::string robot_name, std::string screw_tool_
 
   // Plan & execute LINEAR motion to the tool change position
   ps_pickup = ps_approach;
-  ps_pickup.pose.position.y -= .1;
+  ps_pickup.pose.position.y = -0.05;
   ROS_INFO("Moving to pickup pose LIN.");
   moveToCartPoseLIN(ps_pickup, robot_name);
 
@@ -474,6 +474,9 @@ int main(int argc, char **argv)
 
   ROS_INFO("Testing the screw tool mounting.");
   o2as_skill_server.equipScrewTool("b_bot", "screw_tool_m5");
+
+  ROS_INFO("Going to home pose.");
+  o2as_skill_server.goToNamedPose("b_bot", "home_b");
 
   ROS_INFO("Testing the screw tool unmounting.");
   o2as_skill_server.putBackScrewTool("b_bot");
