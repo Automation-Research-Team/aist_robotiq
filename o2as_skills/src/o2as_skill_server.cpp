@@ -255,7 +255,20 @@ bool SkillServer::equipScrewTool(std::string robot_name, std::string screw_tool_
 
   // Open gripper the correct amount
   openGripper(robot_name);
+
   // TODO: Set the collision matrix to allow movement into the tool
+  moveit_msgs::AllowedCollisionMatrix acm_cleared, acm_original = planning_scene_.allowed_collision_matrix;
+  acm_cleared = acm_original;
+  for (int i = 0; i < acm_cleared.entry_values.size(); ++i)
+  {
+    for (int i = 0; i < acm_cleared.entry_values[i].enabled.size(); ++i)
+    {
+      acm_cleared.entry_values[i].enabled[i] = true;
+    }
+  }
+  moveit_msgs::PlanningScene ps = planning_scene_;
+  ps.allowed_collision_matrix = acm_cleared;
+  planning_scene_interface_.applyPlanningScene(ps);
 
   // Plan & execute LINEAR motion to the tool change position
   ps_pickup = ps_approach;
