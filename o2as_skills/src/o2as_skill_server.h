@@ -40,7 +40,7 @@ public:
   //Helpers (convenience functions)
   bool moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true);
   bool moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true);
-  bool goToNamedPose(std::string robot_name, std::string pose_name);
+  bool goToNamedPose(std::string pose_name, std::string robot_name);
   bool stop();                  // Stops the robot at the current position
   moveit::planning_interface::MoveGroupInterface* robotNameToMoveGroup(std::string robot_name);
 

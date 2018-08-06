@@ -185,29 +185,23 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   return false;
 }
 
-bool SkillServer::goToNamedPose(std::string robot_name, std::string pose_name)
+bool SkillServer::goToNamedPose(std::string pose_name, std::string robot_name)
 {
-  ROS_INFO_STREAM("Going to named pose " << robot_name << " with robot group " << pose_name << ".");
+  ROS_INFO_STREAM("Going to named pose " << pose_name << " with robot group " << robot_name << ".");
   // TODO: Test this.
   moveit::planning_interface::MoveGroupInterface* group_pointer;
-  group_pointer = robotNameToMoveGroup(pose_name);
+  group_pointer = robotNameToMoveGroup(robot_name);
 
   group_pointer->setStartStateToCurrentState();
-  group_pointer->setNamedTarget(robot_name);
+  group_pointer->setNamedTarget(pose_name);
 
   moveit::planning_interface::MoveGroupInterface::Plan myplan;
   moveit::planning_interface::MoveItErrorCode 
     success_plan = moveit_msgs::MoveItErrorCodes::FAILURE, 
     motion_done = moveit_msgs::MoveItErrorCodes::FAILURE;
   
-  success_plan = group_pointer->plan(myplan);
-  if (success_plan) 
-  {
-    motion_done = group_pointer->execute(myplan);
-    if (motion_done) {
-      return true;
-      }
-  }
+  success_plan = group_pointer->move();
+  
   return true;
 }
 
@@ -476,7 +470,7 @@ int main(int argc, char **argv)
   o2as_skill_server.equipScrewTool("b_bot", "screw_tool_m5");
 
   ROS_INFO("Going to home pose.");
-  o2as_skill_server.goToNamedPose("b_bot", "home_b");
+  o2as_skill_server.goToNamedPose("home_b", "b_bot");
 
   ROS_INFO("Testing the screw tool unmounting.");
   o2as_skill_server.putBackScrewTool("b_bot");
