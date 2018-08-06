@@ -15,6 +15,7 @@
 
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
+#include <moveit_msgs/GetPlanningScene.h>
 // #include <moveit_visual_tools/moveit_visual_tools.h>
 
 // Services
@@ -43,6 +44,7 @@ public:
   bool goToNamedPose(std::string pose_name, std::string robot_name);
   bool stop();                  // Stops the robot at the current position
   moveit::planning_interface::MoveGroupInterface* robotNameToMoveGroup(std::string robot_name);
+  bool updatePlanningScene();
 
   // Internal functions
   bool equipScrewTool(std::string robot_name, std::string screw_tool_id);
@@ -94,8 +96,11 @@ private:
   std::string held_screw_tool_ = "";    // "m3", "m4", "m5", "nut"...
 
   // MoveGroup connections
+  moveit_msgs::PlanningScene planning_scene_;
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
+  ros::ServiceClient get_planning_scene_client;
   moveit::planning_interface::MoveGroupInterface a_bot_group_, b_bot_group_, c_bot_group_, front_bots_group_, all_bots_group_;
+  
 
   moveit_msgs::CollisionObject screw_tool_m5, screw_tool_m4, screw_tool_m3;
 

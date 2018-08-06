@@ -47,6 +47,11 @@ SkillServer::SkillServer() :
   all_bots_group_.setPlanningTime(3.0);
   all_bots_group_.setPlannerId("RRTConnectkConfigDefault");
 
+  get_planning_scene_client = n_.serviceClient<moveit_msgs::GetPlanningScene>("/get_planning_scene");
+
+  // Get the planning scene of the movegroup
+  updatePlanningScene();
+
   // --- Define the screw tools.
   
   // Define one of the tools as a collision object
@@ -282,6 +287,25 @@ bool SkillServer::putBackScrewTool(std::string robot_name)
   // OR: Delete the tool from the scene
   // Plan & execute LINEAR motion away from the tool change position
   // Optional: Move back to home
+}
+
+bool SkillServer::updatePlanningScene()
+{
+  moveit_msgs::GetPlanningScene srv;
+  // Request only the collision matrix
+  srv.request.components.components = moveit_msgs::PlanningSceneComponents::ALLOWED_COLLISION_MATRIX;
+  get_planning_scene_client.call(srv);
+  if (get_planning_scene_client.call(srv))
+  {
+    ROS_INFO("Got planning scene from move group.");
+    planning_scene_ = srv.response.scene;
+    return true;
+  }
+  else
+  {
+    ROS_ERROR("Failed to get planning scene from move group.");
+    return false;
+  }
 }
 
 bool SkillServer::openGripper(std::string robot_name)
