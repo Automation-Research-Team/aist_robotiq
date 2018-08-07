@@ -48,7 +48,8 @@ public:
 
   // Internal functions
   bool equipScrewTool(std::string robot_name, std::string screw_tool_id);
-  bool putBackScrewTool(std::string robot_name);
+  bool unequipScrewTool(std::string robot_name);
+  bool equipUnequipScrewTool(std::string robot_name, std::string screw_tool_id, std::string equip_or_unequip);
   bool spawnTool(std::string screw_tool_id);
   bool despawnTool(std::string screw_tool_id);
   bool attachTool(std::string screw_tool_id, std::string link_name);

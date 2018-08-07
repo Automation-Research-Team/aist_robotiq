@@ -42,9 +42,9 @@ SkillServer::SkillServer() :
   c_bot_group_.setPlanningTime(1.0);
   c_bot_group_.setPlannerId("RRTConnectkConfigDefault");
   c_bot_group_.setEndEffectorLink("c_bot_robotiq_85_tip_link");
-  front_bots_group_.setPlanningTime(2.0);
+  front_bots_group_.setPlanningTime(3.0);
   front_bots_group_.setPlannerId("RRTConnectkConfigDefault");
-  all_bots_group_.setPlanningTime(3.0);
+  all_bots_group_.setPlanningTime(5.0);
   all_bots_group_.setPlannerId("RRTConnectkConfigDefault");
 
   get_planning_scene_client = n_.serviceClient<moveit_msgs::GetPlanningScene>("/get_planning_scene");
@@ -149,7 +149,7 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   waypoints.push_back(pose.pose);
 
   group_pointer->setMaxVelocityScalingFactor(0.1);
-  b_bot_group_.setPlanningTime(5.0);
+  b_bot_group_.setPlanningTime(20.0);
 
   moveit_msgs::RobotTrajectory trajectory;
   const double jump_threshold = 0.0;
@@ -157,21 +157,12 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   double cartesian_success = group_pointer->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
   ROS_INFO("Cartesian motion plan was %.2f%% successful.", cartesian_success * 100.0);
 
-  // //----- Visualize the plan in RViz
-  // ROS_INFO("Visualizing cartesian motion into screw holder (%.2f%% achieved)", cartesian_success * 100.0);
-  // namespace rvt = rviz_visual_tools;
-  // moveit_visual_tools::MoveItVisualTools visual_tools(robot_name + "_base_link");
-  // visual_tools.deleteAllMarkers();
-  // Eigen::Affine3d text_pose = Eigen::Affine3d::Identity();
-  // text_pose.translation().z() = 1.75;
-  // visual_tools.publishText(text_pose, "Joint Space Goal", rvt::WHITE, rvt::XLARGE);
-  // visual_tools.publishPath(waypoints, rvt::LIME_GREEN, rvt::SMALL);
-  // for (std::size_t i = 0; i < waypoints.size(); ++i)
-  //   visual_tools.publishAxisLabeled(waypoints[i], "pt" + std::to_string(i), rvt::SMALL);
-  // visual_tools.trigger();
-  // //-----
+  // --- This was for testing the 
+  // ros::Publisher pubLinTraj = n_.advertise<moveit_msgs::RobotTrajectory>("/linear_trajectory", 1);
+  // ROS_INFO("Publishing trajectory.");
+  // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  // pubLinTraj.publish(trajectory);
 
-  // Does the start state of the plan need to be set?
   myplan.trajectory_ = trajectory;
   // if (cartesian_success > .95) 
   if (true) 
@@ -232,76 +223,100 @@ moveit::planning_interface::MoveGroupInterface* SkillServer::robotNameToMoveGrou
 
 bool SkillServer::equipScrewTool(std::string robot_name, std::string screw_tool_id)
 {
-  // TODO: Use status of the robot instead of a general one
-  if (holding_object_) 
+  return equipUnequipScrewTool(robot_name, screw_tool_id, "equip");
+}
+
+bool SkillServer::unequipScrewTool(std::string robot_name)
+{
+  return equipUnequipScrewTool(robot_name, held_screw_tool_, "unequip");
+}
+
+bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string screw_tool_id, std::string equip_or_unequip)
+{
+  // Sanity check on the input instruction
+  bool equip = (equip_or_unequip == "equip");
+  bool unequip = (equip_or_unequip == "unequip");   
+  // The second comparison is not always necessary, but readability comes first.
+  if ((!equip) && (!unequip))
   {
-    ROS_WARN("Robot already holds an object. Cannot pick up screw tool.");
+    ROS_ERROR_STREAM("Cannot read the instruction " << equip_or_unequip << ". Returning false.");
     return false;
   }
-  ROS_INFO("Spawning tool.");
-  spawnTool(screw_tool_id);
+
+  // TODO: Use the status of the robot_name instead of a general one
+  if (holding_object_)
+  {
+    ROS_ERROR_STREAM("Robot already holds an object. Cannot " << equip_or_unequip << " screw tool.");
+    return false;
+  }
+  if (equip)
+  {
+    ROS_INFO("Spawning tool.");
+    spawnTool(screw_tool_id);
+    held_screw_tool_ = screw_tool_id;
+  }
   
   // Plan & execute motion to in front of holder
-  geometry_msgs::PoseStamped ps_approach, ps_pickup;
+  geometry_msgs::PoseStamped ps_approach, ps_tool_holder;
   ps_approach.header.frame_id = screw_tool_id + "_link";
-  // ps_approach.pose.position.y = .1;
-  // ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -M_PI / 2);
 
   ps_approach.pose.position.y = .1;
-  ps_approach.pose.position.z = .015;
+  ps_approach.pose.position.z = .017;
   ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -M_PI / 2);
-  ROS_INFO("Moving to approach pose PTP.");
+  ROS_INFO("Moving to screw tool approach pose PTP.");
   moveToCartPosePTP(ps_approach, robot_name);
 
-  // Open gripper the correct amount
-  openGripper(robot_name);
+  if (equip) {openGripper(robot_name);}
 
-  // TODO: Set the collision matrix to allow movement into the tool
+  // Disable all collisions to allow movement into the tool
+  // NOTE: This could be done cleaner by disabling only gripper + tool, but it is good enough for now.
   moveit_msgs::AllowedCollisionMatrix acm_cleared, acm_original = planning_scene_.allowed_collision_matrix;
   acm_cleared = acm_original;
   for (int i = 0; i < acm_cleared.entry_values.size(); ++i)
   {
-    for (int i = 0; i < acm_cleared.entry_values[i].enabled.size(); ++i)
+    for (int j = 0; j < acm_cleared.entry_values[j].enabled.size(); ++j)
     {
-      acm_cleared.entry_values[i].enabled[i] = true;
+      acm_cleared.entry_values[i].enabled[j] = true;
     }
   }
-  moveit_msgs::PlanningScene ps = planning_scene_;
-  ps.allowed_collision_matrix = acm_cleared;
-  planning_scene_interface_.applyPlanningScene(ps);
+  moveit_msgs::PlanningScene ps_no_collisions = planning_scene_;
+  ps_no_collisions.allowed_collision_matrix = acm_cleared;
+  planning_scene_interface_.applyPlanningScene(ps_no_collisions);
 
   // Plan & execute LINEAR motion to the tool change position
-  ps_pickup = ps_approach;
-  ps_pickup.pose.position.y = -0.05;
-  ROS_INFO("Moving to pickup pose LIN.");
-  moveToCartPoseLIN(ps_pickup, robot_name);
+  ps_tool_holder = ps_approach;
+  if (equip)        ps_tool_holder.pose.position.y = -0.03;
+  else if (unequip) ps_tool_holder.pose.position.y = -0.02;  
+  // The tool is deposited a bit in front of the original position. The magnet pulls it to the final pose.
+  ROS_INFO("Moving to pose in tool holder LIN.");
+  moveToCartPoseLIN(ps_tool_holder, robot_name);
 
   // Close gripper, attach the tool object to the gripper in the Planning Scene
-  closeGripper(robot_name);
-  // attachTool(screw_tool_id, robot_name);
-
+  if (equip)
+  {
+    closeGripper(robot_name);
+    attachTool(screw_tool_id, robot_name);
+  }
+  else if (unequip) 
+  {
+    openGripper(robot_name);
+    detachTool(screw_tool_id, robot_name);
+  }
+  
   // Plan & execute LINEAR motion away from the tool change position
-  ROS_INFO("Moving back to approach pose LIN.");
+  ROS_INFO("Moving back to screw tool approach pose LIN.");
   moveToCartPoseLIN(ps_approach, robot_name);
+
+  // Reactivate the collisions
+  planning_scene_interface_.applyPlanningScene(planning_scene_);
+
+  if (unequip) despawnTool(screw_tool_id);
 
   // Optional: Move back to home
   return true;
 }
 
-bool SkillServer::putBackScrewTool(std::string robot_name)
-{
-  ;
-  // --- THE PLAN:
-  // Make sure no item is held
-  // Plan & execute motion to in front of the correct holder (check the member variable of the size)
-  // Plan & execute LINEAR motion to the tool change position
-  // Open gripper, detach the tool object from the gripper in the Planning Scene
-  // MAYBE: Set the ACM in the planning scene up to allow collisions between the gripper and everything (to avoid unnecessary calculations)
-  // OR: Delete the tool from the scene
-  // Plan & execute LINEAR motion away from the tool change position
-  // Optional: Move back to home
-}
-
+// This refreshes the class member variable of the planning scene.
 bool SkillServer::updatePlanningScene()
 {
   moveit_msgs::GetPlanningScene srv;
@@ -510,7 +525,7 @@ int main(int argc, char **argv)
   o2as_skill_server.goToNamedPose("home_b", "b_bot");
 
   ROS_INFO("Testing the screw tool unmounting.");
-  o2as_skill_server.putBackScrewTool("b_bot");
+  o2as_skill_server.unequipScrewTool("b_bot");
   ROS_INFO("Done.");
 
   return 0;
