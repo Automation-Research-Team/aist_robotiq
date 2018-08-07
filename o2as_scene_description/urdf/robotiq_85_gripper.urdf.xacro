@@ -15,9 +15,24 @@
     <joint name="${prefix}robotiq_85_tip_link_joint" type="fixed">
       <parent link="${prefix}robotiq_85_base_link"/>
       <child link="${prefix}robotiq_85_tip_link"/>
-      <origin rpy="0.0 0.0 0.0" xyz=".16 0.0 0.0"/>
+      <origin rpy="${-pi/2} 0.0 ${-pi/2}" xyz=".16 0.0 0.0"/>
     </joint>
     <link name="${prefix}robotiq_85_tip_link"/>
+
+    <!-- <joint name="${prefix}robotiq_85_m5_screw_tool_tip_joint" type="fixed">
+      <parent link="${prefix}robotiq_85_base_link"/>
+      <child link="${prefix}robotiq_85_m5_screw_tool_tip"/>
+      <origin rpy="${-pi/2} 0.0 ${-pi/2}" xyz=".14 0.0 -0.088"/>
+    </joint>
+    <link name="${prefix}robotiq_85_m5_screw_tool_tip"/> -->
+
+    <!-- Screw tool tip. Z-axis points along the screw into the hole. -->
+    <joint name="${prefix}robotiq_85_m5_screw_tool_tip_joint" type="fixed">
+      <parent link="${prefix}robotiq_85_tip_link"/>
+      <child link="${prefix}robotiq_85_m5_screw_tool_tip"/>
+      <origin rpy="${-pi/2} 0.0 0.0" xyz="0.0 0.088 -0.02"/>
+    </joint>
+    <link name="${prefix}robotiq_85_m5_screw_tool_tip"/>
 
   </xacro:macro>
 </robot>
