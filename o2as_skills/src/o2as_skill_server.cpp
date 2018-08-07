@@ -252,12 +252,6 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     ROS_ERROR_STREAM("Robot already holds an object. Cannot " << equip_or_unequip << " screw tool.");
     return false;
   }
-  if (equip)
-  {
-    ROS_INFO("Spawning tool.");
-    spawnTool(screw_tool_id);
-    held_screw_tool_ = screw_tool_id;
-  }
   
   // Plan & execute motion to in front of holder
   geometry_msgs::PoseStamped ps_approach, ps_tool_holder;
@@ -269,7 +263,13 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   ROS_INFO("Moving to screw tool approach pose PTP.");
   moveToCartPosePTP(ps_approach, robot_name);
 
-  if (equip) {openGripper(robot_name);}
+  if (equip) {
+    openGripper(robot_name);
+    ROS_INFO("Spawning tool. Waiting for a while to be safe.");
+    spawnTool(screw_tool_id);
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    held_screw_tool_ = screw_tool_id;
+  }
 
   // Disable all collisions to allow movement into the tool
   // NOTE: This could be done cleaner by disabling only gripper + tool, but it is good enough for now.
@@ -313,9 +313,9 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   // Reactivate the collisions
   planning_scene_interface_.applyPlanningScene(planning_scene_);
 
+  // Delete tool collision object only after collision reinitialization to avoid errors
   if (unequip) despawnTool(screw_tool_id);
 
-  // Optional: Move back to home
   return true;
 }
 
@@ -447,25 +447,30 @@ bool SkillServer::pickScrew(std::string object_id, std::string screw_tool_id, st
   object_pose.pose.position = poses[object_id].position;
   // We ignore the orientation of the screw (they always point down) and assign an appropriate orientation
   // TODO: How to find a good pose for the robot automatically? Launch a planning request to MoveIt?
-  object_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(110.0/180.0 *M_PI));   // Z-axis pointing up.
+  object_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(145.0/180.0 *M_PI));   // Z-axis pointing up.
   
-  // Move above the screw
-  object_pose.pose.position.z += .1;
-  moveToCartPosePTP(object_pose, robot_name, true, screw_tool_id);
-
-  // Move onto the screw
-  object_pose.pose.position.z -= .1;
-  bool success = moveToCartPoseLIN(object_pose, robot_name, true, screw_tool_id);
-  if (!success) moveToCartPosePTP(object_pose, robot_name, true, screw_tool_id);  // Force the move even if LIN fails
-  
-  // Move back up a little
-  object_pose.pose.position.z += .05;
-  success = moveToCartPoseLIN(object_pose, robot_name, true, screw_tool_id);
-  if (!success) moveToCartPosePTP(object_pose, robot_name, true, screw_tool_id);  // Force the move even if LIN fails
-  
-  return true;
+  std::string screw_tool_link = robot_name + "_" + screw_tool_id + "_tip_link";
+  return pickFromAbove(object_pose, screw_tool_link, robot_name);
 }
 
+bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name)
+{
+  // Move above the screw
+  target_tip_link_pose.pose.position.z += .1;
+  moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);
+
+  // Move onto the screw
+  target_tip_link_pose.pose.position.z -= .1;
+  bool success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
+  if (!success) moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+  
+  // Move back up a little
+  target_tip_link_pose.pose.position.z += .05;
+  success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
+  if (!success) moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+
+  return true;
+}
 
 // ----------- Service definitions
 bool SkillServer::goToNamedPoseCallback(o2as_skills::goToNamedPose::Request &req,
@@ -502,7 +507,7 @@ void SkillServer::executePick(const o2as_skills::pickGoalConstPtr& goal)
   {;} // TODO: Here is space for code from AIST.
   else // No tool being used
   {
-    ; 
+    ;
     // TODO. The plan: 
     // - Check that the object exists in the planning scene
     // - VARIATION A:
@@ -568,6 +573,26 @@ int main(int argc, char **argv)
   o2as_skill_server.equipScrewTool("b_bot", "screw_tool_m5");
 
   ROS_INFO("Going to home pose.");
+  o2as_skill_server.goToNamedPose("home_b", "b_bot");
+
+  ROS_INFO("Picking screw from tray 1.");
+  geometry_msgs::PoseStamped ps = makePoseStamped();
+  ps.header.frame_id = "set3_tray_1";
+  ps.pose.position.z = .02;
+  // We ignore the orientation of the screw (they always point down) and assign an appropriate orientation
+  // TODO: How to find a good pose for the robot automatically? Launch a planning request to MoveIt?
+  ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(110.0/180.0 *M_PI));   // Z-axis pointing up.
+  std::string link_name = "b_bot_screw_tool_m5_tip_link";
+  std::string robot_name = "b_bot";
+
+  o2as_skill_server.pickFromAbove(ps, link_name, robot_name);
+
+  ROS_INFO("Picking screw from tray 2.");
+  ps.header.frame_id = "set3_tray_2";
+  ps.pose.position.y = .05;
+  o2as_skill_server.pickFromAbove(ps, link_name, robot_name);
+
+  ROS_INFO("Going to home pose again.");
   o2as_skill_server.goToNamedPose("home_b", "b_bot");
 
   ROS_INFO("Testing the screw tool unmounting.");

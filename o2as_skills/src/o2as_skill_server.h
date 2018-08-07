@@ -55,6 +55,7 @@ public:
   bool attachTool(std::string screw_tool_id, std::string link_name);
   bool detachTool(std::string screw_tool_id, std::string link_name);
   bool attachDetachTool(std::string screw_tool_id, std::string link_name, std::string attach_or_detach);
+  bool pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name);
   bool pickScrew(std::string object_id, std::string screw_tool_id, std::string robot_name);
   
 
@@ -95,6 +96,12 @@ private:
   // Status variables
   tf::TransformListener tflistener_;
   bool holding_object_ = false;
+  // A status of the robot. This should almost definitely be rosparams instead.
+  // /a_bot/status/carrying_object  (bool)
+  // /a_bot/status/carrying_tool    (bool)
+  // /a_bot/status/held_object_id   (string)
+  // /a_bot/status/held_tool_id     (string)
+  // std::map<std::string robot_name, std::map<std::string attribute, std::string status>> robot_statuses;
   std::string held_object_id_ = "";
   std::string held_screw_tool_ = "";    // "m3", "m4", "m5", "nut"...
 
