@@ -98,7 +98,7 @@ SkillServer::SkillServer() :
 
 
 // This works only for a single robot.
-bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait)
+bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait, std::string end_effector_link)
 {
   moveit::planning_interface::MoveGroupInterface::Plan myplan;
   moveit::planning_interface::MoveItErrorCode 
@@ -109,9 +109,10 @@ bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string
   group_pointer = robotNameToMoveGroup(robot_name);
 
   group_pointer->setStartStateToCurrentState();
+  group_pointer->setEndEffectorLink(end_effector_link);
   group_pointer->setPoseTarget(pose);
 
-  ROS_DEBUG_STREAM("Planning motion for robot " << robot_name << ".");
+  ROS_DEBUG_STREAM("Planning motion for robot " << robot_name << " and EE link " << end_effector_link + "_tip_link.");
   success_plan = group_pointer->plan(myplan);
   if (success_plan) 
   {
@@ -126,7 +127,7 @@ bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string
 }
 
 // This works only for a single robot.
-bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait)
+bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait, std::string end_effector_link)
 {
   moveit::planning_interface::MoveGroupInterface::Plan myplan;
   moveit::planning_interface::MoveItErrorCode 
@@ -137,6 +138,7 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   group_pointer = robotNameToMoveGroup(robot_name);
 
   group_pointer->setStartStateToCurrentState();
+  group_pointer->setEndEffectorLink(end_effector_link);
   
   // Plan cartesian motion
   std::vector<geometry_msgs::Pose> waypoints;
@@ -148,7 +150,7 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   waypoints.push_back(start_pose.pose);
   waypoints.push_back(pose.pose);
 
-  group_pointer->setMaxVelocityScalingFactor(0.1);
+  group_pointer->setMaxVelocityScalingFactor(0.1);  // Does this work??
   b_bot_group_.setPlanningTime(20.0);
 
   moveit_msgs::RobotTrajectory trajectory;
@@ -173,7 +175,8 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
     {
       group_pointer->setMaxVelocityScalingFactor(1.0); // Reset the velocity
       b_bot_group_.setPlanningTime(1.0);
-      return true;
+      if (cartesian_success > .95) return true;
+      else return false;
     }
   }
   group_pointer->setMaxVelocityScalingFactor(1.0); // Reset the velocity
@@ -432,6 +435,37 @@ bool SkillServer::attachDetachTool(std::string screw_tool_id, std::string robot_
   return true;
 }
 
+bool SkillServer::pickScrew(std::string object_id, std::string screw_tool_id, std::string robot_name)
+{
+  // Retrieve the position of the object from the planning scene
+  geometry_msgs::PoseStamped object_pose = makePoseStamped();
+  std::vector<std::string> object_name_vector;
+  object_name_vector.push_back(object_id);
+  std::map< std::string, geometry_msgs::Pose > poses = planning_scene_interface_.getObjectPoses(object_name_vector);
+  
+  object_pose.header.frame_id = "world";
+  object_pose.pose.position = poses[object_id].position;
+  // We ignore the orientation of the screw (they always point down) and assign an appropriate orientation
+  // TODO: How to find a good pose for the robot automatically? Launch a planning request to MoveIt?
+  object_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(110.0/180.0 *M_PI));   // Z-axis pointing up.
+  
+  // Move above the screw
+  object_pose.pose.position.z += .1;
+  moveToCartPosePTP(object_pose, robot_name, true, screw_tool_id);
+
+  // Move onto the screw
+  object_pose.pose.position.z -= .1;
+  bool success = moveToCartPoseLIN(object_pose, robot_name, true, screw_tool_id);
+  if (!success) moveToCartPosePTP(object_pose, robot_name, true, screw_tool_id);  // Force the move even if LIN fails
+  
+  // Move back up a little
+  object_pose.pose.position.z += .05;
+  success = moveToCartPoseLIN(object_pose, robot_name, true, screw_tool_id);
+  if (!success) moveToCartPosePTP(object_pose, robot_name, true, screw_tool_id);  // Force the move even if LIN fails
+  
+  return true;
+}
+
 
 // ----------- Service definitions
 bool SkillServer::goToNamedPoseCallback(o2as_skills::goToNamedPose::Request &req,
@@ -458,17 +492,29 @@ void SkillServer::executeAlign(const o2as_skills::alignGoalConstPtr& goal)
 void SkillServer::executePick(const o2as_skills::pickGoalConstPtr& goal)
 {
   ROS_INFO("pickAction was called");
-  // TODO: Insert commands to do the action
-  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
-  if (goal->gripper == "a_bot")
-  {;}
-  else if (goal->gripper == "b_bot")
-  {;}
-  else if (goal->gripper == "c_bot")
-  {;}
-  else if (goal->gripper == "suction")
-  {;}
+  if (goal->tool_name == "screw_tool")
+  {
+    std::string screw_tool_id = goal->tool_name + "_m" + std::to_string(goal->screw_size);
+    pickScrew(goal->item_id, screw_tool_id, goal->robot_name);
+  }
+  else if (goal->tool_name == "suction")
+  {;} // TODO: Here is space for code from AIST.
+  else // No tool being used
+  {
+    ; 
+    // TODO. The plan: 
+    // - Check that the object exists in the planning scene
+    // - VARIATION A:
+    // -- Pass the request to the grasp planner along with the robot name
+    // -- It should return a grasp to be executed via the modified MoveIt pick routine
+    // - VARIATION B:
+    // -- Take the center of gravity and the major axis of the object
+    // -- Move the gripper to above the object, orienting the major axis along the z-axis of the tip link
+    // -- Allow collisions with the object and the gripper
+    // -- Move down to an appropriate gripping height or to the bottom of the container
+    // -- Close the grasp, then move back up
+  }
 
   ROS_INFO("pickAction is set as succeeded");
   pickActionServer_.setSucceeded();

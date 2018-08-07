@@ -39,8 +39,8 @@ public:
   SkillServer();
 
   //Helpers (convenience functions)
-  bool moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true);
-  bool moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true);
+  bool moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true, std::string end_effector_link = "");
+  bool moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true, std::string end_effector_link = "");
   bool goToNamedPose(std::string pose_name, std::string robot_name);
   bool stop();                  // Stops the robot at the current position
   moveit::planning_interface::MoveGroupInterface* robotNameToMoveGroup(std::string robot_name);
@@ -55,6 +55,8 @@ public:
   bool attachTool(std::string screw_tool_id, std::string link_name);
   bool detachTool(std::string screw_tool_id, std::string link_name);
   bool attachDetachTool(std::string screw_tool_id, std::string link_name, std::string attach_or_detach);
+  bool pickScrew(std::string object_id, std::string screw_tool_id, std::string robot_name);
+  
 
   bool openGripper(std::string robot_name);
   bool closeGripper(std::string robot_name);

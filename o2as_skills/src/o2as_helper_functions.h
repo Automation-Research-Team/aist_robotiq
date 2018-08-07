@@ -193,6 +193,14 @@ geometry_msgs::Pose makePose()
   return pose;
 }
 
+geometry_msgs::PoseStamped makePoseStamped()
+{
+  geometry_msgs::PoseStamped ps;
+  ps.header.frame_id = "world";
+  ps.pose = makePose();
+  return ps;
+}
+
 geometry_msgs::Pose makePose(double x, double y, double z)
 {
   geometry_msgs::Pose pose;
