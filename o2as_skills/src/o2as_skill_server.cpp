@@ -107,7 +107,8 @@ bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string
 
   moveit::planning_interface::MoveGroupInterface* group_pointer;
   group_pointer = robotNameToMoveGroup(robot_name);
-
+  
+  group_pointer->clearPoseTargets();
   group_pointer->setStartStateToCurrentState();
   group_pointer->setEndEffectorLink(end_effector_link);
   group_pointer->setPoseTarget(pose);
@@ -137,6 +138,7 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   moveit::planning_interface::MoveGroupInterface* group_pointer;
   group_pointer = robotNameToMoveGroup(robot_name);
 
+  group_pointer->clearPoseTargets();
   group_pointer->setStartStateToCurrentState();
   group_pointer->setEndEffectorLink(end_effector_link);
   
