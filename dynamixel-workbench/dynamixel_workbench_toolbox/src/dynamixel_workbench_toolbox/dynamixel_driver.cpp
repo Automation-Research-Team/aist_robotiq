@@ -421,7 +421,6 @@ bool DynamixelDriver::writeRegister(uint8_t id, const char *item_name, int32_t d
     //correction (August 6.Kowa Yasushi)
     //In the case of "Torque Limit",the address is 34. It is mistake.
     //reference: http://support.robotis.com/en/product/actuator/dynamixel_x/xl_series/xl-320.htm
-    
     if (!strcmp(item_name,"Torque_Limit"))
     {
       cti->address = 35;

@@ -14,6 +14,9 @@ find_package(catkin REQUIRED COMPONENTS
   dynamixel_workbench_msgs
   dynamixel_workbench_toolbox
   message_generation
+  genmsg
+  actionlib
+  actionlib_msgs
   roscpp
 )
 
@@ -29,8 +32,10 @@ add_service_files(
   Stop.srv
 )
 
+add_action_files(DIRECTORY action FILES FastenerGripperControl.action)
+
 generate_messages(
-  DEPENDENCIES std_msgs
+  DEPENDENCIES actionlib_msgs std_msgs 
 )
 
 ################################################################################
@@ -38,7 +43,7 @@ generate_messages(
 ################################################################################
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS roscpp dynamixel_workbench_msgs dynamixel_workbench_toolbox message_runtime
+  CATKIN_DEPENDS roscpp dynamixel_workbench_msgs dynamixel_workbench_toolbox message_runtime actionlib_msgs
 )
 
 ################################################################################
