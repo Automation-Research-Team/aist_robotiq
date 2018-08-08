@@ -29,6 +29,6 @@
   </include>
 
   <!-- This calls the action client example -->
-  <node name="action_example" pkg="o2as_moveit_planner" type="action_example" respawn="false" output="screen" />
+  <node name="action_example" pkg="o2as_examples" type="action_example" respawn="false" output="screen" />
   
 </launch>

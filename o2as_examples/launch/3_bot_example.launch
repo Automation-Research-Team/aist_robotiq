@@ -13,7 +13,7 @@
   </include> -->
     
   <!-- This calls the ROS node we have written, using the parameters above -->
-  <node name="ExampleLoopMoveit" pkg="o2as_moveit_planner" type="3_bot_example" respawn="false" output="screen">
+  <node name="ExampleLoopMoveit" pkg="o2as_examples" type="3_bot_example" respawn="false" output="screen">
     <param name="move_group" value="$(arg move_group)"/>
     <param name="ee_link1" value="$(arg ee_link1)"/>
     <param name="ee_link2" value="$(arg ee_link2)"/>

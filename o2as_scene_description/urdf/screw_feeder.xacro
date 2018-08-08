@@ -74,5 +74,12 @@
     <child link ="${feedername}_link" />
     <xacro:insert_block name="origin"/>
   </joint>
+
+  <joint name="${feedername}_outlet_joint" type="fixed">
+    <parent link="${feedername}_link"/>
+    <child link="${feedername}_outlet_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="${length-.01} ${width/2} ${height/2 + .02}"/>
+  </joint>
+  <link name="${feedername}_outlet_link"/>
   </xacro:macro>
 </robot>

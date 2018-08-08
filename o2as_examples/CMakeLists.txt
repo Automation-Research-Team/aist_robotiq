@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(o2as_moveit_planner)
+project(o2as_examples)
 
 ## Add support for C++11, supported in ROS Kinetic and newer
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
@@ -69,7 +69,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES o2as_moveit_planner
+#  LIBRARIES o2as_examples
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
@@ -84,7 +84,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/o2as_moveit_planner.cpp
+#   src/${PROJECT_NAME}/o2as_examples.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -130,12 +130,12 @@ add_dependencies(action_example
   	${catkin_EXPORTED_TARGETS})
 target_link_libraries(action_example ${catkin_LIBRARIES})
 
-# add_executable(o2as_moveit_planner src/o2as_moveit_planner.cpp)
-# add_dependencies(o2as_moveit_planner
+# add_executable(o2as_examples src/o2as_examples.cpp)
+# add_dependencies(o2as_examples
 # 	${${PROJECT_NAME}_EXPORTED_TARGETS}
 #   	${catkin_EXPORTED_TARGETS}	
 # )
-# target_link_libraries(o2as_moveit_planner ${catkin_LIBRARIES})
+# target_link_libraries(o2as_examples ${catkin_LIBRARIES})
 
 catkin_install_python(PROGRAMS scripts/example_movegroupcommander.py
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
@@ -160,7 +160,7 @@ catkin_install_python(PROGRAMS scripts/example_movegroupcommander.py
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_o2as_moveit_planner.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_o2as_examples.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
