@@ -33,18 +33,21 @@ SkillServer::SkillServer() :
   // ROS_INFO("Action servers started.");
 
   // Set up MoveGroups
-  a_bot_group_.setPlanningTime(1.0);
+  a_bot_group_.setPlanningTime(PLANNING_TIME);
   a_bot_group_.setPlannerId("RRTConnectkConfigDefault");
   a_bot_group_.setEndEffectorLink("a_bot_robotiq_85_tip_link");
-  b_bot_group_.setPlanningTime(1.0);
+  a_bot_group_.setNumPlanningAttempts(10);
+  b_bot_group_.setPlanningTime(PLANNING_TIME);
   b_bot_group_.setPlannerId("RRTConnectkConfigDefault");
   b_bot_group_.setEndEffectorLink("b_bot_robotiq_85_tip_link");
-  c_bot_group_.setPlanningTime(1.0);
+  b_bot_group_.setNumPlanningAttempts(10);
+  c_bot_group_.setPlanningTime(PLANNING_TIME);
   c_bot_group_.setPlannerId("RRTConnectkConfigDefault");
   c_bot_group_.setEndEffectorLink("c_bot_robotiq_85_tip_link");
-  front_bots_group_.setPlanningTime(3.0);
+  c_bot_group_.setNumPlanningAttempts(10);
+  front_bots_group_.setPlanningTime(PLANNING_TIME);
   front_bots_group_.setPlannerId("RRTConnectkConfigDefault");
-  all_bots_group_.setPlanningTime(5.0);
+  all_bots_group_.setPlanningTime(PLANNING_TIME);
   all_bots_group_.setPlannerId("RRTConnectkConfigDefault");
 
   get_planning_scene_client = n_.serviceClient<moveit_msgs::GetPlanningScene>("/get_planning_scene");
@@ -126,7 +129,6 @@ bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string
   ROS_WARN("Failed to perform motion.");
   return false;
 }
-
 // This works only for a single robot.
 bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait, std::string end_effector_link)
 {
@@ -153,19 +155,13 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   waypoints.push_back(pose.pose);
 
   group_pointer->setMaxVelocityScalingFactor(0.1);  // Does this work??
-  b_bot_group_.setPlanningTime(20.0);
+  b_bot_group_.setPlanningTime(LIN_PLANNING_TIME);
 
   moveit_msgs::RobotTrajectory trajectory;
   const double jump_threshold = 0.0;
   const double eef_step = 0.01;
   double cartesian_success = group_pointer->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
   ROS_INFO("Cartesian motion plan was %.2f%% successful.", cartesian_success * 100.0);
-
-  // --- This was for testing the 
-  // ros::Publisher pubLinTraj = n_.advertise<moveit_msgs::RobotTrajectory>("/linear_trajectory", 1);
-  // ROS_INFO("Publishing trajectory.");
-  // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-  // pubLinTraj.publish(trajectory);
 
   myplan.trajectory_ = trajectory;
   // if (cartesian_success > .95) 
@@ -257,11 +253,11 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   
   // Plan & execute motion to in front of holder
   geometry_msgs::PoseStamped ps_approach, ps_tool_holder;
-  ps_approach.header.frame_id = screw_tool_id + "_link";
+  ps_approach.header.frame_id = screw_tool_id + "_helper_link";
 
-  ps_approach.pose.position.y = .1;
+  ps_approach.pose.position.x = -.1;
   ps_approach.pose.position.z = .017;
-  ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -M_PI / 2);
+  ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
   ROS_INFO("Moving to screw tool approach pose PTP.");
   moveToCartPosePTP(ps_approach, robot_name);
 
@@ -269,12 +265,13 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     openGripper(robot_name);
     ROS_INFO("Spawning tool. Waiting for a while to be safe.");
     spawnTool(screw_tool_id);
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     held_screw_tool_ = screw_tool_id;
   }
 
   // Disable all collisions to allow movement into the tool
   // NOTE: This could be done cleaner by disabling only gripper + tool, but it is good enough for now.
+  updatePlanningScene();
   moveit_msgs::AllowedCollisionMatrix acm_cleared, acm_original = planning_scene_.allowed_collision_matrix;
   acm_cleared = acm_original;
   for (int i = 0; i < acm_cleared.entry_values.size(); ++i)
@@ -290,29 +287,34 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
   // Plan & execute LINEAR motion to the tool change position
   ps_tool_holder = ps_approach;
-  if (equip)        ps_tool_holder.pose.position.y = -0.03;
-  else if (unequip) ps_tool_holder.pose.position.y = -0.02;  
+  if (equip)        ps_tool_holder.pose.position.x = 0.03;
+  else if (unequip) ps_tool_holder.pose.position.x = 0.02;  
   // The tool is deposited a bit in front of the original position. The magnet pulls it to the final pose.
   ROS_INFO("Moving to pose in tool holder LIN.");
   moveToCartPoseLIN(ps_tool_holder, robot_name);
 
-  // Close gripper, attach the tool object to the gripper in the Planning Scene
+  // Close gripper, attach the tool object to the gripper in the Planning Scene.
+  // Its collision with the parent link is set to allowed in the original planning scene.
+  collision_detection::AllowedCollisionMatrix helper_acm(planning_scene_.allowed_collision_matrix);
   if (equip)
   {
     closeGripper(robot_name);
     attachTool(screw_tool_id, robot_name);
+    helper_acm.setEntry(screw_tool_id, robot_name + "_robotiq_85_tip_link", true);
   }
   else if (unequip) 
   {
     openGripper(robot_name);
     detachTool(screw_tool_id, robot_name);
+    helper_acm.removeEntry(screw_tool_id);
   }
+  helper_acm.getMessage(planning_scene_.allowed_collision_matrix);
   
   // Plan & execute LINEAR motion away from the tool change position
   ROS_INFO("Moving back to screw tool approach pose LIN.");
   moveToCartPoseLIN(ps_approach, robot_name);
 
-  // Reactivate the collisions
+  // Reactivate the collisions, with the updated entry about the tool
   planning_scene_interface_.applyPlanningScene(planning_scene_);
 
   // Delete tool collision object only after collision reinitialization to avoid errors
@@ -457,19 +459,32 @@ bool SkillServer::pickScrew(std::string object_id, std::string screw_tool_id, st
 
 bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name)
 {
-  // Move above the screw
+  // Move above the object
   target_tip_link_pose.pose.position.z += .1;
+  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);
 
-  // Move onto the screw
+  // Move onto the object
   target_tip_link_pose.pose.position.z -= .1;
+  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   bool success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
-  if (!success) moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
-  
+  if (!success) 
+  {
+    ROS_INFO_STREAM("Linear motion plan to target pick pose failed. Performing PTP.");
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+  }
+
   // Move back up a little
   target_tip_link_pose.pose.position.z += .05;
+  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
-  if (!success) moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+  if (!success) 
+  {
+    ROS_INFO_STREAM("Linear motion plan back from pick pose failed. Performing PTP.");
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+  }
 
   return true;
 }
@@ -541,7 +556,7 @@ void SkillServer::executePlace(const o2as_skills::placeGoalConstPtr& goal)
 void SkillServer::executeInsert(const o2as_skills::insertGoalConstPtr& goal)
 {
   ROS_INFO("insertAction was called");
-  // TODO: Insert commands to do the action
+  // TODO: Send URscript to the robot
   std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   ROS_INFO("insertAction is set as succeeded");
   insertActionServer_.setSucceeded();
@@ -551,8 +566,33 @@ void SkillServer::executeInsert(const o2as_skills::insertGoalConstPtr& goal)
 void SkillServer::executeScrew(const o2as_skills::screwGoalConstPtr& goal)
 {
   ROS_INFO("screwAction was called");
-  // TODO: Insert commands to do the action
-  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+  // Set target pose for the end effector
+  geometry_msgs::PoseStamped target_tip_link_pose = goal->target_hole;
+  std::string screw_tool_link = goal->robot_name + "_" + held_screw_tool_ + "_tip_link";
+
+  target_tip_link_pose.pose.position.z += goal->screw_height+.005;  // Add the screw height and tolerance
+
+  if (goal->screw_height < 0.001) {target_tip_link_pose.pose.position.z += .02;}   // In case screw_height was not set
+
+  // Move above the screw hole
+  target_tip_link_pose.pose.position.z += .05;
+  moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, screw_tool_link);
+
+  // Move down to the screw hole
+  target_tip_link_pose.pose.position.z -= .05;
+  bool success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link);
+  if (!success) moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, screw_tool_link);  // Force the move even if LIN fails
+
+  // TODO: Move down, exert very light pressure + spiral motion to find the screw hole
+  //       This should be done via a URscript.
+  //       Also turn on the fastener tool motor.
+  
+  // Move back up a little
+  target_tip_link_pose.pose.position.z += .05;
+  success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link);
+  if (!success) moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, screw_tool_link);  // Force the move even if LIN fails
+  
   ROS_INFO("screwAction is set as succeeded");
   screwActionServer_.setSucceeded();
 }
@@ -568,21 +608,19 @@ int main(int argc, char **argv)
 
   // Create an object of class SkillServer that will take care of everything
   SkillServer o2as_skill_server;
-
   ROS_INFO("O2AS skill server started");
 
+  // Debugging procedures that should be in a separate node.
   ROS_INFO("Testing the screw tool mounting.");
   o2as_skill_server.equipScrewTool("b_bot", "screw_tool_m5");
 
-  ROS_INFO("Going to home pose.");
-  o2as_skill_server.goToNamedPose("home_b", "b_bot");
+  ROS_INFO("Going to screw ready pose.");
+  o2as_skill_server.goToNamedPose("screw_ready_b", "b_bot");
 
   ROS_INFO("Picking screw from tray 1.");
   geometry_msgs::PoseStamped ps = makePoseStamped();
   ps.header.frame_id = "set3_tray_1";
   ps.pose.position.z = .02;
-  // We ignore the orientation of the screw (they always point down) and assign an appropriate orientation
-  // TODO: How to find a good pose for the robot automatically? Launch a planning request to MoveIt?
   ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(110.0/180.0 *M_PI));   // Z-axis pointing up.
   std::string link_name = "b_bot_screw_tool_m5_tip_link";
   std::string robot_name = "b_bot";
@@ -594,8 +632,8 @@ int main(int argc, char **argv)
   ps.pose.position.y = .05;
   o2as_skill_server.pickFromAbove(ps, link_name, robot_name);
 
-  ROS_INFO("Going to home pose again.");
-  o2as_skill_server.goToNamedPose("home_b", "b_bot");
+  ROS_INFO("Going back to screw ready pose.");
+  o2as_skill_server.goToNamedPose("screw_ready_b", "b_bot");
 
   ROS_INFO("Testing the screw tool unmounting.");
   o2as_skill_server.unequipScrewTool("b_bot");

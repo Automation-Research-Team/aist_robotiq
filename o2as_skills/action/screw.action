@@ -1,11 +1,11 @@
-# This should be called when? To say screw this frame into this other frame? Or when the screw is positioned? Probably the former.
-
+# This should be called when the screw tool is ready to insert a screw somewhere.
+# Screws can be picked up via the pick action.
 
 # Request
-# z points into the screw hole
+# z points out of the screw hole, to the top
 geometry_msgs/PoseStamped target_hole
 float64 screw_height         # In m, measured from the bottom of the head (M3x5 has a screw_height of 0.005)
-string gripper                          
+string robot_name                          
 ---
 # Result
 bool success

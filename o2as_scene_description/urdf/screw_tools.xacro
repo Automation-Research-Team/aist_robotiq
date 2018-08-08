@@ -116,5 +116,28 @@
     <origin xyz="-0.1 0.0 0.0" rpy="0.0 0.0 0.0" />
   </joint>
 
+  <!-- Extra links to position the gripper more simply -->
+
+  <link name="screw_tool_m3_helper_link"/>
+  <joint name="screw_tool_m3_helper_joint" type="fixed">
+    <parent link="screw_tool_m3_link" />
+    <child link="screw_tool_m3_helper_link" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-pi/2}" />
+  </joint>
+
+  <link name="screw_tool_m4_helper_link"/>
+  <joint name="screw_tool_m4_helper_joint" type="fixed">
+    <parent link="screw_tool_m4_link" />
+    <child link="screw_tool_m4_helper_link" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-pi/2}" />
+  </joint>
+
+  <link name="screw_tool_m5_helper_link"/>
+  <joint name="screw_tool_m5_helper_joint" type="fixed">
+    <parent link="screw_tool_m5_link" />
+    <child link="screw_tool_m5_helper_link" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-pi/2}" />
+  </joint>
+
 
 </robot>

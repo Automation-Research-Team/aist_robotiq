@@ -16,6 +16,7 @@
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit_msgs/GetPlanningScene.h>
+#include <moveit/collision_detection/collision_matrix.h>
 // #include <moveit_visual_tools/moveit_visual_tools.h>
 
 // Services
@@ -91,6 +92,8 @@ private:
   // Action clients
   // actionlib::SimpleActionClient<control_msgs::GripperCommandAction> a_bot_gripper_client_;
   actionlib::SimpleActionClient<robotiq_msgs::CModelCommandAction> b_bot_gripper_client_, c_bot_gripper_client_;
+
+  double PLANNING_TIME = 15.0, LIN_PLANNING_TIME = 30.0;
   
 
   // Status variables

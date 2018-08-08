@@ -20,7 +20,6 @@
   <build_depend>rospy</build_depend>
 
   <build_depend>actionlib</build_depend>
-  <build_depend>o2as_moveit_planner</build_depend>
   <build_depend>tf</build_depend>
   <exec_depend>tf</exec_depend>
 
