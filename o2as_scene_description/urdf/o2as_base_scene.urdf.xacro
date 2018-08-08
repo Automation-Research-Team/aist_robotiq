@@ -130,8 +130,11 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:sensor_d435>
   
-  
-  
+  <!-- spawn and attach AR marker -->
+  <xacro:include filename="$(find o2as_gazebo)/urdf/o2as_ar_marker.urdf.xacro"/>
+  <xacro:o2as_ar_marker prefix="b_bot_" parent="b_bot_wrist_3_link">
+    <origin xyz="0.0 0.0 0.05" rpy="0 0 0"/>
+  </xacro:o2as_ar_marker>
 
   <!-- I meant to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world" />
