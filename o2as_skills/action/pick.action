@@ -1,0 +1,11 @@
+bool use_complex_planning   # Use simple grasp planning from above or complex planning?
+bool retreat_after_pick     # If true, arm moves away from the table after grasping
+string item_id              # item ID in the planning scene
+string gripper              # "a_bot", "b_bot", "c_bot" or "suction"
+uint8 screw_size            # M4, M5, M6 (without the M)
+---
+# success
+bool success
+---
+# Feedback
+float32 progress 

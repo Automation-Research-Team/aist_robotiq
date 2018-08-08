@@ -57,6 +57,15 @@ controller_list:
       - c_bot_wrist_1_joint
       - c_bot_wrist_2_joint
       - c_bot_wrist_3_joint
+  - name: fake_a_gripper_controller
+    joints:
+      - a_bot_robotiq_85_left_knuckle_joint
+  # - name: fake_a_gripper_controller
+  #   action_ns: gripper_action
+  #   type: GripperCommand
+  #   default: true
+  #   joints:
+  #     - a_bot_robotiq_85_left_knuckle_joint
 initial:
   - group: a_bot
     pose: home_a

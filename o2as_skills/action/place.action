@@ -1,0 +1,9 @@
+# Request
+geometry_msgs/PoseStamped target_pose   # Target pose of the object
+string gripper                          # "a_bot", "b_bot", "c_bot" or "suction"
+---
+# Result
+bool success
+---
+# Feedback
+float32 progress
