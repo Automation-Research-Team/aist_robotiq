@@ -18,3 +18,8 @@ spawned in the simulation environment by following the steps below.
     rosrun o2as_parts_description test_spawn_parts.py 9 50 3
     rosrun o2as_parts_description test_spawn_parts.py 16 50 4
     ```
+
+## Rules for item coordinate systems
+
+For items with an axis of rotation, the item coordinate system should be oriented with the z-axis pointing "forward" through the object, along the axis of symmetry. The start of the coordinate system should be the on the side of the center of gravity (on the side of the head of the screw).
+
