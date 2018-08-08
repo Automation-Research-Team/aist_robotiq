@@ -1,0 +1,15 @@
+material MyOrange
+{
+  technique
+  {
+    pass ambient
+    {
+      lighting on
+
+      ambient 1 0.5088 0.0468 1
+      diffuse 1 0.5088 0.0468 1
+      specular 0.5 0.5 0.5 128
+    }
+  }
+}
+
