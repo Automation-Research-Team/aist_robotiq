@@ -226,11 +226,13 @@ moveit::planning_interface::MoveGroupInterface* SkillServer::robotNameToMoveGrou
 
 bool SkillServer::equipScrewTool(std::string robot_name, std::string screw_tool_id)
 {
+  ROS_INFO_STREAM("Equipping screw tool " << screw_tool_id);
   return equipUnequipScrewTool(robot_name, screw_tool_id, "equip");
 }
 
 bool SkillServer::unequipScrewTool(std::string robot_name)
 {
+  ROS_INFO_STREAM("Unequipping screw tool " << held_screw_tool_);
   return equipUnequipScrewTool(robot_name, held_screw_tool_, "unequip");
 }
 
@@ -257,7 +259,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   geometry_msgs::PoseStamped ps_approach, ps_tool_holder;
   ps_approach.header.frame_id = screw_tool_id + "_helper_link";
 
-  ps_approach.pose.position.x = -.1;
+  ps_approach.pose.position.x = .0;   // If this is too far in the back, the LIN movement fails.
   ps_approach.pose.position.z = .017;
   ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
   ROS_INFO("Moving to screw tool approach pose PTP.");
@@ -265,53 +267,54 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
   if (equip) {
     openGripper(robot_name);
-    ROS_INFO("Spawning tool. Waiting for a while to be safe.");
+    ROS_INFO("Spawning tool.");
     spawnTool(screw_tool_id);
-    // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     held_screw_tool_ = screw_tool_id;
   }
 
   // Disable all collisions to allow movement into the tool
   // NOTE: This could be done cleaner by disabling only gripper + tool, but it is good enough for now.
   updatePlanningScene();
-  moveit_msgs::AllowedCollisionMatrix acm_cleared, acm_original = planning_scene_.allowed_collision_matrix;
-  acm_cleared = acm_original;
-  for (int i = 0; i < acm_cleared.entry_values.size(); ++i)
+  ROS_INFO("Updating collision matrix.");
+  collision_detection::AllowedCollisionMatrix acm_no_collisions(planning_scene_.allowed_collision_matrix),
+                                              acm_original(planning_scene_.allowed_collision_matrix);
+  acm_no_collisions.setEntry(screw_tool_id, true);   // Allow collisions with screw tool during pickup,
+  acm_original.setEntry(screw_tool_id, false); // but not afterwards.
+  std::vector<std::string> entries;
+  acm_no_collisions.getAllEntryNames(entries);
+  for (auto i : entries)
   {
-    for (int j = 0; j < acm_cleared.entry_values[j].enabled.size(); ++j)
-    {
-      acm_cleared.entry_values[i].enabled[j] = true;
-    }
+    acm_no_collisions.setEntry(i, true);
   }
   moveit_msgs::PlanningScene ps_no_collisions = planning_scene_;
-  ps_no_collisions.allowed_collision_matrix = acm_cleared;
+  acm_no_collisions.getMessage(ps_no_collisions.allowed_collision_matrix);
   planning_scene_interface_.applyPlanningScene(ps_no_collisions);
 
-  // Plan & execute LINEAR motion to the tool change position
+  // Plan & execute linear motion to the tool change position
   ps_tool_holder = ps_approach;
   if (equip)        ps_tool_holder.pose.position.x = 0.03;
   else if (unequip) ps_tool_holder.pose.position.x = 0.02;  
+
   // The tool is deposited a bit in front of the original position. The magnet pulls it to the final pose.
   ROS_INFO("Moving to pose in tool holder LIN.");
   moveToCartPoseLIN(ps_tool_holder, robot_name);
 
   // Close gripper, attach the tool object to the gripper in the Planning Scene.
   // Its collision with the parent link is set to allowed in the original planning scene.
-  collision_detection::AllowedCollisionMatrix helper_acm(planning_scene_.allowed_collision_matrix);
   if (equip)
   {
     closeGripper(robot_name);
     attachTool(screw_tool_id, robot_name);
-    helper_acm.setEntry(screw_tool_id, robot_name + "_robotiq_85_tip_link", true);
+    acm_original.setEntry(screw_tool_id, robot_name + "_robotiq_85_tip_link", true);
   }
   else if (unequip) 
   {
     openGripper(robot_name);
     detachTool(screw_tool_id, robot_name);
     held_screw_tool_ = "";
-    helper_acm.removeEntry(screw_tool_id);
+    acm_original.removeEntry(screw_tool_id);
   }
-  helper_acm.getMessage(planning_scene_.allowed_collision_matrix);
+  acm_original.getMessage(planning_scene_.allowed_collision_matrix);
   
   // Plan & execute LINEAR motion away from the tool change position
   ROS_INFO("Moving back to screw tool approach pose LIN.");
@@ -464,28 +467,28 @@ bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose,
 {
   // Move above the object
   target_tip_link_pose.pose.position.z += .1;
-  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);
 
   // Move onto the object
   target_tip_link_pose.pose.position.z -= .1;
-  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   bool success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
   if (!success) 
   {
     ROS_INFO_STREAM("Linear motion plan to target pick pose failed. Performing PTP.");
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
   }
 
   // Move back up a little
   target_tip_link_pose.pose.position.z += .05;
-  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
   if (!success) 
   {
     ROS_INFO_STREAM("Linear motion plan back from pick pose failed. Performing PTP.");
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
   }
 
