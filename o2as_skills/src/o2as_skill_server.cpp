@@ -18,6 +18,9 @@ SkillServer::SkillServer() :
   goToNamedPoseService_ = n_.advertiseService("o2as_skills/goToNamedPose", &SkillServer::goToNamedPoseCallback,
                                         this);
 
+  // Services to subscribe to
+  sendScriptToURClient_ = n_.serviceClient<o2as_skills::sendScriptToUR>("o2as_skills/ur_program_relay");
+
   // Actions we serve
   alignActionServer_.start();
   pickActionServer_.start();
@@ -617,6 +620,18 @@ int main(int argc, char **argv)
   // Create an object of class SkillServer that will take care of everything
   SkillServer o2as_skill_server;
   ROS_INFO("O2AS skill server started");
+
+  ROS_INFO("Testing sending a UR script to the robot.");
+  std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+
+  o2as_skills::sendScriptToUR srv;
+  srv.request.program_id = "test";
+  srv.request.robot_name = "b_bot";
+  o2as_skill_server.sendScriptToURClient_.call(srv);
+  if (srv.response.success == true)
+    ROS_INFO("Successfully called the service client");
+  else
+    ROS_WARN("Could not call the service client");
 
   //// ------------ Debugging procedures. Should be in a separate node, but ohwell.
   // ROS_INFO("Testing the screw tool mounting.");

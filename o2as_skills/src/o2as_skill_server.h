@@ -21,6 +21,7 @@
 
 // Services
 #include "o2as_skills/goToNamedPose.h"
+#include "o2as_skills/sendScriptToUR.h"
 
 // Actions
 #include <actionlib/server/simple_action_server.h>
@@ -76,11 +77,14 @@ public:
   void executeScrew(const o2as_skills::screwGoalConstPtr& goal);
   
 
-private:
+// private:
   ros::NodeHandle n_;
 
   // Service declarations
   ros::ServiceServer goToNamedPoseService_;
+
+  // Service clients
+  ros::ServiceClient sendScriptToURClient_;
   
   // Action declarations
   actionlib::SimpleActionServer<o2as_skills::alignAction> alignActionServer_;
