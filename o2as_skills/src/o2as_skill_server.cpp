@@ -162,8 +162,10 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   moveit_msgs::RobotTrajectory trajectory;
   const double jump_threshold = 0.0;
   const double eef_step = 0.01;
+  ros::Time start_time = ros::Time::now();
   double cartesian_success = group_pointer->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
-  ROS_INFO("Cartesian motion plan was %.2f%% successful.", cartesian_success * 100.0);
+  ros::Duration d = ros::Time::now() - start_time;
+  ROS_INFO_STREAM("Cartesian motion plan took " << d.toSec() << " s and was " << cartesian_success * 100.0 << "% successful.");
 
   myplan.trajectory_ = trajectory;
   // if (cartesian_success > .95) 
