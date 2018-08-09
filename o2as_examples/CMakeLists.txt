@@ -138,6 +138,7 @@ target_link_libraries(action_example ${catkin_LIBRARIES})
 # target_link_libraries(o2as_examples ${catkin_LIBRARIES})
 
 catkin_install_python(PROGRAMS scripts/example_movegroupcommander.py
+                      scripts/send_program_to_ur.py
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ## Rename C++ executable without prefix
