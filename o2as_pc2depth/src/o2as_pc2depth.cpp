@@ -10,10 +10,10 @@
 #include <pcl/conversions.h>
 #include <pcl_ros/transforms.h>
 
-#include <o2as_pc2depth/pc2depth.h>
+#include <o2as_msgs/pc2depth.h>
 
-bool callback(o2as_pc2depth::pc2depth::Request& req,
-    o2as_pc2depth::pc2depth::Response& res) {
+bool callback(o2as_msgs::pc2depth::Request& req,
+    o2as_msgs::pc2depth::Response& res) {
 
     // Receive topic coming from depth sensor
     sensor_msgs::PointCloud2 msg =
