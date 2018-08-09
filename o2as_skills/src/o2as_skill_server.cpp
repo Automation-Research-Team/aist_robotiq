@@ -113,7 +113,8 @@ bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string
   
   group_pointer->clearPoseTargets();
   group_pointer->setStartStateToCurrentState();
-  group_pointer->setEndEffectorLink(end_effector_link);
+  if (end_effector_link == "") group_pointer->setEndEffectorLink(robot_name + "_robotiq_85_tip_link"); // Force default
+  else group_pointer->setEndEffectorLink(end_effector_link);
   group_pointer->setPoseTarget(pose);
 
   ROS_DEBUG_STREAM("Planning motion for robot " << robot_name << " and EE link " << end_effector_link + "_tip_link.");
@@ -147,7 +148,8 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   // Plan cartesian motion
   std::vector<geometry_msgs::Pose> waypoints;
   geometry_msgs::PoseStamped start_pose;
-  start_pose.header.frame_id = robot_name + "_robotiq_85_tip_link";
+  if (end_effector_link == "") start_pose.header.frame_id = robot_name + "_robotiq_85_tip_link";
+  else start_pose.header.frame_id = end_effector_link;
   start_pose.pose = makePose();
   start_pose = transform_pose_now(start_pose, "world", tflistener_);
   pose = transform_pose_now(pose, "world", tflistener_);
@@ -306,6 +308,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   {
     openGripper(robot_name);
     detachTool(screw_tool_id, robot_name);
+    held_screw_tool_ = "";
     helper_acm.removeEntry(screw_tool_id);
   }
   helper_acm.getMessage(planning_scene_.allowed_collision_matrix);
