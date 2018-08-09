@@ -616,38 +616,44 @@ int main(int argc, char **argv)
   SkillServer o2as_skill_server;
   ROS_INFO("O2AS skill server started");
 
-  // Debugging procedures that should be in a separate node.
-  ROS_INFO("Testing the screw tool mounting.");
-  o2as_skill_server.equipScrewTool("b_bot", "screw_tool_m5");
+  //// ------------ Debugging procedures. Should be in a separate node, but ohwell.
+  // ROS_INFO("Testing the screw tool mounting.");
+  // o2as_skill_server.equipScrewTool("b_bot", "screw_tool_m5");
 
-  ROS_INFO("Going to screw ready pose.");
-  o2as_skill_server.goToNamedPose("screw_ready_b", "b_bot");
+  // ROS_INFO("Going to screw ready pose.");
+  // o2as_skill_server.goToNamedPose("screw_ready_b", "b_bot");
 
-  ROS_INFO("Picking screw from feeder.");
-  geometry_msgs::PoseStamped ps = makePoseStamped();
-  ps.header.frame_id = "m5_feeder_outlet_link";
-  ps.pose.position.z = .01;
-  ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(110.0/180.0 *M_PI));   // Z-axis pointing up.
-  std::string link_name = "b_bot_screw_tool_m5_tip_link";
-  std::string robot_name = "b_bot";
+  // ROS_INFO("Picking screw from feeder.");
+  // geometry_msgs::PoseStamped ps = makePoseStamped();
+  // ps.header.frame_id = "m5_feeder_outlet_link";
+  // ps.pose.position.z = .01;
+  // ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(110.0/180.0 *M_PI));   // Z-axis pointing up.
+  // std::string link_name = "b_bot_screw_tool_m5_tip_link";
+  // std::string robot_name = "b_bot";
 
-  o2as_skill_server.pickFromAbove(ps, link_name, robot_name);
+  // o2as_skill_server.pickFromAbove(ps, link_name, robot_name);
 
-  ROS_INFO("Picking screw from tray 1.");
-  ps.header.frame_id = "set3_tray_1";
-  ps.pose.position.y = .05;
-  ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(90.0/180.0 *M_PI));   // Z-axis pointing up.
-  o2as_skill_server.pickFromAbove(ps, link_name, robot_name);
+  // ROS_INFO("Picking screw from tray 1.");
+  // ps.header.frame_id = "set3_tray_1";
+  // ps.pose.position.y = .05;
+  // ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(90.0/180.0 *M_PI));   // Z-axis pointing up.
+  // o2as_skill_server.pickFromAbove(ps, link_name, robot_name);
 
-  ROS_INFO("Going back to screw ready pose.");
-  o2as_skill_server.goToNamedPose("screw_ready_b", "b_bot");
+  // ROS_INFO("Going back to screw ready pose.");
+  // o2as_skill_server.goToNamedPose("screw_ready_b", "b_bot");
 
-  ROS_INFO("Testing the screw tool unmounting.");
-  o2as_skill_server.unequipScrewTool("b_bot");
+  // ROS_INFO("Testing the screw tool unmounting.");
+  // o2as_skill_server.unequipScrewTool("b_bot");
 
-  ROS_INFO("Going to home pose.");
-  o2as_skill_server.goToNamedPose("home_b", "b_bot");
-  ROS_INFO("Done.");
+  // ROS_INFO("Going to home pose.");
+  // o2as_skill_server.goToNamedPose("home_b", "b_bot");
+  // ROS_INFO("Done.");
+  //// ------------
+
+  while (ros::ok())
+  {
+    ros::spinOnce();
+  }
 
   return 0;
 }
