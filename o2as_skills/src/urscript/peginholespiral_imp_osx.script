@@ -1302,7 +1302,7 @@ textmsg("disable external sensor")  # end: URCap Installation Node
     
         # TODO: Zero the force sensor: rq_zero_sensor()
         # TODO: Eliminate the while loop surrounding this comment?
-        # TODO: Eliminate the while loop below, and integrate the 
+        # TODO: Eliminate the while loop below
         # while (True):
         #     textmsg("tst0")
         #     rq_linear_search("Z+",10,0.02,0.2)

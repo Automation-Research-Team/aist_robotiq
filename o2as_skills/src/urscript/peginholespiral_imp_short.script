@@ -912,7 +912,7 @@ def myProg():
                 sync()
             end
         end
-
         
-    end
-end
+# These two lines need to be added manually before sending the script to the robot.
+#     end
+# end
