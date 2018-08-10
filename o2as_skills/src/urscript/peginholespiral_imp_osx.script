@@ -1303,17 +1303,17 @@ textmsg("disable external sensor")  # end: URCap Installation Node
         # TODO: Zero the force sensor: rq_zero_sensor()
         # TODO: Eliminate the while loop surrounding this comment?
         # TODO: Eliminate the while loop below, and integrate the 
-        while (True):
-            textmsg("tst0")
-            rq_linear_search("Z+",10,0.02,0.2)
-            stroke = 0.035
-            if rq_spiral_search_new(stroke,10,7,.3,peck_mode=True):
-                #Insert the Part into the bore#
-                textmsg("Impedance insert")
-                massm = 10
-                rq_impedance(stroke, massm)
-            end
-            textmsg("running")
-        end
-    end
-end
+        # while (True):
+        #     textmsg("tst0")
+        #     rq_linear_search("Z+",10,0.02,0.2)
+        #     stroke = 0.035
+        #     if rq_spiral_search_new(stroke,10,7,.3,peck_mode=True):
+        #         #Insert the Part into the bore#
+        #         textmsg("Impedance insert")
+        #         massm = 10
+        #         rq_impedance(stroke, massm)
+        #     end
+        #     textmsg("running")
+        # end
+#     end
+# end

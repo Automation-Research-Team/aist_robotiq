@@ -56,45 +56,62 @@ class URScriptRelay():
             return False
 
         if req.program_id == "insertion":
-            program = self.full_program
-            # program_front = self.insertion_template_front
-            # program_back = self.insertion_template_back
-            # program_mid = ""
+            program_front = self.insertion_template_front
+            #program_back = self.insertion_template_back  # This is broken right now anyway
+            program_mid = ""
 
-            # # FUNCTION:  rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 )
-            # # rq_spiral_search_new(stroke, force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False):
+            if not req.force_magnitude:
+                req.force_magnitude = 5.0
+            if not req.force_direction:
+                req.force_direction = "Z+"
+            if not req.forward_speed:
+                req.forward_speed = .02
+            if not req.max_insertion_distance:
+                req.max_insertion_distance = .02
+            if not req.max_radius:
+                req.max_radius = 4.0
+            if not req.peck_mode:
+                req.peck_mode = False
 
-            # # program_mid += "        textmsg(\"Approaching.\")"
-            # # program_mid += "        rq_linear_search(\"" + req.force_direction + "\"," \
-            # #                     + str(req.force_magnitude) + "," \
-            # #                     + str(req.forward_speed) + "," \
-            # #                     + str(req.max_insertion_distance) + ")"
-            # # program_mid += "        stroke = 0.035"
-            # # program_mid += "        textmsg(\"Spiral searching.\")"
-            # # program_mid += "        if rq_spiral_search_new(stroke," + str(req.force_magnitude) \
-            # #                     + "," + str(req.max_radius) \
-            # #                     + ",.3," \   
-            # #                     + "peck_mode=" + str(req.peck_mode) + "):"
-            # # program_mid += "            #Insert the Part into the bore#"
-            # # program_mid += "            textmsg(\"Impedance insert\")"
-            # # program_mid += "            massm = 10"     # 
-            # # program_mid += "            rq_impedance(stroke, massm)"
-            # # program_mid += "        end"
 
-            # # The original version, to debug
-            # program_mid += "        textmsg(\"tst0\")"
-            # program_mid += "        rq_linear_search(\"Z+\",5,0.02,0.2)"
-            # program_mid += "        stroke = 0.035"
-            # program_mid += "        if rq_spiral_search_new(stroke,5,4,.3,peck_mode=True):"
-            # program_mid += "            #Insert the Part into the bore#"
-            # program_mid += "            textmsg(\"Impedance insert\")"
-            # program_mid += "            massm = 5"
-            # program_mid += "            rq_impedance(stroke, massm)"
-            # program_mid += "        end"
-            # program_mid += "        textmsg(\"running\")"
-            # ####
+            # FUNCTION:  rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 )
+            # rq_spiral_search_new(stroke, force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False):
 
-            # program = program_front + program_mid + program_back
+            # program_mid += "        textmsg(\"Approaching.\")\n"
+            # program_mid += "        rq_linear_search(\"" + req.force_direction + "\"," \
+            #                     + str(req.force_magnitude) + "," \
+            #                     + str(req.forward_speed) + "," \
+            #                     + str(req.max_insertion_distance) + ")\n"
+            # program_mid += "        stroke = 0.035\n"
+            # program_mid += "        textmsg(\"Spiral searching.\")\n"
+            # program_mid += "        if rq_spiral_search_new(stroke," + str(req.force_magnitude) \
+            #                     + "," + str(req.max_radius) \
+            #                     + ",.3," \   
+            #                     + "peck_mode=" + str(req.peck_mode) + "):\n"
+            # program_mid += "            #Insert the Part into the bore#\n"
+            # program_mid += "            textmsg(\"Impedance insert\")\n"
+            # program_mid += "            massm = 10"     #\n 
+            # program_mid += "            rq_impedance(stroke, massm)\n"
+            # program_mid += "        end\n"
+            # program_mid += "    end\n"
+            # program_mid += "end\n"
+
+            # The original version, to debug
+            program_mid += "        textmsg(\"tst0\")\n"
+            program_mid += "        rq_linear_search(\"Z+\",5,0.02,0.2)\n"
+            program_mid += "        stroke = 0.035\n"
+            program_mid += "        if rq_spiral_search_new(stroke,5,4,.3,peck_mode=True):\n"
+            program_mid += "            #Insert the Part into the bore#\n"
+            program_mid += "            textmsg(\"Impedance insert\")\n"
+            program_mid += "            massm = 5\n"
+            program_mid += "            rq_impedance(stroke, massm)\n"
+            program_mid += "        end\n"
+            program_mid += "        textmsg(\"running\")\n"
+            program_mid += "    end\n"
+            program_mid += "end\n"
+            ####
+
+            program = program_front + "\n" + program_mid # + "\n" + program_back
         elif req.program_id == "lin_move":
             rospy.logerr("LIN MOVE IS NOT IMPLEMENTED YET") # TODO
         elif req.program_id == "spiral_press":
@@ -112,6 +129,8 @@ class URScriptRelay():
         program_msg.data = program
 
         rospy.loginfo("Sending UR robot command.")
+        rospy.loginfo("Program is:")
+        rospy.loginfo(program)
         self.publishers[req.robot_name].publish(program_msg)
         return True
 
@@ -119,24 +138,22 @@ class URScriptRelay():
         # Read the files containing the program templates into memory
         self.insertion_template_front = ""
         self.insertion_template_back  = ""
-        program_template_file = open(os.path.join(self.rospack.get_path("o2as_skills"), "src/urscript", "peginholespiral_imp_short.script"), 'rb')
+        program_template_file = open(os.path.join(self.rospack.get_path("o2as_skills"), "src/urscript", "peginholespiral_imp_osx.script"), 'rb')
         program_line = program_template_file.read(1024)
         linecounter = 0
         while program_line:
-            linecounter += 1
-            if linecounter < 916:
+            linecounter += 1   # This doesn't work as expected, it's not reading line by line.
+            # if linecounter < 916:
+            if linecounter < 1302:
                 self.insertion_template_front += program_line
             else:
                 self.insertion_template_back += program_line
             program_line = program_template_file.read(1024)
-
-        self.full_program = ""
-        program_template_file = open(os.path.join(self.rospack.get_path("o2as_skills"), "src/urscript", "peginholespiral_imp_osx.script"), 'rb')
-        program_line = program_template_file.read(1024)
-        while program_line:
-            self.full_program += program_line
-            program_line = program_template_file.read(1024)
-            
+        # rospy.loginfo("Insertion front:")
+        # rospy.loginfo(self.insertion_template_front)
+        # rospy.loginfo("----------------")
+        # rospy.loginfo("Insertion back:")
+        # rospy.loginfo(self.insertion_template_back)
         return True
 
 
