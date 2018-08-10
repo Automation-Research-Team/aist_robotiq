@@ -1,0 +1,19 @@
+<launch>
+    <arg name="serial_no_camera1" default="616205004841"/>
+    <arg name="serial_no_camera2" default=""/>
+    <arg name="camera_dir" default="$(find o2as_realsense_camera)/image"/>
+    <arg name="pcloud_filename" default="$(arg camera_dir)/test000.dat"/>
+    <arg name="image_filename" default="$(arg camera_dir)/test000.png"/>
+
+	<group ns="camera1">
+		<include file="$(find o2as_realsense_camera)/launch/camera_node.launch">
+            <arg name="serial_number" value="$(arg serial_no_camera1)"/>
+        </include>
+	</group>
+
+	<node name="client" pkg="o2as_realsense_camera" type="client.py" output="screen">
+		<param name="camera_name" type="string" value="camera1"/>
+		<param name="pcloud_filename" type="string" value="$(arg pcloud_filename)"/>
+		<param name="image_filename" type="string" value="$(arg image_filename)"/>
+	</node>
+</launch>
