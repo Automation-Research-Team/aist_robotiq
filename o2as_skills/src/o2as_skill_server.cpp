@@ -471,6 +471,7 @@ bool SkillServer::pickScrew(std::string object_id, std::string screw_tool_id, st
 bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name)
 {
   // Move above the object
+  openGripper(robot_name);
   target_tip_link_pose.pose.position.z += .1;
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);
@@ -485,6 +486,7 @@ bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose,
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
   }
+  closeGripper(robot_name);
 
   // Move back up a little
   target_tip_link_pose.pose.position.z += .05;
@@ -533,9 +535,15 @@ void SkillServer::executePick(const o2as_skills::pickGoalConstPtr& goal)
   }
   else if (goal->tool_name == "suction")
   {;} // TODO: Here is space for code from AIST.
-  else // No tool being used
+  else // No special tool being used; use the gripper instead
   {
-    ;
+    // Assume that the pose is given
+    if (abs(goal->item_pose.pose.position.x) > 0 || abs(goal->item_pose.pose.position.y) > 0 || abs(goal->item_pose.pose.position.z) > 0)
+    {
+      std::string ee_link_name = goal->robot_name + "_robotiq_85_tip_link";
+      pickFromAbove(goal->item_pose, ee_link_name, goal->robot_name);
+    }
+
     // TODO. The plan: 
     // - Check that the object exists in the planning scene
     // - VARIATION A:
@@ -621,17 +629,46 @@ int main(int argc, char **argv)
   SkillServer o2as_skill_server;
   ROS_INFO("O2AS skill server started");
 
-  ROS_INFO("Testing sending a UR script to the robot.");
-  std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+  ROS_INFO("Testing an assembly sequence.");
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-  o2as_skills::sendScriptToUR srv;
-  srv.request.program_id = "test";
-  srv.request.robot_name = "b_bot";
-  o2as_skill_server.sendScriptToURClient_.call(srv);
-  if (srv.response.success == true)
-    ROS_INFO("Successfully called the service client");
-  else
-    ROS_WARN("Could not call the service client");
+  // Define the pose of each item (for the ee_link)
+  geometry_msgs::PoseStamped peg_pose = makePoseStamped();
+  peg_pose.header.frame_id = "c_bot_base_link";
+  peg_pose.pose.orientation.x = 0.99994;
+  peg_pose.pose.orientation.y = -0.0011537;
+  peg_pose.pose.orientation.z = 0.002202;
+  peg_pose.pose.orientation.w = 0.010578;
+  peg_pose.pose.position.x = 0.045;
+  peg_pose.pose.position.y = -0.300;
+  peg_pose.pose.position.z = 0.254;
+  
+  geometry_msgs::PoseStamped bearing_pose = makePoseStamped();
+  bearing_pose.header.frame_id = "b_bot_base_link";
+  bearing_pose.pose.orientation.x = 0.99249;
+  bearing_pose.pose.orientation.y = -0.10267;
+  bearing_pose.pose.orientation.z = 0.06558;
+  bearing_pose.pose.orientation.w = 0.011064;
+  bearing_pose.pose.position.x = -0.025;
+  bearing_pose.pose.position.y = -0.658;
+  bearing_pose.pose.position.z = 0.233;
+
+  o2as_skill_server.goToNamedPose("home_b", "b_bot");
+  o2as_skill_server.goToNamedPose("home_c", "c_bot");
+  o2as_skill_server.pickFromAbove(peg_pose, "c_bot_ee_link", "c_bot");
+  o2as_skill_server.goToNamedPose("home_c", "c_bot");
+  
+  o2as_skill_server.pickFromAbove(bearing_pose, "b_bot_ee_link", "b_bot");
+  o2as_skill_server.goToNamedPose("home_b", "b_bot");
+
+  // o2as_skills::sendScriptToUR srv;
+  // srv.request.program_id = "insertion";
+  // srv.request.robot_name = "b_bot";
+  // o2as_skill_server.sendScriptToURClient_.call(srv);
+  // if (srv.response.success == true)
+  //   ROS_INFO("Successfully called the service client");
+  // else
+  //   ROS_WARN("Could not call the service client");
 
   //// ------------ Debugging procedures. Should be in a separate node, but ohwell.
   // ROS_INFO("Testing the screw tool mounting.");
