@@ -55,7 +55,7 @@
     <remap from="joint_states" to="/joint_states"/>
   </node>
   
-  <!-- <node name="c_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen" ns="c_bot_controller">
+  <node name="c_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen" ns="c_bot_controller">
     <param name="prefix" type="str" value="c_bot_" />
     <param name="robot_ip_address" type="str" value="$(arg robot_ip_c)" />
     <param name="reverse_port" type="int" value="50001" /> 
@@ -68,7 +68,7 @@
     <param name="require_activation" type="str" value="$(arg require_activation)" />
     <param name="shutdown_on_disconnect" type="bool" value="$(arg shutdown_on_disconnect)"/>
     <remap from="joint_states" to="/joint_states"/>
-  </node> -->
+  </node>
   
   <!-- Grippers -->
   <include file="$(find robotiq_control)/launch/ur_cmodel_action_controller.launch">
@@ -76,5 +76,15 @@
     <arg name="topic" value="/b_bot_controller/ur_driver/URScript" />
   </include>
 
+  <include file="$(find robotiq_control)/launch/cmodel_action_controller.launch">
+    <arg name="ip" default="192.168.0.40" />
+    <arg name="namespace" value="c_bot_gripper" />
+  </include>
+
+  <!-- <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch">
+    <arg name="sim" value="false" />
+    <arg name="debug" value="false" />
+    <arg name="config" value="true" />
+  </include> -->
 
 </launch>
