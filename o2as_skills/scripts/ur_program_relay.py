@@ -66,12 +66,18 @@ class URScriptRelay():
                 req.force_direction = "Z+"
             if not req.forward_speed:
                 req.forward_speed = .02
-            if not req.max_insertion_distance:
-                req.max_insertion_distance = .02
+            if not req.max_approach_distance:
+                req.max_approach_distance = .02
             if not req.max_radius:
                 req.max_radius = 4.0
+            if not req.radius_increment:
+                req.radius_increment = 0.3
             if not req.peck_mode:
                 req.peck_mode = False
+            if not req.stroke:
+                req.stroke = 0.035
+            if not req.impedance_mass:
+                req.impedance_mass = 10
 
             # Function definitions:
             # rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 )
@@ -81,17 +87,16 @@ class URScriptRelay():
             program_mid += "        rq_linear_search(\"" + req.force_direction + "\"," \
                                 + str(req.force_magnitude) + "," \
                                 + str(req.forward_speed) + "," \
-                                + str(req.max_insertion_distance) + ")\n"
-            program_mid += "        stroke = 0.035\n"
+                                + str(req.max_approach_distance) + ")\n"
+            program_mid += "        stroke = " + str(req.stroke) + "\n"
             program_mid += "        textmsg(\"Spiral searching.\")\n"
             program_mid += "        if rq_spiral_search_new(stroke," + str(req.force_magnitude) \
-                                + "," + str(req.max_radius) \
-                                + ",.3," \
-                                + "peck_mode=" + str(req.peck_mode) + "):\n"
+                                + ", " + str(req.max_radius) \
+                                + ", " + str(req.radius_increment) \
+                                + ", peck_mode=" + str(req.peck_mode) + "):\n"
             program_mid += "            #Insert the Part into the bore#\n"
             program_mid += "            textmsg(\"Impedance insert\")\n"
-            program_mid += "            massm = 10"     #\n 
-            program_mid += "            rq_impedance(stroke, massm)\n"
+            program_mid += "            rq_impedance(stroke, " + str(req.impedance_mass) + ")\n"
             program_mid += "        end\n"
             program_mid += "    end\n"
             program_mid += "end\n"

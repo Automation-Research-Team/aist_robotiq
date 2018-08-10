@@ -7,11 +7,15 @@ string program_id       # "insertion", "lin_move", "spiral_press"
 # Parameters for each of the programs
 float64 force_magnitude         # The force that spiral_press applies, in N
 string force_direction          # The direction vector of the force (usually X+ or Z-)
-float64 max_radius              # in m
-geometry_msgs/Vector3 stiffness # For insertion and spiral_press. In N/m. The 
+float64 max_radius              # In m
+float64 radius_increment        # How fast the spiral increases in size. In m
+geometry_msgs/Vector3 stiffness # For insertion and spiral_press. In N/m. The coordinate system is the ee link.
 float64 forward_speed           # The speed at which "insertion" moves forward. Slower probably improves precision.
-float64 max_insertion_distance  # 
-bool peck_mode                  #
+float64 max_approach_distance   # For the linear search approach
+bool peck_mode                  # 
+
+float64 stroke                  # 
+float64 impedance_mass          # Mass used for impedance control (default: 10 kg)
 ---
 # Response
 bool success
