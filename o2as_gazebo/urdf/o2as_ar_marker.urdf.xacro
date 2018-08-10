@@ -2,7 +2,7 @@
 
 <robot name="o2as_ar_marker" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:macro name="o2as_ar_marker" params="prefix parent *origin">
+  <xacro:macro name="o2as_ar_marker" params="marker_id prefix parent *origin">
 
     <joint name="${prefix}ar_marker_joint" type="fixed">
       <parent link="${parent}" />
@@ -28,7 +28,7 @@
          o2as_gazebo/media/material. You also need to export
          gazebo_media_path in package.xml. -->
     <gazebo reference="${prefix}ar_marker">
-      <material>Aruco/marker26_8cm</material>
+      <material>Aruco/marker${marker_id}</material>
     </gazebo>
 
   </xacro:macro>
