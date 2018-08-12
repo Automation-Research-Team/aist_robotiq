@@ -316,21 +316,6 @@
       </collision>
     </link>
 
-    <joint name="${prefix}ee_duplicate_fixed_joint" type="fixed">
-      <parent link="${prefix}wrist_3_link" />
-      <child link = "${prefix}ee_duplicate_link" />
-      <origin xyz="0.0 ${ur5_wrist_3_length} 0.0" rpy="0.0 0.0 ${pi/2.0}" />
-    </joint>
-
-    <link name="${prefix}ee_duplicate_link">
-      <collision>
-        <geometry>
-          <box size="0.01 0.01 0.01"/>
-        </geometry>
-        <origin rpy="0 0 0" xyz="-0.01 0 0"/>
-      </collision>
-    </link>
-
     <xacro:ur_arm_transmission prefix="${prefix}" />
     <xacro:ur_arm_gazebo prefix="${prefix}" />
 

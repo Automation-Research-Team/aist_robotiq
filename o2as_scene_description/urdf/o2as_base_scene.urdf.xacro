@@ -120,15 +120,15 @@
 
   <!-- spawn and attach grippers -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_85_gripper.urdf.xacro" />
-  <xacro:robotiq_85_gripper_o2as prefix="a_bot_" parent = "a_bot_ee_duplicate_link">
+  <xacro:robotiq_85_gripper_o2as prefix="a_bot_" parent = "a_bot_ee_link">
     <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
   </xacro:robotiq_85_gripper_o2as>
 
-  <xacro:robotiq_85_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_duplicate_link">
+  <xacro:robotiq_85_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link">
     <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
   </xacro:robotiq_85_gripper_o2as>
 
-  <xacro:robotiq_85_gripper_o2as prefix="c_bot_" parent = "c_bot_ee_duplicate_link">
+  <xacro:robotiq_85_gripper_o2as prefix="c_bot_" parent = "c_bot_ee_link">
     <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
   </xacro:robotiq_85_gripper_o2as>
 
