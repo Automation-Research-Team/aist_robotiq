@@ -7,6 +7,10 @@ bool close_inner_gripper_fully
 
 bool stop
 
+uint32 linear_motor_position
+uint32 outer_gripper_move_to
+uint32 inner_gripper_move_to
+
 #uint32 outer_gripper_move_to
 # float64 opening_width_inner_gripper   # Not implemented yet
 # float64 opening_width_outer_gripper   # Not implemented yet
