@@ -148,9 +148,10 @@ if __name__ == "__main__":
     #initialise the class here
     
     rospy.init_node("precision_gripper_server")
-    serial_port = rospy.get_param("serial_port")
+    serial_port = rospy.get_param("serial_port", "/dev/ttyUSB0")
     rospy.loginfo("Starting up on serial port: " + serial_port)
-    gripper = PrecisionGripper()
+    gripper = PrecisionGripper(serial_port)
+
     my_service = rospy.Service('precision_gripper_command', PrecisionGripperCommand, gripper.my_callback)
     rospy.loginfo("Service precision_gripper is ready")
     rospy.spin()
