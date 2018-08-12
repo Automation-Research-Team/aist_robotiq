@@ -1,10 +1,12 @@
 <?xml version="1.0"?>
 <launch>
   <!-- Parameters to pass to the ROS node -->
-  <!-- <arg name="move_group" default="a_bot"/> -->
+  <arg name="serial_port" default="/dev/ttyUSB0"/>
   
   <!-- This calls the ROS node we have written, using the parameters above -->
-  <node name="precision_gripper_server" pkg="o2as_precision_gripper" type="precision_gripper_server.py" respawn="false" output="screen" />
+  <node name="precision_gripper_server" pkg="o2as_precision_gripper" type="precision_gripper_server.py" respawn="false" output="screen">
+    <param name="serial_port" value="$(arg serial_port)"/>
+  </node>
   
   <node name="precision_gripper_client" pkg="o2as_precision_gripper" type="precision_gripper_client.py" respawn="false" output="screen">
     <!-- <param name="move_group" value="$(arg move_group)"/> -->

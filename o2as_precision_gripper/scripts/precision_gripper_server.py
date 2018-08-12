@@ -8,14 +8,14 @@ from o2as_precision_gripper.srv import *
 
 class PrecisionGripper:
     def __init__(self, serial_port = '/dev/ttyUSB0'):
-
-        self.dynamixel1 = xm430.USB2Dynamixel_Device( serial_port, baudrate = 57600 )
-        self.p1 = xm430.Robotis_Servo2( self.dynamixel1, 1, series = "XM" )  #inner gripper
-        self.p2 = xm430.Robotis_Servo2( self.dynamixel1, 2, series = "XM" )  #outer gripper
+        self.dynamixel = xm430.USB2Dynamixel_Device( serial_port, baudrate = 57600 )
+        self.p1 = xm430.Robotis_Servo2( self.dynamixel, 1, series = "XM" )  #inner gripper
+        self.p2 = xm430.Robotis_Servo2( self.dynamixel, 2, series = "XM" )  #outer gripper
         return
 
     def my_callback(self, req):
-        rospy.loginfo("Gripper callback has been called")
+        rospy.loginfo("Precision gripper callback has been called")
+        res = PrecisionGripperCommandResponse()
 
         if req.stop:
             self.inner_gripper_disable_torque()
@@ -24,11 +24,15 @@ class PrecisionGripper:
             self.outer_gripper_open_fully()
         elif not(req.open_outer_gripper_fully) and (req.close_outer_gripper_fully):
             self.outer_gripper_close_fully()
+        elif req.open_inner_gripper_fully and not(req.close_inner_gripper_fully):
+            self.inner_gripper_open_fully()
+        elif not(req.open_inner_gripper_fully) and (req.close_inner_gripper_fully):
+            self.inner_gripper_close_fully()
         else:
             rospy.logerr('No command sent to the gripper, service request was empty.')
-            return False
+            res.success = False
+            return res
 
-        res = PrecisionGripperCommandResponse()
         res.success = True
         return res
 
@@ -142,8 +146,11 @@ class PrecisionGripper:
 
 if __name__ == "__main__":
     #initialise the class here
-    gripper = PrecisionGripper()
+    
     rospy.init_node("precision_gripper_server")
+    serial_port = rospy.get_param("serial_port")
+    rospy.loginfo("Starting up on serial port: " + serial_port)
+    gripper = PrecisionGripper()
     my_service = rospy.Service('precision_gripper_command', PrecisionGripperCommand, gripper.my_callback)
     rospy.loginfo("Service precision_gripper is ready")
     rospy.spin()
