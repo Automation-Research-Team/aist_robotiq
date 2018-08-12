@@ -94,7 +94,7 @@ def crc( ds ):
 class USB2Dynamixel_Device():
     ''' Class that manages serial port contention between servos on same bus
     '''
-    def __init__( self, dev_name = 'dev/ttyUSB0', baudrate = 3000000):
+    def __init__( self, dev_name = 'dev/ttyUSB0', baudrate = 57600):
         try:
             self.dev_name = string.atoi( dev_name ) # stores the serial port as 0-based integer for Windows
         except:
