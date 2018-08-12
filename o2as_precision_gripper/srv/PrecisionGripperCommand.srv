@@ -1,19 +1,14 @@
-# Define the request
-# string command      # "open_inner_gripper", "open_outer_gripper"
+# Only one command can be set at a time. Requests are interpreted from the top (the stop command overrides all)
+bool stop
+
 bool open_outer_gripper_fully
 bool close_outer_gripper_fully
 bool open_inner_gripper_fully
 bool close_inner_gripper_fully
 
-bool stop
-
-uint32 linear_motor_position
-uint32 outer_gripper_move_to
-uint32 inner_gripper_move_to
-
-#uint32 outer_gripper_move_to
-# float64 opening_width_inner_gripper   # Not implemented yet
-# float64 opening_width_outer_gripper   # Not implemented yet
+float64 linear_motor_position           # 0 when at the bottom position. in m
+float64 outer_gripper_opening_width     # in m
+float64 inner_gripper_opening_width     # in m
 ---
 # Define the result
 bool success
