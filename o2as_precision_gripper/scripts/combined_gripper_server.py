@@ -9,13 +9,14 @@ from o2as_precision_gripper.srv import *
 class PrecisionGripper:
     def __init__(self, serial_port = '/dev/ttyUSB0'):
         self.dynamixel = xm430.USB2Dynamixel_Device( serial_port )
-        self.p1 = xm430.Robotis_Servo2( self.dynamixel, 1, series = "XM" )#inner gripper
-        self.p2 = xm430.Robotis_Servo2( self.dynamixel, 2, series = "XM" )#outer gripper
-        self.p3 = xm430.Robotis_Servo2( self.dynamixel, 3, series = "XM" )#outer gripper
-        self.p4 = xm430.Robotis_Servo2( self.dynamixel, 4, series = "XM" )#linear actuator
+        self.p1 = xm430.Robotis_Servo2(self.dynamixel, 1, series = "XM" )#inner gripper
+        self.p2 = xm430.Robotis_Servo2(self.dynamixel, 2, series = "XM" )#outer gripper
+        self.p3 = xm430.Robotis_Servo2(self.dynamixel, 3, series = "XM" )#outer gripper
+        self.p4 = xm430.Robotis_Servo2(self.dynamixel, 4, series = "XM" )#linear actuator
         
-        self.pitch = 1.98   #9./5.*1.05*1.02   # found from experiment
-        self.pgc_linear_zero = 3325
+        self.pitch = rospy.get_param("pitch", "1.98")   
+        self.pgc_linear_zero = rospy.get_param("pgc_linear_zero", "3325")
+        self.og_open_motor_pos_ = rospy.get_param("og_open_motor_pos_", "1024")
         return
 
     def my_callback(self, req):
@@ -101,8 +102,8 @@ class PrecisionGripper:
             self.p3.set_operating_mode("currentposition")
             self.p2.set_current(current)
             self.p3.set_current(current)
-            self.p2.set_goal_position(1024)
-            self.p3.set_goal_position(1024)
+            self.p2.set_goal_position(self.og_open_motor_pos_)
+            self.p3.set_goal_position(self.og_open_motor_pos_)
         except:
             rospy.logerr("Failed to run commands.")
     def outer_gripper_disable_torque(self):
@@ -130,7 +131,7 @@ class PrecisionGripper:
             self.p1.set_operating_mode("current")
             self.p1.set_positive_direction("cw")
             self.p1.set_current(current)
-            # self.p1.set_goal_position(1024)
+            # self.p1.set_goal_position(self.og_open_motor_pos_)
         except:
             rospy.logerr("Failed to run commands.")
     def inner_gripper_move_to(self,current_position):
