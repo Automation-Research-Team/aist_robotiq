@@ -73,11 +73,13 @@
   <!-- Grippers -->
   <include file="$(find robotiq_control)/launch/ur_cmodel_action_controller.launch">
     <arg name="namespace" value="b_bot_gripper" />
+    <arg name="gripper_prefix" value="b_bot_" />
     <arg name="topic" value="/b_bot_controller/ur_driver/URScript" />
   </include>
 
   <include file="$(find robotiq_control)/launch/cmodel_action_controller.launch">
     <arg name="ip" default="192.168.0.40" />
+    <arg name="gripper_prefix" value="c_bot_" />
     <arg name="namespace" value="c_bot_gripper" />
   </include>
 
