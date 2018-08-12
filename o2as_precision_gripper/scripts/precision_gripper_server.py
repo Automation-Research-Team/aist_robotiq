@@ -7,8 +7,8 @@ from o2as_precision_gripper.srv import *
 
 if __name__ == "__main__":
     #initialise the class here
-    pg = pgc.PrecisionGripper()
+    gripper = pgc.PrecisionGripper()
     rospy.init_node("precision_gripper_server")
-    my_service = rospy.Service('precision_gripper_command', PrecisionGripperCommand, pg.my_callback)
+    my_service = rospy.Service('precision_gripper_command', PrecisionGripperCommand, gripper.my_callback)
     rospy.loginfo("Service precision_gripper is ready")
     rospy.spin()
