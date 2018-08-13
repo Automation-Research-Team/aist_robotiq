@@ -1,6 +1,8 @@
 <?xml version="1.0" ?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="kitting_bin">
   
+  <!-- These macros define the three bins from which items are picked in the kitting -->
+
   <!-- z-origin-offset should be set such that the frame is on the surface of the bin -->
   <xacro:macro name="kitting_bin_internal" params="binname parent filename z_origin_offset *origin">
     <xacro:property name="mesh_file" value="package://o2as_scene_description/meshes/${filename}.stl" />
