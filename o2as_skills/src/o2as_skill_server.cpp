@@ -456,74 +456,83 @@ bool SkillServer::attachDetachTool(std::string screw_tool_id, std::string robot_
 
 bool SkillServer::placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name)
 {
-  publishMarker(target_tip_link_pose);
+  publishMarker(target_tip_link_pose, "place_pose");
   ROS_INFO_STREAM("Received placeFromAbove command.");
 
   // Move above the target pose
   target_tip_link_pose.pose.position.z += .1;
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  ROS_INFO_STREAM("Moving above object target place.");
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
   moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);
 
   // Move down to the target pose
   target_tip_link_pose.pose.position.z -= .1;
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  ROS_INFO_STREAM("Moving down to place object.");
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
   bool success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
   if (!success) 
   {
     ROS_INFO_STREAM("Linear motion plan to target place pose failed. Performing PTP.");
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
   }
   openGripper(robot_name);
   
   // Move back up a little
   target_tip_link_pose.pose.position.z += .05;
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  ROS_INFO_STREAM("Moving back up after placing object.");
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
   success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
   if (!success) 
   {
     ROS_INFO_STREAM("Linear motion plan back from place pose failed. Performing PTP.");
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
   }
 
+  ROS_INFO_STREAM("Finished placing object.");
   return true;
 }
 
 bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name)
 {
+  publishMarker(target_tip_link_pose, "pick_pose");
   ROS_INFO_STREAM("Received pickFromAbove command.");
-  publishMarker(target_tip_link_pose, "pose");
+  
 
   // Move above the object
   openGripper(robot_name);
   target_tip_link_pose.pose.position.z += .1;
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  ROS_INFO_STREAM("Opening gripper, moving above object.");
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
   moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);
 
   // Move onto the object
   target_tip_link_pose.pose.position.z -= .1;
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  ROS_INFO_STREAM("Moving down to pick object.");
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
   bool success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
   if (!success) 
   {
     ROS_INFO_STREAM("Linear motion plan to target pick pose failed. Performing PTP.");
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
   }
   closeGripper(robot_name);
 
   // Move back up a little
   target_tip_link_pose.pose.position.z += .05;
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  ROS_INFO_STREAM("Moving back up after picking object.");
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
   success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
   if (!success) 
   {
     ROS_INFO_STREAM("Linear motion plan back from pick pose failed. Performing PTP.");
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
   }
 
+  ROS_INFO_STREAM("Finished picking object.");
   return true;
 }
 
@@ -553,47 +562,99 @@ bool SkillServer::publishMarker(geometry_msgs::PoseStamped marker_pose, std::str
     marker.pose = marker_pose.pose;
 
     marker.ns = "markers";
-    marker.id = 0;
+    marker.id = marker_id_count++;
     marker.lifetime = ros::Duration();
     marker.action = visualization_msgs::Marker::ADD;
 
     if (marker_type == "pose")
     {
-      // This draws a TF-like frame.
-      marker.type = visualization_msgs::Marker::ARROW;
-      marker.scale.x = .1;
-      marker.scale.y = .01;
-      marker.scale.z = .01;
-      marker.color.a = 1.0;
+      publishPoseMarker(marker_pose);
 
-      visualization_msgs::Marker arrow_x, arrow_y, arrow_z;
-      arrow_x = marker; arrow_y = marker; arrow_z = marker;
-      arrow_x.id = 1; arrow_y.id = 2; arrow_z.id = 3;
-      arrow_x.color.r = 1.0; arrow_y.color.g = 1.0; arrow_z.color.b = 1.0;
-
-      rotatePoseByRPY(0, 0, M_PI/2, arrow_y.pose);
-      rotatePoseByRPY(0, -M_PI/2, 0, arrow_z.pose);
-
-      pubMarker_.publish(arrow_x); pubMarker_.publish(arrow_y); pubMarker_.publish(arrow_z);
+      // Add a flat sphere
+      marker.type = visualization_msgs::Marker::SPHERE;
+      marker.scale.x = .01;
+      marker.scale.y = .05;
+      marker.scale.z = .05;
+      marker.color.g = 1.0;
+      marker.color.a = 0.8;
+      pubMarker_.publish(marker);
       return true;
+    }
+    if (marker_type == "place_pose")
+    {
+      publishPoseMarker(marker_pose);
+
+      // Add a flat sphere
+      marker.type = visualization_msgs::Marker::SPHERE;
+      marker.scale.x = .01;
+      marker.scale.y = .05;
+      marker.scale.z = .05;
+      marker.color.g = 1.0;
+      marker.color.a = 0.8;
+      pubMarker_.publish(marker);
+      return true;
+    }
+    if (marker_type == "pick_pose")
+    {
+      publishPoseMarker(marker_pose);
+
+      // Add a flat sphere
+      marker.type = visualization_msgs::Marker::SPHERE;
+      marker.scale.x = .01;
+      marker.scale.y = .05;
+      marker.scale.z = .05;
+      marker.color.r = 0.8;
+      marker.color.g = 0.4;
+      marker.color.a = 0.8;
     }
     else if (marker_type == "")
     {
       marker.type = visualization_msgs::Marker::SPHERE;
-      marker.scale.x = .1;
+      marker.scale.x = .02;
       marker.scale.y = .1;
-      marker.scale.z = .02;
+      marker.scale.z = .1;
       
       marker.color.g = 1.0;
-      marker.color.a = 1.0;
+      marker.color.a = 0.8;
     }
     else 
     {ROS_WARN("No useful marker message received.");}
     pubMarker_.publish(marker);
+    if (marker_id_count > 50) marker_id_count = 0;
     return true;
 }
 
+// This is a helper function for publishMarker. Publishes a TF-like frame.
+bool SkillServer::publishPoseMarker(geometry_msgs::PoseStamped marker_pose)
+{
+  visualization_msgs::Marker marker;
+  marker.header = marker_pose.header;
+  marker.header.stamp = ros::Time::now();
+  marker.pose = marker_pose.pose;
 
+  marker.ns = "markers";
+  marker.id = marker_id_count++;
+  marker.lifetime = ros::Duration();
+  marker.action = visualization_msgs::Marker::ADD;
+
+  // This draws a TF-like frame.
+  marker.type = visualization_msgs::Marker::ARROW;
+  marker.scale.x = .1;
+  marker.scale.y = .01;
+  marker.scale.z = .01;
+  marker.color.a = .8;
+
+  visualization_msgs::Marker arrow_x, arrow_y, arrow_z;
+  arrow_x = marker; arrow_y = marker; arrow_z = marker;
+  arrow_x.id = marker_id_count++; arrow_y.id = marker_id_count++; arrow_z.id = marker_id_count++;
+  arrow_x.color.r = 1.0; arrow_y.color.g = 1.0; arrow_z.color.b = 1.0;
+
+  rotatePoseByRPY(0, 0, M_PI/2, arrow_y.pose);
+  rotatePoseByRPY(0, -M_PI/2, 0, arrow_z.pose);
+
+  pubMarker_.publish(arrow_x); pubMarker_.publish(arrow_y); pubMarker_.publish(arrow_z);
+  return true;
+}
 // ----------- Service definitions
 bool SkillServer::goToNamedPoseCallback(o2as_skills::goToNamedPose::Request &req,
                                            o2as_skills::goToNamedPose::Response &res)
@@ -665,11 +726,17 @@ void SkillServer::executePlace(const o2as_skills::placeGoalConstPtr& goal)
 {
   ROS_INFO("placeAction was called");
   // TODO: Calculate the target pose with the item height currently held
+
   std::string ee_link_name;
   if (goal->robot_name == "a_bot"){ee_link_name = goal->robot_name + "_gripper_tip_link"; }
   else {ee_link_name = goal->robot_name + "_robotiq_85_tip_link";}
   
-  placeFromAbove(goal->target_pose, ee_link_name, goal->robot_name);
+  if (goal->tool_name == "suction")
+  {
+    ; // TODO: Set the ee_link_name correctly and pass a flag to placeFromAbove
+  }
+
+  placeFromAbove(goal->item_pose, ee_link_name, goal->robot_name);
   ROS_INFO("placeAction is set as succeeded");
   placeActionServer_.setSucceeded();
 }

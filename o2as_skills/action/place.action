@@ -1,6 +1,7 @@
 # Request
-geometry_msgs/PoseStamped target_pose   # Target pose of the object
+geometry_msgs/PoseStamped item_pose     # Target pose of the object
 string robot_name                       # "a_bot", "b_bot", "c_bot" or "suction"
+string tool_name                        # "suction" or empty, I suppose
 string item_id                          # Is this necessary? No, it should be a parameter on the server, most likely.
 ---
 # Result

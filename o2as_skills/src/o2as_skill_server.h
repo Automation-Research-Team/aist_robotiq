@@ -64,6 +64,7 @@ public:
   bool pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name);
   bool pickScrew(std::string object_id, std::string screw_tool_id, std::string robot_name);
   bool publishMarker(geometry_msgs::PoseStamped marker_pose, std::string marker_type = "");
+  bool publishPoseMarker(geometry_msgs::PoseStamped marker_pose);
 
   bool openGripper(std::string robot_name);
   bool closeGripper(std::string robot_name);
@@ -85,6 +86,7 @@ public:
   ros::NodeHandle n_;
 
   ros::Publisher pubMarker_;
+  int marker_id_count = 0;
 
   // Service declarations
   ros::ServiceServer goToNamedPoseService_;

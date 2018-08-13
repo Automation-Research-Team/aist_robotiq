@@ -39,15 +39,23 @@
 import sys
 import copy
 import rospy
+import tf_conversions
+import actionlib
+
 import moveit_commander
 import moveit_msgs.msg
 import geometry_msgs.msg
 import std_msgs.msg
-import o2as_msgs.msg
+import robotiq_msgs.msg
+
+import o2as_msgs
+import o2as_skills
+import o2as_skills.msg
+import o2as_skills.srv
+
 from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
-## END_SUB_TUTORIAL
 
 def all_close(goal, actual, tolerance):
   """
@@ -74,42 +82,41 @@ def all_close(goal, actual, tolerance):
 class ExampleClass(object):
   """ExampleClass"""
   def __init__(self):
-    super(ExampleClass, self).__init__()
+    # super(ExampleClass, self).__init__()
     
-    ## First initialize `moveit_commander`_ and a `rospy`_ node:
     moveit_commander.roscpp_initialize(sys.argv)
-    rospy.init_node('move_group_python_interface_tutorial',
-                    anonymous=True)
+    rospy.init_node('assembly_example', anonymous=False)
 
     self.robots = moveit_commander.RobotCommander()
-    # group_name = rospy.get_param("move_group_name", "a_bot")
-    # rospy.loginfo(group_name)
-    # ee_link = rospy.get_param("ee_link", "a_bot_robotiq_85_tip_link")
-    # rospy.loginfo(ee_link)
-    # group = moveit_commander.MoveGroupCommander(group_name)
     self.groups = {"a_bot":moveit_commander.MoveGroupCommander("a_bot"),
               "b_bot":moveit_commander.MoveGroupCommander("b_bot"),
-              "c_bot":moveit_commander.MoveGroupCommander("c_bot"),
-              "front_bots":moveit_commander.MoveGroupCommander("front_bots"),
-              "all_bots":moveit_commander.MoveGroupCommander("all_bots") }
+              "c_bot":moveit_commander.MoveGroupCommander("c_bot")}
+              # "front_bots":moveit_commander.MoveGroupCommander("front_bots"),
+              # "all_bots":moveit_commander.MoveGroupCommander("all_bots") }
     self.gripper_action_clients = { "a_bot":actionlib.SimpleActionClient('/a_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction), 
                                "b_bot":actionlib.SimpleActionClient('/b_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction), 
                                "c_bot":actionlib.SimpleActionClient('/c_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction) }
 
-    self.pick_client = actionlib.SimpleActionClient('/o2as_skills/pick', o2as_skills.msg.PickAction)
-    self.place_client = actionlib.SimpleActionClient('/o2as_skills/place', o2as_skills.msg.PlaceAction)
-    self.align_client = actionlib.SimpleActionClient('/o2as_skills/align', o2as_skills.msg.AlignAction)
-    self.insert_client = actionlib.SimpleActionClient('/o2as_skills/insert', o2as_skills.msg.InsertAction)
-    self.screw_client = actionlib.SimpleActionClient('/o2as_skills/screw', o2as_skills.msg.ScrewAction)
+    self.pick_client = actionlib.SimpleActionClient('/o2as_skills/pick', o2as_skills.msg.pickAction)
+    self.place_client = actionlib.SimpleActionClient('/o2as_skills/place', o2as_skills.msg.placeAction)
+    self.align_client = actionlib.SimpleActionClient('/o2as_skills/align', o2as_skills.msg.alignAction)
+    self.insert_client = actionlib.SimpleActionClient('/o2as_skills/insert', o2as_skills.msg.insertAction)
+    self.screw_client = actionlib.SimpleActionClient('/o2as_skills/screw', o2as_skills.msg.screwAction)
 
-    self.urscript_client = rospy.ServiceProxy('/o2as_skills/ur_program_relay', o2as_skills.msg.sendScriptToUR)
-    self.goToNamedPose_client = rospy.ServiceProxy('/o2as_skills/goToNamedPose', o2as_skills.msg.goToNamedPose)
+    self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_skills.srv.sendScriptToUR)
+    self.goToNamedPose_client = rospy.ServiceProxy('/o2as_skills/goToNamedPose', o2as_skills.srv.goToNamedPose)
+
+    self.pick_client.wait_for_server() # wait for the clients to connect
+    self.place_client.wait_for_server() 
+    self.align_client.wait_for_server() 
+    self.insert_client.wait_for_server() 
+    self.screw_client.wait_for_server() 
+    
 
   def go_to_pose_goal(self, group_name, pose_goal_stamped):
     group = self.groups[group_name]
-    group.set_pose_target(pose_goal_stamped)  # How to set multiple goals? Does not seem to work in Python.
+    group.set_pose_target(pose_goal_stamped)
 
-    ## Now, we call the planner to compute the plan and execute it.
     plan = group.go(wait=True)
     group.stop()
     # It is always good to clear your targets after planning with poses.
@@ -119,86 +126,104 @@ class ExampleClass(object):
     current_pose = self.group.get_current_pose().pose
     return all_close(pose_goal_stamped.pose, current_pose, 0.01)
 
-  def do_pick_action(self, robot_name, pose_stamped, link_name = "ee_link"):
+  def do_pick_action(self, robot_name, pose_stamped, tool_name = ""):
     # Call the pick action
-    return True
+    goal = o2as_skills.msg.pickGoal()
+    goal.robot_name = robot_name
+    goal.item_pose = pose_stamped
+    goal.tool_name = tool_name
+    rospy.loginfo("Sending pick action goal")
+    rospy.loginfo(goal)
+
+    self.pick_client.send_goal(goal)
+    rospy.loginfo("Waiting for result")
+    self.pick_client.wait_for_result()
+    rospy.loginfo("Getting result")
+    return self.pick_client.get_result()
+
+  def do_place_action(self, robot_name, pose_stamped, tool_name = ""):
+    # Call the pick action
+    goal = o2as_skills.msg.placeGoal()
+    goal.robot_name = robot_name
+    goal.item_pose = pose_stamped
+    goal.tool_name = tool_name
+    rospy.loginfo("Sending place action goal")
+    rospy.loginfo(goal)
+
+    self.place_client.send_goal(goal)
+    rospy.loginfo("Waiting for result")
+    self.place_client.wait_for_result()
+    rospy.loginfo("Getting result")
+    return self.place_client.get_result()
 
   def do_insertion(self, robot_name):
+    # Currently calling the UR service directly rather than the action of the skill_server
     srv = o2as_skills.msg.sendScriptToUR
     srv.request.robot_name = robot_name
     srv.request.program_id = "insertion"
     self.urscript_client.call(srv)
     return srv.response.success
+  
+  def go_to_named_pose(self, pose_name, robot_name):
+    # pose_name should be "home_a", "home_b" etc.
+    self.groups[robot_name].set_named_target(pose_name)
+    self.groups[robot_name].go(wait=True)
+    self.groups[robot_name].stop()
+    self.groups[robot_name].clear_pose_targets()
+    return True
 
   def assembly_demo(self):
-    # Pick a thing with b_bot, then c_bot, then send the insertion command to c_bot
+    # Pick a thing with b_bot, then c_bot
     
-    # Define the pose of each item (ee_link)
+    # Define the pose of each item
     peg_pose = geometry_msgs.msg.PoseStamped()
-    peg_pose.header.frame_id = "c_bot_base"
-    peg_pose.pose.orientation.x = -0.5
-    peg_pose.pose.orientation.y = 0.5
-    peg_pose.pose.orientation.z = 0.5
-    peg_pose.pose.orientation.w = 0.5
-    peg_pose.pose.position.x = 0.045
-    peg_pose.pose.position.y = -0.300
-    peg_pose.pose.position.z = 0.254
+    peg_pose.header.frame_id = "workspace_center"
+    peg_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    peg_pose.pose.position.x = -0.2
+    peg_pose.pose.position.z = 0.03
     
-    bearing_pose = geometry_msgs.msg.PoseStamped()
-    bearing_pose.header.frame_id = "b_bot_base"
-    bearing_pose.pose.orientation.x = -0.5
-    bearing_pose.pose.orientation.y = 0.5
-    bearing_pose.pose.orientation.z = 0.5
-    bearing_pose.pose.orientation.w = 0.5
-    bearing_pose.pose.position.x = -0.025
-    bearing_pose.pose.position.y = -0.658
-    bearing_pose.pose.position.z = 0.233
+    bearing_pose = copy.deepcopy(peg_pose) # Careful: pose1 = pose2 would create a shallow copy (changes to one will affect the other)
+    bearing_pose.pose.position.x = 0.0
+    bearing_pose.pose.position.y = 0.15
     
-    # First use a_bot
+    # First pick up item with b_bot
+    self.do_pick_action("b_bot", bearing_pose, tool_name = "")
+    self.go_to_named_pose("home_b", "b_bot")
+    
+    # Now pick the item with c_bot
+    self.do_pick_action("c_bot", peg_pose, tool_name = "")
+    self.go_to_named_pose("home_c", "c_bot")
 
-    do_pick_action("b_bot", bearing_pose, link_name = "ee_link")
+    # Pick a thing with b_bot, then c_bot
+    place_pose_c = geometry_msgs.msg.PoseStamped()
+    place_pose_c.header.frame_id = "workspace_center"
+    place_pose_c.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    place_pose_c.pose.position.x = -0.1
+    place_pose_c.pose.position.z = 0.03
     
-    if not success:
-      # Add a line to the log here
-      rospy.loginfo("Something went wrong")
-    
-    # Move the robot back (there will be a more convenient function for this later)
-    home_pose = geometry_msgs.msg.PoseStamped()
-    home_pose.pose = pose_goal.pose.orientation
-    home_pose.pose.position.x = -0.4
-    home_pose.pose.position.y = 0.4
-    home_pose.pose.position.z = 0.4
-    home_pose.header.frame_id = "a_bot_base_link"
-    self.go_to_pose_goal(home_pose)
+    place_pose_b = copy.deepcopy(place_pose_c)
+    place_pose_b.pose.position.x = 0.0
+    place_pose_b.pose.position.y = 0.1
 
-    # Now check with b_bot
-    self.group = moveit_commander.MoveGroupCommander("b_bot")
-    success = True
+    # First pick up item with b_bot
+    self.do_place_action("b_bot", place_pose_b, tool_name = "")
+    self.go_to_named_pose("home_b", "b_bot")
 
-    bin_header_ids = ['/set2_bin1', '/set2_bin2', '/set2_bin3']
-    for bin_id in bin_header_ids:
-      pose_goal.header.frame_id = bin_id
-      rospy.loginfo("Trying to move b_bot to bin:" + bin_id)
-      if self.go_to_pose_goal(pose_goal):
-        rospy.sleep(2)
-      else:
-        success = False
-  
-    if not success:
-      # Add a line to the log here
-      rospy.loginfo("Something went wrong")
+    # Now pick the item with c_bot
+    self.do_place_action("c_bot", place_pose_c, tool_name = "")
+    self.go_to_named_pose("home_c", "c_bot")
+    rospy.loginfo("Done.")
 
 
 def main():
   try:
     tutorial = ExampleClass()
 
-    print "============ Press `Enter` to go to different bin positions ..."
-    raw_input()
-    # tutorial.cycle_through_bins()
-    tutorial.check_all_bins()
+    # print "============ Press `Enter` to start assembly test ..."
+    # raw_input()
+    tutorial.assembly_demo()
 
-    print "============ Python tutorial demo complete!"
+    print "============ Demo complete!"
   except rospy.ROSInterruptException:
     return
   except KeyboardInterrupt:
