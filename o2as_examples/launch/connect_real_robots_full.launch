@@ -34,7 +34,7 @@
     <param name="max_velocity" type="double" value="$(arg max_velocity)" />
     <param name="servoj_time" type="double" value="$(arg servoj_time)" />
     <param name="base_frame" type="str" value="a_bot_base" />
-    <param name="tool_frame" type="str" value="a_bot_ee_link" />
+    <param name="tool_frame" type="str" value="a_bot_tool0_controller" />
     <param name="require_activation" type="str" value="$(arg require_activation)" />
     <param name="shutdown_on_disconnect" type="bool" value="$(arg shutdown_on_disconnect)"/>
     <remap from="joint_states" to="/joint_states"/>
@@ -48,6 +48,8 @@
     <param name="max_payload" type="double" value="$(arg max_payload)" />
     <param name="max_velocity" type="double" value="$(arg max_velocity)" />
     <param name="servoj_time" type="double" value="$(arg servoj_time)" />
+    <param name="base_frame" type="str" value="b_bot_base" />
+    <param name="tool_frame" type="str" value="b_bot_tool0_controller" />
     <param name="require_activation" type="str" value="$(arg require_activation)" />
     <param name="shutdown_on_disconnect" type="bool" value="$(arg shutdown_on_disconnect)"/>
     <remap from="joint_states" to="/joint_states"/>
@@ -61,6 +63,8 @@
     <param name="max_payload" type="double" value="$(arg max_payload)" />
     <param name="max_velocity" type="double" value="$(arg max_velocity)" />
     <param name="servoj_time" type="double" value="$(arg servoj_time)" />
+    <param name="base_frame" type="str" value="c_bot_base" />
+    <param name="tool_frame" type="str" value="c_bot_tool0_controller" />
     <param name="require_activation" type="str" value="$(arg require_activation)" />
     <param name="shutdown_on_disconnect" type="bool" value="$(arg shutdown_on_disconnect)"/>
     <remap from="joint_states" to="/joint_states"/>
