@@ -1,0 +1,5 @@
+uint8 motor_id
+string addr_name
+int64 value
+---
+bool comm_result
