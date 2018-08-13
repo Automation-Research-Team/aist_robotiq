@@ -23,7 +23,7 @@ class URScriptRelay():
         
         self.rospack = rospkg.RosPack()
         self.read_templates()
-        s = rospy.Service('o2as_skills/ur_program_relay', o2as_skills.srv.sendScriptToUR, self.srv_callback)
+        s = rospy.Service('o2as_skills/sendScriptToUR', o2as_skills.srv.sendScriptToUR, self.srv_callback)
 
 
         # rospy.loginfo("TESTING SCRIPT SENDING")
@@ -49,7 +49,7 @@ class URScriptRelay():
     def srv_callback(self, req):
         # Interpret the service parameters, construct the program, send it to the UR
         if not req.robot_name:
-            rospy.logerr("robot_name was not defined in the service call to ur_program_relay!")
+            rospy.logerr("robot_name was not defined in the service call to sendScriptToUR!")
             return False
         elif not req.program_id:
             rospy.logerr("No program ID was defined!")

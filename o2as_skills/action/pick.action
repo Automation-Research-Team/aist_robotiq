@@ -3,7 +3,7 @@ bool retreat_after_pick     # If true, arm moves away from the table after grasp
 string item_id              # item ID in the planning scene
 geometry_msgs/PoseStamped item_pose # This overrides the item_id
 string robot_name           # "a_bot", "b_bot", "c_bot"
-string tool_name            # This only needs to be set when using "suction" or "screw_tool"
+string tool_name            # "outer_gripper", "inner_gripper", "suction", "screw_tool" or empty
 uint8 screw_size            # M4, M5, M6 (without the M)
 ---
 # success

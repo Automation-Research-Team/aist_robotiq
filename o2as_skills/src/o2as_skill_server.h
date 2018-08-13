@@ -12,12 +12,15 @@
 
 #include <chrono>
 #include <thread>
+#include <cmath>
 
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit_msgs/GetPlanningScene.h>
 #include <moveit/collision_detection/collision_matrix.h>
 // #include <moveit_visual_tools/moveit_visual_tools.h>
+
+#include "visualization_msgs/Marker.h"
 
 // Services
 #include "o2as_skills/goToNamedPose.h"
@@ -57,9 +60,10 @@ public:
   bool attachTool(std::string screw_tool_id, std::string link_name);
   bool detachTool(std::string screw_tool_id, std::string link_name);
   bool attachDetachTool(std::string screw_tool_id, std::string link_name, std::string attach_or_detach);
+  bool placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name);
   bool pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name);
   bool pickScrew(std::string object_id, std::string screw_tool_id, std::string robot_name);
-  
+  bool publishMarker(geometry_msgs::PoseStamped marker_pose, std::string marker_type = "");
 
   bool openGripper(std::string robot_name);
   bool closeGripper(std::string robot_name);
@@ -80,6 +84,8 @@ public:
 // private:
   ros::NodeHandle n_;
 
+  ros::Publisher pubMarker_;
+
   // Service declarations
   ros::ServiceServer goToNamedPoseService_;
 
@@ -99,7 +105,6 @@ public:
 
   double PLANNING_TIME = 15.0, LIN_PLANNING_TIME = 30.0;
   
-
   // Status variables
   tf::TransformListener tflistener_;
   bool holding_object_ = false;
@@ -116,7 +121,7 @@ public:
   moveit_msgs::PlanningScene planning_scene_;
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
   ros::ServiceClient get_planning_scene_client;
-  moveit::planning_interface::MoveGroupInterface a_bot_group_, b_bot_group_, c_bot_group_, front_bots_group_, all_bots_group_;
+  moveit::planning_interface::MoveGroupInterface a_bot_group_, b_bot_group_, c_bot_group_; // front_bots_group_, all_bots_group_;
   
 
   moveit_msgs::CollisionObject screw_tool_m5, screw_tool_m4, screw_tool_m3;

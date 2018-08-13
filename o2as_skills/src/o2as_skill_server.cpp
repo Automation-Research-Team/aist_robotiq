@@ -7,19 +7,18 @@ SkillServer::SkillServer() :
                   insertActionServer_(n_, "o2as_skills/insert", boost::bind(&SkillServer::executeInsert, this, _1),false),
                   screwActionServer_(n_, "o2as_skills/screw", boost::bind(&SkillServer::executeScrew, this, _1),false),
                   a_bot_group_("a_bot"), b_bot_group_("b_bot"), c_bot_group_("c_bot"),
-                  front_bots_group_("front_bots"), all_bots_group_("all_bots"),
                   b_bot_gripper_client_("/b_bot_gripper/gripper_action_controller", true),
                   c_bot_gripper_client_("/c_bot_gripper/gripper_action_controller", true)
-                  // a_bot_gripper_client_("/a_bot_gripper/gripper_action_controller", true),
 { 
   // Topics to publish
+  pubMarker_ = n_.advertise<visualization_msgs::Marker>("visualization_marker", 10);
 
   // Services to advertise
   goToNamedPoseService_ = n_.advertiseService("o2as_skills/goToNamedPose", &SkillServer::goToNamedPoseCallback,
                                         this);
 
   // Services to subscribe to
-  sendScriptToURClient_ = n_.serviceClient<o2as_skills::sendScriptToUR>("o2as_skills/ur_program_relay");
+  sendScriptToURClient_ = n_.serviceClient<o2as_skills::sendScriptToUR>("o2as_skills/sendScriptToUR");
 
   // Actions we serve
   alignActionServer_.start();
@@ -48,10 +47,10 @@ SkillServer::SkillServer() :
   c_bot_group_.setPlannerId("RRTConnectkConfigDefault");
   c_bot_group_.setEndEffectorLink("c_bot_robotiq_85_tip_link");
   c_bot_group_.setNumPlanningAttempts(10);
-  front_bots_group_.setPlanningTime(PLANNING_TIME);
-  front_bots_group_.setPlannerId("RRTConnectkConfigDefault");
-  all_bots_group_.setPlanningTime(PLANNING_TIME);
-  all_bots_group_.setPlannerId("RRTConnectkConfigDefault");
+  // front_bots_group_.setPlanningTime(PLANNING_TIME);
+  // front_bots_group_.setPlannerId("RRTConnectkConfigDefault");
+  // all_bots_group_.setPlanningTime(PLANNING_TIME);
+  // all_bots_group_.setPlannerId("RRTConnectkConfigDefault");
 
   get_planning_scene_client = n_.serviceClient<moveit_msgs::GetPlanningScene>("/get_planning_scene");
 
@@ -222,8 +221,8 @@ moveit::planning_interface::MoveGroupInterface* SkillServer::robotNameToMoveGrou
   if (robot_name == "a_bot") return &a_bot_group_;
   if (robot_name == "b_bot") return &b_bot_group_;
   if (robot_name == "c_bot") return &c_bot_group_;
-  if (robot_name == "front_bots") return &front_bots_group_;
-  if (robot_name == "all_bots") return &all_bots_group_;
+  // if (robot_name == "front_bots") return &front_bots_group_;
+  // if (robot_name == "all_bots") return &all_bots_group_;
 }
 
 
@@ -367,7 +366,12 @@ bool SkillServer::closeGripper(std::string robot_name)
 bool SkillServer::sendGripperCommand(std::string robot_name, double opening_width)
 {
   bool finished_before_timeout;
-  if ((robot_name == "b_bot") || (robot_name == "c_bot"))
+  ROS_INFO_STREAM("Opening gripper of: " << robot_name);
+  if ((robot_name == "a_bot"))
+  {
+    // TODO: Call the action or service of our custom gripper
+  }
+  else if ((robot_name == "b_bot") || (robot_name == "c_bot"))
   {
     // Send a goal to the action
     robotiq_msgs::CModelCommandGoal goal;
@@ -375,12 +379,12 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
     if (robot_name == "b_bot")
     {
       b_bot_gripper_client_.sendGoal(goal);
-      finished_before_timeout = b_bot_gripper_client_.waitForResult(ros::Duration(5.0));
+      finished_before_timeout = b_bot_gripper_client_.waitForResult(ros::Duration(2.0));
     }
     else if (robot_name == "c_bot")
     {
       c_bot_gripper_client_.sendGoal(goal);
-      finished_before_timeout = c_bot_gripper_client_.waitForResult(ros::Duration(5.0));
+      finished_before_timeout = c_bot_gripper_client_.waitForResult(ros::Duration(2.0));
     }
   }
   else
@@ -450,26 +454,47 @@ bool SkillServer::attachDetachTool(std::string screw_tool_id, std::string robot_
   return true;
 }
 
-bool SkillServer::pickScrew(std::string object_id, std::string screw_tool_id, std::string robot_name)
+bool SkillServer::placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name)
 {
-  // Retrieve the position of the object from the planning scene
-  geometry_msgs::PoseStamped object_pose = makePoseStamped();
-  std::vector<std::string> object_name_vector;
-  object_name_vector.push_back(object_id);
-  std::map< std::string, geometry_msgs::Pose > poses = planning_scene_interface_.getObjectPoses(object_name_vector);
+  publishMarker(target_tip_link_pose);
+  ROS_INFO_STREAM("Received placeFromAbove command.");
+
+  // Move above the target pose
+  target_tip_link_pose.pose.position.z += .1;
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);
+
+  // Move down to the target pose
+  target_tip_link_pose.pose.position.z -= .1;
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  bool success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
+  if (!success) 
+  {
+    ROS_INFO_STREAM("Linear motion plan to target place pose failed. Performing PTP.");
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+  }
+  openGripper(robot_name);
   
-  object_pose.header.frame_id = "world";
-  object_pose.pose.position = poses[object_id].position;
-  // We ignore the orientation of the screw (they always point down) and assign an appropriate orientation
-  // TODO: How to find a good pose for the robot automatically? Launch a planning request to MoveIt?
-  object_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(145.0/180.0 *M_PI));   // Z-axis pointing up.
-  
-  std::string screw_tool_link = robot_name + "_" + screw_tool_id + "_tip_link";
-  return pickFromAbove(object_pose, screw_tool_link, robot_name);
+  // Move back up a little
+  target_tip_link_pose.pose.position.z += .05;
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
+  if (!success) 
+  {
+    ROS_INFO_STREAM("Linear motion plan back from place pose failed. Performing PTP.");
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+  }
+
+  return true;
 }
 
 bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name)
 {
+  ROS_INFO_STREAM("Received pickFromAbove command.");
+  publishMarker(target_tip_link_pose, "pose");
+
   // Move above the object
   openGripper(robot_name);
   target_tip_link_pose.pose.position.z += .1;
@@ -502,11 +527,79 @@ bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose,
   return true;
 }
 
+bool SkillServer::pickScrew(std::string object_id, std::string screw_tool_id, std::string robot_name)
+{
+  // Retrieve the position of the object from the planning scene
+  geometry_msgs::PoseStamped object_pose = makePoseStamped();
+  std::vector<std::string> object_name_vector;
+  object_name_vector.push_back(object_id);
+  std::map< std::string, geometry_msgs::Pose > poses = planning_scene_interface_.getObjectPoses(object_name_vector);
+  
+  object_pose.header.frame_id = "world";
+  object_pose.pose.position = poses[object_id].position;
+  // We ignore the orientation of the screw (they always point down) and assign an appropriate orientation
+  // TODO: How to find a good pose for the robot automatically? Launch a planning request to MoveIt?
+  object_pose.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(145.0/180.0 *M_PI));   // Z-axis pointing up.
+  
+  std::string screw_tool_link = robot_name + "_" + screw_tool_id + "_tip_link";
+  return pickFromAbove(object_pose, screw_tool_link, robot_name);
+}
+
+bool SkillServer::publishMarker(geometry_msgs::PoseStamped marker_pose, std::string marker_type)
+{
+    visualization_msgs::Marker marker;
+    marker.header = marker_pose.header;
+    marker.header.stamp = ros::Time::now();
+    marker.pose = marker_pose.pose;
+
+    marker.ns = "markers";
+    marker.id = 0;
+    marker.lifetime = ros::Duration();
+    marker.action = visualization_msgs::Marker::ADD;
+
+    if (marker_type == "pose")
+    {
+      // This draws a TF-like frame.
+      marker.type = visualization_msgs::Marker::ARROW;
+      marker.scale.x = .1;
+      marker.scale.y = .01;
+      marker.scale.z = .01;
+      marker.color.a = 1.0;
+
+      visualization_msgs::Marker arrow_x, arrow_y, arrow_z;
+      arrow_x = marker; arrow_y = marker; arrow_z = marker;
+      arrow_x.id = 1; arrow_y.id = 2; arrow_z.id = 3;
+      arrow_x.color.r = 1.0; arrow_y.color.g = 1.0; arrow_z.color.b = 1.0;
+
+      rotatePoseByRPY(0, 0, M_PI/2, arrow_y.pose);
+      rotatePoseByRPY(0, -M_PI/2, 0, arrow_z.pose);
+
+      pubMarker_.publish(arrow_x); pubMarker_.publish(arrow_y); pubMarker_.publish(arrow_z);
+      return true;
+    }
+    else if (marker_type == "")
+    {
+      marker.type = visualization_msgs::Marker::SPHERE;
+      marker.scale.x = .1;
+      marker.scale.y = .1;
+      marker.scale.z = .02;
+      
+      marker.color.g = 1.0;
+      marker.color.a = 1.0;
+    }
+    else 
+    {ROS_WARN("No useful marker message received.");}
+    pubMarker_.publish(marker);
+    return true;
+}
+
+
 // ----------- Service definitions
 bool SkillServer::goToNamedPoseCallback(o2as_skills::goToNamedPose::Request &req,
                                            o2as_skills::goToNamedPose::Response &res)
 {
-  res.success = goToNamedPose(req.planning_group, req.named_pose);
+  ROS_INFO("Received goToNamedPose callback.");
+  res.success = goToNamedPose(req.named_pose, req.planning_group);
   return true;
 }
 
@@ -537,11 +630,17 @@ void SkillServer::executePick(const o2as_skills::pickGoalConstPtr& goal)
   {;} // TODO: Here is space for code from AIST.
   else // No special tool being used; use the gripper instead
   {
-    // Assume that the pose is given
-    if (abs(goal->item_pose.pose.position.x) > 0 || abs(goal->item_pose.pose.position.y) > 0 || abs(goal->item_pose.pose.position.z) > 0)
+    // Warning: Using only "abs" rounds to int. Amazing.
+    if ((std::abs(goal->item_pose.pose.position.x)) > 0 || (std::abs(goal->item_pose.pose.position.y)) > 0 || (std::abs(goal->item_pose.pose.position.z)) > 0)
     {
-      std::string ee_link_name = goal->robot_name + "_robotiq_85_tip_link";
+      std::string ee_link_name;
+      if (goal->robot_name == "a_bot"){ee_link_name = goal->robot_name + "_gripper_tip_link"; }
+      else {ee_link_name = goal->robot_name + "_robotiq_85_tip_link";}
       pickFromAbove(goal->item_pose, ee_link_name, goal->robot_name);
+    }
+    else
+    {
+      ROS_WARN("Item_pose is empty and no tool_name was set. Not doing anything");
     }
 
     // TODO. The plan: 
@@ -565,8 +664,12 @@ void SkillServer::executePick(const o2as_skills::pickGoalConstPtr& goal)
 void SkillServer::executePlace(const o2as_skills::placeGoalConstPtr& goal)
 {
   ROS_INFO("placeAction was called");
-  // TODO: Insert commands to do the action
-  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  // TODO: Calculate the target pose with the item height currently held
+  std::string ee_link_name;
+  if (goal->robot_name == "a_bot"){ee_link_name = goal->robot_name + "_gripper_tip_link"; }
+  else {ee_link_name = goal->robot_name + "_robotiq_85_tip_link";}
+  
+  placeFromAbove(goal->target_pose, ee_link_name, goal->robot_name);
   ROS_INFO("placeAction is set as succeeded");
   placeActionServer_.setSucceeded();
 }
@@ -628,38 +731,6 @@ int main(int argc, char **argv)
   // Create an object of class SkillServer that will take care of everything
   SkillServer o2as_skill_server;
   ROS_INFO("O2AS skill server started");
-
-  ROS_INFO("Testing an assembly sequence.");
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-  // Define the pose of each item (for the ee_link)
-  geometry_msgs::PoseStamped peg_pose = makePoseStamped();
-  peg_pose.header.frame_id = "c_bot_base_link";
-  peg_pose.pose.orientation.x = 0.99994;
-  peg_pose.pose.orientation.y = -0.0011537;
-  peg_pose.pose.orientation.z = 0.002202;
-  peg_pose.pose.orientation.w = 0.010578;
-  peg_pose.pose.position.x = 0.045;
-  peg_pose.pose.position.y = -0.300;
-  peg_pose.pose.position.z = 0.254;
-  
-  geometry_msgs::PoseStamped bearing_pose = makePoseStamped();
-  bearing_pose.header.frame_id = "b_bot_base_link";
-  bearing_pose.pose.orientation.x = 0.99249;
-  bearing_pose.pose.orientation.y = -0.10267;
-  bearing_pose.pose.orientation.z = 0.06558;
-  bearing_pose.pose.orientation.w = 0.011064;
-  bearing_pose.pose.position.x = -0.025;
-  bearing_pose.pose.position.y = -0.658;
-  bearing_pose.pose.position.z = 0.233;
-
-  o2as_skill_server.goToNamedPose("home_b", "b_bot");
-  o2as_skill_server.goToNamedPose("home_c", "c_bot");
-  o2as_skill_server.pickFromAbove(peg_pose, "c_bot_ee_link", "c_bot");
-  o2as_skill_server.goToNamedPose("home_c", "c_bot");
-  
-  o2as_skill_server.pickFromAbove(bearing_pose, "b_bot_ee_link", "b_bot");
-  o2as_skill_server.goToNamedPose("home_b", "b_bot");
 
   // o2as_skills::sendScriptToUR srv;
   // srv.request.program_id = "insertion";
