@@ -119,10 +119,10 @@
   </joint>
 
   <!-- spawn and attach grippers -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/combined_gripper.xacro" />
-  <xacro:combined_gripper prefix="a_bot_"  grippername = "gripper" parent = "a_bot_tool0">
+  <xacro:include filename="$(find o2as_scene_description)/urdf/precision_gripper.xacro" />
+  <xacro:precision_gripper prefix="a_bot_"  grippername = "gripper" parent = "a_bot_tool0">
     <origin xyz="0.0 0 0.04" rpy="0 ${pi/2} 0"/>
-  </xacro:combined_gripper>
+  </xacro:precision_gripper>
 
   <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_85_gripper.urdf.xacro" />
   <xacro:robotiq_85_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link">
