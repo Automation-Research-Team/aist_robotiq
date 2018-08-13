@@ -123,7 +123,7 @@ class ExampleClass(object):
     # Note: there is no equivalent function for clear_joint_value_targets()
     group.clear_pose_targets()
 
-    current_pose = self.group.get_current_pose().pose
+    current_pose = group.get_current_pose().pose
     return all_close(pose_goal_stamped.pose, current_pose, 0.01)
 
   def do_pick_action(self, robot_name, pose_stamped, tool_name = ""):
@@ -176,22 +176,22 @@ class ExampleClass(object):
     # Pick a thing with b_bot, then c_bot
     
     # Define the pose of each item
-    peg_pose = geometry_msgs.msg.PoseStamped()
-    peg_pose.header.frame_id = "workspace_center"
-    peg_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    peg_pose.pose.position.x = -0.2
-    peg_pose.pose.position.z = 0.03
+    pick_pose_c = geometry_msgs.msg.PoseStamped()
+    pick_pose_c.header.frame_id = "workspace_center"
+    pick_pose_c.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pick_pose_c.pose.position.x = -0.2
+    pick_pose_c.pose.position.z = 0.03
     
-    bearing_pose = copy.deepcopy(peg_pose) # Careful: pose1 = pose2 would create a shallow copy (changes to one will affect the other)
-    bearing_pose.pose.position.x = 0.0
-    bearing_pose.pose.position.y = 0.15
+    pick_pose_b = copy.deepcopy(pick_pose_c) # Careful: pose1 = pose2 would create a shallow copy (changes to one will affect the other)
+    pick_pose_b.pose.position.x = 0.0
+    pick_pose_b.pose.position.y = 0.15
     
     # First pick up item with b_bot
-    self.do_pick_action("b_bot", bearing_pose, tool_name = "")
+    self.do_pick_action("b_bot", pick_pose_b, tool_name = "")
     self.go_to_named_pose("home_b", "b_bot")
     
     # Now pick the item with c_bot
-    self.do_pick_action("c_bot", peg_pose, tool_name = "")
+    self.do_pick_action("c_bot", pick_pose_c, tool_name = "")
     self.go_to_named_pose("home_c", "c_bot")
 
     # Pick a thing with b_bot, then c_bot
@@ -214,6 +214,62 @@ class ExampleClass(object):
     self.go_to_named_pose("home_c", "c_bot")
     rospy.loginfo("Done.")
 
+  def insertion_demo(self):
+    # Pick a thing with b_bot, then c_bot
+
+    # Define the pose of each item
+    pick_pose_c = geometry_msgs.msg.PoseStamped()
+    pick_pose_c.header.frame_id = "workspace_center"
+    pick_pose_c.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pick_pose_c.pose.position.x = -0.2
+    pick_pose_c.pose.position.z = 0.03
+    self.go_to_pose_goal("c_bot", pick_pose_c)
+    
+    # Define the pose of each item
+    # peg_pose = geometry_msgs.msg.PoseStamped()
+    # peg_pose.header.frame_id = "workspace_center"
+    # peg_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    # peg_pose.pose.position.x = -0.2
+    # peg_pose.pose.position.z = 0.03
+    
+    # bearing_pose = copy.deepcopy(peg_pose)
+    # bearing_pose.pose.position.x = 0.0
+    # bearing_pose.pose.position.y = 0.15
+    
+    # # First pick up item with b_bot
+    # self.do_pick_action("b_bot", bearing_pose, tool_name = "")
+    # self.go_to_named_pose("home_b", "b_bot")
+    
+    # # Now pick the item with c_bot
+    # self.do_pick_action("c_bot", peg_pose, tool_name = "")
+    # self.go_to_named_pose("home_c", "c_bot")
+
+    # Move the robots to a pose and tell one to insert
+    pre_insertion_pose_c = geometry_msgs.msg.PoseStamped()
+    pre_insertion_pose_c.header.frame_id = "workspace_center"
+    pre_insertion_pose_c.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, pi*1/4))
+    # pre_insertion_pose_c.pose.orientation = geometry_msgs.msg.Quaternion(*[0.0024936, 0.023435, 0.40201, 0.91533])
+    pre_insertion_pose_c.pose.position.x = -0.21
+    pre_insertion_pose_c.pose.position.y = 0.18
+    pre_insertion_pose_c.pose.position.z = 0.55
+
+    pre_insertion_pose_b = geometry_msgs.msg.PoseStamped()
+    pre_insertion_pose_b.header.frame_id = "workspace_center"
+    pre_insertion_pose_b.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, -pi*3/4))
+    pre_insertion_pose_b.pose.position.x = -0.11
+    pre_insertion_pose_b.pose.position.y = 0.28
+    pre_insertion_pose_b.pose.position.z = 0.55
+    
+    rospy.loginfo("Going to pre_insertion c")
+    self.go_to_pose_goal("c_bot", pre_insertion_pose_c)
+    rospy.loginfo("Going to pre_insertion b")
+    self.go_to_pose_goal("b_bot", pre_insertion_pose_b)
+
+    rospy.loginfo("Attempt insertion?")
+    raw_input()
+    self.do_insertion("c_bot")
+    rospy.loginfo("Done.")
+
 
 def main():
   try:
@@ -221,7 +277,7 @@ def main():
 
     # print "============ Press `Enter` to start assembly test ..."
     # raw_input()
-    tutorial.assembly_demo()
+    tutorial.insertion_demo()
 
     print "============ Demo complete!"
   except rospy.ROSInterruptException:
