@@ -14,9 +14,9 @@ class PrecisionGripper:
         self.p3 = xm430.Robotis_Servo2(self.dynamixel, 3, series = "XM" )#outer gripper
         self.p4 = xm430.Robotis_Servo2(self.dynamixel, 4, series = "XM" )#linear actuator
         
-        self.pitch = rospy.get_param("pitch", "1.98")   
-        self.pgc_linear_zero = rospy.get_param("pgc_linear_zero", "3325")
-        self.og_open_motor_pos_ = rospy.get_param("og_open_motor_pos_", "1024")
+        self.pitch = rospy.get_param("pitch", 1.98)
+        self.pgc_linear_zero = rospy.get_param("pgc_linear_zero", 3325)
+        self.og_open_motor_pos_ = rospy.get_param("og_open_motor_pos_", 1024)
         return
 
     def my_callback(self, req):
@@ -194,7 +194,7 @@ class PrecisionGripper:
         if length_in_mm<0:
             rospy.logerr("error during length conversion from mm to rotation")
         else:
-            length_in_rotation=linear_zero+int(length_in_mm*4096/self.pitch)
+            length_in_rotation=linear_zero+int(length_in_mm*4096.0/self.pitch)
             return length_in_rotation
 
 
