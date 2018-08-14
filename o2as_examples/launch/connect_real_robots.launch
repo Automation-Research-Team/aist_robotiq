@@ -25,7 +25,7 @@
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
   <!-- Drivers for the robots -->
-  <!-- <node name="a_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen" ns="a_bot_controller">
+  <node name="a_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen" ns="a_bot_controller">
     <param name="prefix" type="str" value="a_bot_" />
     <param name="robot_ip_address" type="str" value="$(arg robot_ip_a)" />
     <param name="reverse_port" type="int" value="50003" /> 
@@ -38,7 +38,7 @@
     <param name="require_activation" type="str" value="$(arg require_activation)" />
     <param name="shutdown_on_disconnect" type="bool" value="$(arg shutdown_on_disconnect)"/>
     <remap from="joint_states" to="/joint_states"/>
-  </node> -->
+  </node>
   
   <node name="b_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen" ns="b_bot_controller">
     <param name="prefix" type="str" value="b_bot_" />
@@ -81,6 +81,10 @@
     <arg name="ip" default="192.168.0.40" />
     <arg name="gripper_prefix" value="c_bot_" />
     <arg name="namespace" value="c_bot_gripper" />
+  </include>
+
+  <include file="$(find o2as_precision_gripper)/launch/test_precision_gripper.launch">
+    <arg name="serial_port" default="/dev/ttyUSB1" />
   </include>
 
   <!-- <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch">

@@ -104,7 +104,7 @@ SkillServer::SkillServer() :
 
 
 // This works only for a single robot.
-bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait, std::string end_effector_link)
+bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait, std::string end_effector_link, double velocity_scaling_factor)
 {
   moveit::planning_interface::MoveGroupInterface::Plan myplan;
   moveit::planning_interface::MoveItErrorCode 
@@ -116,6 +116,7 @@ bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string
   
   group_pointer->clearPoseTargets();
   group_pointer->setStartStateToCurrentState();
+  group_pointer->setMaxVelocityScalingFactor(velocity_scaling_factor);  // TODO: Check if this works
   if (end_effector_link == "") group_pointer->setEndEffectorLink(robot_name + "_robotiq_85_tip_link"); // Force default
   else group_pointer->setEndEffectorLink(end_effector_link);
   group_pointer->setPoseTarget(pose);
@@ -127,14 +128,16 @@ bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string
     if (wait) motion_done = group_pointer->execute(myplan);
     else motion_done = group_pointer->asyncExecute(myplan);
     if (motion_done) {
+      group_pointer->setMaxVelocityScalingFactor(1.0); // Reset the velocity
       return true;
     }
   }
   ROS_WARN("Failed to perform motion.");
+  group_pointer->setMaxVelocityScalingFactor(1.0); // Reset the velocity
   return false;
 }
 // This works only for a single robot.
-bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait, std::string end_effector_link)
+bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait, std::string end_effector_link, double velocity_scaling_factor)
 {
   moveit::planning_interface::MoveGroupInterface::Plan myplan;
   moveit::planning_interface::MoveItErrorCode 
@@ -160,7 +163,7 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   waypoints.push_back(pose.pose);
 
   ROS_WARN("Speed scaling does not work for linear motions. Going at regular speed.");
-  group_pointer->setMaxVelocityScalingFactor(0.1);  // Does this work?? Not for linear paths: https://answers.ros.org/question/288989/moveit-velocity-scaling-for-cartesian-path/
+  group_pointer->setMaxVelocityScalingFactor(velocity_scaling_factor); // This doesn't work for linear paths: https://answers.ros.org/question/288989/moveit-velocity-scaling-for-cartesian-path/
   b_bot_group_.setPlanningTime(LIN_PLANNING_TIME);
 
   moveit_msgs::RobotTrajectory trajectory;
@@ -499,12 +502,12 @@ bool SkillServer::placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose
   target_tip_link_pose.pose.position.z -= .1;
   ROS_INFO_STREAM("Moving down to place object.");
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  bool success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
+  bool success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name, 0.1);
   if (!success) 
   {
     ROS_INFO_STREAM("Linear motion plan to target place pose failed. Performing PTP.");
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name, 0.1);  // Force the move even if LIN fails
   }
   openGripper(robot_name, gripper_name);
   
@@ -541,12 +544,12 @@ bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose,
   target_tip_link_pose.pose.position.z -= .1;
   ROS_INFO_STREAM("Moving down to pick object.");
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  bool success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
+  bool success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name, 0.1);
   if (!success) 
   {
     ROS_INFO_STREAM("Linear motion plan to target pick pose failed. Performing PTP.");
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name, 0.1);  // Force the move even if LIN fails
   }
   closeGripper(robot_name, gripper_name);
 

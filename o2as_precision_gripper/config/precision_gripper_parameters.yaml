@@ -1,2 +1,5 @@
 publish_rate: 100
-
+outer_force: 30
+inner_force: 5
+outer_open_position: -50000
+outer_close_position: 50240
