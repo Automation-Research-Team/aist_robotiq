@@ -27,13 +27,13 @@ class PrecisionGripper:
             self.inner_gripper_read_current_position()
             self.inner_gripper_disable_torque()
             self.outer_gripper_disable_torque()
-        elif req.open_outer_gripper_fully and not(req.close_outer_gripper_fully):
+        elif req.open_outer_gripper_fully:        
             self.outer_gripper_open_fully(self.outer_force)
-        elif not(req.open_outer_gripper_fully) and (req.close_outer_gripper_fully):
+        elif req.close_outer_gripper_fully:
             self.outer_gripper_close_fully(self.outer_force)
-        elif req.open_inner_gripper_fully and not(req.close_inner_gripper_fully):
+        elif req.open_inner_gripper_fully:
             self.inner_gripper_open_fully(self.inner_force)
-        elif not(req.open_inner_gripper_fully) and (req.close_inner_gripper_fully):
+        elif req.close_inner_gripper_fully:
             self.inner_gripper_close_fully(self.inner_force)
         else:
             rospy.logerr('No command sent to the gripper, service request was empty.')
