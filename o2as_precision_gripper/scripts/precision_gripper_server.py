@@ -16,6 +16,7 @@ class PrecisionGripper:
         self.inner_force = rospy.get_param("inner_force", 5)
         self.outer_open_position = rospy.get_param("outer_open_position", -50000)
         self.outer_close_position = rospy.get_param("outer_close_position", 50240)
+        self.speed_limit = rospy.get_param("speed_limit", 10)
         return
 
     def my_callback(self, req):
@@ -80,9 +81,11 @@ class PrecisionGripper:
             self.p2.set_current(current)
             self.p2.set_goal_position(self.outer_open_position)
             rospy.sleep(0.1)
-            current_velocity = self.p2.read_current_velocity
-            while current_velocity>0:
-                current_velocity = self.p2.read_current_velocity
+            current_velocity = self.p2.read_current_velocity()
+            while current_velocity>self.speed_limit:
+                print current_velocity
+                current_velocity = self.p2.read_current_velocity()
+                rospy.sleep(0.1)
         except:
             rospy.logerr("Failed to run commands.")
 
@@ -93,9 +96,11 @@ class PrecisionGripper:
             self.p2.set_current(current)
             self.p2.set_goal_position(self.outer_close_position)
             rospy.sleep(0.1)
-            current_velocity = self.p2.read_current_velocity
-            while current_velocity>0:
-                current_velocity = self.p2.read_current_velocity
+            current_velocity = self.p2.read_current_velocity()
+            while current_velocity>self.speed_limit:
+                print current_velocity
+                current_velocity = self.p2.read_current_velocity()
+                rospy.sleep(0.1)
         except:
             rospy.logerr("Failed to run commands.")
 
@@ -126,9 +131,11 @@ class PrecisionGripper:
             self.p1.set_current(current)
             self.p1.set_goal_position(3799)
             rospy.sleep(0.1)
-            current_velocity = self.p1.read_current_velocity
-            while current_velocity>0:
-                current_velocity = self.p1.read_current_velocity
+            current_velocity = self.p1.read_current_velocity()
+            while current_velocity>self.speed_limit:
+                print current_velocity
+                current_velocity = self.p1.read_current_velocity()
+                rospy.sleep(0.1)
         except:
             rospy.logerr("Failed to run commands.")
 
@@ -138,9 +145,11 @@ class PrecisionGripper:
             self.p1.set_positive_direction("cw")
             self.p1.set_current(current)
             rospy.sleep(0.1)
-            current_velocity = self.p1.read_current_velocity
-            while current_velocity>0:
-                current_velocity = self.p1.read_current_velocity
+            current_velocity = self.p1.read_current_velocity()
+            while current_velocity>self.speed_limit:
+                print current_velocity
+                current_velocity = self.p1.read_current_velocity()
+                rospy.sleep(0.1)
         except:
             rospy.logerr("Failed to run commands.")
 
