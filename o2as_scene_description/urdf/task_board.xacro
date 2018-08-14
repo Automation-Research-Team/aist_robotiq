@@ -134,6 +134,32 @@
   </joint>
   <link name="${boardname}_part15"/>  
 
+  <joint name="${boardname}_corner1" type="fixed">
+    <parent link="${boardname}"/>
+    <child link="${boardname}_corner1"/>
+    <origin rpy="0.0 0.0 ${pi/2}" xyz="0.01 0.39 0.06"/>
+  </joint>
+  <link name="${boardname}_corner1"/> 
+
+  <joint name="${boardname}_corner2" type="fixed">
+    <parent link="${boardname}"/>
+    <child link="${boardname}_corner2"/>
+    <origin rpy="0.0 0.0 ${pi/2}" xyz="0.39 0.39 0.06"/>
+  </joint>
+  <link name="${boardname}_corner2"/> 
+  <joint name="${boardname}_corner3" type="fixed">
+    <parent link="${boardname}"/>
+    <child link="${boardname}_corner3"/>
+    <origin rpy="0.0 0.0 ${pi/2}" xyz="0.39 0.01 0.06"/>
+  </joint>
+  <link name="${boardname}_corner3"/> 
+  <joint name="${boardname}_corner4" type="fixed">
+    <parent link="${boardname}"/>
+    <child link="${boardname}_corner4"/>
+    <origin rpy="0.0 0.0 ${pi/2}" xyz="0.01 0.01 0.06"/>
+  </joint>
+  <link name="${boardname}_corner4"/> 
+  
   </xacro:macro>
   <!-- Add additional links for us to plan with.-->
 </robot>

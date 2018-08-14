@@ -9,6 +9,7 @@ Panels:
         - /MotionPlanning1
         - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
+        - /TF1
       Splitter Ratio: 0.5
     Tree Height: 221
   - Class: rviz/Selection
@@ -105,52 +106,12 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          a_bot_robotiq_85_base_link:
+          a_bot_gripper:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          a_bot_robotiq_85_left_finger_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_robotiq_85_left_finger_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_robotiq_85_left_inner_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_robotiq_85_left_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_robotiq_85_right_finger_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_robotiq_85_right_finger_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_robotiq_85_right_inner_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_robotiq_85_right_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_robotiq_85_tip_link:
+          a_bot_gripper_tip_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -293,6 +254,10 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          b_bot_screw_tool_m5_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_bot_shoulder_link:
             Alpha: 1
             Show Axes: false
@@ -395,6 +360,10 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          c_bot_screw_tool_m5_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           c_bot_shoulder_link:
             Alpha: 1
             Show Axes: false
@@ -428,71 +397,196 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          m3_feeder_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          m3_feeder_outlet_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          m4_feeder_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          m4_feeder_outlet_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          m5_feeder_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          m5_feeder_outlet_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          mat_part1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part10:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part11:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part12:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part13:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part14:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part15:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part7:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part9:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           o2as_ground:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          set1_bin1_1:
+          screw_tool_holder:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          set1_bin1_2:
+          screw_tool_m3_helper_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          screw_tool_m3_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          set1_bin1_3:
+          screw_tool_m4_helper_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          screw_tool_m4_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          set1_bin1_4:
+          screw_tool_m5_helper_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          screw_tool_m5_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          set1_bin1_5:
+          taskboard:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          set2_bin2_1:
+          taskboard_part1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          set2_bin2_2:
+          taskboard_part10:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          set2_bin2_3:
+          taskboard_part11:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          set2_bin2_4:
+          taskboard_part12:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          set2_bin3:
+          taskboard_part13:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          set3_tray_1:
+          taskboard_part14:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          set3_tray_2:
+          taskboard_part15:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          wall_b:
+          taskboard_part2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part9:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          wall_a:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -584,52 +678,12 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          a_bot_robotiq_85_base_link:
+          a_bot_gripper:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          a_bot_robotiq_85_left_finger_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_robotiq_85_left_finger_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_robotiq_85_left_inner_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_robotiq_85_left_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_robotiq_85_right_finger_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_robotiq_85_right_finger_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_robotiq_85_right_inner_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_robotiq_85_right_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_robotiq_85_tip_link:
+          a_bot_gripper_tip_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -772,6 +826,10 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          b_bot_screw_tool_m5_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_bot_shoulder_link:
             Alpha: 1
             Show Axes: false
@@ -874,6 +932,10 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          c_bot_screw_tool_m5_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           c_bot_shoulder_link:
             Alpha: 1
             Show Axes: false
@@ -907,71 +969,196 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          m3_feeder_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          m3_feeder_outlet_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          m4_feeder_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          m4_feeder_outlet_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          m5_feeder_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          m5_feeder_outlet_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          mat_part1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part10:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part11:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part12:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part13:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part14:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part15:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part7:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part9:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           o2as_ground:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          set1_bin1_1:
+          screw_tool_holder:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          set1_bin1_2:
+          screw_tool_m3_helper_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          screw_tool_m3_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          set1_bin1_3:
+          screw_tool_m4_helper_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          screw_tool_m4_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          set1_bin1_4:
+          screw_tool_m5_helper_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          screw_tool_m5_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          set1_bin1_5:
+          taskboard:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          set2_bin2_1:
+          taskboard_part1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          set2_bin2_2:
+          taskboard_part10:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          set2_bin2_3:
+          taskboard_part11:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          set2_bin2_4:
+          taskboard_part12:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          set2_bin3:
+          taskboard_part13:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          set3_tray_1:
+          taskboard_part14:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          set3_tray_2:
+          taskboard_part15:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          wall_b:
+          taskboard_part2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part9:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          wall_a:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -998,6 +1185,440 @@ Visualization Manager:
         Show Robot Collision: false
         Show Robot Visual: true
       Value: true
+    - Class: rviz/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+        a_bot_base:
+          Value: true
+        a_bot_base_link:
+          Value: true
+        a_bot_base_smfl:
+          Value: true
+        a_bot_ee_link:
+          Value: true
+        a_bot_forearm_link:
+          Value: true
+        a_bot_gripper:
+          Value: true
+        a_bot_gripper_tip_link:
+          Value: true
+        a_bot_shoulder_link:
+          Value: true
+        a_bot_tool0:
+          Value: true
+        a_bot_tool0_controller:
+          Value: true
+        a_bot_upper_arm_link:
+          Value: true
+        a_bot_wrist_1_link:
+          Value: true
+        a_bot_wrist_2_link:
+          Value: true
+        a_bot_wrist_3_link:
+          Value: true
+        b_bot_base:
+          Value: true
+        b_bot_base_link:
+          Value: true
+        b_bot_base_smfl:
+          Value: true
+        b_bot_cam_holder_link:
+          Value: true
+        b_bot_camera_depth_frame:
+          Value: true
+        b_bot_camera_depth_optical_frame:
+          Value: true
+        b_bot_camera_fisheye_frame:
+          Value: true
+        b_bot_camera_fisheye_optical_frame:
+          Value: true
+        b_bot_camera_left_ir_frame:
+          Value: true
+        b_bot_camera_left_ir_optical_frame:
+          Value: true
+        b_bot_camera_link:
+          Value: true
+        b_bot_camera_right_ir_frame:
+          Value: true
+        b_bot_ee_link:
+          Value: true
+        b_bot_forearm_link:
+          Value: true
+        b_bot_robotiq_85_base_link:
+          Value: true
+        b_bot_robotiq_85_left_finger_link:
+          Value: true
+        b_bot_robotiq_85_left_finger_tip_link:
+          Value: true
+        b_bot_robotiq_85_left_inner_knuckle_link:
+          Value: true
+        b_bot_robotiq_85_left_knuckle_link:
+          Value: true
+        b_bot_robotiq_85_right_finger_link:
+          Value: true
+        b_bot_robotiq_85_right_finger_tip_link:
+          Value: true
+        b_bot_robotiq_85_right_inner_knuckle_link:
+          Value: true
+        b_bot_robotiq_85_right_knuckle_link:
+          Value: true
+        b_bot_robotiq_85_tip_link:
+          Value: true
+        b_bot_screw_tool_m5_tip_link:
+          Value: true
+        b_bot_shoulder_link:
+          Value: true
+        b_bot_tool0:
+          Value: true
+        b_bot_tool0_controller:
+          Value: true
+        b_bot_upper_arm_link:
+          Value: true
+        b_bot_wrist_1_link:
+          Value: true
+        b_bot_wrist_2_link:
+          Value: true
+        b_bot_wrist_3_link:
+          Value: true
+        c_bot_base:
+          Value: true
+        c_bot_base_link:
+          Value: true
+        c_bot_base_smfl:
+          Value: true
+        c_bot_ee_link:
+          Value: true
+        c_bot_forearm_link:
+          Value: true
+        c_bot_robotiq_85_base_link:
+          Value: true
+        c_bot_robotiq_85_left_finger_link:
+          Value: true
+        c_bot_robotiq_85_left_finger_tip_link:
+          Value: true
+        c_bot_robotiq_85_left_inner_knuckle_link:
+          Value: true
+        c_bot_robotiq_85_left_knuckle_link:
+          Value: true
+        c_bot_robotiq_85_right_finger_link:
+          Value: true
+        c_bot_robotiq_85_right_finger_tip_link:
+          Value: true
+        c_bot_robotiq_85_right_inner_knuckle_link:
+          Value: true
+        c_bot_robotiq_85_right_knuckle_link:
+          Value: true
+        c_bot_robotiq_85_tip_link:
+          Value: true
+        c_bot_screw_tool_m5_tip_link:
+          Value: true
+        c_bot_shoulder_link:
+          Value: true
+        c_bot_tool0:
+          Value: true
+        c_bot_tool0_controller:
+          Value: true
+        c_bot_upper_arm_link:
+          Value: true
+        c_bot_wrist_1_link:
+          Value: true
+        c_bot_wrist_2_link:
+          Value: true
+        c_bot_wrist_3_link:
+          Value: true
+        camera_right_ir_optical_frame:
+          Value: true
+        m3_feeder_link:
+          Value: true
+        m3_feeder_outlet_link:
+          Value: true
+        m4_feeder_link:
+          Value: true
+        m4_feeder_outlet_link:
+          Value: true
+        m5_feeder_link:
+          Value: true
+        m5_feeder_outlet_link:
+          Value: true
+        mat:
+          Value: true
+        mat_part1:
+          Value: true
+        mat_part10:
+          Value: true
+        mat_part11:
+          Value: true
+        mat_part12:
+          Value: true
+        mat_part13:
+          Value: true
+        mat_part14:
+          Value: true
+        mat_part15:
+          Value: true
+        mat_part2:
+          Value: true
+        mat_part3:
+          Value: true
+        mat_part4:
+          Value: true
+        mat_part5:
+          Value: true
+        mat_part6:
+          Value: true
+        mat_part7:
+          Value: true
+        mat_part8:
+          Value: true
+        mat_part9:
+          Value: true
+        o2as_ground:
+          Value: true
+        screw_tool_holder:
+          Value: true
+        screw_tool_m3_helper_link:
+          Value: true
+        screw_tool_m3_link:
+          Value: true
+        screw_tool_m4_helper_link:
+          Value: true
+        screw_tool_m4_link:
+          Value: true
+        screw_tool_m5_helper_link:
+          Value: true
+        screw_tool_m5_link:
+          Value: true
+        taskboard:
+          Value: true
+        taskboard_part1:
+          Value: true
+        taskboard_part10:
+          Value: true
+        taskboard_part11:
+          Value: true
+        taskboard_part12:
+          Value: true
+        taskboard_part13:
+          Value: true
+        taskboard_part14:
+          Value: true
+        taskboard_part15:
+          Value: true
+        taskboard_part2:
+          Value: true
+        taskboard_part3:
+          Value: true
+        taskboard_part4:
+          Value: true
+        taskboard_part5:
+          Value: true
+        taskboard_part6:
+          Value: true
+        taskboard_part8:
+          Value: true
+        taskboard_part9:
+          Value: true
+        wall_a:
+          Value: true
+        wall_c:
+          Value: true
+        workbox:
+          Value: true
+        workspace_center:
+          Value: true
+        world:
+          Value: true
+      Marker Scale: 0.150000006
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: false
+      Tree:
+        world:
+          o2as_ground:
+            a_bot_base_link:
+              a_bot_base:
+                a_bot_tool0_controller:
+                  {}
+              a_bot_shoulder_link:
+                a_bot_upper_arm_link:
+                  a_bot_forearm_link:
+                    a_bot_wrist_1_link:
+                      a_bot_wrist_2_link:
+                        a_bot_wrist_3_link:
+                          a_bot_ee_link:
+                            {}
+                          a_bot_tool0:
+                            a_bot_gripper:
+                              {}
+                            a_bot_gripper_tip_link:
+                              {}
+            a_bot_base_smfl:
+              m3_feeder_link:
+                m3_feeder_outlet_link:
+                  {}
+            b_bot_base_link:
+              b_bot_base:
+                b_bot_tool0_controller:
+                  {}
+              b_bot_shoulder_link:
+                b_bot_upper_arm_link:
+                  b_bot_forearm_link:
+                    b_bot_wrist_1_link:
+                      b_bot_wrist_2_link:
+                        b_bot_cam_holder_link:
+                          b_bot_camera_link:
+                            b_bot_camera_depth_frame:
+                              b_bot_camera_depth_optical_frame:
+                                {}
+                              b_bot_camera_fisheye_frame:
+                                b_bot_camera_fisheye_optical_frame:
+                                  {}
+                              b_bot_camera_left_ir_frame:
+                                b_bot_camera_left_ir_optical_frame:
+                                  {}
+                              b_bot_camera_right_ir_frame:
+                                camera_right_ir_optical_frame:
+                                  {}
+                        b_bot_wrist_3_link:
+                          b_bot_ee_link:
+                            b_bot_robotiq_85_base_link:
+                              b_bot_robotiq_85_left_inner_knuckle_link:
+                                b_bot_robotiq_85_left_finger_tip_link:
+                                  {}
+                              b_bot_robotiq_85_left_knuckle_link:
+                                b_bot_robotiq_85_left_finger_link:
+                                  {}
+                              b_bot_robotiq_85_right_inner_knuckle_link:
+                                b_bot_robotiq_85_right_finger_tip_link:
+                                  {}
+                              b_bot_robotiq_85_right_knuckle_link:
+                                b_bot_robotiq_85_right_finger_link:
+                                  {}
+                              b_bot_robotiq_85_tip_link:
+                                b_bot_screw_tool_m5_tip_link:
+                                  {}
+                          b_bot_tool0:
+                            {}
+            b_bot_base_smfl:
+              {}
+            c_bot_base_link:
+              c_bot_base:
+                c_bot_tool0_controller:
+                  {}
+              c_bot_shoulder_link:
+                c_bot_upper_arm_link:
+                  c_bot_forearm_link:
+                    c_bot_wrist_1_link:
+                      c_bot_wrist_2_link:
+                        c_bot_wrist_3_link:
+                          c_bot_ee_link:
+                            c_bot_robotiq_85_base_link:
+                              c_bot_robotiq_85_left_inner_knuckle_link:
+                                c_bot_robotiq_85_left_finger_tip_link:
+                                  {}
+                              c_bot_robotiq_85_left_knuckle_link:
+                                c_bot_robotiq_85_left_finger_link:
+                                  {}
+                              c_bot_robotiq_85_right_inner_knuckle_link:
+                                c_bot_robotiq_85_right_finger_tip_link:
+                                  {}
+                              c_bot_robotiq_85_right_knuckle_link:
+                                c_bot_robotiq_85_right_finger_link:
+                                  {}
+                              c_bot_robotiq_85_tip_link:
+                                c_bot_screw_tool_m5_tip_link:
+                                  {}
+                          c_bot_tool0:
+                            {}
+            c_bot_base_smfl:
+              m4_feeder_link:
+                m4_feeder_outlet_link:
+                  {}
+              m5_feeder_link:
+                m5_feeder_outlet_link:
+                  {}
+              screw_tool_holder:
+                screw_tool_m3_link:
+                  screw_tool_m3_helper_link:
+                    {}
+                screw_tool_m4_link:
+                  screw_tool_m4_helper_link:
+                    {}
+                screw_tool_m5_link:
+                  screw_tool_m5_helper_link:
+                    {}
+            workbox:
+              {}
+            workspace_center:
+              taskboard:
+                mat:
+                  mat_part1:
+                    {}
+                  mat_part10:
+                    {}
+                  mat_part11:
+                    {}
+                  mat_part12:
+                    {}
+                  mat_part13:
+                    {}
+                  mat_part14:
+                    {}
+                  mat_part15:
+                    {}
+                  mat_part2:
+                    {}
+                  mat_part3:
+                    {}
+                  mat_part4:
+                    {}
+                  mat_part5:
+                    {}
+                  mat_part6:
+                    {}
+                  mat_part7:
+                    {}
+                  mat_part8:
+                    {}
+                  mat_part9:
+                    {}
+                taskboard_part1:
+                  {}
+                taskboard_part10:
+                  {}
+                taskboard_part11:
+                  {}
+                taskboard_part12:
+                  {}
+                taskboard_part13:
+                  {}
+                taskboard_part14:
+                  {}
+                taskboard_part15:
+                  {}
+                taskboard_part2:
+                  {}
+                taskboard_part3:
+                  {}
+                taskboard_part4:
+                  {}
+                taskboard_part5:
+                  {}
+                taskboard_part6:
+                  {}
+                taskboard_part8:
+                  {}
+                taskboard_part9:
+                  {}
+          wall_a:
+            {}
+          wall_c:
+            {}
+      Update Interval: 0
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -1023,25 +1644,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.55779266
+      Distance: 1.63698733
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.015371209
-        Y: -0.0602318086
-        Z: 1.34766304
+        X: -0.081535399
+        Y: 0.0152023155
+        Z: 1.37138975
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.570397675
+      Pitch: 0.135397777
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.650392532
+      Yaw: 0.720392287
     Saved: ~
 Window Geometry:
   Displays:
