@@ -26,16 +26,16 @@ find_package(catkin REQUIRED COMPONENTS
 # Declare ROS messages, services and actions
 ################################################################################
 
-add_service_files(
-  DIRECTORY
-  srv
-)
+# add_service_files(
+#   DIRECTORY
+#   srv
+# )
 
-add_action_files(DIRECTORY action )
+# add_action_files(DIRECTORY action )
 
-generate_messages(
-  DEPENDENCIES actionlib_msgs std_msgs control_msgs
-)
+# generate_messages(
+#   DEPENDENCIES actionlib_msgs std_msgs control_msgs
+# )
 
 ################################################################################
 # Declare catkin specific configuration to be passed to dependent projects
