@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(o2as_examples)
+project(o2as_routines)
 
 ## Add support for C++11, supported in ROS Kinetic and newer
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
@@ -69,7 +69,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES o2as_examples
+#  LIBRARIES o2as_routines
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
@@ -84,7 +84,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/o2as_examples.cpp
+#   src/${PROJECT_NAME}/o2as_routines.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -94,51 +94,14 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 ## Declare a C++ executable
 
-add_executable(example_loop src/example_loop.cpp)
-add_dependencies(example_loop 
-	${${PROJECT_NAME}_EXPORTED_TARGETS}
-  	${catkin_EXPORTED_TARGETS})
-target_link_libraries(example_loop ${catkin_LIBRARIES})
-
-add_executable(example_tf src/example_tf.cpp)
-add_dependencies(example_tf 
-	${${PROJECT_NAME}_EXPORTED_TARGETS}
-  	${catkin_EXPORTED_TARGETS})
-target_link_libraries(example_tf ${catkin_LIBRARIES})
-
-add_executable(2_bot_example src/2_bot_example.cpp)
-add_dependencies(2_bot_example 
-	${${PROJECT_NAME}_EXPORTED_TARGETS}
-  	${catkin_EXPORTED_TARGETS})
-target_link_libraries(2_bot_example ${catkin_LIBRARIES})
-
-add_executable(3_bot_example src/3_bot_example.cpp)
-add_dependencies(3_bot_example 
-	${${PROJECT_NAME}_EXPORTED_TARGETS}
-  	${catkin_EXPORTED_TARGETS})
-target_link_libraries(3_bot_example ${catkin_LIBRARIES})
-
-add_executable(grasp_example src/grasp_example.cpp)
-add_dependencies(grasp_example 
-	${${PROJECT_NAME}_EXPORTED_TARGETS}
-  	${catkin_EXPORTED_TARGETS})
-target_link_libraries(grasp_example ${catkin_LIBRARIES})
-
-add_executable(action_example src/action_example.cpp)
-add_dependencies(action_example 
-	${${PROJECT_NAME}_EXPORTED_TARGETS}
-  	${catkin_EXPORTED_TARGETS})
-target_link_libraries(action_example ${catkin_LIBRARIES})
-
-# add_executable(o2as_examples src/o2as_examples.cpp)
-# add_dependencies(o2as_examples
+# add_executable(o2as_routines src/o2as_routines.cpp)
+# add_dependencies(o2as_routines
 # 	${${PROJECT_NAME}_EXPORTED_TARGETS}
 #   	${catkin_EXPORTED_TARGETS}	
 # )
-# target_link_libraries(o2as_examples ${catkin_LIBRARIES})
+# target_link_libraries(o2as_routines ${catkin_LIBRARIES})
 
-catkin_install_python(PROGRAMS scripts/example_movegroupcommander.py
-                      scripts/send_program_to_ur.py
+catkin_install_python(PROGRAMS scripts/example.py
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ## Rename C++ executable without prefix

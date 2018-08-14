@@ -1,5 +1,0 @@
-def move_forward_10cm():
-    start_pos=get_forward_kin()
-    target_pos=pose_trans(start_pos,p[0.0, 0.0, 100.0, 0.0, 0.0, 0.0])
-    movel(pose_trans(p[0.0,0.0,0.0,0.0,0.0,0.0], target_pos), a=1.2, v=0.25)
-end

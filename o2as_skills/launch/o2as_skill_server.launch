@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Parameters to pass to the ROS node -->
+  <!-- <arg name="example" default="test"/> -->
+  
+  <!-- <group ns="o2as_skill_server"> -->
+    <node name="ur_program_relay" pkg="o2as_skills" type="ur_program_relay.py" respawn="false" output="screen"/>
+    <node name="o2as_skill_server" pkg="o2as_skills" type="o2as_skill_server" respawn="false" output="screen"/>
+    
+  <!-- </group> -->
+</launch>

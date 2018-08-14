@@ -7,16 +7,19 @@ SkillServer::SkillServer() :
                   insertActionServer_(n_, "o2as_skills/insert", boost::bind(&SkillServer::executeInsert, this, _1),false),
                   screwActionServer_(n_, "o2as_skills/screw", boost::bind(&SkillServer::executeScrew, this, _1),false),
                   a_bot_group_("a_bot"), b_bot_group_("b_bot"), c_bot_group_("c_bot"),
-                  front_bots_group_("front_bots"), all_bots_group_("all_bots"),
                   b_bot_gripper_client_("/b_bot_gripper/gripper_action_controller", true),
                   c_bot_gripper_client_("/c_bot_gripper/gripper_action_controller", true)
-                  // a_bot_gripper_client_("/a_bot_gripper/gripper_action_controller", true),
 { 
   // Topics to publish
+  pubMarker_ = n_.advertise<visualization_msgs::Marker>("visualization_marker", 10);
 
   // Services to advertise
   goToNamedPoseService_ = n_.advertiseService("o2as_skills/goToNamedPose", &SkillServer::goToNamedPoseCallback,
                                         this);
+
+  // Services to subscribe to
+  sendScriptToURClient_ = n_.serviceClient<o2as_skills::sendScriptToUR>("o2as_skills/sendScriptToUR");
+  PrecisionGripperClient_ = n_.serviceClient<o2as_msgs::PrecisionGripperCommand>("precision_gripper_command");
 
   // Actions we serve
   alignActionServer_.start();
@@ -26,11 +29,11 @@ SkillServer::SkillServer() :
   screwActionServer_.start();
 
   // Action clients
-  // ROS_INFO("Waiting for action servers to start.");
-  // // a_bot_gripper_client.waitForServer(); 
-  // b_bot_gripper_client_.waitForServer();
-  // c_bot_gripper_client_.waitForServer();
-  // ROS_INFO("Action servers started.");
+  ROS_INFO("Waiting for action servers to start.");
+  // a_bot_gripper_client.waitForServer(); 
+  b_bot_gripper_client_.waitForServer();
+  c_bot_gripper_client_.waitForServer();
+  ROS_INFO("Action servers started.");
 
   // Set up MoveGroups
   a_bot_group_.setPlanningTime(PLANNING_TIME);
@@ -45,10 +48,10 @@ SkillServer::SkillServer() :
   c_bot_group_.setPlannerId("RRTConnectkConfigDefault");
   c_bot_group_.setEndEffectorLink("c_bot_robotiq_85_tip_link");
   c_bot_group_.setNumPlanningAttempts(10);
-  front_bots_group_.setPlanningTime(PLANNING_TIME);
-  front_bots_group_.setPlannerId("RRTConnectkConfigDefault");
-  all_bots_group_.setPlanningTime(PLANNING_TIME);
-  all_bots_group_.setPlannerId("RRTConnectkConfigDefault");
+  // front_bots_group_.setPlanningTime(PLANNING_TIME);
+  // front_bots_group_.setPlannerId("RRTConnectkConfigDefault");
+  // all_bots_group_.setPlanningTime(PLANNING_TIME);
+  // all_bots_group_.setPlannerId("RRTConnectkConfigDefault");
 
   get_planning_scene_client = n_.serviceClient<moveit_msgs::GetPlanningScene>("/get_planning_scene");
 
@@ -219,8 +222,8 @@ moveit::planning_interface::MoveGroupInterface* SkillServer::robotNameToMoveGrou
   if (robot_name == "a_bot") return &a_bot_group_;
   if (robot_name == "b_bot") return &b_bot_group_;
   if (robot_name == "c_bot") return &c_bot_group_;
-  if (robot_name == "front_bots") return &front_bots_group_;
-  if (robot_name == "all_bots") return &all_bots_group_;
+  // if (robot_name == "front_bots") return &front_bots_group_;
+  // if (robot_name == "all_bots") return &all_bots_group_;
 }
 
 
@@ -364,7 +367,30 @@ bool SkillServer::closeGripper(std::string robot_name)
 bool SkillServer::sendGripperCommand(std::string robot_name, double opening_width)
 {
   bool finished_before_timeout;
-  if ((robot_name == "b_bot") || (robot_name == "c_bot"))
+  ROS_INFO_STREAM("Opening gripper of: " << robot_name);
+  if ((robot_name == "a_bot"))
+  {
+    o2as_msgs::PrecisionGripperCommand srv;
+    
+    if (opening_width < 0.01) {srv.request.close_outer_gripper_fully = true;}
+    else if (opening_width > 0.05) {srv.request.open_outer_gripper_fully = true;}
+    // TODO: Add inner gripper
+    // else if ((use_inner_gripper) && (opening_width < 0.01)) {srv.request.close_inner_gripper_fully = true;}
+    // else if ((use_inner_gripper) && (opening_width > 0.05)) {srv.request.open_inner_gripper_fully = true;}
+
+    PrecisionGripperClient_.call(srv);
+    if (srv.response.success == true)
+    {
+      ROS_INFO("Successfully sent the precision gripper command.");
+      ros::Duration(5).sleep();
+      ROS_WARN("Sleeping 5 seconds, hoping the command is done. This needs to be an action!");
+      srv.request.stop = true;
+      PrecisionGripperClient_.call(srv);
+    }
+    else
+      ROS_ERROR("Could not send the precision gripper command.");
+  }
+  else if ((robot_name == "b_bot") || (robot_name == "c_bot"))
   {
     // Send a goal to the action
     robotiq_msgs::CModelCommandGoal goal;
@@ -372,17 +398,17 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
     if (robot_name == "b_bot")
     {
       b_bot_gripper_client_.sendGoal(goal);
-      finished_before_timeout = b_bot_gripper_client_.waitForResult(ros::Duration(5.0));
+      finished_before_timeout = b_bot_gripper_client_.waitForResult(ros::Duration(2.0));
     }
     else if (robot_name == "c_bot")
     {
       c_bot_gripper_client_.sendGoal(goal);
-      finished_before_timeout = c_bot_gripper_client_.waitForResult(ros::Duration(5.0));
+      finished_before_timeout = c_bot_gripper_client_.waitForResult(ros::Duration(2.0));
     }
   }
   else
   {
-    ROS_WARN("The gripper you specified is not defined.");
+    ROS_ERROR("The specified gripper is not defined!");
     return false;
   }
   return finished_before_timeout;
@@ -447,6 +473,88 @@ bool SkillServer::attachDetachTool(std::string screw_tool_id, std::string robot_
   return true;
 }
 
+bool SkillServer::placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name)
+{
+  publishMarker(target_tip_link_pose, "place_pose");
+  ROS_INFO_STREAM("Received placeFromAbove command.");
+
+  // Move above the target pose
+  target_tip_link_pose.pose.position.z += .1;
+  ROS_INFO_STREAM("Moving above object target place.");
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);
+
+  // Move down to the target pose
+  target_tip_link_pose.pose.position.z -= .1;
+  ROS_INFO_STREAM("Moving down to place object.");
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  bool success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
+  if (!success) 
+  {
+    ROS_INFO_STREAM("Linear motion plan to target place pose failed. Performing PTP.");
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+  }
+  openGripper(robot_name);
+  
+  // Move back up a little
+  target_tip_link_pose.pose.position.z += .05;
+  ROS_INFO_STREAM("Moving back up after placing object.");
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
+  if (!success) 
+  {
+    ROS_INFO_STREAM("Linear motion plan back from place pose failed. Performing PTP.");
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+  }
+
+  ROS_INFO_STREAM("Finished placing object.");
+  return true;
+}
+
+bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name)
+{
+  publishMarker(target_tip_link_pose, "pick_pose");
+  ROS_INFO_STREAM("Received pickFromAbove command.");
+  
+
+  // Move above the object
+  openGripper(robot_name);
+  target_tip_link_pose.pose.position.z += .1;
+  ROS_INFO_STREAM("Opening gripper, moving above object.");
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);
+
+  // Move onto the object
+  target_tip_link_pose.pose.position.z -= .1;
+  ROS_INFO_STREAM("Moving down to pick object.");
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  bool success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
+  if (!success) 
+  {
+    ROS_INFO_STREAM("Linear motion plan to target pick pose failed. Performing PTP.");
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+  }
+  closeGripper(robot_name);
+
+  // Move back up a little
+  target_tip_link_pose.pose.position.z += .05;
+  ROS_INFO_STREAM("Moving back up after picking object.");
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
+  if (!success) 
+  {
+    ROS_INFO_STREAM("Linear motion plan back from pick pose failed. Performing PTP.");
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+  }
+
+  ROS_INFO_STREAM("Finished picking object.");
+  return true;
+}
+
 bool SkillServer::pickScrew(std::string object_id, std::string screw_tool_id, std::string robot_name)
 {
   // Retrieve the position of the object from the planning scene
@@ -465,43 +573,113 @@ bool SkillServer::pickScrew(std::string object_id, std::string screw_tool_id, st
   return pickFromAbove(object_pose, screw_tool_link, robot_name);
 }
 
-bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name)
+bool SkillServer::publishMarker(geometry_msgs::PoseStamped marker_pose, std::string marker_type)
 {
-  // Move above the object
-  target_tip_link_pose.pose.position.z += .1;
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);
+    visualization_msgs::Marker marker;
+    marker.header = marker_pose.header;
+    marker.header.stamp = ros::Time::now();
+    marker.pose = marker_pose.pose;
 
-  // Move onto the object
-  target_tip_link_pose.pose.position.z -= .1;
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  bool success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
-  if (!success) 
-  {
-    ROS_INFO_STREAM("Linear motion plan to target pick pose failed. Performing PTP.");
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
-  }
+    marker.ns = "markers";
+    marker.id = marker_id_count++;
+    marker.lifetime = ros::Duration();
+    marker.action = visualization_msgs::Marker::ADD;
 
-  // Move back up a little
-  target_tip_link_pose.pose.position.z += .05;
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
-  if (!success) 
-  {
-    ROS_INFO_STREAM("Linear motion plan back from pick pose failed. Performing PTP.");
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
-  }
+    if (marker_type == "pose")
+    {
+      publishPoseMarker(marker_pose);
 
-  return true;
+      // Add a flat sphere
+      marker.type = visualization_msgs::Marker::SPHERE;
+      marker.scale.x = .01;
+      marker.scale.y = .05;
+      marker.scale.z = .05;
+      marker.color.g = 1.0;
+      marker.color.a = 0.8;
+      pubMarker_.publish(marker);
+      return true;
+    }
+    if (marker_type == "place_pose")
+    {
+      publishPoseMarker(marker_pose);
+
+      // Add a flat sphere
+      marker.type = visualization_msgs::Marker::SPHERE;
+      marker.scale.x = .01;
+      marker.scale.y = .05;
+      marker.scale.z = .05;
+      marker.color.g = 1.0;
+      marker.color.a = 0.8;
+      pubMarker_.publish(marker);
+      return true;
+    }
+    if (marker_type == "pick_pose")
+    {
+      publishPoseMarker(marker_pose);
+
+      // Add a flat sphere
+      marker.type = visualization_msgs::Marker::SPHERE;
+      marker.scale.x = .01;
+      marker.scale.y = .05;
+      marker.scale.z = .05;
+      marker.color.r = 0.8;
+      marker.color.g = 0.4;
+      marker.color.a = 0.8;
+    }
+    else if (marker_type == "")
+    {
+      marker.type = visualization_msgs::Marker::SPHERE;
+      marker.scale.x = .02;
+      marker.scale.y = .1;
+      marker.scale.z = .1;
+      
+      marker.color.g = 1.0;
+      marker.color.a = 0.8;
+    }
+    else 
+    {ROS_WARN("No useful marker message received.");}
+    pubMarker_.publish(marker);
+    if (marker_id_count > 50) marker_id_count = 0;
+    return true;
 }
 
+// This is a helper function for publishMarker. Publishes a TF-like frame.
+bool SkillServer::publishPoseMarker(geometry_msgs::PoseStamped marker_pose)
+{
+  visualization_msgs::Marker marker;
+  marker.header = marker_pose.header;
+  marker.header.stamp = ros::Time::now();
+  marker.pose = marker_pose.pose;
+
+  marker.ns = "markers";
+  marker.id = marker_id_count++;
+  marker.lifetime = ros::Duration();
+  marker.action = visualization_msgs::Marker::ADD;
+
+  // This draws a TF-like frame.
+  marker.type = visualization_msgs::Marker::ARROW;
+  marker.scale.x = .1;
+  marker.scale.y = .01;
+  marker.scale.z = .01;
+  marker.color.a = .8;
+
+  visualization_msgs::Marker arrow_x, arrow_y, arrow_z;
+  arrow_x = marker; arrow_y = marker; arrow_z = marker;
+  arrow_x.id = marker_id_count++; arrow_y.id = marker_id_count++; arrow_z.id = marker_id_count++;
+  arrow_x.color.r = 1.0; arrow_y.color.g = 1.0; arrow_z.color.b = 1.0;
+
+  rotatePoseByRPY(0, 0, M_PI/2, arrow_y.pose);
+  rotatePoseByRPY(0, -M_PI/2, 0, arrow_z.pose);
+
+  pubMarker_.publish(arrow_x); pubMarker_.publish(arrow_y); pubMarker_.publish(arrow_z);
+  return true;
+}
 // ----------- Service definitions
 bool SkillServer::goToNamedPoseCallback(o2as_skills::goToNamedPose::Request &req,
                                            o2as_skills::goToNamedPose::Response &res)
 {
-  res.success = goToNamedPose(req.planning_group, req.named_pose);
+  ROS_INFO("Received goToNamedPose callback.");
+  res.success = goToNamedPose(req.named_pose, req.planning_group);
   return true;
 }
 
@@ -530,9 +708,21 @@ void SkillServer::executePick(const o2as_skills::pickGoalConstPtr& goal)
   }
   else if (goal->tool_name == "suction")
   {;} // TODO: Here is space for code from AIST.
-  else // No tool being used
+  else // No special tool being used; use the gripper instead
   {
-    ;
+    // Warning: Using only "abs" rounds to int. Amazing.
+    if ((std::abs(goal->item_pose.pose.position.x)) > 0 || (std::abs(goal->item_pose.pose.position.y)) > 0 || (std::abs(goal->item_pose.pose.position.z)) > 0)
+    {
+      std::string ee_link_name;
+      if (goal->robot_name == "a_bot"){ee_link_name = goal->robot_name + "_gripper_tip_link"; }
+      else {ee_link_name = goal->robot_name + "_robotiq_85_tip_link";}
+      pickFromAbove(goal->item_pose, ee_link_name, goal->robot_name);
+    }
+    else
+    {
+      ROS_WARN("Item_pose is empty and no tool_name was set. Not doing anything");
+    }
+
     // TODO. The plan: 
     // - Check that the object exists in the planning scene
     // - VARIATION A:
@@ -554,8 +744,18 @@ void SkillServer::executePick(const o2as_skills::pickGoalConstPtr& goal)
 void SkillServer::executePlace(const o2as_skills::placeGoalConstPtr& goal)
 {
   ROS_INFO("placeAction was called");
-  // TODO: Insert commands to do the action
-  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  // TODO: Calculate the target pose with the item height currently held
+
+  std::string ee_link_name;
+  if (goal->robot_name == "a_bot"){ee_link_name = goal->robot_name + "_gripper_tip_link"; }
+  else {ee_link_name = goal->robot_name + "_robotiq_85_tip_link";}
+  
+  if (goal->tool_name == "suction")
+  {
+    ; // TODO: Set the ee_link_name correctly and pass a flag to placeFromAbove
+  }
+
+  placeFromAbove(goal->item_pose, ee_link_name, goal->robot_name);
   ROS_INFO("placeAction is set as succeeded");
   placeActionServer_.setSucceeded();
 }
@@ -617,6 +817,15 @@ int main(int argc, char **argv)
   // Create an object of class SkillServer that will take care of everything
   SkillServer o2as_skill_server;
   ROS_INFO("O2AS skill server started");
+
+  // o2as_skills::sendScriptToUR srv;
+  // srv.request.program_id = "insertion";
+  // srv.request.robot_name = "b_bot";
+  // o2as_skill_server.sendScriptToURClient_.call(srv);
+  // if (srv.response.success == true)
+  //   ROS_INFO("Successfully called the service client");
+  // else
+  //   ROS_WARN("Could not call the service client");
 
   //// ------------ Debugging procedures. Should be in a separate node, but ohwell.
   // ROS_INFO("Testing the screw tool mounting.");
