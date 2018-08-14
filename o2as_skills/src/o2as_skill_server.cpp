@@ -371,9 +371,10 @@ bool SkillServer::closeGripper(std::string robot_name, std::string gripper_name)
 bool SkillServer::sendGripperCommand(std::string robot_name, double opening_width, std::string gripper_name)
 {
   bool finished_before_timeout;
-  ROS_INFO_STREAM("Opening gripper of: " << robot_name);
+  ROS_INFO_STREAM("Sending command to gripper of: " << robot_name);
   if ((robot_name == "a_bot"))
   {
+    ROS_INFO_STREAM("Gripper: " << gripper_name);
     o2as_msgs::PrecisionGripperCommand srv;
     
     if (gripper_name == "")
@@ -381,7 +382,8 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
       ROS_WARN("No gripper was defined for a_bot! Using outer_gripper by default.");
       gripper_name = "outer_gripper";
     }
-    else if (gripper_name == "outer_gripper")
+    
+    if (gripper_name == "outer_gripper")
     {
       if (opening_width < 0.01) {srv.request.close_outer_gripper_fully = true;}
       else if (opening_width > 0.05) {srv.request.open_outer_gripper_fully = true;}
@@ -396,10 +398,8 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
     if (srv.response.success == true)
     {
       ROS_INFO("Successfully sent the precision gripper command.");
-      ros::Duration(5).sleep();
-      ROS_WARN("Sleeping 5 seconds, hoping the command is done. This needs to be an action!");
-      srv.request.stop = true;
-      PrecisionGripperClient_.call(srv);
+      // srv.request.stop = true;
+      // PrecisionGripperClient_.call(srv);
     }
     else
       ROS_ERROR("Could not send the precision gripper command.");
@@ -425,6 +425,7 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
     ROS_ERROR("The specified gripper is not defined!");
     return false;
   }
+  ROS_INFO("Returning from gripper command.");
   return finished_before_timeout;
 }
 
@@ -502,26 +503,27 @@ bool SkillServer::placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose
   target_tip_link_pose.pose.position.z -= .1;
   ROS_INFO_STREAM("Moving down to place object.");
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  bool success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name, 0.1);
-  if (!success) 
-  {
-    ROS_INFO_STREAM("Linear motion plan to target place pose failed. Performing PTP.");
+  bool success = 0;
+  // bool success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name, 0.1);
+  // if (!success) 
+  // {
+    // ROS_INFO_STREAM("Linear motion plan to target place pose failed. Performing PTP.");
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name, 0.1);  // Force the move even if LIN fails
-  }
+    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name, 0.01);  // Force the move even if LIN fails
+  // }
   openGripper(robot_name, gripper_name);
   
-  // Move back up a little
-  target_tip_link_pose.pose.position.z += .05;
-  ROS_INFO_STREAM("Moving back up after placing object.");
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
-  if (!success) 
-  {
-    ROS_INFO_STREAM("Linear motion plan back from place pose failed. Performing PTP.");
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
-  }
+  // // Move back up a little
+  // target_tip_link_pose.pose.position.z += .05;
+  // ROS_INFO_STREAM("Moving back up after placing object.");
+  // std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  // success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
+  // if (!success) 
+  // {
+  //   ROS_INFO_STREAM("Linear motion plan back from place pose failed. Performing PTP.");
+  //   std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  //   moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+  // }
 
   ROS_INFO_STREAM("Finished placing object.");
   return true;
@@ -554,7 +556,7 @@ bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose,
   closeGripper(robot_name, gripper_name);
 
   // Move back up a little
-  target_tip_link_pose.pose.position.z += .05;
+  target_tip_link_pose.pose.position.z += .1;
   ROS_INFO_STREAM("Moving back up after picking object.");
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
   success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name);
@@ -729,11 +731,13 @@ void SkillServer::executePick(const o2as_skills::pickGoalConstPtr& goal)
     {
       ROS_INFO_STREAM("Opening outer and closing inner gripper, moving above object.");
       closeGripper("a_bot", "inner_gripper");
+      std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     }
     else if (goal->do_complex_pick_from_outside)
     {
       ROS_INFO_STREAM("Opening outer and inner gripper, moving above object.");
       openGripper("a_bot", "inner_gripper");
+      std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     }
     target_tip_link_pose.pose.position.z += .1;
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -752,25 +756,25 @@ void SkillServer::executePick(const o2as_skills::pickGoalConstPtr& goal)
 
     target_tip_link_pose.pose.position.z -= .05;
     ROS_INFO_STREAM("Moving down to object (no offset).");
-    moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, end_effector_link_name, 0.03);  // Go very slow
+    moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, end_effector_link_name, 0.01);  // Go very slow
     // TODO: Send the MoveL command to the real robot instead?
     
     if (goal->do_complex_pick_from_inside) 
     {
       ROS_INFO_STREAM("Opening inner gripper to position object.");
       openGripper("a_bot", "inner_gripper");
+      std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     }
     else if (goal->do_complex_pick_from_outside)
     {
       ROS_INFO_STREAM("Closing inner gripper to position object.");
       closeGripper("a_bot", "inner_gripper");
+      std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     }
-    ROS_INFO_STREAM("Waiting for 4 s, then grasping with outer gripper.");
-    std::this_thread::sleep_for(std::chrono::milliseconds(4000));
     closeGripper("a_bot", "outer_gripper");
 
     ROS_INFO_STREAM("Moving back up after picking object.");
-    target_tip_link_pose.pose.position.z += .05;
+    target_tip_link_pose.pose.position.z += .1;
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, end_effector_link_name);
     if (!success) 
@@ -778,6 +782,19 @@ void SkillServer::executePick(const o2as_skills::pickGoalConstPtr& goal)
       ROS_INFO_STREAM("Linear motion plan back from pick pose failed. Performing PTP.");
       std::this_thread::sleep_for(std::chrono::milliseconds(500));
       moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+    }
+
+        if (goal->do_complex_pick_from_inside) 
+    {
+      ROS_INFO_STREAM("Closing inner gripper again after outer gripper grasped object.");
+      closeGripper("a_bot", "inner_gripper");
+      std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    }
+    else if (goal->do_complex_pick_from_outside)
+    {
+      ROS_INFO_STREAM("Opening inner gripper again after outer gripper grasped object.");
+      openGripper("a_bot", "inner_gripper");
+      std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     }
 
     ROS_INFO_STREAM("Finished picking object.");
