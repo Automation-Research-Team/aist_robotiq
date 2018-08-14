@@ -52,6 +52,7 @@ import o2as_msgs
 import o2as_skills
 import o2as_skills.msg
 import o2as_skills.srv
+from o2as_msgs.srv import *
 
 from math import pi
 from std_msgs.msg import String
@@ -139,12 +140,14 @@ class ExampleClass(object):
     self.groups[robot_name].clear_pose_targets()
     return True
 
-  def do_pick_action(self, robot_name, pose_stamped, tool_name = ""):
+  def do_pick_action(self, robot_name, pose_stamped, tool_name = "", do_complex_pick_from_inside=False, do_complex_pick_from_outside=False):
     # Call the pick action
     goal = o2as_skills.msg.pickGoal()
     goal.robot_name = robot_name
     goal.item_pose = pose_stamped
     goal.tool_name = tool_name
+    goal.do_complex_pick_from_inside = do_complex_pick_from_inside
+    goal.do_complex_pick_from_outside = do_complex_pick_from_outside
     rospy.loginfo("Sending pick action goal")
     rospy.loginfo(goal)
 
@@ -213,39 +216,7 @@ class ExampleClass(object):
     # self.go_to_named_pose("home_c", "c_bot")
 
     return
-  def precision_gripper_outer_close(self):
-    rospy.wait_for_service('precision_gripper_command')
-    try:
-        precision_gripper_client = rospy.ServiceProxy('precision_gripper_command',o2as_msgs.srv.PrecisionGripperCommand)
-        rospy.sleep(.5)
-        
-        request = PrecisionGripperCommandRequest()
-        request.close_outer_gripper_fully = True
-        
-        rospy.loginfo("Closing outer gripper")
-        precision_gripper_client(request)
-        rospy.loginfo("Waiting for 1 second")
-        rospy.sleep(1)
-
-        request = PrecisionGripperCommandRequest()
-        request.open_outer_gripper_fully = True
-        request.close_outer_gripper_fully = False
-
-        rospy.loginfo("Opening outer gripper")
-        precision_gripper_client(request)
-        rospy.loginfo("Waiting for 1 second")
-        rospy.sleep(1)
-
-        request.stop = True
-        request.open_outer_gripper_fully = False
-        request.close_outer_gripper_fully = False
-
-        rospy.loginfo("Disabling torque (stopping the gripper)")
-        precision_gripper_client(request)
-
-    except rospy.ServiceException, e:
-        print "Service call failed: %s"%e
-
+    
   def taskboard_with_pick_action(self):
     # Pick a thing with c_bot, then b_bot
     self.go_to_named_pose("home_c", "c_bot")
@@ -262,61 +233,21 @@ class ExampleClass(object):
       place_pose = geometry_msgs.msg.PoseStamped()
       place_pose.pose.orientation = downward_orientation
       place_pose.header.frame_id = "taskboard_part" + str(i+1)
-      place_pose.pose.position.z = 0.15
+      place_pose.pose.position.z = 0.14
       place_poses.append(place_pose)
 
       pick_pose = geometry_msgs.msg.PoseStamped()
       pick_pose.pose.orientation = downward_orientation
       pick_pose.header.frame_id = "mat_part" + str(i+1)
-      pick_pose.pose.position.z = 0.15
+      pick_pose.pose.position.z = 0.14
       pick_poses.append(pick_pose)
       
     # Perform the pick/place actions
     for j in range(0,1):
-      self.do_pick_action("a_bot", pick_poses[j], tool_name = "")
-      self.do_place_action("a_bot", place_poses[j], tool_name = "")
+      self.do_pick_action("a_bot", pick_poses[j], tool_name = "", do_complex_pick_from_inside=True)
+      # self.do_place_action("a_bot", place_poses[j], tool_name = "")
       self.go_to_named_pose("home_a", "a_bot")
-
-  def taskboard_pick(self):
-    calib_pose = geometry_msgs.msg.PoseStamped()
-    #calib_pose.header.frame_id = "taskboard_part4"
-    calib_pose.header.frame_id = "mat_part4"
-    calib_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
-    rospy.loginfo(calib_pose.pose.orientation)
-    calib_pose.pose.position.x = 0
-    calib_pose.pose.position.z = 0.15
-
-    self.go_to_named_pose("home_a", "a_bot")
-    self.go_to_named_pose("home_b", "b_bot")
-    self.go_to_named_pose("home_c", "c_bot")
-
-    self.go_to_pose_goal("a_bot", calib_pose, speed=0.3)
-    print "============ Press `Enter` to move a_bot ..."
-    raw_input()
-    calib_pose.pose.position.z -= (.12)
-    self.go_to_pose_goal("a_bot", calib_pose, speed=0.02)
-
-    print "============ Press `Enter` to move a_bot ..."
-    raw_input()
-    calib_pose.pose.position.z += (.12)
-    self.go_to_pose_goal("a_bot", calib_pose, speed=0.02)
-    print "============ Press `Enter` to move ..."
-    raw_input()
-    self.go_to_named_pose("home_a", "a_bot",speed=0.3)
-    
-    self.precision_gripper_outer_close()
-    # self.go_to_pose_goal("b_bot", calib_pose)
-
-    # print "============ Press `Enter` to move c_bot to calibration position ..."
-    # raw_input()
-    # self.go_to_named_pose("home_b", "b_bot")
-    # self.go_to_pose_goal("c_bot", calib_pose)
-
-    # print "============ Press `Enter` to move c_bot home ..."
-    # raw_input()
-    # self.go_to_named_pose("home_c", "c_bot")
-
-    return True
+    return
 
   def simple_taskboard_demo(self):
     # Pick a thing with c_bot, then b_bot
@@ -348,46 +279,6 @@ class ExampleClass(object):
       self.do_place_action("b_bot", place_poses[j], tool_name = "")
       self.go_to_named_pose("home_b", "b_bot")
     
-    rospy.loginfo("Done.")
-
-  def pick_place_demo(self):
-    # Pick a thing with c_bot, then b_bot
-    self.go_to_named_pose("home_c", "c_bot")
-    self.go_to_named_pose("home_b", "b_bot")
-    
-    # Define the pose of each item
-    # It should be defined via the frame_id in the taskboard, or via the item_id in the planning scene.
-    pick_pose_c = geometry_msgs.msg.PoseStamped()
-    pick_pose_c.header.frame_id = "workspace_center"
-    pick_pose_c.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    pick_pose_c.pose.position.x = -0.2
-    pick_pose_c.pose.position.y = 0.15
-    pick_pose_c.pose.position.z = 0.08
-    
-    place_pose_c = copy.deepcopy(pick_pose_c)
-    place_pose_c.pose.position.x = -0.2
-    place_pose_c.pose.position.y = 0.0
-    place_pose_c.pose.position.z = 0.095
-
-    pick_pose_b = copy.deepcopy(pick_pose_c) # Careful: pose1 = pose2 would create a shallow copy (changes to one will affect the other)
-    pick_pose_b.pose.position.x = 0.0
-    pick_pose_b.pose.position.y = 0.15
-    pick_pose_b.pose.position.z = 0.055
-    
-    place_pose_b = copy.deepcopy(place_pose_c)
-    place_pose_b.pose.position.x = -0.05
-    place_pose_b.pose.position.y = 0.0
-    place_pose_b.pose.position.z = 0.08
-
-    # First pick up item with b_bot
-    self.do_pick_action("b_bot", pick_pose_b, tool_name = "")
-    self.do_place_action("b_bot", place_pose_b, tool_name = "")
-    self.go_to_named_pose("home_b", "b_bot")
-    
-    # Now pick the item with c_bot
-    self.do_pick_action("c_bot", pick_pose_c, tool_name = "")
-    self.do_place_action("c_bot", place_pose_c, tool_name = "")
-    self.go_to_named_pose("home_c", "c_bot")
     rospy.loginfo("Done.")
 
   def insertion_demo(self):
