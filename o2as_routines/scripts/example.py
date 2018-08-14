@@ -112,12 +112,13 @@ class ExampleClass(object):
     self.insert_client.wait_for_server() 
     self.screw_client.wait_for_server() 
     
+  ############## ------ Internal functions (and convenience functions)
 
-  def go_to_pose_goal(self, group_name, pose_goal_stamped):
+  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 0.1):
     group = self.groups[group_name]
     group.set_pose_target(pose_goal_stamped)
-    rospy.loginfo("Setting velocity scaling to 0.05")
-    group.set_max_velocity_scaling_factor(.05)
+    rospy.loginfo("Setting velocity scaling to " + str(speed))
+    group.set_max_velocity_scaling_factor(speed)
 
     plan = group.go(wait=True)
     group.stop()
@@ -127,6 +128,16 @@ class ExampleClass(object):
 
     current_pose = group.get_current_pose().pose
     return all_close(pose_goal_stamped.pose, current_pose, 0.01)
+
+  def go_to_named_pose(self, pose_name, robot_name, speed = 0.1):
+    # pose_name should be "home_a", "home_b" etc.
+    self.groups[robot_name].set_named_target(pose_name)
+    rospy.loginfo("Setting velocity scaling to " + str(speed))
+    self.groups[robot_name].set_max_velocity_scaling_factor(speed)
+    self.groups[robot_name].go(wait=True)
+    self.groups[robot_name].stop()
+    self.groups[robot_name].clear_pose_targets()
+    return True
 
   def do_pick_action(self, robot_name, pose_stamped, tool_name = ""):
     # Call the pick action
@@ -165,13 +176,12 @@ class ExampleClass(object):
     req.program_id = "insertion"
     res = self.urscript_client.call(req)
     return res.success
-  
-  def go_to_named_pose(self, pose_name, robot_name):
-    # pose_name should be "home_a", "home_b" etc.
-    self.groups[robot_name].set_named_target(pose_name)
-    self.groups[robot_name].go(wait=True)
-    self.groups[robot_name].stop()
-    self.groups[robot_name].clear_pose_targets()
+
+
+  ################ ----- Routines  
+  ################ 
+  ################ 
+
     return True
 
   def simple_taskboard_demo(self):
