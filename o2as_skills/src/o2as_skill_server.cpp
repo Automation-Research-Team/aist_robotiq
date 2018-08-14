@@ -159,7 +159,8 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   waypoints.push_back(start_pose.pose);
   waypoints.push_back(pose.pose);
 
-  group_pointer->setMaxVelocityScalingFactor(0.1);  // Does this work??
+  ROS_WARN("Speed scaling does not work for linear motions. Going at regular speed.");
+  group_pointer->setMaxVelocityScalingFactor(0.1);  // Does this work?? Not for linear paths: https://answers.ros.org/question/288989/moveit-velocity-scaling-for-cartesian-path/
   b_bot_group_.setPlanningTime(LIN_PLANNING_TIME);
 
   moveit_msgs::RobotTrajectory trajectory;
@@ -354,17 +355,17 @@ bool SkillServer::updatePlanningScene()
   }
 }
 
-bool SkillServer::openGripper(std::string robot_name)
+bool SkillServer::openGripper(std::string robot_name, std::string gripper_name)
 {
-  return sendGripperCommand(robot_name, 0.085);
+  return sendGripperCommand(robot_name, 0.085, gripper_name);
 }
 
-bool SkillServer::closeGripper(std::string robot_name)
+bool SkillServer::closeGripper(std::string robot_name, std::string gripper_name)
 {
-  return sendGripperCommand(robot_name, 0.0);
+  return sendGripperCommand(robot_name, 0.0, gripper_name);
 }
 
-bool SkillServer::sendGripperCommand(std::string robot_name, double opening_width)
+bool SkillServer::sendGripperCommand(std::string robot_name, double opening_width, std::string gripper_name)
 {
   bool finished_before_timeout;
   ROS_INFO_STREAM("Opening gripper of: " << robot_name);
@@ -372,11 +373,21 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
   {
     o2as_msgs::PrecisionGripperCommand srv;
     
-    if (opening_width < 0.01) {srv.request.close_outer_gripper_fully = true;}
-    else if (opening_width > 0.05) {srv.request.open_outer_gripper_fully = true;}
-    // TODO: Add inner gripper
-    // else if ((use_inner_gripper) && (opening_width < 0.01)) {srv.request.close_inner_gripper_fully = true;}
-    // else if ((use_inner_gripper) && (opening_width > 0.05)) {srv.request.open_inner_gripper_fully = true;}
+    if (gripper_name == "")
+    {
+      ROS_WARN("No gripper was defined for a_bot! Using outer_gripper by default.");
+      gripper_name = "outer_gripper";
+    }
+    else if (gripper_name == "outer_gripper")
+    {
+      if (opening_width < 0.01) {srv.request.close_outer_gripper_fully = true;}
+      else if (opening_width > 0.05) {srv.request.open_outer_gripper_fully = true;}
+    }
+    else if (gripper_name == "inner_gripper")
+    {
+      if (opening_width < 0.01) {srv.request.close_inner_gripper_fully = true;}
+      else if (opening_width > 0.05) {srv.request.open_inner_gripper_fully = true;}
+    }
 
     PrecisionGripperClient_.call(srv);
     if (srv.response.success == true)
@@ -473,7 +484,7 @@ bool SkillServer::attachDetachTool(std::string screw_tool_id, std::string robot_
   return true;
 }
 
-bool SkillServer::placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name)
+bool SkillServer::placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name)
 {
   publishMarker(target_tip_link_pose, "place_pose");
   ROS_INFO_STREAM("Received placeFromAbove command.");
@@ -495,7 +506,7 @@ bool SkillServer::placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
   }
-  openGripper(robot_name);
+  openGripper(robot_name, gripper_name);
   
   // Move back up a little
   target_tip_link_pose.pose.position.z += .05;
@@ -513,14 +524,14 @@ bool SkillServer::placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose
   return true;
 }
 
-bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name)
+bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name)
 {
   publishMarker(target_tip_link_pose, "pick_pose");
   ROS_INFO_STREAM("Received pickFromAbove command.");
   
 
   // Move above the object
-  openGripper(robot_name);
+  openGripper(robot_name, gripper_name);
   target_tip_link_pose.pose.position.z += .1;
   ROS_INFO_STREAM("Opening gripper, moving above object.");
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -537,7 +548,7 @@ bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose,
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
   }
-  closeGripper(robot_name);
+  closeGripper(robot_name, gripper_name);
 
   // Move back up a little
   target_tip_link_pose.pose.position.z += .05;
@@ -720,7 +731,7 @@ void SkillServer::executePick(const o2as_skills::pickGoalConstPtr& goal)
     }
     else
     {
-      ROS_WARN("Item_pose is empty and no tool_name was set. Not doing anything");
+      ROS_ERROR("Item_pose is empty and no tool_name was set. Not doing anything");
     }
 
     // TODO. The plan: 
@@ -804,7 +815,6 @@ void SkillServer::executeScrew(const o2as_skills::screwGoalConstPtr& goal)
   ROS_INFO("screwAction is set as succeeded");
   screwActionServer_.setSucceeded();
 }
-
 
 // ----------- End of the class definitions
 
