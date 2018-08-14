@@ -13,35 +13,31 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   roscpp
-  message_generation
-  genmsg
-  actionlib
-  actionlib_msgs
-  std_msgs
-  control_msgs
+  sensor_msgs
+  cv_bridge
 )
 
 ################################################################################
 # Declare ROS messages, services and actions
 ################################################################################
 
-add_service_files(
-  DIRECTORY
-  srv
-)
+# add_service_files(
+#   DIRECTORY
+#   srv
+# )
 
-add_action_files(DIRECTORY action )
+# add_action_files(DIRECTORY action )
 
-generate_messages(
-  DEPENDENCIES actionlib_msgs std_msgs control_msgs
-)
+# generate_messages(
+#   DEPENDENCIES actionlib_msgs std_msgs control_msgs
+# )
 
 ################################################################################
 # Declare catkin specific configuration to be passed to dependent projects
 ################################################################################
 catkin_package(
   # INCLUDE_DIRS include
-  CATKIN_DEPENDS roscpp message_runtime actionlib_msgs
+  CATKIN_DEPENDS roscpp
 )
 
 ################################################################################

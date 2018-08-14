@@ -5,6 +5,9 @@ import numpy as np
 import math
 from o2as_circle_detection.srv import *
 import rospy
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge, CvBridgeError
+
 
 class ObjectDetection:
     __distance_constant = 0.326
@@ -12,6 +15,10 @@ class ObjectDetection:
     __object_position = {"cp": (288, 346),
                          "ps": (298, 356),
                          "pss": (255, 399)}
+
+    def __init__(self):
+        self.image_pub = rospy.Publisher("webcam_img", Image, queue_size=1)
+        self.bridge = CvBridge()
 
     def calculate_distance(self, height, width, obj, camera_constant):
         distanceHeight = (height - self.__object_position[obj][1])
@@ -104,7 +111,7 @@ class ObjectDetection:
             print circles
             
             # ensure at least some circles were found
-            if circles is not None:
+            if circles is not None and not rospy.is_shutdown():
                 if int(circles.shape[1]) == 1:
                     # convert the (x, y) coordinates and radius of the circles to integers
                     circles = np.round(circles[0, :]).astype("int")
@@ -112,25 +119,19 @@ class ObjectDetection:
                     for (x, y, r) in circles:
                         # draw the circle in the output image, then draw a rectangle in the image
                         # corresponding to the center of the circle
-
                         distance = self.calculate_distance(Height - y, Width - x, obj, camera)
-                        #if abs(distance[0]) > 60 or abs(distance[1]) > 20:
-                        #    continue
                         if False:
-                            print "yo"
+                            print "debug1"
                         else:
                             cv2.circle(output, (x, y), r, (0, 255, 0), 4)
                             cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-                            # cv2.putText(output, str(distance[0]), (x - 250, y), font, 1, (255, 0, 0), 2, cv2.LINE_AA)
-                            # cv2.putText(output, str(distance[1]), (x - 100, y), font, 1, (255, 0, 0), 2, cv2.LINE_AA)
-                        cv2.imwrite('output.png',output)
+                        img_message = self.bridge.cv2_to_imgmsg(output, "bgr8")
+                        self.image_pub.publish(img_message)
+
                         circle_not_detected=False
                         
                         return (-distance[0], -distance[1])
-            # cv2.imshow('output', output)
-            print "lala2"
-            # if cv2.waitKey(1) & 0xFF == ord('q'):
-            #     break
+            print "debug2"
 
         # When everything done, release the capture
         cap.release()
@@ -158,4 +159,7 @@ if __name__ == "__main__":
 
     my_service = rospy.Service('circle_detection_command', CircleDetectionCommand, object_detection.my_callback)
     rospy.loginfo("Service circle_detection is ready")
-    rospy.spin()
+    while not rospy.is_shutdown():
+        object_detection.capture_until_one_circle_detected(0,"cp")
+        rospy.sleep(.01)
+    # rospy.spin()
