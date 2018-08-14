@@ -174,6 +174,38 @@ class ExampleClass(object):
     self.groups[robot_name].clear_pose_targets()
     return True
 
+  def simple_taskboard_demo(self):
+    # Pick a thing with c_bot, then b_bot
+    self.go_to_named_pose("home_c", "c_bot")
+    self.go_to_named_pose("home_b", "b_bot")
+    # self.go_to_named_pose("home_a", "a_bot")
+    
+    downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+
+    # Define each item pose
+    place_poses = []
+    pick_poses = []
+    for i in range(0,5):
+      place_pose = geometry_msgs.msg.PoseStamped()
+      place_pose.pose.orientation = downward_orientation
+      place_pose.header.frame_id = "taskboard_part" + str(i+1)
+      place_pose.pose.position.z = 0.08
+      place_poses.append(place_pose)
+
+      pick_pose = geometry_msgs.msg.PoseStamped()
+      pick_pose.pose.orientation = downward_orientation
+      pick_pose.header.frame_id = "mat_part" + str(i+1)
+      pick_pose.pose.position.z = 0.08
+      pick_poses.append(pick_pose)
+      
+    # Perform the pick/place actions
+    for j in range(0,5):
+      # self.do_pick_action("b_bot", pick_poses[j], tool_name = "")
+      self.do_place_action("b_bot", place_poses[j], tool_name = "")
+      self.go_to_named_pose("home_b", "b_bot")
+    
+    rospy.loginfo("Done.")
+
   def pick_place_demo(self):
     # Pick a thing with c_bot, then b_bot
     self.go_to_named_pose("home_c", "c_bot")
@@ -272,7 +304,8 @@ def main():
     # print "============ Press `Enter` to start assembly test ..."
     # raw_input()
     # tutorial.insertion_demo()
-    tutorial.pick_place_demo()
+    # tutorial.pick_place_demo()
+    tutorial.simple_taskboard_demo()
 
     print "============ Demo complete!"
   except rospy.ROSInterruptException:

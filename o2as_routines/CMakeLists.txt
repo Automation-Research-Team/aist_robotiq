@@ -52,11 +52,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs  # Or other packages containing msgs
-  geometry_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+#   geometry_msgs
+# )
 
 ###################################
 ## catkin specific configuration ##
@@ -101,7 +101,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 # )
 # target_link_libraries(o2as_routines ${catkin_LIBRARIES})
 
-catkin_install_python(PROGRAMS scripts/assembly_example.py
+catkin_install_python(PROGRAMS scripts/example.py
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ## Rename C++ executable without prefix
