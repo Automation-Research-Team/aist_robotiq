@@ -100,7 +100,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 # )
 # target_link_libraries(o2as_routines ${catkin_LIBRARIES})
 
-catkin_install_python(PROGRAMS scripts/example.py
+catkin_install_python(PROGRAMS scripts/calibration.py
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ## Rename C++ executable without prefix

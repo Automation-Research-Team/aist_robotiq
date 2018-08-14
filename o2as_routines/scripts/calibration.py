@@ -38,9 +38,9 @@ import sys
 import copy
 import rospy
 
-import o2as_routines
+from o2as_routines.base import O2ASBaseRoutines
 
-class CalibrationClass(o2as_routines.O2ASBaseRoutines):
+class CalibrationClass(O2ASBaseRoutines):
   """
   This routine checks the robot calibration the robots by moving them to
   objects defined in the scene.
@@ -82,7 +82,6 @@ if __name__ == '__main__':
   try:
     c = CalibrationClass()
     c.do_calibration()
-
     print "============ Calibration complete!"
   except rospy.ROSInterruptException:
-    return
+    print "Something went wrong."
