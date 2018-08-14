@@ -14,6 +14,7 @@ find_package(catkin REQUIRED
 	std_msgs
 	control_msgs
 	robotiq_msgs
+	o2as_msgs
 	std_srvs
 	moveit_core
 	moveit_commander

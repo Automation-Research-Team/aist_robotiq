@@ -19,6 +19,7 @@ SkillServer::SkillServer() :
 
   // Services to subscribe to
   sendScriptToURClient_ = n_.serviceClient<o2as_skills::sendScriptToUR>("o2as_skills/sendScriptToUR");
+  PrecisionGripperClient_ = n_.serviceClient<o2as_msgs::PrecisionGripperCommand>("precision_gripper_command");
 
   // Actions we serve
   alignActionServer_.start();
@@ -28,11 +29,11 @@ SkillServer::SkillServer() :
   screwActionServer_.start();
 
   // Action clients
-  // ROS_INFO("Waiting for action servers to start.");
-  // // a_bot_gripper_client.waitForServer(); 
-  // b_bot_gripper_client_.waitForServer();
-  // c_bot_gripper_client_.waitForServer();
-  // ROS_INFO("Action servers started.");
+  ROS_INFO("Waiting for action servers to start.");
+  // a_bot_gripper_client.waitForServer(); 
+  b_bot_gripper_client_.waitForServer();
+  c_bot_gripper_client_.waitForServer();
+  ROS_INFO("Action servers started.");
 
   // Set up MoveGroups
   a_bot_group_.setPlanningTime(PLANNING_TIME);
@@ -369,7 +370,25 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
   ROS_INFO_STREAM("Opening gripper of: " << robot_name);
   if ((robot_name == "a_bot"))
   {
-    // TODO: Call the action or service of our custom gripper
+    o2as_msgs::PrecisionGripperCommand srv;
+    
+    if (opening_width < 0.01) {srv.request.close_outer_gripper_fully = true;}
+    else if (opening_width > 0.05) {srv.request.open_outer_gripper_fully = true;}
+    // TODO: Add inner gripper
+    // else if ((use_inner_gripper) && (opening_width < 0.01)) {srv.request.close_inner_gripper_fully = true;}
+    // else if ((use_inner_gripper) && (opening_width > 0.05)) {srv.request.open_inner_gripper_fully = true;}
+
+    PrecisionGripperClient_.call(srv);
+    if (srv.response.success == true)
+    {
+      ROS_INFO("Successfully sent the precision gripper command.");
+      ros::Duration(5).sleep();
+      ROS_WARN("Sleeping 5 seconds, hoping the command is done. This needs to be an action!");
+      srv.request.stop = true;
+      PrecisionGripperClient_.call(srv);
+    }
+    else
+      ROS_ERROR("Could not send the precision gripper command.");
   }
   else if ((robot_name == "b_bot") || (robot_name == "c_bot"))
   {
@@ -389,7 +408,7 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
   }
   else
   {
-    ROS_WARN("The gripper you specified is not defined.");
+    ROS_ERROR("The specified gripper is not defined!");
     return false;
   }
   return finished_before_timeout;

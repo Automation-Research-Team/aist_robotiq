@@ -25,6 +25,7 @@
 // Services
 #include "o2as_skills/goToNamedPose.h"
 #include "o2as_skills/sendScriptToUR.h"
+#include "o2as_msgs/PrecisionGripperCommand.h"
 
 // Actions
 #include <actionlib/server/simple_action_server.h>
@@ -93,6 +94,7 @@ public:
 
   // Service clients
   ros::ServiceClient sendScriptToURClient_;
+  ros::ServiceClient PrecisionGripperClient_;
   
   // Action declarations
   actionlib::SimpleActionServer<o2as_skills::alignAction> alignActionServer_;
