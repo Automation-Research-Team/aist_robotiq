@@ -21,5 +21,8 @@
   <exec_depend>control_msgs</exec_depend>
   <build_depend>std_msgs</build_depend>
   <exec_depend>std_msgs</exec_depend>
+  <build_depend>o2as_msgs</build_depend> 
+  <exec_depend>o2as_msgs</exec_depend> 
+
 
 </package>
