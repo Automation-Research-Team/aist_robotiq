@@ -216,9 +216,11 @@ class ExampleClass(object):
     # self.go_to_named_pose("home_c", "c_bot")
 
     return
-    
+
   def taskboard_with_pick_action(self):
     # Pick a thing with c_bot, then b_bot
+    self.groups["a_bot"].set_goal_tolerance(.0001) 
+    self.groups["a_bot"].set_planning_time(5) 
     self.go_to_named_pose("home_c", "c_bot")
     self.go_to_named_pose("home_b", "b_bot")
     self.go_to_named_pose("home_a", "a_bot")
@@ -233,20 +235,31 @@ class ExampleClass(object):
       place_pose = geometry_msgs.msg.PoseStamped()
       place_pose.pose.orientation = downward_orientation
       place_pose.header.frame_id = "taskboard_part" + str(i+1)
-      place_pose.pose.position.z = 0.14
+      place_pose.pose.position.z = 0.04
       place_poses.append(place_pose)
 
       pick_pose = geometry_msgs.msg.PoseStamped()
       pick_pose.pose.orientation = downward_orientation
       pick_pose.header.frame_id = "mat_part" + str(i+1)
-      pick_pose.pose.position.z = 0.14
+      pick_pose.pose.position.z = 0.02
       pick_poses.append(pick_pose)
+
+      self.groups["a_bot"].set_goal_tolerance(.000001) 
+      self.groups["a_bot"].set_planning_time(10) 
+      self.groups["a_bot"].set_num_planning_attempts(1000) 
       
     # Perform the pick/place actions
     for j in range(0,1):
       self.do_pick_action("a_bot", pick_poses[j], tool_name = "", do_complex_pick_from_inside=True)
-      # self.do_place_action("a_bot", place_poses[j], tool_name = "")
-      self.go_to_named_pose("home_a", "a_bot")
+      self.do_place_action("a_bot", place_poses[j], tool_name = "")
+      
+      
+      # place_poses[j].pose.position.z += (.1)
+      # self.go_to_pose_goal("a_bot", place_poses[j], speed=0.3)
+      # place_poses[j].pose.position.z -= (.1)
+      # self.go_to_pose_goal("a_bot", place_poses[j], speed=0.02)
+
+      #self.go_to_named_pose("home_a", "a_bot")
     return
 
   def simple_taskboard_demo(self):
@@ -264,14 +277,18 @@ class ExampleClass(object):
       place_pose = geometry_msgs.msg.PoseStamped()
       place_pose.pose.orientation = downward_orientation
       place_pose.header.frame_id = "taskboard_part" + str(i+1)
-      place_pose.pose.position.z = 0.08
+      place_pose.pose.position.z = 0.04
       place_poses.append(place_pose)
 
       pick_pose = geometry_msgs.msg.PoseStamped()
       pick_pose.pose.orientation = downward_orientation
       pick_pose.header.frame_id = "mat_part" + str(i+1)
-      pick_pose.pose.position.z = 0.08
+      pick_pose.pose.position.z = 0.04
       pick_poses.append(pick_pose)
+
+      tutorial.groups["a_bot"].set_goal_tolerance(.000001) 
+      tutorial.groups["a_bot"].set_planning_time(10) 
+      tutorial.groups["a_bot"].set_num_planning_attempts(1000) 
       
     # Perform the pick/place actions
     for j in range(0,5):
@@ -342,7 +359,11 @@ def main():
     # tutorial.pick_place_demo()
     # tutorial.simple_taskboard_demo()
     # tutorial.taskboard_pick()
+    tutorial.groups["a_bot"].set_goal_tolerance(.000001)
+    tutorial.groups["a_bot"].set_planning_time(10)
+    tutorial.groups["a_bot"].set_num_planning_attempts(1000)
     tutorial.taskboard_with_pick_action()
+    
 
     print "============ Demo complete!"
   except rospy.ROSInterruptException:

@@ -390,6 +390,7 @@ def main():
     # tutorial.pick_place_demo()
     # tutorial.simple_taskboard_demo()
     # tutorial.taskboard_pick()
+    tutorial.groups["a_bot"].set_goal_tolerance([.000001, .000001, .000001])
     tutorial.precision_gripper_outer_open()
 
     print "============ Demo complete!"
