@@ -182,6 +182,140 @@ class ExampleClass(object):
   ################ 
   ################ 
 
+
+  def do_calibration(self):
+    calib_pose = geometry_msgs.msg.PoseStamped()
+    calib_pose.header.frame_id = "workspace_center"
+    calib_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    calib_pose.pose.position.x = -0.15
+    calib_pose.pose.position.z = 0.15
+
+    self.go_to_named_pose("home_a", "a_bot")
+    self.go_to_named_pose("home_b", "b_bot")
+    self.go_to_named_pose("home_c", "c_bot")
+
+    print "============ Press `Enter` to move a_bot to calibration position ..."
+    raw_input()
+    self.go_to_pose_goal("c_bot", calib_pose)
+
+    print "============ Press `Enter` to move b_bot to calibration position ..."
+    raw_input()
+    self.go_to_named_pose("home_c", "c_bot")
+    # self.go_to_pose_goal("b_bot", calib_pose)
+
+    # print "============ Press `Enter` to move c_bot to calibration position ..."
+    # raw_input()
+    # self.go_to_named_pose("home_b", "b_bot")
+    # self.go_to_pose_goal("c_bot", calib_pose)
+
+    # print "============ Press `Enter` to move c_bot home ..."
+    # raw_input()
+    # self.go_to_named_pose("home_c", "c_bot")
+
+    return
+  def precision_gripper_outer_close(self):
+    rospy.wait_for_service('precision_gripper_command')
+    try:
+        precision_gripper_client = rospy.ServiceProxy('precision_gripper_command',o2as_msgs.srv.PrecisionGripperCommand)
+        rospy.sleep(.5)
+        
+        request = PrecisionGripperCommandRequest()
+        request.close_outer_gripper_fully = True
+        
+        rospy.loginfo("Closing outer gripper")
+        precision_gripper_client(request)
+        rospy.loginfo("Waiting for 1 second")
+        rospy.sleep(1)
+
+        request = PrecisionGripperCommandRequest()
+        request.open_outer_gripper_fully = True
+        request.close_outer_gripper_fully = False
+
+        rospy.loginfo("Opening outer gripper")
+        precision_gripper_client(request)
+        rospy.loginfo("Waiting for 1 second")
+        rospy.sleep(1)
+
+        request.stop = True
+        request.open_outer_gripper_fully = False
+        request.close_outer_gripper_fully = False
+
+        rospy.loginfo("Disabling torque (stopping the gripper)")
+        precision_gripper_client(request)
+
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
+
+  def taskboard_with_pick_action(self):
+    # Pick a thing with c_bot, then b_bot
+    self.go_to_named_pose("home_c", "c_bot")
+    self.go_to_named_pose("home_b", "b_bot")
+    self.go_to_named_pose("home_a", "a_bot")
+    
+    downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
+
+    # Define each item pose
+    place_poses = []
+    pick_poses = []
+    for i in range(0,1):
+      i=3
+      place_pose = geometry_msgs.msg.PoseStamped()
+      place_pose.pose.orientation = downward_orientation
+      place_pose.header.frame_id = "taskboard_part" + str(i+1)
+      place_pose.pose.position.z = 0.15
+      place_poses.append(place_pose)
+
+      pick_pose = geometry_msgs.msg.PoseStamped()
+      pick_pose.pose.orientation = downward_orientation
+      pick_pose.header.frame_id = "mat_part" + str(i+1)
+      pick_pose.pose.position.z = 0.15
+      pick_poses.append(pick_pose)
+      
+    # Perform the pick/place actions
+    for j in range(0,1):
+      self.do_pick_action("a_bot", pick_poses[j], tool_name = "")
+      self.do_place_action("a_bot", place_poses[j], tool_name = "")
+      self.go_to_named_pose("home_a", "a_bot")
+
+  def taskboard_pick(self):
+    calib_pose = geometry_msgs.msg.PoseStamped()
+    #calib_pose.header.frame_id = "taskboard_part4"
+    calib_pose.header.frame_id = "mat_part4"
+    calib_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
+    rospy.loginfo(calib_pose.pose.orientation)
+    calib_pose.pose.position.x = 0
+    calib_pose.pose.position.z = 0.15
+
+    self.go_to_named_pose("home_a", "a_bot")
+    self.go_to_named_pose("home_b", "b_bot")
+    self.go_to_named_pose("home_c", "c_bot")
+
+    self.go_to_pose_goal("a_bot", calib_pose, speed=0.3)
+    print "============ Press `Enter` to move a_bot ..."
+    raw_input()
+    calib_pose.pose.position.z -= (.12)
+    self.go_to_pose_goal("a_bot", calib_pose, speed=0.02)
+
+    print "============ Press `Enter` to move a_bot ..."
+    raw_input()
+    calib_pose.pose.position.z += (.12)
+    self.go_to_pose_goal("a_bot", calib_pose, speed=0.02)
+    print "============ Press `Enter` to move ..."
+    raw_input()
+    self.go_to_named_pose("home_a", "a_bot",speed=0.3)
+    
+    self.precision_gripper_outer_close()
+    # self.go_to_pose_goal("b_bot", calib_pose)
+
+    # print "============ Press `Enter` to move c_bot to calibration position ..."
+    # raw_input()
+    # self.go_to_named_pose("home_b", "b_bot")
+    # self.go_to_pose_goal("c_bot", calib_pose)
+
+    # print "============ Press `Enter` to move c_bot home ..."
+    # raw_input()
+    # self.go_to_named_pose("home_c", "c_bot")
+
     return True
 
   def simple_taskboard_demo(self):
@@ -315,7 +449,9 @@ def main():
     # raw_input()
     # tutorial.insertion_demo()
     # tutorial.pick_place_demo()
-    tutorial.simple_taskboard_demo()
+    # tutorial.simple_taskboard_demo()
+    # tutorial.taskboard_pick()
+    tutorial.taskboard_with_pick_action()
 
     print "============ Demo complete!"
   except rospy.ROSInterruptException:
