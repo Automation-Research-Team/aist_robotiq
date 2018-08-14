@@ -61,15 +61,15 @@ public:
   bool attachTool(std::string screw_tool_id, std::string link_name);
   bool detachTool(std::string screw_tool_id, std::string link_name);
   bool attachDetachTool(std::string screw_tool_id, std::string link_name, std::string attach_or_detach);
-  bool placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name);
-  bool pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name);
+  bool placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name = "");
+  bool pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name = "");
   bool pickScrew(std::string object_id, std::string screw_tool_id, std::string robot_name);
   bool publishMarker(geometry_msgs::PoseStamped marker_pose, std::string marker_type = "");
   bool publishPoseMarker(geometry_msgs::PoseStamped marker_pose);
 
-  bool openGripper(std::string robot_name);
-  bool closeGripper(std::string robot_name);
-  bool sendGripperCommand(std::string robot_name, double opening_width);
+  bool openGripper(std::string robot_name, std::string gripper_name = "");
+  bool closeGripper(std::string robot_name, std::string gripper_name = "");
+  bool sendGripperCommand(std::string robot_name, double opening_width, std::string gripper_name = "");
 
   // Callback declarations
   bool goToNamedPoseCallback(o2as_skills::goToNamedPose::Request &req,
