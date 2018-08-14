@@ -2,7 +2,8 @@
 
 import sys
 import rospy
-from o2as_precision_gripper.srv import *
+from o2as_msgs.srv import *
+# from o2as_precision_gripper.srv import *
 
 if __name__ == "__main__":
     rospy.wait_for_service('precision_gripper_command')
@@ -16,7 +17,7 @@ if __name__ == "__main__":
         rospy.loginfo("Closing outer gripper")
         precision_gripper_client(request)
         rospy.loginfo("Waiting 5 seconds")
-        rospy.sleep(5)
+        rospy.sleep(1)
 
         request = PrecisionGripperCommandRequest()
         request.open_outer_gripper_fully = True
@@ -25,7 +26,7 @@ if __name__ == "__main__":
         rospy.loginfo("Opening outer gripper")
         precision_gripper_client(request)
         rospy.loginfo("Waiting 5 seconds")
-        rospy.sleep(5)
+        rospy.sleep(1)
 
         request.stop = True
         request.open_outer_gripper_fully = False

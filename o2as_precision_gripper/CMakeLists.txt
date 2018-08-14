@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   genmsg
   actionlib
   actionlib_msgs
+  o2as_msgs 
   std_msgs
   control_msgs
 )

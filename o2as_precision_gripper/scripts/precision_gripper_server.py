@@ -4,7 +4,7 @@ import lib_robotis_xm430 as xm430
 import sys
 import time
 import rospy
-from o2as_precision_gripper.srv import *
+from o2as_msgs.srv import *
 
 class PrecisionGripper:
     def __init__(self, serial_port = '/dev/ttyUSB0'):
