@@ -715,14 +715,81 @@ void SkillServer::executePick(const o2as_skills::pickGoalConstPtr& goal)
 {
   ROS_INFO("pickAction was called");
 
-  if (goal->tool_name == "screw_tool")
+  if ((goal->do_complex_pick_from_inside) || (goal->do_complex_pick_from_outside))
+  {
+    geometry_msgs::PoseStamped target_tip_link_pose = goal->item_pose;
+    std::string end_effector_link_name = goal->robot_name + "_gripper_tip_link";
+    // Do the positioning with the inner gripper first, then close the outer gripper
+    publishMarker(target_tip_link_pose, "pick_pose");
+    ROS_INFO_STREAM("Doing complex pick with custom gripper.");
+    
+    // Move above the object
+    openGripper("a_bot", "outer_gripper");
+    if (goal->do_complex_pick_from_inside) 
+    {
+      ROS_INFO_STREAM("Opening outer and closing inner gripper, moving above object.");
+      closeGripper("a_bot", "inner_gripper");
+    }
+    else if (goal->do_complex_pick_from_outside)
+    {
+      ROS_INFO_STREAM("Opening outer and inner gripper, moving above object.");
+      openGripper("a_bot", "inner_gripper");
+    }
+    target_tip_link_pose.pose.position.z += .1;
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, end_effector_link_name);
+
+    ROS_INFO_STREAM("Moving closer to object (5 cm offset).");
+    target_tip_link_pose.pose.position.z -= .05;
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    bool success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, end_effector_link_name, 0.1);
+    if (!success) 
+    {
+      ROS_INFO_STREAM("Linear motion plan failed. Performing PTP.");
+      std::this_thread::sleep_for(std::chrono::milliseconds(500));
+      moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, end_effector_link_name, 0.1);  // Force the move even if LIN fails
+    }
+
+    target_tip_link_pose.pose.position.z -= .05;
+    ROS_INFO_STREAM("Moving down to object (no offset).");
+    moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, end_effector_link_name, 0.03);  // Go very slow
+    // TODO: Send the MoveL command to the real robot instead?
+    
+    if (goal->do_complex_pick_from_inside) 
+    {
+      ROS_INFO_STREAM("Opening inner gripper to position object.");
+      openGripper("a_bot", "inner_gripper");
+    }
+    else if (goal->do_complex_pick_from_outside)
+    {
+      ROS_INFO_STREAM("Closing inner gripper to position object.");
+      closeGripper("a_bot", "inner_gripper");
+    }
+    ROS_INFO_STREAM("Waiting for 4 s, then grasping with outer gripper.");
+    std::this_thread::sleep_for(std::chrono::milliseconds(4000));
+    closeGripper("a_bot", "outer_gripper");
+
+    ROS_INFO_STREAM("Moving back up after picking object.");
+    target_tip_link_pose.pose.position.z += .05;
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, end_effector_link_name);
+    if (!success) 
+    {
+      ROS_INFO_STREAM("Linear motion plan back from pick pose failed. Performing PTP.");
+      std::this_thread::sleep_for(std::chrono::milliseconds(500));
+      moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+    }
+
+    ROS_INFO_STREAM("Finished picking object.");
+  }
+  else if (goal->tool_name == "screw_tool")
   {
     std::string screw_tool_id = goal->tool_name + "_m" + std::to_string(goal->screw_size);
     pickScrew(goal->item_id, screw_tool_id, goal->robot_name);
   }
   else if (goal->tool_name == "suction")
   {;} // TODO: Here is space for code from AIST.
-  else // No special tool being used; use the gripper instead
+  else // No special tool being used; use just one gripper instead
   {
     // Warning: Using only "abs" rounds to int. Amazing.
     if ((std::abs(goal->item_pose.pose.position.x)) > 0 || (std::abs(goal->item_pose.pose.position.y)) > 0 || (std::abs(goal->item_pose.pose.position.z)) > 0)
