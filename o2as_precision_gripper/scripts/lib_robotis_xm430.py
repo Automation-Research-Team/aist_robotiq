@@ -311,6 +311,13 @@ class Robotis_Servo2():
         params = self.protocol2_read_address( 132, 4 )
         #print params
         return (params[3] << 24)+(params[2] << 16)+(params[1] << 8) + params[0]
+
+    def read_current_velocity(self):
+        params = self.protocol2_read_address( 128, 4 )
+        #print params
+        return (params[3] << 24)+(params[2] << 16)+(params[1] << 8) + params[0]
+
+
     def read_goal_position(self):
         params = self.protocol2_read_address( 116, 4 )
         print params
