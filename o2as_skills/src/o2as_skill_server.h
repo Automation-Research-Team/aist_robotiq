@@ -45,8 +45,8 @@ public:
   SkillServer();
 
   //Helpers (convenience functions)
-  bool moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true, std::string end_effector_link = "");
-  bool moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true, std::string end_effector_link = "");
+  bool moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true, std::string end_effector_link = "", double velocity_scaling_factor = 0.1);
+  bool moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true, std::string end_effector_link = "", double velocity_scaling_factor = 0.1);
   bool goToNamedPose(std::string pose_name, std::string robot_name);
   bool stop();                  // Stops the robot at the current position
   moveit::planning_interface::MoveGroupInterface* robotNameToMoveGroup(std::string robot_name);
