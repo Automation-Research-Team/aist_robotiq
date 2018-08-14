@@ -160,11 +160,11 @@ class ExampleClass(object):
 
   def do_insertion(self, robot_name):
     # Currently calls the UR service directly rather than the action of the skill_server
-    srv = o2as_skills.srv.sendScriptToUR()
-    srv.request.robot_name = robot_name
-    srv.request.program_id = "insertion"
-    self.urscript_client.call(srv)
-    return srv.response.success
+    req = o2as_skills.srv.sendScriptToURRequest()
+    req.robot_name = robot_name
+    req.program_id = "insertion"
+    res = self.urscript_client.call(req)
+    return res.success
   
   def go_to_named_pose(self, pose_name, robot_name):
     # pose_name should be "home_a", "home_b" etc.
