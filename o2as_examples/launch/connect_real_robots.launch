@@ -83,8 +83,8 @@
     <arg name="namespace" value="c_bot_gripper" />
   </include>
 
-  <include file="$(find o2as_precision_gripper)/launch/test_precision_gripper.launch">
-    <arg name="serial_port" default="/dev/ttyUSB1" />
+  <include file="$(find o2as_precision_gripper)/launch/precision_gripper.launch">
+    <arg name="serial_port" default="/dev/ttyUSB2" />
   </include>
 
   <!-- <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch">
