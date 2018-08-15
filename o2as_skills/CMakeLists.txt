@@ -10,7 +10,6 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED
 	rospy
 	roscpp
-	actionlib_msgs
 	std_msgs
 	control_msgs
 	robotiq_msgs
@@ -36,7 +35,20 @@ find_package(catkin REQUIRED
 ## Declare ROS messages, services and actions ##
 ################################################
 
-## To declare and build messages, services or actions from within this
+## To declare and build messahe 'srv' folder
+# add_service_files( DIRECTORY srv )
+
+# # Generate actions in the 'action' folder
+# add_action_files( DIRECTORY action )
+
+# # Generate added messages and services with any dependencies listed here
+# generate_messages(
+#   DEPENDENCIES
+#   std_srvs
+#   std_msgs
+#   actionlib_msgs
+#   geometry_msgs
+# )ges, services or actions from within this
 ## package, follow these steps:
 ## * Let MSG_DEP_SET be the set of packages whose message types you use in
 ##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).
@@ -63,20 +75,20 @@ find_package(catkin REQUIRED
 #   Message2.msg
 # )
 
-# Generate services in the 'srv' folder
-add_service_files( DIRECTORY srv )
+# # Generate services in the 'srv' folder
+# add_service_files( DIRECTORY srv )
 
-# Generate actions in the 'action' folder
-add_action_files( DIRECTORY action )
+# # Generate actions in the 'action' folder
+# add_action_files( DIRECTORY action )
 
-# Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_srvs
-  std_msgs
-  actionlib_msgs
-  geometry_msgs
-)
+# # Generate added messages and services with any dependencies listed here
+# generate_messages(
+#   DEPENDENCIES
+#   std_srvs
+#   std_msgs
+#   actionlib_msgs
+#   geometry_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
