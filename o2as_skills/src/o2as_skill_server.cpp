@@ -4,6 +4,7 @@ SkillServer::SkillServer() :
                   alignActionServer_(n_, "o2as_skills/align", boost::bind(&SkillServer::executeAlign, this, _1),false),
                   pickActionServer_(n_, "o2as_skills/pick", boost::bind(&SkillServer::executePick, this, _1),false),
                   placeActionServer_(n_, "o2as_skills/place", boost::bind(&SkillServer::executePlace, this, _1),false),
+                  regraspActionServer_(n_, "o2as_skills/regrasp", boost::bind(&SkillServer::executeRegrasp, this, _1),false),
                   insertActionServer_(n_, "o2as_skills/insert", boost::bind(&SkillServer::executeInsert, this, _1),false),
                   screwActionServer_(n_, "o2as_skills/screw", boost::bind(&SkillServer::executeScrew, this, _1),false),
                   a_bot_group_("a_bot"), b_bot_group_("b_bot"), c_bot_group_("c_bot"),
@@ -863,6 +864,16 @@ void SkillServer::executePlace(const o2as_msgs::placeGoalConstPtr& goal)
   placeFromAbove(goal->item_pose, ee_link_name, goal->robot_name);
   ROS_INFO("placeAction is set as succeeded");
   placeActionServer_.setSucceeded();
+}
+
+// regraspAction
+void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
+{
+  ROS_INFO("regraspAction was called");
+  // TODO: Implement this.
+
+  ROS_INFO("regraspAction is set as succeeded");
+  regraspActionServer_.setSucceeded();
 }
 
 // insertAction

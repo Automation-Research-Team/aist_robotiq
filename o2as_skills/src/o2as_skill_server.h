@@ -32,6 +32,7 @@
 #include "o2as_msgs/alignAction.h"
 #include "o2as_msgs/pickAction.h"
 #include "o2as_msgs/placeAction.h"
+#include "o2as_msgs/regraspAction.h"
 #include "o2as_msgs/insertAction.h"
 #include "o2as_msgs/screwAction.h"
 
@@ -80,6 +81,7 @@ public:
   void executeAlign(const o2as_msgs::alignGoalConstPtr& goal);
   void executePick(const o2as_msgs::pickGoalConstPtr& goal);
   void executePlace(const o2as_msgs::placeGoalConstPtr& goal);
+  void executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal);
   void executeInsert(const o2as_msgs::insertGoalConstPtr& goal);
   void executeScrew(const o2as_msgs::screwGoalConstPtr& goal);
   
@@ -101,6 +103,7 @@ public:
   actionlib::SimpleActionServer<o2as_msgs::alignAction> alignActionServer_;
   actionlib::SimpleActionServer<o2as_msgs::pickAction> pickActionServer_;
   actionlib::SimpleActionServer<o2as_msgs::placeAction> placeActionServer_;
+  actionlib::SimpleActionServer<o2as_msgs::regraspAction> regraspActionServer_;
   actionlib::SimpleActionServer<o2as_msgs::insertAction> insertActionServer_;
   actionlib::SimpleActionServer<o2as_msgs::screwAction> screwActionServer_;  
 
@@ -128,7 +131,6 @@ public:
   ros::ServiceClient get_planning_scene_client;
   moveit::planning_interface::MoveGroupInterface a_bot_group_, b_bot_group_, c_bot_group_; // front_bots_group_, all_bots_group_;
   
-
   moveit_msgs::CollisionObject screw_tool_m5, screw_tool_m4, screw_tool_m3;
 
 };//End of class SkillServer

@@ -25,7 +25,6 @@ class URScriptRelay():
         self.read_templates()
         s = rospy.Service('o2as_skills/sendScriptToUR', o2as_skills.srv.sendScriptToUR, self.srv_callback)
 
-
         # rospy.loginfo("TESTING SCRIPT SENDING")
         # rospack = rospkg.RosPack()
         # program = ""
@@ -103,14 +102,14 @@ class URScriptRelay():
 
             program = program_front + "\n" + program_mid # + "\n" + program_back
         elif req.program_id == "lin_move":
-            rospy.logerr("LIN MOVE IS NOT IMPLEMENTED YET") # TODO
-            program = ""
-            program += "def move_to_pose_lin():\n"
-            program += "    textmsg(\"Moving back and forth 5 cm.\")\n"
-            program += "    start_pos=get_forward_kin()\n"
-            program += "    target_pos=pose_trans(start_pos,p[0.0, 0.0, 0.05, 0.0, 0.0, 0.0])\n"
-            program += "    movel(pose_trans(p[0.0,0.0,0.0,0.0,0.0,0.0], target_pos), a=0.5, v=0.1)\n"
-            program += "end\n"
+            rospy.logerr("LIN MOVE IS NOT IMPLEMENTED YET") 
+            # TODO: Send the pose to the robot
+            # program = ""
+            # program += "def move_to_pose_lin():\n"
+            # program += "    textmsg(\"Moving to a pose.\")\n"
+            # program += "    target_pos=p[0.0, 0.0, 0.05, 0.0, 0.0, 0.0]\n"
+            # program += "    movel(pose_trans(p[0.0,0.0,0.0,0.0,0.0,0.0], target_pos), a=0.5, v=0.1)\n"
+            # program += "end\n"
         elif req.program_id == "spiral_press":
             rospy.logerr("SPIRAL PRESS IS NOT IMPLEMENTED YET") # TODO
         elif req.program_id == "test":
