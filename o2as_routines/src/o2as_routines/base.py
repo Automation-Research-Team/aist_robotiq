@@ -117,17 +117,26 @@ class O2ASBaseRoutines(object):
     
   ############## ------ Internal functions (and convenience functions)
 
-  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 0.1):
+  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 0.1, high_precision = False):
     group = self.groups[group_name]
     group.set_pose_target(pose_goal_stamped)
     rospy.loginfo("Setting velocity scaling to " + str(speed))
     group.set_max_velocity_scaling_factor(speed)
+
+    if high_precision:
+      group.set_goal_tolerance(.000001) 
+      group.set_planning_time(10) 
 
     plan = group.go(wait=True)
     group.stop()
     # It is always good to clear your targets after planning with poses.
     # Note: there is no equivalent function for clear_joint_value_targets()
     group.clear_pose_targets()
+    
+    # Reset the precision
+    if high_precision:
+      group.set_goal_tolerance(.0001) 
+      group.set_planning_time(5) 
 
     current_pose = group.get_current_pose().pose
     return all_close(pose_goal_stamped.pose, current_pose, 0.01)

@@ -54,7 +54,7 @@ class TaskboardClass(O2ASBaseRoutines):
                       "M6 Nut & Bolt", "M12 nut", "6 mm washer", 
                       "10 mm washer", "M3 set screw", "M3 bolt", 
                       "M4 bolt", "Pulley", "10 mm end cap"]
-    self.item_pick_heights = [0.02, 0.02, 0.02, 
+    self.item_pick_heights = [0.02, 0.02, 0.023, 
                               0.02, 0.02, 0.02, 
                               0.02, 0.02, 0.02, 
                               0.02, 0.02, 0.02,
@@ -125,12 +125,193 @@ class TaskboardClass(O2ASBaseRoutines):
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
 
+  def precision_gripper_inner_close(self):
+    rospy.wait_for_service('precision_gripper_command')
+    try:
+        precision_gripper_client = rospy.ServiceProxy('precision_gripper_command',PrecisionGripperCommand)
+        rospy.sleep(.5)
+        
+        request = PrecisionGripperCommandRequest()
+        request.close_inner_gripper_fully = True
+        
+        rospy.loginfo("Closing outer gripper")
+        precision_gripper_client(request)
+        rospy.loginfo("Waiting for 5 seconds")
+        rospy.sleep(5)
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
+
+  def precision_gripper_inner_open(self):
+    rospy.wait_for_service('precision_gripper_command')
+    try:
+        precision_gripper_client = rospy.ServiceProxy('precision_gripper_command',PrecisionGripperCommand)
+        rospy.sleep(.5)
+        request = PrecisionGripperCommandRequest()
+        request.open_inner_gripper_fully = True
+        request.close_inner_gripper_fully = False
+
+        rospy.loginfo("Opening outer gripper")
+        precision_gripper_client(request)
+        rospy.loginfo("Waiting for 5 seconds")
+        rospy.sleep(5)
+
+        request.stop = True
+        request.open_inner_gripper_fully = False
+        request.close_inner_gripper_fully = False
+
+        rospy.loginfo("Disabling torque (stopping the gripper)")
+        precision_gripper_client(request)
+
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
+
+  # def 
+  # calib_pose = geometry_msgs.msg.PoseStamped()
+  #   #calib_pose.header.frame_id = "taskboard_part4"
+  #   calib_pose.header.frame_id = "mat_part4"
+  #   calib_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
+  #   rospy.loginfo(calib_pose.pose.orientation)
+  #   calib_pose.pose.position.x = 0
+  #   calib_pose.pose.position.z = 0.15
+
+  #   self.go_to_named_pose("home_a", "a_bot")
+  #   self.go_to_named_pose("home_b", "b_bot")
+  #   self.go_to_named_pose("home_c", "c_bot")
+
+  #   self.go_to_pose_goal("a_bot", calib_pose, speed=0.3)
+  #   print "============ Press `Enter` to move a_bot ..."
+  #   raw_input()
+  #   calib_pose.pose.position.z -= (.12)
+  #   self.go_to_pose_goal("a_bot", calib_pose, speed=0.02)
+
+  #   print "============ Press `Enter` to move a_bot ..."
+  #   raw_input()
+  #   calib_pose.pose.position.z += (.12)
+  #   self.go_to_pose_goal("a_bot", calib_pose, speed=0.02)
+  #   print "============ Press `Enter` to move ..."
+  #   raw_input()
+  #   self.go_to_named_pose("home_a", "a_bot",speed=0.3)
+    
 
   ################ ----- Routines  
   ################ 
   ################ 
+  def pick(self,robotname,object_pose,grasp_height,speed_fast,speed_slow,gripper_command):
+    #initial gripper_setup
+    object_pose.pose.position.z = 0.16
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
+
+    if gripper_command=="complex_pick_from_inside":
+      self.precision_gripper_inner_close() 
+    elif gripper_command=="complex_pick_from_outside":
+      self.precision_gripper_inner_open()
+    elif gripper_command=="easy_pick_only_inner":
+      self.precision_gripper_inner_close()
+
+    object_pose.pose.position.z = grasp_height
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True)
+
+    #gripper close
+    if gripper_command=="complex_pick_from_inside":
+      self.precision_gripper_inner_open()
+      self.precision_gripper_outer_close()
+    elif gripper_command=="complex_pick_from_outside"
+      self.precision_gripper_inner_close()
+      self.precision_gripper_outer_close()
+    elif gripper_command=="easy_pick_only_inner":
+      self.precision_gripper_inner_close()
+
+    object_pose.pose.position.z = (.16)
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
+
+  def place(self,robotname,object_pose,place_height,speed_fast,speed_slow):
+    object_pose.pose.position.z = 0.16
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
+
+    object_pose.pose.position.z = place_height
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True)
+
+    print "============ Stopping at the placement height. Press `Enter` to keep moving moving the robot ..."
+    raw_input()
+
+    #gripper open
+    if gripper_command=="complex_pick_from_inside":
+      self.precision_gripper_outer_open()
+      self.precision_gripper_inner_close()
+    elif gripper_command=="complex_pick_from_outside"
+      self.precision_gripper_outer_open()
+      self.precision_gripper_inner_open()
+    elif gripper_command=="easy_pick_only_inner"
+      self.precision_gripper_inner_open()
+
+    object_pose.pose.position.z = (.16)
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)  
+
     
-  def simple_taskboard_demo(self):
+
+  def full_taskboard_task(self):
+    self.groups["a_bot"].set_goal_tolerance(.0001) 
+    self.groups["a_bot"].set_planning_time(5) 
+    self.groups["a_bot"].set_num_planning_attempts(1000) 
+    self.go_to_named_pose("home_c", "c_bot")
+    self.go_to_named_pose("home_b", "b_bot")
+    self.go_to_named_pose("home_a", "a_bot")
+
+    for i in range(0,15):
+      rospy.loginfo("=== Now targeting part number " + str(i+1) + ": " + self.item_names[i])
+
+      # peg-in-hole with complex_pick_from_inside
+      if i in [2, 13]:
+        self.pick("a_bot",self.pick_poses[i],self.item_pick_heights[i],
+                    speed_fast = 0.2, speed_slow = 0.02, "complex_pick_from_inside")
+        self.place("a_bot",self.place_poses[i],self.item_place_heights[i],
+                    speed_fast = 0.2, speed_slow = 0.02, "complex_pick_from_inside")
+      
+      #peg-in-hole with complex_pick_from_outside
+      if i == 3:
+        self.pick("a_bot",self.pick_poses[i],self.item_pick_heights[i],
+                    speed_fast = 0.2, speed_slow = 0.02, "complex_pick_from_outerside")
+        self.place("a_bot",self.place_poses[i],self.item_place_heights[i],
+                    speed_fast = 0.2, speed_slow = 0.02, "complex_pick_from_outerside")
+
+      #peg-in-hole with easy pick_only_inner(washers)
+      if i in [8, 9, 14]
+        self.pick("a_bot",self.pick_poses[i],self.item_pick_heights[i],
+                    speed_fast = 0.2, speed_slow = 0.02, "easy_pick_only_inner")
+        self.place("a_bot",self.place_poses[i],self.item_place_heights[i],
+                    speed_fast = 0.2, speed_slow = 0.02, "easy_pick_only_inner")
+
+      # This requires a regrasp (bearing)
+      if i == 0:
+        rospy.logwarn("This part is skipped because it requires a regrasp")
+        pass
+      
+      # Requires a regrasp (pin)
+      if i == 1:
+        rospy.logwarn("This part is skipped because it requires a regrasp")
+        pass
+
+      # Screwing
+      if i in [4, 7, 10, 11, 12]:
+        self.pick("a_bot",self.pick_poses[i],self.item_pick_heights[i], speed_fast = 0.2, speed_slow = 0.02)
+        self.place("a_bot",self.place_poses[i],self.item_place_heights[i], speed_fast = 0.2, speed_slow = 0.02)
+      
+      # Requires multiple robots (Bolt and nut)
+      if i == 6:
+        rospy.logwarn("This part is skipped because it requires multiple robots interacting")
+        pass
+
+      # Requires special strategy (Belt)
+      if i == 5:
+        rospy.logwarn("This part is skipped because it requires a special strategy")
+        pass
+
+
+      self.go_to_named_pose("home_c", "c_bot")
+      self.go_to_named_pose("home_b", "b_bot")
+      self.go_to_named_pose("home_a", "a_bot")
+
+  def taskboard_manual_testing(self):
     self.groups["a_bot"].set_goal_tolerance(.0001) 
     self.groups["a_bot"].set_planning_time(5) 
     self.go_to_named_pose("home_c", "c_bot")
@@ -140,33 +321,32 @@ class TaskboardClass(O2ASBaseRoutines):
     downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
 
     # Perform the pick/place operations
-    for i in range(0,1):
-      i=3
-      rospy.loginfo("=== Now targeting part number " + str(i+1) + ": " + self.item_names[i])
-
-      self.groups["a_bot"].set_goal_tolerance(.000001) 
-      self.groups["a_bot"].set_planning_time(10) 
-      self.groups["a_bot"].set_num_planning_attempts(1000) 
-
-      self.do_pick_action("a_bot", pick_poses[j], tool_name = "", do_complex_pick_from_inside=True)
-      self.do_place_action("a_bot", place_poses[j], tool_name = "")
-      
-      
-      # place_poses[j].pose.position.z += (.1)
-      # self.go_to_pose_goal("a_bot", place_poses[j], speed=0.3)
-      # place_poses[j].pose.position.z -= (.1)
-      # self.go_to_pose_goal("a_bot", place_poses[j], speed=0.02)
-
-      #self.go_to_named_pose("home_a", "a_bot")
+    i = raw_input("the number of the part")
+    rospy.loginfo("=== Now targeting part number " + str(i+1) + ": " + self.item_names[i])
+    
+    self.groups["a_bot"].set_goal_tolerance(.000001) 
+    self.groups["a_bot"].set_planning_time(10) 
+    self.groups["a_bot"].set_num_planning_attempts(1000) 
+    if i == 3:  
+      self.do_pick_action("a_bot", pick_poses[i], tool_name = "", do_complex_pick_from_inside=True)
+      self.do_place_action("a_bot", place_poses[i], tool_name = "")
+      pass
     return
-
 
 
 if __name__ == '__main__':
   try:
-    c = TaskboardClass()
-    c.simple_taskboard_demo()
-
+    taskboard = TaskboardClass()
+    taskboard.set_up_item_parameters()
+    #taskboard.full_taskboard_task()
+    
+    i = raw_input("the number of the part")
+    i =int(i)
+    while(i):
+      taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],speed_fast = 0.2, speed_slow = 0.02)
+      taskboard.place("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],speed_fast = 0.2, speed_slow = 0.02)
+      i = raw_input("the number of the part")
+      i =int(i)
     print "============ Done!"
   except rospy.ROSInterruptException:
-    return
+    pass

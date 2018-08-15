@@ -57,7 +57,7 @@
     <joint name="${matname}_part3" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part3"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.29 0.355 0.01"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.257 0.107 0.01"/>
     </joint>
     <link name="${matname}_part3"/>
 
