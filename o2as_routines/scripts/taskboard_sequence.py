@@ -37,10 +37,13 @@
 import sys
 import copy
 import rospy
+import geometry_msgs.msg
+import tf_conversions
+from math import pi
 
-import o2as_routines
+from o2as_routines.base import O2ASBaseRoutines
 
-class TaskboardClass(o2as_routines.O2ASBaseRoutines):
+class TaskboardClass(O2ASBaseRoutines):
   """
   This contains the routine used to run the taskboard task.
   """
@@ -62,7 +65,7 @@ class TaskboardClass(o2as_routines.O2ASBaseRoutines):
                                0.04, 0.04, 0.04, 
                                0.04, 0.04, 0.04]
     self.gripper_operation_to_use = ["outer", "inner_from_inside", "inner_from_outside", "complex_pick_from_inside", "complex_pick_from_outside"]
-
+    downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
     # 
     self.pick_poses = []
     self.place_poses = []
