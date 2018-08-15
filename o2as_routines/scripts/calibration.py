@@ -140,6 +140,7 @@ class CalibrationClass(O2ASBaseRoutines):
   def taskboard_calibration_mat(self):
     speed=0.3
 
+    rospy.loginfo("Moving all robots home.")
     self.go_to_named_pose("home_a", "a_bot")
     self.go_to_named_pose("home_b", "b_bot")
     self.go_to_named_pose("home_c", "c_bot")
@@ -148,49 +149,37 @@ class CalibrationClass(O2ASBaseRoutines):
     calib_pose.header.frame_id = "mat_corner2"
     calib_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     calib_pose.pose.position.x = 0
-    calib_pose.pose.position.z = -0.02
+    calib_pose.pose.position.z = .05
 
+    rospy.loginfo("Moving a_bot to " + calib_pose.header.frame_id)
     self.go_to_pose_goal("a_bot", calib_pose,speed=speed)
 
-    print "============ Press `Enter` to move b_bot to calibration position ..."
-    raw_input()
-    self.go_to_named_pose("home_a", "a_bot",speed=speed)
 
     calib_pose = geometry_msgs.msg.PoseStamped()
     calib_pose.header.frame_id = "mat_corner3"
     calib_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     calib_pose.pose.position.x = 0
-    calib_pose.pose.position.z = -0.02
+    calib_pose.pose.position.z = .05
 
-    self.go_to_pose_goal("a_bot", calib_pose,speed=speed)
-
-    print "============ Press `Enter` to move b_bot to calibration position ..."
+    rospy.loginfo("============ Press `Enter` to move a_bot to " + calib_pose.header.frame_id)
     raw_input()
     self.go_to_named_pose("home_a", "a_bot",speed=speed)
+    self.go_to_pose_goal("a_bot", calib_pose,speed=speed)
+
 
     calib_pose = geometry_msgs.msg.PoseStamped()
     calib_pose.header.frame_id = "mat_part3"
     calib_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     calib_pose.pose.position.x = 0
     calib_pose.pose.position.z += 0.01
-
-    self.go_to_pose_goal("a_bot", calib_pose,speed=speed)
-
-    print "============ Press `Enter` to move b_bot to calibration position ..."
+    rospy.loginfo("============ Press `Enter` to move a_bot to " + calib_pose.header.frame_id)
     raw_input()
     self.go_to_named_pose("home_a", "a_bot",speed=speed)
+    self.go_to_pose_goal("a_bot", calib_pose,speed=speed)
 
-    # self.go_to_pose_goal("b_bot", calib_pose)
-
-    # print "============ Press `Enter` to move c_bot to calibration position ..."
-    # raw_input()
-    # self.go_to_named_pose("home_b", "b_bot")
-    # self.go_to_pose_goal("c_bot", calib_pose)
-
-    # print "============ Press `Enter` to move c_bot home ..."
-    # raw_input()
-    # self.go_to_named_pose("home_c", "c_bot")
-
+    rospy.loginfo("============ Press `Enter` to move a_bot home.")
+    raw_input()
+    self.go_to_named_pose("home_a", "a_bot",speed=speed)
     return
 
 
