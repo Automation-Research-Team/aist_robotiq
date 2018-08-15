@@ -57,14 +57,14 @@ class TaskboardClass(O2ASBaseRoutines):
                       "M4 bolt", "Pulley", "10 mm end cap"]
     self.item_pick_heights = [0.02, 0.02, 0.025, 
                               0.025, 0.02, 0.02, 
-                              0.02, 0.02, -0.035, 
-                              -0.035, 0.02, 0.02,
-                              0.02, -0.025, -0.02]
+                              0.02, 0.02, -0.01, 
+                              -0.017, 0.02, 0.02,
+                              0.02, -0.01, -0.01]
 
     self.item_place_heights = [0.04, 0.04, 0.035,
                                0.035, 0.04, 0.04, 
-                               0.04, 0.04, -0.025, 
-                               -0.025, 0.04, 0.04, 
+                               0.04, 0.04, 0.04, 
+                               0.0, 0.04, 0.04, 
                                0.04, -0.015, -0.01]
     self.gripper_operation_to_use = ["outer", "inner_from_inside", "inner_from_outside", "complex_pick_from_inside", "complex_pick_from_outside"]
     downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
@@ -82,7 +82,7 @@ class TaskboardClass(O2ASBaseRoutines):
       place_pose.pose.orientation = downward_orientation
       place_pose.header.frame_id = "taskboard_part" + str(i+1)
       # 
-      place_pose.pose.position.z = self.item_pick_heights[i]+.01
+      place_pose.pose.position.z = self.item_place_heights[i]
       self.place_poses.append(place_pose)
     
 
@@ -99,8 +99,6 @@ class TaskboardClass(O2ASBaseRoutines):
         
         rospy.loginfo("Closing outer gripper")
         precision_gripper_client(request)
-        rospy.loginfo("Waiting for 5 seconds")
-        rospy.sleep(5)
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
 
@@ -115,8 +113,6 @@ class TaskboardClass(O2ASBaseRoutines):
 
         rospy.loginfo("Opening outer gripper")
         precision_gripper_client(request)
-        rospy.loginfo("Waiting for 5 seconds")
-        rospy.sleep(5)
 
         request.stop = True
         request.open_outer_gripper_fully = False
@@ -139,8 +135,6 @@ class TaskboardClass(O2ASBaseRoutines):
         
         rospy.loginfo("Closing outer gripper")
         precision_gripper_client(request)
-        rospy.loginfo("Waiting for 5 seconds")
-        rospy.sleep(5)
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
 
@@ -155,8 +149,6 @@ class TaskboardClass(O2ASBaseRoutines):
 
         rospy.loginfo("Opening outer gripper")
         precision_gripper_client(request)
-        rospy.loginfo("Waiting for 5 seconds")
-        rospy.sleep(5)
 
         request.stop = True
         request.open_inner_gripper_fully = False
@@ -201,7 +193,8 @@ class TaskboardClass(O2ASBaseRoutines):
   ################ 
   def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command):
     #initial gripper_setup
-    object_pose.pose.position.z = 0.16
+    rospy.loginfo("Going above object to pick")
+    object_pose.pose.position.z = 0.1
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
 
     if gripper_command=="complex_pick_from_inside":
@@ -210,13 +203,12 @@ class TaskboardClass(O2ASBaseRoutines):
       self.precision_gripper_inner_open()
     elif gripper_command=="easy_pick_only_inner":
       self.precision_gripper_inner_close()
+    else: 
+      rospy.logerr("No gripper command was set")
 
-    rospy.loginfo("debug1")
-
+    rospy.loginfo("Moving down to object")
     object_pose.pose.position.z = grasp_height
-
     rospy.loginfo(grasp_height)
-
     self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True)
 
     W = raw_input("waiting for the gripper")
@@ -228,15 +220,20 @@ class TaskboardClass(O2ASBaseRoutines):
       self.precision_gripper_inner_close()
       self.precision_gripper_outer_close()
     elif gripper_command=="easy_pick_only_inner":
-      self.precision_gripper_inner_close()
+      self.precision_gripper_inner_open()
 
-    object_pose.pose.position.z = (.16)
+    rospy.loginfo("Going back up")
+    object_pose.pose.position.z = (.1)
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
+
+######
 
   def place(self,robotname,object_pose,place_height,speed_fast,speed_slow,gripper_command):
-    object_pose.pose.position.z = 0.16
+    rospy.loginfo("Going above place target")
+    object_pose.pose.position.z = 0.1
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
 
+    rospy.loginfo("Moving to place target")
     object_pose.pose.position.z = place_height
     self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True)
 
@@ -251,9 +248,12 @@ class TaskboardClass(O2ASBaseRoutines):
       self.precision_gripper_outer_open()
       self.precision_gripper_inner_open()
     elif gripper_command=="easy_pick_only_inner":
-      self.precision_gripper_inner_open()
-
-    object_pose.pose.position.z = (.16)
+      self.precision_gripper_inner_close()
+    else: 
+      rospy.logerr("No gripper command was set")
+    
+    rospy.loginfo("Moving back up")
+    object_pose.pose.position.z = (.1)
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)  
 
     
@@ -353,8 +353,8 @@ if __name__ == '__main__':
     # 4           complex_pick_from_outside
     # 9, 10, 15   easy_pick_only_inner
     taskboard.groups["a_bot"].set_goal_tolerance(.0001) 
-    taskboard.groups["a_bot"].set_planning_time(5) 
-    taskboard.groups["a_bot"].set_num_planning_attempts(1000)
+    taskboard.groups["a_bot"].set_planning_time(3) 
+    taskboard.groups["a_bot"].set_num_planning_attempts(10)
     taskboard.go_to_named_pose("home_c", "c_bot")
     taskboard.go_to_named_pose("home_b", "b_bot")
     taskboard.go_to_named_pose("home_a", "a_bot")
@@ -373,8 +373,8 @@ if __name__ == '__main__':
       #15 is not adjusted yet  
       if i in [9, 10]:
         taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
-        taskboard.pick("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
-      #taskboard.place("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],speed_fast = 0.2, speed_slow = 0.02)
+        taskboard.place("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
+      
       taskboard.go_to_named_pose("home_c", "c_bot")
       taskboard.go_to_named_pose("home_b", "b_bot")
       taskboard.go_to_named_pose("home_a", "a_bot")
