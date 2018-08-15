@@ -35,6 +35,7 @@
 # Author: Felix von Drigalski
 
 import sys
+from o2as_msgs.srv import *
 import copy
 import rospy
 import geometry_msgs.msg
@@ -54,16 +55,16 @@ class TaskboardClass(O2ASBaseRoutines):
                       "M6 Nut & Bolt", "M12 nut", "6 mm washer", 
                       "10 mm washer", "M3 set screw", "M3 bolt", 
                       "M4 bolt", "Pulley", "10 mm end cap"]
-    self.item_pick_heights = [0.02, 0.02, 0.023, 
-                              0.02, 0.02, 0.02, 
-                              0.02, 0.02, 0.02, 
-                              0.02, 0.02, 0.02,
-                              0.02, 0.02, 0.02]
-    self.item_place_heights = [0.04, 0.04, 0.04,
-                               0.04, 0.04, 0.04, 
-                               0.04, 0.04, 0.04, 
-                               0.04, 0.04, 0.04, 
-                               0.04, 0.04, 0.04]
+    self.item_pick_heights = [0.02, 0.02, 0.025, 
+                              0.025, 0.02, 0.02, 
+                              0.02, 0.02, -0.035, 
+                              -0.035, 0.02, 0.02,
+                              0.02, -0.025, -0.02]
+    self.item_place_heights = [0.035, 0.035, 0.035,
+                               0.035, 0.035, 0.035, 
+                               0.035, 0.035, 0.035, 
+                               0.035, 0.035, 0.035, 
+                               0.035, 0.035, 0.035]
     self.gripper_operation_to_use = ["outer", "inner_from_inside", "inner_from_outside", "complex_pick_from_inside", "complex_pick_from_outside"]
     downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
     # 
@@ -196,7 +197,7 @@ class TaskboardClass(O2ASBaseRoutines):
   ################ ----- Routines  
   ################ 
   ################ 
-  def pick(self,robotname,object_pose,grasp_height,speed_fast,speed_slow,gripper_command):
+  def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command):
     #initial gripper_setup
     object_pose.pose.position.z = 0.16
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
@@ -208,14 +209,20 @@ class TaskboardClass(O2ASBaseRoutines):
     elif gripper_command=="easy_pick_only_inner":
       self.precision_gripper_inner_close()
 
+    rospy.loginfo("debug1")
+
     object_pose.pose.position.z = grasp_height
+
+    rospy.loginfo(grasp_height)
+
     self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True)
 
+    W = raw_input("waiting for the gripper")
     #gripper close
     if gripper_command=="complex_pick_from_inside":
       self.precision_gripper_inner_open()
       self.precision_gripper_outer_close()
-    elif gripper_command=="complex_pick_from_outside"
+    elif gripper_command=="complex_pick_from_outside":
       self.precision_gripper_inner_close()
       self.precision_gripper_outer_close()
     elif gripper_command=="easy_pick_only_inner":
@@ -224,7 +231,7 @@ class TaskboardClass(O2ASBaseRoutines):
     object_pose.pose.position.z = (.16)
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
 
-  def place(self,robotname,object_pose,place_height,speed_fast,speed_slow):
+  def place(self,robotname,object_pose,place_height,speed_fast,speed_slow,gripper_command):
     object_pose.pose.position.z = 0.16
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
 
@@ -238,10 +245,10 @@ class TaskboardClass(O2ASBaseRoutines):
     if gripper_command=="complex_pick_from_inside":
       self.precision_gripper_outer_open()
       self.precision_gripper_inner_close()
-    elif gripper_command=="complex_pick_from_outside"
+    elif gripper_command=="complex_pick_from_outside":
       self.precision_gripper_outer_open()
       self.precision_gripper_inner_open()
-    elif gripper_command=="easy_pick_only_inner"
+    elif gripper_command=="easy_pick_only_inner":
       self.precision_gripper_inner_open()
 
     object_pose.pose.position.z = (.16)
@@ -263,23 +270,23 @@ class TaskboardClass(O2ASBaseRoutines):
       # peg-in-hole with complex_pick_from_inside
       if i in [2, 13]:
         self.pick("a_bot",self.pick_poses[i],self.item_pick_heights[i],
-                    speed_fast = 0.2, speed_slow = 0.02, "complex_pick_from_inside")
+                    speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside")
         self.place("a_bot",self.place_poses[i],self.item_place_heights[i],
-                    speed_fast = 0.2, speed_slow = 0.02, "complex_pick_from_inside")
+                    speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside")
       
       #peg-in-hole with complex_pick_from_outside
       if i == 3:
         self.pick("a_bot",self.pick_poses[i],self.item_pick_heights[i],
-                    speed_fast = 0.2, speed_slow = 0.02, "complex_pick_from_outerside")
+                    speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_outside")
         self.place("a_bot",self.place_poses[i],self.item_place_heights[i],
-                    speed_fast = 0.2, speed_slow = 0.02, "complex_pick_from_outerside")
+                    speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_outside")
 
       #peg-in-hole with easy pick_only_inner(washers)
-      if i in [8, 9, 14]
+      if i in [8, 9, 14]:
         self.pick("a_bot",self.pick_poses[i],self.item_pick_heights[i],
-                    speed_fast = 0.2, speed_slow = 0.02, "easy_pick_only_inner")
+                    speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
         self.place("a_bot",self.place_poses[i],self.item_place_heights[i],
-                    speed_fast = 0.2, speed_slow = 0.02, "easy_pick_only_inner")
+                    speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
 
       # This requires a regrasp (bearing)
       if i == 0:
@@ -292,9 +299,9 @@ class TaskboardClass(O2ASBaseRoutines):
         pass
 
       # Screwing
-      if i in [4, 7, 10, 11, 12]:
-        self.pick("a_bot",self.pick_poses[i],self.item_pick_heights[i], speed_fast = 0.2, speed_slow = 0.02)
-        self.place("a_bot",self.place_poses[i],self.item_place_heights[i], speed_fast = 0.2, speed_slow = 0.02)
+      # if i in [4, 7, 10, 11, 12]:
+      #   self.pick("a_bot",self.pick_poses[i],self.item_pick_heights[i], speed_fast = 0.2, speed_slow = 0.02)
+      #   self.place("a_bot",self.place_poses[i],self.item_place_heights[i], speed_fast = 0.2, speed_slow = 0.02)
       
       # Requires multiple robots (Bolt and nut)
       if i == 6:
@@ -340,11 +347,30 @@ if __name__ == '__main__':
     taskboard.set_up_item_parameters()
     #taskboard.full_taskboard_task()
     
+    # 3,14        complex_pick_from_inside
+    # 4           complex_pick_from_outside
+    # 9, 10, 15   easy_pick_only_inner
+    taskboard.groups["a_bot"].set_goal_tolerance(.0001) 
+    taskboard.groups["a_bot"].set_planning_time(5) 
+    taskboard.groups["a_bot"].set_num_planning_attempts(1000)
+    taskboard.go_to_named_pose("home_c", "c_bot")
+    taskboard.go_to_named_pose("home_b", "b_bot")
+    taskboard.go_to_named_pose("home_a", "a_bot")
+
     i = raw_input("the number of the part")
     i =int(i)
     while(i):
-      taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],speed_fast = 0.2, speed_slow = 0.02)
-      taskboard.place("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],speed_fast = 0.2, speed_slow = 0.02)
+      if i in [3,14]:
+        taskboard.pick("a_bot",taskboard.pick_poses[2],taskboard.item_pick_heights[2],speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside")
+        taskboard.place("a_bot",taskboard.place_poses[2],taskboard.item_place_heights[2],speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside")
+      if i == 4:
+        taskboard.pick("a_bot",taskboard.pick_poses[3],taskboard.item_pick_heights[3],speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_outside")
+      if i in [9, 10, 15]:
+        taskboard.pick("a_bot",taskboard.pick_poses[3],taskboard.item_pick_heights[3],speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
+      #taskboard.place("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],speed_fast = 0.2, speed_slow = 0.02)
+      taskboard.go_to_named_pose("home_c", "c_bot")
+      taskboard.go_to_named_pose("home_b", "b_bot")
+      taskboard.go_to_named_pose("home_a", "a_bot")
       i = raw_input("the number of the part")
       i =int(i)
     print "============ Done!"
