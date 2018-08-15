@@ -78,7 +78,9 @@
       <geometry>
         <cylinder length=".0045" radius=".002"/> 
       </geometry>
-      <material name="grey"/>
+      <material name="grey">
+        <color rgba=".3 .3 .3 1"/>
+      </material>
     </visual>
   </link>
 
@@ -94,7 +96,9 @@
       <geometry>
         <cylinder length=".0085" radius=".016"/> 
       </geometry>
-      <material name="grey"/>
+      <material name="grey">
+        <color rgba=".3 .3 .3 1"/>
+      </material>
     </visual>
   </link>
 
@@ -109,7 +113,9 @@
       <geometry>
         <cylinder length=".0085" radius=".031"/> 
       </geometry>
-      <material name="grey"/>
+      <material name="grey">
+        <color rgba=".3 .3 .3 1"/>
+      </material>
     </visual>
   </link>
   <!-- ======== -->
@@ -133,7 +139,9 @@
       <geometry>
         <box size=".015 0.003 .07"/> 
       </geometry>
-      <material name="grey"/>
+      <material name="grey">
+        <color rgba=".3 .3 .3 1"/>
+      </material>
     </visual>
   </link>
   <!-- ======== -->
@@ -149,7 +157,9 @@
       <geometry>
         <cylinder length=".012" radius=".006"/> 
       </geometry>
-      <material name="grey"/>
+      <material name="grey">
+        <color rgba=".3 .3 .3 1"/>
+      </material>
     </visual>
   </link>
 
@@ -164,7 +174,9 @@
       <geometry>
         <cylinder length=".009" radius=".0032"/> 
       </geometry>
-      <material name="grey"/>
+      <material name="grey">
+        <color rgba=".3 .3 .3 1"/>
+      </material>
     </visual>
   </link>
 
@@ -179,7 +191,9 @@
       <geometry>
         <cylinder length=".05" radius=".003"/> 
       </geometry>
-      <material name="grey"/>
+      <material name="grey">
+        <color rgba=".3 .3 .3 1"/>
+      </material>
     </visual>
   </link>
 
@@ -215,7 +229,9 @@
       <geometry>
         <cylinder length=".05" radius=".003"/> 
       </geometry>
-      <material name="grey"/>
+      <material name="grey">
+        <color rgba=".3 .3 .3 1"/>
+      </material>
     </visual>
   </link>
 

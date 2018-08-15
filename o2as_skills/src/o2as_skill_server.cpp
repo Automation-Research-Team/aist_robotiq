@@ -810,13 +810,13 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
       moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
     }
 
-        if (goal->do_complex_pick_from_inside) 
+        if (goal->gripper_command == "complex_pick_from_inside")
     {
       ROS_INFO_STREAM("Closing inner gripper again after outer gripper grasped object.");
       closeGripper("a_bot", "inner_gripper");
       std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     }
-    else if (goal->do_complex_pick_from_outside)
+    else if (goal->gripper_command == "complex_pick_from_outside")
     {
       ROS_INFO_STREAM("Opening inner gripper again after outer gripper grasped object.");
       openGripper("a_bot", "inner_gripper");
