@@ -7,10 +7,10 @@ import actionlib
 import o2as_msgs.msg
 
 class PrecisionGripperAction:
-    def __init__(self, serial_port = '/dev/ttyUSB1',name="precision_gripper_action_server"):
-        # self.dynamixel = xm430.USB2Dynamixel_Device( serial_port, baudrate = 57600 )
-        # self.p1 = xm430.Robotis_Servo2( self.dynamixel, 1, series = "XM" )  #inner gripper
-        # self.p2 = xm430.Robotis_Servo2( self.dynamixel, 2, series = "XM" )  #outer gripper
+    def __init__(self, serial_port = '/dev/ttyUSB1'):
+        self.dynamixel = xm430.USB2Dynamixel_Device( serial_port, baudrate = 57600 )
+        self.p1 = xm430.Robotis_Servo2( self.dynamixel, 1, series = "XM" )  #inner gripper
+        self.p2 = xm430.Robotis_Servo2( self.dynamixel, 2, series = "XM" )  #outer gripper
         #read the parameters
         self._feedback = o2as_msgs.msg.PrecisionGripperCommandFeedback()
         self._result = o2as_msgs.msg.PrecisionGripperCommandResult()
@@ -20,18 +20,15 @@ class PrecisionGripperAction:
         self.outer_close_position = rospy.get_param("outer_close_position", 50240)
         self.speed_limit = rospy.get_param("speed_limit", 10)
         #define the action
-        self._action_name = name
-        self._as = actionlib.SimpleActionServer(self._action_name, o2as_msgs.msg.PrecisionGripperCommandAction, execute_cb=self.execute_cb, auto_start = False)
-        self._as.start()
+        self._action_name = "precision_gripper_action"
+        self._action_server = actionlib.SimpleActionServer(self._action_name, o2as_msgs.msg.PrecisionGripperCommandAction, execute_cb=self.execute_cb, auto_start = False)
+        self._action_server.start()
+        rospy.loginfo('Action server '+ str(self._action_name)+" started.")
         return
 
     def execute_cb(self, goal):
-        # helper variables
-        # r = rospy.Rate(1)
-        #self._feedback.motor_speed = -1
-        print goal
-        print self._feedback.motor_speed
-        # append the seeds for the fibonacci sequence
+        #print goal
+        #print self._feedback.motor_speed
         
         # publish info to the console for the user
         rospy.loginfo('Executing'+ str(self._action_name)+"."+"request sent:")
@@ -45,10 +42,8 @@ class PrecisionGripperAction:
                 command_is_sent = True
             else:
                 command_is_sent = False
-            print "hello1"
         elif goal.open_outer_gripper_fully:        
             command_is_sent = self.outer_gripper_open_fully(self.outer_force)
-            print "hello2"
         elif goal.close_outer_gripper_fully:
             command_is_sent = self.outer_gripper_close_fully(self.outer_force)
         elif goal.open_inner_gripper_fully:
@@ -70,9 +65,9 @@ class PrecisionGripperAction:
             while self._feedback.motor_speed > self.speed_limit:
                 rospy.sleep(0.1)
                 # check that preempt has not been requested by the client
-                if self._as.is_preempt_requested():
+                if self._action_server.is_preempt_requested():
                     rospy.loginfo('%s: Preempted' % self._action_name)
-                    self._as.set_preempted()
+                    self._action_server.set_preempted()
                     success = False
                     break
                 if goal.open_outer_gripper_fully or goal.close_outer_gripper_fully:  
@@ -80,14 +75,13 @@ class PrecisionGripperAction:
                 elif goal.open_inner_gripper_fully or goal.close_inner_gripper_fully:
                     self._feedback.motor_speed = self.p1.read_current_velocity()
                 # publish the feedback
-                self._as.publish_feedback(self._feedback)
-                print "success"+str(success)
+                self._action_server.publish_feedback(self._feedback)
             if success:
                 self._result.success = True
                 rospy.loginfo('%s: Succeeded' % self._action_name)
-                self._as.set_succeeded(self._result)
+                self._action_server.set_succeeded(self._result)
         else:
-            self._as.set_preempted()
+            self._action_server.set_preempted()
 
     #outer gripper related functions
     def outer_gripper_close_new(self, goal_position):
