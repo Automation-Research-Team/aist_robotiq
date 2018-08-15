@@ -63,11 +63,11 @@ class CalibrationClass(O2ASBaseRoutines):
 
     print "============ Press `Enter` to move a_bot to calibration position ..."
     raw_input()
-    self.go_to_pose_goal("c_bot", calib_pose)
+    self.go_to_pose_goal("a_bot", calib_pose)
 
     print "============ Press `Enter` to move b_bot to calibration position ..."
     raw_input()
-    self.go_to_named_pose("home_c", "c_bot")
+    self.go_to_named_pose("home_a", "a_bot")
     # self.go_to_pose_goal("b_bot", calib_pose)
 
     # print "============ Press `Enter` to move c_bot to calibration position ..."
@@ -81,11 +81,123 @@ class CalibrationClass(O2ASBaseRoutines):
 
     return
   
+  def taskboard_calibration(self):
+    speed=0.3
+
+    self.go_to_named_pose("home_a", "a_bot")
+    self.go_to_named_pose("home_b", "b_bot")
+    self.go_to_named_pose("home_c", "c_bot")
+
+    calib_pose = geometry_msgs.msg.PoseStamped()
+    calib_pose.header.frame_id = "taskboard_corner2"
+    calib_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    calib_pose.pose.position.x = 0
+    calib_pose.pose.position.z = 0.03
+
+    self.go_to_pose_goal("a_bot", calib_pose,speed=speed)
+
+    print "============ Press `Enter` to move b_bot to calibration position ..."
+    raw_input()
+    self.go_to_named_pose("home_a", "a_bot",speed=speed)
+
+    calib_pose = geometry_msgs.msg.PoseStamped()
+    calib_pose.header.frame_id = "taskboard_corner3"
+    calib_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    calib_pose.pose.position.x = 0
+    calib_pose.pose.position.z = 0.03
+
+    self.go_to_pose_goal("a_bot", calib_pose,speed=speed)
+
+    print "============ Press `Enter` to move b_bot to calibration position ..."
+    raw_input()
+    self.go_to_named_pose("home_a", "a_bot",speed=speed)
+
+    calib_pose = geometry_msgs.msg.PoseStamped()
+    calib_pose.header.frame_id = "taskboard_part4"
+    calib_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    calib_pose.pose.position.x = 0
+    calib_pose.pose.position.z = 0.03
+
+    self.go_to_pose_goal("a_bot", calib_pose,speed=speed)
+
+    print "============ Press `Enter` to move b_bot to calibration position ..."
+    raw_input()
+    self.go_to_named_pose("home_a", "a_bot",speed=speed)
+
+    # self.go_to_pose_goal("b_bot", calib_pose)
+
+    # print "============ Press `Enter` to move c_bot to calibration position ..."
+    # raw_input()
+    # self.go_to_named_pose("home_b", "b_bot")
+    # self.go_to_pose_goal("c_bot", calib_pose)
+
+    # print "============ Press `Enter` to move c_bot home ..."
+    # raw_input()
+    # self.go_to_named_pose("home_c", "c_bot")
+
+    return
+
+  def taskboard_calibration_mat(self):
+    speed=0.3
+
+    self.go_to_named_pose("home_a", "a_bot")
+    self.go_to_named_pose("home_b", "b_bot")
+    self.go_to_named_pose("home_c", "c_bot")
+
+    calib_pose = geometry_msgs.msg.PoseStamped()
+    calib_pose.header.frame_id = "mat_corner2"
+    calib_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    calib_pose.pose.position.x = 0
+    calib_pose.pose.position.z = -0.02
+
+    self.go_to_pose_goal("a_bot", calib_pose,speed=speed)
+
+    print "============ Press `Enter` to move b_bot to calibration position ..."
+    raw_input()
+    self.go_to_named_pose("home_a", "a_bot",speed=speed)
+
+    calib_pose = geometry_msgs.msg.PoseStamped()
+    calib_pose.header.frame_id = "mat_corner3"
+    calib_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    calib_pose.pose.position.x = 0
+    calib_pose.pose.position.z = -0.02
+
+    self.go_to_pose_goal("a_bot", calib_pose,speed=speed)
+
+    print "============ Press `Enter` to move b_bot to calibration position ..."
+    raw_input()
+    self.go_to_named_pose("home_a", "a_bot",speed=speed)
+
+    calib_pose = geometry_msgs.msg.PoseStamped()
+    calib_pose.header.frame_id = "mat_part3"
+    calib_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    calib_pose.pose.position.x = 0
+    calib_pose.pose.position.z += 0.01
+
+    self.go_to_pose_goal("a_bot", calib_pose,speed=speed)
+
+    print "============ Press `Enter` to move b_bot to calibration position ..."
+    raw_input()
+    self.go_to_named_pose("home_a", "a_bot",speed=speed)
+
+    # self.go_to_pose_goal("b_bot", calib_pose)
+
+    # print "============ Press `Enter` to move c_bot to calibration position ..."
+    # raw_input()
+    # self.go_to_named_pose("home_b", "b_bot")
+    # self.go_to_pose_goal("c_bot", calib_pose)
+
+    # print "============ Press `Enter` to move c_bot home ..."
+    # raw_input()
+    # self.go_to_named_pose("home_c", "c_bot")
+
+    return
+
 
 if __name__ == '__main__':
   try:
     c = CalibrationClass()
-    c.do_calibration()
+    c.taskboard_calibration_mat()
     print "============ Calibration complete!"
   except rospy.ROSInterruptException:
     print "Something went wrong."

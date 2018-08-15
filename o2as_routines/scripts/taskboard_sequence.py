@@ -60,11 +60,12 @@ class TaskboardClass(O2ASBaseRoutines):
                               0.02, 0.02, -0.035, 
                               -0.035, 0.02, 0.02,
                               0.02, -0.025, -0.02]
-    self.item_place_heights = [0.035, 0.035, 0.035,
-                               0.035, 0.035, 0.035, 
-                               0.035, 0.035, 0.035, 
-                               0.035, 0.035, 0.035, 
-                               0.035, 0.035, 0.035]
+
+    self.item_place_heights = [0.04, 0.04, 0.035,
+                               0.035, 0.04, 0.04, 
+                               0.04, 0.04, -0.025, 
+                               -0.025, 0.04, 0.04, 
+                               0.04, -0.015, -0.01]
     self.gripper_operation_to_use = ["outer", "inner_from_inside", "inner_from_outside", "complex_pick_from_inside", "complex_pick_from_outside"]
     downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
     # 
@@ -80,7 +81,8 @@ class TaskboardClass(O2ASBaseRoutines):
       place_pose = geometry_msgs.msg.PoseStamped()
       place_pose.pose.orientation = downward_orientation
       place_pose.header.frame_id = "taskboard_part" + str(i+1)
-      place_pose.pose.position.z = self.item_place_heights[i]
+      # 
+      place_pose.pose.position.z = self.item_pick_heights[i]+.01
       self.place_poses.append(place_pose)
     
 
@@ -360,13 +362,18 @@ if __name__ == '__main__':
     i = raw_input("the number of the part")
     i =int(i)
     while(i):
-      if i in [3,14]:
-        taskboard.pick("a_bot",taskboard.pick_poses[2],taskboard.item_pick_heights[2],speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside")
-        taskboard.place("a_bot",taskboard.place_poses[2],taskboard.item_place_heights[2],speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside")
+      #14 is not adjusted yet
+      if i in [3]:
+        taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside")
+        taskboard.place("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside")
       if i == 4:
-        taskboard.pick("a_bot",taskboard.pick_poses[3],taskboard.item_pick_heights[3],speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_outside")
-      if i in [9, 10, 15]:
-        taskboard.pick("a_bot",taskboard.pick_poses[3],taskboard.item_pick_heights[3],speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
+        taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_outside")
+        taskboard.place("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_outside")
+  
+      #15 is not adjusted yet  
+      if i in [9, 10]:
+        taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
+        taskboard.pick("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
       #taskboard.place("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],speed_fast = 0.2, speed_slow = 0.02)
       taskboard.go_to_named_pose("home_c", "c_bot")
       taskboard.go_to_named_pose("home_b", "b_bot")
