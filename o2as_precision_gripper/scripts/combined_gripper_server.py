@@ -14,9 +14,10 @@ class PrecisionGripper:
         self.p3 = xm430.Robotis_Servo2(self.dynamixel, 3, series = "XM" )#outer gripper
         self.p4 = xm430.Robotis_Servo2(self.dynamixel, 4, series = "XM" )#linear actuator
         
-        self.pitch = rospy.get_param("pitch", 1.98)
-        self.pgc_linear_zero = rospy.get_param("pgc_linear_zero", 3325)
-        self.og_open_motor_pos_ = rospy.get_param("og_open_motor_pos_", 1024)
+        name = rospy.get_name()
+        self.pitch = rospy.get_param(name + "/pitch", 1.98)
+        self.pgc_linear_zero = rospy.get_param(name + "/pgc_linear_zero", 3325)
+        self.og_open_motor_pos_ = rospy.get_param(name + "/og_open_motor_pos_", 1024)
         return
 
     def my_callback(self, req):

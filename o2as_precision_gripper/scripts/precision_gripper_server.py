@@ -12,11 +12,13 @@ class PrecisionGripper:
         self.p1 = xm430.Robotis_Servo2( self.dynamixel, 1, series = "XM" )  #inner gripper
         self.p2 = xm430.Robotis_Servo2( self.dynamixel, 2, series = "XM" )  #outer gripper
 
-        self.outer_force = rospy.get_param("outer_force", 30)
-        self.inner_force = rospy.get_param("inner_force", 5)
-        self.outer_open_position = rospy.get_param("outer_open_position", -50000)
-        self.outer_close_position = rospy.get_param("outer_close_position", 50240)
-        self.speed_limit = rospy.get_param("speed_limit", 10)
+        name = rospy.get_name()
+        self.outer_force = rospy.get_param(name + "/outer_force", 30)
+        self.inner_force = rospy.get_param(name + "/inner_force", 5)
+        rospy.logwarn("inner_force = " + str(self.inner_force))
+        self.outer_open_position = rospy.get_param(name + "/outer_open_position", -50000)
+        self.outer_close_position = rospy.get_param(name + "/outer_close_position", 50240)
+        self.speed_limit = rospy.get_param(name + "/speed_limit", 10)
         return
 
     def my_callback(self, req):
@@ -27,13 +29,17 @@ class PrecisionGripper:
             self.inner_gripper_read_current_position()
             self.inner_gripper_disable_torque()
             self.outer_gripper_disable_torque()
-        elif req.open_outer_gripper_fully:        
+        elif req.open_outer_gripper_fully:
+            rospy.loginfo("Opening outer gripper")
             self.outer_gripper_open_fully(self.outer_force)
         elif req.close_outer_gripper_fully:
+            rospy.loginfo("Closing outer gripper")
             self.outer_gripper_close_fully(self.outer_force)
         elif req.open_inner_gripper_fully:
+            rospy.loginfo("Opening inner gripper")
             self.inner_gripper_open_fully(self.inner_force)
         elif req.close_inner_gripper_fully:
+            rospy.loginfo("Closing inner gripper")
             self.inner_gripper_close_fully(self.inner_force)
         else:
             rospy.logerr('No command sent to the gripper, service request was empty.')
@@ -41,6 +47,7 @@ class PrecisionGripper:
             return res
 
         res.success = True
+        rospy.loginfo("Precision gripper service callback returns.")
         return res
 
     #outer gripper related functions
