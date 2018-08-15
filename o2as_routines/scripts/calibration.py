@@ -105,14 +105,15 @@ class CalibrationClass(O2ASBaseRoutines):
     rospy.loginfo("============ Calibrating placement mat for the taskboard task. ============")
     poses = []
 
-    pose1 = geometry_msgs.msg.PoseStamped()
-    pose1.header.frame_id = "mat_corner2"
-    pose1.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    pose1.pose.position.z = .03
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.position.z = .0
 
-    pose2 = copy.deepcopy(pose1)
+    pose1 = copy.deepcopy(pose0)
+    pose1.header.frame_id = "mat_part15"
+    pose2 = copy.deepcopy(pose0)
     pose2.header.frame_id = "mat_corner3"
-    pose3 = copy.deepcopy(pose1)
+    pose3 = copy.deepcopy(pose0)
     pose3.header.frame_id = "mat_part3"
     
     poses = [pose1, pose2, pose3]
@@ -127,10 +128,13 @@ class CalibrationClass(O2ASBaseRoutines):
     self.go_to_named_pose("home_c", "c_bot")
     home_pose = "home_" + robot_name[0]
     
+    rospy.loginfo("============ Moving " + robot_name + " to " + poses[0].header.frame_id)
     self.go_to_pose_goal(robot_name, poses[0],speed=speed)
     for pose in poses[1:]:  
       rospy.loginfo("============ Press `Enter` to move " + robot_name + " to " + pose.header.frame_id)
       raw_input()
+      if rospy.is_shutdown():
+        break
       self.go_to_named_pose(home_pose, robot_name)
       self.go_to_pose_goal(robot_name, pose,speed=speed)
     

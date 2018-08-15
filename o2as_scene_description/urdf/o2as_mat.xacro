@@ -78,6 +78,7 @@
       <child link = "${matname}" />
       <xacro:insert_block name="origin"/>
     </joint>
+    
     <joint name="${matname}_part1" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part1"/>
@@ -95,7 +96,7 @@
     <joint name="${matname}_part3" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part3"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.261 0.323 0.0"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.262 0.323 0.0"/>
     </joint>
     <link name="${matname}_part3"/>
 
@@ -144,7 +145,7 @@
     <joint name="${matname}_part10" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part10"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.252 0.106 0.0"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.2565 0.1065 0.0"/>
     </joint>
     <link name="${matname}_part10"/>
 
@@ -179,7 +180,7 @@
     <joint name="${matname}_part15" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part15"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.3465 0.051 0.0"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.346 0.0515 0.0"/>
     </joint>
     <link name="${matname}_part15"/>
 
