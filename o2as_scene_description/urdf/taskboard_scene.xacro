@@ -10,10 +10,10 @@
   
   <!-- Placement mat -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_mat.xacro" />
-  <xacro:property name="p_w" value="0.38"/>   <!--0.84 -->
-  <xacro:property name="p_l" value="0.38"/>   <!--0.62 -->
+  <xacro:property name="p_w" value="0.4"/>
+  <xacro:property name="p_l" value="0.4"/>
   <xacro:o2as_mat matname="mat" mat_w="${p_w}" mat_l="${p_l}" mat_h=".001" parent="taskboard">
-    <origin xyz="0.01 0.42 -0.029" rpy="0 0 0" />   
+    <origin xyz="0.0 0.41 -0.029" rpy="0 0 0" />   
   </xacro:o2as_mat>
 
   
