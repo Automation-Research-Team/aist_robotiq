@@ -1,6 +1,5 @@
 bool use_complex_planning           # Use simple grasp planning from above or complex planning?
-bool do_complex_pick_from_inside    # First positions with the inner gripper, then grasps with outer
-bool do_complex_pick_from_outside   # First positions with the inner gripper, then grasps with outer
+string gripper_command              # "inner_only", "complex_pick_from_inside", "complex_pick_from_outside"
 bool retreat_after_pick             # If true, arm moves away from the table after grasping
 string item_id                      # item ID in the planning scene
 geometry_msgs/PoseStamped item_pose # This overrides the item_id
