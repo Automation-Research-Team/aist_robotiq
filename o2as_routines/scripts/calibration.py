@@ -101,22 +101,81 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
     return
 
+  def taskboard_calibration_extended(self):
+    rospy.loginfo("============ Demonstrating the calibration of the taskboard. ============")
+    rospy.loginfo("This moves to the top of the parts pre-mounted in the taskboard.")
+    poses = []
+
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.position.z = 0.0
+
+    # On top of the metal sheet
+    pose1 = copy.deepcopy(pose0)
+    pose1.header.frame_id = "taskboard_part7b"
+    pose1.pose.position.y = .0015
+    pose1.pose.position.z = .0253 + 0.0
+
+    pose2 = copy.deepcopy(pose0)
+    pose2.header.frame_id = "taskboard_part8"
+    pose3 = copy.deepcopy(pose0)
+    pose3.header.frame_id = "taskboard_part9"
+    pose4 = copy.deepcopy(pose0)
+    pose4.header.frame_id = "taskboard_part14"
+    
+    poses = [pose1, pose2, pose3, pose4]
+    
+    self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
+    return
+
   def taskboard_calibration_mat(self):
     rospy.loginfo("============ Calibrating placement mat for the taskboard task. ============")
     poses = []
 
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    pose0.pose.position.z = .0
+    pose0.pose.position.z = .003
 
     pose1 = copy.deepcopy(pose0)
     pose1.header.frame_id = "mat_part15"
     pose2 = copy.deepcopy(pose0)
-    pose2.header.frame_id = "mat_corner3"
+    pose2.header.frame_id = "mat_part7b"
     pose3 = copy.deepcopy(pose0)
     pose3.header.frame_id = "mat_part3"
     
     poses = [pose1, pose2, pose3]
+
+    self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
+    return 
+
+  def gripper_frame_calibration_mat(self):
+    rospy.loginfo("============ Calibrating the gripper tip frame for a_bot. ============")
+    rospy.loginfo("Each approach of the target position has its orientation turned by 90 degrees.")
+    poses = []
+
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.header.frame_id = "taskboard_part14"  # Good for demonstration, but not for calculation
+    # pose0.header.frame_id = "mat_part10"      # Good for touching down and noting the position
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.position.x = -.002
+    pose0.pose.position.y = -.002
+    pose0.pose.position.z = .001
+
+    q0 = tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0)
+    q_turn_90 = tf_conversions.transformations.quaternion_from_euler(pi/2, 0, 0)
+    q1 = tf_conversions.transformations.quaternion_multiply(q0, q_turn_90)
+    q2 = tf_conversions.transformations.quaternion_multiply(q1, q_turn_90)
+    q3 = tf_conversions.transformations.quaternion_multiply(q2, q_turn_90)
+
+    pose1 = copy.deepcopy(pose0)
+    pose1.pose.orientation = geometry_msgs.msg.Quaternion(*q1)
+    pose2 = copy.deepcopy(pose0)
+    pose2.pose.orientation = geometry_msgs.msg.Quaternion(*q2)
+    pose3 = copy.deepcopy(pose0)
+    pose3.pose.orientation = geometry_msgs.msg.Quaternion(*q3)
+    
+    
+    poses = [pose0, pose1, pose2, pose3]
 
     self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
     return 
@@ -133,9 +192,9 @@ class CalibrationClass(O2ASBaseRoutines):
     for pose in poses[1:]:  
       rospy.loginfo("============ Press `Enter` to move " + robot_name + " to " + pose.header.frame_id)
       raw_input()
+      self.go_to_named_pose(home_pose, robot_name)
       if rospy.is_shutdown():
         break
-      self.go_to_named_pose(home_pose, robot_name)
       self.go_to_pose_goal(robot_name, pose,speed=speed)
     
     rospy.loginfo("============ Press `Enter` to move " + robot_name + " home")
@@ -156,7 +215,9 @@ if __name__ == '__main__':
       rospy.loginfo("Enter a number to check calibrations for the following things: ")
       rospy.loginfo("1: The robots")
       rospy.loginfo("2: Taskboard")
-      rospy.loginfo("3: Placement mat (for the taskboard task)")
+      rospy.loginfo("3: Taskboard extended fun tour")
+      rospy.loginfo("4: Placement mat (for the taskboard task)")
+      rospy.loginfo("5: Gripper frame (rotate around EEF axis)")
       rospy.loginfo("x: Exit ")
       rospy.loginfo(" ")
       r = raw_input()
@@ -165,7 +226,11 @@ if __name__ == '__main__':
       elif r == '2':
         c.taskboard_calibration()
       elif r == '3':
+        c.taskboard_calibration_extended()
+      elif r == '4':
         c.taskboard_calibration_mat()
+      elif r == '5':
+        c.gripper_frame_calibration_mat()
       elif r == 'x':
         break
       else:

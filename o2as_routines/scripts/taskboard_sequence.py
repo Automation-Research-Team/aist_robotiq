@@ -57,17 +57,17 @@ class TaskboardClass(O2ASBaseRoutines):
                       "M4 bolt", "Pulley", "10 mm end cap"]
     self.item_pick_heights = [0.02, 0.02, 0.025, 
                               0.025, 0.02, 0.02, 
-                              0.02, 0.02, -0.01, 
-                              -0.017, 0.02, 0.02,
-                              0.02, -0.01, -0.01]
+                              0.02, 0.02, -0.005, 
+                              -0.005, 0.02, 0.02,
+                              0.02, -0.005, -0.005]
 
     self.item_place_heights = [0.04, 0.04, 0.035,
                                0.035, 0.04, 0.04, 
-                               0.04, 0.04, 0.04, 
-                               0.0, 0.04, 0.04, 
-                               0.04, -0.015, -0.01]
+                               0.04, 0.04, 0.001, 
+                               0.001, 0.04, 0.04, 
+                               0.04, 0.0, 0.0]
     self.gripper_operation_to_use = ["outer", "inner_from_inside", "inner_from_outside", "complex_pick_from_inside", "complex_pick_from_outside"]
-    downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
+    downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     # 
     self.pick_poses = []
     self.place_poses = []
@@ -191,10 +191,10 @@ class TaskboardClass(O2ASBaseRoutines):
   ################ ----- Routines  
   ################ 
   ################ 
-  def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command):
+  def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.03):
     #initial gripper_setup
     rospy.loginfo("Going above object to pick")
-    object_pose.pose.position.z = 0.1
+    object_pose.pose.position.z = approach_height
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
 
     if gripper_command=="complex_pick_from_inside":
@@ -223,14 +223,14 @@ class TaskboardClass(O2ASBaseRoutines):
       self.precision_gripper_inner_open()
 
     rospy.loginfo("Going back up")
-    object_pose.pose.position.z = (.1)
+    object_pose.pose.position.z = (approach_height)
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
 
 ######
 
-  def place(self,robotname,object_pose,place_height,speed_fast,speed_slow,gripper_command):
+  def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05):
     rospy.loginfo("Going above place target")
-    object_pose.pose.position.z = 0.1
+    object_pose.pose.position.z = approach_height
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
 
     rospy.loginfo("Moving to place target")
@@ -253,7 +253,7 @@ class TaskboardClass(O2ASBaseRoutines):
       rospy.logerr("No gripper command was set")
     
     rospy.loginfo("Moving back up")
-    object_pose.pose.position.z = (.1)
+    object_pose.pose.position.z = (approach_height)
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)  
 
     
@@ -327,7 +327,7 @@ class TaskboardClass(O2ASBaseRoutines):
     self.go_to_named_pose("home_b", "b_bot")
     self.go_to_named_pose("home_a", "a_bot")
     
-    downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
+    downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
 
     # Perform the pick/place operations
     i = raw_input("the number of the part")
