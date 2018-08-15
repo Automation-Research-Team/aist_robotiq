@@ -38,6 +38,10 @@ import sys
 import copy
 import rospy
 
+import geometry_msgs.msg
+import tf_conversions
+from math import pi
+
 from o2as_routines.base import O2ASBaseRoutines
 
 class CalibrationClass(O2ASBaseRoutines):

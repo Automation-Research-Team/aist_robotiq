@@ -49,9 +49,8 @@ import std_msgs.msg
 import robotiq_msgs.msg
 
 import o2as_msgs
-import o2as_skills
-import o2as_skills.msg
-import o2as_skills.srv
+import o2as_msgs.msg
+import o2as_msgs.srv
 
 from math import pi
 from std_msgs.msg import String
@@ -101,14 +100,14 @@ class O2ASBaseRoutines(object):
                                "b_bot":actionlib.SimpleActionClient('/b_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction), 
                                "c_bot":actionlib.SimpleActionClient('/c_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction) }
 
-    self.pick_client = actionlib.SimpleActionClient('/o2as_skills/pick', o2as_skills.msg.pickAction)
-    self.place_client = actionlib.SimpleActionClient('/o2as_skills/place', o2as_skills.msg.placeAction)
-    self.align_client = actionlib.SimpleActionClient('/o2as_skills/align', o2as_skills.msg.alignAction)
-    self.insert_client = actionlib.SimpleActionClient('/o2as_skills/insert', o2as_skills.msg.insertAction)
-    self.screw_client = actionlib.SimpleActionClient('/o2as_skills/screw', o2as_skills.msg.screwAction)
+    self.pick_client = actionlib.SimpleActionClient('/o2as_skills/pick', o2as_msgs.msg.pickAction)
+    self.place_client = actionlib.SimpleActionClient('/o2as_skills/place', o2as_msgs.msg.placeAction)
+    self.align_client = actionlib.SimpleActionClient('/o2as_skills/align', o2as_msgs.msg.alignAction)
+    self.insert_client = actionlib.SimpleActionClient('/o2as_skills/insert', o2as_msgs.msg.insertAction)
+    self.screw_client = actionlib.SimpleActionClient('/o2as_skills/screw', o2as_msgs.msg.screwAction)
 
-    self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_skills.srv.sendScriptToUR)
-    self.goToNamedPose_client = rospy.ServiceProxy('/o2as_skills/goToNamedPose', o2as_skills.srv.goToNamedPose)
+    self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR)
+    self.goToNamedPose_client = rospy.ServiceProxy('/o2as_skills/goToNamedPose', o2as_msgs.srv.goToNamedPose)
 
     self.pick_client.wait_for_server() # wait for the clients to connect
     self.place_client.wait_for_server() 
@@ -145,7 +144,7 @@ class O2ASBaseRoutines(object):
 
   def do_pick_action(self, robot_name, pose_stamped, tool_name = ""):
     # Call the pick action
-    goal = o2as_skills.msg.pickGoal()
+    goal = o2as_msgs.msg.pickGoal()
     goal.robot_name = robot_name
     goal.item_pose = pose_stamped
     goal.tool_name = tool_name
@@ -160,7 +159,7 @@ class O2ASBaseRoutines(object):
 
   def do_place_action(self, robot_name, pose_stamped, tool_name = ""):
     # Call the pick action
-    goal = o2as_skills.msg.placeGoal()
+    goal = o2as_msgs.msg.placeGoal()
     goal.robot_name = robot_name
     goal.item_pose = pose_stamped
     goal.tool_name = tool_name
@@ -175,7 +174,7 @@ class O2ASBaseRoutines(object):
 
   def do_insertion(self, robot_name):
     # Currently calls the UR service directly rather than the action of the skill_server
-    req = o2as_skills.srv.sendScriptToURRequest()
+    req = o2as_msgs.srv.sendScriptToURRequest()
     req.robot_name = robot_name
     req.program_id = "insertion"
     res = self.urscript_client.call(req)
