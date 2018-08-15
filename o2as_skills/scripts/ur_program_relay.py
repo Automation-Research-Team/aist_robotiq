@@ -6,7 +6,7 @@ import rospy
 
 import moveit_msgs.msg
 import std_msgs.msg
-import o2as_skills.srv
+import o2as_msgs.srv
 
 import os, sys, rospkg
 
@@ -23,7 +23,7 @@ class URScriptRelay():
         
         self.rospack = rospkg.RosPack()
         self.read_templates()
-        s = rospy.Service('o2as_skills/sendScriptToUR', o2as_skills.srv.sendScriptToUR, self.srv_callback)
+        s = rospy.Service('o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR, self.srv_callback)
 
         # rospy.loginfo("TESTING SCRIPT SENDING")
         # rospack = rospkg.RosPack()
@@ -103,6 +103,8 @@ class URScriptRelay():
             program = program_front + "\n" + program_mid # + "\n" + program_back
         elif req.program_id == "lin_move":
             rospy.logerr("LIN MOVE IS NOT IMPLEMENTED YET") 
+            # TODO: Transform the pose to the robot base coordinates
+            # TODO: 
             # TODO: Send the pose to the robot
             # program = ""
             # program += "def move_to_pose_lin():\n"

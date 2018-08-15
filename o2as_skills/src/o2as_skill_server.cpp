@@ -26,15 +26,16 @@ SkillServer::SkillServer() :
   alignActionServer_.start();
   pickActionServer_.start();
   placeActionServer_.start();
+  regraspActionServer_.start();
   insertActionServer_.start();
   screwActionServer_.start();
 
   // Action clients
-  ROS_INFO("Waiting for action servers to start.");
-  // a_bot_gripper_client.waitForServer(); 
-  b_bot_gripper_client_.waitForServer();
-  c_bot_gripper_client_.waitForServer();
-  ROS_INFO("Action servers started.");
+  // ROS_INFO("Waiting for action servers to start.");
+  // // a_bot_gripper_client.waitForServer(); 
+  // b_bot_gripper_client_.waitForServer();
+  // c_bot_gripper_client_.waitForServer();
+  // ROS_INFO("Action servers started.");
 
   // Set up MoveGroups
   a_bot_group_.setPlanningTime(PLANNING_TIME);
@@ -740,7 +741,7 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
 {
   ROS_INFO("pickAction was called");
 
-  if ((goal->do_complex_pick_from_inside) || (goal->do_complex_pick_from_outside))
+  if ((goal->gripper_command == "complex_pick_from_inside") || (goal->gripper_command == "complex_pick_from_outside"))
   {
     geometry_msgs::PoseStamped target_tip_link_pose = goal->item_pose;
     std::string end_effector_link_name = goal->robot_name + "_gripper_tip_link";
@@ -750,12 +751,12 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
     
     // Move above the object
     openGripper("a_bot", "outer_gripper");
-    if (goal->do_complex_pick_from_inside) 
+    if (goal->gripper_command == "complex_pick_from_inside")
     {
       ROS_INFO_STREAM("Opening outer and closing inner gripper, moving above object.");
       closeGripper("a_bot", "inner_gripper");
     }
-    else if (goal->do_complex_pick_from_outside)
+    else if (goal->gripper_command == "complex_pick_from_outside")
     {
       ROS_INFO_STREAM("Opening outer and inner gripper, moving above object.");
       openGripper("a_bot", "inner_gripper");
@@ -780,12 +781,12 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
     moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, end_effector_link_name, 0.03);  // Go very slow
     // TODO: Send the MoveL command to the real robot instead?
     
-    if (goal->do_complex_pick_from_inside) 
+    if (goal->gripper_command == "complex_pick_from_inside")
     {
       ROS_INFO_STREAM("Opening inner gripper to position object.");
       openGripper("a_bot", "inner_gripper");
     }
-    else if (goal->do_complex_pick_from_outside)
+    else if (goal->gripper_command == "complex_pick_from_outside")
     {
       ROS_INFO_STREAM("Closing inner gripper to position object.");
       closeGripper("a_bot", "inner_gripper");
@@ -870,7 +871,107 @@ void SkillServer::executePlace(const o2as_msgs::placeGoalConstPtr& goal)
 void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
 {
   ROS_INFO("regraspAction was called");
-  // TODO: Implement this.
+  
+  // Create the handover_pose for first robot and second robot
+  // Start by making a few motion primitives.
+  geometry_msgs::PoseStamped c_bot_facing_forward, a_bot_facing_forward, b_bot_facing_forward, a_bot_facing_c, b_bot_facing_c;
+  c_bot_facing_forward.header.frame_id = "workspace_center";
+  a_bot_facing_forward.header.frame_id = "workspace_center";
+  b_bot_facing_forward.header.frame_id = "workspace_center";
+  a_bot_facing_c.header.frame_id = "workspace_center";
+  b_bot_facing_c.header.frame_id = "workspace_center";
+  
+  c_bot_facing_forward.pose.position.x = -.35;
+  c_bot_facing_forward.pose.position.y = 0.11;
+  c_bot_facing_forward.pose.position.z = 0.55;
+  c_bot_facing_forward.pose.orientation.w = 1.0;
+
+  b_bot_facing_forward.pose.position.x = 0.0;
+  b_bot_facing_forward.pose.position.y = 0.1;
+  b_bot_facing_forward.pose.position.z = 0.65;
+  b_bot_facing_forward.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -M_PI/2);
+
+  a_bot_facing_forward.pose.position.x = 0.0;
+  a_bot_facing_forward.pose.position.y = 0.1;
+  a_bot_facing_forward.pose.position.z = 0.65;
+  a_bot_facing_forward.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(-M_PI/2, 0, M_PI/2);
+
+  a_bot_facing_c.pose.position.x = -.28;
+  a_bot_facing_c.pose.position.y = 0.11;
+  a_bot_facing_c.pose.position.z = 0.55;
+  a_bot_facing_c.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -M_PI);
+
+  b_bot_facing_c.pose.position.x = -.28;
+  b_bot_facing_c.pose.position.y = 0.11;
+  b_bot_facing_c.pose.position.z = 0.55;
+  a_bot_facing_c.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(-M_PI, 0, M_PI/2);
+
+
+  geometry_msgs::PoseStamped handover_pose_giver, handover_pose_receiver;
+  if (goal->giver_robot_name == "a_bot")
+  {
+    if (goal->receiver_robot_name == "c_bot")
+    {
+      handover_pose_giver = a_bot_facing_c;
+      handover_pose_receiver = c_bot_facing_forward;
+    }
+    else if (goal->receiver_robot_name == "b_bot")
+    {
+      handover_pose_giver = a_bot_facing_forward;
+      handover_pose_receiver = b_bot_facing_forward;
+    }
+  }
+  else if (goal->giver_robot_name == "b_bot")
+  {
+    if (goal->receiver_robot_name == "c_bot")
+    {
+      handover_pose_giver = b_bot_facing_c;
+      handover_pose_receiver = c_bot_facing_forward;
+    }
+    else if (goal->receiver_robot_name == "b_bot")
+    {
+      handover_pose_giver = a_bot_facing_forward;
+      handover_pose_receiver = b_bot_facing_forward;
+    }
+  }
+  else if (goal->giver_robot_name == "c_bot")
+  {
+    handover_pose_giver = c_bot_facing_forward;
+    if (goal->receiver_robot_name == "a_bot")
+    {
+      handover_pose_receiver = a_bot_facing_c;
+    }
+    else if (goal->receiver_robot_name == "b_bot")
+    {
+      handover_pose_receiver = b_bot_facing_c;
+    }
+  }
+
+  // Move the first robot to the regrasp_pose
+  ROS_INFO_STREAM("Moving giver robot (" << goal->giver_robot_name << ") to handover pose.");
+  moveToCartPosePTP(handover_pose_giver, goal->giver_robot_name);
+  
+  // Move the second robot to an approach pose, then on to grasp
+  ROS_INFO_STREAM("Moving receiver robot (" << goal->giver_robot_name << ") to approach pose.");
+  handover_pose_receiver.pose.position.x -= .1;
+  moveToCartPosePTP(handover_pose_receiver, goal->receiver_robot_name);
+
+  ros::Duration(1).sleep();
+  ROS_INFO_STREAM("Moving receiver robot (" << goal->giver_robot_name << ") to grasp pose.");
+  handover_pose_receiver.pose.position.x += .1;
+  moveToCartPosePTP(handover_pose_receiver, goal->receiver_robot_name);
+  
+  // Close the second robot's gripper
+  closeGripper(goal->receiver_robot_name);
+  ros::Duration(1).sleep();
+  openGripper(goal->giver_robot_name);
+
+  // Move back.
+  ROS_INFO_STREAM("Moving receiver robot (" << goal->giver_robot_name << ") back to approach pose.");
+  handover_pose_receiver.pose.position.x -= .1;
+  moveToCartPosePTP(handover_pose_receiver, goal->receiver_robot_name);
+
+  // goToNamedPose("home", goal->giver_robot_name);
 
   ROS_INFO("regraspAction is set as succeeded");
   regraspActionServer_.setSucceeded();
