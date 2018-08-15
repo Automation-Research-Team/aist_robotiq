@@ -65,7 +65,8 @@
   <joint name="${prefix}${grippername}_tip_link_joint" type="fixed">
     <parent link="${parent}"/>
     <child link="${prefix}${grippername}_tip_link"/>
-    <origin rpy="0.0 ${-pi/2} 0.0" xyz="0.0 0.0 .233"/>
+    <!-- Hand-calibrated values from 14 August 2018 @ OSX (not very precise) -->
+    <origin rpy="0.0 ${-pi/2} 0.0" xyz="0.005 -0.003 .233"/>
   </joint>
   <link name="${prefix}${grippername}_tip_link"/>
   </xacro:macro>
