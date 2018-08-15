@@ -72,25 +72,49 @@
     <child link="${boardname}_part5"/>
     <origin rpy="0.0 0.0 ${pi/2}" xyz="0.07 0.26 0.0045"/>
   </joint>
-  <link name="${boardname}_part5"/>
+  <link name="${boardname}_part5">
+    <visual>
+      <origin xyz="0 0 -.00275" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length=".0045" radius=".002"/> 
+      </geometry>
+      <material name="grey"/>
+    </visual>
+  </link>
 
-  <!--  -->
+  <!-- The pulleys for the belt -->
   <joint name="${boardname}_part6_small_pulley" type="fixed">
     <parent link="${boardname}_surface"/>
     <child link="${boardname}_part6_small_pulley"/>
     <origin rpy="0.0 0.0 ${pi/2}" xyz="0.06 0.06 0.0085"/>
   </joint>
-  <link name="${boardname}_part6_small_pulley"/>
+  <link name="${boardname}_part6_small_pulley">
+    <visual>
+      <origin xyz="0 0 -.00475" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length=".0085" radius=".016"/> 
+      </geometry>
+      <material name="grey"/>
+    </visual>
+  </link>
 
   <joint name="${boardname}_part6_large_pulley" type="fixed">
     <parent link="${boardname}_surface"/>
     <child link="${boardname}_part6_large_pulley"/>
     <origin rpy="0.0 0.0 ${pi/2}" xyz="0.188 0.06 0.0085"/>
   </joint>
-  <link name="${boardname}_part6_large_pulley"/>
-  <!--  -->
+  <link name="${boardname}_part6_large_pulley">
+    <visual>
+      <origin xyz="0 0 -.00475" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length=".0085" radius=".031"/> 
+      </geometry>
+      <material name="grey"/>
+    </visual>
+  </link>
+  <!-- ======== -->
 
-  <!--  -->
+  <!-- The nut and bolt on the metal sheet -->
   <joint name="${boardname}_part7a" type="fixed">
     <parent link="${boardname}_surface"/>
     <child link="${boardname}_part7a"/>
@@ -103,29 +127,61 @@
     <child link="${boardname}_part7b"/>
     <origin rpy="0.0 0.0 ${pi/2}" xyz="0.338 0.056 0.05"/>
   </joint>
-  <link name="${boardname}_part7b"/>
-  <!--  -->
+  <link name="${boardname}_part7b">
+    <visual>
+      <origin xyz="0 0.0015 -.015" rpy="0 0 0"/>
+      <geometry>
+        <box size=".015 0.003 .07"/> 
+      </geometry>
+      <material name="grey"/>
+    </visual>
+  </link>
+  <!-- ======== -->
  
   <joint name="${boardname}_part8" type="fixed">
     <parent link="${boardname}_surface"/>
     <child link="${boardname}_part8"/>
     <origin rpy="0.0 0.0 ${pi/2}" xyz="0.32 0.25 0.012"/>
   </joint>
-  <link name="${boardname}_part8"/>
+  <link name="${boardname}_part8">
+    <visual>
+      <origin xyz="0 0 -.006" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length=".012" radius=".006"/> 
+      </geometry>
+      <material name="grey"/>
+    </visual>
+  </link>
 
   <joint name="${boardname}_part9" type="fixed">
     <parent link="${boardname}_surface"/>
     <child link="${boardname}_part9"/>
     <origin rpy="0.0 0.0 ${pi/2}" xyz="0.26 0.15 0.009"/>
   </joint>
-  <link name="${boardname}_part9"/>
+  <link name="${boardname}_part9">
+    <visual>
+      <origin xyz="0 0 -.0045" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length=".009" radius=".0032"/> 
+      </geometry>
+      <material name="grey"/>
+    </visual>
+  </link>
 
   <joint name="${boardname}_part10" type="fixed">
     <parent link="${boardname}_surface"/>
     <child link="${boardname}_part10"/>
     <origin rpy="0.0 0.0 ${pi/2}" xyz="0.16 0.36 0.05"/>
   </joint>
-  <link name="${boardname}_part10"/>  
+  <link name="${boardname}_part10">  
+    <visual>
+      <origin xyz="0 0 -.025" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length=".05" radius=".003"/> 
+      </geometry>
+      <material name="grey"/>
+    </visual>
+  </link>
 
   <joint name="${boardname}_part11" type="fixed">
     <parent link="${boardname}_surface"/>
@@ -153,21 +209,30 @@
     <child link="${boardname}_part14"/>
     <origin rpy="0.0 0.0 ${pi/2}" xyz="0.23 0.23 0.05"/>
   </joint>
-  <link name="${boardname}_part14"/>  
+  <link name="${boardname}_part14">  
+    <visual>
+      <origin xyz="0 0 -.025" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length=".05" radius=".003"/> 
+      </geometry>
+      <material name="grey"/>
+    </visual>
+  </link>
 
   <joint name="${boardname}_part15" type="fixed">
     <parent link="${boardname}_surface"/>
     <child link="${boardname}_part15"/>
     <origin rpy="0.0 0.0 ${pi/2}" xyz="0.16 0.36 0.05"/>
   </joint>
-  <link name="${boardname}_part15"/>  
+  <link name="${boardname}_part15"/> 
+   <!-- The cylinder is already defined under part10 -->
 
   <joint name="${boardname}_corner1" type="fixed">
     <parent link="${boardname}_surface"/>
     <child link="${boardname}_corner1"/>
     <origin rpy="0.0 0.0 ${pi/2}" xyz="0.01 0.39 0.0"/>
   </joint>
-  <link name="${boardname}_corner1"/> 
+  <link name="${boardname}_corner1"/>
 
   <joint name="${boardname}_corner2" type="fixed">
     <parent link="${boardname}_surface"/>

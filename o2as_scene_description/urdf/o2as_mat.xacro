@@ -17,14 +17,43 @@
         </material>
       </visual>
       <visual>
-        <origin xyz="${mat_w/2} ${mat_l/2} ${mat_h/2}+.0001" rpy="0 0 0"/>
+        <origin xyz="${mat_w-.01} ${mat_l/2} ${mat_h}" rpy="0 0 ${pi/2}"/>
         <geometry>
-          <box size="${mat_w} ${mat_l} ${mat_h}"/> 
+          <box size=".38 .002 ${mat_h}"/> 
         </geometry>
-        <material name="white">
-          <color rgba="1 1 1 1"/>
+        <material name="black">
+          <color rgba=".1 .1 .1 1"/>
         </material>
       </visual>
+      <visual>
+        <origin xyz=".01 ${mat_l/2} ${mat_h}" rpy="0 0 ${pi/2}"/>
+        <geometry>
+          <box size=".38 .002 ${mat_h}"/> 
+        </geometry>
+        <material name="black">
+          <color rgba=".1 .1 .1 1"/>
+        </material>
+      </visual>
+
+      <visual>
+        <origin xyz="${mat_w/2} ${mat_l-.01} ${mat_h}" rpy="0 0 0"/>
+        <geometry>
+          <box size=".38 .002 ${mat_h}"/> 
+        </geometry>
+        <material name="black">
+          <color rgba=".1 .1 .1 1"/>
+        </material>
+      </visual>
+      <visual>
+        <origin xyz="${mat_w/2} .01 ${mat_h}" rpy="0 0 0"/>
+        <geometry>
+          <box size=".38 .002 ${mat_h}"/> 
+        </geometry>
+        <material name="black">
+          <color rgba=".1 .1 .1 1"/>
+        </material>
+      </visual>
+      <!-- Done with boundary drawing -->
       <collision>
         <geometry>
           <box size="${mat_w} ${mat_l} ${mat_h}"/> 
