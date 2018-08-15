@@ -63,21 +63,21 @@ class CalibrationClass(O2ASBaseRoutines):
     self.go_to_named_pose("home_b", "b_bot")
     self.go_to_named_pose("home_c", "c_bot")
 
-    rospy.loginf("============ Press `Enter` to move a_bot to calibration position ...")
+    rospy.loginfo("============ Press `Enter` to move a_bot to calibration position ...")
     raw_input()
     self.go_to_pose_goal("a_bot", calib_pose)
 
-    rospy.loginf("============ Press `Enter` to move b_bot to calibration position ...")
+    rospy.loginfo("============ Press `Enter` to move b_bot to calibration position ...")
     raw_input()
     self.go_to_named_pose("home_a", "a_bot")
     self.go_to_pose_goal("b_bot", calib_pose)
 
-    rospy.loginf("============ Press `Enter` to move c_bot to calibration position ...")
+    rospy.loginfo("============ Press `Enter` to move c_bot to calibration position ...")
     raw_input()
     self.go_to_named_pose("home_b", "b_bot")
     self.go_to_pose_goal("c_bot", calib_pose)
 
-    rospy.loginf("============ Press `Enter` to move c_bot back home ...")
+    rospy.loginfo("============ Press `Enter` to move c_bot back home ...")
     raw_input()
     self.go_to_named_pose("home_c", "c_bot")
     return
@@ -89,16 +89,16 @@ class CalibrationClass(O2ASBaseRoutines):
     pose1 = geometry_msgs.msg.PoseStamped()
     pose1.header.frame_id = "taskboard_corner2"
     pose1.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    pose1.pose.position.z = .05
+    pose1.pose.position.z = .00
 
     pose2 = copy.deepcopy(pose1)
     pose2.header.frame_id = "taskboard_corner3"
     pose3 = copy.deepcopy(pose1)
-    pose3.header.frame_id = "taskboard_part4"
+    pose3.header.frame_id = "taskboard_part10"
     
     poses = [pose1, pose2, pose3]
     
-    cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
+    self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
     return
 
   def taskboard_calibration_mat(self):
@@ -108,7 +108,7 @@ class CalibrationClass(O2ASBaseRoutines):
     pose1 = geometry_msgs.msg.PoseStamped()
     pose1.header.frame_id = "mat_corner2"
     pose1.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    pose1.pose.position.z = .05
+    pose1.pose.position.z = .03
 
     pose2 = copy.deepcopy(pose1)
     pose2.header.frame_id = "mat_corner3"
@@ -117,23 +117,25 @@ class CalibrationClass(O2ASBaseRoutines):
     
     poses = [pose1, pose2, pose3]
 
-    cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
+    self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
     return 
 
-  def cycle_through_calibration_poses(poses, robot_name, speed=0.3):
+  def cycle_through_calibration_poses(self, poses, robot_name, speed=0.3):
     rospy.loginfo("Moving all robots home.")
     self.go_to_named_pose("home_a", "a_bot")
     self.go_to_named_pose("home_b", "b_bot")
     self.go_to_named_pose("home_c", "c_bot")
     home_pose = "home_" + robot_name[0]
     
-    self.go_to_pose_goal(robot_name, pose,speed=speed)
+    self.go_to_pose_goal(robot_name, poses[0],speed=speed)
     for pose in poses[1:]:  
-      rospy.loginfo("============ Press `Enter` to move a_bot to " + pose.header.frame_id)
+      rospy.loginfo("============ Press `Enter` to move " + robot_name + " to " + pose.header.frame_id)
       raw_input()
       self.go_to_named_pose(home_pose, robot_name)
       self.go_to_pose_goal(robot_name, pose,speed=speed)
     
+    rospy.loginfo("============ Press `Enter` to move " + robot_name + " home")
+    raw_input()
     rospy.loginfo("Moving all robots home again.")
     self.go_to_named_pose("home_a", "a_bot")
     self.go_to_named_pose("home_b", "b_bot")

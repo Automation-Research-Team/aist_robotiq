@@ -18,10 +18,39 @@
           <color rgba="0.1 0.1 0.1 1"/>
         </material>
     </visual>
-    <collision>
-      <origin rpy="0 ${pi/2} 0" xyz="-0.11 0 0"/>
+
+    <!-- <visual>
+      <origin rpy="0 ${pi/2} 0" xyz="-0.16 0 0"/>
       <geometry>
-        <box size="0.22 0.15 0.1"/>
+        <box size=".1 .08 .07"/>
+      </geometry>
+      <material name="cyan2">
+        <color rgba="0.3 0.5 0.5 0.3"/>
+      </material>
+    </visual>
+    <visual>
+      <origin rpy="0 ${pi/2} 0" xyz="-0.05 0 0"/>
+      <geometry>
+        <box size="0.18 0.09 0.13"/>
+      </geometry>
+      <material name="green2">
+        <color rgba="0.1 0.8 0.1 0.3"/>
+      </material>
+    </visual> -->
+
+    <!-- TODO: Do this properly and check the offset above. -->
+    <!-- Back part -->
+    <collision>
+      <origin rpy="0 ${pi/2} 0" xyz="-0.05 0 0"/>
+      <geometry>
+        <box size="0.18 0.09 0.13"/>
+      </geometry>
+    </collision>
+    <!-- Front part -->
+    <collision>
+      <origin rpy="0 ${pi/2} 0" xyz="-0.16 0 0"/>
+      <geometry>
+        <box size=".1 .08 .07"/>
       </geometry>
     </collision>
   </link>

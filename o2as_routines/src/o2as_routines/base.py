@@ -109,15 +109,17 @@ class O2ASBaseRoutines(object):
     self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR)
     self.goToNamedPose_client = rospy.ServiceProxy('/o2as_skills/goToNamedPose', o2as_msgs.srv.goToNamedPose)
 
-    self.pick_client.wait_for_server() # wait for the clients to connect
-    self.place_client.wait_for_server() 
-    self.align_client.wait_for_server() 
-    self.insert_client.wait_for_server() 
-    self.screw_client.wait_for_server() 
+    # self.pick_client.wait_for_server() # wait for the clients to connect
+    # self.place_client.wait_for_server() 
+    # self.align_client.wait_for_server() 
+    # self.insert_client.wait_for_server() 
+    # self.screw_client.wait_for_server() 
+    rospy.sleep(.5)   # 
+    rospy.loginfo("Finished initializing class")
     
   ############## ------ Internal functions (and convenience functions)
 
-  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 0.1, high_precision = False):
+  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, high_precision = False):
     group = self.groups[group_name]
     group.set_pose_target(pose_goal_stamped)
     rospy.loginfo("Setting velocity scaling to " + str(speed))
@@ -136,12 +138,12 @@ class O2ASBaseRoutines(object):
     # Reset the precision
     if high_precision:
       group.set_goal_tolerance(.0001) 
-      group.set_planning_time(5) 
+      group.set_planning_time(3) 
 
     current_pose = group.get_current_pose().pose
     return all_close(pose_goal_stamped.pose, current_pose, 0.01)
 
-  def go_to_named_pose(self, pose_name, robot_name, speed = 0.1):
+  def go_to_named_pose(self, pose_name, robot_name, speed = 1.0):
     # pose_name should be "home_a", "home_b" etc.
     self.groups[robot_name].set_named_target(pose_name)
     rospy.loginfo("Setting velocity scaling to " + str(speed))

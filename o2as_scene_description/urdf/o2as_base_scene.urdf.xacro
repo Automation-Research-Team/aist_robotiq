@@ -69,9 +69,9 @@
   <xacro:screw_feeder feedername="m4_feeder" parent="c_bot_base_smfl">
     <origin xyz=".45 .05 .05" rpy="0 0 0" />   
   </xacro:screw_feeder>
-  <xacro:screw_feeder feedername="m5_feeder" parent="c_bot_base_smfl">
+  <!-- <xacro:screw_feeder feedername="m5_feeder" parent="c_bot_base_smfl">
     <origin xyz=".45 .2 .05" rpy="0 0 0" />   
-  </xacro:screw_feeder>
+  </xacro:screw_feeder> -->
 
   <!-- robot arms -->    
   <xacro:ur5_robot prefix="a_bot_" joint_limited="true"
