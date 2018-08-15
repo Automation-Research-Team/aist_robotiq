@@ -1,47 +1,88 @@
-#!/usr/bin/env python
-
+#! /usr/bin/env python
 import lib_robotis_xm430 as xm430
 import sys
 import time
 import rospy
-from o2as_msgs.srv import *
+import actionlib
+import o2as_msgs.msg
 
-class PrecisionGripper:
-    def __init__(self, serial_port = '/dev/ttyUSB1'):
+class PrecisionGripperAction:
+    _feedback = o2as_msgs.msg.PrecisionGripperCommandFeedback()
+    _result = o2as_msgs.msg.PrecisionGripperCommandResult()
+
+    def __init__(self, serial_port = '/dev/ttyUSB1',name="precision_gripper_action_server"):
         self.dynamixel = xm430.USB2Dynamixel_Device( serial_port, baudrate = 57600 )
         self.p1 = xm430.Robotis_Servo2( self.dynamixel, 1, series = "XM" )  #inner gripper
         self.p2 = xm430.Robotis_Servo2( self.dynamixel, 2, series = "XM" )  #outer gripper
-
+        #read the parameters
         self.outer_force = rospy.get_param("outer_force", 30)
         self.inner_force = rospy.get_param("inner_force", 5)
         self.outer_open_position = rospy.get_param("outer_open_position", -50000)
         self.outer_close_position = rospy.get_param("outer_close_position", 50240)
         self.speed_limit = rospy.get_param("speed_limit", 10)
+        #define the action
+        self._action_name = name
+        self._as = actionlib.SimpleActionServer(self._action_name, o2as_msgs.msg.PrecisionGripperCommandAction, execute_cb=self.execute_cb, auto_start = False)
+        self._as.start()
         return
 
-    def my_callback(self, req):
-        rospy.loginfo("Precision gripper callback has been called")
-        res = PrecisionGripperCommandResponse()
-
+    def execute_cb(self, req):
+        # helper variables
+        # r = rospy.Rate(1)
+        print _feedback
+        # append the seeds for the fibonacci sequence
+        
+        # publish info to the console for the user
+        rospy.loginfo('Executing'+ str(self._action_name)+"."+"Request sent:")
+        rospy.loginfo(req)
+        # start executing the action
+        
         if req.stop:
-            self.inner_gripper_read_current_position()
-            self.inner_gripper_disable_torque()
-            self.outer_gripper_disable_torque()
+            command_is_sent1 = self.inner_gripper_disable_torque()
+            command_is_sent2 = self.outer_gripper_disable_torque()
+            if command_is_sent1 and command_is_sent2 is True:
+                command_is_sent = True
+            else:
+                command_is_sent = False
         elif req.open_outer_gripper_fully:        
-            self.outer_gripper_open_fully(self.outer_force)
+            command_is_sent = self.outer_gripper_open_fully(self.outer_force)
         elif req.close_outer_gripper_fully:
-            self.outer_gripper_close_fully(self.outer_force)
+            command_is_sent = self.outer_gripper_close_fully(self.outer_force)
         elif req.open_inner_gripper_fully:
-            self.inner_gripper_open_fully(self.inner_force)
+            command_is_sent = self.inner_gripper_open_fully(self.inner_force)
         elif req.close_inner_gripper_fully:
-            self.inner_gripper_close_fully(self.inner_force)
+            command_is_sent = self.inner_gripper_close_fully(self.inner_force)
         else:
             rospy.logerr('No command sent to the gripper, service request was empty.')
-            res.success = False
-            return res
+            command_is_sent = False
+        
+        success = command_is_sent
+        if success:
+            if req.stop:
+                self._feedback.motor_speed = -1 #an arbitary number higher than self.speed_limit
+            elif req.open_outer_gripper_fully or req.close_outer_gripper_fully:  
+                self._feedback.motor_speed = self.p2.read_current_velocity()
+            elif req.open_inner_gripper_fully or req.close_inner_gripper_fully:
+                self._feedback.motor_speed = self.p1.read_current_velocity()
 
-        res.success = True
-        return res
+            while _feedback.motor_speed > self.speed_limit:
+                rospy.sleep(0.1)
+                # check that preempt has not been requested by the client
+                if self._as.is_preempt_requested():
+                    rospy.loginfo('%s: Preempted' % self._action_name)
+                    self._as.set_preempted()
+                    success = False
+                    break
+                if req.open_outer_gripper_fully or req.close_outer_gripper_fully:  
+                    self._feedback.motor_speed = self.p2.read_current_velocity()
+                elif req.open_inner_gripper_fully or req.close_inner_gripper_fully:
+                    self._feedback.motor_speed = self.p1.read_current_velocity()
+                # publish the feedback
+                self._as.publish_feedback(self._feedback)
+            if success:
+                self._result.success = True
+                rospy.loginfo('%s: Succeeded' % self._action_name)
+                self._as.set_succeeded(self._result)
 
     #outer gripper related functions
     def outer_gripper_close_new(self, goal_position):
@@ -56,6 +97,14 @@ class PrecisionGripper:
                 if current2 > 100:
                     break
                 i_avg = i_avg + 8
+        except:
+            rospy.logerr("Failed to run commands.")
+
+
+    def inner_gripper_read_current_position(self):
+        try:
+            x=self.p1.read_current_position()
+            rospy.loginfo("id1="+str(x))
         except:
             rospy.logerr("Failed to run commands.")
 
@@ -78,8 +127,10 @@ class PrecisionGripper:
                 print current_velocity
                 current_velocity = self.p2.read_current_velocity()
                 rospy.sleep(0.1)
+            return True
         except:
             rospy.logerr("Failed to run commands.")
+            return False
 
 
     def outer_gripper_close_fully(self,current):
@@ -93,14 +144,18 @@ class PrecisionGripper:
                 print current_velocity
                 current_velocity = self.p2.read_current_velocity()
                 rospy.sleep(0.1)
+            return True
         except:
             rospy.logerr("Failed to run commands.")
+            return False
 
     def outer_gripper_disable_torque(self):
         try:
             self.p2.disable_torque()
+            return True
         except:
             rospy.logerr("Failed to run commands.")
+            return False
 
 
     def outer_gripper_open_to(self, location):#still editing
@@ -108,20 +163,15 @@ class PrecisionGripper:
             self.p2.set_operating_mode("currentposition")
             self.p2.set_current(100)
             self.p2.set_goal_position(location)
+            return True
         except:
             rospy.logerr("Failed to run commands.")
+            return False
 
 
     #inner gripper related functions
     ######################################################
     ######################################################
-
-    def inner_gripper_read_current_position(self):
-        try:
-            x=self.p1.read_current_position()
-            rospy.loginfo("id1="+str(x))
-        except:
-            rospy.logerr("Failed to run commands.")
 
     def inner_gripper_open_fully(self, current):
         try:
@@ -135,8 +185,10 @@ class PrecisionGripper:
                 print current_velocity
                 current_velocity = self.p1.read_current_velocity()
                 rospy.sleep(0.1)
+            return True
         except:
             rospy.logerr("Failed to run commands.")
+            return False
 
     def inner_gripper_close_fully(self, current):
         try:
@@ -149,8 +201,10 @@ class PrecisionGripper:
                 print current_velocity
                 current_velocity = self.p1.read_current_velocity()
                 rospy.sleep(0.1)
+            return True
         except:
             rospy.logerr("Failed to run commands.")
+            return False
 
     def inner_gripper_open_slightly(self, current_position):
         try:
@@ -165,17 +219,13 @@ class PrecisionGripper:
     def inner_gripper_disable_torque(self):
         try:
             self.p1.disable_torque()
+            return True
         except:
             rospy.logerr("Failed to run commands.")
+            return False
 
-if __name__ == "__main__":
-    #initialise the class here
-    
-    rospy.init_node("precision_gripper_server")
-    serial_port = rospy.get_param("precision_gripper_server/serial_port", "/dev/ttyUSB2")
-    rospy.loginfo("Starting up on serial port: " + serial_port)
-    gripper = PrecisionGripper(serial_port)
-
-    my_service = rospy.Service('precision_gripper_command', PrecisionGripperCommand, gripper.my_callback)
-    rospy.loginfo("Service precision_gripper is ready")
+        
+if __name__ == '__main__':
+    rospy.init_node('precision_gripper_action_server')
+    server = PrecisionGripperAction(rospy.get_name())
     rospy.spin()
