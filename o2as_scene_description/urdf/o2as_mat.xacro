@@ -121,12 +121,19 @@
     </joint>
     <link name="${matname}_part6"/>
 
-    <joint name="${matname}_part7" type="fixed">
+    <joint name="${matname}_part7a" type="fixed">
       <parent link="${matname}"/>
-      <child link="${matname}_part7"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.011 0.011 0.0"/>
+      <child link="${matname}_part7a"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.0785 0.116 0.0"/>
     </joint>
-    <link name="${matname}_part7"/>
+    <link name="${matname}_part7a"/>
+
+    <joint name="${matname}_part7b" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part7b"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.0785 0.116 0.0"/>
+    </joint>
+    <link name="${matname}_part7b"/>
 
     <joint name="${matname}_part8" type="fixed">
       <parent link="${matname}"/>
