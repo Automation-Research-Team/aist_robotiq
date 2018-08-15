@@ -5,9 +5,11 @@ find_package(catkin REQUIRED COMPONENTS
     message_generation
     cmake_modules
     geometry_msgs
+    std_srvs
     std_msgs
     sensor_msgs
     visualization_msgs
+    actionlib_msgs
 )
 
 # Declare the message files to be built
@@ -15,7 +17,28 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_service_files(DIRECTORY srv)
 
-# Actually generate the language-specific message and service files
-generate_messages(DEPENDENCIES std_msgs sensor_msgs geometry_msgs visualization_msgs)
+# Generate actions in the 'action' folder
+add_action_files( DIRECTORY action )
 
-catkin_package(CATKIN_DEPENDS message_runtime std_msgs geometry_msgs visualization_msgs)
+# # Generate added messages and services with any dependencies listed here
+
+# Actually generate the language-specific message and service files
+generate_messages(
+  DEPENDENCIES
+  std_srvs
+  std_msgs
+  sensor_msgs 
+  geometry_msgs 
+  visualization_msgs
+  actionlib_msgs
+)
+
+
+catkin_package(CATKIN_DEPENDS 
+  message_runtime 
+  std_msgs 
+  sensor_msgs 
+  geometry_msgs 
+  visualization_msgs
+  actionlib_msgs
+)

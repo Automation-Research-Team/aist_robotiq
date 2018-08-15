@@ -18,7 +18,7 @@ SkillServer::SkillServer() :
                                         this);
 
   // Services to subscribe to
-  sendScriptToURClient_ = n_.serviceClient<o2as_skills::sendScriptToUR>("o2as_skills/sendScriptToUR");
+  sendScriptToURClient_ = n_.serviceClient<o2as_msgs::sendScriptToUR>("o2as_skills/sendScriptToUR");
   PrecisionGripperClient_ = n_.serviceClient<o2as_msgs::PrecisionGripperCommand>("precision_gripper_command");
 
   // Actions we serve
@@ -488,6 +488,30 @@ bool SkillServer::attachDetachTool(std::string screw_tool_id, std::string robot_
   return true;
 }
 
+bool SkillServer::goFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, double velocity_scaling_factor)
+{
+  ROS_INFO_STREAM("Received goFromAbove command.");
+
+  // Move above the target pose
+  target_tip_link_pose.pose.position.z += .1;
+  ROS_INFO_STREAM("Moving above target.");
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);
+
+  // Move down to the target pose
+  target_tip_link_pose.pose.position.z -= .1;
+  ROS_INFO_STREAM("Moving down to target.");
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  bool success = moveToCartPoseLIN(target_tip_link_pose, robot_name, true, end_effector_link_name, velocity_scaling_factor);
+  if (!success) 
+  {
+    ROS_INFO_STREAM("Linear motion plan to target place pose failed. Performing PTP.");
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    success = moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name, velocity_scaling_factor);  // Force the move even if LIN fails
+  }
+  return success;
+}
+
 bool SkillServer::placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name)
 {
   publishMarker(target_tip_link_pose, "place_pose");
@@ -691,8 +715,8 @@ bool SkillServer::publishPoseMarker(geometry_msgs::PoseStamped marker_pose)
   return true;
 }
 // ----------- Service definitions
-bool SkillServer::goToNamedPoseCallback(o2as_skills::goToNamedPose::Request &req,
-                                           o2as_skills::goToNamedPose::Response &res)
+bool SkillServer::goToNamedPoseCallback(o2as_msgs::goToNamedPose::Request &req,
+                                           o2as_msgs::goToNamedPose::Response &res)
 {
   ROS_INFO("Received goToNamedPose callback.");
   res.success = goToNamedPose(req.named_pose, req.planning_group);
@@ -703,7 +727,7 @@ bool SkillServer::goToNamedPoseCallback(o2as_skills::goToNamedPose::Request &req
 // ----------- Action servers
 
 // alignAction
-void SkillServer::executeAlign(const o2as_skills::alignGoalConstPtr& goal)
+void SkillServer::executeAlign(const o2as_msgs::alignGoalConstPtr& goal)
 {
   ROS_INFO("alignAction was called");
   // TODO: Insert commands to do the action
@@ -713,7 +737,7 @@ void SkillServer::executeAlign(const o2as_skills::alignGoalConstPtr& goal)
 }
 
 // pickAction
-void SkillServer::executePick(const o2as_skills::pickGoalConstPtr& goal)
+void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
 {
   ROS_INFO("pickAction was called");
 
@@ -839,7 +863,7 @@ void SkillServer::executePick(const o2as_skills::pickGoalConstPtr& goal)
 }
 
 // placeAction
-void SkillServer::executePlace(const o2as_skills::placeGoalConstPtr& goal)
+void SkillServer::executePlace(const o2as_msgs::placeGoalConstPtr& goal)
 {
   ROS_INFO("placeAction was called");
   // TODO: Calculate the target pose with the item height currently held
@@ -859,17 +883,37 @@ void SkillServer::executePlace(const o2as_skills::placeGoalConstPtr& goal)
 }
 
 // insertAction
-void SkillServer::executeInsert(const o2as_skills::insertGoalConstPtr& goal)
+void SkillServer::executeInsert(const o2as_msgs::insertGoalConstPtr& goal)
 {
   ROS_INFO("insertAction was called");
-  // TODO: Send URscript to the robot
-  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  std::string ee_link_name;
+  if (goal->robot_name == "a_bot"){ee_link_name = goal->robot_name + "_gripper_tip_link"; }
+  else {ee_link_name = goal->robot_name + "_robotiq_85_tip_link";}
+
+  // TODO: Set the height/offset!
+  goFromAbove(goal->target_hole, ee_link_name, goal->robot_name, 0.1);
+  
+  o2as_msgs::sendScriptToUR srv;
+  srv.request.program_id = "insertion";
+  srv.request.robot_name = goal->robot_name;
+  srv.request.stroke = goal->maximum_insertion_distance;
+  srv.request.force_magnitude = goal->maximum_force;
+  srv.request.forward_speed = goal->speed;
+  sendScriptToURClient_.call(srv);
+  if (srv.response.success == true)
+    ROS_INFO("Successfully called the URScript client to start insertion");
+  else
+    ROS_WARN("Could not call the URScript client to start insertion");
+  
+  geometry_msgs::PoseStamped ps = goal->target_hole;
+  
+
   ROS_INFO("insertAction is set as succeeded");
   insertActionServer_.setSucceeded();
 }
 
 // screwAction
-void SkillServer::executeScrew(const o2as_skills::screwGoalConstPtr& goal)
+void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
 {
   ROS_INFO("screwAction was called");
 
@@ -915,7 +959,7 @@ int main(int argc, char **argv)
   SkillServer o2as_skill_server;
   ROS_INFO("O2AS skill server started");
 
-  // o2as_skills::sendScriptToUR srv;
+  // o2as_msgs::sendScriptToUR srv;
   // srv.request.program_id = "insertion";
   // srv.request.robot_name = "b_bot";
   // o2as_skill_server.sendScriptToURClient_.call(srv);

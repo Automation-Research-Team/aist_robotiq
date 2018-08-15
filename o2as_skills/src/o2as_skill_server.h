@@ -23,17 +23,17 @@
 #include "visualization_msgs/Marker.h"
 
 // Services
-#include "o2as_skills/goToNamedPose.h"
-#include "o2as_skills/sendScriptToUR.h"
+#include "o2as_msgs/goToNamedPose.h"
+#include "o2as_msgs/sendScriptToUR.h"
 #include "o2as_msgs/PrecisionGripperCommand.h"
 
 // Actions
 #include <actionlib/server/simple_action_server.h>
-#include "o2as_skills/alignAction.h"
-#include "o2as_skills/pickAction.h"
-#include "o2as_skills/placeAction.h"
-#include "o2as_skills/insertAction.h"
-#include "o2as_skills/screwAction.h"
+#include "o2as_msgs/alignAction.h"
+#include "o2as_msgs/pickAction.h"
+#include "o2as_msgs/placeAction.h"
+#include "o2as_msgs/insertAction.h"
+#include "o2as_msgs/screwAction.h"
 
 #include <actionlib/client/simple_action_client.h>
 #include <robotiq_msgs/CModelCommandAction.h>
@@ -61,6 +61,7 @@ public:
   bool attachTool(std::string screw_tool_id, std::string link_name);
   bool detachTool(std::string screw_tool_id, std::string link_name);
   bool attachDetachTool(std::string screw_tool_id, std::string link_name, std::string attach_or_detach);
+  bool goFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, double velocity_scaling_factor);
   bool placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name = "");
   bool pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name = "");
   bool pickScrew(std::string object_id, std::string screw_tool_id, std::string robot_name);
@@ -72,15 +73,15 @@ public:
   bool sendGripperCommand(std::string robot_name, double opening_width, std::string gripper_name = "");
 
   // Callback declarations
-  bool goToNamedPoseCallback(o2as_skills::goToNamedPose::Request &req,
-                        o2as_skills::goToNamedPose::Response &res);
+  bool goToNamedPoseCallback(o2as_msgs::goToNamedPose::Request &req,
+                        o2as_msgs::goToNamedPose::Response &res);
 
   // Actions
-  void executeAlign(const o2as_skills::alignGoalConstPtr& goal);
-  void executePick(const o2as_skills::pickGoalConstPtr& goal);
-  void executePlace(const o2as_skills::placeGoalConstPtr& goal);
-  void executeInsert(const o2as_skills::insertGoalConstPtr& goal);
-  void executeScrew(const o2as_skills::screwGoalConstPtr& goal);
+  void executeAlign(const o2as_msgs::alignGoalConstPtr& goal);
+  void executePick(const o2as_msgs::pickGoalConstPtr& goal);
+  void executePlace(const o2as_msgs::placeGoalConstPtr& goal);
+  void executeInsert(const o2as_msgs::insertGoalConstPtr& goal);
+  void executeScrew(const o2as_msgs::screwGoalConstPtr& goal);
   
 
 // private:
@@ -97,11 +98,11 @@ public:
   ros::ServiceClient PrecisionGripperClient_;
   
   // Action declarations
-  actionlib::SimpleActionServer<o2as_skills::alignAction> alignActionServer_;
-  actionlib::SimpleActionServer<o2as_skills::pickAction> pickActionServer_;
-  actionlib::SimpleActionServer<o2as_skills::placeAction> placeActionServer_;
-  actionlib::SimpleActionServer<o2as_skills::insertAction> insertActionServer_;
-  actionlib::SimpleActionServer<o2as_skills::screwAction> screwActionServer_;  
+  actionlib::SimpleActionServer<o2as_msgs::alignAction> alignActionServer_;
+  actionlib::SimpleActionServer<o2as_msgs::pickAction> pickActionServer_;
+  actionlib::SimpleActionServer<o2as_msgs::placeAction> placeActionServer_;
+  actionlib::SimpleActionServer<o2as_msgs::insertAction> insertActionServer_;
+  actionlib::SimpleActionServer<o2as_msgs::screwAction> screwActionServer_;  
 
   // Action clients
   // actionlib::SimpleActionClient<control_msgs::GripperCommandAction> a_bot_gripper_client_;
