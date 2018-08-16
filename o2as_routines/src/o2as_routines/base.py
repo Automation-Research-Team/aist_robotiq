@@ -40,7 +40,9 @@ import sys
 import copy
 import rospy
 import tf_conversions
+import tf 
 import actionlib
+from math import *
 
 import moveit_commander
 import moveit_msgs.msg
@@ -87,6 +89,8 @@ class O2ASBaseRoutines(object):
   def __init__(self):
     # super(O2ASBaseRoutines, self).__init__()
     
+    self.listener = tf.TransformListener()
+
     moveit_commander.roscpp_initialize(sys.argv)
     rospy.init_node('assembly_example', anonymous=False)
 
@@ -142,6 +146,49 @@ class O2ASBaseRoutines(object):
 
     current_pose = group.get_current_pose().pose
     return all_close(pose_goal_stamped.pose, current_pose, 0.01)
+
+  def horizontal_spiral_motion(self, robot_name, max_radius, speed = 0.02):
+    group = self.groups[robot_name]
+    rospy.loginfo("Performing horizontal spiral motion " + str(speed))
+    rospy.loginfo("Setting velocity scaling to " + str(speed))
+    group.set_max_velocity_scaling_factor(speed)
+
+    # Modified code from Robotiq spiral search
+    theta_incr = 30
+    radius_incr = 0.0005
+    radius_inc_set = radius_incr / (360 / theta_incr)
+    r=0.0003  #Start radius
+    theta=0
+    RealRadius=0
+    # current_pos = group.get_current_pose() 
+    # TODO: This does not return the same for the real robots and the demo.launch!!!
+    # It returns a pose that is x = .8, y = -.22 and z = .7 in "world", but should be -.1, -.47, 1.14.
+    
+    gripper_pos = geometry_msgs.msg.PoseStamped()
+    gripper_pos.header.frame_id = "a_bot_gripper_tip_link"
+    gripper_pos.pose.orientation.w = 1.0
+    start_pos = self.listener.transformPose("world", gripper_pos)
+    next_pos = start_pos
+    # rospy.loginfo("The current pose is: ")
+    # rospy.loginfo(start_pos)
+    while RealRadius <= max_radius and not rospy.is_shutdown():
+        #By default, the Spiral_Search function will maintain contact between both mating parts at all times
+        theta=theta+theta_incr
+        x=cos(radians(theta))*r
+        y=sin(radians(theta))*r
+        next_pos.pose.position.x = start_pos.pose.position.x + x
+        next_pos.pose.position.y = start_pos.pose.position.y + y
+        r=r + radius_inc_set
+        RealRadius = sqrt(pow(x,2)+pow(y,2))
+        # rospy.loginfo("The next target pose is: ")
+        # rospy.loginfo(next_pos)
+        # rospy.loginfo("Go? Type y")
+        # inp = raw_input()
+        # if inp == "y":
+        self.go_to_pose_goal(robot_name, next_pos)
+        rospy.sleep(0.1)
+    # -------------
+    return True
 
   def go_to_named_pose(self, pose_name, robot_name, speed = 1.0):
     # pose_name should be "home_a", "home_b" etc.
