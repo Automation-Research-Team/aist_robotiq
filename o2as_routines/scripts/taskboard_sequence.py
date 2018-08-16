@@ -55,9 +55,11 @@ class TaskboardClass(O2ASBaseRoutines):
   def __init__(self):
     super(TaskboardClass, self).__init__()
     self.set_up_item_parameters()
+    
 
     self.action_client = actionlib.SimpleActionClient('precision_gripper_action', o2as_msgs.msg.PrecisionGripperCommandAction)
-    self.action_client.wait_for_server()
+    # self.action_client.wait_for_server()
+    rospy.sleep(.5)   # Use this instead of waiting, so that simulation can be used
 
   def set_up_item_parameters(self):
     # These parameters should probably be read from a csv file.
@@ -67,16 +69,16 @@ class TaskboardClass(O2ASBaseRoutines):
                       "10 mm washer", "M3 set screw", "M3 bolt", 
                       "M4 bolt", "Pulley", "10 mm end cap"]
     self.item_pick_heights = [0.02, 0.02, 0.025, 
-                              0.025, 0.02, 0.02, 
+                              0.047, 0.02, 0.02, 
                               0.02, 0.02, -0.005, 
                               -0.005, 0.02, 0.02,
-                              0.02, -0.005, -0.005]
+                              0.02, 0.007, -0.005]
 
     self.item_place_heights = [0.04, 0.04, 0.035,
-                               0.035, 0.04, 0.04, 
+                               0.046, 0.04, 0.04, 
                                0.04, 0.04, 0.002, 
                                0.002, 0.04, 0.04, 
-                               0.04, 0.0, 0.0]
+                               0.04, 0.006, 0.0]
     self.gripper_operation_to_use = ["outer", "inner_from_inside", "inner_from_outside", "complex_pick_from_inside", "complex_pick_from_outside"]
     downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     # 
@@ -207,7 +209,7 @@ class TaskboardClass(O2ASBaseRoutines):
     rospy.loginfo(grasp_height)
     self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True)
 
-    W = raw_input("waiting for the gripper")
+    # W = raw_input("waiting for the gripper")
     #gripper close
     if gripper_command=="complex_pick_from_inside":
       self.precision_gripper_inner_open(this_action_grasps_an_object = True)
@@ -224,7 +226,7 @@ class TaskboardClass(O2ASBaseRoutines):
 
 ######
 
-  def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05):
+  def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, lift_up_after_place = True):
     rospy.loginfo("Going above place target")
     object_pose.pose.position.z = approach_height
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
@@ -233,8 +235,8 @@ class TaskboardClass(O2ASBaseRoutines):
     object_pose.pose.position.z = place_height
     self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True)
 
-    print "============ Stopping at the placement height. Press `Enter` to keep moving moving the robot ..."
-    raw_input()
+    # print "============ Stopping at the placement height. Press `Enter` to keep moving moving the robot ..."
+    # raw_input()
 
     #gripper open
     if gripper_command=="complex_pick_from_inside":
@@ -248,10 +250,10 @@ class TaskboardClass(O2ASBaseRoutines):
     else: 
       rospy.logerr("No gripper command was set")
     
-    rospy.loginfo("Moving back up")
-    object_pose.pose.position.z = (approach_height)
-    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)  
-
+    if lift_up_after_place:
+      rospy.loginfo("Moving back up")
+      object_pose.pose.position.z = (approach_height)
+      self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)  
     
 
   def full_taskboard_task(self):
@@ -355,21 +357,46 @@ if __name__ == '__main__':
     taskboard.go_to_named_pose("home_b", "b_bot")
     taskboard.go_to_named_pose("home_a", "a_bot")
 
-    i = raw_input("the number of the part")
+    i = raw_input("Enter the number of the part to be performed: ")
     i =int(i)
     while(i):
-      #14 is not adjusted yet
+      if i == 20:
+        rospy.loginfo("doing spiral motion")
+        taskboard.horizontal_spiral_motion("a_bot", .005)
+      
       if i in [3]:
         taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside")
         taskboard.place("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside")
+      
       if i == 4:
-        taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_outside")
-        taskboard.place("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_outside")
+        taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
+                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
+                                approach_height = 0.1)
+        taskboard.place("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],
+                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
+                                approach_height = 0.15, lift_up_after_place = False)
+        taskboard.horizontal_spiral_motion("a_bot", .002)
   
       #15 is not adjusted yet  
       if i in [9, 10]:
-        taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
-        taskboard.place("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
+        taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1], approach_height = 0.05,
+                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
+        taskboard.place("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1], approach_height = 0.05,
+                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
+                                lift_up_after_place = False)
+        if i == 9:
+          taskboard.horizontal_spiral_motion("a_bot", .0025)
+        if i == 10:
+          taskboard.horizontal_spiral_motion("a_bot", .003)
+
+      if i == 14:
+        taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1], approach_height = 0.05,
+                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
+        taskboard.place("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1], approach_height = 0.05,
+                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
+                                lift_up_after_place = False)
+        taskboard.horizontal_spiral_motion("a_bot", .002)
+        
       
       taskboard.go_to_named_pose("home_c", "c_bot")
       taskboard.go_to_named_pose("home_b", "b_bot")

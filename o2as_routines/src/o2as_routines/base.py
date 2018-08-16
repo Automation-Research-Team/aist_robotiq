@@ -147,7 +147,7 @@ class O2ASBaseRoutines(object):
     current_pose = group.get_current_pose().pose
     return all_close(pose_goal_stamped.pose, current_pose, 0.01)
 
-  def horizontal_spiral_motion(self, robot_name, max_radius, speed = 0.02):
+  def horizontal_spiral_motion(self, robot_name, max_radius, radius_increment = .001, speed = 0.02):
     group = self.groups[robot_name]
     rospy.loginfo("Performing horizontal spiral motion " + str(speed))
     rospy.loginfo("Setting velocity scaling to " + str(speed))
@@ -155,8 +155,7 @@ class O2ASBaseRoutines(object):
 
     # Modified code from Robotiq spiral search
     theta_incr = 30
-    radius_incr = 0.0005
-    radius_inc_set = radius_incr / (360 / theta_incr)
+    radius_inc_set = radius_increment / (360 / theta_incr)
     r=0.0003  #Start radius
     theta=0
     RealRadius=0
