@@ -130,6 +130,7 @@ class CalibrationClass(O2ASBaseRoutines):
 
   def taskboard_calibration_mat(self):
     rospy.loginfo("============ Calibrating placement mat for the taskboard task. ============")
+    rospy.loginfo("Robot gripper tip should be 3 mm above the surface.")
     poses = []
 
     pose0 = geometry_msgs.msg.PoseStamped()

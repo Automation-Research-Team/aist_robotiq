@@ -57,7 +57,7 @@ class TaskboardClass(O2ASBaseRoutines):
     self.set_up_item_parameters()
 
     self.action_client = actionlib.SimpleActionClient('precision_gripper_action', o2as_msgs.msg.PrecisionGripperCommandAction)
-    action_client.wait_for_server()
+    self.action_client.wait_for_server()
 
   def set_up_item_parameters(self):
     # These parameters should probably be read from a csv file.
@@ -74,8 +74,8 @@ class TaskboardClass(O2ASBaseRoutines):
 
     self.item_place_heights = [0.04, 0.04, 0.035,
                                0.035, 0.04, 0.04, 
-                               0.04, 0.04, 0.001, 
-                               0.001, 0.04, 0.04, 
+                               0.04, 0.04, 0.002, 
+                               0.002, 0.04, 0.04, 
                                0.04, 0.0, 0.0]
     self.gripper_operation_to_use = ["outer", "inner_from_inside", "inner_from_outside", "complex_pick_from_inside", "complex_pick_from_outside"]
     downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
