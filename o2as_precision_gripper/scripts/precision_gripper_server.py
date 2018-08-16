@@ -8,22 +8,26 @@ import o2as_msgs.msg
 import o2as_msgs.srv
 
 class PrecisionGripperAction:
-    def __init__(self, serial_port = '/dev/ttyUSB2'):
+    def __init__(self):
+        name = rospy.get_name()
+        serial_port = rospy.get_param(name + "/serial_port", "/dev/ttyUSB0")
+        rospy.loginfo("Starting up on serial port: " + serial_port)
         self.dynamixel = xm430.USB2Dynamixel_Device( serial_port, baudrate = 57600 )
         self.p1 = xm430.Robotis_Servo2( self.dynamixel, 1, series = "XM" )  #inner gripper
         self.p2 = xm430.Robotis_Servo2( self.dynamixel, 2, series = "XM" )  #outer gripper
 
         #read the parameters
-        name = rospy.get_name()
+        
         self._feedback = o2as_msgs.msg.PrecisionGripperCommandFeedback()
         self._result = o2as_msgs.msg.PrecisionGripperCommandResult()
-        self.outer_force = rospy.get_param(name + "outer_force", 30)
-        self.inner_force = rospy.get_param(name + "inner_force", 7)
+        self.outer_force = rospy.get_param(name + "/outer_force", 30)
+        self.inner_force = rospy.get_param(name + "/inner_force", 7)
         self.grasping_inner_force = rospy.get_param(name + "/grasping_inner_force", 5)
-        self.outer_open_position = rospy.get_param(name + "outer_open_position", -50000)
-        self.outer_close_position = rospy.get_param(name + "outer_close_position", 50240)
-        self.speed_limit = rospy.get_param(name + "speed_limit", 10)
-        
+        self.outer_open_position = rospy.get_param(name + "/outer_open_position", -50000)
+        self.outer_close_position = rospy.get_param(name + "/outer_close_position", 50240)
+        self.speed_limit = rospy.get_param(name + "/speed_limit", 10)
+        self.inner_open_motor_position = rospy.get_param(name + "/inner_open_motor_position", 5635)
+
         #define the action
         self._action_name = "precision_gripper_action"
         self._action_server = actionlib.SimpleActionServer(self._action_name, o2as_msgs.msg.PrecisionGripperCommandAction, execute_cb=self.action_callback, auto_start = False)
@@ -43,6 +47,7 @@ class PrecisionGripperAction:
         # start executing the action
         command_is_sent = False
         if goal.stop:
+            print "self.inner_gripper_read_current_position()="+str(self.inner_gripper_read_current_position())
             command_is_sent1 = self.inner_gripper_disable_torque()
             command_is_sent2 = self.outer_gripper_disable_torque()
             if command_is_sent1 and command_is_sent2 is True:
@@ -104,7 +109,7 @@ class PrecisionGripperAction:
         res = PrecisionGripperCommandResponse()
 
         if req.stop:
-            self.inner_gripper_read_current_position()
+            print "self.inner_gripper_read_current_position()="+str(self.inner_gripper_read_current_position())
             self.inner_gripper_disable_torque()
             self.outer_gripper_disable_torque()
             res.success = True
@@ -235,7 +240,7 @@ class PrecisionGripperAction:
             self.p1.set_operating_mode("currentposition")
             self.p1.set_positive_direction("ccw")
             self.p1.set_current(current)
-            self.p1.set_goal_position(3799)
+            self.p1.set_goal_position(self.inner_open_motor_position)
             rospy.sleep(0.1)
             return True
         except:
@@ -273,8 +278,6 @@ class PrecisionGripperAction:
 
         
 if __name__ == '__main__':
-    rospy.init_node('precision_gripper_action_server')
-    serial_port = rospy.get_param("precision_gripper_action_server/serial_port", "/dev/ttyUSB2")
-    rospy.loginfo("Starting up on serial port: " + serial_port)
-    server = PrecisionGripperAction(serial_port)
+    rospy.init_node('precision_gripper_server')
+    server = PrecisionGripperAction()
     rospy.spin()
