@@ -35,12 +35,16 @@
 # Author: Felix von Drigalski
 
 import sys
-from o2as_msgs.srv import *
 import copy
 import rospy
 import geometry_msgs.msg
 import tf_conversions
 from math import pi
+
+from o2as_msgs.srv import *
+import actionlib
+import o2as_msgs.msg
+
 
 from o2as_routines.base import O2ASBaseRoutines
 
@@ -48,6 +52,13 @@ class TaskboardClass(O2ASBaseRoutines):
   """
   This contains the routine used to run the taskboard task.
   """
+  def __init__(self):
+    super(TaskboardClass, self).__init__()
+    self.set_up_item_parameters()
+
+    self.action_client = actionlib.SimpleActionClient('precision_gripper_action', o2as_msgs.msg.PrecisionGripperCommandAction)
+    action_client.wait_for_server()
+
   def set_up_item_parameters(self):
     # These parameters should probably be read from a csv file.
     self.item_names = ["Bearing with housing", "6 mm bearing retainer pin", "17 mm spacer for bearings", 
@@ -89,76 +100,58 @@ class TaskboardClass(O2ASBaseRoutines):
 
 
   def precision_gripper_outer_close(self):
-    rospy.wait_for_service('precision_gripper_command')
     try:
-        precision_gripper_client = rospy.ServiceProxy('precision_gripper_command',PrecisionGripperCommand)
-        rospy.sleep(.5)
-        
-        request = PrecisionGripperCommandRequest()
-        request.close_outer_gripper_fully = True
-        rospy.loginfo("Closing outer gripper")
-        precision_gripper_client(request)
-    except rospy.ServiceException, e:
-        print "Service call failed: %s"%e
+        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
+        goal.close_outer_gripper_fully = True
+        self.action_client.send_goal(goal)
+        rospy.loginfo("close outer gripper")
+        self.action_client.wait_for_result()
+        result = self.action_client.get_result()
+        rospy.loginfo(result)
+    except rospy.ROSInterruptException:
+        rospy.loginfo("program interrupted before completion", file=sys.stderr)
+
 
   def precision_gripper_outer_open(self):
-    rospy.wait_for_service('precision_gripper_command')
     try:
-        precision_gripper_client = rospy.ServiceProxy('precision_gripper_command',PrecisionGripperCommand)
-        rospy.sleep(.5)
-        request = PrecisionGripperCommandRequest()
-        request.open_outer_gripper_fully = True
-        request.close_outer_gripper_fully = False
-
-        rospy.loginfo("Opening outer gripper")
-        precision_gripper_client(request)
-
-        # request.stop = True
-        # request.open_outer_gripper_fully = False
-        # request.close_outer_gripper_fully = False
-
-        # rospy.loginfo("Disabling torque (stopping the gripper)")
-        # precision_gripper_client(request)
-
-    except rospy.ServiceException, e:
-        print "Service call failed: %s"%e
+        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
+        goal.open_outer_gripper_fully = True
+        goal.close_outer_gripper_fully = False
+        self.action_client.send_goal(goal)
+        rospy.loginfo("open outer gripper")
+        self.action_client.wait_for_result()
+        result = self.action_client.get_result()
+        rospy.loginfo(result)
+    except rospy.ROSInterruptException:
+        rospy.loginfo("program interrupted before completion", file=sys.stderr)
 
   def precision_gripper_inner_close(self, this_action_grasps_an_object = False):
-    rospy.wait_for_service('precision_gripper_command')
     try:
-        precision_gripper_client = rospy.ServiceProxy('precision_gripper_command',PrecisionGripperCommand)
-        rospy.sleep(.5)
-        
-        request = PrecisionGripperCommandRequest()
-        request.close_inner_gripper_fully = True
-        request.this_action_grasps_an_object = this_action_grasps_an_object
-
+        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
+        goal.close_inner_gripper_fully = True
+        goal.this_action_grasps_an_object = this_action_grasps_an_object
+        self.action_client.send_goal(goal)
         rospy.loginfo("Closing inner gripper")
-        precision_gripper_client(request)
-    except rospy.ServiceException, e:
-        print "Service call failed: %s"%e
+        self.action_client.wait_for_result()
+        result = self.action_client.get_result()
+        rospy.loginfo(result)
+    except rospy.ROSInterruptException:
+        rospy.loginfo("program interrupted before completion", file=sys.stderr)
+
 
   def precision_gripper_inner_open(self, this_action_grasps_an_object = False):
-    rospy.wait_for_service('precision_gripper_command')
     try:
-        precision_gripper_client = rospy.ServiceProxy('precision_gripper_command',PrecisionGripperCommand)
-        rospy.sleep(.5)
-        request = PrecisionGripperCommandRequest()
-        request.open_inner_gripper_fully = True
-        request.close_inner_gripper_fully = False
-        request.this_action_grasps_an_object = this_action_grasps_an_object
-
+        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
+        goal.open_inner_gripper_fully = True
+        goal.close_inner_gripper_fully = False
+        goal.this_action_grasps_an_object = this_action_grasps_an_object
+        self.action_client.send_goal(goal)
         rospy.loginfo("Opening inner gripper")
-        precision_gripper_client(request)
-
-        # if not this_action_grasps_an_object:
-        #   request.stop = True
-        #   request.open_inner_gripper_fully = False
-        #   request.close_inner_gripper_fully = False
-        #   request.this_action_grasps_an_object = False
-
-        #   rospy.loginfo("Disabling torque (stopping the gripper)")
-        #   precision_gripper_client(request)
+        self.action_client.wait_for_result()
+        result = self.action_client.get_result()
+        rospy.loginfo(result)
+    except rospy.ROSInterruptException:
+        rospy.loginfo("program interrupted before completion", file=sys.stderr)
 
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
