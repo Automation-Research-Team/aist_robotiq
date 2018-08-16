@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro"
+       name="kitting_tray2_o2as">
+  <xacro:macro name="kitting_tray2" params="trayname parent *origin">
+
+    <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray.xacro" />
+
+    <xacro:kitting_tray trayname="${trayname}" parent = "${parent}">
+      <xacro:insert_block name="origin"/>
+    </xacro:kitting_tray>
+
+    <link name="${trayname}_partition2">
+      <visual>
+	<origin xyz="-0.095 0.14 0" rpy="0 0 ${-pi/2}"/>
+	<geometry>
+          <mesh
+	      filename="package://o2as_scene_description/meshes/partition2.stl"
+	      scale="0.001 0.001 0.001" />
+	</geometry>
+	<material name="white">
+          <color rgba="1 1 1 1"/>
+	</material>
+      </visual>
+    </link>
+
+    <joint name="${trayname}_partition2_joint" type="fixed">
+      <parent link="${trayname}" />
+      <child  link="${trayname}_partition2" />
+    </joint>
+
+    <link name="${trayname}_screw_holder">
+      <visual>
+	<origin xyz="-0.095 -0.05 0" rpy="0 0 ${-pi/2}"/>
+	<geometry>
+          <mesh
+	      filename="package://o2as_scene_description/meshes/screw_holder.stl"
+	      scale="0.001 0.001 0.001" />
+	</geometry>
+	<material name="white">
+          <color rgba="1 1 1 1"/>
+	</material>
+      </visual>
+    </link>
+
+    <joint name="${trayname}_screw_holder_joint" type="fixed">
+      <parent link="${trayname}" />
+      <child  link="${trayname}_screw_holder" />
+    </joint>
+
+  </xacro:macro>
+</robot>
