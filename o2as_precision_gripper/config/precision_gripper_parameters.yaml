@@ -1,6 +1,7 @@
 publish_rate: 100
 outer_force: 30
-inner_force: 5
+inner_force: 7
 outer_open_position: -55000
 outer_close_position: 50240
 speed_limit: 10
+grasping_inner_force : 5

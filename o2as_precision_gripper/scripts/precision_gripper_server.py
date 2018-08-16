@@ -14,7 +14,8 @@ class PrecisionGripper:
 
         name = rospy.get_name()
         self.outer_force = rospy.get_param(name + "/outer_force", 30)
-        self.inner_force = rospy.get_param(name + "/inner_force", 5)
+        self.inner_force = rospy.get_param(name + "/inner_force", 7)
+        self.grasping_inner_force = rospy.get_param(name + "/grasping_inner_force", 5)
         rospy.logwarn("inner_force = " + str(self.inner_force))
         self.outer_open_position = rospy.get_param(name + "/outer_open_position", -50000)
         self.outer_close_position = rospy.get_param(name + "/outer_close_position", 50240)
@@ -37,10 +38,16 @@ class PrecisionGripper:
             self.outer_gripper_close_fully(self.outer_force)
         elif req.open_inner_gripper_fully:
             rospy.loginfo("Opening inner gripper")
-            self.inner_gripper_open_fully(self.inner_force)
+            if req.this_action_grasps_an_object:
+                self.inner_gripper_open_fully(self.grasping_inner_force)
+            else:
+                self.inner_gripper_open_fully(self.inner_force)
         elif req.close_inner_gripper_fully:
             rospy.loginfo("Closing inner gripper")
-            self.inner_gripper_close_fully(self.inner_force)
+            if req.this_action_grasps_an_object:
+                self.inner_gripper_close_fully(self.grasping_inner_force)
+            else:
+                self.inner_gripper_close_fully(self.inner_force)
         else:
             rospy.logerr('No command sent to the gripper, service request was empty.')
             res.success = False

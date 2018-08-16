@@ -12,13 +12,15 @@ class PrecisionGripperAction:
         self.p1 = xm430.Robotis_Servo2( self.dynamixel, 1, series = "XM" )  #inner gripper
         self.p2 = xm430.Robotis_Servo2( self.dynamixel, 2, series = "XM" )  #outer gripper
         #read the parameters
+        name = rospy.get_name()
         self._feedback = o2as_msgs.msg.PrecisionGripperCommandFeedback()
         self._result = o2as_msgs.msg.PrecisionGripperCommandResult()
-        self.outer_force = rospy.get_param("outer_force", 30)
-        self.inner_force = rospy.get_param("inner_force", 5)
-        self.outer_open_position = rospy.get_param("outer_open_position", -50000)
-        self.outer_close_position = rospy.get_param("outer_close_position", 50240)
-        self.speed_limit = rospy.get_param("speed_limit", 10)
+        self.outer_force = rospy.get_param(name + "outer_force", 30)
+        self.inner_force = rospy.get_param(name + "inner_force", 7)
+        self.grasping_inner_force = rospy.get_param(name + "/grasping_inner_force", 5)
+        self.outer_open_position = rospy.get_param(name + "outer_open_position", -50000)
+        self.outer_close_position = rospy.get_param(name + "outer_close_position", 50240)
+        self.speed_limit = rospy.get_param(name + "speed_limit", 10)
         #define the action
         self._action_name = "precision_gripper_action"
         self._action_server = actionlib.SimpleActionServer(self._action_name, o2as_msgs.msg.PrecisionGripperCommandAction, execute_cb=self.execute_cb, auto_start = False)
@@ -47,9 +49,17 @@ class PrecisionGripperAction:
         elif goal.close_outer_gripper_fully:
             command_is_sent = self.outer_gripper_close_fully(self.outer_force)
         elif goal.open_inner_gripper_fully:
-            command_is_sent = self.inner_gripper_open_fully(self.inner_force)
+            rospy.loginfo("Opening inner gripper")
+            if goal.this_action_grasps_an_object:
+                command_is_sent = self.inner_gripper_open_fully(self.grasping_inner_force)
+            else:
+                command_is_sent = self.inner_gripper_open_fully(self.inner_force)
         elif goal.close_inner_gripper_fully:
-            command_is_sent = self.inner_gripper_close_fully(self.inner_force)
+            rospy.loginfo("Closing inner gripper")
+            if goal.this_action_grasps_an_object:
+                command_is_sent = self.inner_gripper_close_fully(self.grasping_inner_force)
+            else:
+                command_is_sent = self.inner_gripper_close_fully(self.inner_force)
         else:
             rospy.logerr('No command sent to the gripper, service request was empty.')
             command_is_sent = False
@@ -121,11 +131,6 @@ class PrecisionGripperAction:
             self.p2.set_current(current)
             self.p2.set_goal_position(self.outer_open_position)
             rospy.sleep(0.1)
-            current_velocity = self.p2.read_current_velocity()
-            while current_velocity>self.speed_limit:
-                print current_velocity
-                current_velocity = self.p2.read_current_velocity()
-                rospy.sleep(0.1)
             return True
         except:
             rospy.logerr("Failed to run commands.")
@@ -138,11 +143,6 @@ class PrecisionGripperAction:
             self.p2.set_current(current)
             self.p2.set_goal_position(self.outer_close_position)
             rospy.sleep(0.1)
-            current_velocity = self.p2.read_current_velocity()
-            while current_velocity>self.speed_limit:
-                print current_velocity
-                current_velocity = self.p2.read_current_velocity()
-                rospy.sleep(0.1)
             return True
         except:
             rospy.logerr("Failed to run commands.")
@@ -179,11 +179,6 @@ class PrecisionGripperAction:
             self.p1.set_current(current)
             self.p1.set_goal_position(3799)
             rospy.sleep(0.1)
-            current_velocity = self.p1.read_current_velocity()
-            while current_velocity>self.speed_limit:
-                print current_velocity
-                current_velocity = self.p1.read_current_velocity()
-                rospy.sleep(0.1)
             return True
         except:
             rospy.logerr("Failed to run commands.")
@@ -195,11 +190,6 @@ class PrecisionGripperAction:
             self.p1.set_positive_direction("cw")
             self.p1.set_current(current)
             rospy.sleep(0.1)
-            current_velocity = self.p1.read_current_velocity()
-            while current_velocity>self.speed_limit:
-                print current_velocity
-                current_velocity = self.p1.read_current_velocity()
-                rospy.sleep(0.1)
             return True
         except:
             rospy.logerr("Failed to run commands.")
