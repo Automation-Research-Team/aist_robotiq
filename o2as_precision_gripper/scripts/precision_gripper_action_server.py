@@ -7,10 +7,11 @@ import actionlib
 import o2as_msgs.msg
 
 class PrecisionGripperAction:
-    def __init__(self, serial_port = '/dev/ttyUSB1'):
+    def __init__(self, serial_port = '/dev/ttyUSB2'):
         self.dynamixel = xm430.USB2Dynamixel_Device( serial_port, baudrate = 57600 )
         self.p1 = xm430.Robotis_Servo2( self.dynamixel, 1, series = "XM" )  #inner gripper
         self.p2 = xm430.Robotis_Servo2( self.dynamixel, 2, series = "XM" )  #outer gripper
+
         #read the parameters
         name = rospy.get_name()
         self._feedback = o2as_msgs.msg.PrecisionGripperCommandFeedback()
@@ -216,7 +217,7 @@ class PrecisionGripperAction:
         
 if __name__ == '__main__':
     rospy.init_node('precision_gripper_action_server')
-    serial_port = rospy.get_param("precision_gripper_server/serial_port", "/dev/ttyUSB2")
+    serial_port = rospy.get_param("precision_gripper_action_server/serial_port", "/dev/ttyUSB2")
     rospy.loginfo("Starting up on serial port: " + serial_port)
-    server = PrecisionGripperAction(rospy.get_name())
+    server = PrecisionGripperAction(serial_port)
     rospy.spin()
