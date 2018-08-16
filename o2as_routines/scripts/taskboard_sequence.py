@@ -96,7 +96,6 @@ class TaskboardClass(O2ASBaseRoutines):
         
         request = PrecisionGripperCommandRequest()
         request.close_outer_gripper_fully = True
-        
         rospy.loginfo("Closing outer gripper")
         precision_gripper_client(request)
     except rospy.ServiceException, e:
@@ -114,17 +113,17 @@ class TaskboardClass(O2ASBaseRoutines):
         rospy.loginfo("Opening outer gripper")
         precision_gripper_client(request)
 
-        request.stop = True
-        request.open_outer_gripper_fully = False
-        request.close_outer_gripper_fully = False
+        # request.stop = True
+        # request.open_outer_gripper_fully = False
+        # request.close_outer_gripper_fully = False
 
-        rospy.loginfo("Disabling torque (stopping the gripper)")
-        precision_gripper_client(request)
+        # rospy.loginfo("Disabling torque (stopping the gripper)")
+        # precision_gripper_client(request)
 
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
 
-  def precision_gripper_inner_close(self):
+  def precision_gripper_inner_close(self, this_action_grasps_an_object = False):
     rospy.wait_for_service('precision_gripper_command')
     try:
         precision_gripper_client = rospy.ServiceProxy('precision_gripper_command',PrecisionGripperCommand)
@@ -132,13 +131,14 @@ class TaskboardClass(O2ASBaseRoutines):
         
         request = PrecisionGripperCommandRequest()
         request.close_inner_gripper_fully = True
-        
-        rospy.loginfo("Closing outer gripper")
+        request.this_action_grasps_an_object = this_action_grasps_an_object
+
+        rospy.loginfo("Closing inner gripper")
         precision_gripper_client(request)
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
 
-  def precision_gripper_inner_open(self):
+  def precision_gripper_inner_open(self, this_action_grasps_an_object = False):
     rospy.wait_for_service('precision_gripper_command')
     try:
         precision_gripper_client = rospy.ServiceProxy('precision_gripper_command',PrecisionGripperCommand)
@@ -146,16 +146,19 @@ class TaskboardClass(O2ASBaseRoutines):
         request = PrecisionGripperCommandRequest()
         request.open_inner_gripper_fully = True
         request.close_inner_gripper_fully = False
+        request.this_action_grasps_an_object = this_action_grasps_an_object
 
-        rospy.loginfo("Opening outer gripper")
+        rospy.loginfo("Opening inner gripper")
         precision_gripper_client(request)
 
-        request.stop = True
-        request.open_inner_gripper_fully = False
-        request.close_inner_gripper_fully = False
+        # if not this_action_grasps_an_object:
+        #   request.stop = True
+        #   request.open_inner_gripper_fully = False
+        #   request.close_inner_gripper_fully = False
+        #   request.this_action_grasps_an_object = False
 
-        rospy.loginfo("Disabling torque (stopping the gripper)")
-        precision_gripper_client(request)
+        #   rospy.loginfo("Disabling torque (stopping the gripper)")
+        #   precision_gripper_client(request)
 
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
@@ -214,14 +217,14 @@ class TaskboardClass(O2ASBaseRoutines):
     W = raw_input("waiting for the gripper")
     #gripper close
     if gripper_command=="complex_pick_from_inside":
-      self.precision_gripper_inner_open()
+      self.precision_gripper_inner_open(this_action_grasps_an_object = True)
       self.precision_gripper_outer_close()
     elif gripper_command=="complex_pick_from_outside":
-      self.precision_gripper_inner_close()
+      self.precision_gripper_inner_close(this_action_grasps_an_object = True)
       self.precision_gripper_outer_close()
     elif gripper_command=="easy_pick_only_inner":
-      self.precision_gripper_inner_open()
-
+      self.precision_gripper_inner_open(this_action_grasps_an_object = True)
+    rospy.sleep(2)
     rospy.loginfo("Going back up")
     object_pose.pose.position.z = (approach_height)
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
