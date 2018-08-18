@@ -135,12 +135,19 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:sensor_d435>
   
+
   <!-- spawn and attach AR marker -->
   <xacro:include filename="$(find o2as_gazebo)/urdf/o2as_ar_marker.urdf.xacro"/>
   <xacro:o2as_ar_marker prefix="b_bot_" parent="b_bot_wrist_3_link"
    marker_id="26">
     <origin xyz="0.0 -0.07 0.0" rpy="${pi/2} 0 0"/>
   </xacro:o2as_ar_marker>
+
+  <!-- Add PhoXi 3D scanners -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />
+  <xacro:phoxi_m_camera_o2as prefix="a_" parent="o2as_ground">
+    <origin xyz="0.56 0 ${bots_z + .1 + .8}" rpy="${170*pi/180} 0 ${-pi/2}"/>
+  </xacro:phoxi_m_camera_o2as>
 
   <!-- I meant to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world" />
