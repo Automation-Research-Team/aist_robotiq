@@ -1,0 +1,143 @@
+<!-- This has a size of about 155 mm x 40 mm x 26 mm -->
+<!-- The Bit cushion has a height of 30.5 mm, starts about 24 mm from the top-->
+<!-- The gripper center would be about 44 mm from the top, so the tip might be 111 mm further down -->
+<!-- The tip\axis seems to be 11.5 mm from the "front" side. The front side looks into the gripper -->
+
+<robot name="screw_tools">
+  <link name="screw_tool_holder">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1.0"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 -.05 0"/>
+      <geometry>
+        <box size=".3 .1 .004"/> 
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 -.05 0"/>
+      <geometry>
+        <box size=".3 .1 .004"/> 
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="screw_holder_to_base" type="fixed">
+    <parent link="c_bot_base_smfl" />
+    <child link="screw_tool_holder" />
+    <origin xyz="0.45 0.7 0.06" rpy="0.0 0.0 0.0" />
+  </joint>
+
+  <!-- ++++++++++++++++++++++++++++ -->
+
+  <link name="screw_tool_m5_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1.0"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://o2as_scene_description/meshes/screw_tool_m5_BC5-XL320-00.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="white">
+        <color rgba=".9 .9 .9 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 -.225" xyz="0 0 0"/>
+      <geometry>
+        <box size=".02 .04 .155"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="screw_tool_m5_to_holder" type="fixed">
+    <parent link="screw_tool_holder" />
+    <child link="screw_tool_m5_link" />
+    <origin xyz="0.1 0.0 0.0" rpy="0.0 0.0 0.0" />
+  </joint>
+
+  <link name="screw_tool_m4_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1.0"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://o2as_scene_description/meshes/screw_tool_m5_BC5-XL320-00.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="white">
+        <color rgba=".9 .9 .9 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 -.225" xyz="0 0 0"/>
+      <geometry>
+        <box size=".02 .04 .155"/> 
+      </geometry>
+    </collision>
+  </link>
+  <joint name="screw_tool_m4_to_holder" type="fixed">
+    <parent link="screw_tool_holder" />
+    <child link="screw_tool_m4_link" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+  </joint>
+  
+  <link name="screw_tool_m3_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1.0"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://o2as_scene_description/meshes/screw_tool_m5_BC5-XL320-00.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="white">
+        <color rgba=".9 .9 .9 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 -.225" xyz="0 0 0"/>
+      <geometry>
+        <box size=".02 .04 .155"/> 
+      </geometry>
+    </collision>
+  </link>
+  <joint name="screw_tool_m3_to_holder" type="fixed">
+    <parent link="screw_tool_holder" />
+    <child link="screw_tool_m3_link" />
+    <origin xyz="-0.1 0.0 0.0" rpy="0.0 0.0 0.0" />
+  </joint>
+
+  <!-- Extra links to position the gripper more simply -->
+
+  <link name="screw_tool_m3_helper_link"/>
+  <joint name="screw_tool_m3_helper_joint" type="fixed">
+    <parent link="screw_tool_m3_link" />
+    <child link="screw_tool_m3_helper_link" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-pi/2}" />
+  </joint>
+
+  <link name="screw_tool_m4_helper_link"/>
+  <joint name="screw_tool_m4_helper_joint" type="fixed">
+    <parent link="screw_tool_m4_link" />
+    <child link="screw_tool_m4_helper_link" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-pi/2}" />
+  </joint>
+
+  <link name="screw_tool_m5_helper_link"/>
+  <joint name="screw_tool_m5_helper_joint" type="fixed">
+    <parent link="screw_tool_m5_link" />
+    <child link="screw_tool_m5_helper_link" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-pi/2}" />
+  </joint>
+
+
+</robot>

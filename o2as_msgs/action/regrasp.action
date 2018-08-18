@@ -1,0 +1,16 @@
+# This is used when one gripper should grasp the item held by another gripper.
+
+# The second gripper is oriented opposite to the first by default.
+
+# Request
+# geometry_msgs/PoseStamped handover_pose         # Target frame for the gripper_tip_link of the giver_robot
+string giver_robot_name                         
+string receiver_robot_name                      
+float64 gripper_distance_before_grasp           # Default: .15
+float64 gripper_distance_after_grasp            # Default: .02
+---
+# Result
+bool success
+---
+# Feedback
+float32 progress

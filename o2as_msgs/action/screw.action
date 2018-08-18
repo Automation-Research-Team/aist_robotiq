@@ -1,0 +1,14 @@
+# This should be called when the screw tool is ready to insert a screw somewhere.
+# Screws can be picked up via the pick action.
+
+# Request
+# z points out of the screw hole, to the top
+geometry_msgs/PoseStamped target_hole
+float64 screw_height         # In m, measured from the bottom of the head (M3x5 has a screw_height of 0.005)
+string robot_name                          
+---
+# Result
+bool success
+---
+# Feedback
+float32 progress
