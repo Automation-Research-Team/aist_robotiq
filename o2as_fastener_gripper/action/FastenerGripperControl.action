@@ -1,0 +1,8 @@
+# Define the goal
+#uint8 goal
+---
+# Define the result
+bool control_result
+---
+# Define a feedback message
+uint32 motor_speed
