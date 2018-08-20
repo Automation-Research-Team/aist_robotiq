@@ -3,10 +3,8 @@ from util import *
 from std_srvs.srv import *
 from subtask import SubTask
 from o2as_vision.srv import FindObject, FindObjectRequest
-# from o2as_vision.srv import FindObjects, FindObjectsRequest
 
 FIND_OBJECT_SERVICE = "find_object"
-# FIND_OBJECTS_SERVICE = "find_objects"
 
 class PartsInfo(object):
     def __init__(self, name, id, type, desc):
@@ -22,7 +20,6 @@ class AssemblyTask(object):
 
         # vision
         self._find_object = ros_service_proxy(FIND_OBJECT_SERVICE, FindObject)
-        # self._find_objects = ros_service_proxy(FIND_OBJECTS_SERVICE, FindObjects)
 
     #############
     ### parts ###
@@ -62,12 +59,10 @@ class AssemblyTask(object):
             parts_info = self.get_parts_info("output_pulley")   # 11
             #parts_info = self.get_parts_info("drive_shaft")   # 8
             req = FindObjectRequest()
-            # req = FindObjectsRequest()
             req.object_id = str(parts_info.id)
             req.camera = "b_bot_camera"
             rospy.logdebug("find_object()) object_id=%s, type=%s", parts_info.id, parts_info.type)
             self._find_object(req.expected_position, req.position_tolerance, req.object_id, req.camera)
-            # self._find_objects(req.expected_position, req.position_tolerance, req.object_id, req.camera)
         except rospy.ServiceException as e:
             rospy.logerr("Service call failed: %s", str(e))
 
