@@ -21,7 +21,7 @@ class USBDevice
     };
 
   protected:
-    USBDevice(uint16_t idVendor, uint16_t idProduct, uint8_t deviceClass);
+    USBDevice(uint16_t idVendor, uint16_t idProduct)			;
     ~USBDevice()							;
 
   public:
@@ -33,7 +33,7 @@ class USBDevice
     usb_dev_handle*	handle()		const	{ return _handle; }
 	 
   private:
-    usb_dev_handle* const	_handle;	//!< USB�ǥХ����Υϥ�ɥ�
+    usb_dev_handle* const	_handle;	//!< USBデバイスのハンドル
 
     static Initializer		_initializer;
 };
@@ -80,7 +80,7 @@ class USBHub : public USBDevice
     uint32_t	getStatus(u_int port)				const	;
     
   private:
-    u_int	_nports;	//!< USB�ϥ֤Υݡ��ȿ�
+    u_int	_nports;	//!< USBハブのポート数
 };
 
 inline u_int

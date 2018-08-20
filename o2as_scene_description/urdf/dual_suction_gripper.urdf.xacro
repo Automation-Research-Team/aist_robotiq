@@ -20,8 +20,7 @@
     <joint name="${prefix}dual_suction_gripper_joint" type="fixed">
       <parent link="${parent}"/>
       <child  link="${prefix}dual_suction_gripper_base_link"/>
-      <child  link="base_link"/>
-      <xacro:insert_block name="origin"/>
+       <xacro:insert_block name="origin"/>
     </joint>
   </xacro:macro>
 </robot>
