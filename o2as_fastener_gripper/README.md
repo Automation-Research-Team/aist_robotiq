@@ -36,4 +36,3 @@ I think that the following operation is possible.
 
 # Known issues
 
-to be filled. 
