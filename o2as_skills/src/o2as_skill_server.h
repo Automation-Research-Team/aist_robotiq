@@ -21,6 +21,7 @@
 // #include <moveit_visual_tools/moveit_visual_tools.h>
 
 #include "visualization_msgs/Marker.h"
+#include <rviz_visual_tools/rviz_visual_tools.h>
 
 // Services
 #include "o2as_msgs/goToNamedPose.h"
@@ -89,6 +90,8 @@ public:
 // private:
   ros::NodeHandle n_;
 
+  // For visualizing things in rviz
+  rviz_visual_tools::RvizVisualToolsPtr visual_tools_;
   ros::Publisher pubMarker_;
   int marker_id_count = 0;
 

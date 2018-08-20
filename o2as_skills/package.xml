@@ -31,6 +31,7 @@
   <exec_depend>message_generation</exec_depend>
   
 
+  <build_depend>rviz_visual_tools</build_depend>
   <exec_depend>moveit_core</exec_depend>
   <exec_depend>moveit_commander</exec_depend>
   <exec_depend>moveit_ros_planning_interface</exec_depend>
