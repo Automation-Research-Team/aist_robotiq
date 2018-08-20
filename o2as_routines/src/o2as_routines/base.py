@@ -100,7 +100,7 @@ class O2ASBaseRoutines(object):
               "c_bot":moveit_commander.MoveGroupCommander("c_bot")}
               # "front_bots":moveit_commander.MoveGroupCommander("front_bots"),
               # "all_bots":moveit_commander.MoveGroupCommander("all_bots") }
-    self.gripper_action_clients = { "a_bot":actionlib.SimpleActionClient('/a_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction), 
+    self.gripper_action_clients = { "a_bot":actionlib.SimpleActionClient('precision_gripper_action', o2as_msgs.msg.PrecisionGripperCommandAction), 
                                "b_bot":actionlib.SimpleActionClient('/b_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction), 
                                "c_bot":actionlib.SimpleActionClient('/c_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction) }
 
@@ -240,7 +240,99 @@ class O2ASBaseRoutines(object):
     return res.success
 
 
-  ################ ----- Routines  
-  ################ 
-  ################ 
+  ################ ----- Gripper interfaces
+  
+  def send_gripper_command(self, gripper, command, this_action_grasps_an_object = False):
+    if gripper == "precision_gripper_outer" or gripper == "precision_gripper_inner":
+      goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
+      if command == "stop":
+        goal.stop = True
+      elif command == "close":
+        if gripper == "precision_gripper_inner":
+          goal.close_inner_gripper_fully = True
+        else:
+          goal.close_outer_gripper_fully = True
+      elif command == "open":
+        if gripper == "precision_gripper_inner":
+          goal.open_inner_gripper_fully = True
+        else:
+          goal.open_outer_gripper_fully = True
+      goal.this_action_grasps_an_object = this_action_grasps_an_object
+      action_client = self.gripper_action_clients["a_bot"]
+    elif gripper == "b_bot" or gripper == "c_bot":
+      goal = robotiq_msgs.msg.CModelCommandGoal()
+      action_client = self.gripper_action_clients[gripper]
+      goal.velocity = 0.1   # from 0.013 to 0.1
+      if command == "close":
+        goal.position = 0.0
+      elif command == "open":
+        goal.position = 0.085
+      else:
+        goal.position = command     # This sets the opening width directly
+    else:
+      rospy.logerr("Could not parse gripper command")
+
+    action_client.send_goal(goal)
+    rospy.loginfo("Sending command " + command + " to gripper: " + gripper)
+    action_client.wait_for_result(rospy.Duration(3.0))  # Default wait time: 3 s
+    result = action_client.get_result()
+    rospy.loginfo(result)
+    return 
+
+  def precision_gripper_outer_close(self):
+    try:
+        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
+        goal.close_outer_gripper_fully = True
+        self.gripper_action_clients["c_bot"].send_goal(goal)
+        rospy.loginfo("close outer gripper")
+        self.gripper_action_clients["c_bot"].wait_for_result()
+        result = self.gripper_action_clients["c_bot"].get_result()
+        rospy.loginfo(result)
+    except rospy.ROSInterruptException:
+        rospy.loginfo("program interrupted before completion", file=sys.stderr)
+
+
+  def precision_gripper_outer_open(self):
+    try:
+        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
+        goal.open_outer_gripper_fully = True
+        goal.close_outer_gripper_fully = False
+        self.gripper_action_clients["c_bot"].send_goal(goal)
+        rospy.loginfo("open outer gripper")
+        self.gripper_action_clients["c_bot"].wait_for_result()
+        result = self.gripper_action_clients["c_bot"].get_result()
+        rospy.loginfo(result)
+    except rospy.ROSInterruptException:
+        rospy.loginfo("program interrupted before completion", file=sys.stderr)
+
+  def precision_gripper_inner_close(self, this_action_grasps_an_object = False):
+    try:
+        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
+        goal.close_inner_gripper_fully = True
+        goal.this_action_grasps_an_object = this_action_grasps_an_object
+        self.gripper_action_clients["c_bot"].send_goal(goal)
+        rospy.loginfo("Closing inner gripper")
+        self.gripper_action_clients["c_bot"].wait_for_result()
+        result = self.gripper_action_clients["c_bot"].get_result()
+        rospy.loginfo(result)
+    except rospy.ROSInterruptException:
+        rospy.loginfo("program interrupted before completion", file=sys.stderr)
+
+
+  def precision_gripper_inner_open(self, this_action_grasps_an_object = False):
+    try:
+        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
+        goal.open_inner_gripper_fully = True
+        goal.close_inner_gripper_fully = False
+        goal.this_action_grasps_an_object = this_action_grasps_an_object
+        self.gripper_action_clients["c_bot"].send_goal(goal)
+        rospy.loginfo("Opening inner gripper")
+        self.gripper_action_clients["c_bot"].wait_for_result()
+        result = self.gripper_action_clients["c_bot"].get_result()
+        rospy.loginfo(result)
+    except rospy.ROSInterruptException:
+        rospy.loginfo("program interrupted before completion", file=sys.stderr)
+
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
 

@@ -56,8 +56,6 @@ class TaskboardClass(O2ASBaseRoutines):
     super(TaskboardClass, self).__init__()
     self.set_up_item_parameters()
     
-
-    self.action_client = actionlib.SimpleActionClient('precision_gripper_action', o2as_msgs.msg.PrecisionGripperCommandAction)
     # self.action_client.wait_for_server()
     rospy.sleep(.5)   # Use this instead of waiting, so that simulation can be used
 
@@ -98,65 +96,6 @@ class TaskboardClass(O2ASBaseRoutines):
       place_pose.pose.position.z = self.item_place_heights[i]
       self.place_poses.append(place_pose)
     
-
-
-
-  def precision_gripper_outer_close(self):
-    try:
-        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
-        goal.close_outer_gripper_fully = True
-        self.action_client.send_goal(goal)
-        rospy.loginfo("close outer gripper")
-        self.action_client.wait_for_result()
-        result = self.action_client.get_result()
-        rospy.loginfo(result)
-    except rospy.ROSInterruptException:
-        rospy.loginfo("program interrupted before completion", file=sys.stderr)
-
-
-  def precision_gripper_outer_open(self):
-    try:
-        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
-        goal.open_outer_gripper_fully = True
-        goal.close_outer_gripper_fully = False
-        self.action_client.send_goal(goal)
-        rospy.loginfo("open outer gripper")
-        self.action_client.wait_for_result()
-        result = self.action_client.get_result()
-        rospy.loginfo(result)
-    except rospy.ROSInterruptException:
-        rospy.loginfo("program interrupted before completion", file=sys.stderr)
-
-  def precision_gripper_inner_close(self, this_action_grasps_an_object = False):
-    try:
-        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
-        goal.close_inner_gripper_fully = True
-        goal.this_action_grasps_an_object = this_action_grasps_an_object
-        self.action_client.send_goal(goal)
-        rospy.loginfo("Closing inner gripper")
-        self.action_client.wait_for_result()
-        result = self.action_client.get_result()
-        rospy.loginfo(result)
-    except rospy.ROSInterruptException:
-        rospy.loginfo("program interrupted before completion", file=sys.stderr)
-
-
-  def precision_gripper_inner_open(self, this_action_grasps_an_object = False):
-    try:
-        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
-        goal.open_inner_gripper_fully = True
-        goal.close_inner_gripper_fully = False
-        goal.this_action_grasps_an_object = this_action_grasps_an_object
-        self.action_client.send_goal(goal)
-        rospy.loginfo("Opening inner gripper")
-        self.action_client.wait_for_result()
-        result = self.action_client.get_result()
-        rospy.loginfo(result)
-    except rospy.ROSInterruptException:
-        rospy.loginfo("program interrupted before completion", file=sys.stderr)
-
-    except rospy.ServiceException, e:
-        print "Service call failed: %s"%e
 
   # def 
   # calib_pose = geometry_msgs.msg.PoseStamped()
@@ -346,9 +285,6 @@ if __name__ == '__main__':
     taskboard = TaskboardClass()
     taskboard.set_up_item_parameters()
     #taskboard.full_taskboard_task()
-
-    taskboard.horizontal_spiral_motion("a_bot", .005)
-
     
     # 3,14        complex_pick_from_inside
     # 4           complex_pick_from_outside
