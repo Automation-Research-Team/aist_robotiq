@@ -112,6 +112,7 @@ class O2ASBaseRoutines(object):
 
     self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR)
     self.goToNamedPose_client = rospy.ServiceProxy('/o2as_skills/goToNamedPose', o2as_msgs.srv.goToNamedPose)
+    self.publishMarker_client = rospy.ServiceProxy('/o2as_skills/publishMarker', o2as_msgs.srv.publishMarker)
 
     # self.pick_client.wait_for_server() # wait for the clients to connect
     # self.place_client.wait_for_server() 
@@ -122,6 +123,13 @@ class O2ASBaseRoutines(object):
     rospy.loginfo("Finished initializing class")
     
   ############## ------ Internal functions (and convenience functions)
+
+  def publish_marker(self, pose_stamped, marker_type):
+    req = o2as_msgs.srv.publishMarkerRequest()
+    req.marker_pose = pose_stamped
+    req.marker_type = marker_type
+    res = self.publishMarker_client.call(req)
+    return res.success
 
   def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, high_precision = False):
     group = self.groups[group_name]

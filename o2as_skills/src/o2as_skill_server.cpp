@@ -17,6 +17,8 @@ SkillServer::SkillServer() :
   // Services to advertise
   goToNamedPoseService_ = n_.advertiseService("o2as_skills/goToNamedPose", &SkillServer::goToNamedPoseCallback,
                                         this);
+  publishMarkerService_ = n_.advertiseService("o2as_skills/publishMarker", &SkillServer::publishMarkerCallback,
+                                        this);
 
   // Services to subscribe to
   sendScriptToURClient_ = n_.serviceClient<o2as_msgs::sendScriptToUR>("o2as_skills/sendScriptToUR");
@@ -725,6 +727,12 @@ bool SkillServer::goToNamedPoseCallback(o2as_msgs::goToNamedPose::Request &req,
   return true;
 }
 
+bool SkillServer::publishMarkerCallback(o2as_msgs::publishMarker::Request &req,
+                                           o2as_msgs::publishMarker::Response &res)
+{
+  ROS_INFO("Received publishMarker callback.");
+  return publishMarker(req.marker_pose, req.marker_type);
+}
 
 // ----------- Action servers
 

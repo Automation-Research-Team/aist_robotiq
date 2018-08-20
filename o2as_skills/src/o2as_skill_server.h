@@ -25,6 +25,7 @@
 // Services
 #include "o2as_msgs/goToNamedPose.h"
 #include "o2as_msgs/sendScriptToUR.h"
+#include "o2as_msgs/publishMarker.h"
 #include "o2as_msgs/PrecisionGripperCommand.h"
 
 // Actions
@@ -76,6 +77,8 @@ public:
   // Callback declarations
   bool goToNamedPoseCallback(o2as_msgs::goToNamedPose::Request &req,
                         o2as_msgs::goToNamedPose::Response &res);
+  bool publishMarkerCallback(o2as_msgs::publishMarker::Request &req,
+                        o2as_msgs::publishMarker::Response &res);
 
   // Actions
   void executeAlign(const o2as_msgs::alignGoalConstPtr& goal);
@@ -94,6 +97,7 @@ public:
 
   // Service declarations
   ros::ServiceServer goToNamedPoseService_;
+  ros::ServiceServer publishMarkerService_;
 
   // Service clients
   ros::ServiceClient sendScriptToURClient_;
