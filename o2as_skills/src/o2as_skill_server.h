@@ -52,6 +52,7 @@ public:
   bool goToNamedPose(std::string pose_name, std::string robot_name);
   bool stop();                  // Stops the robot at the current position
   moveit::planning_interface::MoveGroupInterface* robotNameToMoveGroup(std::string robot_name);
+  std::string getEELink(std::string robot_name);
   bool updatePlanningScene();
 
   // Internal functions
@@ -115,7 +116,7 @@ public:
   // actionlib::SimpleActionClient<control_msgs::GripperCommandAction> a_bot_gripper_client_;
   actionlib::SimpleActionClient<robotiq_msgs::CModelCommandAction> b_bot_gripper_client_, c_bot_gripper_client_;
 
-  double PLANNING_TIME = 15.0, LIN_PLANNING_TIME = 30.0;
+  double PLANNING_TIME = 5.0, LIN_PLANNING_TIME = 15.0;
   
   // Status variables
   tf::TransformListener tflistener_;
