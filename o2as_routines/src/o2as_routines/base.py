@@ -192,7 +192,7 @@ class O2ASBaseRoutines(object):
     return True
 
   def go_to_named_pose(self, pose_name, robot_name, speed = 1.0):
-    # pose_name should be "home_a", "home_b" etc.
+    # pose_name should be "home", "back" etc.
     self.groups[robot_name].set_named_target(pose_name)
     rospy.loginfo("Setting velocity scaling to " + str(speed))
     self.groups[robot_name].set_max_velocity_scaling_factor(speed)

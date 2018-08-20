@@ -1118,7 +1118,7 @@ int main(int argc, char **argv)
   // o2as_skill_server.unequipScrewTool("b_bot");
 
   // ROS_INFO("Going to home pose.");
-  // o2as_skill_server.goToNamedPose("home_b", "b_bot");
+  // o2as_skill_server.goToNamedPose("home", "b_bot");
   // ROS_INFO("Done.");
   //// ------------
 
