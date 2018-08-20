@@ -93,13 +93,13 @@ bool RealSenseCamera::SaveFrameForCadMatching(
 		cv::Mat cv_depth_image = cv::Mat(height, width, CV_16SC1, const_cast<void*>(depth_frame.get_data()));
 		cv::Mat cv_color_image = cv::Mat(height, width, CV_8UC3, const_cast<void*>(color_frame.get_data()));
 		// convert image format
-		ROS_INFO("get point cloud");
+		ROS_DEBUG("get point cloud");
 		point_cloud = (float*)malloc(width * height * 3 * sizeof(float));
 		GetPointCloud2(depth_frame, this->depth_scale_, this->inv_param_, point_cloud);
 		// save image data to files
-		ROS_INFO("save color image. filename = %s", req.image_filename.c_str());
+		ROS_DEBUG("save color image. filename = %s", req.image_filename.c_str());
 		imwrite((char*)req.image_filename.c_str(), cv_color_image);
-		ROS_INFO("save depth image. filename = %s", req.pcloud_filename.c_str());
+		ROS_DEBUG("save depth image. filename = %s", req.pcloud_filename.c_str());
 		SavePointCloudToBinary(point_cloud, width, height, (char*)req.pcloud_filename.c_str());
 		cv::imshow("depth", cv_depth_image);
 		cv::imshow("color", cv_color_image);

@@ -9,9 +9,13 @@
 
 using namespace o2as;
 
+//#define LOG_LEVEL ros::console::levels::Debug
+#define LOG_LEVEL ros::console::levels::Info
+
 int main(int argc, char **argv) 
 {
     ros::init(argc, argv, "realsense_camera_node");
+    ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, LOG_LEVEL);
     ros::NodeHandle nh;
 
     std::string serial_number;
