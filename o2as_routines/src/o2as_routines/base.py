@@ -169,23 +169,14 @@ class O2ASBaseRoutines(object):
     RealRadius=0
     
     # ==== MISBEHAVING VERSION (see https://answers.ros.org/question/300978/movegroupcommander-get_current_pose-returns-incorrect-result-when-using-real-robot/ )
-    start_pos_bugged = group.get_current_pose() 
+    # start_pos_bugged = group.get_current_pose() 
     # ==== WORKING VERSION:
     gripper_pos = geometry_msgs.msg.PoseStamped()
     gripper_pos.header.frame_id = "a_bot_gripper_tip_link"
     gripper_pos.pose.orientation.w = 1.0
     start_pos = self.listener.transformPose("world", gripper_pos)
-    # ====
-    next_pos = start_pos
 
-    rospy.loginfo("The EE link is: " + group.get_end_effector_link())
-    rospy.loginfo("The planning frame is: " + group.get_planning_frame())
-    rospy.loginfo("Pose via MoveGroupCommander is: ")
-    rospy.loginfo(start_pos_bugged)
-    rospy.loginfo("Pose via manual TF is: ")
-    rospy.loginfo(start_pos)
-    self.publishMarker_client(start_pos_bugged, "pose")
-    self.publishMarker_client(start_pos, "pose")
+    next_pos = start_pos
     while RealRadius <= max_radius and not rospy.is_shutdown():
         #By default, the Spiral_Search function will maintain contact between both mating parts at all times
         theta=theta+theta_incr
@@ -195,14 +186,8 @@ class O2ASBaseRoutines(object):
         next_pos.pose.position.y = start_pos.pose.position.y + y
         r=r + radius_inc_set
         RealRadius = sqrt(pow(x,2)+pow(y,2))
-        rospy.loginfo("The next target pose is: ")
-        rospy.loginfo(next_pos)
-        self.publishMarker_client(next_pos, "pose")
-        rospy.loginfo("Go? Type y")
-        inp = raw_input()
-        if inp == "y":
-          self.go_to_pose_goal(robot_name, next_pos)
-          rospy.sleep(0.1)
+        self.go_to_pose_goal(robot_name, next_pos)
+        rospy.sleep(0.1)
     # -------------
     return True
 
