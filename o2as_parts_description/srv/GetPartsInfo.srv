@@ -1,0 +1,4 @@
+string object_id
+---
+int32 exists
+o2as_parts_description/PartsInfo parts_info

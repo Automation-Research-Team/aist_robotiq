@@ -1,0 +1,6 @@
+<launch>
+	<arg name="parts_list_filename" default="$(find o2as_parts_description)/config/assembly_parts_list.yaml"/>
+    <node name="parts_database" pkg="o2as_parts_description" type="parts_database.py" output="screen">
+        <rosparam command="load" file="$(arg parts_list_filename)"/>
+    </node>
+</launch>
