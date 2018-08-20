@@ -42,7 +42,7 @@ SkillServer::SkillServer() :
   // Set up MoveGroups
   a_bot_group_.setPlanningTime(PLANNING_TIME);
   a_bot_group_.setPlannerId("RRTConnectkConfigDefault");
-  a_bot_group_.setEndEffectorLink("a_bot_robotiq_85_tip_link");
+  a_bot_group_.setEndEffectorLink("a_bot_gripper_tip_link");
   a_bot_group_.setNumPlanningAttempts(10);
   b_bot_group_.setPlanningTime(PLANNING_TIME);
   b_bot_group_.setPlannerId("RRTConnectkConfigDefault");
