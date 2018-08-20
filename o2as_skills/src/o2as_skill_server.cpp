@@ -918,114 +918,63 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
   ROS_INFO("regraspAction was called");
 
   // Create the handover_pose for Giver and Receiver robot
-  // Start by making a few motion primitives.
-  geometry_msgs::PoseStamped c_bot_facing_forward, a_bot_facing_forward, b_bot_facing_forward, a_bot_facing_c, b_bot_facing_c;
-  c_bot_facing_forward.header.frame_id = "workspace_center";
-  a_bot_facing_forward.header.frame_id = "workspace_center";
-  b_bot_facing_forward.header.frame_id = "workspace_center";
-  a_bot_facing_c.header.frame_id = "workspace_center";
-  b_bot_facing_c.header.frame_id = "workspace_center";
-
-  double c_tilt = 0.0;
-  if ((goal->giver_robot_name == "b_bot") || (goal->receiver_robot_name == "b_bot"))
-  {
-    c_tilt = 10.0; // degrees. Tilt during the handover to c (this makes the pose nicer for b_bot)
-  }
-  
-  c_bot_facing_forward.pose.position.x = -.28;
-  c_bot_facing_forward.pose.position.y = 0.11;
-  c_bot_facing_forward.pose.position.z = 0.55;
-  c_bot_facing_forward.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, -c_tilt/180.0*M_PI, 0);
-
-  b_bot_facing_forward.pose.position.x = 0.0;
-  b_bot_facing_forward.pose.position.y = 0.1;
-  b_bot_facing_forward.pose.position.z = 0.65;
-  b_bot_facing_forward.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -M_PI/2);
-
-  a_bot_facing_forward.pose.position.x = 0.0;
-  a_bot_facing_forward.pose.position.y = 0.1;
-  a_bot_facing_forward.pose.position.z = 0.65;
-  a_bot_facing_forward.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(-M_PI/2, 0, M_PI/2);
-
-  a_bot_facing_c.pose.position.x = -.28;
-  a_bot_facing_c.pose.position.y = 0.11;
-  a_bot_facing_c.pose.position.z = 0.55;
-  // a_bot_facing_c.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, c_tilt/180.0*M_PI, M_PI); // Confirmed
-  a_bot_facing_c.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI/2, c_tilt/180.0*M_PI, M_PI);  // Confirmed
-
-  b_bot_facing_c.pose.position.x = -.28;
-  b_bot_facing_c.pose.position.y = 0.11;
-  b_bot_facing_c.pose.position.z = 0.55;
-  // b_bot_facing_c.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, c_tilt/180.0*M_PI, M_PI); // Confirmed
-  b_bot_facing_c.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI/2, c_tilt/180.0*M_PI, M_PI);  // (90 degrees rotated to c_bot)
-
   std::string giver_robot_name = goal->giver_robot_name, 
               receiver_robot_name = goal->receiver_robot_name;
 
   // The giver holds the item steady, the receiver picks it up.
-  // If c_bot is involved, it always picks up as the receiver, because its configuration is advantageous.
+  // Priority: c_bot, b_bot, a_bot (a_bot only gives passively)
+  // If c_bot is involved, it always picks up (receiver), because its configuration is advantageous.
   if (giver_robot_name == "c_bot")
   {
     giver_robot_name = receiver_robot_name;
     receiver_robot_name = "c_bot";
   }
-
-  // 
-  geometry_msgs::PoseStamped handover_pose_giver, handover_pose_receiver;
-  if (giver_robot_name == "a_bot")
-  {
-    if (receiver_robot_name == "c_bot")
-    {
-      handover_pose_giver = a_bot_facing_c;
-      handover_pose_receiver = c_bot_facing_forward;
-    }
-    else if (receiver_robot_name == "b_bot")
-    {
-      handover_pose_giver = a_bot_facing_forward;
-      handover_pose_receiver = b_bot_facing_forward;
-    }
-  }
   else if (giver_robot_name == "b_bot")
   {
-    if (receiver_robot_name == "c_bot")
-    {
-      handover_pose_giver = b_bot_facing_c;
-      handover_pose_receiver = c_bot_facing_forward;
-    }
-    else if (receiver_robot_name == "b_bot")
-    {
-      handover_pose_giver = a_bot_facing_forward;
-      handover_pose_receiver = b_bot_facing_forward;
-    }
+    giver_robot_name = receiver_robot_name; // This is always a_bot
+    receiver_robot_name = "b_bot";
   }
-  else if (giver_robot_name == "c_bot")
+
+  tf::Transform t;
+  tf::Quaternion q;
+  if (receiver_robot_name == "c_bot")
   {
-    handover_pose_giver = c_bot_facing_forward;
-    if (receiver_robot_name == "a_bot")
-    {
-      handover_pose_receiver = a_bot_facing_c;
-    }
-    else if (receiver_robot_name == "b_bot")
-    {
-      handover_pose_receiver = b_bot_facing_c;
-    }
+    t.setOrigin(tf::Vector3(-.28, .11, .55));  // x y z of the handover position
+    double c_tilt = 0.0;
+    if (giver_robot_name == "b_bot") 
+    { 
+      c_tilt = 10.0;  // degrees. Tilts during the handover to c (this makes the pose nicer for b_bot)
+    } 
+    q.setRPY(0, -c_tilt/180.0*M_PI, 0);   // r p y of the handover position (for the receiver)    
   }
+  else if ((receiver_robot_name == "b_bot") || (receiver_robot_name == "a_bot"))
+  {
+    t.setOrigin(tf::Vector3(0.1, 0.0, 0.65));
+    if (receiver_robot_name == "b_bot")
+    {
+      q.setRPY(0, 0, -M_PI/2);
+    }
+    else
+    {
+      ROS_ERROR("This function should not arrive here.");
+      q.setRPY(0, 0, M_PI/2);   
+    }
+    
+  }
+  t.setRotation(q);
+  tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "workspace_center", "handover_frame"));
+
+  geometry_msgs::PoseStamped handover_pose_giver, handover_pose_receiver;
+  handover_pose_giver.header.frame_id = "handover_frame";
+  handover_pose_receiver.header.frame_id = "handover_frame";
+  handover_pose_giver.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI/2, 0, M_PI); // Facing the receiver, rotated
 
   publishMarker(handover_pose_receiver, "pick_pose");
   publishMarker(handover_pose_giver, "place_pose");
+  ros::Duration(.1).sleep();
+  tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "workspace_center", "handover_frame"));
 
-  // To give space
-  if ( (receiver_robot_name == "c_bot") || (receiver_robot_name == "c_bot"))
-  {
-    goToNamedPose("back", "c_bot");
-  }
-
-  // Transform pose to the EE frame
-  // handover_pose_receiver = transform_pose_now(handover_pose_receiver, getEELink(receiver_robot_name), tflistener_);
-  // handover_pose_giver = transform_pose_now(handover_pose_giver, getEELink(giver_robot_name), tflistener_);
-
-  publishMarker(handover_pose_receiver, "pick_pose");
-  publishMarker(handover_pose_giver, "place_pose");
+  goToNamedPose("back", receiver_robot_name);
 
   // Move the Giver to the regrasp_pose
   ROS_INFO_STREAM("Moving giver robot (" << giver_robot_name << ") to handover pose.");
@@ -1033,12 +982,12 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
   
   // Move the Receiver to an approach pose, then on to grasp
   ROS_INFO_STREAM("Moving receiver robot (" << receiver_robot_name << ") to approach pose.");
-  handover_pose_receiver.pose.position.x -= .1;
+  handover_pose_receiver.pose.position.x = -goal->gripper_distance_before_grasp;
   moveToCartPosePTP(handover_pose_receiver, receiver_robot_name);
 
   ros::Duration(1).sleep();
   ROS_INFO_STREAM("Moving receiver robot (" << receiver_robot_name << ") to grasp pose.");
-  handover_pose_receiver.pose.position.x += .1;
+  handover_pose_receiver.pose.position.x = -goal->grasp_distance;
   moveToCartPosePTP(handover_pose_receiver, receiver_robot_name);
   
   // Close the Receiver's gripper
@@ -1048,7 +997,7 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
 
   // Move back.
   ROS_INFO_STREAM("Moving receiver robot (" << receiver_robot_name << ") back to approach pose.");
-  handover_pose_receiver.pose.position.x -= .1;
+  handover_pose_receiver.pose.position.x = -goal->gripper_distance_after_grasp;
   moveToCartPosePTP(handover_pose_receiver, receiver_robot_name);
 
   // goToNamedPose("home", giver_robot_name);

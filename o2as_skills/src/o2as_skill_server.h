@@ -8,6 +8,8 @@
 #include "geometry_msgs/PoseStamped.h"
 
 #include <tf/transform_listener.h>    // Includes the TF conversions
+#include <tf/transform_broadcaster.h>
+
 #include "o2as_helper_functions.h"
 
 #include <chrono>
@@ -120,6 +122,7 @@ public:
   
   // Status variables
   tf::TransformListener tflistener_;
+  tf::TransformBroadcaster tfbroadcaster_;
   bool holding_object_ = false;
   // A status of the robot. This should almost definitely be rosparams instead.
   // /a_bot/status/carrying_object  (bool)
