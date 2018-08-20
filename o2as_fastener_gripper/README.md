@@ -1,8 +1,10 @@
 # Introduction
 Control the XL320 with ROS.
+
 It is implemented by Action Server.
 
 Install the Dynamixel SDK to control XL320.
+
 The following is the part described in Dockerfile.
 ```bash
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -26,16 +28,17 @@ The following is an example(o2as_fastener_gripper/launch/fastener_gripper_action
 
 Three XL320 will be used this time.
 ID is 1,2,3 respectively.
+
 BaundRate is 1000000.
 
 After connecting and configuring, execute fastener_gripper_test_action.launch.
 
 I think that the following operation is possible.
 
-* 1.Turn on the torque of 'XL-320' and rotate clockwise (wheel mode)
-* 2.Stop rotation of the motor with fingers, generate load (assuming screws close)
-* 3.When the load is detected (rotation speed = 0), the torque of 'XL-320' is turned off and the rotation stop
-* 4.Next ID(XL320).
+* 1. Turn on the torque of 'XL-320' and rotate clockwise (wheel mode)
+* 2. Stop rotation of the motor with fingers, generate load (assuming screws close)
+* 3. When the load is detected (rotation speed = 0), the torque of XL-320 is turned off and the rotation stop
+* 4. Next ID(XL320).
 
 
 # Known issues
