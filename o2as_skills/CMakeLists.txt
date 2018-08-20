@@ -19,7 +19,6 @@ find_package(catkin REQUIRED
 	moveit_commander
 	moveit_ros_planning_interface
 	moveit_ros_planning
-	rviz_visual_tools
 	tf
 )
 

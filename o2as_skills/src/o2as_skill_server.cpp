@@ -13,8 +13,6 @@ SkillServer::SkillServer() :
 { 
   // Topics to publish
   pubMarker_ = n_.advertise<visualization_msgs::Marker>("visualization_marker", 10);
-  visual_tools_.reset(new rviz_visual_tools::RvizVisualTools("world","viz_tools_marker"));
-  ros::Duration(.5).sleep();
 
   // Services to advertise
   goToNamedPoseService_ = n_.advertiseService("o2as_skills/goToNamedPose", &SkillServer::goToNamedPoseCallback,
@@ -619,7 +617,77 @@ bool SkillServer::pickScrew(std::string object_id, std::string screw_tool_id, st
 
 bool SkillServer::publishMarker(geometry_msgs::PoseStamped marker_pose, std::string marker_type)
 {
+    visualization_msgs::Marker marker;
+    marker.header = marker_pose.header;
+    marker.header.stamp = ros::Time::now();
+    marker.pose = marker_pose.pose;
 
+    marker.ns = "markers";
+    marker.id = marker_id_count++;
+    marker.lifetime = ros::Duration();
+    marker.action = visualization_msgs::Marker::ADD;
+
+    if (marker_type == "pose")
+    {
+      publishPoseMarker(marker_pose);
+
+      // Add a flat sphere
+      marker.type = visualization_msgs::Marker::SPHERE;
+      marker.scale.x = .01;
+      marker.scale.y = .05;
+      marker.scale.z = .05;
+      marker.color.g = 1.0;
+      marker.color.a = 0.8;
+      pubMarker_.publish(marker);
+      return true;
+    }
+    if (marker_type == "place_pose")
+    {
+      publishPoseMarker(marker_pose);
+
+      // Add a flat sphere
+      marker.type = visualization_msgs::Marker::SPHERE;
+      marker.scale.x = .01;
+      marker.scale.y = .05;
+      marker.scale.z = .05;
+      marker.color.g = 1.0;
+      marker.color.a = 0.8;
+      pubMarker_.publish(marker);
+      return true;
+    }
+    if (marker_type == "pick_pose")
+    {
+      publishPoseMarker(marker_pose);
+
+      // Add a flat sphere
+      marker.type = visualization_msgs::Marker::SPHERE;
+      marker.scale.x = .01;
+      marker.scale.y = .05;
+      marker.scale.z = .05;
+      marker.color.r = 0.8;
+      marker.color.g = 0.4;
+      marker.color.a = 0.8;
+    }
+    else if (marker_type == "")
+    {
+      marker.type = visualization_msgs::Marker::SPHERE;
+      marker.scale.x = .02;
+      marker.scale.y = .1;
+      marker.scale.z = .1;
+      
+      marker.color.g = 1.0;
+      marker.color.a = 0.8;
+    }
+    else 
+    {ROS_WARN("No useful marker message received.");}
+    pubMarker_.publish(marker);
+    if (marker_id_count > 50) marker_id_count = 0;
+    return true;
+}
+
+// This is a helper function for publishMarker. Publishes a TF-like frame.
+bool SkillServer::publishPoseMarker(geometry_msgs::PoseStamped marker_pose)
+{
   visualization_msgs::Marker marker;
   marker.header = marker_pose.header;
   marker.header.stamp = ros::Time::now();
@@ -630,70 +698,22 @@ bool SkillServer::publishMarker(geometry_msgs::PoseStamped marker_pose, std::str
   marker.lifetime = ros::Duration();
   marker.action = visualization_msgs::Marker::ADD;
 
-  if (marker_type == "pose")
-  {
-    publishPoseMarker(marker_pose);
+  // This draws a TF-like frame.
+  marker.type = visualization_msgs::Marker::ARROW;
+  marker.scale.x = .1;
+  marker.scale.y = .01;
+  marker.scale.z = .01;
+  marker.color.a = .8;
 
-    // Add a flat sphere
-    marker.type = visualization_msgs::Marker::SPHERE;
-    marker.scale.x = .01;
-    marker.scale.y = .05;
-    marker.scale.z = .05;
-    marker.color.g = 1.0;
-    marker.color.a = 0.8;
-    pubMarker_.publish(marker);
-    return true;
-  }
-  if (marker_type == "place_pose")
-  {
-    publishPoseMarker(marker_pose);
+  visualization_msgs::Marker arrow_x, arrow_y, arrow_z;
+  arrow_x = marker; arrow_y = marker; arrow_z = marker;
+  arrow_x.id = marker_id_count++; arrow_y.id = marker_id_count++; arrow_z.id = marker_id_count++;
+  arrow_x.color.r = 1.0; arrow_y.color.g = 1.0; arrow_z.color.b = 1.0;
 
-    // Add a flat sphere
-    marker.type = visualization_msgs::Marker::SPHERE;
-    marker.scale.x = .01;
-    marker.scale.y = .05;
-    marker.scale.z = .05;
-    marker.color.g = 1.0;
-    marker.color.a = 0.8;
-    pubMarker_.publish(marker);
-    return true;
-  }
-  if (marker_type == "pick_pose")
-  {
-    publishPoseMarker(marker_pose);
+  rotatePoseByRPY(0, 0, M_PI/2, arrow_y.pose);
+  rotatePoseByRPY(0, -M_PI/2, 0, arrow_z.pose);
 
-    // Add a flat sphere
-    marker.type = visualization_msgs::Marker::SPHERE;
-    marker.scale.x = .01;
-    marker.scale.y = .05;
-    marker.scale.z = .05;
-    marker.color.r = 0.8;
-    marker.color.g = 0.4;
-    marker.color.a = 0.8;
-  }
-  else if (marker_type == "")
-  {
-    marker.type = visualization_msgs::Marker::SPHERE;
-    marker.scale.x = .02;
-    marker.scale.y = .1;
-    marker.scale.z = .1;
-    
-    marker.color.g = 1.0;
-    marker.color.a = 0.8;
-  }
-  else 
-  {ROS_WARN("No useful marker message received.");}
-  pubMarker_.publish(marker);
-  if (marker_id_count > 50) marker_id_count = 0;
-  return true;
-}
-
-// This is a helper function for publishMarker. Publishes a TF-like frame.
-bool SkillServer::publishPoseMarker(geometry_msgs::PoseStamped marker_pose)
-{
-  geometry_msgs::PoseStamped ps = transform_pose_now(marker_pose, "world", tflistener_);
-  visual_tools_->publishAxis(ps.pose);
-  visual_tools_->trigger();
+  pubMarker_.publish(arrow_x); pubMarker_.publish(arrow_y); pubMarker_.publish(arrow_z);
   return true;
 }
 // ----------- Service definitions
@@ -1050,24 +1070,6 @@ int main(int argc, char **argv)
   // Create an object of class SkillServer that will take care of everything
   SkillServer o2as_skill_server;
   ROS_INFO("O2AS skill server started");
-
-
-  // ############## Test markers
-  geometry_msgs::PoseStamped ps1, ps2;
-  ps1 = makePoseStamped();
-  ps1.pose.position.z = .3;
-  ps2 = ps1;
-  ps1.pose.position.x = .5;
-
-  while (ros::ok())
-  {
-    ros::spinOnce();
-    o2as_skill_server.publishPoseMarker(ps1);
-    o2as_skill_server.publishPoseMarker(ps2);
-    ros::Duration(1).sleep();
-    o2as_skill_server.visual_tools_->deleteAllMarkers();
-  }
-  // ###############
 
   // o2as_msgs::sendScriptToUR srv;
   // srv.request.program_id = "insertion";
