@@ -1,0 +1,8 @@
+# Request
+geometry_msgs/PoseStamped expected_position # Where the object is expected to be
+float64 position_tolerance                  # How far the object may be from the expected position
+string object_id                            # The gripper holding the part to be inserted
+string camera                               # The camera to be used for the recognition ("phoxi", "a_bot_realsense"...)
+---
+# Response
+bool success

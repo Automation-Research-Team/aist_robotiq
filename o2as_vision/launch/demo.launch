@@ -1,9 +1,20 @@
 <launch>
-	<arg name="parts_list_filename" default="$(find o2as_parts_description)/config/assembly_parts_list.yaml"/>
+	<include file="$(find o2as_moveit_config)/launch/demo.launch">
+	</include>
+
+    <arg name="parts_list_filename" default="$(find o2as_parts_description)/config/assembly_parts_list.yaml"/>
 	<include file="$(find o2as_vision)/launch/vision.launch">
 	    <arg name="parts_list_filename" value="$(arg parts_list_filename)"/>
     </include>
 
+    <!-- 
+     7 : bearing housing
+    11 : output pulley
+    13 : idler pulley
+    -1 : all 
+    -->
+    <arg name="object_id" default="11"/>
     <node name="o2as_vision_demo" pkg="o2as_vision" type="o2as_vision_demo.py" output="screen">
+	    <param name="object_id" type="string" value="$(arg object_id)"/>
     </node>
 </launch>

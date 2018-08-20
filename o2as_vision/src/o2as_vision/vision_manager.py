@@ -3,7 +3,8 @@ import rospkg
 import tf
 from util import *
 from geometry_msgs.msg import Pose
-from o2as_vision.srv import FindObjectsResponse
+from o2as_vision.srv import FindObjectResponse
+from o2as_vision.srv import FindObjectsResponse 
 from o2as_parts_description.srv import GetPartsInfo
 from vision_group_interface import VisionGroupInterface
 
@@ -40,7 +41,7 @@ class VisionManager(object):
 
         res = FindObjectsResponse()
         group = self.get_group(camera)
-        detected_objects = group.find_object(object_id)
+        detected_objects = group.find_objects(object_id)
 
         if (len(detected_objects) == 0):
             rospy.loginfo("no object found")
@@ -50,6 +51,19 @@ class VisionManager(object):
                 self.add_detected_object_to_planning_scene(obj, group)
 
         rospy.logdebug("VisionManager.find_objects() end")
+        return res
+
+    def find_object(self, camera, object_id, expected_position, position_tolerance):
+        rospy.logdebug("VisionManager.find_object() begin")
+        res = FindObjectResponse()
+        group = self.get_group(camera)
+        detected_object = group.find_object(object_id, expected_position, position_tolerance)
+        if detected_object == None:
+            rospy.loginfo("no object found")
+        else:
+            rospy.logdebug("add detected object to planning scene")
+            self.add_detected_object_to_planning_scene(detected_object, group)
+        rospy.logdebug("VisionManager.find_object() end")
         return res
 
     def add_detected_object_to_planning_scene(self, obj, group):
@@ -84,9 +98,9 @@ class VisionManager(object):
         rospy.logdebug("scale = (%f, %f, %f)", scale[0], scale[1], scale[2])
         group.add_detected_object_to_planning_scene(name=object_name+"_mesh", pose=pose, cad_filename=cad_filename, scale=scale)
 
-    def update_scene(self):
-        for key in self._items:
-            self._items[key].find_object()
+    # def update_scene(self):
+    #     for key in self._items:
+    #         self._items[key].find_object()
 
     def add_group(self, name):
         self._items[name] = VisionGroupInterface(name)

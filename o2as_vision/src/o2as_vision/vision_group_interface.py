@@ -1,5 +1,7 @@
 
 import rospy
+import numpy as np
+from numpy import linalg as LA
 from realsense_camera_interface import RealSenseCameraInterface
 from cad_matching_interface import CadMatchingInterface
 from planning_scene_interface import PlanningSceneInterface
@@ -47,8 +49,8 @@ class VisionGroupInterface(object):
 
         rospy.logdebug("VisionGroupInterface.prepare() end")
 
-    def find_object(self, object_id):
-        rospy.logdebug("VisionGroupInterface.find_object() begin")
+    def find_objects(self, object_id):
+        rospy.logdebug("VisionGroupInterface.find_objects() begin")
 
         # get image from sensor
         rospy.logdebug("save frame for cad matching")
@@ -58,10 +60,33 @@ class VisionGroupInterface(object):
         rospy.logdebug("search object")
         success, response = self._cad_matching.search(self._pcloud_filename, self._image_filename, object_id)
 
-        rospy.logdebug("VisionGroupInterface.find_object() end")
+        rospy.logdebug("VisionGroupInterface.find_objects() end")
         if not success:
             return []
         return response.search_result.detected_objects
+
+    def find_object(self, object_id, expected_position, position_tolerance):
+        rospy.logdebug("VisionGroupInterface.find_object() begin")
+        detected_objects = self.find_objects(object_id)
+
+        n = len(detected_objects) 
+        if n > 0:
+            # choose nearest object from expected position within torelance
+            rospy.logdebug("%d objects found. select nearest.", n)
+            i_min = 0
+            d_min = float("inf")
+            for i in range(n):
+                obj = detected_objects[i]
+                a = np.array([expected_position.pose.position.x, expected_position.pose.position.y, expected_position.pose.position.z])
+                b = np.array([obj.pos3D.x, obj.pos3D.y, obj.pos3D.z])
+                d = LA.norm(a-b)
+                if d < d_min:
+                    d_min = d
+                    i_min = i
+                rospy.logdebug("expected=({},{},{}), real=({},{},{}), d={}".format(a[0], a[1], a[2], b[0], b[1], b[2], d))
+            return detected_objects[i_min]
+        else:
+            return None
 
     def add_detected_object_to_planning_scene(self, name, pose, cad_filename, scale):
         rospy.logdebug("VisionGroupInterface.add_detected_object_to_planning_scene() begin")
