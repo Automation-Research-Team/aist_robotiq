@@ -1,0 +1,65 @@
+belt_drive_unit_parts:
+  - motor:
+      id: 4
+      type: 04_37D-GEARMOTOR-50-70 
+      description: Geared motor (Gear ratio 1:70)
+  - motor_pulley:
+      id: 5
+      type: 05_MBRFA30-2-P6
+      description: Pulley for Round Belt (4mm) - Setscrew P.D. 30mm
+  - belt:
+      id: 6
+      type: 06_MBT4-400
+      description: Polyurethane round belt (welded joint product) P.D. 4mm L=400mm
+  - bearing_housing:
+      id: 7
+      type: 07_SBARB6200ZZ-30
+      description: Bearings with Housings (Double Bearings)
+  - drive_shaft:
+      id: 8
+      type: 08_KZAF10-75-NA4-WA55-GA20-AA0
+      description: Drive shaft (Straight) D10h6
+  - end_cap:
+      id: 9
+      type: 09_EDCS10
+      description: End Cap for Shaft
+  - bearing_spacer:
+      id: 10
+      type: 10_CLBPS10-17-4
+      description: Bearing Spacers For Inner Ring (output pulley)
+  - output_pulley:
+      id: 11
+      type: 11_MBRAC60-2-10
+      description: Pulley for Round Belts Clamping Type P.D. 60mm
+  - idler_spacer:
+      id: 12
+      type: 12_CLBUS6-9-9.5
+      description: Bearing Spacers For Inner Ring (tension pulley)
+  - idler_pulley:
+      id: 13
+      type: 13_MBGA30-2
+      description: Idler for Round Belt - Wide
+  - idler_pin:
+      id: 14
+      type: 14_BGPSL6-9-L30-F8
+      description: Bearing Shaft Screw
+  - m6_nut:
+      id: 15
+      type: 15_SLBNR6 
+      description: M6 Hex Nut  (Fixing for idler shaft)
+  - m6_washer:
+      id: 16
+      type: 16_SPWF6
+      description: M6 Flat Washer  (Fixing for idler shaft)
+  - m4_screw:
+      id: 17
+      type: 17_SCB4-10
+      description: 10mm M4 Socket Head Cap Screw  (metric coarse thread)
+  - m3_screw_long:
+      id: 18
+      type: 18_SCB3
+      description: 10mm M3 Socket Head Cap Screw  (metric coarse thread)
+  - m3_screw_short:
+      id: 19
+      type: 19_MSSFS3-6 
+      description: 6mm M3 Hex Socket Set Screw  (metric coarse thread)
