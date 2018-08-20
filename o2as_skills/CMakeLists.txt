@@ -10,10 +10,10 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED
 	rospy
 	roscpp
-	actionlib_msgs
 	std_msgs
 	control_msgs
 	robotiq_msgs
+	o2as_msgs
 	std_srvs
 	moveit_core
 	moveit_commander
@@ -35,7 +35,20 @@ find_package(catkin REQUIRED
 ## Declare ROS messages, services and actions ##
 ################################################
 
-## To declare and build messages, services or actions from within this
+## To declare and build messahe 'srv' folder
+# add_service_files( DIRECTORY srv )
+
+# # Generate actions in the 'action' folder
+# add_action_files( DIRECTORY action )
+
+# # Generate added messages and services with any dependencies listed here
+# generate_messages(
+#   DEPENDENCIES
+#   std_srvs
+#   std_msgs
+#   actionlib_msgs
+#   geometry_msgs
+# )ges, services or actions from within this
 ## package, follow these steps:
 ## * Let MSG_DEP_SET be the set of packages whose message types you use in
 ##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).
@@ -62,20 +75,20 @@ find_package(catkin REQUIRED
 #   Message2.msg
 # )
 
-# Generate services in the 'srv' folder
-add_service_files( DIRECTORY srv )
+# # Generate services in the 'srv' folder
+# add_service_files( DIRECTORY srv )
 
-# Generate actions in the 'action' folder
-add_action_files( DIRECTORY action )
+# # Generate actions in the 'action' folder
+# add_action_files( DIRECTORY action )
 
-# Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_srvs
-  std_msgs
-  actionlib_msgs
-  geometry_msgs
-)
+# # Generate added messages and services with any dependencies listed here
+# generate_messages(
+#   DEPENDENCIES
+#   std_srvs
+#   std_msgs
+#   actionlib_msgs
+#   geometry_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -143,55 +156,8 @@ add_dependencies(o2as_skill_server
   	${catkin_EXPORTED_TARGETS})
 target_link_libraries(o2as_skill_server ${catkin_LIBRARIES})
 
-## Rename C++ executable without prefix
-## The above recommended prefix causes long target names, the following renames the
-## target back to the shorter version for ease of user use
-## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
-# set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
-
-## Add cmake target dependencies of the executable
-## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
-
-#############
-## Install ##
-#############
-
-# all install targets should use catkin DESTINATION variables
-# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
-
-## Mark executable scripts (Python etc.) for installation
-## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-## Mark executables and/or libraries for installation
-# install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
-
-## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+catkin_install_python(PROGRAMS scripts/ur_program_relay.py
+                      DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 #############
 ## Testing ##

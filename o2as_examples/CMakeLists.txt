@@ -40,9 +40,9 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  DIRECTORY srv
-)
+# add_service_files(
+#   DIRECTORY srv
+# )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -52,11 +52,11 @@ add_service_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs  # Or other packages containing msgs
-  geometry_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+#   geometry_msgs
+# )
 
 ###################################
 ## catkin specific configuration ##
@@ -138,6 +138,7 @@ target_link_libraries(action_example ${catkin_LIBRARIES})
 # target_link_libraries(o2as_examples ${catkin_LIBRARIES})
 
 catkin_install_python(PROGRAMS scripts/example_movegroupcommander.py
+                      scripts/send_program_to_ur.py
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ## Rename C++ executable without prefix
