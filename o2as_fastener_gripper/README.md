@@ -23,9 +23,7 @@ The following is an example(o2as_fastener_gripper/launch/fastener_gripper_action
 ```
 
 Three XL320 will be used this time.
-
 ID is 1,2,3 respectively.
-
 BaundRate is 1000000.
 
 After connecting and configuring, execute fastener_gripper_test_action.launch.
