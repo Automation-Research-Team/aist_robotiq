@@ -1,6 +1,0 @@
-<launch>
-	<group ns="o2as_realsense_camera">
-		<node name="camera_manager" pkg="o2as_realsense_camera" type="camera_manager" output="screen">
-		</node>
-	</group>    
-</launch>

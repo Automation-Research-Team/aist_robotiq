@@ -1,0 +1,7 @@
+<launch>
+	<arg name="node_name" default="camera_node"/>
+	<arg name="serial_number" default=""/> <!-- specify serial number of your camera -->
+	<node name="$(arg node_name)" pkg="o2as_realsense_camera" type="o2as_realsense_camera_node" output="screen">
+		<param name="serial_number" type="string" value="$(arg serial_number)"/>
+	</node>
+</launch>

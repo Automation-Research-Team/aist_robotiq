@@ -1,8 +1,24 @@
+#include "o2as_realsense_camera/util_cam.h"
+
 #include <cmath>
 #include <cstring>
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
-#include "util_cam.h"
+
+namespace o2as {
+
+bool DeviceExists(std::string serial_number)
+{
+    rs2::context ctx;    
+    for (auto&& dev : ctx.query_devices()) 
+    {
+        std::string s = std::string(dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
+        if (s == serial_number) {
+            return true;
+        }
+    }
+    return false;
+}
 
 void InvMatrix3x3(float src[9], double dst[9])
 {
@@ -74,3 +90,4 @@ int SavePointCloudToBinary(float *src_pc, int width, int height, char *fileName)
 	return 0;
 }
 
+} // namespace o2as
