@@ -70,8 +70,6 @@ class FastenerGripperController(object):
             # res = self.dynamixel_read_state(self.motor_id, "Present_Position")
             res2 = self.dynamixel_read_state(self.motor_id, "Present_Speed")
             # res3 = self.dynamixel_read_state(self.motor_id, "Present_Load")
-            # if res2.value > self._feedback.motor_speed + 300:
-            #     rospy.loginfo("Present_Position = {0} : Present_Speed = {1} : Present_Load = {2}".format(res.value,res2.value,res3.value))
 
             self._feedback.motor_speed = res2.value
 
