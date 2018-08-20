@@ -770,13 +770,28 @@ void SkillServer::executeAlign(const o2as_msgs::alignGoalConstPtr& goal)
 void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
 {
   ROS_INFO("pickAction was called");
+  geometry_msgs::PoseStamped target_pose = goal->item_pose;
+  target_pose = transform_pose_now(target_pose, "world", tflistener_);
+  if (!goal->use_complex_planning)
+  {
+    ROS_INFO_STREAM("Using simple pick planning. Gripper will face downward, with z_axis_rotation = " << goal->z_axis_rotation);
+    tf::Quaternion q_down, q_axis_rotation;
+    q_down.setRPY(0, M_PI/2, 0);  // Faces into the table
+    q_axis_rotation.setRPY(0, 0, goal->z_axis_rotation);
+    tf::quaternionTFToMsg(q_down*q_axis_rotation, target_pose.pose.orientation);
+    ROS_INFO_STREAM("Orientation set to: " << target_pose.pose.orientation.x << ", "
+                                            << target_pose.pose.orientation.y << ", "
+                                            << target_pose.pose.orientation.z << ", "
+                                            << target_pose.pose.orientation.w);
+  }
+  
+
 
   if ((goal->gripper_command == "complex_pick_from_inside") || (goal->gripper_command == "complex_pick_from_outside"))
   {
-    geometry_msgs::PoseStamped target_tip_link_pose = goal->item_pose;
     std::string end_effector_link_name = goal->robot_name + "_gripper_tip_link";
     // Do the positioning with the inner gripper first, then close the outer gripper
-    publishMarker(target_tip_link_pose, "pick_pose");
+    publishMarker(target_pose, "pick_pose");
     ROS_INFO_STREAM("Doing complex pick with custom gripper.");
     
     // Move above the object
@@ -793,24 +808,24 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
       openGripper("a_bot", "inner_gripper");
       std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     }
-    target_tip_link_pose.pose.position.z += .1;
+    target_pose.pose.position.z += .1;
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, end_effector_link_name);
+    moveToCartPosePTP(target_pose, goal->robot_name, true, end_effector_link_name);
 
     ROS_INFO_STREAM("Moving closer to object (5 cm offset).");
-    target_tip_link_pose.pose.position.z -= .05;
+    target_pose.pose.position.z -= .05;
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    bool success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, end_effector_link_name, 0.1);
+    bool success = moveToCartPoseLIN(target_pose, goal->robot_name, true, end_effector_link_name, 0.1);
     if (!success) 
     {
       ROS_INFO_STREAM("Linear motion plan failed. Performing PTP.");
       std::this_thread::sleep_for(std::chrono::milliseconds(500));
-      moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, end_effector_link_name, 0.1);  // Force the move even if LIN fails
+      moveToCartPosePTP(target_pose, goal->robot_name, true, end_effector_link_name, 0.1);  // Force the move even if LIN fails
     }
 
-    target_tip_link_pose.pose.position.z -= .05;
+    target_pose.pose.position.z -= .05;
     ROS_INFO_STREAM("Moving down to object (no offset).");
-    moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, end_effector_link_name, 0.01);  // Go very slow
+    moveToCartPosePTP(target_pose, goal->robot_name, true, end_effector_link_name, 0.01);  // Go very slow
     // TODO: Send the MoveL command to the real robot instead?
     
     if (goal->gripper_command == "complex_pick_from_inside")
@@ -828,14 +843,14 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
     closeGripper("a_bot", "outer_gripper");
 
     ROS_INFO_STREAM("Moving back up after picking object.");
-    target_tip_link_pose.pose.position.z += .1;
+    target_pose.pose.position.z += .1;
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, end_effector_link_name);
+    success = moveToCartPoseLIN(target_pose, goal->robot_name, true, end_effector_link_name);
     if (!success) 
     {
       ROS_INFO_STREAM("Linear motion plan back from pick pose failed. Performing PTP.");
       std::this_thread::sleep_for(std::chrono::milliseconds(500));
-      moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
+      moveToCartPosePTP(target_pose, goal->robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
     }
 
         if (goal->gripper_command == "complex_pick_from_inside")
@@ -863,19 +878,19 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
   else // No special tool being used; use just one gripper instead
   {
     // Warning: Using only "abs" rounds to int. Amazing.
-    if ((std::abs(goal->item_pose.pose.position.x)) > 0 || (std::abs(goal->item_pose.pose.position.y)) > 0 || (std::abs(goal->item_pose.pose.position.z)) > 0)
+    if ((std::abs(target_pose.pose.position.x)) > 0 || (std::abs(target_pose.pose.position.y)) > 0 || (std::abs(target_pose.pose.position.z)) > 0)
     {
       std::string ee_link_name;
       if (goal->robot_name == "a_bot"){ee_link_name = goal->robot_name + "_gripper_tip_link"; }
       else {ee_link_name = goal->robot_name + "_robotiq_85_tip_link";}
-      pickFromAbove(goal->item_pose, ee_link_name, goal->robot_name);
+      pickFromAbove(target_pose, ee_link_name, goal->robot_name);
     }
     else
     {
       ROS_ERROR("Item_pose is empty and no tool_name was set. Not doing anything");
     }
 
-    // TODO. The plan: 
+    // TODO. The plan for complex planning: 
     // - Check that the object exists in the planning scene
     // - VARIATION A:
     // -- Pass the request to the grasp planner along with the robot name
@@ -916,6 +931,19 @@ void SkillServer::executePlace(const o2as_msgs::placeGoalConstPtr& goal)
 void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
 {
   ROS_INFO("regraspAction was called");
+  double gripper_distance_before_grasp, grasp_distance, gripper_distance_after_grasp;
+  if (goal->gripper_distance_before_grasp < 0.001)
+  {
+    gripper_distance_before_grasp = 0.1;
+  }
+  if (goal->grasp_distance < 0.001)
+  {
+    grasp_distance = 0.02;
+  }
+  if (goal->gripper_distance_after_grasp < 0.001)
+  {
+    gripper_distance_after_grasp = 0.1;
+  }
 
   // Create the handover_pose for Giver and Receiver robot
   std::string giver_robot_name = goal->giver_robot_name, 
@@ -929,9 +957,9 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
     giver_robot_name = receiver_robot_name;
     receiver_robot_name = "c_bot";
   }
-  else if (giver_robot_name == "b_bot")
+  else if ((giver_robot_name == "b_bot") && (receiver_robot_name == "a_bot"))
   {
-    giver_robot_name = receiver_robot_name; // This is always a_bot
+    giver_robot_name = "a_bot";
     receiver_robot_name = "b_bot";
   }
 
@@ -941,7 +969,7 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
   {
     t.setOrigin(tf::Vector3(-.28, .11, .55));  // x y z of the handover position
     double c_tilt = 0.0;
-    if (giver_robot_name == "b_bot") 
+    if (giver_robot_name == "b_bot")
     { 
       c_tilt = 10.0;  // degrees. Tilts during the handover to c (this makes the pose nicer for b_bot)
     } 
@@ -949,7 +977,7 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
   }
   else if ((receiver_robot_name == "b_bot") || (receiver_robot_name == "a_bot"))
   {
-    t.setOrigin(tf::Vector3(0.1, 0.0, 0.65));
+    t.setOrigin(tf::Vector3(0.1, 0.0, 0.65)); 
     if (receiver_robot_name == "b_bot")
     {
       q.setRPY(0, 0, -M_PI/2);
@@ -959,7 +987,6 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
       ROS_ERROR("This function should not arrive here.");
       q.setRPY(0, 0, M_PI/2);   
     }
-    
   }
   t.setRotation(q);
   tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "workspace_center", "handover_frame"));
@@ -982,12 +1009,12 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
   
   // Move the Receiver to an approach pose, then on to grasp
   ROS_INFO_STREAM("Moving receiver robot (" << receiver_robot_name << ") to approach pose.");
-  handover_pose_receiver.pose.position.x = -goal->gripper_distance_before_grasp;
+  handover_pose_receiver.pose.position.x = -gripper_distance_before_grasp;
   moveToCartPosePTP(handover_pose_receiver, receiver_robot_name);
 
   ros::Duration(1).sleep();
   ROS_INFO_STREAM("Moving receiver robot (" << receiver_robot_name << ") to grasp pose.");
-  handover_pose_receiver.pose.position.x = -goal->grasp_distance;
+  handover_pose_receiver.pose.position.x = -grasp_distance;
   moveToCartPosePTP(handover_pose_receiver, receiver_robot_name);
   
   // Close the Receiver's gripper
@@ -997,7 +1024,7 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
 
   // Move back.
   ROS_INFO_STREAM("Moving receiver robot (" << receiver_robot_name << ") back to approach pose.");
-  handover_pose_receiver.pose.position.x = -goal->gripper_distance_after_grasp;
+  handover_pose_receiver.pose.position.x = -gripper_distance_after_grasp;
   moveToCartPosePTP(handover_pose_receiver, receiver_robot_name);
 
   // goToNamedPose("home", giver_robot_name);

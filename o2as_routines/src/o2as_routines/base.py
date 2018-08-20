@@ -106,6 +106,7 @@ class O2ASBaseRoutines(object):
 
     self.pick_client = actionlib.SimpleActionClient('/o2as_skills/pick', o2as_msgs.msg.pickAction)
     self.place_client = actionlib.SimpleActionClient('/o2as_skills/place', o2as_msgs.msg.placeAction)
+    self.regrasp_client = actionlib.SimpleActionClient('/o2as_skills/regrasp', o2as_msgs.msg.regraspAction)
     self.align_client = actionlib.SimpleActionClient('/o2as_skills/align', o2as_msgs.msg.alignAction)
     self.insert_client = actionlib.SimpleActionClient('/o2as_skills/insert', o2as_msgs.msg.insertAction)
     self.screw_client = actionlib.SimpleActionClient('/o2as_skills/screw', o2as_msgs.msg.screwAction)
@@ -201,12 +202,14 @@ class O2ASBaseRoutines(object):
     self.groups[robot_name].clear_pose_targets()
     return True
 
-  def do_pick_action(self, robot_name, pose_stamped, tool_name = ""):
+  def do_pick_action(self, robot_name, pose_stamped, z_axis_rotation = 0.0, use_complex_planning = False, tool_name = ""):
     # Call the pick action
     goal = o2as_msgs.msg.pickGoal()
     goal.robot_name = robot_name
     goal.item_pose = pose_stamped
     goal.tool_name = tool_name
+    goal.use_complex_planning = use_complex_planning
+    goal.z_axis_rotation = z_axis_rotation
     rospy.loginfo("Sending pick action goal")
     rospy.loginfo(goal)
 
@@ -238,6 +241,20 @@ class O2ASBaseRoutines(object):
     req.program_id = "insertion"
     res = self.urscript_client.call(req)
     return res.success
+
+  def do_regrasp(self, giver_robot_name, receiver_robot_name, grasp_distance = .02):
+    """The item goes from giver to receiver."""
+    goal = o2as_msgs.msg.regraspGoal()
+    goal.giver_robot_name = giver_robot_name
+    goal.receiver_robot_name = receiver_robot_name
+    goal.grasp_distance = grasp_distance
+
+    self.regrasp_client.send_goal(goal)
+    rospy.loginfo("Performing regrasp with grippers " + giver_robot_name + " and " + receiver_robot_name)
+    self.regrasp_client.wait_for_result(rospy.Duration(90.0))
+    result = self.regrasp_client.get_result()
+    rospy.loginfo(result)
+    return result
 
 
   ################ ----- Gripper interfaces
