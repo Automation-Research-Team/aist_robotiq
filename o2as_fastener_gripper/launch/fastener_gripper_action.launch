@@ -1,12 +1,20 @@
 <launch>
-    <node name="dynamixel_controller" pkg="o2as_fastener_gripper" type="dynamixel_controller" output="screen"/>
+
+    <node name="dynamixel_controller" pkg="o2as_fastener_gripper" type="dynamixel_controller" output="screen">
+        <param name="connect_name" type="str" value="/dev/for_docker/fastener_gripper_1"/>
+        <param name="baundrate"    type="int" value="1000000"/>
+    </node>
+
     <node name="fg1" pkg="o2as_fastener_gripper" type="fastener_gripper_controller_action.py" output="screen">
-        <param name="motor_id" value="1" type="int"/>
+        <param name="motor_id"     type="int" value="1"/>
     </node>
+
     <node name="fg2" pkg="o2as_fastener_gripper" type="fastener_gripper_controller_action.py" output="screen">
-        <param name="motor_id" value="2" type="int"/>
+        <param name="motor_id"     type="int" value="2"/>
     </node>
+
     <node name="fg3" pkg="o2as_fastener_gripper" type="fastener_gripper_controller_action.py" output="screen">
-        <param name="motor_id" value="3" type="int"/>
+        <param name="motor_id"     type="int" value="3"/>
     </node>
+    
 </launch>
