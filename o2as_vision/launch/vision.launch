@@ -22,6 +22,12 @@
         </include>
 	</group>
     
+    <!-- parts info -->
+	<arg name="parts_list_filename" default="$(find o2as_parts_description)/config/assembly_parts_list.yaml"/>
+	<include file="$(find o2as_parts_description)/launch/demo.launch">
+        <arg name="parts_list_filename" value="$(arg parts_list_filename)"/>
+    </include>
+    
     <!-- o2as_vision -->
     <arg name="camera_list" default="[$(arg camera1)]"/>
     <!-- <node name="o2as_vision_node" pkg="o2as_vision" type="o2as_vision_node" output="screen"> -->

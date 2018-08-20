@@ -2,8 +2,11 @@
 
 import rospy
 from std_srvs.srv import *
-from o2as_vision.srv import FindObjects, FindObjectsResponse
+from o2as_vision.srv import FindObjects
 from o2as_vision.vision_manager import VisionManager
+
+#LOG_LEVEL = log_level=rospy.DEBUG
+LOG_LEVEL = log_level=rospy.INFO
 
 FIND_OBJECTS_SERVICE = "find_objects"
 
@@ -32,27 +35,9 @@ class VisionNode(object):
         rospy.logdebug("VisionNode.__init__() success")
 
     def find_objects(self, req):
-        res = FindObjectsResponse()
-
-        rospy.logdebug("VisionNode.find_objects() begin")
-        pos = req.expected_position.pose.position
-        rospy.logdebug("expected_position = (%f, %f, %f)", pos.x, pos.y, pos.z)
-        rospy.logdebug("position_tolerance = %f", req.position_tolerance)
-        rospy.logdebug("object_id = %s", req.object_id)
-        rospy.logdebug("camera = %s", req.camera)
-
-        #self.manager.update_scene() # test
-        group = self.manager.get_group(req.camera)
-        group.find_object(req.object_id)
-
-        ###############################
-        # TODO: implement here
-        ###############################
-
-        rospy.logdebug("VisionNode.find_objects() begin")
-        return res
+        return self.manager.find_objects(req.camera, req.object_id, req.expected_position, req.position_tolerance)
 
 if __name__ == "__main__":
-    rospy.init_node('o2as_vision', anonymous=True, log_level=rospy.DEBUG)
+    rospy.init_node('o2as_vision', anonymous=True, log_level=LOG_LEVEL)
     node = VisionNode()
     rospy.spin()
