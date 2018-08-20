@@ -3,13 +3,11 @@
 import rospy
 from std_srvs.srv import *
 from o2as_vision.srv import FindObject
-from o2as_vision.srv import FindObjects
 from o2as_vision.vision_manager import VisionManager
 
 LOG_LEVEL = log_level=rospy.DEBUG
 #LOG_LEVEL = log_level=rospy.INFO
 
-FIND_OBJECTS_SERVICE = "find_objects"
 FIND_OBJECT_SERVICE = "find_object"
 
 class VisionNode(object):
@@ -28,8 +26,6 @@ class VisionNode(object):
             self.manager.prepare()
 
             # service
-            rospy.logdebug("start service %s",FIND_OBJECTS_SERVICE)
-            self._find_objects_server = rospy.Service(FIND_OBJECTS_SERVICE, FindObjects, self.find_objects)
             rospy.logdebug("start service %s",FIND_OBJECT_SERVICE)
             self._find_object_server = rospy.Service(FIND_OBJECT_SERVICE, FindObject, self.find_object)
 
@@ -37,9 +33,6 @@ class VisionNode(object):
             rospy.logerr("Service call failed: %s", str(e)) 
 
         rospy.logdebug("VisionNode.__init__() success")
-
-    def find_objects(self, req):
-        return self.manager.find_objects(req.camera, req.object_id, req.expected_position, req.position_tolerance)
 
     def find_object(self, req):
         return self.manager.find_object(req.camera, req.object_id, req.expected_position, req.position_tolerance)

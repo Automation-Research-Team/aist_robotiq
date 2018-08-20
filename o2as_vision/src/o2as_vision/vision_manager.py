@@ -4,7 +4,6 @@ import tf
 from util import *
 from geometry_msgs.msg import Pose
 from o2as_vision.srv import FindObjectResponse
-from o2as_vision.srv import FindObjectsResponse 
 from o2as_parts_description.srv import GetPartsInfo
 from vision_group_interface import VisionGroupInterface
 
@@ -31,30 +30,14 @@ class VisionManager(object):
         for key in self._items:
             self._items[key].prepare()
 
-    def find_objects(self, camera, object_id, expected_position, position_tolerance):
-        rospy.logdebug("VisionManager.find_objects() begin")
+    def find_object(self, camera, object_id, expected_position, position_tolerance):
+        rospy.logdebug("VisionManager.find_object() begin")
         pos = expected_position.pose.position
         rospy.logdebug("camera = %s", camera)
         rospy.logdebug("object_id = %s", object_id)
         rospy.logdebug("expected_position = (%f, %f, %f)", pos.x, pos.y, pos.z)
         rospy.logdebug("position_tolerance = %f", position_tolerance)
 
-        res = FindObjectsResponse()
-        group = self.get_group(camera)
-        detected_objects = group.find_objects(object_id)
-
-        if (len(detected_objects) == 0):
-            rospy.loginfo("no object found")
-        else:
-            rospy.logdebug("add detected object to planning scene")
-            for obj in detected_objects:
-                self.add_detected_object_to_planning_scene(obj, group)
-
-        rospy.logdebug("VisionManager.find_objects() end")
-        return res
-
-    def find_object(self, camera, object_id, expected_position, position_tolerance):
-        rospy.logdebug("VisionManager.find_object() begin")
         res = FindObjectResponse()
         group = self.get_group(camera)
         detected_object = group.find_object(object_id, expected_position, position_tolerance)
@@ -97,10 +80,6 @@ class VisionManager(object):
         rospy.logdebug("rot = (%f, %f, %f)", obj.rot3D.x, obj.rot3D.y, obj.rot3D.z)
         rospy.logdebug("scale = (%f, %f, %f)", scale[0], scale[1], scale[2])
         group.add_detected_object_to_planning_scene(name=object_name+"_mesh", pose=pose, cad_filename=cad_filename, scale=scale)
-
-    # def update_scene(self):
-    #     for key in self._items:
-    #         self._items[key].find_object()
 
     def add_group(self, name):
         self._items[name] = VisionGroupInterface(name)
