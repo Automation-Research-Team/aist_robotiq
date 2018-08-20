@@ -1,0 +1,6 @@
+<launch>
+	<include file="$(find o2as_vision)/launch/vision.launch">
+    </include>
+    <node name="o2as_vision_demo" pkg="o2as_vision" type="o2as_vision_demo.py" output="screen">
+    </node>
+</launch>
