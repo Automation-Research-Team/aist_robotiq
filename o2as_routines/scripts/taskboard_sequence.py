@@ -106,9 +106,9 @@ class TaskboardClass(O2ASBaseRoutines):
   #   calib_pose.pose.position.x = 0
   #   calib_pose.pose.position.z = 0.15
 
-  #   self.go_to_named_pose("home_a", "a_bot")
-  #   self.go_to_named_pose("home_b", "b_bot")
-  #   self.go_to_named_pose("home_c", "c_bot")
+  #   self.go_to_named_pose("home", "a_bot")
+  #   self.go_to_named_pose("home", "b_bot")
+  #   self.go_to_named_pose("home", "c_bot")
 
   #   self.go_to_pose_goal("a_bot", calib_pose, speed=0.3)
   #   print "============ Press `Enter` to move a_bot ..."
@@ -122,7 +122,7 @@ class TaskboardClass(O2ASBaseRoutines):
   #   self.go_to_pose_goal("a_bot", calib_pose, speed=0.02)
   #   print "============ Press `Enter` to move ..."
   #   raw_input()
-  #   self.go_to_named_pose("home_a", "a_bot",speed=0.3)
+  #   self.go_to_named_pose("home", "a_bot",speed=0.3)
     
 
   ################ ----- Routines  
@@ -199,9 +199,9 @@ class TaskboardClass(O2ASBaseRoutines):
     self.groups["a_bot"].set_goal_tolerance(.0001) 
     self.groups["a_bot"].set_planning_time(5) 
     self.groups["a_bot"].set_num_planning_attempts(1000) 
-    self.go_to_named_pose("home_c", "c_bot")
-    self.go_to_named_pose("home_b", "b_bot")
-    self.go_to_named_pose("home_a", "a_bot")
+    self.go_to_named_pose("home", "c_bot")
+    self.go_to_named_pose("home", "b_bot")
+    self.go_to_named_pose("home", "a_bot")
 
     for i in range(0,15):
       rospy.loginfo("=== Now targeting part number " + str(i+1) + ": " + self.item_names[i])
@@ -253,16 +253,16 @@ class TaskboardClass(O2ASBaseRoutines):
         pass
 
 
-      self.go_to_named_pose("home_c", "c_bot")
-      self.go_to_named_pose("home_b", "b_bot")
-      self.go_to_named_pose("home_a", "a_bot")
+      self.go_to_named_pose("home", "c_bot")
+      self.go_to_named_pose("home", "b_bot")
+      self.go_to_named_pose("home", "a_bot")
 
   def taskboard_manual_testing(self):
     self.groups["a_bot"].set_goal_tolerance(.0001) 
     self.groups["a_bot"].set_planning_time(5) 
-    self.go_to_named_pose("home_c", "c_bot")
-    self.go_to_named_pose("home_b", "b_bot")
-    self.go_to_named_pose("home_a", "a_bot")
+    self.go_to_named_pose("home", "c_bot")
+    self.go_to_named_pose("home", "b_bot")
+    self.go_to_named_pose("home", "a_bot")
     
     downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
 
@@ -292,9 +292,9 @@ if __name__ == '__main__':
     taskboard.groups["a_bot"].set_goal_tolerance(.0001) 
     taskboard.groups["a_bot"].set_planning_time(3) 
     taskboard.groups["a_bot"].set_num_planning_attempts(10)
-    taskboard.go_to_named_pose("home_c", "c_bot")
-    taskboard.go_to_named_pose("home_b", "b_bot")
-    taskboard.go_to_named_pose("home_a", "a_bot")
+    taskboard.go_to_named_pose("home", "c_bot")
+    taskboard.go_to_named_pose("home", "b_bot")
+    taskboard.go_to_named_pose("home", "a_bot")
 
     i = raw_input("Enter the number of the part to be performed: ")
     i =int(i)
@@ -337,9 +337,9 @@ if __name__ == '__main__':
         taskboard.horizontal_spiral_motion("a_bot", .002)
         
       
-      taskboard.go_to_named_pose("home_c", "c_bot")
-      taskboard.go_to_named_pose("home_b", "b_bot")
-      taskboard.go_to_named_pose("home_a", "a_bot")
+      taskboard.go_to_named_pose("home", "c_bot")
+      taskboard.go_to_named_pose("home", "b_bot")
+      taskboard.go_to_named_pose("home", "a_bot")
       i = raw_input("the number of the part")
       i =int(i)
     print "============ Done!"
