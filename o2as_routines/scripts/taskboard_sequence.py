@@ -346,6 +346,9 @@ if __name__ == '__main__':
     taskboard = TaskboardClass()
     taskboard.set_up_item_parameters()
     #taskboard.full_taskboard_task()
+
+    taskboard.horizontal_spiral_motion("a_bot", .005)
+
     
     # 3,14        complex_pick_from_inside
     # 4           complex_pick_from_outside
