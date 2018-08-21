@@ -5,7 +5,8 @@
   <!-- Task board position: .2 .1 to column-->
   <xacro:include filename="$(find o2as_scene_description)/urdf/task_board.xacro" />
   <xacro:task_board boardname="taskboard" parent="workspace_center">
-    <origin xyz="-0.35 0.2 0.0" rpy="0 0 ${-pi/2}" />   
+    <!-- <origin xyz="-0.35 0.2 0.0" rpy="0 0 ${-pi/2}" />    -->
+    <origin xyz="-0.35 0.1 0.0" rpy="0 0 ${-pi/2}" /> 
   </xacro:task_board>
   
   <!-- Placement mat -->
