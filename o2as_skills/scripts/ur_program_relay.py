@@ -27,21 +27,6 @@ class URScriptRelay():
         self.read_templates()
         s = rospy.Service('o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR, self.srv_callback)
 
-        # rospy.loginfo("TESTING SCRIPT SENDING")
-        # rospack = rospkg.RosPack()
-        # program = ""
-        # program_template = open(os.path.join(rospack.get_path("o2as_examples"), "scripts/ur", "move_back_forth_5cm.script"), 'rb')
-        # program_line = program_template.read(1024)
-        # while program_line:
-        #     program += program_line
-        #     program_line = program_template.read(1024)
-
-        # # Send the program to the robot
-        # program_msg = std_msgs.msg.String()
-        # program_msg.data = program
-        # self.publishers["b_bot"].publish(program_msg)
-        # rospy.loginfo("SENT")
-        
         # Main while loop.
         while not rospy.is_shutdown():
             rospy.sleep(.1)
@@ -58,7 +43,7 @@ class URScriptRelay():
 
         if req.program_id == "insertion":
             program_front = self.insertion_template
-            program_mid = ""
+            program_back = ""
 
             # Assign defaults
             if not req.force_magnitude:
@@ -80,31 +65,31 @@ class URScriptRelay():
             if not req.impedance_mass:
                 req.impedance_mass = 10
 
-            # Function definitions:
-            # rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 )
-            # rq_spiral_search_new(stroke, force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False):
+            ### Function definitions, for reference:
+            ### rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 )
+            ### rq_spiral_search_new(stroke, force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False):
 
-            program_mid += "        textmsg(\"Approaching.\")\n"
-            program_mid += "        rq_linear_search(\"" + req.force_direction + "\"," \
+            program_back += "        textmsg(\"Approaching.\")\n"
+            program_back += "        rq_linear_search(\"" + req.force_direction + "\"," \
                                 + str(req.force_magnitude) + "," \
                                 + str(req.forward_speed) + "," \
                                 + str(req.max_approach_distance) + ")\n"
-            program_mid += "        stroke = " + str(req.stroke) + "\n"
-            program_mid += "        textmsg(\"Spiral searching.\")\n"
-            program_mid += "        if rq_spiral_search_new(stroke," + str(req.force_magnitude) \
+            program_back += "        stroke = " + str(req.stroke) + "\n"
+            program_back += "        textmsg(\"Spiral searching.\")\n"
+            program_back += "        if rq_spiral_search_new(stroke," + str(req.force_magnitude) \
                                 + ", " + str(req.max_radius) \
                                 + ", " + str(req.radius_increment) \
                                 + ", peck_mode=" + str(req.peck_mode) + "):\n"
-            program_mid += "            #Insert the Part into the bore#\n"
-            program_mid += "            textmsg(\"Impedance insert\")\n"
-            program_mid += "            rq_impedance(stroke, " + str(req.impedance_mass) + ")\n"
-            program_mid += "        end\n"
-            program_mid += "    end\n"
-            program_mid += "end\n"
+            program_back += "            #Insert the Part into the bore#\n"
+            program_back += "            textmsg(\"Impedance insert\")\n"
+            program_back += "            rq_impedance(stroke, " + str(req.impedance_mass) + ")\n"
+            program_back += "        end\n"
+            program_back += "    end\n"
+            program_back += "end\n"
 
-            program = program_front + "\n" + program_mid # + "\n" + program_back
+            program = program_front + "\n" + program_back
         elif req.program_id == "lin_move":
-            rospy.logerr("LIN MOVE IS NOT IMPLEMENTED YET") 
+            rospy.logwarn("LIN MOVE IS NOT IMPLEMENTED CORRECTLY YET") 
             if not req.acceleration:
                 req.acceleration = 0.5
             if not req.velocity:
@@ -175,6 +160,9 @@ class URScriptRelay():
             while program_line:
                 program += program_line
                 program_line = program_file.read(1024)
+        else:
+            rospy.logerr("The program could not be recognized: " + req.program_id)
+            return False
 
         # Send the program to the robot
         program_msg = std_msgs.msg.String()
