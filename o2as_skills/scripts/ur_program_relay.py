@@ -7,6 +7,7 @@ import rospy
 import moveit_msgs.msg
 import std_msgs.msg
 import o2as_msgs.srv
+import tf
 
 import os, sys, rospkg
 
@@ -15,11 +16,12 @@ import os, sys, rospkg
 class URScriptRelay():
     # Must have __init__(self) function for a class, similar to a C++ class constructor.
     def __init__(self):
+        self.listener = tf.TransformListener()
         self.publishers = {
             'a_bot':rospy.Publisher("/a_bot_controller/ur_driver/URScript", std_msgs.msg.String, queue_size=1), 
             'b_bot':rospy.Publisher("/b_bot_controller/ur_driver/URScript", std_msgs.msg.String, queue_size=1), 
             'c_bot':rospy.Publisher("/c_bot_controller/ur_driver/URScript", std_msgs.msg.String, queue_size=1) }
-        rospy.sleep(0.5) # Wait for the publishers to be registered
+        rospy.sleep(0.5) # Wait for the publishers to be registered and the listener to receive 
         
         self.rospack = rospkg.RosPack()
         self.read_templates()
@@ -103,15 +105,26 @@ class URScriptRelay():
             program = program_front + "\n" + program_mid # + "\n" + program_back
         elif req.program_id == "lin_move":
             rospy.logerr("LIN MOVE IS NOT IMPLEMENTED YET") 
-            # TODO: Transform the pose to the robot base coordinates
-            # TODO: 
-            # TODO: Send the pose to the robot
-            # program = ""
-            # program += "def move_to_pose_lin():\n"
-            # program += "    textmsg(\"Moving to a pose.\")\n"
-            # program += "    target_pos=p[0.0, 0.0, 0.05, 0.0, 0.0, 0.0]\n"
-            # program += "    movel(pose_trans(p[0.0,0.0,0.0,0.0,0.0,0.0], target_pos), a=0.5, v=0.1)\n"
-            # program += "end\n"
+            if not req.acceleration:
+                req.acceleration = 0.5
+            if not req.velocity:
+                req.velocity = .03
+            robot_pose = self.listener.transformPose(req.robot_name + "_base", req.target_pose)
+            xyz = [robot_pose.pose.position.x, robot_pose.pose.position.y, robot_pose.pose.position.z]
+            q = [robot_pose.pose.orientation.x, robot_pose.pose.orientation.y, 
+                 robot_pose.pose.orientation.z, robot_pose.pose.orientation.w]
+            rpy = tf.transformations.euler_from_quaternion(q)
+
+            # This works, but it uses the ee_link TCP of the robot.
+            program = ""
+            program += "def move_to_pose_lin():\n"
+            program += "    textmsg(\"Move_l to a pose.\")\n"
+            program += "    target_pos=p[" + str(xyz[0]) + "," + str(xyz[1]) + "," + str(xyz[2]) + "," \
+                                      + str(rpy[0]) + "," + str(rpy[1]) + "," + str(rpy[2]) + "]\n"
+            program += "    movel(pose_trans(p[0.0,0.0,0.0,0.0,0.0,0.0], target_pos), " + \
+                            "a = " + str(req.acceleration) + ", v = " + str(req.velocity) + ")\n"
+            program += "    textmsg(\"Done.\")\n"
+            program += "end\n"
         elif req.program_id == "spiral_press":
             rospy.logerr("SPIRAL PRESS IS NOT IMPLEMENTED YET") # TODO
         elif req.program_id == "test":
