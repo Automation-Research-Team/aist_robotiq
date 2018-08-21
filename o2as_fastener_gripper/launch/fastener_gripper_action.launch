@@ -7,14 +7,17 @@
 
     <node name="fg1" pkg="o2as_fastener_gripper" type="fastener_gripper_controller_action.py" output="screen">
         <param name="motor_id"     type="int" value="1"/>
+        <param name="speed"        type="int" value="120"/>
     </node>
 
     <node name="fg2" pkg="o2as_fastener_gripper" type="fastener_gripper_controller_action.py" output="screen">
         <param name="motor_id"     type="int" value="2"/>
+        <param name="speed"        type="int" value="120"/>
     </node>
 
     <node name="fg3" pkg="o2as_fastener_gripper" type="fastener_gripper_controller_action.py" output="screen">
         <param name="motor_id"     type="int" value="3"/>
+        <param name="speed"        type="int" value="120"/>
     </node>
     
 </launch>
