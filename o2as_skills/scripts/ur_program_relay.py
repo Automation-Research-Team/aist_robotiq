@@ -125,8 +125,49 @@ class URScriptRelay():
                             "a = " + str(req.acceleration) + ", v = " + str(req.velocity) + ")\n"
             program += "    textmsg(\"Done.\")\n"
             program += "end\n"
+            rospy.loginfo(program)
+            rospy.logwarn("Not sending this.")
+            return True
+        elif req.program_id == "lin_move_rel":
+            if not req.acceleration:
+                req.acceleration = 0.5
+            if not req.velocity:
+                req.velocity = .03
+            xyz = [req.relative_translation.point.x, req.relative_translation.point.y, req.relative_translation.point.z]
+
+            program = ""
+            program += "def move_lin_rel():\n"
+            program += "    textmsg(\"Move_l via relative translation.\")\n"
+            program += "    current_pos = get_actual_tcp_pose()\n"
+            program += "    offset_pose = p[" + str(xyz[0]) + ", " + str(xyz[1]) + ", " + str(xyz[2]) + ", 0.0, 0.0, 0.0]\n"
+            program += "    movel(pose_trans(current_pos, offset_pose), " + \
+                            "a = " + str(req.acceleration) + ", v = " + str(req.velocity) + ")\n"
+            program += "    textmsg(\"Done.\")\n"
+            program += "end\n"
         elif req.program_id == "spiral_press":
-            rospy.logerr("SPIRAL PRESS IS NOT IMPLEMENTED YET") # TODO
+            rospy.logerr("SPIRAL PRESS IS NOT IMPLEMENTED YET") # TODO: Is this not just the "insertion" script with peck_mode=False?
+        elif req.program_id == "spiral_motion":
+            program_front = self.spiral_motion_template
+            program_back = ""
+            if not req.acceleration:
+                req.acceleration = 0.1
+            if not req.velocity:
+                req.velocity = .03
+            if not req.max_radius:
+                req.max_radius = .0065
+            if not req.radius_increment:
+                req.radius_increment = .002
+
+            
+            program_back += "    textmsg(\"Performing spiral motion.\")\n"
+            program_back += "    spiral_motion(" + str(req.max_radius) \
+                                + ", " + str(req.radius_increment) \
+                                + ", " + str(req.velocity) \
+                                + ", " + str(req.acceleration) + ")\n"
+            program_back += "    textmsg(\"Done.\")\n"
+            program_back += "end\n"
+
+            program = program_front + "\n" + program_back
         elif req.program_id == "test":
             program = ""
             program_file = open(os.path.join(self.rospack.get_path("o2as_examples"), "scripts/ur", "move_back_forth_5cm.script"), 'rb')
@@ -147,14 +188,20 @@ class URScriptRelay():
 
     def read_templates(self):
         # Read the files containing the program templates into memory
-        self.insertion_template = ""
-        program_template_file = open(os.path.join(self.rospack.get_path("o2as_skills"), "src/urscript", "peginholespiral_imp_osx.script"), 'rb')
+        self.insertion_template = self.read_template("peginholespiral_imp_osx.script")
+        self.spiral_motion_template = self.read_template("spiral_motion.script")
+        
+        return True
+
+    def read_template(self, filename):
+        program_template_file = open(os.path.join(self.rospack.get_path("o2as_skills"), "src/urscript", filename), 'rb')
         program_line = program_template_file.read(1024)
         linecounter = 0
+        template = ""
         while program_line:
-            self.insertion_template += program_line
+            template += program_line
             program_line = program_template_file.read(1024)
-        return True
+        return template
 
 
 if __name__ == '__main__':
