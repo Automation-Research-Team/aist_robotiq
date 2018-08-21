@@ -18,8 +18,8 @@ class FastenerGripperController(object):
         self.dynamixel_read_state = rospy.ServiceProxy('dynamixel_read_state', DynamixelReadState)
         
         #Initial Setting(XL320)
-        self.torque_enable(0)      # disable
-        self.set_control_mode(1)   # wheel mode
+        self.torque_enable(0)       # disable
+        self.set_control_mode(1)    # wheel mode
         self.set_torque_limit(1023) # half of max
 
         self._action_name = '~Action'
@@ -43,7 +43,6 @@ class FastenerGripperController(object):
 
     def get_present_speed(self):
         res = self.dynamixel_read_state(self.motor_id, "Present_Speed")
-        #rospy.loginfo("present_speed = {0}".format(res.value))
         return res.value
 
     def set_moving_speed(self, value):
@@ -55,7 +54,7 @@ class FastenerGripperController(object):
 
     def execute_control(self, goal):
         self._result.control_result = True
-        self._feedback.motor_speed = 120
+        self._feedback.motor_speed = rospy.get_param("~speed")
 
         self.set_moving_speed(self._feedback.motor_speed)
         
@@ -67,11 +66,9 @@ class FastenerGripperController(object):
                 self._result.control_result = False
                 break
 
-            # res = self.dynamixel_read_state(self.motor_id, "Present_Position")
-            res2 = self.dynamixel_read_state(self.motor_id, "Present_Speed")
-            # res3 = self.dynamixel_read_state(self.motor_id, "Present_Load")
+            res = self.dynamixel_read_state(self.motor_id, "Present_Speed")
 
-            self._feedback.motor_speed = res2.value
+            self._feedback.motor_speed = res.value
 
             self._as.publish_feedback(self._feedback)
             rospy.sleep(1)
