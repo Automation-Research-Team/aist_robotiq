@@ -23,7 +23,17 @@
           <box size="${wall_w} ${wall_l} ${wall_h}"/> 
         </geometry>
       </collision>
+      <!-- Tall objects seem to be instable in Gazebo, so we ignore the walls for the physical simulation. -->
+      <!-- <inertial>
+        <mass value="1.0" />
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+          iyy="1.0" iyz="0.0"
+          izz="1.0" />
+      </inertial> -->
     </link>
+    <!-- <gazebo reference="${wall_name}">
+      <material>Gazebo/Brick</material>
+    </gazebo> -->
 
     <joint name="${wall_name}" type="fixed">
       <parent link="world" />
@@ -34,8 +44,8 @@
 
   <!-- ############################# -->
 
-  <xacro:o2as_wall wall_name="wall_a" wall_w="${wall_width}" wall_l="${wall_thickness}" wall_h="${wall_height}">
-    <origin xyz="0.0 -1.2 0.0" rpy="0.0 0.0 0.0" />  
+  <xacro:o2as_wall wall_name="wall_b" wall_w="${wall_width}" wall_l="${wall_thickness}" wall_h="${wall_height}">
+    <origin xyz="0.0 -1.0 0.0" rpy="0.0 0.0 0.0" />  
   </xacro:o2as_wall>
 
   <xacro:o2as_wall wall_name="wall_c" wall_w="${wall_width}" wall_l="${wall_thickness}" wall_h="${wall_height}">
