@@ -19,7 +19,7 @@
   <arg name="use_gui" default="false" />
 
   <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
-  <include file="$(find o2as_moveit_config)/launch/planning_context.launch">
+  <include file="$(find o2as_moveit_config)/launch/planning_osaka_context.launch">
     <arg name="load_robot_description" value="true"/>
   </include>
 

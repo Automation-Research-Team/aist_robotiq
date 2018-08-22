@@ -7,7 +7,8 @@
   <remap if="$(arg sim)" from="/follow_joint_trajectory" to="/arm_controller/follow_joint_trajectory"/>
   
   <!-- Launch moveit -->
-  <include file="$(find o2as_moveit_config)/launch/move_group.launch">
+  <!-- <include file="$(find o2as_moveit_config)/launch/move_group.launch"> -->
+  <include file="$(find o2as_moveit_config)/launch/move_osaka_group.launch">
     <arg name="debug" default="$(arg debug)" />
   </include>
 
