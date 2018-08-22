@@ -7,7 +7,7 @@
     </include>
 
 	<arg name="parts_dict_filename" default="$(find o2as_assembly_task)/config/parts_dict.yaml"/>
-	<node name="o2as_assembly_task_node" pkg="o2as_assembly_task" type="o2as_assembly_task_node.py" output="screen">
+	<node name="o2as_assembly_task_node" pkg="o2as_assembly_task" type="test.py" output="screen">
         <rosparam command="load" file="$(arg parts_dict_filename)"/>
 	</node>
 </launch>
