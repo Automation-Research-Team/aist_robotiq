@@ -139,13 +139,24 @@
   <link name="b_bot_cam_holder_link" />
   <joint name="b_bot_cam_holder_joint" type="fixed">
     <parent link="b_bot_wrist_2_link" />
-    <child link = "b_bot_cam_holder_link" />
+    <child  link="b_bot_cam_holder_link" />
     <origin xyz="0.0 -0.06 0.16" rpy="0.0 0.0 ${pi/2}" />
   </joint>
 
   <xacro:sensor_d435 prefix="b_bot_" parent="b_bot_cam_holder_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:sensor_d435>
+
+  <!-- <link name="d_bot_cam_holder_link" /> -->
+  <!-- <joint name="d_bot_cam_holder_joint" type="fixed"> -->
+  <!--   <parent link="o2as_ground" /> -->
+  <!--   <child  link="d_bot_cam_holder_link" /> -->
+  <!--   <origin xyz="0.0 0.0 2.0" rpy="0.0 ${pi/2} 0.0" /> -->
+  <!-- </joint> -->
+
+  <!-- <xacro:sensor_d435 prefix="d_bot_" parent="d_bot_cam_holder_link"> -->
+  <!--   <origin xyz="0 0 0" rpy="0 0 0"/> -->
+  <!-- </xacro:sensor_d435> -->
 
   <!-- spawn and attach AR marker -->
   <xacro:include filename="$(find o2as_gazebo)/urdf/o2as_ar_marker.urdf.xacro"/>

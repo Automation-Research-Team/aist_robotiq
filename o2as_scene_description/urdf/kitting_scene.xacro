@@ -3,8 +3,7 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kitting_scene">
   <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_bins.xacro" />
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray.xacro" /> -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray1.xacro" />
-  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray2.xacro" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray_with_partitions.xacro" />
 
   <xacro:property name="bin1_width" value=".125"/>
   <xacro:property name="bin1_length" value=".128" />
