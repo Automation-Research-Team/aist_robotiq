@@ -1,27 +1,4 @@
 <launch>
-    <!-- camera1 -->
-    <arg name="camera1" default="b_bot_camera"/>
-    <arg name="camera1_type" default="realsense"/>
-    <arg name="camera1_serial_number" default="616205004841"/>
-
-	<group ns="$(arg camera1)">
-		<include file="$(find o2as_realsense_camera)/launch/camera.launch">
-            <arg name="node_name" value="camera_node"/>
-            <arg name="serial_number" value="$(arg camera1_serial_number)"/>
-        </include>
-
-        <arg name="model_name" value="$(arg camera1)_$(arg camera1_type)_$(arg camera1_serial_number)"/>
-        <arg name="model_filename" value="$(find o2as_cad_matching)/data/model/$(arg model_name).dat"/>
-        <arg name="id_map_filename" value="$(find o2as_cad_matching)/data/model/$(arg model_name).yaml"/>
-        <arg name="search_param_filename" value="$(find o2as_cad_matching)/config/group/$(arg camera1)_search_param.yaml"/>
-        <include file="$(find o2as_cad_matching)/launch/search_server.launch">
-            <arg name="group_name" value="$(arg camera1)"/>
-            <arg name="model_filename" value="$(arg model_filename)"/>
-            <arg name="search_param_filename" value="$(arg search_param_filename)"/>
-            <arg name="id_map_filename" value="$(arg id_map_filename)"/>
-        </include>
-	</group>
-    
     <!-- parts info -->
 	<arg name="parts_list_filename" default="$(find o2as_parts_description)/config/assembly_parts_list.yaml"/>
 	<include file="$(find o2as_parts_description)/launch/demo.launch">
@@ -29,8 +6,7 @@
     </include>
     
     <!-- o2as_vision -->
-    <arg name="camera_list" default="[$(arg camera1)]"/>
-    <!-- <node name="o2as_vision_node" pkg="o2as_vision" type="o2as_vision_node" output="screen"> -->
+    <arg name="camera_list" default=""/>
     <node name="o2as_vision_node" pkg="o2as_vision" type="o2as_vision_node.py" output="screen">
         <param name="sleep_time" type="double" value="0.1"/>
         <param name="image_dir" type="string" value="$(find o2as_vision)/image"/>

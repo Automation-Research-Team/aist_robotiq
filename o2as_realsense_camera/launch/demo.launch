@@ -1,9 +1,15 @@
 <launch>
+    <!-- 
+    616205004841 : free @ osx used by shibata
+    612201001671 : b_bot_camera
+     -->
+    <arg name="serial_number" default=""/> <!-- specify serial number of your camera -->
     <arg name="camera_name" default="camera"/>
+
 	<group ns="$(arg camera_name)">
         <!-- server -->
         <include file="$(find o2as_realsense_camera)/launch/camera.launch">
-            <arg name="serial_number" value="616205004841"/>
+            <arg name="serial_number" value="$(arg serial_number)"/>
         </include>
 
         <!-- client -->
