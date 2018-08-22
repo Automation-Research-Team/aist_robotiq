@@ -395,7 +395,7 @@ bool SkillServer::closeGripper(std::string robot_name, std::string gripper_name)
 bool SkillServer::sendGripperCommand(std::string robot_name, double opening_width, std::string gripper_name)
 {
   bool finished_before_timeout;
-  ROS_INFO_STREAM("Sending command to gripper of: " << robot_name);
+  ROS_INFO_STREAM("Sending opening_width " << opening_width << " to gripper of: " << robot_name);
   if ((robot_name == "a_bot"))
   {
     ROS_INFO_STREAM("Gripper: " << gripper_name);
@@ -433,6 +433,7 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
     // Send a goal to the action
     robotiq_msgs::CModelCommandGoal goal;
     goal.position = opening_width;    // Opening width. 0 to close, 0.085 to open the gripper.
+    goal.velocity = 0.1;              // From 0.013 to 0.1
     if (robot_name == "b_bot")
     {
       b_bot_gripper_client_.sendGoal(goal);
