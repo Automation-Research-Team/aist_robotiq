@@ -32,7 +32,6 @@
 
   <build_depend>std_msgs</build_depend>
   <build_depend>std_srvs</build_depend>
-  <exec_depend>message_generation</exec_depend>
 
   <!-- for get image from camera device -->
   <build_depend>geometry_msgs</build_depend>

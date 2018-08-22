@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 import rospy
-from util import *
 from std_srvs.srv import *
-from o2as_vision.srv import FindObject, FindObjectRequest
+from o2as_msgs.srv import *
+from o2as_vision.util import *
 from o2as_vision.vision_manager import VisionManager
 
 FIND_OBJECT_SERVICE = "find_object"
@@ -16,7 +16,6 @@ if __name__ == "__main__":
         find_object = ros_service_proxy(FIND_OBJECT_SERVICE, FindObject)
 
         while not rospy.core.is_shutdown():
-            # find object
             req = FindObjectRequest()
             req.object_id = object_id
             req.camera = "b_bot_camera"

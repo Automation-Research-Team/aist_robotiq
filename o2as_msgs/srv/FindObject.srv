@@ -6,3 +6,4 @@ string camera                               # The camera to be used for the reco
 ---
 # Response
 bool success
+geometry_msgs/PoseStamped object_pose

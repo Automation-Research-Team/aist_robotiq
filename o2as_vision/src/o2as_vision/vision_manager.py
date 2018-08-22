@@ -2,9 +2,9 @@ import rospy
 import rospkg
 import tf
 from util import *
-from geometry_msgs.msg import Pose
-from o2as_vision.srv import FindObjectResponse
-from o2as_parts_description.srv import GetPartsInfo
+import geometry_msgs.msg
+from o2as_msgs.srv import *
+from o2as_parts_description.srv import *
 from vision_group_interface import VisionGroupInterface
 
 GET_PARTS_INFO_SERVICE = "get_parts_info"
@@ -39,12 +39,25 @@ class VisionManager(object):
         rospy.logdebug("position_tolerance = %f", position_tolerance)
 
         res = FindObjectResponse()
+        res.success = False
         group = self.get_group(camera)
         detected_object = group.find_object(object_id, expected_position, position_tolerance)
         if detected_object == None:
             rospy.loginfo("no object found")
         else:
             rospy.logdebug("add detected object to planning scene")
+            res.success = True
+
+            q = tf.transformations.quaternion_from_euler(detected_object.rot3D.x, detected_object.rot3D.y, detected_object.rot3D.z)
+            p = geometry_msgs.msg.PoseStamped()
+            p.header.frame_id = camera + "_depth_frame"
+            p.pose.position = detected_object.pos3D
+            p.pose.orientation.x = q[0]
+            p.pose.orientation.y = q[1]
+            p.pose.orientation.z = q[2]
+            p.pose.orientation.w = q[3]
+            res.object_pose = p
+
             self.add_detected_object_to_planning_scene(detected_object, group)
         rospy.logdebug("VisionManager.find_object() end")
         return res
@@ -64,7 +77,7 @@ class VisionManager(object):
 
         # convert position and orientation of detected object
         q = tf.transformations.quaternion_from_euler(obj.rot3D.x, obj.rot3D.y, obj.rot3D.z)
-        pose = Pose()
+        pose = geometry_msgs.msg.Pose()
         pose.position = obj.pos3D
         pose.orientation.x = q[0]
         pose.orientation.y = q[1]

@@ -2,7 +2,7 @@
 
 import rospy
 from std_srvs.srv import *
-from o2as_vision.srv import FindObject
+from o2as_msgs.srv import *
 from o2as_vision.vision_manager import VisionManager
 
 LOG_LEVEL = log_level=rospy.DEBUG
