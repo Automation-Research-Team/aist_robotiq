@@ -1,0 +1,6 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="assy_part_02">
+  <xacro:include filename="$(find o2as_parts_description)/urdf/01_BASE_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/02_PANEL_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/03_PANEL2_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/13_MBGA30-2_macro.urdf"/>
+</robot>

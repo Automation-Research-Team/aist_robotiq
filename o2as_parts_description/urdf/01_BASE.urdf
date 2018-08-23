@@ -1,4 +1,4 @@
-<robot name="16_SPWF6">
+<robot name="04_37D-GEARMOTOR-50-70">
   <link name="baseLink">
     <contact>
       <lateral_friction value="1"/>
@@ -11,7 +11,7 @@
     <visual>
       <origin rpy="1.5707 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="/root/catkin_ws/src/o2as_parts_description/meshes/16_SPWF6.dae" scale="0.001 0.001 0.001"/>
+        <mesh filename="/root/catkin_ws/src/o2as_parts_description/meshes/01-BASE.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="white">
         <color rgba="1 1 1 1"/>
@@ -20,7 +20,7 @@
     <collision>
       <origin rpy="1.5707 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="/root/catkin_ws/src/o2as_parts_description/meshes/16_SPWF6.vhacd.dae" scale="0.001 0.001 0.001"/>
+        <mesh filename="/root/catkin_ws/src/o2as_parts_description/meshes/01-BASE.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
