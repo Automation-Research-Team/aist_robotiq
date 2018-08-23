@@ -6,6 +6,7 @@ from std_srvs.srv import Trigger
 from o2as_phoxi_camera.srv import SetInt
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
+from skimage import io
 
 def handle_get_image(req):
     if req.camera == "phoxi":
@@ -15,13 +16,15 @@ def handle_get_image(req):
 
         trigger = rospy.ServiceProxy("o2as_phoxi_camera/trigger_frame", Trigger)
         res_trigger = trigger()
-        while not res_trigger.success
+        while not res_trigger.success:
+            rospy.sleep(0.1)
             res_trigger = trigger()
         get_frame = rospy.ServiceProxy("o2as_phoxi_camera/get_image", SetInt)
         res_get_frame = get_frame(0)
         msg_depth = rospy.wait_for_message("o2as_phoxi_camera/depth_map", Image, timeout=None)
         bridge = CvBridge()
-        bridge.imgmsg_to_cv2(msg_depth, )
+        bridge.imgmsg_to_cv2(msg_depth, '32FC1') 
+        io.imsave(rospy.get_param("o2as_phoxi_camera/id") + ".tif")
         
         stop = rospy.ServiceProxy("o2as_phoxi_camera/stop_acquisition", Trigger)
         res_stop = stop()
@@ -30,7 +33,7 @@ def aist_kitting_server():
     rospy.loginfo("Start aist_kiting_server")
     rospy.init_node("aist_kitting_server", anonymous=True)
 
-    get_image = rospy.Service("get_image", GetImage, handle_get_image)
+    get_image = rospy.Service("aist_kitting/get_image", GetImage, handle_get_image)
 
     rospy.spin()
 
