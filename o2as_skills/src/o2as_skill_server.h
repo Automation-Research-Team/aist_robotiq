@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include "std_msgs/String.h"
+#include "std_msgs/Bool.h"
 #include "geometry_msgs/PoseStamped.h"
 
 #include <tf/transform_listener.h>    // Includes the TF conversions
@@ -56,6 +57,7 @@ public:
   moveit::planning_interface::MoveGroupInterface* robotNameToMoveGroup(std::string robot_name);
   std::string getEELink(std::string robot_name);
   bool updatePlanningScene();
+  bool waitForURProgram(std::string robot_name);    // Waits for the robot to report that a custom program has finished. 
 
   // Internal functions
   bool equipScrewTool(std::string robot_name, std::string screw_tool_id);
