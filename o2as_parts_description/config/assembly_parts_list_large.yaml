@@ -1,5 +1,8 @@
 parts_list:
-   - 00_holder
+   - 00_holder                      # Test parts
+   - 01-BASE                        # Base Panel
+   - 02-PANEL                       # Output shaft fixing plate
+   - 03-PANEL2                      # Motor fixing plate
 #  - 04_37D-GEARMOTOR-50-70         # Geared motor (Gear ratio 1:70)
    - 05_MBRFA30-2-P6                # Pulley for Round Belt (4mm) - Setscrew P.D. 30mm
 #  - 06_MBT4-400                    # Polyurethane round belt （welded joint product) P.D. 4mm L=400mm
