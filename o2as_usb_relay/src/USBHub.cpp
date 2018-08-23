@@ -24,7 +24,7 @@ static const u_int	CTRL_TIMEOUT		= 1000;
 *  class USBHub								*
 ************************************************************************/
 USBHub::USBHub(uint16_t idVendor, uint16_t idProduct)
-    :USBDevice(idVendor, idProduct, USB_CLASS_HUB), _nports(0)
+    :USBDevice(idVendor, idProduct), _nports(0)
 {
     initialize();
 }

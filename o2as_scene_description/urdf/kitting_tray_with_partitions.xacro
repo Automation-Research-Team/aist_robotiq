@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro"
+       name="kitting_tray2_o2as">
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray.xacro" />
+
+  <xacro:macro name="tray_contents" params="trayname contents *origin">
+    <link name="${trayname}_${contents}">
+      <visual>
+	<xacro:insert_block name="origin"/>
+	<geometry>
+          <mesh filename="package://o2as_scene_description/meshes/${contents}.stl" scale="0.001 0.001 0.001" />
+	</geometry>
+	<material name="white">
+          <color rgba="1 1 1 1"/>
+	</material>
+      </visual>
+      <collision>
+        <xacro:insert_block name="origin"/>
+        <geometry>
+          <mesh filename="package://o2as_scene_description/meshes/${contents}.stl" scale="0.001 0.001 0.001" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${trayname}_${contents}_joint" type="fixed">
+      <parent link="${trayname}" />
+      <child  link="${trayname}_${contents}" />
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="kitting_tray1" params="trayname parent *origin">
+    <xacro:kitting_tray trayname="${trayname}" parent="${parent}">
+      <xacro:insert_block name="origin"/>
+    </xacro:kitting_tray>
+
+    <xacro:tray_contents trayname="${trayname}" contents="partition1_1">
+      <origin xyz="-0.095 0.14 0" rpy="0 0 ${-pi/2}"/>
+    </xacro:tray_contents>
+
+    <xacro:tray_contents trayname="${trayname}" contents="partition1_2">
+      <origin xyz="-0.095 -0.062 0" rpy="0 0 ${-pi/2}"/>
+    </xacro:tray_contents>
+  </xacro:macro>
+
+  <xacro:macro name="kitting_tray2" params="trayname parent *origin">
+    <xacro:kitting_tray trayname="${trayname}" parent="${parent}">
+      <xacro:insert_block name="origin"/>
+    </xacro:kitting_tray>
+
+    <xacro:tray_contents trayname="${trayname}" contents="partition2">
+      <origin xyz="-0.095 0.14 0" rpy="0 0 ${-pi/2}"/>
+    </xacro:tray_contents>
+
+    <xacro:tray_contents trayname="${trayname}" contents="screw_holder">
+      <origin xyz="-0.095 -0.05 0" rpy="0 0 ${-pi/2}"/>
+    </xacro:tray_contents>
+  </xacro:macro>
+</robot>

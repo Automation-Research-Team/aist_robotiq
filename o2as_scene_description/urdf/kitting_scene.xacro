@@ -2,7 +2,8 @@
 
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kitting_scene">
   <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_bins.xacro" />
-  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray.xacro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray.xacro" /> -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray_with_partitions.xacro" />
 
   <xacro:property name="bin1_width" value=".125"/>
   <xacro:property name="bin1_length" value=".128" />
@@ -76,12 +77,18 @@
   <xacro:property name="set3_z" value=".007" />
 
   <!-- set3_tray_1 -->
-  <xacro:kitting_tray trayname="set3_tray_1" parent="workspace_center">
+  <!-- <xacro:kitting_tray trayname="set3_tray_1" parent="workspace_center"> -->
+  <!--   <origin xyz="${set3_x} ${set3_y} ${set3_z}" rpy="0 0 0" /> -->
+  <!-- </xacro:kitting_tray> -->
+  <xacro:kitting_tray1 trayname="set3_tray_1" parent="workspace_center">
     <origin xyz="${set3_x} ${set3_y} ${set3_z}" rpy="0 0 0" />
-  </xacro:kitting_tray>
+  </xacro:kitting_tray1>
   <!-- set3_tray_2 -->
-  <xacro:kitting_tray trayname="set3_tray_2" parent="workspace_center">
+  <!-- <xacro:kitting_tray trayname="set3_tray_2" parent="workspace_center"> -->
+  <!--   <origin xyz="${set3_x} ${set3_y-tray_width} ${set3_z}" rpy="0 0 0" /> -->
+  <!-- </xacro:kitting_tray> -->
+  <xacro:kitting_tray2 trayname="set3_tray_2" parent="workspace_center">
     <origin xyz="${set3_x} ${set3_y-tray_width} ${set3_z}" rpy="0 0 0" />
-  </xacro:kitting_tray>
+  </xacro:kitting_tray2>
   
 </robot>

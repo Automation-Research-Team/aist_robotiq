@@ -20,7 +20,7 @@ static const u_int CTRL_TIMEOUT			= 5000;
 *  class USBHid								*
 ************************************************************************/
 USBHid::USBHid(uint16_t idVendor, uint16_t idProduct, bool useReportIDs)
-    :USBDevice(idVendor, idProduct, USB_CLASS_HUB), _useReportIDs(useReportIDs)
+    :USBDevice(idVendor, idProduct), _useReportIDs(useReportIDs)
 {
 }
 
