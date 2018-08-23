@@ -3,9 +3,6 @@
        xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:macro name="dual_suction_gripper_o2as"
 	       params="prefix parent *origin">
-    <material name="light_grey">
-      <color rgba="0.8 0.8 0.8 1"/>
-    </material>
 
     <!-- A link representing the gripper and a joint attaching it to parnet -->
     <link name="${prefix}dual_suction_gripper_base_link">
@@ -14,7 +11,9 @@
 	<geometry>
           <mesh filename="package://o2as_scene_description/meshes/dual_suction_gripper.stl"/>
 	</geometry>
-	<material name="light_grey"/>
+	<material name="light_grey">
+	  <color rgba="0.8 0.8 0.8 1"/>
+	</material>
       </visual>
       <collision>
 	<geometry>
