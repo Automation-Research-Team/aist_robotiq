@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(o2as_moveit_config)
+project(o2as_aist_config)
 
 find_package(catkin REQUIRED)
 

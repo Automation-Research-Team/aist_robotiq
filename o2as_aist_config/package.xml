@@ -1,6 +1,6 @@
 <package>
 
-  <name>o2as_moveit_config</name>
+  <name>o2as_aist_config</name>
   <version>0.3.0</version>
   <description>
      An automatically generated package with all the configuration and launch files for using the o2as_base_scene with the MoveIt! Motion Planning Framework
