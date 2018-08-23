@@ -106,7 +106,7 @@
 
   <!-- spawn and attach grippers -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_85_gripper.urdf.xacro" />
-  <xacro:robotiq_85_gripper_o2as prefix="a_bot_" parent = "a_bot_ee_link">
+  <xacro:robotiq_85_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link">
     <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
   </xacro:robotiq_85_gripper_o2as>
 
@@ -120,7 +120,7 @@
 
   <!-- spawn and attach diual suction grippers -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro" />
-  <xacro:dual_suction_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link">
+  <xacro:dual_suction_gripper_o2as prefix="a_bot_" parent = "a_bot_ee_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:dual_suction_gripper_o2as>
 
