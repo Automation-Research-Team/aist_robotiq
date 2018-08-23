@@ -5,4 +5,5 @@ def move_back_forth_5cm():
     movel(pose_trans(p[0.0,0.0,0.0,0.0,0.0,0.0], target_pos), a=0.5, v=0.1)
     sleep(0.5)
     movel(pose_trans(p[0.0,0.0,0.0,0.0,0.0,0.0], start_pos), a=0.5, v=0.1)
+    textmsg("Done.")
 end

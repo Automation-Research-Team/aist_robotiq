@@ -8,6 +8,8 @@
 #include "geometry_msgs/PoseStamped.h"
 
 #include <tf/transform_listener.h>    // Includes the TF conversions
+#include <tf/transform_broadcaster.h>
+
 #include "o2as_helper_functions.h"
 
 #include <chrono>
@@ -25,6 +27,7 @@
 // Services
 #include "o2as_msgs/goToNamedPose.h"
 #include "o2as_msgs/sendScriptToUR.h"
+#include "o2as_msgs/publishMarker.h"
 #include "o2as_msgs/PrecisionGripperCommand.h"
 
 // Actions
@@ -51,6 +54,7 @@ public:
   bool goToNamedPose(std::string pose_name, std::string robot_name);
   bool stop();                  // Stops the robot at the current position
   moveit::planning_interface::MoveGroupInterface* robotNameToMoveGroup(std::string robot_name);
+  std::string getEELink(std::string robot_name);
   bool updatePlanningScene();
 
   // Internal functions
@@ -76,6 +80,8 @@ public:
   // Callback declarations
   bool goToNamedPoseCallback(o2as_msgs::goToNamedPose::Request &req,
                         o2as_msgs::goToNamedPose::Response &res);
+  bool publishMarkerCallback(o2as_msgs::publishMarker::Request &req,
+                        o2as_msgs::publishMarker::Response &res);
 
   // Actions
   void executeAlign(const o2as_msgs::alignGoalConstPtr& goal);
@@ -94,6 +100,7 @@ public:
 
   // Service declarations
   ros::ServiceServer goToNamedPoseService_;
+  ros::ServiceServer publishMarkerService_;
 
   // Service clients
   ros::ServiceClient sendScriptToURClient_;
@@ -111,10 +118,11 @@ public:
   // actionlib::SimpleActionClient<control_msgs::GripperCommandAction> a_bot_gripper_client_;
   actionlib::SimpleActionClient<robotiq_msgs::CModelCommandAction> b_bot_gripper_client_, c_bot_gripper_client_;
 
-  double PLANNING_TIME = 15.0, LIN_PLANNING_TIME = 30.0;
+  double PLANNING_TIME = 5.0, LIN_PLANNING_TIME = 15.0;
   
   // Status variables
   tf::TransformListener tflistener_;
+  tf::TransformBroadcaster tfbroadcaster_;
   bool holding_object_ = false;
   // A status of the robot. This should almost definitely be rosparams instead.
   // /a_bot/status/carrying_object  (bool)

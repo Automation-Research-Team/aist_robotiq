@@ -56,8 +56,6 @@ class TaskboardClass(O2ASBaseRoutines):
     super(TaskboardClass, self).__init__()
     self.set_up_item_parameters()
     
-
-    self.action_client = actionlib.SimpleActionClient('precision_gripper_action', o2as_msgs.msg.PrecisionGripperCommandAction)
     # self.action_client.wait_for_server()
     rospy.sleep(.5)   # Use this instead of waiting, so that simulation can be used
 
@@ -99,65 +97,6 @@ class TaskboardClass(O2ASBaseRoutines):
       self.place_poses.append(place_pose)
     
 
-
-
-  def precision_gripper_outer_close(self):
-    try:
-        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
-        goal.close_outer_gripper_fully = True
-        self.action_client.send_goal(goal)
-        rospy.loginfo("close outer gripper")
-        self.action_client.wait_for_result()
-        result = self.action_client.get_result()
-        rospy.loginfo(result)
-    except rospy.ROSInterruptException:
-        rospy.loginfo("program interrupted before completion", file=sys.stderr)
-
-
-  def precision_gripper_outer_open(self):
-    try:
-        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
-        goal.open_outer_gripper_fully = True
-        goal.close_outer_gripper_fully = False
-        self.action_client.send_goal(goal)
-        rospy.loginfo("open outer gripper")
-        self.action_client.wait_for_result()
-        result = self.action_client.get_result()
-        rospy.loginfo(result)
-    except rospy.ROSInterruptException:
-        rospy.loginfo("program interrupted before completion", file=sys.stderr)
-
-  def precision_gripper_inner_close(self, this_action_grasps_an_object = False):
-    try:
-        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
-        goal.close_inner_gripper_fully = True
-        goal.this_action_grasps_an_object = this_action_grasps_an_object
-        self.action_client.send_goal(goal)
-        rospy.loginfo("Closing inner gripper")
-        self.action_client.wait_for_result()
-        result = self.action_client.get_result()
-        rospy.loginfo(result)
-    except rospy.ROSInterruptException:
-        rospy.loginfo("program interrupted before completion", file=sys.stderr)
-
-
-  def precision_gripper_inner_open(self, this_action_grasps_an_object = False):
-    try:
-        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
-        goal.open_inner_gripper_fully = True
-        goal.close_inner_gripper_fully = False
-        goal.this_action_grasps_an_object = this_action_grasps_an_object
-        self.action_client.send_goal(goal)
-        rospy.loginfo("Opening inner gripper")
-        self.action_client.wait_for_result()
-        result = self.action_client.get_result()
-        rospy.loginfo(result)
-    except rospy.ROSInterruptException:
-        rospy.loginfo("program interrupted before completion", file=sys.stderr)
-
-    except rospy.ServiceException, e:
-        print "Service call failed: %s"%e
-
   # def 
   # calib_pose = geometry_msgs.msg.PoseStamped()
   #   #calib_pose.header.frame_id = "taskboard_part4"
@@ -167,9 +106,9 @@ class TaskboardClass(O2ASBaseRoutines):
   #   calib_pose.pose.position.x = 0
   #   calib_pose.pose.position.z = 0.15
 
-  #   self.go_to_named_pose("home_a", "a_bot")
-  #   self.go_to_named_pose("home_b", "b_bot")
-  #   self.go_to_named_pose("home_c", "c_bot")
+  #   self.go_to_named_pose("home", "a_bot")
+  #   self.go_to_named_pose("home", "b_bot")
+  #   self.go_to_named_pose("home", "c_bot")
 
   #   self.go_to_pose_goal("a_bot", calib_pose, speed=0.3)
   #   print "============ Press `Enter` to move a_bot ..."
@@ -183,7 +122,7 @@ class TaskboardClass(O2ASBaseRoutines):
   #   self.go_to_pose_goal("a_bot", calib_pose, speed=0.02)
   #   print "============ Press `Enter` to move ..."
   #   raw_input()
-  #   self.go_to_named_pose("home_a", "a_bot",speed=0.3)
+  #   self.go_to_named_pose("home", "a_bot",speed=0.3)
     
 
   ################ ----- Routines  
@@ -260,9 +199,9 @@ class TaskboardClass(O2ASBaseRoutines):
     self.groups["a_bot"].set_goal_tolerance(.0001) 
     self.groups["a_bot"].set_planning_time(5) 
     self.groups["a_bot"].set_num_planning_attempts(1000) 
-    self.go_to_named_pose("home_c", "c_bot")
-    self.go_to_named_pose("home_b", "b_bot")
-    self.go_to_named_pose("home_a", "a_bot")
+    self.go_to_named_pose("home", "c_bot")
+    self.go_to_named_pose("home", "b_bot")
+    self.go_to_named_pose("home", "a_bot")
 
     for i in range(0,15):
       rospy.loginfo("=== Now targeting part number " + str(i+1) + ": " + self.item_names[i])
@@ -314,16 +253,16 @@ class TaskboardClass(O2ASBaseRoutines):
         pass
 
 
-      self.go_to_named_pose("home_c", "c_bot")
-      self.go_to_named_pose("home_b", "b_bot")
-      self.go_to_named_pose("home_a", "a_bot")
+      self.go_to_named_pose("home", "c_bot")
+      self.go_to_named_pose("home", "b_bot")
+      self.go_to_named_pose("home", "a_bot")
 
   def taskboard_manual_testing(self):
     self.groups["a_bot"].set_goal_tolerance(.0001) 
     self.groups["a_bot"].set_planning_time(5) 
-    self.go_to_named_pose("home_c", "c_bot")
-    self.go_to_named_pose("home_b", "b_bot")
-    self.go_to_named_pose("home_a", "a_bot")
+    self.go_to_named_pose("home", "c_bot")
+    self.go_to_named_pose("home", "b_bot")
+    self.go_to_named_pose("home", "a_bot")
     
     downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
 
@@ -353,9 +292,9 @@ if __name__ == '__main__':
     taskboard.groups["a_bot"].set_goal_tolerance(.0001) 
     taskboard.groups["a_bot"].set_planning_time(3) 
     taskboard.groups["a_bot"].set_num_planning_attempts(10)
-    taskboard.go_to_named_pose("home_c", "c_bot")
-    taskboard.go_to_named_pose("home_b", "b_bot")
-    taskboard.go_to_named_pose("home_a", "a_bot")
+    taskboard.go_to_named_pose("home", "c_bot")
+    taskboard.go_to_named_pose("home", "b_bot")
+    taskboard.go_to_named_pose("home", "a_bot")
 
     i = raw_input("Enter the number of the part to be performed: ")
     i =int(i)
@@ -398,9 +337,9 @@ if __name__ == '__main__':
         taskboard.horizontal_spiral_motion("a_bot", .002)
         
       
-      taskboard.go_to_named_pose("home_c", "c_bot")
-      taskboard.go_to_named_pose("home_b", "b_bot")
-      taskboard.go_to_named_pose("home_a", "a_bot")
+      taskboard.go_to_named_pose("home", "c_bot")
+      taskboard.go_to_named_pose("home", "b_bot")
+      taskboard.go_to_named_pose("home", "a_bot")
       i = raw_input("the number of the part")
       i =int(i)
     print "============ Done!"

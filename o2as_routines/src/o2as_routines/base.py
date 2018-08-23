@@ -100,18 +100,20 @@ class O2ASBaseRoutines(object):
               "c_bot":moveit_commander.MoveGroupCommander("c_bot")}
               # "front_bots":moveit_commander.MoveGroupCommander("front_bots"),
               # "all_bots":moveit_commander.MoveGroupCommander("all_bots") }
-    self.gripper_action_clients = { "a_bot":actionlib.SimpleActionClient('/a_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction), 
+    self.gripper_action_clients = { "a_bot":actionlib.SimpleActionClient('precision_gripper_action', o2as_msgs.msg.PrecisionGripperCommandAction), 
                                "b_bot":actionlib.SimpleActionClient('/b_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction), 
                                "c_bot":actionlib.SimpleActionClient('/c_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction) }
 
     self.pick_client = actionlib.SimpleActionClient('/o2as_skills/pick', o2as_msgs.msg.pickAction)
     self.place_client = actionlib.SimpleActionClient('/o2as_skills/place', o2as_msgs.msg.placeAction)
+    self.regrasp_client = actionlib.SimpleActionClient('/o2as_skills/regrasp', o2as_msgs.msg.regraspAction)
     self.align_client = actionlib.SimpleActionClient('/o2as_skills/align', o2as_msgs.msg.alignAction)
     self.insert_client = actionlib.SimpleActionClient('/o2as_skills/insert', o2as_msgs.msg.insertAction)
     self.screw_client = actionlib.SimpleActionClient('/o2as_skills/screw', o2as_msgs.msg.screwAction)
 
     self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR)
     self.goToNamedPose_client = rospy.ServiceProxy('/o2as_skills/goToNamedPose', o2as_msgs.srv.goToNamedPose)
+    self.publishMarker_client = rospy.ServiceProxy('/o2as_skills/publishMarker', o2as_msgs.srv.publishMarker)
 
     # self.pick_client.wait_for_server() # wait for the clients to connect
     # self.place_client.wait_for_server() 
@@ -122,6 +124,13 @@ class O2ASBaseRoutines(object):
     rospy.loginfo("Finished initializing class")
     
   ############## ------ Internal functions (and convenience functions)
+
+  def publish_marker(self, pose_stamped, marker_type):
+    req = o2as_msgs.srv.publishMarkerRequest()
+    req.marker_pose = pose_stamped
+    req.marker_type = marker_type
+    res = self.publishMarker_client.call(req)
+    return res.success
 
   def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, high_precision = False):
     group = self.groups[group_name]
@@ -159,17 +168,16 @@ class O2ASBaseRoutines(object):
     r=0.0003  #Start radius
     theta=0
     RealRadius=0
-    # current_pos = group.get_current_pose() 
-    # TODO: This does not return the same for the real robots and the demo.launch!!!
-    # It returns a pose that is x = .8, y = -.22 and z = .7 in "world", but should be -.1, -.47, 1.14.
     
+    # ==== MISBEHAVING VERSION (see https://answers.ros.org/question/300978/movegroupcommander-get_current_pose-returns-incorrect-result-when-using-real-robot/ )
+    # start_pos_bugged = group.get_current_pose() 
+    # ==== WORKING VERSION:
     gripper_pos = geometry_msgs.msg.PoseStamped()
     gripper_pos.header.frame_id = "a_bot_gripper_tip_link"
     gripper_pos.pose.orientation.w = 1.0
     start_pos = self.listener.transformPose("world", gripper_pos)
+
     next_pos = start_pos
-    # rospy.loginfo("The current pose is: ")
-    # rospy.loginfo(start_pos)
     while RealRadius <= max_radius and not rospy.is_shutdown():
         #By default, the Spiral_Search function will maintain contact between both mating parts at all times
         theta=theta+theta_incr
@@ -179,18 +187,13 @@ class O2ASBaseRoutines(object):
         next_pos.pose.position.y = start_pos.pose.position.y + y
         r=r + radius_inc_set
         RealRadius = sqrt(pow(x,2)+pow(y,2))
-        # rospy.loginfo("The next target pose is: ")
-        # rospy.loginfo(next_pos)
-        # rospy.loginfo("Go? Type y")
-        # inp = raw_input()
-        # if inp == "y":
         self.go_to_pose_goal(robot_name, next_pos)
         rospy.sleep(0.1)
     # -------------
     return True
 
   def go_to_named_pose(self, pose_name, robot_name, speed = 1.0):
-    # pose_name should be "home_a", "home_b" etc.
+    # pose_name should be "home", "back" etc.
     self.groups[robot_name].set_named_target(pose_name)
     rospy.loginfo("Setting velocity scaling to " + str(speed))
     self.groups[robot_name].set_max_velocity_scaling_factor(speed)
@@ -199,12 +202,14 @@ class O2ASBaseRoutines(object):
     self.groups[robot_name].clear_pose_targets()
     return True
 
-  def do_pick_action(self, robot_name, pose_stamped, tool_name = ""):
+  def do_pick_action(self, robot_name, pose_stamped, z_axis_rotation = 0.0, use_complex_planning = False, tool_name = ""):
     # Call the pick action
     goal = o2as_msgs.msg.pickGoal()
     goal.robot_name = robot_name
     goal.item_pose = pose_stamped
     goal.tool_name = tool_name
+    goal.use_complex_planning = use_complex_planning
+    goal.z_axis_rotation = z_axis_rotation
     rospy.loginfo("Sending pick action goal")
     rospy.loginfo(goal)
 
@@ -237,8 +242,114 @@ class O2ASBaseRoutines(object):
     res = self.urscript_client.call(req)
     return res.success
 
+  def do_regrasp(self, giver_robot_name, receiver_robot_name, grasp_distance = .02):
+    """The item goes from giver to receiver."""
+    goal = o2as_msgs.msg.regraspGoal()
+    goal.giver_robot_name = giver_robot_name
+    goal.receiver_robot_name = receiver_robot_name
+    goal.grasp_distance = grasp_distance
 
-  ################ ----- Routines  
-  ################ 
-  ################ 
+    self.regrasp_client.send_goal(goal)
+    rospy.loginfo("Performing regrasp with grippers " + giver_robot_name + " and " + receiver_robot_name)
+    self.regrasp_client.wait_for_result(rospy.Duration(90.0))
+    result = self.regrasp_client.get_result()
+    rospy.loginfo(result)
+    return result
+
+
+  ################ ----- Gripper interfaces
+  
+  def send_gripper_command(self, gripper, command, this_action_grasps_an_object = False):
+    if gripper == "precision_gripper_outer" or gripper == "precision_gripper_inner":
+      goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
+      if command == "stop":
+        goal.stop = True
+      elif command == "close":
+        if gripper == "precision_gripper_inner":
+          goal.close_inner_gripper_fully = True
+        else:
+          goal.close_outer_gripper_fully = True
+      elif command == "open":
+        if gripper == "precision_gripper_inner":
+          goal.open_inner_gripper_fully = True
+        else:
+          goal.open_outer_gripper_fully = True
+      goal.this_action_grasps_an_object = this_action_grasps_an_object
+      action_client = self.gripper_action_clients["a_bot"]
+    elif gripper == "b_bot" or gripper == "c_bot":
+      goal = robotiq_msgs.msg.CModelCommandGoal()
+      action_client = self.gripper_action_clients[gripper]
+      goal.velocity = 0.1   # from 0.013 to 0.1
+      if command == "close":
+        goal.position = 0.0
+      elif command == "open":
+        goal.position = 0.085
+      else:
+        goal.position = command     # This sets the opening width directly
+    else:
+      rospy.logerr("Could not parse gripper command")
+
+    action_client.send_goal(goal)
+    rospy.loginfo("Sending command " + command + " to gripper: " + gripper)
+    action_client.wait_for_result(rospy.Duration(3.0))  # Default wait time: 3 s
+    result = action_client.get_result()
+    rospy.loginfo(result)
+    return 
+
+  def precision_gripper_outer_close(self):
+    try:
+        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
+        goal.close_outer_gripper_fully = True
+        self.gripper_action_clients["c_bot"].send_goal(goal)
+        rospy.loginfo("close outer gripper")
+        self.gripper_action_clients["c_bot"].wait_for_result()
+        result = self.gripper_action_clients["c_bot"].get_result()
+        rospy.loginfo(result)
+    except rospy.ROSInterruptException:
+        rospy.loginfo("program interrupted before completion", file=sys.stderr)
+
+
+  def precision_gripper_outer_open(self):
+    try:
+        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
+        goal.open_outer_gripper_fully = True
+        goal.close_outer_gripper_fully = False
+        self.gripper_action_clients["c_bot"].send_goal(goal)
+        rospy.loginfo("open outer gripper")
+        self.gripper_action_clients["c_bot"].wait_for_result()
+        result = self.gripper_action_clients["c_bot"].get_result()
+        rospy.loginfo(result)
+    except rospy.ROSInterruptException:
+        rospy.loginfo("program interrupted before completion", file=sys.stderr)
+
+  def precision_gripper_inner_close(self, this_action_grasps_an_object = False):
+    try:
+        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
+        goal.close_inner_gripper_fully = True
+        goal.this_action_grasps_an_object = this_action_grasps_an_object
+        self.gripper_action_clients["c_bot"].send_goal(goal)
+        rospy.loginfo("Closing inner gripper")
+        self.gripper_action_clients["c_bot"].wait_for_result()
+        result = self.gripper_action_clients["c_bot"].get_result()
+        rospy.loginfo(result)
+    except rospy.ROSInterruptException:
+        rospy.loginfo("program interrupted before completion", file=sys.stderr)
+
+
+  def precision_gripper_inner_open(self, this_action_grasps_an_object = False):
+    try:
+        goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
+        goal.open_inner_gripper_fully = True
+        goal.close_inner_gripper_fully = False
+        goal.this_action_grasps_an_object = this_action_grasps_an_object
+        self.gripper_action_clients["c_bot"].send_goal(goal)
+        rospy.loginfo("Opening inner gripper")
+        self.gripper_action_clients["c_bot"].wait_for_result()
+        result = self.gripper_action_clients["c_bot"].get_result()
+        rospy.loginfo(result)
+    except rospy.ROSInterruptException:
+        rospy.loginfo("program interrupted before completion", file=sys.stderr)
+
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
 

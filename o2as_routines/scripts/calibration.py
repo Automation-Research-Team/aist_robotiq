@@ -57,29 +57,34 @@ class CalibrationClass(O2ASBaseRoutines):
     calib_pose.header.frame_id = "workspace_center"
     calib_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     calib_pose.pose.position.x = -0.15
-    calib_pose.pose.position.z = 0.03
+    calib_pose.pose.position.z = 0.07
 
-    self.go_to_named_pose("home_a", "a_bot")
-    self.go_to_named_pose("home_b", "b_bot")
-    self.go_to_named_pose("home_c", "c_bot")
+    self.go_to_named_pose("home", "a_bot")
+    self.go_to_named_pose("home", "b_bot")
+    self.go_to_named_pose("home", "c_bot")
 
-    rospy.loginfo("============ Press `Enter` to move a_bot to calibration position ...")
+    rospy.loginfo("============ Press `Enter` to move a_bot to calibration position, enter 0 to skip.")
+    if raw_input() != "0":
+      self.send_gripper_command("precision_gripper_outer", "close")
+      self.go_to_pose_goal("a_bot", calib_pose)
+
+    rospy.loginfo("============ Press `Enter` to move b_bot to calibration position, enter 0 to skip.")
+    if raw_input() != "0":
+      self.go_to_named_pose("home", "a_bot")
+      self.send_gripper_command("b_bot", "close")
+      self.go_to_pose_goal("b_bot", calib_pose)
+
+    rospy.loginfo("============ Press `Enter` to move c_bot to calibration position, enter 0 to skip.")
+    if raw_input() != "0":
+      self.go_to_named_pose("home", "b_bot")
+      self.send_gripper_command("c_bot", "close")
+      self.go_to_pose_goal("c_bot", calib_pose)
+
+    rospy.loginfo("============ Press `Enter` to move robots back home.")
     raw_input()
-    self.go_to_pose_goal("a_bot", calib_pose)
-
-    rospy.loginfo("============ Press `Enter` to move b_bot to calibration position ...")
-    raw_input()
-    self.go_to_named_pose("home_a", "a_bot")
-    self.go_to_pose_goal("b_bot", calib_pose)
-
-    rospy.loginfo("============ Press `Enter` to move c_bot to calibration position ...")
-    raw_input()
-    self.go_to_named_pose("home_b", "b_bot")
-    self.go_to_pose_goal("c_bot", calib_pose)
-
-    rospy.loginfo("============ Press `Enter` to move c_bot back home ...")
-    raw_input()
-    self.go_to_named_pose("home_c", "c_bot")
+    self.go_to_named_pose("home", "a_bot")
+    self.go_to_named_pose("home", "b_bot")
+    self.go_to_named_pose("home", "c_bot")
     return
   
   def taskboard_calibration(self):
@@ -103,7 +108,7 @@ class CalibrationClass(O2ASBaseRoutines):
 
   def taskboard_calibration_extended(self):
     rospy.loginfo("============ Demonstrating the calibration of the taskboard. ============")
-    rospy.loginfo("This moves to the top of the parts pre-mounted in the taskboard.")
+    rospy.loginfo("This moves a_bot to the top of the parts pre-mounted in the taskboard.")
     poses = []
 
     pose0 = geometry_msgs.msg.PoseStamped()
@@ -130,7 +135,7 @@ class CalibrationClass(O2ASBaseRoutines):
 
   def taskboard_calibration_mat(self):
     rospy.loginfo("============ Calibrating placement mat for the taskboard task. ============")
-    rospy.loginfo("Robot gripper tip should be 3 mm above the surface.")
+    rospy.loginfo("a_bot gripper tip should be 3 mm above the surface.")
     poses = []
 
     pose0 = geometry_msgs.msg.PoseStamped()
@@ -150,7 +155,7 @@ class CalibrationClass(O2ASBaseRoutines):
     return 
 
   def gripper_frame_calibration_mat(self):
-    rospy.loginfo("============ Calibrating the gripper tip frame for a_bot. ============")
+    rospy.loginfo("============ Calibrating the a_bot gripper tip frame for a_bot. ============")
     rospy.loginfo("Each approach of the target position has its orientation turned by 90 degrees.")
     poses = []
 
@@ -183,9 +188,9 @@ class CalibrationClass(O2ASBaseRoutines):
 
   def cycle_through_calibration_poses(self, poses, robot_name, speed=0.3):
     rospy.loginfo("Moving all robots home.")
-    self.go_to_named_pose("home_a", "a_bot")
-    self.go_to_named_pose("home_b", "b_bot")
-    self.go_to_named_pose("home_c", "c_bot")
+    self.go_to_named_pose("home", "a_bot")
+    self.go_to_named_pose("home", "b_bot")
+    self.go_to_named_pose("home", "c_bot")
     home_pose = "home_" + robot_name[0]
     
     rospy.loginfo("============ Moving " + robot_name + " to " + poses[0].header.frame_id)
@@ -201,9 +206,9 @@ class CalibrationClass(O2ASBaseRoutines):
     rospy.loginfo("============ Press `Enter` to move " + robot_name + " home")
     raw_input()
     rospy.loginfo("Moving all robots home again.")
-    self.go_to_named_pose("home_a", "a_bot")
-    self.go_to_named_pose("home_b", "b_bot")
-    self.go_to_named_pose("home_c", "c_bot")
+    self.go_to_named_pose("home", "a_bot")
+    self.go_to_named_pose("home", "b_bot")
+    self.go_to_named_pose("home", "c_bot")
     return
 
 
@@ -218,7 +223,7 @@ if __name__ == '__main__':
       rospy.loginfo("2: Taskboard")
       rospy.loginfo("3: Taskboard extended fun tour")
       rospy.loginfo("4: Placement mat (for the taskboard task)")
-      rospy.loginfo("5: Gripper frame (rotate around EEF axis)")
+      rospy.loginfo("5: a_bot gripper frame (rotate around EEF axis)")
       rospy.loginfo("x: Exit ")
       rospy.loginfo(" ")
       r = raw_input()
