@@ -39,6 +39,7 @@ import copy
 import rospy
 import geometry_msgs.msg
 import tf_conversions
+import tf
 from math import pi
 
 from o2as_msgs.srv import *
@@ -146,8 +147,15 @@ class AssemblyClass(O2ASBaseRoutines):
     ps = geometry_msgs.msg.PoseStamped()
     ps.header.frame_id = "workspace_center"
     ps.pose.orientation.w = 1.0
-    ps.pose.position.y = .1
-    ps.pose.position.z = .04
+    ps.pose.position.x = -.32
+    ps.pose.position.y = -.315
+    ps.pose.position.z = .025
+    self.do_pick_action("c_bot", ps)
+    self.go_to_named_pose("home", "c_bot")
+    self.do_regrasp(giver_robot_name="c_bot", receiver_robot_name="b_bot", grasp_distance = -.01)
+
+    self.go_to_named_pose("home", "b_bot")
+    self.go_to_named_pose("home", "c_bot")
     self.do_pick_action("b_bot", ps)
     self.go_to_named_pose("home", "b_bot")
     self.do_regrasp("b_bot", "c_bot", grasp_distance = .08)
@@ -163,9 +171,9 @@ if __name__ == '__main__':
     assy = AssemblyClass()
     assy.set_up_item_parameters()
 
-    assy.handover_demo()
 
 
+    # assy.handover_demo()
 
     print "============ Done!"
   except rospy.ROSInterruptException:

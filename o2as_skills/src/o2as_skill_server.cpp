@@ -455,18 +455,23 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
   {
     // Send a goal to the action
     robotiq_msgs::CModelCommandGoal goal;
+    robotiq_msgs::CModelCommandResultConstPtr result;
+
     goal.position = opening_width;    // Opening width. 0 to close, 0.085 to open the gripper.
     goal.velocity = 0.1;              // From 0.013 to 0.1
     if (robot_name == "b_bot")
     {
       b_bot_gripper_client_.sendGoal(goal);
       finished_before_timeout = b_bot_gripper_client_.waitForResult(ros::Duration(2.0));
+      result = b_bot_gripper_client_.getResult();
     }
     else if (robot_name == "c_bot")
     {
       c_bot_gripper_client_.sendGoal(goal);
-      finished_before_timeout = c_bot_gripper_client_.waitForResult(ros::Duration(2.0));
+      finished_before_timeout = c_bot_gripper_client_.waitForResult(ros::Duration(4.0));
+      result = c_bot_gripper_client_.getResult();
     }
+    ROS_INFO_STREAM("Action " << (finished_before_timeout ? "returned" : "did not return before timeout") <<", with result: " << result->reached_goal);
   }
   else
   {
@@ -612,7 +617,7 @@ bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose,
   target_tip_link_pose.pose.position.z += .1;
   ROS_INFO_STREAM("Opening gripper, moving above object.");
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);
+  moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name, 1.0);
 
   // Move onto the object
   target_tip_link_pose.pose.position.z -= .1;
@@ -954,55 +959,60 @@ void SkillServer::executePlace(const o2as_msgs::placeGoalConstPtr& goal)
 // regraspAction
 void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
 {
-  ROS_INFO("regraspAction was called");
-  double gripper_distance_before_grasp, grasp_distance, gripper_distance_after_grasp;
-  if (goal->gripper_distance_before_grasp < 0.001)
+  ROS_INFO_STREAM("regraspAction was called with grasp_distance = " << goal->grasp_distance);
+  openGripper(goal->receiver_robot_name);
+  double gripper_distance_before_grasp = goal->gripper_distance_before_grasp, 
+         grasp_distance = goal->grasp_distance, 
+         gripper_distance_after_grasp = goal->gripper_distance_after_grasp;
+  
+  // Set default values
+  if (gripper_distance_before_grasp < 0.001)
   {
     gripper_distance_before_grasp = 0.1;
   }
-  if (goal->grasp_distance < 0.001)
+  if (grasp_distance == 0.0)
   {
     grasp_distance = 0.02;
   }
-  if (goal->gripper_distance_after_grasp < 0.001)
+  if (gripper_distance_after_grasp < 0.001)
   {
     gripper_distance_after_grasp = 0.1;
   }
 
   // Create the handover_pose for Giver and Receiver robot
-  std::string giver_robot_name = goal->giver_robot_name, 
-              receiver_robot_name = goal->receiver_robot_name;
+  std::string holder_robot_name = goal->giver_robot_name, 
+              picker_robot_name = goal->receiver_robot_name;
 
   // The giver holds the item steady, the receiver picks it up.
   // Priority: c_bot, b_bot, a_bot (a_bot only gives passively)
   // If c_bot is involved, it always picks up (receiver), because its configuration is advantageous.
-  if (giver_robot_name == "c_bot")
+  if (holder_robot_name == "c_bot")
   {
-    giver_robot_name = receiver_robot_name;
-    receiver_robot_name = "c_bot";
+    holder_robot_name = picker_robot_name;
+    picker_robot_name = "c_bot";
   }
-  else if ((giver_robot_name == "b_bot") && (receiver_robot_name == "a_bot"))
+  else if ((holder_robot_name == "b_bot") && (picker_robot_name == "a_bot"))
   {
-    giver_robot_name = "a_bot";
-    receiver_robot_name = "b_bot";
+    holder_robot_name = "a_bot";
+    picker_robot_name = "b_bot";
   }
 
   tf::Transform t;
   tf::Quaternion q;
-  if (receiver_robot_name == "c_bot")
+  if (picker_robot_name == "c_bot")
   {
     t.setOrigin(tf::Vector3(-.28, .11, .55));  // x y z of the handover position
     double c_tilt = 0.0;
-    if (giver_robot_name == "b_bot")
+    if (holder_robot_name == "b_bot")
     { 
       c_tilt = 10.0;  // degrees. Tilts during the handover to c (this makes the pose nicer for b_bot)
     } 
     q.setRPY(0, -c_tilt/180.0*M_PI, 0);   // r p y of the handover position (for the receiver)    
   }
-  else if ((receiver_robot_name == "b_bot") || (receiver_robot_name == "a_bot"))
+  else if ((picker_robot_name == "b_bot") || (picker_robot_name == "a_bot"))
   {
     t.setOrigin(tf::Vector3(0.1, 0.0, 0.65)); 
-    if (receiver_robot_name == "b_bot")
+    if (picker_robot_name == "b_bot")
     {
       q.setRPY(0, 0, -M_PI/2);
     }
@@ -1015,43 +1025,44 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
   t.setRotation(q);
   tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "workspace_center", "handover_frame"));
 
-  geometry_msgs::PoseStamped handover_pose_giver, handover_pose_receiver;
-  handover_pose_giver.header.frame_id = "handover_frame";
-  handover_pose_receiver.header.frame_id = "handover_frame";
-  handover_pose_giver.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI/2, 0, M_PI); // Facing the receiver, rotated
+  geometry_msgs::PoseStamped handover_pose_holder, handover_pose_picker;
+  handover_pose_holder.header.frame_id = "handover_frame";
+  handover_pose_picker.header.frame_id = "handover_frame";
+  handover_pose_holder.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI/2, 0, M_PI); // Facing the receiver, rotated
 
-  publishMarker(handover_pose_receiver, "pick_pose");
-  publishMarker(handover_pose_giver, "place_pose");
+  publishMarker(handover_pose_picker, "pick_pose");
+  publishMarker(handover_pose_holder, "place_pose");
   ros::Duration(.1).sleep();
   tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "workspace_center", "handover_frame"));
 
-  goToNamedPose("back", receiver_robot_name);
+  goToNamedPose("back", picker_robot_name);
 
   // Move the Giver to the regrasp_pose
-  ROS_INFO_STREAM("Moving giver robot (" << giver_robot_name << ") to handover pose.");
-  moveToCartPosePTP(handover_pose_giver, giver_robot_name);
+  ROS_INFO_STREAM("Moving giver robot (" << holder_robot_name << ") to handover pose.");
+  moveToCartPosePTP(handover_pose_holder, holder_robot_name);
   
   // Move the Receiver to an approach pose, then on to grasp
-  ROS_INFO_STREAM("Moving receiver robot (" << receiver_robot_name << ") to approach pose.");
-  handover_pose_receiver.pose.position.x = -gripper_distance_before_grasp;
-  moveToCartPosePTP(handover_pose_receiver, receiver_robot_name);
+  ROS_INFO_STREAM("Moving receiver robot (" << picker_robot_name << ") to approach pose.");
+  handover_pose_picker.pose.position.x = -gripper_distance_before_grasp;
+  moveToCartPosePTP(handover_pose_picker, picker_robot_name);
 
   ros::Duration(1).sleep();
-  ROS_INFO_STREAM("Moving receiver robot (" << receiver_robot_name << ") to grasp pose.");
-  handover_pose_receiver.pose.position.x = -grasp_distance;
-  moveToCartPosePTP(handover_pose_receiver, receiver_robot_name);
+  ROS_INFO_STREAM("Moving receiver robot (" << picker_robot_name << ") to grasp pose.");
+  handover_pose_picker.pose.position.x = -grasp_distance;
+  ROS_WARN_STREAM("Position x is: " << -grasp_distance);
+  moveToCartPosePTP(handover_pose_picker, picker_robot_name);
   
   // Close the Receiver's gripper
-  closeGripper(receiver_robot_name);
+  closeGripper(goal->receiver_robot_name);
   ros::Duration(1).sleep();
-  openGripper(giver_robot_name);
+  openGripper(goal->giver_robot_name);
 
   // Move back.
-  ROS_INFO_STREAM("Moving receiver robot (" << receiver_robot_name << ") back to approach pose.");
-  handover_pose_receiver.pose.position.x = -gripper_distance_after_grasp;
-  moveToCartPosePTP(handover_pose_receiver, receiver_robot_name);
+  ROS_INFO_STREAM("Moving receiver robot (" << picker_robot_name << ") back to approach pose.");
+  handover_pose_picker.pose.position.x = -gripper_distance_after_grasp;
+  moveToCartPosePTP(handover_pose_picker, picker_robot_name);
 
-  // goToNamedPose("home", giver_robot_name);
+  // goToNamedPose("home", holder_robot_name);
 
   ROS_INFO("regraspAction is set as succeeded");
   regraspActionServer_.setSucceeded();
