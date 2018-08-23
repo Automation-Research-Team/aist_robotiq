@@ -1073,29 +1073,78 @@ void SkillServer::executeInsert(const o2as_msgs::insertGoalConstPtr& goal)
 {
   ROS_INFO("insertAction was called");
   std::string ee_link_name;
-  if (goal->robot_name == "a_bot"){ee_link_name = goal->robot_name + "_gripper_tip_link"; }
-  else {ee_link_name = goal->robot_name + "_robotiq_85_tip_link";}
+  if (goal->active_robot_name == "a_bot"){ee_link_name = goal->active_robot_name + "_gripper_tip_link"; }
+  else {ee_link_name = goal->active_robot_name + "_robotiq_85_tip_link";}
 
-  // TODO: Set the height/offset!
-  goFromAbove(goal->target_hole, ee_link_name, goal->robot_name, 0.1);
-  
-  o2as_msgs::sendScriptToUR srv;
-  srv.request.program_id = "insertion";
-  srv.request.robot_name = goal->robot_name;
-  srv.request.stroke = goal->maximum_insertion_distance;
-  srv.request.force_magnitude = goal->maximum_force;
-  srv.request.forward_speed = goal->speed;
-  sendScriptToURClient_.call(srv);
-  if (srv.response.success == true)
-    ROS_INFO("Successfully called the URScript client to start insertion");
-  else
-    ROS_WARN("Could not call the URScript client to start insertion");
-  
-  geometry_msgs::PoseStamped ps = goal->target_hole;
-  
+  bool inHandInsertion = true;
+  if (inHandInsertion)  // = b_bot and c_bot.
+  {
+    // This bit is copied from the handover action. Assumes that the parts are perfectly aligned etc.
+    tf::Transform t;
+    tf::Quaternion q;
+    t.setOrigin(tf::Vector3(-.28, .11, .55));  // x y z of the handover position
+    double c_tilt = 10.0;
+    q.setRPY(0, -c_tilt/180.0*M_PI, 0);   // r p y of the handover position (for the receiver)    
+    t.setRotation(q);
+    tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "workspace_center", "in_hand_insertion_frame"));
 
+    geometry_msgs::PoseStamped insertion_pose_active, insertion_pose_passive;
+    insertion_pose_active.header.frame_id = "in_hand_insertion_frame";
+    insertion_pose_passive.header.frame_id = "in_hand_insertion_frame";
+    insertion_pose_active.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI/2, 0, M_PI); // Facing the receiver, rotated
+
+    std::string active_robot_name = "b_bot";
+    std::string passive_robot_name = "c_bot";
+
+    publishMarker(insertion_pose_passive, "pick_pose");
+    publishMarker(insertion_pose_active, "place_pose");
+    ros::Duration(.1).sleep();
+    tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "workspace_center", "in_hand_insertion_frame"));
+
+    goToNamedPose("back", passive_robot_name);
+
+    // Move the 
+    ROS_INFO_STREAM("Moving active robot (" << active_robot_name << ") to insertion pose.");
+    moveToCartPosePTP(insertion_pose_active, active_robot_name);
+    
+    // Move the Receiver to an approach pose, then send the insertion command
+    ROS_INFO_STREAM("Moving passive robot (" << passive_robot_name << ") to approach pose.");
+    insertion_pose_passive.pose.position.x = - goal->starting_offset - .05;
+    moveToCartPosePTP(insertion_pose_passive, passive_robot_name);
+
+    o2as_msgs::sendScriptToUR srv;
+    srv.request.program_id = "insertion";
+    srv.request.robot_name = goal->active_robot_name;
+    srv.request.max_insertion_distance = goal->max_insertion_distance;
+    srv.request.max_force = goal->max_force;
+    srv.request.max_radius = goal->max_radius;
+    srv.request.radius_increment = goal->radius_increment;
+    srv.request.forward_speed = goal->speed;
+    sendScriptToURClient_.call(srv);
+    if (srv.response.success == true)
+      ROS_INFO("Successfully called the URScript client to start insertion");
+    else
+      ROS_WARN("Could not call the URScript client to start insertion");
+    
+    ROS_INFO("Waiting for the robot to finish the operation.");
+    ros::Duration(.5).sleep();
+    waitForURProgram(active_robot_name);
+
+    // Assume that the operation succeeded
+    // ROS_WARN("Sleeping for 15 seconds because we get no feedback from the robot.");
+    // ros::Duration(15).sleep();
+    openGripper(active_robot_name);
+
+    // Move back
+    ROS_INFO_STREAM("Moving passive robot (" << passive_robot_name << ") back.");
+    insertion_pose_passive.pose.position.x = - goal->starting_offset - 0.1;
+    moveToCartPosePTP(insertion_pose_passive, passive_robot_name);
+  }
+
+  // TODO: Add insertAction for one robot (not both at once)
   ROS_INFO("insertAction is set as succeeded");
   insertActionServer_.setSucceeded();
+  return;
 }
 
 // screwAction
