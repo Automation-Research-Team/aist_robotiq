@@ -1,4 +1,9 @@
 parts_list:
+  - id: 0
+    name: holder
+    type: 00_holder
+    cad: 00_holder.stl
+    description: Holder
   - id: 4
     name: motor
     type: 04_37D-GEARMOTOR-50-70

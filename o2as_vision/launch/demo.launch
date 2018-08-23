@@ -5,7 +5,8 @@
     <!-- camera1 -->
     <arg name="camera1" default="b_bot_camera"/>
     <arg name="camera1_type" default="realsense"/>
-    <arg name="camera1_serial_number" default="612201001671"/>
+    <arg name="camera1_serial_number" default="616205004841"/>
+    <!-- <arg name="camera1_serial_number" default="612201001671"/> -->
     <!-- <arg name="camera1_serial_number" default="616205004841"/> -->
 	<include file="$(find o2as_vision)/launch/vision_group_realsense.launch">
         <arg name="camera" value="$(arg camera1)"/>
@@ -23,11 +24,12 @@
     
     <!-- 
     -1 : all 
+     0 : holder (for test)
      7 : bearing housing
     11 : output pulley
     13 : idler pulley
     -->
-    <arg name="object_id" default="11"/>
+    <arg name="object_id" default="0"/>
     <node name="o2as_vision_demo" pkg="o2as_vision" type="realsense_camera_demo.py" output="screen">
 	    <param name="object_id" type="string" value="$(arg object_id)"/>
     </node>
