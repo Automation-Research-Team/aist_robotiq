@@ -69,10 +69,9 @@ if __name__ == '__main__':
         if item_pose == None:
           continue
 
-        transform = tf_buffer.lookup_transform("mat", #target frame
-                                              item_pose.header.frame_id, #source frame
-                                              rospy.Time(0), #get the tf at first available time
-                                              rospy.Duration(1.0)) #wait for 1 second
+        target_frame = "mat"
+        source_frame = item_pose.header.frame_id
+        transform = tf_buffer.lookup_transform(target_frame, source_frame, rospy.Time(0), rospy.Duration(1.0))
         pick_pose = tf2_geometry_msgs.do_transform_pose(item_pose, transform)
 
         downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))

@@ -18,7 +18,8 @@ class VisionGroupInterface(object):
         self._cad_matching = CadMatchingInterface(group_name)
 
         # planning scene
-        self._camera_frame = "/" + self._group_name + "_depth_frame"
+        #self._camera_frame = "/" + self._group_name + "_depth_frame"
+        self._camera_frame = "/" + self._group_name + "_depth_image_frame"
         self._planning_scene = PlanningSceneInterface(self._camera_frame)
 
         rospy.logdebug("VisionGroupInterface.__init__() end")
@@ -73,13 +74,14 @@ class VisionGroupInterface(object):
         n = len(detected_objects) 
         if n > 0:
             # choose nearest object from expected position within torelance
+            # expected position should be specified with depth image frame of the camera
             rospy.logdebug("%d objects found. select nearest.", n)
             i_min = 0
             d_min = float("inf")
             for i in range(n):
                 obj = detected_objects[i]
                 a = np.array([expected_position.pose.position.x, expected_position.pose.position.y, expected_position.pose.position.z])
-                b = np.array([obj.pos3D.x, obj.pos3D.y, obj.pos3D.z])
+                b = np.array([obj.pose.position.x, obj.pose.position.y, obj.pose.position.z])
                 d = LA.norm(a-b)
                 if d < d_min:
                     d_min = d
@@ -91,6 +93,12 @@ class VisionGroupInterface(object):
 
     def add_detected_object_to_planning_scene(self, name, pose, cad_filename, scale):
         rospy.logdebug("VisionGroupInterface.add_detected_object_to_planning_scene() begin")
+        rospy.logdebug("name: " + name)
+        rospy.logdebug("cad_filename: " + cad_filename)
+        rospy.logdebug("pose:")
+        rospy.logdebug(pose)
+        rospy.logdebug("scale: (%f, %f, %f)", scale[0], scale[1], scale[2])
+
         self._planning_scene.addMesh(name=name, pose=pose, filename=cad_filename, scale=scale)
         # # add box to planning scene (test)
         # a = 0.05
