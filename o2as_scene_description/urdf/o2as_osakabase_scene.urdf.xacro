@@ -33,15 +33,15 @@
   <!-- Robot bases -->
   <!-- Putting these at height 0.0 makes them intersect with the ground, so they are elevated. -->
   <!-- There are some instabilities when the box is big, for some reason. -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_base.xacro" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_osakabase.xacro" />
   <xacro:o2as_base boxname="a_bot_base_smfl" parent="o2as_ground">
-    <origin xyz="${a_bot_x-.65/2} ${a_bot_y-.65/2} ${bots_z-.06}" rpy="0 0 0" />   
+    <origin xyz="${a_bot_x-.4/2} ${a_bot_y-.4/2} ${bots_z-.06}" rpy="0 0 0" />   
   </xacro:o2as_base>
   <xacro:o2as_base boxname="b_bot_base_smfl" parent="o2as_ground">
-    <origin xyz="${b_bot_x-.65/2} ${b_bot_y-.65/2} ${bots_z-.06}" rpy="0 0 0" />   
+    <origin xyz="${b_bot_x-.4/2} ${b_bot_y-.4/2} ${bots_z-.06}" rpy="0 0 0" />   
   </xacro:o2as_base>
   <xacro:o2as_base boxname="c_bot_base_smfl" parent="o2as_ground">
-    <origin xyz="${c_bot_x-.65/2-.16} ${c_bot_y-.65/2-.1} ${bots_z-.06}" rpy="0 0 0" />   
+    <origin xyz="${c_bot_x-.4/2-.16} ${c_bot_y-.4/2-.1} ${bots_z-.06}" rpy="0 0 0" />   
   </xacro:o2as_base>
 
   <!-- Main workspace -->
@@ -50,18 +50,18 @@
   <xacro:property name="plate_w" value="0.9"/>
   <xacro:property name="plate_l" value="0.75"/>
   <xacro:o2as_box boxname="workbox" box_w="${plate_w}" box_l="${plate_l}" box_h=".01" parent="o2as_ground">
-    <origin xyz="${-plate_w/2+.1} ${-plate_l/2} ${bots_z}" rpy="0 0 0" />   
+    <origin xyz="${-plate_w/2+.1} ${-plate_l/2} ${bots_z-0.196}" rpy="0 0 0" />   
   </xacro:o2as_box>
 
   <link name="workspace_center" />
   <joint name="world_to_workspace" type="fixed">
     <parent link="o2as_ground" />
     <child link="workspace_center" />
-    <origin xyz="0.0 0.0 ${bots_z+.01}" rpy="0.0 0.0 0.0" />
+    <origin xyz="0.0 0.0 ${bots_z+.01-0.196}" rpy="0.0 0.0 0.0" />
   </joint>
 
   <!-- Screw holder & screw tool visual -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/screw_tools.xacro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/screw_tools.xacro" /> -->
 
   <!-- Feeders -->
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/screw_feeder.xacro" />
