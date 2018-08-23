@@ -68,12 +68,12 @@ controller_list:
   #     - a_bot_robotiq_85_left_knuckle_joint
 initial:
   - group: a_bot
-    pose: home_a
+    pose: home
   - group: b_bot
-    pose: home_b
+    pose: home
   - group: c_bot
-    pose: home_c
+    pose: home
   - group: front_bots
-    pose: home_front
+    pose: home
   - group: all_bots
-    pose: home_all
+    pose: home

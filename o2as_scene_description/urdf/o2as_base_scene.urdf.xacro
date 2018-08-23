@@ -4,11 +4,12 @@
 
   <!-- This is the main file defining our robot arrangement and physical environment. -->
 
-  <!-- These values are still not fixed -->
-  <xacro:property name="a_bot_x" value="0.0"/>
-  <xacro:property name="a_bot_y" value="-0.65"/>
-  <xacro:property name="b_bot_x" value="0.0"/>
-  <xacro:property name="b_bot_y" value="0.65"/>
+  <!-- Calibration from 20 August 2018 -->
+  <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
+  <xacro:property name="a_bot_x" value="-0.005"/>
+  <xacro:property name="a_bot_y" value="-0.543"/>
+  <xacro:property name="b_bot_x" value="0.001"/>
+  <xacro:property name="b_bot_y" value="0.529"/>
   <xacro:property name="c_bot_x" value="-0.5"/>
   <xacro:property name="c_bot_y" value="0.0"/>
 
@@ -25,7 +26,6 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur3.urdf.xacro" />
 
   <!-- Scene items (trays, bins...) -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/walls.xacro" />
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/taskboard_scene.xacro" /> -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" />
   
@@ -63,13 +63,13 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/screw_tools.xacro" />
 
   <!-- Feeders -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/screw_feeder.xacro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/screw_feeder.xacro" />
   <xacro:screw_feeder feedername="m3_feeder" parent="a_bot_base_smfl">
-    <origin xyz=".1 .4 .05" rpy="0 0 ${pi/2}" />   
+    <origin xyz=".3 .4 .05" rpy="0 0 ${pi/2}" />   
   </xacro:screw_feeder>
   <xacro:screw_feeder feedername="m4_feeder" parent="c_bot_base_smfl">
     <origin xyz=".45 .05 .05" rpy="0 0 0" />   
-  </xacro:screw_feeder>
+  </xacro:screw_feeder> -->
   <!-- <xacro:screw_feeder feedername="m5_feeder" parent="c_bot_base_smfl">
     <origin xyz=".45 .2 .05" rpy="0 0 0" />   
   </xacro:screw_feeder> -->
@@ -95,7 +95,7 @@
     shoulder_pan_lower_limit="0.0" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="0.0"
     elbow_joint_lower_limit="0.0" elbow_joint_upper_limit="${pi}"
-    wrist_1_lower_limit="${-pi}" wrist_1_upper_limit="0.3"
+    wrist_1_lower_limit="${-pi}" wrist_1_upper_limit="${pi}"
     wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
     wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
 

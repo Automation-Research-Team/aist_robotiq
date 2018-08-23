@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kitting_scene">
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_bins.xacro" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray.xacro" />
+
+  <!-- Insert: -->
+  <!-- Tray 1 -->
+  <!-- Tray 2 -->
+  <!-- The base plate -->
+
+  <!-- All the other parts need to be added somehow so that their frames can be updated, I guess. Hmmmmmmm. -->
+  
+
+  <!-- Manually defined pulley frame for the small test on 21 August. -->
+  <joint name="test_joint" type="fixed">
+    <parent link="workspace_center"/>
+    <child link="pulley_front_end"/>
+    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.07 "/>
+  </joint>
+  <link name="pulley_front_end"/>
+
+  <xacro:include filename="$(find o2as_parts_description)/urdf/assembly_parts_macros.urdf"/>
+  <xacro:assy_part_01 prefix="" parent="workspace_center">
+    <origin xyz="0.05 0.08 0.07" rpy="0 0 ${-pi/2}" />   
+  </xacro:assy_part_01>
+  <xacro:assy_part_02 prefix="" parent="workspace_center">
+    <origin xyz="0.0 -0.3 0.0" rpy="0 0 ${pi/2}" />   
+  </xacro:assy_part_02>
+  <xacro:assy_part_03 prefix="" parent="workspace_center">
+    <origin xyz="0.0 0.22 0.0" rpy="0 0 ${pi/2}" />   
+  </xacro:assy_part_03>
+  <xacro:assy_part_13 prefix="" parent="workspace_center">
+    <origin xyz="0.0 0.0 0.13" rpy="0 0 0" />   
+  </xacro:assy_part_13>
+
+
+</robot>
