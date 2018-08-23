@@ -46,19 +46,17 @@ class VisionManager(object):
             rospy.loginfo("no object found")
         else:
             rospy.logdebug("add detected object to planning scene")
+            self.add_detected_object_to_planning_scene(detected_object, group)
+
+            # chage Pose to PoseStamped 
+            # (cad matching always returns pose in depth image frame)
+            depth_image_frame = camera + "_depth_image_frame"
+            p = geometry_msgs.msg.PoseStamped()
+            p.header.frame_id = depth_image_frame
+            p.pose = detected_object.pose
+            res.object_pose = p
             res.success = True
 
-            q = tf.transformations.quaternion_from_euler(detected_object.rot3D.x, detected_object.rot3D.y, detected_object.rot3D.z)
-            p = geometry_msgs.msg.PoseStamped()
-            p.header.frame_id = camera + "_depth_frame"
-            p.pose.position = detected_object.pos3D
-            p.pose.orientation.x = q[0]
-            p.pose.orientation.y = q[1]
-            p.pose.orientation.z = q[2]
-            p.pose.orientation.w = q[3]
-            res.object_pose = p
-
-            self.add_detected_object_to_planning_scene(detected_object, group)
         rospy.logdebug("VisionManager.find_object() end")
         return res
 
@@ -72,27 +70,10 @@ class VisionManager(object):
         # add detected objects to the planning scene
         rospack = rospkg.RosPack()
         path = rospack.get_path('o2as_parts_description')
-        object_name = parts_info.type
+        name = parts_info.type+"_mesh"
         cad_filename = path + "/meshes/" + parts_info.cad
-
-        # convert position and orientation of detected object
-        q = tf.transformations.quaternion_from_euler(obj.rot3D.x, obj.rot3D.y, obj.rot3D.z)
-        pose = geometry_msgs.msg.Pose()
-        pose.position = obj.pos3D
-        pose.orientation.x = q[0]
-        pose.orientation.y = q[1]
-        pose.orientation.z = q[2]
-        pose.orientation.w = q[3]
-
-        # convert size 
         scale = [0.001, 0.001, 0.001] # [mm to meter]
-        
-        rospy.logdebug("name = %s", object_name)
-        rospy.logdebug("cad_filename = %s", cad_filename)
-        rospy.logdebug("pos = (%f, %f, %f)", pose.position.x, pose.position.y, pose.position.z)
-        rospy.logdebug("rot = (%f, %f, %f)", obj.rot3D.x, obj.rot3D.y, obj.rot3D.z)
-        rospy.logdebug("scale = (%f, %f, %f)", scale[0], scale[1], scale[2])
-        group.add_detected_object_to_planning_scene(name=object_name+"_mesh", pose=pose, cad_filename=cad_filename, scale=scale)
+        group.add_detected_object_to_planning_scene(name=name, pose=obj.pose, cad_filename=cad_filename, scale=scale)
 
     def add_group(self, name):
         self._items[name] = VisionGroupInterface(name)
