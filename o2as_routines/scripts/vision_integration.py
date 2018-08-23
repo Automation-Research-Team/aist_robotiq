@@ -54,9 +54,9 @@ if __name__ == '__main__':
     vi.groups["a_bot"].set_goal_tolerance(.0001) 
     vi.groups["a_bot"].set_planning_time(3) 
     vi.groups["a_bot"].set_num_planning_attempts(10)
-    vi.go_to_named_pose("home_c", "c_bot")
-    vi.go_to_named_pose("home_b", "b_bot")
-    vi.go_to_named_pose("home_a", "a_bot")
+    # vi.go_to_named_pose("home_c", "c_bot")
+    # vi.go_to_named_pose("home_b", "b_bot")
+    # vi.go_to_named_pose("home_a", "a_bot")
 
     i = raw_input("Enter the number of the part to be performed: ")
     i = int(i)
@@ -69,7 +69,7 @@ if __name__ == '__main__':
         if item_pose == None:
           continue
 
-        target_frame = "mat"
+        target_frame = "workspace_center" #"mat"
         source_frame = item_pose.header.frame_id
         transform = tf_buffer.lookup_transform(target_frame, source_frame, rospy.Time(0), rospy.Duration(1.0))
         pick_pose = tf2_geometry_msgs.do_transform_pose(item_pose, transform)
