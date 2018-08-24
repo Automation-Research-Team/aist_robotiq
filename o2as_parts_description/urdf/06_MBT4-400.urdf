@@ -20,7 +20,7 @@
     <collision>
       <origin rpy="1.5707 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="/root/catkin_ws/src/o2as_parts_description/meshes/06_MBT4-400.vhacd.dae" scale="0.001 0.001 0.001"/> -->
+        <mesh filename="/root/catkin_ws/src/o2as_parts_description/meshes/06_MBT4-400.vhacd.dae" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
