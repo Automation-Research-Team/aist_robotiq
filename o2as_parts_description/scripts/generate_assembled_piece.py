@@ -97,6 +97,7 @@ for mating in frame_matings:
     new_mating +=  "    <joint name=\"${prefix}part_" + str(parent_part_num).zfill(2) + "_to_" + str(child_part_num).zfill(2) + "_joint\" type=\"fixed\"> \n"
     new_mating +=  "      <parent link=\"${prefix}" + parent_frame + "\"/> \n"
     new_mating +=  "      <child link=\"${prefix}" + child_part_base_frame + "\"/> \n"
+    # TODO/BUG: This does not consider in the mating[3:7] rpy/xyz settings!
     new_mating +=  "      <origin rpy=\"${" + \
                             str(rpy_inv[0]) + "} ${" + \
                             str(rpy_inv[1]) + "} ${" + \
