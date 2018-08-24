@@ -1,6 +1,20 @@
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="assy_part_02">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="assy_parts">
   <xacro:include filename="$(find o2as_parts_description)/urdf/01_BASE_macro.urdf"/>
   <xacro:include filename="$(find o2as_parts_description)/urdf/02_PANEL_macro.urdf"/>
   <xacro:include filename="$(find o2as_parts_description)/urdf/03_PANEL2_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/04_37D-GEARMOTOR-50-71_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/05_MBRFA30-2-P6_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/06_MBT4-400_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/07_SBARB6200ZZ_30_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/08_KZAF1075NA4WA55GA20AA0_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/09_EDCS10_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/10_CLBPS10_17_4_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/11_MBRAC60-2-10_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/12_CLBUS6-9-9.5_macro.urdf"/>
   <xacro:include filename="$(find o2as_parts_description)/urdf/13_MBGA30-2_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/14_BGPSL6-9-L30-F8_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/15_SLBNR6_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/16_SPWF6_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/17_SCB4-10_macro.urdf"/>
+  <xacro:include filename="$(find o2as_parts_description)/urdf/18_SCB3-10_macro.urdf"/>
 </robot>
