@@ -176,7 +176,7 @@ class AssemblyClass(O2ASBaseRoutines):
     ps = geometry_msgs.msg.PoseStamped()
     ps.header.frame_id = "workspace_center"
     ps.pose.orientation.w = 1.0
-    ps.pose.position.x = -.195
+    ps.pose.position.x = -.197
     ps.pose.position.y = .333
     ps.pose.position.z = .06
     self.do_pick_action("b_bot", ps)
@@ -184,7 +184,8 @@ class AssemblyClass(O2ASBaseRoutines):
 
     # Move to the insertion pose and do it
     self.do_insert_action(active_robot_name = "b_bot", passive_robot_name = "c_bot",
-                          starting_offset = .05, max_approach_distance = .1)
+                          starting_offset = .05, max_approach_distance = .1,
+                          max_radius = 0.01, radius_increment = .0008)
 
     # self.go_to_named_pose("home", "b_bot")
     # self.go_to_named_pose("home", "c_bot")

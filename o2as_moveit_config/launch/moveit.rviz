@@ -10,6 +10,8 @@ Panels:
         - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
         - /TF1
+        - /TF1/Frames1
+        - /TF1/Tree1
       Splitter Ratio: 0.5
     Tree Height: 221
   - Class: rviz/Selection
@@ -407,25 +409,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          m3_feeder_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          m3_feeder_outlet_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          m4_feeder_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          m4_feeder_outlet_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           o2as_ground:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          pulley_front_end:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -844,25 +832,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          m3_feeder_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          m3_feeder_outlet_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          m4_feeder_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          m4_feeder_outlet_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           o2as_ground:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          pulley_front_end:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -938,6 +912,8 @@ Visualization Manager:
           Value: true
         a_bot_tool0:
           Value: true
+        a_bot_tool0_controller:
+          Value: true
         a_bot_upper_arm_link:
           Value: true
         a_bot_wrist_1_link:
@@ -1002,6 +978,8 @@ Visualization Manager:
           Value: true
         b_bot_tool0:
           Value: true
+        b_bot_tool0_controller:
+          Value: true
         b_bot_upper_arm_link:
           Value: true
         b_bot_wrist_1_link:
@@ -1048,6 +1026,8 @@ Visualization Manager:
           Value: true
         c_bot_tool0:
           Value: true
+        c_bot_tool0_controller:
+          Value: true
         c_bot_upper_arm_link:
           Value: true
         c_bot_wrist_1_link:
@@ -1058,15 +1038,11 @@ Visualization Manager:
           Value: true
         camera_right_ir_optical_frame:
           Value: true
-        m3_feeder_link:
-          Value: true
-        m3_feeder_outlet_link:
-          Value: true
-        m4_feeder_link:
-          Value: true
-        m4_feeder_outlet_link:
+        handover_frame:
           Value: true
         o2as_ground:
+          Value: true
+        pulley_front_end:
           Value: true
         screw_tool_holder:
           Value: true
@@ -1098,7 +1074,8 @@ Visualization Manager:
           o2as_ground:
             a_bot_base_link:
               a_bot_base:
-                {}
+                a_bot_tool0_controller:
+                  {}
               a_bot_shoulder_link:
                 a_bot_upper_arm_link:
                   a_bot_forearm_link:
@@ -1113,12 +1090,11 @@ Visualization Manager:
                             a_bot_gripper_tip_link:
                               {}
             a_bot_base_smfl:
-              m3_feeder_link:
-                m3_feeder_outlet_link:
-                  {}
+              {}
             b_bot_base_link:
               b_bot_base:
-                {}
+                b_bot_tool0_controller:
+                  {}
               b_bot_shoulder_link:
                 b_bot_upper_arm_link:
                   b_bot_forearm_link:
@@ -1164,7 +1140,8 @@ Visualization Manager:
               {}
             c_bot_base_link:
               c_bot_base:
-                {}
+                c_bot_tool0_controller:
+                  {}
               c_bot_shoulder_link:
                 c_bot_upper_arm_link:
                   c_bot_forearm_link:
@@ -1193,9 +1170,6 @@ Visualization Manager:
                           c_bot_tool0:
                             {}
             c_bot_base_smfl:
-              m4_feeder_link:
-                m4_feeder_outlet_link:
-                  {}
               screw_tool_holder:
                 screw_tool_m3_link:
                   screw_tool_m3_helper_link:
@@ -1209,7 +1183,10 @@ Visualization Manager:
             workbox:
               {}
             workspace_center:
-              {}
+              handover_frame:
+                {}
+              pulley_front_end:
+                {}
       Update Interval: 0
       Value: true
     - Class: rviz/Marker
@@ -1217,7 +1194,7 @@ Visualization Manager:
       Marker Topic: visualization_marker
       Name: Marker
       Namespaces:
-        {}
+        markers: true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -1245,25 +1222,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.5854224
+      Distance: 1.93189013
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.233466014
-        Y: 0.135252997
-        Z: 1.05839193
+        X: 0.0343694426
+        Y: -0.0860467255
+        Z: 0.889410913
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.450397909
+      Pitch: 0.50039798
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.99539018
+      Yaw: 2.3053906
     Saved: ~
 Window Geometry:
   Displays:
