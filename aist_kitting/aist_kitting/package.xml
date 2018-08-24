@@ -49,23 +49,33 @@
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-
+  <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
-  
-  <build_depend>std_msgs</build_depend>
-  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>rospy</exec_depend>
+
+  <build_depend>std_srvs</build_depend>
   <build_depend>sensor_msgs</build_depend>
-  <exec_depend>sensor_msgs</exec_depend>
+  <build_depend>geometry_msgs</build_depend>
   <build_depend>o2as_phoxi_camera</build_depend>
-  <exec_depend>o2as_phoxi_camera</exec_depend>
-  <build_depend>skimage</build_depend>
-  <exec_depend>skimage</exec_depend>
   <build_depend>cv_bridge</build_depend>
+  <build_depend>cv2</build_depend>
+  <build_depend>skimage</build_depend>
+  <exec_depend>std_srvs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>o2as_phoxi_camera</exec_depend>
   <exec_depend>cv_bridge</exec_depend>
+  <exec_depend>cv2</exec_depend>
+  <exec_depend>skimage</exec_depend>
 
-  <build_depend>message_generation</build_depend>
-  <exec_depend>message_runtime</exec_depend>
+  <build_depend>moveit_commander</build_depend>  
+  <exec_depend>moveit_commander</exec_depend>
+  <build_depend>moveit_msgs</build_depend>
+  <exec_depend>moveit_msgs</exec_depend>
 
+  <build_depend>aist_kitting_msgs</build_depend>
+  <exec_depend>aist_kitting_msgs</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
