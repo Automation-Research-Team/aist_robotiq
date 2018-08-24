@@ -70,26 +70,25 @@ class URScriptRelay():
             ### rq_spiral_search_new(max_insertion_distance, force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False):
 
             
-            program_back += "        rq_zero_sensor()\n"
-            program_back += "        textmsg(\"Approaching.\")\n"
-            program_back += "        rq_linear_search(\"" + req.force_direction + "\"," \
+            program_back += "    rq_zero_sensor()\n"
+            program_back += "    textmsg(\"Approaching.\")\n"
+            program_back += "    rq_linear_search(\"" + req.force_direction + "\"," \
                                 + str(req.max_force) + "," \
                                 + str(req.forward_speed) + "," \
                                 + str(req.max_approach_distance) + ")\n"
-            program_back += "        max_insertion_distance = " + str(req.max_insertion_distance) + "\n"
-            program_back += "        textmsg(\"Spiral searching.\")\n"
-            program_back += "        sleep(3.0)\n"
-            program_back += "        if rq_spiral_search_new(max_insertion_distance," + str(req.max_force) \
+            program_back += "    max_insertion_distance = " + str(req.max_insertion_distance) + "\n"
+            program_back += "    textmsg(\"Spiral searching.\")\n"
+            program_back += "    sleep(3.0)\n"
+            program_back += "    if rq_spiral_search_new(max_insertion_distance," + str(req.max_force) \
                                 + ", " + str(req.max_radius*1000) \
                                 + ", " + str(req.radius_increment*1000) \
                                 + ", peck_mode=" + str(req.peck_mode) + "):\n"
-            program_back += "            #Insert the Part into the bore#\n"
-            program_back += "            textmsg(\"Impedance insert\")\n"
-            program_back += "            sleep(3.0)\n" 
-            program_back += "            rq_impedance(max_insertion_distance, " + str(req.impedance_mass) + ")\n"
-            program_back += "        end\n"
-            program_back += "        textmsg(\"Done. Exiting.\")\n"
+            program_back += "        #Insert the Part into the bore#\n"
+            program_back += "        textmsg(\"Impedance insert\")\n"
+            program_back += "        sleep(3.0)\n" 
+            program_back += "        rq_impedance(max_insertion_distance, " + str(req.impedance_mass) + ")\n"
             program_back += "    end\n"
+            program_back += "    textmsg(\"Done. Exiting.\")\n"
             program_back += "end\n"
 
             program = program_front + "\n" + program_back
