@@ -4,6 +4,9 @@ import os
 
 import rospy
 import rospkg
+import tf
+import geometry_msgs
+from math import pi
 rp = rospkg.RosPack()
 
 # Read in the assembly matings
@@ -50,9 +53,6 @@ content +=  "      <xacro:insert_block name=\"origin\"/> \n"
 content +=  "    </xacro:assy_part_01> \n"
 content +=  "    \n"
 for mating in frame_matings:
-    print(mating)
-    t = ---3
-    print(t)
     parent_frame = mating[0]
     child_frame = mating[1]
     parent_part_num = int(parent_frame[10:12])
@@ -67,6 +67,27 @@ for mating in frame_matings:
             subframe_offset = subframe_offset
             break
     
+    # Get the inverse transform for the transformation entered into extra_frames
+    rpy = [float(eval(subframe_offset[2])), float(eval(subframe_offset[3])), float(eval(subframe_offset[4]))]
+    xyz = [float(eval(subframe_offset[5])), float(eval(subframe_offset[6])), float(eval(subframe_offset[7]))]
+    q = tf.transformations.quaternion_from_euler(rpy[0], rpy[1], rpy[2])
+    
+    t = tf.TransformerROS(True, rospy.Duration(10.0))
+    m = geometry_msgs.msg.TransformStamped()
+    m.header.frame_id = child_part_base_frame
+    m.child_frame_id = child_frame
+    m.transform.translation.x = xyz[0]
+    m.transform.translation.y = xyz[1]
+    m.transform.translation.z = xyz[2]
+    m.transform.rotation.x = q[0]
+    m.transform.rotation.y = q[1]
+    m.transform.rotation.z = q[2]
+    m.transform.rotation.w = q[3]
+    t.setTransform(m)
+
+    t_inv, q_i = t.lookupTransform(child_frame, child_part_base_frame, rospy.Time(0))
+    rpy_inv = tf.transformations.euler_from_quaternion(q_i)
+
     # First, spawn the part unattached (no link to the world). Then, create the mating joint manually, offset to the part's base frame.
     new_mating = "" 
     new_mating +=  "    <xacro:assy_part_" + str(child_part_num).zfill(2)+ " prefix=\"${prefix}\" parent=\"${prefix}" + parent_frame + "\" spawn_attached=\"false\"> \n"
@@ -76,13 +97,13 @@ for mating in frame_matings:
     new_mating +=  "    <joint name=\"${prefix}part_" + str(parent_part_num).zfill(2) + "_to_" + str(child_part_num).zfill(2) + "_joint\" type=\"fixed\"> \n"
     new_mating +=  "      <parent link=\"${prefix}" + parent_frame + "\"/> \n"
     new_mating +=  "      <child link=\"${prefix}" + child_part_base_frame + "\"/> \n"
-    new_mating +=  "      <origin rpy=\"${-" + \
-                            subframe_offset[2] + "} ${-" + \
-                            subframe_offset[3] + "} ${-" + \
-                            subframe_offset[4] + "}\" xyz=\"${-" + \
-                            subframe_offset[5] + "} ${-" + \
-                            subframe_offset[6] + "} ${-" + \
-                            subframe_offset[7] + "}\"/> \n"
+    new_mating +=  "      <origin rpy=\"${" + \
+                            str(rpy_inv[0]) + "} ${" + \
+                            str(rpy_inv[1]) + "} ${" + \
+                            str(rpy_inv[2]) + "}\" xyz=\"${" + \
+                            str(t_inv[0]) + "} ${" + \
+                            str(t_inv[1]) + "} ${" + \
+                            str(t_inv[2]) + "}\"/> \n"
     new_mating +=  "    </joint> \n"
     new_mating +=  "    \n"
     content += new_mating

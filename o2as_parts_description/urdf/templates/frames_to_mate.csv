@@ -1,6 +1,6 @@
 parent_frame, child_frame, roll, pitch, yaw, x, y, z, notes
-assy_part_01_screw_hole_panel1_1, assy_part_02_bottom_screw_hole_aligner_1,   0, 0, 0,   0,0,0, Base + Panel1
-#assy_part_01_screw_hole_panel2_1, assy_part_03_bottom_screw_hole_aligner_1,   0, 0, 0,   0,0,0, Base + Panel2
+assy_part_01_screw_hole_panel2_1, assy_part_02_bottom_screw_hole_aligner_1,   0, 0, 0,   0,0,0, Base + Panel1
+#assy_part_01_screw_hole_panel1_1, assy_part_03_bottom_screw_hole_aligner_1,   0, 0, 0,   0,0,0, Base + Panel2
 
 #assy_part_02_back_hole, assy_part_04_inserted_02,   0, 0, 0,   ${pi},0,0, Panel2 + Motor
 #assy_part_04_inserted_13, assy_part_13_center,   0, 0, 0,   -0.005,0,0, Motor + Pulley
