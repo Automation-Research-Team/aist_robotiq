@@ -5,7 +5,7 @@
     <!-- camera1 -->
     <arg name="camera1" default="b_bot_camera"/>
     <arg name="camera1_type" default="realsense"/>
-    <arg name="camera1_serial_number" default="605201001486"/>
+    <arg name="camera1_serial_number" default="616205004841"/>
     <!-- <arg name="camera1_serial_number" default="612201001671"/> -->
     <!-- <arg name="camera1_serial_number" default="616205004841"/> -->
     <!-- <arg name="camera1_serial_number" default="605201001486"/> -->
