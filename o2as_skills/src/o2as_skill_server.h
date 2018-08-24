@@ -11,6 +11,7 @@
 #include <tf/transform_listener.h>    // Includes the TF conversions
 #include <tf/transform_broadcaster.h>
 
+#include "ur_modern_driver/wait_for_program.h"
 #include "o2as_helper_functions.h"
 
 #include <chrono>
@@ -57,7 +58,6 @@ public:
   moveit::planning_interface::MoveGroupInterface* robotNameToMoveGroup(std::string robot_name);
   std::string getEELink(std::string robot_name);
   bool updatePlanningScene();
-  bool waitForURProgram(std::string robot_name);    // Waits for the robot to report that a custom program has finished. 
 
   // Internal functions
   bool equipScrewTool(std::string robot_name, std::string screw_tool_id);

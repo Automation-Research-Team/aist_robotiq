@@ -382,29 +382,6 @@ bool SkillServer::updatePlanningScene()
   }
 }
 
-bool SkillServer::waitForURProgram(std::string robot_name)
-{
-  ROS_INFO("Waiting for UR program to finish. Only run this for custom URScripts and not the regular motion commands, or this call will not terminate.");
-
-  boost::shared_ptr<std_msgs::Bool const> sharedPtr;
-  std_msgs::Bool program_running;
-  program_running.data = true;
-
-  while (program_running.data)
-  {
-    sharedPtr  = ros::topic::waitForMessage<std_msgs::Bool>("/" + robot_name + "_controller/ur_driver/program_running", ros::Duration(2));
-    if (sharedPtr == NULL)
-    {
-        ROS_ERROR("No message received from the robot. Is everything running?");
-        return false;
-    }
-    else
-        program_running = *sharedPtr;
-  }
-  ROS_INFO("UR Program has terminated.");
-  return true;
-}
-
 bool SkillServer::openGripper(std::string robot_name, std::string gripper_name)
 {
   return sendGripperCommand(robot_name, 0.085, gripper_name);
@@ -612,7 +589,6 @@ bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose,
   publishMarker(target_tip_link_pose, "pick_pose");
   ROS_INFO_STREAM("Received pickFromAbove command.");
   
-
   // Move above the object
   openGripper(robot_name, gripper_name);
   target_tip_link_pose.pose.position.z += .1;
@@ -815,8 +791,6 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
                                             << target_pose.pose.orientation.w);
   }
   
-
-
   if ((goal->gripper_command == "complex_pick_from_inside") || (goal->gripper_command == "complex_pick_from_outside"))
   {
     std::string end_effector_link_name = goal->robot_name + "_gripper_tip_link";
@@ -1129,7 +1103,7 @@ void SkillServer::executeInsert(const o2as_msgs::insertGoalConstPtr& goal)
     
     ROS_INFO("Waiting for the robot to finish the operation.");
     ros::Duration(.5).sleep();
-    waitForURProgram(active_robot_name);
+    waitForURProgram("/" + active_robot_name + "_controller");
 
     // Assume that the operation succeeded
     // ROS_WARN("Sleeping for 15 seconds because we get no feedback from the robot.");
