@@ -34,5 +34,6 @@
     <origin xyz="0.0 0.0 0.13" rpy="0 0 0" />   
   </xacro:assy_part_13>
 
-
+  <xacro:include filename="$(find o2as_parts_description)/urdf/display_all_parts.urdf"/>
+  
 </robot>
