@@ -459,6 +459,7 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
 
     goal.position = opening_width;    // Opening width. 0 to close, 0.085 to open the gripper.
     goal.velocity = 0.1;              // From 0.013 to 0.1
+    goal.force = 100;                 // From 40 to 100
     if (robot_name == "b_bot")
     {
       b_bot_gripper_client_.sendGoal(goal);
