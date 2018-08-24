@@ -2,7 +2,7 @@
 
 # Request
 string robot_name       # "a_bot", "b_bot", "c_bot"
-string program_id       # "insertion", "lin_move", "spiral_press"
+string program_id       # "insertion", "lin_move", "lin_move_rel", "spiral_motion"
 
 # Parameters for each of the programs
 float64 force_magnitude         # The force that spiral_press applies, in N
@@ -17,7 +17,13 @@ bool peck_mode                  #
 float64 stroke                  # Probably max_insertion_distance
 float64 impedance_mass          # Mass used for impedance control (default: 10 kg)
 
+# lin_move
 geometry_msgs/PoseStamped target_pose   # for lin_move
+float64 acceleration            # move_l param (default: .5)
+float64 velocity                # move_l param (default: .05)
+
+# lin_move_rel
+geometry_msgs/PointStamped relative_translation  # for lin_translation
 ---
 # Response
 bool success
