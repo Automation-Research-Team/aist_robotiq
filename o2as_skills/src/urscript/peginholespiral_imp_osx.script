@@ -997,7 +997,6 @@ textmsg("disable external sensor")  # end: URCap Installation Node
         #   Return True if the force is detected during the robot motion
         #************************************************
         def rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 ):
-            textmsg("tst1")
             global pos_offset_setting = p[0,0,0,0,0,0]
             if (direction == "X+") or (direction == "x+"):
                 pos_offset_setting = p[max_distance,0,0,0,0,0]
@@ -1019,7 +1018,7 @@ textmsg("disable external sensor")  # end: URCap Installation Node
             #The funtion will return the value True if the force is detected during the motion
             global find_something = True
             #Parameters validation
-            textmsg("tst2")
+            textmsg("linear_search parameters validated")
             if (max_distance < 2):
                 if ((speed > 0) and (speed <= 0.1)):
                     if ((force > 0) and (force < 200)):
@@ -1051,6 +1050,7 @@ textmsg("disable external sensor")  # end: URCap Installation Node
                             #The force is detected or max distance is reached, kill the thread to stop the motion
                             kill thread_find_handler
                             if (find_something == True):
+                                textmsg("Found something with linear search")
                                 find_distance_from_last=point_dist(get_actual_tcp_pose(),find_location)
                                 find_dimension=find_distance_from_last - find_dimension_adjust
                                 find_mid_location_from_last=interpolate_pose(find_location,get_actual_tcp_pose(),0.5)
@@ -1122,8 +1122,8 @@ textmsg("disable external sensor")  # end: URCap Installation Node
                         while ((RealRadius <= max_radius_set) and (norm(Fz) >= force_threshold)):
                             #By default, the Spiral_Search function will maintain contact between both mating parts at all times
                             if (peck_mode == False):
-                                textmsg(norm(Fx))
-                                textmsg(norm(Fy))
+                                textmsg("norm Fx + norm Fy: ")
+                                textmsg(norm(Fx) + norm(Fy))
                                 #standard method
                                 theta=theta+theta_incr
                                 x=cos(d2r(theta))*r

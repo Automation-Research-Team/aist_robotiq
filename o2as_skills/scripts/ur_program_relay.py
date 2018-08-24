@@ -55,9 +55,9 @@ class URScriptRelay():
             if not req.max_approach_distance:
                 req.max_approach_distance = .1
             if not req.max_radius:
-                req.max_radius = 4.0            # in mm!!
+                req.max_radius = .004            # in m
             if not req.radius_increment:
-                req.radius_increment = 0.3      # in mm!!
+                req.radius_increment = 0.0003    # in m
             if not req.peck_mode:
                 req.peck_mode = False
             if not req.max_insertion_distance:
@@ -70,7 +70,7 @@ class URScriptRelay():
             ### rq_spiral_search_new(max_insertion_distance, force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False):
 
             
-            # program_back += "        rq_zero_sensor()\n"
+            program_back += "        rq_zero_sensor()\n"
             program_back += "        textmsg(\"Approaching.\")\n"
             program_back += "        rq_linear_search(\"" + req.force_direction + "\"," \
                                 + str(req.max_force) + "," \
@@ -160,7 +160,7 @@ class URScriptRelay():
             program = program_front + "\n" + program_back
         elif req.program_id == "test":
             program = ""
-            program_file = open(os.path.join(self.rospack.get_path("o2as_examples"), "scripts/ur", "move_back_forth_5cm.script"), 'rb')
+            program_file = open(os.path.join(self.rospack.get_path("o2as_examples"), "scripts/urscript", "move_back_forth_5cm.script"), 'rb')
             program_line = program_file.read(1024)
             while program_line:
                 program += program_line
@@ -199,7 +199,7 @@ class URScriptRelay():
 
 if __name__ == '__main__':
     # Initialize the node and name it.
-    rospy.init_node('urscript_construction_node')
+    rospy.init_node('o2as_urscript_construction_node')
     # Go to class functions that do all the heavy lifting. Do error checking.
     try:
         ne = URScriptRelay()
