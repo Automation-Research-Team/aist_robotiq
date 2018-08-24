@@ -21,7 +21,7 @@
   <link name="pulley_front_end"/>
 
   <xacro:include filename="$(find o2as_parts_description)/urdf/assembly_parts_macros.urdf"/>
-  <xacro:assy_part_01 prefix="" parent="workspace_center">
+  <!-- <xacro:assy_part_01 prefix="" parent="workspace_center">
     <origin xyz="0.05 0.08 0.07" rpy="0 0 ${-pi/2}" />   
   </xacro:assy_part_01>
   <xacro:assy_part_02 prefix="" parent="workspace_center">
@@ -32,8 +32,12 @@
   </xacro:assy_part_03>
   <xacro:assy_part_13 prefix="" parent="workspace_center">
     <origin xyz="0.0 0.0 0.13" rpy="0 0 0" />   
-  </xacro:assy_part_13>
+  </xacro:assy_part_13> -->
 
-  <xacro:include filename="$(find o2as_parts_description)/urdf/display_all_parts.urdf"/>
+  <!-- <xacro:include filename="$(find o2as_parts_description)/urdf/display_all_parts.urdf"/> -->
+  <xacro:include filename="$(find o2as_parts_description)/urdf/full_assembly.urdf"/>
+  <xacro:full_assembly prefix="assembled_" parent="workspace_center">
+    <origin xyz="0 0 .4" rpy="0 0 0" />   
+  </xacro:full_assembly>
   
 </robot>
