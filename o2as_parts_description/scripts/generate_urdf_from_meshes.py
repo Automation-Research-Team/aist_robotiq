@@ -60,7 +60,13 @@ for part_num, partname in enumerate(partnames):
             new_joint +=  "    <joint name=\"${prefix}" + mname + "_LINK_NAME_joint\" type=\"fixed\"> \n"
             new_joint +=  "      <parent link=\"${prefix}" + mname + "\"/> \n"
             new_joint +=  "      <child link=\"${prefix}" + mname + "_LINK_NAME\"/> \n"
-            new_joint +=  "      <origin rpy=\"" + entry[2] + " " + entry[3] + " " + entry[4] + "\" xyz=\"" + entry[5] + " " + entry[6] + " " + entry[7] + " \"/> \n"
+            new_joint +=  "      <origin rpy=\"${" + \
+                                entry[2] + "} ${" + \
+                                entry[3] + "} ${" + \
+                                entry[4] + "}\" xyz=\"${" + \
+                                entry[5] + "} ${" + \
+                                entry[6] + "} ${" + \
+                                entry[7] + "}\"/> \n"
             new_joint +=  "    </joint> \n"
             new_joint +=  "    <link name=\"${prefix}" + mname + "_LINK_NAME\"/> \n"
             new_joint +=  "    \n"
