@@ -3,19 +3,12 @@
        name="o2as_base_scene" >
 
 
-<<<<<<< HEAD
-  <xacro:property name="a_bot_x" value="0.0"/>
-  <xacro:property name="a_bot_y" value="-0.6"/>
-  <xacro:property name="b_bot_x" value="0.0"/>
-  <xacro:property name="b_bot_y" value="0.6"/>
-=======
   <!-- Calibration from 20 August 2018 -->
   <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
   <xacro:property name="a_bot_x" value="-0.005"/>
   <xacro:property name="a_bot_y" value="-0.543"/>
   <xacro:property name="b_bot_x" value="0.001"/>
   <xacro:property name="b_bot_y" value="0.529"/>
->>>>>>> 156be353b0da943b90a267d6d15847b35054a9a3
   <xacro:property name="c_bot_x" value="-0.5"/>
   <xacro:property name="c_bot_y" value="0.0"/>
 
