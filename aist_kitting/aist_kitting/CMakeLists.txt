@@ -10,10 +10,9 @@ project(aist_kitting)
 find_package(catkin REQUIRED
     roscpp
     rospy
+    geometry_msgs
     o2as_phoxi_camera
-    cv_bridge
-    sensor_msgs
-    message_generation
+    aist_kitting_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -56,11 +55,13 @@ find_package(catkin REQUIRED
 #   Message2.msg
 # )
 
-# Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  GetImage.srv
-)
+# # Generate services in the 'srv' folder
+# add_service_files(
+#   FILES
+#   GetImage.srv
+#   Search.srv
+#   Pick.srv
+# )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -69,11 +70,12 @@ add_service_files(
 #   Action2.action
 # )
 
-# Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs  # Or other packages containing msgs
-)
+# # Generate added messages and services with any dependencies listed here
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+#   geometry_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
