@@ -1,0 +1,65 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="assy_part_01">
+  <xacro:macro name="assy_part_01" params="prefix parent *origin">
+    <link name="${prefix}assy_part_01">
+      <visual>
+        <origin rpy="1.5707 0 0" xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="package://o2as_parts_description/meshes/01-BASE.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="white">
+          <color rgba="1 1 1 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="1.5707 0 0" xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="package://o2as_parts_description/meshes/01-BASE.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="${prefix}assy_part_01_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${prefix}assy_part_01"/>
+      <xacro:insert_block name="origin"/>
+    </joint>
+  
+  <!-- Extra frames for assembly and motion planning, if any -->
+    <joint name="${prefix}assy_part_01_under_outer_hole_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_01"/> 
+      <child link="${prefix}assy_part_01_under_outer_hole"/> 
+      <origin rpy="0 0 0" xyz=".01 -.01 0 "/> 
+    </joint> 
+    <link name="${prefix}assy_part_01_under_outer_hole"/> 
+    
+    <joint name="${prefix}assy_part_01_screw_hole_panel1_1_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_01"/> 
+      <child link="${prefix}assy_part_01_screw_hole_panel1_1"/> 
+      <origin rpy="0 ${pi/2} 0" xyz="0.006 -.052 .01 "/> 
+    </joint> 
+    <link name="${prefix}assy_part_01_screw_hole_panel1_1"/> 
+    
+    <joint name="${prefix}assy_part_01_screw_hole_panel1_2_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_01"/> 
+      <child link="${prefix}assy_part_01_screw_hole_panel1_2"/> 
+      <origin rpy="0 ${pi/2} 0" xyz="0.11 -.052 .01 "/> 
+    </joint> 
+    <link name="${prefix}assy_part_01_screw_hole_panel1_2"/> 
+    
+    <joint name="${prefix}assy_part_01_screw_hole_panel2_1_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_01"/> 
+      <child link="${prefix}assy_part_01_screw_hole_panel2_1"/> 
+      <origin rpy="0 ${pi/2} 0" xyz="0.136 -.05 .01 "/> 
+    </joint> 
+    <link name="${prefix}assy_part_01_screw_hole_panel2_1"/> 
+    
+    <joint name="${prefix}assy_part_01_screw_hole_panel2_2_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_01"/> 
+      <child link="${prefix}assy_part_01_screw_hole_panel2_2"/> 
+      <origin rpy="0 ${pi/2} 0" xyz="0.196 -.05 .01 "/> 
+    </joint> 
+    <link name="${prefix}assy_part_01_screw_hole_panel2_2"/> 
+    
+
+  </xacro:macro>
+</robot>

@@ -23,5 +23,29 @@
       <child link="${prefix}assy_part_08"/>
       <xacro:insert_block name="origin"/>
     </joint>
+  
+  <!-- Extra frames for assembly and motion planning, if any -->
+    <joint name="${prefix}assy_part_08_front_tip_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_08"/> 
+      <child link="${prefix}assy_part_08_front_tip"/> 
+      <origin rpy="0.0 0.0 0.0" xyz="0.075 0 0 "/> 
+    </joint> 
+    <link name="${prefix}assy_part_08_front_tip"/> 
+    
+    <joint name="${prefix}assy_part_08_inserted_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_08"/> 
+      <child link="${prefix}assy_part_08_inserted"/> 
+      <origin rpy="0.0 0.0 ${pi}" xyz=".026 0 0 "/> 
+    </joint> 
+    <link name="${prefix}assy_part_08_inserted"/> 
+    
+    <joint name="${prefix}assy_part_08_back_tip_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_08"/> 
+      <child link="${prefix}assy_part_08_back_tip"/> 
+      <origin rpy="0.0 0.0 ${pi}" xyz="0 0 0 "/> 
+    </joint> 
+    <link name="${prefix}assy_part_08_back_tip"/> 
+    
+
   </xacro:macro>
 </robot>

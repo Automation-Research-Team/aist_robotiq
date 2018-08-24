@@ -23,5 +23,15 @@
       <child link="${prefix}assy_part_10"/>
       <xacro:insert_block name="origin"/>
     </joint>
+  
+  <!-- Extra frames for assembly and motion planning, if any -->
+    <joint name="${prefix}assy_part_10_center_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_10"/> 
+      <child link="${prefix}assy_part_10_center"/> 
+      <origin rpy="0 0 0" xyz="0.002 0 0 "/> 
+    </joint> 
+    <link name="${prefix}assy_part_10_center"/> 
+    
+
   </xacro:macro>
 </robot>
