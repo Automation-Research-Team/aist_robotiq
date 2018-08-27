@@ -39,6 +39,7 @@ import copy
 import rospy
 
 import geometry_msgs.msg
+import tf
 import tf_conversions
 from math import pi
 
@@ -46,9 +47,64 @@ from o2as_routines.base import O2ASBaseRoutines
 
 class CalibrationClass(O2ASBaseRoutines):
   """
-  This routine checks the robot calibration by moving them to
+  These routines check the robots' calibration by moving them to
   objects defined in the scene.
   """
+
+  def cycle_through_calibration_poses(self, poses, robot_name, speed=0.3, with_approach=True, go_home=False):
+    rospy.loginfo("Moving all robots home.")
+    self.go_to_named_pose("home", "a_bot")
+    self.go_to_named_pose("home", "b_bot")
+    self.go_to_named_pose("home", "c_bot")
+    home_pose = "home_" + robot_name[0]
+    
+    
+      
+    rospy.loginfo("============ Moving " + robot_name + " to " + poses[0].header.frame_id)
+    if with_approach:                 # To calculate the approach, we publish the target pose to TF
+      ps_approach = geometry_msgs.msg.PoseStamped()
+      ps_approach.header.frame_id = "calibration_target_pose"
+      ps_approach.pose.position.x -= .05
+
+    for pose in poses:  
+      rospy.loginfo("============ Press `Enter` to move " + robot_name + " to " + pose.header.frame_id)
+      raw_input()
+      if go_home:
+        self.go_to_named_pose(home_pose, robot_name)
+      if with_approach:
+        br = tf.TransformBroadcaster()
+        br.sendTransform((pose.pose.position.x, pose.pose.position.y, pose.pose.position.z),
+                          (pose.pose.orientation.x, pose.pose.orientation.y,
+                           pose.pose.orientation.z, pose.pose.orientation.w), rospy.Time.now(),
+                           "calibration_target_pose", pose.header.frame_id)
+        rospy.sleep(.2)
+        self.go_to_pose_goal(robot_name, ps_approach,speed=speed)
+      if rospy.is_shutdown():
+        break
+      if with_approach:
+        self.go_to_pose_goal(robot_name, ps_approach,speed=speed)
+        self.go_to_pose_goal(robot_name, pose,speed=speed)
+      else:
+        self.go_to_pose_goal(robot_name, pose,speed=speed)
+      
+      rospy.loginfo("============ Press `Enter` to move away ")
+      raw_input()
+      if with_approach:
+        br = tf.TransformBroadcaster()
+        br.sendTransform((pose.pose.position.x, pose.pose.position.y, pose.pose.position.z),
+                          (pose.pose.orientation.x, pose.pose.orientation.y,
+                           pose.pose.orientation.z, pose.pose.orientation.w), rospy.Time.now(),
+                           "calibration_target_pose", pose.header.frame_id)
+        rospy.sleep(.2)
+        self.go_to_pose_goal(robot_name, ps_approach,speed=speed)
+      if go_home:
+        self.go_to_named_pose(home_pose, robot_name)
+    
+    rospy.loginfo("Moving all robots home again.")
+    self.go_to_named_pose("home", "a_bot")
+    self.go_to_named_pose("home", "b_bot")
+    self.go_to_named_pose("home", "c_bot")
+    return
   
   def check_robot_calibration(self):
     rospy.loginfo("============ Testing robot calibration. ============")
@@ -186,30 +242,30 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
     return 
 
-  def cycle_through_calibration_poses(self, poses, robot_name, speed=0.3):
-    rospy.loginfo("Moving all robots home.")
-    self.go_to_named_pose("home", "a_bot")
-    self.go_to_named_pose("home", "b_bot")
-    self.go_to_named_pose("home", "c_bot")
-    home_pose = "home_" + robot_name[0]
+  def assembly_calibration_assembled_parts(self):
+    rospy.loginfo("============ Calibrating assembled parts for the assembly task. ============")
+    rospy.loginfo("a_bot gripper tip should be 3 mm above the surface.")
+    poses = []
+
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.position.z = .003
+
+    pose1 = copy.deepcopy(pose0)
+    pose1.header.frame_id = "assembled_assy_part_01_corner_1"
+    pose2 = copy.deepcopy(pose0)
+    pose2.header.frame_id = "assembled_assy_part_01_corner_2"
+    pose3 = copy.deepcopy(pose0)
+    pose3.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, pi/4, pi/2))
+    pose3.header.frame_id = "assembled_assy_part_01_corner_3"
+    pose4 = copy.deepcopy(pose0)
+    pose4.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, pi/4, pi/2))
+    pose4.header.frame_id = "assembled_assy_part_01_corner_4"
     
-    rospy.loginfo("============ Moving " + robot_name + " to " + poses[0].header.frame_id)
-    self.go_to_pose_goal(robot_name, poses[0],speed=speed)
-    for pose in poses[1:]:  
-      rospy.loginfo("============ Press `Enter` to move " + robot_name + " to " + pose.header.frame_id)
-      raw_input()
-      self.go_to_named_pose(home_pose, robot_name)
-      if rospy.is_shutdown():
-        break
-      self.go_to_pose_goal(robot_name, pose,speed=speed)
-    
-    rospy.loginfo("============ Press `Enter` to move " + robot_name + " home")
-    raw_input()
-    rospy.loginfo("Moving all robots home again.")
-    self.go_to_named_pose("home", "a_bot")
-    self.go_to_named_pose("home", "b_bot")
-    self.go_to_named_pose("home", "c_bot")
-    return
+    poses = [pose1, pose2, pose3, pose4]
+
+    self.cycle_through_calibration_poses(poses, "b_bot", speed=0.3)
+    return 
 
 
 if __name__ == '__main__':
@@ -224,6 +280,7 @@ if __name__ == '__main__':
       rospy.loginfo("3: Taskboard extended fun tour")
       rospy.loginfo("4: Placement mat (for the taskboard task)")
       rospy.loginfo("5: a_bot gripper frame (rotate around EEF axis)")
+      rospy.loginfo("6: Assembly, the base plate and assembled parts")
       rospy.loginfo("x: Exit ")
       rospy.loginfo(" ")
       r = raw_input()
@@ -237,6 +294,8 @@ if __name__ == '__main__':
         c.taskboard_calibration_mat()
       elif r == '5':
         c.gripper_frame_calibration_mat()
+      elif r == '6':
+        c.assembly_calibration_assembled_parts()
       elif r == 'x':
         break
       else:

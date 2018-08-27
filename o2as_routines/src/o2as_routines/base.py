@@ -139,8 +139,8 @@ class O2ASBaseRoutines(object):
     group.set_max_velocity_scaling_factor(speed)
 
     if high_precision:
-      group.set_goal_tolerance(.000001) 
-      group.set_planning_time(10) 
+      group.set_goal_tolerance(.000001)
+      group.set_planning_time(10)
 
     plan = group.go(wait=True)
     group.stop()
@@ -257,6 +257,14 @@ class O2ASBaseRoutines(object):
     req = o2as_msgs.srv.sendScriptToURRequest()
     req.robot_name = robot_name
     req.program_id = "insertion"
+    res = self.urscript_client.call(req)
+    return res.success
+  
+  def do_linear_push(self, robot_name):
+    # Directly calls the UR service rather than the action of the skill_server
+    req = o2as_msgs.srv.sendScriptToURRequest()
+    req.robot_name = robot_name
+    req.program_id = "linear_push"
     res = self.urscript_client.call(req)
     return res.success
 

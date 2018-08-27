@@ -92,6 +92,35 @@ class URScriptRelay():
             program_back += "end\n"
 
             program = program_front + "\n" + program_back
+        if req.program_id == "linear_push":
+            program_front = self.insertion_template
+            program_back = ""
+
+            # Assign defaults
+            if not req.max_force:
+                req.max_force = 10.0
+            if not req.force_direction:
+                req.force_direction = "Z+"
+            if not req.forward_speed:
+                req.forward_speed = .02
+            if not req.max_approach_distance:
+                req.max_approach_distance = .1
+
+            ### Function definitions, for reference:
+            ### rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 )
+            ### rq_spiral_search_new(max_insertion_distance, force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False):
+
+            
+            program_back += "    rq_zero_sensor()\n"
+            program_back += "    textmsg(\"Approaching linearly.\")\n"
+            program_back += "    rq_linear_search(\"" + req.force_direction + "\"," \
+                                + str(req.max_force) + "," \
+                                + str(req.forward_speed) + "," \
+                                + str(req.max_approach_distance) + ")\n"
+            program_back += "    textmsg(\"Done.\")\n"
+            program_back += "end\n"
+
+            program = program_front + "\n" + program_back
         elif req.program_id == "lin_move":
             rospy.logwarn("LIN MOVE IS NOT IMPLEMENTED CORRECTLY YET") 
             if not req.acceleration:
