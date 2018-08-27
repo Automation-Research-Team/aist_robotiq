@@ -1,0 +1,42 @@
+material MyOrange
+{
+  technique
+  {
+    pass ambient
+    {
+      lighting on
+
+      ambient 1 0.5088 0.0468 1
+      diffuse 1 0.5088 0.0468 1
+      specular 0.5 0.5 0.5 128
+    }
+  }
+}
+
+material Aruco/marker26
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture aruco-26-8-1.png
+			}
+		}
+	}
+}
+
+material Aruco/marker17
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture aruco-17-8-1.png
+			}
+		}
+	}
+}

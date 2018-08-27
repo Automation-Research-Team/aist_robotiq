@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot name="phoxi_m_camera_o2as" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="phoxi_m_camera_o2as" params="prefix parent *origin">
+
+    <xacro:include filename="$(find o2as_phoxi_camera)/urdf/PhoXi3Dscanner_values.xacro"/>
+    <xacro:include filename="$(find o2as_phoxi_camera)/urdf/PhoXi3Dscanner_macro.xacro"/>
+
+    <xacro:PhoXi3Dscanner scanner_parent = "${parent}"
+			  scanner_name   = "${prefix}phoxi_m_camera"
+			  sensor_parent  = "${prefix}phoxi_m_camera"
+			  sensor_name    = "${prefix}phoxi_m_sensor" >
+      <xacro:insert_block name = "origin" />
+      <xacro:PhoXi3DscannerM_default_sensor_origin />
+      <xacro:PhoXi3DscannerM_meshes />
+    </xacro:PhoXi3Dscanner>
+
+    <!-- <gazebo> -->
+    <!--   <static>true</static> -->
+    <!-- </gazebo> -->
+
+    <!-- <xacro:include filename="$(find o2as_gazebo)/urdf/${prefix}phoxi_m_camera.gazebo"/> -->
+  
+  </xacro:macro>
+</robot>
