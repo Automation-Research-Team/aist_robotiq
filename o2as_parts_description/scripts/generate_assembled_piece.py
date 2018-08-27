@@ -87,6 +87,11 @@ for mating in frame_matings:
 
     mating_pose = geometry_msgs.msg.PoseStamped()
     mating_pose.header.frame_id = child_frame
+    mating_pose.pose.position.x = float(mating[5])
+    mating_pose.pose.position.y = float(mating[6])
+    mating_pose.pose.position.z = float(mating[7])
+    mating_pose.pose.orientation = geometry_msgs.msg.Quaternion(
+                                    *tf.transformations.quaternion_from_euler(float(mating[2]), float(mating[3]), float(mating[4])) )
     mating_pose.pose.orientation.w = 1.0
     mating_pose = t.transformPose(child_part_base_frame, mating_pose)
     
