@@ -2,8 +2,13 @@
 
 #include <cmath>
 #include <cstring>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
+
+using namespace std;
 
 namespace o2as {
 
@@ -87,6 +92,38 @@ int SavePointCloudToBinary(float *src_pc, int width, int height, char *fileName)
 
 	fwrite(src_pc, sizeof(float), width * height * 3, fout);
 	fclose(fout);
+	return 0;
+}
+
+template <class T>
+void WriteKeyValue(ofstream& f, std::string key, T value, std::string indent = "  ", std::string space = " ") 
+{
+	f << indent;
+	f << std::setw(20) << std::left << key << ":";
+	f << space << std::setw(10) << std::left << to_string(value);
+	f << std::endl;
+	// f << indent << key << ":" << space << to_string(value) << std::endl;
+}
+
+bool SaveCameraSetting(std::string filename, const CameraSetting& setting)
+{
+	ofstream f;
+	f.open((char*)filename.c_str());
+	string indent = "  ";
+	string space = " ";
+	f << "camera_setting: \n";
+	WriteKeyValue<int>(f, "width", setting.width);
+	WriteKeyValue<int>(f, "height", setting.height);
+	WriteKeyValue<float>(f, "focal_length_x", setting.focal_length_x);
+	WriteKeyValue<float>(f, "focal_length_y", setting.focal_length_y);
+	WriteKeyValue<float>(f, "principal_point_x", setting.principal_point_x);
+	WriteKeyValue<float>(f, "principal_point_y", setting.principal_point_y);
+	WriteKeyValue<float>(f, "dist_param_k1", setting.dist_param_k1);
+	WriteKeyValue<float>(f, "dist_param_k2", setting.dist_param_k2);
+	WriteKeyValue<float>(f, "dist_param_p1", setting.dist_param_p1);
+	WriteKeyValue<float>(f, "dist_param_p2", setting.dist_param_p2);
+	WriteKeyValue<float>(f, "dist_param_k3", setting.dist_param_k3);
+	f.close();
 	return 0;
 }
 

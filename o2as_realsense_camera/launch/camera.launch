@@ -1,7 +1,15 @@
 <launch>
 	<arg name="node_name" default="camera_node"/>
 	<arg name="serial_number" default=""/> <!-- specify serial number of your camera -->
+	<arg name="color_width" default="640"/>
+	<arg name="color_height" default="360"/>
+	<arg name="depth_width" default="640"/>
+	<arg name="depth_height" default="480"/>
 	<node name="$(arg node_name)" pkg="o2as_realsense_camera" type="o2as_realsense_camera_node" output="screen">
 		<param name="serial_number" type="string" value="$(arg serial_number)"/>
+		<param name="color_width" type="int" value="$(arg color_width)"/>
+		<param name="color_height" type="int" value="$(arg color_height)"/>
+		<param name="depth_width" type="int" value="$(arg depth_width)"/>
+		<param name="depth_height" type="int" value="$(arg depth_height)"/>
 	</node>
 </launch>

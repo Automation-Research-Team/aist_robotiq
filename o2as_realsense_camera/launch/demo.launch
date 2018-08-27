@@ -14,6 +14,7 @@
 
         <!-- client -->
         <node name="camera_client" pkg="o2as_realsense_camera" type="demo.py" output="screen">
+            <param name="setting_filename" value="$(find o2as_realsense_camera)/image/relasense_$(arg serial_number).yaml"/>
             <param name="pcloud_filename" value="$(find o2as_realsense_camera)/image/test.dat"/>
             <param name="image_filename" value="$(find o2as_realsense_camera)/image/test.png"/>
             <remap from="/connect" to="$(arg camera_name)/connect"/>

@@ -11,8 +11,9 @@ add_compile_options(-std=gnu++11 -O2 -fopenmp)
 # Catkin packages
 find_package(catkin REQUIRED COMPONENTS 
     roscpp 
-    cv_bridge
+    dynamic_reconfigure
     message_generation
+    cv_bridge
 )
 
 # OpenCV
@@ -41,9 +42,16 @@ if(NOT realsense2_FOUND)
     message(FATAL_ERROR "\n\n Intel RealSense SDK 2.0 is missing, please install it from https://github.com/IntelRealSense/librealsense/releases\n\n")
 endif()
 
-# Service
+catkin_python_setup()
+generate_dynamic_reconfigure_options(cfg/CameraSetting.cfg)
+
+#########################
+## message and service ##
+#########################
+
 add_service_files(FILES 
     Connect.srv
+    SaveCameraInfo.srv
     SaveFrameForCadMatching.srv
 )
 generate_messages(DEPENDENCIES)
@@ -72,13 +80,3 @@ set(${PROJECT_NAME}_SOURCES
 add_executable(${PROJECT_NAME}_node ${${PROJECT_NAME}_SOURCES} src/o2as_realsense_camera_node.cpp)
 add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_node realsense2 ${OpenCV_LIBRARIES} ${catkin_LIBRARIES})
-
-#############
-## Install ##
-#############
-
-#install(DIRECTORY include/${PROJECT_NAME}/
-#    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#    FILES_MATCHING PATTERN "*.h"
-#    PATTERN ".svn" EXCLUDE
-#)

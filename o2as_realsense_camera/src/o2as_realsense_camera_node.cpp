@@ -18,6 +18,7 @@ int main(int argc, char **argv)
     ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, LOG_LEVEL);
     ros::NodeHandle nh;
 
+    // check existence of device with specified serial no.
     std::string serial_number;
     ros::param::get("~serial_number", serial_number);
     if (!DeviceExists(serial_number)) {
@@ -25,8 +26,16 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    // get image size setting
+    int color_width, color_height, depth_width, depth_height;
+    ros::param::get("~color_width",  color_width);
+    ros::param::get("~color_height", color_height);
+    ros::param::get("~depth_width",  depth_width);
+    ros::param::get("~depth_height", depth_height);
+
     try {
-        RealSenseCamera device(serial_number);
+        // create inastance of camera server
+        RealSenseCamera device(serial_number, color_width, color_height, depth_width, depth_height);
 		while (ros::ok()) {
             //server.polling();
             cv::waitKey(1);
