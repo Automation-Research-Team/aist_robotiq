@@ -3,8 +3,8 @@ import rospy
 import tf
 import numpy as np
 from numpy import linalg as LA
-from realsense_camera_interface import RealSenseCameraInterface
-from cad_matching_interface import CadMatchingInterface
+from o2as_realsense_camera.client import RealSenseCameraClient
+from o2as_cad_matching.cad_matching_client import CadMatchingClient
 from planning_scene_interface import PlanningSceneInterface
 
 class VisionGroupInterface(object):
@@ -14,8 +14,8 @@ class VisionGroupInterface(object):
 
         # camera and cad matching
         self._group_name = group_name
-        self._camera = RealSenseCameraInterface(group_name) 
-        self._cad_matching = CadMatchingInterface(group_name)
+        self._camera = RealSenseCameraClient("/"+group_name+"/")
+        self._cad_matching = CadMatchingClient("/"+group_name+"/")
 
         # planning scene
         #self._camera_frame = "/" + self._group_name + "_depth_frame"
@@ -37,14 +37,6 @@ class VisionGroupInterface(object):
     def prepare(self):
         rospy.logdebug("VisionGroupInterface.prepare() begin")
 
-        # load model data for cad matching
-        if not self._cad_matching.load_model_data():
-    		rospy.logerr("cad matching load model data failed")
-
-        # prepare for cad matching
-        if not self._cad_matching.prepare():
-    		rospy.logerr("cad matching prepare failed")
-
         # connect to the camera
         if not self._camera.connect():
     		rospy.logerr("camera connect failed")
@@ -60,10 +52,10 @@ class VisionGroupInterface(object):
 
         # cad matching
         rospy.logdebug("search object")
-        success, response = self._cad_matching.search(self._pcloud_filename, self._image_filename, object_id)
+        response = self._cad_matching.search(self._pcloud_filename, self._image_filename, object_id)
 
         rospy.logdebug("VisionGroupInterface.find_objects() end")
-        if not success:
+        if not response.success:
             return []
         return response.search_result.detected_objects
 

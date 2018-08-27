@@ -27,8 +27,10 @@ class VisionManager(object):
         return None
         
     def prepare(self):
+        rospy.logdebug("VisionNode.prepare() begin")
         for key in self._items:
             self._items[key].prepare()
+        rospy.logdebug("VisionNode.prepare() end")
 
     def find_object(self, camera, object_id, expected_position, position_tolerance):
         rospy.logdebug("VisionManager.find_object() begin")

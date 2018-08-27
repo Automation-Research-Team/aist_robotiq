@@ -9,6 +9,7 @@
     <!-- <arg name="camera1_serial_number" default="612201001671"/> -->
     <!-- <arg name="camera1_serial_number" default="616205004841"/> -->
     <!-- <arg name="camera1_serial_number" default="605201001486"/> -->
+    <!-- <arg name="camera1_serial_number" default="627201001218"/> -->
 	<include file="$(find o2as_vision)/launch/vision_group_realsense.launch">
         <arg name="camera" value="$(arg camera1)"/>
         <arg name="camera_type" value="$(arg camera1_type)"/>
