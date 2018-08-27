@@ -26,10 +26,10 @@ part_number, frame_name, roll, pitch, yaw, x, y, z
 4, tip, 0, 0, -pi/2,        0.019, -.021 - 0.021, -.006
 4, inserted_13, 0, 0, -pi/2, 0.019, -.021 - 0.006, -.006
 4, inserted_02, 0, 0, -pi/2, 0.019, -.021 - 0.0, -.006
-5, center, 0, 0, 0, 0, 0, 0
-7, front_hole, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-7, back_hole, 0.0, 0.0, pi, -0.03, 0.0, 0.0
-7, back_tip, 0.0, 0.0, 0.0, -0.03, 0.0, 0.0
+5, center, -0.001, 0, 0, 0, 0, 0
+7, front_hole, 0.0, 0.0, pi, 0.0, 0.0, 0.0
+7, back_hole, 0.0, 0.0, 0.0, -0.03, 0.0, 0.0
+7, back_tip, 0.0, 0.0, pi, -0.03, 0.0, 0.0
 7, inserted, 0.0, 0.0, pi, -0.008, 0.0, 0.0
 7, screw_hole_1, 0.0, 0.0, pi, 0.0, 0.022, 0.0
 7, screw_hole_2, 0.0, 0.0, pi, 0.0, -0.022, 0.0
@@ -41,8 +41,9 @@ part_number, frame_name, roll, pitch, yaw, x, y, z
 9, inner_surface, 0, 0, 0, 0.002, 0, 0
 9, screw_hole, 0, 0, pi, 0, 0, 0
 10, center, 0, 0, 0, 0.002, 0, 0
-11, front_hole, 0, 0, 0, 0.015, 0, 0
+11, front_hole, 0, 0, pi, 0.015, 0, 0
 11, back_hole, 0, 0, 0, -0.005, 0, 0
+11, back_tip, 0, 0, pi, -0.005, 0, 0
 11, screw_head_1, 0, 0, pi/2, 0.01, 0.00875, 0.01
 11, screw_head_2, 0, 0, pi/2, 0.01, -0.00875, 0.01
 12, center, 0, 0, 0, 0.00475, 0, 0

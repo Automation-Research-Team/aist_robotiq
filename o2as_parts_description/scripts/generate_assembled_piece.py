@@ -63,7 +63,7 @@ for mating in frame_matings:
     # Find the name of the child_frame in the extra_frames, and use its offset to link it to that part's base frame.
     # This is necessary because only one frame in the tree may be without a parent.
     for subframe_offset in extra_frames:
-        if subframe_offset[1] == child_part_subframe_name:
+        if subframe_offset[1] == child_part_subframe_name and int(subframe_offset[0]) == child_part_num:
             subframe_offset = subframe_offset
             break
     
@@ -87,17 +87,16 @@ for mating in frame_matings:
 
     mating_pose = geometry_msgs.msg.PoseStamped()
     mating_pose.header.frame_id = child_frame
-    mating_pose.pose.position.x = float(mating[5])
-    mating_pose.pose.position.y = float(mating[6])
-    mating_pose.pose.position.z = float(mating[7])
+    mating_pose.pose.position.x = float(eval(mating[5]))
+    mating_pose.pose.position.y = float(eval(mating[6]))
+    mating_pose.pose.position.z = float(eval(mating[7]))
     mating_pose.pose.orientation = geometry_msgs.msg.Quaternion(
-                                    *tf.transformations.quaternion_from_euler(float(mating[2]), float(mating[3]), float(mating[4])) )
-    mating_pose.pose.orientation.w = 1.0
+                                    *tf.transformations.quaternion_from_euler(float(eval(mating[2])), float(eval(mating[3])), float(eval(mating[4]))) )
     mating_pose = t.transformPose(child_part_base_frame, mating_pose)
     
     rpy_in_base = tf.transformations.euler_from_quaternion(
-                    (mating_pose.pose.orientation.x, mating_pose.pose.orientation.y, 
-                     mating_pose.pose.orientation.z, mating_pose.pose.orientation.w) )
+                    [mating_pose.pose.orientation.x, mating_pose.pose.orientation.y, 
+                     mating_pose.pose.orientation.z, mating_pose.pose.orientation.w] )
 
     # First, spawn the part unattached (no link to the world). Then, create the mating joint manually, offset to the part's base frame.
     new_mating = "" 
