@@ -74,8 +74,8 @@ for mating in frame_matings:
     
     t = tf.TransformerROS(True, rospy.Duration(10.0))
     m = geometry_msgs.msg.TransformStamped()
-    m.header.frame_id = child_frame             
-    m.child_frame_id = child_part_base_frame   # I don't know why this order returns the correct results, it doesn't seem right.
+    m.header.frame_id = child_part_base_frame
+    m.child_frame_id = child_frame
     m.transform.translation.x = xyz[0]
     m.transform.translation.y = xyz[1]
     m.transform.translation.z = xyz[2]
@@ -85,18 +85,23 @@ for mating in frame_matings:
     m.transform.rotation.w = q[3]
     t.setTransform(m)
 
-    mating_pose = geometry_msgs.msg.PoseStamped()
-    mating_pose.header.frame_id = child_frame
-    mating_pose.pose.position.x = float(eval(mating[5]))
-    mating_pose.pose.position.y = float(eval(mating[6]))
-    mating_pose.pose.position.z = float(eval(mating[7]))
-    mating_pose.pose.orientation = geometry_msgs.msg.Quaternion(
-                                    *tf.transformations.quaternion_from_euler(float(eval(mating[2])), float(eval(mating[3])), float(eval(mating[4]))) )
-    mating_pose = t.transformPose(child_part_base_frame, mating_pose)
+    m2 = geometry_msgs.msg.TransformStamped()
+    m2.header.frame_id = child_frame
+    m2.child_frame_id = "mating_position"
+    m2.transform.translation.x = float(eval(mating[5]))
+    m2.transform.translation.y = float(eval(mating[6]))
+    m2.transform.translation.z = float(eval(mating[7]))
+    q = tf.transformations.quaternion_from_euler(float(eval(mating[2])), float(eval(mating[3])), float(eval(mating[4]))) 
+    m2.transform.rotation.x = q[0]
+    m2.transform.rotation.y = q[1]
+    m2.transform.rotation.z = q[2]
+    m2.transform.rotation.w = q[3]
+    t.setTransform(m2)
     
-    rpy_in_base = tf.transformations.euler_from_quaternion(
-                    [mating_pose.pose.orientation.x, mating_pose.pose.orientation.y, 
-                     mating_pose.pose.orientation.z, mating_pose.pose.orientation.w] )
+    
+    
+    t_inv, q_i = t.lookupTransform("mating_position", child_part_base_frame, rospy.Time(0)) 
+    rpy_inv = tf.transformations.euler_from_quaternion(q_i)
 
     # First, spawn the part unattached (no link to the world). Then, create the mating joint manually, offset to the part's base frame.
     new_mating = "" 
@@ -108,12 +113,12 @@ for mating in frame_matings:
     new_mating +=  "      <parent link=\"${prefix}" + parent_frame + "\"/> \n"
     new_mating +=  "      <child link=\"${prefix}" + child_part_base_frame + "\"/> \n"
     new_mating +=  "      <origin rpy=\"${" + \
-                            str(rpy_in_base[0]) + "} ${" + \
-                            str(rpy_in_base[1]) + "} ${" + \
-                            str(rpy_in_base[2]) + "}\" xyz=\"${" + \
-                            str(mating_pose.pose.position.x) + "} ${" + \
-                            str(mating_pose.pose.position.y) + "} ${" + \
-                            str(mating_pose.pose.position.z) + "}\"/> \n"
+                            str(rpy_inv[0]) + "} ${" + \
+                            str(rpy_inv[1]) + "} ${" + \
+                            str(rpy_inv[2]) + "}\" xyz=\"${" + \
+                            str(t_inv[0]) + "} ${" + \
+                            str(t_inv[1]) + "} ${" + \
+                            str(t_inv[2]) + "}\"/> \n"
     new_mating +=  "    </joint> \n"
     new_mating +=  "    \n"
     content += new_mating
