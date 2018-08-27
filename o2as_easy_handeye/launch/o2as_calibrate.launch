@@ -8,12 +8,6 @@
          doc="Size of the ArUco marker used, in meters" />
     <arg name="marker_id" default="26" doc="The ID of the ArUco marker used" />
 
-    <!-- Add camera in Gazebo -->
-    <param name="d_bot_camera_description"
-           command="$(find xacro)/xacro --inorder '$(find o2as_gazebo)/urdf/d_bot_camera.urdf.xacro'" />
-    <node name="spawn_gazebo_model2" pkg="gazebo_ros" type="spawn_model"
-          args="-urdf -param d_bot_camera_description -model o2as_d_bot -unpause" respawn="false" output="screen"/>
-
     <!-- Camera state publisher -->
     <node pkg="robot_state_publisher" type="robot_state_publisher"
         name="d_bot_st_pub">

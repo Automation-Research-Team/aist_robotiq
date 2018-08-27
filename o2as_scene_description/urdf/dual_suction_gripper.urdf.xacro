@@ -16,9 +16,9 @@
 	</material>
       </visual>
       <collision>
+	<origin xyz="0.187 -0.035 -0.035" rpy="0 0 ${pi/2}"/>
 	<geometry>
-	  <mesh
-	      filename="package://o2as_scene_description/meshes/dual_suction_gripper.vhacd.dae"/>
+	  <mesh filename="package://o2as_scene_description/meshes/dual_suction_gripper.vhacd.dae"/>
 	</geometry>
       </collision>
       <inertial>
