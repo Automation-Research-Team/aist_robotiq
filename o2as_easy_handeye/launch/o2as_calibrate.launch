@@ -1,12 +1,17 @@
 <?xml version="1.0" ?>
 <launch>
-    <arg name="robot_name" default="b_bot" />
-    <arg name="move_group" default="b_bot" />
+    <arg name="robot_name" />  <!-- "a_bot", "b_bot", or "c_bot" -->
+    <arg name="move_group" value="$(arg robot_name)" />
     <arg name="camera_name" default="d_bot_camera"/>
-    <arg name="namespace_prefix" default="o2as_easy_handeye_b_bot" />
+    <arg name="namespace_prefix" value="o2as_easy_handeye_$(arg robot_name)" />
     <arg name="marker_size" default="0.08"
          doc="Size of the ArUco marker used, in meters" />
-    <arg name="marker_id" default="26" doc="The ID of the ArUco marker used" />
+
+    <!-- Set AR marker ID -->
+    <arg name="marker_id" value="17" if="$(eval arg('robot_name') == 'a_bot')"/>
+    <arg name="marker_id" value="26" if="$(eval arg('robot_name') == 'b_bot')"/>
+    <arg name="marker_id" value="256" if="$(eval arg('robot_name') == 'c_bot')"/>
+    <!--<arg name="marker_id" default="26" doc="The ID of the ArUco marker used" />-->
 
     <!-- Add camera in Gazebo -->
     <param name="d_bot_camera_description"
