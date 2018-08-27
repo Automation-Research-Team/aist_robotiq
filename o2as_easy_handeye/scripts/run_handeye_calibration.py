@@ -16,6 +16,14 @@ from easy_handeye.srv import TakeSample, RemoveSample, ComputeCalibration
 # Poses taken during handeye calibration
 # TODO: These poses are specific for `d_bot` camera, need to modify for Phoxi
 posess = {
+  'a_bot': [
+    [-0.016, 0.547, 0.700, -1.591, 0.000, -0.000],  # a_bot, pose 1
+    [-0.016, 0.547, 0.700, -1.591, 0.313, -0.000],  # a_bot, pose 2
+    [-0.016, 0.547, 0.700, -1.591, 0.626, -0.000],  # a_bot, pose 3
+    [-0.016, 0.547, 0.700, -1.591, 0.313, -0.313],  # a_bot, pose 4
+    [-0.016, 0.547, 0.700, -1.591, 0.000, -0.626],  # a_bot, pose 5
+  ],
+
   'b_bot': [
     [-0.016, 0.547, 0.700, -1.591,  0.000, -0.000],  # b_bot, pose 1
     [-0.016, 0.547, 0.700, -1.591,  0.313, -0.000],  # b_bot, pose 2
@@ -36,7 +44,22 @@ posess = {
     # [-0.016, 0.547, 0.650, -1.272, -0.626,  0.626],  # b_bot, pose 17
     # [-0.016, 0.547, 0.650, -1.272,  0.626, -0.626],  # b_bot, pose 18
     # [-0.016, 0.547, 0.650, -1.272, -0.626, -0.626],  # b_bot, pose 19
-  ]
+  ],
+
+  'c_bot': [
+    [-0.111, 0.350, 0.400, -1.591, 0.000, -0.000],  # c_bot, pose 1
+    [-0.111, 0.350, 0.400, -1.591, 0.313, -0.000],  # c_bot, pose 2
+    [-0.111, 0.350, 0.400, -1.591, 0.626, -0.000],  # c_bot, pose 3
+    [-0.111, 0.350, 0.400, -1.591, 0.313, -0.313],  # c_bot, pose 4
+    [-0.111, 0.350, 0.400, -1.591, 0.000, -0.626],  # c_bot, pose 5
+  ],
+}
+
+
+init_poses = {
+  'a_bot': [-0.108, 0.183, 0.707, -1.571, 0.000, 0.000],
+  'b_bot': [-0.108, 0.183, 0.707, -1.571, 0.000, 0.000],
+  'c_bot': [-0.112, 0.127, 0.498, -1.571, 0.000, 0.000],
 }
 
 
@@ -144,15 +167,16 @@ def run_calibration(base_name):
   compute_calibration()
   save_calibration()
 
+  # Reset pose
+  mg.move(init_poses[base_name])
+
   print("=== Calibration completed for {} ===".format(base_name))
 
 
-def main():
+def main(base_name):
   try:
     rospy.init_node('run_calibration', anonymous=True, log_level=rospy.INFO)
-    # run_calibration(base_name="a_bot")
-    run_calibration(base_name="b_bot")
-    # run_calibration(base_name="c_bot")
+    run_calibration(base_name)
 
   except rospy.ROSInterruptException:
     return
@@ -162,4 +186,5 @@ def main():
 
 
 if __name__ == '__main__':
-  main()
+  assert(sys.argv[1] in {"a_bot", "b_bot", "c_bot"})
+  main(sys.argv[1])
