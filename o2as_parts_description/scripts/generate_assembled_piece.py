@@ -44,7 +44,7 @@ template_front = f.read()
 f.close()
 
 # Write the file containing connections between the frames in the instructions
-out_dir = os.path.join(rp.get_path("o2as_parts_description"), "urdf")
+out_dir = os.path.join(rp.get_path("o2as_parts_description"), "urdf/generated")
 outfile = open(os.path.join(out_dir, "full_assembly.urdf"),'w+')
 content = template_front
 
