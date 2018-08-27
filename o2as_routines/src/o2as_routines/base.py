@@ -234,8 +234,26 @@ class O2ASBaseRoutines(object):
     rospy.loginfo("Getting result")
     return self.place_client.get_result()
 
+  def do_insert_action(self, active_robot_name, passive_robot_name = "", 
+                        starting_offset = 0.05, max_insertion_distance=0.01, 
+                        max_approach_distance = .1, max_force = 5,
+                        max_radius = .001, radius_increment = .0001):
+    goal = o2as_msgs.msg.insertGoal()
+    goal.active_robot_name = active_robot_name
+    goal.passive_robot_name = passive_robot_name
+    goal.starting_offset = starting_offset
+    goal.max_insertion_distance = max_insertion_distance
+    goal.max_approach_distance = max_approach_distance
+    goal.max_force = max_force
+    goal.max_radius = max_radius
+    goal.radius_increment = radius_increment
+    rospy.loginfo("Sending insert action goal.")    
+    self.insert_client.send_goal(goal)
+    self.insert_client.wait_for_result()
+    return self.insert_client.get_result()
+
   def do_insertion(self, robot_name):
-    # Currently calls the UR service directly rather than the action of the skill_server
+    # Directly calls the UR service rather than the action of the skill_server
     req = o2as_msgs.srv.sendScriptToURRequest()
     req.robot_name = robot_name
     req.program_id = "insertion"
@@ -253,7 +271,6 @@ class O2ASBaseRoutines(object):
     rospy.loginfo("Performing regrasp with grippers " + giver_robot_name + " and " + receiver_robot_name)
     self.regrasp_client.wait_for_result(rospy.Duration(90.0))
     result = self.regrasp_client.get_result()
-    rospy.loginfo(result)
     return result
 
 

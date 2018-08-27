@@ -46,45 +46,49 @@ class URScriptRelay():
             program_back = ""
 
             # Assign defaults
-            if not req.force_magnitude:
-                req.force_magnitude = 5.0
+            if not req.max_force:
+                req.max_force = 5.0
             if not req.force_direction:
                 req.force_direction = "Z+"
             if not req.forward_speed:
                 req.forward_speed = .02
             if not req.max_approach_distance:
-                req.max_approach_distance = .02
+                req.max_approach_distance = .1
             if not req.max_radius:
-                req.max_radius = 4.0
+                req.max_radius = .004            # in m
             if not req.radius_increment:
-                req.radius_increment = 0.3
+                req.radius_increment = 0.0003    # in m
             if not req.peck_mode:
                 req.peck_mode = False
-            if not req.stroke:
-                req.stroke = 0.035
+            if not req.max_insertion_distance:
+                req.max_insertion_distance = 0.035
             if not req.impedance_mass:
                 req.impedance_mass = 10
 
             ### Function definitions, for reference:
             ### rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 )
-            ### rq_spiral_search_new(stroke, force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False):
+            ### rq_spiral_search_new(max_insertion_distance, force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False):
 
-            program_back += "        textmsg(\"Approaching.\")\n"
-            program_back += "        rq_linear_search(\"" + req.force_direction + "\"," \
-                                + str(req.force_magnitude) + "," \
+            
+            program_back += "    rq_zero_sensor()\n"
+            program_back += "    textmsg(\"Approaching.\")\n"
+            program_back += "    rq_linear_search(\"" + req.force_direction + "\"," \
+                                + str(req.max_force) + "," \
                                 + str(req.forward_speed) + "," \
                                 + str(req.max_approach_distance) + ")\n"
-            program_back += "        stroke = " + str(req.stroke) + "\n"
-            program_back += "        textmsg(\"Spiral searching.\")\n"
-            program_back += "        if rq_spiral_search_new(stroke," + str(req.force_magnitude) \
-                                + ", " + str(req.max_radius) \
-                                + ", " + str(req.radius_increment) \
+            program_back += "    max_insertion_distance = " + str(req.max_insertion_distance) + "\n"
+            program_back += "    textmsg(\"Spiral searching.\")\n"
+            program_back += "    sleep(3.0)\n"
+            program_back += "    if rq_spiral_search_new(max_insertion_distance," + str(req.max_force) \
+                                + ", " + str(req.max_radius*1000) \
+                                + ", " + str(req.radius_increment*1000) \
                                 + ", peck_mode=" + str(req.peck_mode) + "):\n"
-            program_back += "            #Insert the Part into the bore#\n"
-            program_back += "            textmsg(\"Impedance insert\")\n"
-            program_back += "            rq_impedance(stroke, " + str(req.impedance_mass) + ")\n"
-            program_back += "        end\n"
+            program_back += "        #Insert the Part into the bore#\n"
+            program_back += "        textmsg(\"Impedance insert\")\n"
+            program_back += "        sleep(3.0)\n" 
+            program_back += "        rq_impedance(max_insertion_distance, " + str(req.impedance_mass) + ")\n"
             program_back += "    end\n"
+            program_back += "    textmsg(\"Done. Exiting.\")\n"
             program_back += "end\n"
 
             program = program_front + "\n" + program_back
@@ -155,7 +159,7 @@ class URScriptRelay():
             program = program_front + "\n" + program_back
         elif req.program_id == "test":
             program = ""
-            program_file = open(os.path.join(self.rospack.get_path("o2as_examples"), "scripts/ur", "move_back_forth_5cm.script"), 'rb')
+            program_file = open(os.path.join(self.rospack.get_path("o2as_examples"), "scripts/urscript", "move_back_forth_5cm.script"), 'rb')
             program_line = program_file.read(1024)
             while program_line:
                 program += program_line
@@ -194,7 +198,7 @@ class URScriptRelay():
 
 if __name__ == '__main__':
     # Initialize the node and name it.
-    rospy.init_node('urscript_construction_node')
+    rospy.init_node('o2as_urscript_construction_node')
     # Go to class functions that do all the heavy lifting. Do error checking.
     try:
         ne = URScriptRelay()

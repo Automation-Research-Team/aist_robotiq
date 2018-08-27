@@ -5,11 +5,13 @@
 #include <vector>
 #include <string>
 #include "std_msgs/String.h"
+#include "std_msgs/Bool.h"
 #include "geometry_msgs/PoseStamped.h"
 
 #include <tf/transform_listener.h>    // Includes the TF conversions
 #include <tf/transform_broadcaster.h>
 
+#include "ur_modern_driver/wait_for_program.h"
 #include "o2as_helper_functions.h"
 
 #include <chrono>

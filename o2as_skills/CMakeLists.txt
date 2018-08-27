@@ -20,6 +20,7 @@ find_package(catkin REQUIRED
 	moveit_ros_planning_interface
 	moveit_ros_planning
 	tf
+	ur_modern_driver
 )
 
 ## System dependencies are found with CMake's conventions
