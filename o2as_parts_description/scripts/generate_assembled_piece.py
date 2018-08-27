@@ -74,8 +74,8 @@ for mating in frame_matings:
     
     t = tf.TransformerROS(True, rospy.Duration(10.0))
     m = geometry_msgs.msg.TransformStamped()
-    m.header.frame_id = child_part_base_frame
-    m.child_frame_id = child_frame
+    m.header.frame_id = child_frame             
+    m.child_frame_id = child_part_base_frame   # I don't know why this order returns the correct results, it doesn't seem right.
     m.transform.translation.x = xyz[0]
     m.transform.translation.y = xyz[1]
     m.transform.translation.z = xyz[2]
@@ -85,8 +85,14 @@ for mating in frame_matings:
     m.transform.rotation.w = q[3]
     t.setTransform(m)
 
-    t_inv, q_i = t.lookupTransform(child_frame, child_part_base_frame, rospy.Time(0))
-    rpy_inv = tf.transformations.euler_from_quaternion(q_i)
+    mating_pose = geometry_msgs.msg.PoseStamped()
+    mating_pose.header.frame_id = child_frame
+    mating_pose.pose.orientation.w = 1.0
+    mating_pose = t.transformPose(child_part_base_frame, mating_pose)
+    
+    rpy_in_base = tf.transformations.euler_from_quaternion(
+                    (mating_pose.pose.orientation.x, mating_pose.pose.orientation.y, 
+                     mating_pose.pose.orientation.z, mating_pose.pose.orientation.w) )
 
     # First, spawn the part unattached (no link to the world). Then, create the mating joint manually, offset to the part's base frame.
     new_mating = "" 
@@ -97,14 +103,13 @@ for mating in frame_matings:
     new_mating +=  "    <joint name=\"${prefix}part_" + str(parent_part_num).zfill(2) + "_to_" + str(child_part_num).zfill(2) + "_joint\" type=\"fixed\"> \n"
     new_mating +=  "      <parent link=\"${prefix}" + parent_frame + "\"/> \n"
     new_mating +=  "      <child link=\"${prefix}" + child_part_base_frame + "\"/> \n"
-    # TODO/BUG: This does not consider in the mating[3:7] rpy/xyz settings!
     new_mating +=  "      <origin rpy=\"${" + \
-                            str(rpy_inv[0]) + "} ${" + \
-                            str(rpy_inv[1]) + "} ${" + \
-                            str(rpy_inv[2]) + "}\" xyz=\"${" + \
-                            str(t_inv[0]) + "} ${" + \
-                            str(t_inv[1]) + "} ${" + \
-                            str(t_inv[2]) + "}\"/> \n"
+                            str(rpy_in_base[0]) + "} ${" + \
+                            str(rpy_in_base[1]) + "} ${" + \
+                            str(rpy_in_base[2]) + "}\" xyz=\"${" + \
+                            str(mating_pose.pose.position.x) + "} ${" + \
+                            str(mating_pose.pose.position.y) + "} ${" + \
+                            str(mating_pose.pose.position.z) + "}\"/> \n"
     new_mating +=  "    </joint> \n"
     new_mating +=  "    \n"
     content += new_mating
