@@ -69,9 +69,9 @@ def search_test():
 if __name__ == '__main__':
     rospy.init_node("aist_kitting_demo")
 
-    pick_test()
-    # search_test()
-    move_named_pose_test()
+    # pick_test()
+    search_test()
+    # move_named_pose_test()
 
     # T_phoxi = np.matrix([
     #     [-0.005532755388, 0.895263942347, -0.445501809369, 544.512175068866],
