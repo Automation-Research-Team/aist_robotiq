@@ -1,5 +1,5 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="assy_part_06">
-  <xacro:macro name="assy_part_06" params="prefix parent *origin">
+  <xacro:macro name="assy_part_06" params="prefix parent spawn_attached *origin">
     <link name="${prefix}assy_part_06">
       <visual>
         <origin rpy="1.5707 0 0" xyz="0 0 0"/>
@@ -18,11 +18,13 @@
       </collision>
     </link>
 
-    <joint name="${prefix}assy_part_06_joint" type="fixed">
-      <parent link="${parent}"/>
-      <child link="${prefix}assy_part_06"/>
-      <xacro:insert_block name="origin"/>
-    </joint>
+    <xacro:if value="${spawn_attached}">
+      <joint name="${prefix}assy_part_06_joint" type="fixed">
+        <parent link="${parent}"/>
+        <child link="${prefix}assy_part_06"/>
+        <xacro:insert_block name="origin"/>
+      </joint>
+    </xacro:if>
   
   <!-- Extra frames for assembly and motion planning, if any -->
 <!-- #EXTRAFRAMES -->

@@ -1,5 +1,5 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="assy_part_14">
-  <xacro:macro name="assy_part_14" params="prefix parent *origin">
+  <xacro:macro name="assy_part_14" params="prefix parent spawn_attached *origin">
     <link name="${prefix}assy_part_14">
       <visual>
         <origin rpy="1.5707 0 0" xyz="0 0 0"/>
@@ -18,31 +18,33 @@
       </collision>
     </link>
 
-    <joint name="${prefix}assy_part_14_joint" type="fixed">
-      <parent link="${parent}"/>
-      <child link="${prefix}assy_part_14"/>
-      <xacro:insert_block name="origin"/>
-    </joint>
+    <xacro:if value="${spawn_attached}">
+      <joint name="${prefix}assy_part_14_joint" type="fixed">
+        <parent link="${parent}"/>
+        <child link="${prefix}assy_part_14"/>
+        <xacro:insert_block name="origin"/>
+      </joint>
+    </xacro:if>
   
   <!-- Extra frames for assembly and motion planning, if any -->
     <joint name="${prefix}assy_part_14_screw_tip_joint" type="fixed"> 
       <parent link="${prefix}assy_part_14"/> 
       <child link="${prefix}assy_part_14_screw_tip"/> 
-      <origin rpy="0 0 0" xyz="0.03 0 0 "/> 
+      <origin rpy="${0} ${0} ${0}" xyz="${0.03} ${0} ${0}"/> 
     </joint> 
     <link name="${prefix}assy_part_14_screw_tip"/> 
     
     <joint name="${prefix}assy_part_14_screw_inserted_joint" type="fixed"> 
       <parent link="${prefix}assy_part_14"/> 
       <child link="${prefix}assy_part_14_screw_inserted"/> 
-      <origin rpy="0 0 0" xyz="0 0 0 "/> 
+      <origin rpy="${0} ${0} ${0}" xyz="${0} ${0} ${0}"/> 
     </joint> 
     <link name="${prefix}assy_part_14_screw_inserted"/> 
     
     <joint name="${prefix}assy_part_14_screw_head_joint" type="fixed"> 
       <parent link="${prefix}assy_part_14"/> 
       <child link="${prefix}assy_part_14_screw_head"/> 
-      <origin rpy="0 0 0" xyz="-0.002 0 0 "/> 
+      <origin rpy="${0} ${0} ${0}" xyz="${-0.002} ${0} ${0}"/> 
     </joint> 
     <link name="${prefix}assy_part_14_screw_head"/> 
     
