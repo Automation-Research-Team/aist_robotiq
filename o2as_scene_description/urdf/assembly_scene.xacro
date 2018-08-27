@@ -34,10 +34,15 @@
     <origin xyz="0.0 0.0 0.13" rpy="0 0 0" />   
   </xacro:assy_part_13> -->
 
-  <!-- <xacro:include filename="$(find o2as_parts_description)/urdf/display_all_parts.urdf"/> -->
+  <xacro:include filename="$(find o2as_parts_description)/urdf/display_all_parts.urdf"/>
   <xacro:include filename="$(find o2as_parts_description)/urdf/generated/full_assembly.urdf"/>
   <xacro:full_assembly prefix="assembled_" parent="workspace_center">
     <origin xyz="0 0 .4" rpy="0 0 0" />   
   </xacro:full_assembly>
+
+    <xacro:include filename="$(find o2as_parts_description)/urdf/generated/full_assembly_frames_only.urdf"/>
+  <xacro:full_assembly_frames_only prefix="assembled_frames_only_" parent="workspace_center">
+    <origin xyz="0 .15 .4" rpy="0 0 0" />   
+  </xacro:full_assembly_frames_only>
   
 </robot>

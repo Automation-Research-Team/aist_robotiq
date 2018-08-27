@@ -16,7 +16,7 @@ with open(mating_filename, 'r') as f:
     reader = csv.reader(f)
     header = next(reader)
     for row in reader:
-        if row:     # Should skip empty rows
+        if row:     # Skips empty rows
             if row[0][0] == "#":    # Skips commented rows
                 continue
             row_stripped = []
@@ -30,7 +30,7 @@ with open(frames_filename, 'r') as f:
     reader = csv.reader(f)
     header = next(reader)
     for row in reader:
-        if row:     # Should skip empty rows
+        if row:     # Skips empty rows
             if row[0][0] == "#":    # Skips commented rows
                 continue
             row_stripped = []
@@ -68,6 +68,8 @@ for mating in frame_matings:
             break
     
     # Get the inverse transform for the transformation entered into extra_frames
+    # The transformation has to be set manually because this file is executed before the robot is started up,
+    # so TF does not publish these frames.
     rpy = [float(eval(subframe_offset[2])), float(eval(subframe_offset[3])), float(eval(subframe_offset[4]))]
     xyz = [float(eval(subframe_offset[5])), float(eval(subframe_offset[6])), float(eval(subframe_offset[7]))]
     q = tf.transformations.quaternion_from_euler(rpy[0], rpy[1], rpy[2])
@@ -128,6 +130,11 @@ content += "</robot>\n"
 outfile.write(content)
 
 
+# Write the same assembly, but without the collision and visual bodies
+content = content.replace("xacro:assy_part_", "xacro:assy_part_frames_only_")
+content = content.replace("name=\"full_assembly\"", "name=\"full_assembly_frames_only\"")
+content = content.replace("assembly_parts_macros.urdf", "assembly_parts_frame_macros.urdf")
 
-
-
+out_dir2 = os.path.join(rp.get_path("o2as_parts_description"), "urdf/generated")
+outfile2 = open(os.path.join(out_dir2, "full_assembly_frames_only.urdf"),'w+')
+outfile2.write(content)
