@@ -26,8 +26,10 @@
 
   <!-- Scene items (trays, bins...) -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/walls.xacro" />
-  <xacro:include filename="$(find o2as_scene_description)/urdf/taskboard_scene.xacro" />
-  
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/taskboard_scene.xacro" /> -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene_old.xacro" /> -->
+
   <!-- Robot bases -->
   <!-- Putting these at height 0.0 makes them intersect with the ground, so they are elevated. -->
   <!-- There are some instabilities when the box is big, for some reason. -->
@@ -69,9 +71,9 @@
   <xacro:screw_feeder feedername="m4_feeder" parent="c_bot_base_smfl">
     <origin xyz=".45 .05 .05" rpy="0 0 0" />   
   </xacro:screw_feeder>
-  <!-- <xacro:screw_feeder feedername="m5_feeder" parent="c_bot_base_smfl">
+  <xacro:screw_feeder feedername="m5_feeder" parent="c_bot_base_smfl">
     <origin xyz=".45 .2 .05" rpy="0 0 0" />   
-  </xacro:screw_feeder> -->
+  </xacro:screw_feeder>
 
   <!-- robot arms -->    
   <xacro:ur5_robot prefix="a_bot_" joint_limited="true"
