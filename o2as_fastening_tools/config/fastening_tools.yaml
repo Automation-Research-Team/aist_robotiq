@@ -1,4 +1,4 @@
-grippers:
+fastening_tools:
   - name: m5_tool
     motor_id: 1
   - name: m4_tool

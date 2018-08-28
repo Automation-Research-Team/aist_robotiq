@@ -3,12 +3,12 @@
 import rospy
 import os.path
 from std_msgs.msg import String
-from o2as_fastener_gripper.srv import *
-from o2as_fastener_gripper.msg import *
+from o2as_fastening_gripper.srv import *
+from o2as_fastening_gripper.msg import *
 
-class FastenerGripperController(object):
-    _feedback = FastenerGripperControlFeedback()
-    _result = FastenerGripperControlResult()
+class FasteningToolController(object):
+    _feedback = FasteningToolControlFeedback()
+    _result = FasteningToolControlResult()
 
     def __init__(self):
         self.dynamixel_command_write = rospy.ServiceProxy('dynamixel_write_command', DynamixelWriteCommand)
@@ -23,7 +23,7 @@ class FastenerGripperController(object):
         
 if __name__ == '__main__':
     rospy.init_node('motor_id_setup')
-    server = FastenerGripperController()
+    server = FasteningToolController()
 
     rospy.sleep(5)
 

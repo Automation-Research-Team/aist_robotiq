@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>o2as_fastener_gripper</name>
+  <name>o2as_fastening_tools</name>
   <version>1.0.0</version>
-  <description>The o2as_fastener_gripper package</description>
+  <description>The o2as_fastening_tools package</description>
 
   <maintainer email="kowa.yasushi@gmail.com">arayasu</maintainer>
 

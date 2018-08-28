@@ -1,10 +1,10 @@
 #include <fstream>
 #include "ros/ros.h"
-#include "o2as_fastener_gripper/dynamixel_controller.h"
+#include "o2as_fastening_tools/dynamixel_controller.h"
 
 using namespace dynamixel_controller;
 
-bool DynamixelController::dynamixelCommandMsgCallback(o2as_fastener_gripper::DynamixelWriteCommand::Request &req, o2as_fastener_gripper::DynamixelWriteCommand::Response &res)
+bool DynamixelController::dynamixelCommandMsgCallback(o2as_fastening_tools::DynamixelWriteCommand::Request &req, o2as_fastening_tools::DynamixelWriteCommand::Response &res)
 {
 	uint8_t motor_id = req.motor_id;
 	std::string item = req.item_name;
@@ -25,7 +25,7 @@ bool DynamixelController::dynamixelCommandMsgCallback(o2as_fastener_gripper::Dyn
 	}
 }
 
-bool DynamixelController::dynamixelReadMsgCallback(o2as_fastener_gripper::DynamixelReadState::Request &req, o2as_fastener_gripper::DynamixelReadState::Response &res)
+bool DynamixelController::dynamixelReadMsgCallback(o2as_fastening_tools::DynamixelReadState::Request &req, o2as_fastening_tools::DynamixelReadState::Response &res)
 {
 	uint8_t motor_id = req.motor_id;
 	int32_t item_status = 0;

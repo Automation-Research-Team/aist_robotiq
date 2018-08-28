@@ -4,19 +4,19 @@ from __future__ import print_function
 import sys
 import rospy
 from std_msgs.msg import String
-from o2as_fastener_gripper.srv import *
-from o2as_fastener_gripper.msg import *
+from o2as_fastening_tool.srv import *
+from o2as_fastening_tool.msg import *
 
 import actionlib
 import actionlib_tutorials.msg
 
-class FastenerGripperController:
+class FasteningToolController:
     def fasten(self,name):
-        client = actionlib.SimpleActionClient('FastenerGripperAction', FastenerGripperControlAction)
+        client = actionlib.SimpleActionClient('FasteningToolAction', FasteningToolControlAction)
         client.wait_for_server()
-        goal = FastenerGripperControlGoal()
+        goal = FasteningToolControlGoal()
 
-        goal.gripper_name = name
+        goal.fastening_tool_name = name
         goal.speed = 60
 
         client.send_goal_and_wait(goal,rospy.Duration(10),rospy.Duration(10))
@@ -26,9 +26,9 @@ class FastenerGripperController:
 
 if __name__ == '__main__':
     try:
-        rospy.init_node('fastener_gripper_controller_test')
+        rospy.init_node('fastening_tool_controller_test')
 
-        controller = FastenerGripperController()
+        controller = FasteningToolController()
 
         name_list = [
             "m4_tool",
