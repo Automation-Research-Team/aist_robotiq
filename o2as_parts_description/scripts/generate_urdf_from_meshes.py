@@ -61,9 +61,12 @@ for part_num, partname in enumerate(partnames):
     macro_frames_only_filecontent = macro_frames_only_template.replace("MACRONAME_INTERNAL", mname_fo_int)
     macro_frames_only_filecontent = macro_frames_only_filecontent.replace("MACRONAME_EXTERNAL", mname_fo_ext)
 
-    if int(partname[0:2]) in [1,2,3]:
+    if int(partname[0:2]) in [1,2,3,4]:
         macrofile_content = macrofile_content.replace("vhacd.dae", "stl")
         macrofile_content = macrofile_content.replace("dae", "stl")
+
+    if int(partname[0:2]) == 4:
+        macrofile_content = macrofile_content.replace("0.001", "0.000001")      # To correct for that mesh's scale
 
     extra_frames_urdf = ""
     for entry in extra_frames:
