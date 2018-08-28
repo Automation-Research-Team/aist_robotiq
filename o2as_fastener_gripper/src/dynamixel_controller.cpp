@@ -4,7 +4,7 @@
 
 using namespace dynamixel_controller;
 
-bool DynamixelControll::dynamixelCommandMsgCallback(o2as_fastener_gripper::DynamixelWriteCommand::Request &req, o2as_fastener_gripper::DynamixelWriteCommand::Response &res)
+bool DynamixelController::dynamixelCommandMsgCallback(o2as_fastener_gripper::DynamixelWriteCommand::Request &req, o2as_fastener_gripper::DynamixelWriteCommand::Response &res)
 {
 	uint8_t motor_id = req.motor_id;
 	std::string item = req.item_name;
@@ -12,7 +12,7 @@ bool DynamixelControll::dynamixelCommandMsgCallback(o2as_fastener_gripper::Dynam
 
 	res.comm_result = true;
 
-    int result_index = DynamixelControll::searchMotor(motor_id);
+    int result_index = DynamixelController::searchMotor(motor_id);
 	if (result_index == -1)
 	{
 		ROS_ERROR("The specified Motor_ID (%d) can not be found.",motor_id);
@@ -25,12 +25,12 @@ bool DynamixelControll::dynamixelCommandMsgCallback(o2as_fastener_gripper::Dynam
 	}
 }
 
-bool DynamixelControll::dynamixelReadMsgCallback(o2as_fastener_gripper::DynamixelReadState::Request &req, o2as_fastener_gripper::DynamixelReadState::Response &res)
+bool DynamixelController::dynamixelReadMsgCallback(o2as_fastener_gripper::DynamixelReadState::Request &req, o2as_fastener_gripper::DynamixelReadState::Response &res)
 {
 	uint8_t motor_id = req.motor_id;
 	int32_t item_status = 0;
 
-    int result_index = DynamixelControll::searchMotor(motor_id);
+    int result_index = DynamixelController::searchMotor(motor_id);
 	if (result_index == -1)
 	{
 		ROS_ERROR("The specified Motor_ID (%d) can not be found.",motor_id);
@@ -47,7 +47,7 @@ bool DynamixelControll::dynamixelReadMsgCallback(o2as_fastener_gripper::Dynamixe
 	}
 }
 
-int DynamixelControll::searchMotor(uint8_t motor_id)
+int DynamixelController::searchMotor(uint8_t motor_id)
 {
 	std::vector<std::string> split_list;
 
@@ -55,7 +55,7 @@ int DynamixelControll::searchMotor(uint8_t motor_id)
 	{
 		if (u2d2_connect_id_list[index] != "")
 		{
-			split_list = DynamixelControll::StringSplit(u2d2_connect_id_list[index],',');
+			split_list = DynamixelController::StringSplit(u2d2_connect_id_list[index],',');
 			for(int i=0; i<split_list.size(); i++) if (std::stoi(split_list[i]) == motor_id) return index;
 		}
 	}
@@ -63,7 +63,7 @@ int DynamixelControll::searchMotor(uint8_t motor_id)
 	return -1;
 }
 
-bool DynamixelControll::initMotor(int32_t index, uint8_t motor_id, bool baudrate_flag)
+bool DynamixelController::initMotor(int32_t index, uint8_t motor_id, bool baudrate_flag)
 {
 	if (baudrate_flag)
 	{
@@ -93,7 +93,7 @@ bool DynamixelControll::initMotor(int32_t index, uint8_t motor_id, bool baudrate
 	return true;
 }
 
-DynamixelControll::DynamixelControll(void)
+DynamixelController::DynamixelController(void)
 {
 	int max_access = 0;
     int value = 10;
@@ -147,7 +147,7 @@ DynamixelControll::DynamixelControll(void)
 						if (baudrate_list[n] != 1000000) baudrate_flag = true;
 						else baudrate_flag = false;
 
-			    		if (DynamixelControll::initMotor(index, id_list[i], baudrate_flag))
+			    		if (DynamixelController::initMotor(index, id_list[i], baudrate_flag))
 			    		{
 			    			if (u2d2_connect_id_list[index] == "") u2d2_connect_id_list[index] = std::to_string(id_list[i]);
 			    			else u2d2_connect_id_list[index] = u2d2_connect_id_list[index] + "," + std::to_string(id_list[i]);
@@ -170,18 +170,18 @@ DynamixelControll::DynamixelControll(void)
 		}
 	}
 	
-	dynamixel_command_server_ = node_handle_.advertiseService("dynamixel_write_command", &DynamixelControll::dynamixelCommandMsgCallback,this);
-	dynamixel_info_server_ = node_handle_.advertiseService("dynamixel_read_state", &DynamixelControll::dynamixelReadMsgCallback,this);
+	dynamixel_command_server_ = node_handle_.advertiseService("dynamixel_write_command", &DynamixelController::dynamixelCommandMsgCallback,this);
+	dynamixel_info_server_ = node_handle_.advertiseService("dynamixel_read_state", &DynamixelController::dynamixelReadMsgCallback,this);
 }
 
-DynamixelControll::~DynamixelControll(void){}
+DynamixelController::~DynamixelController(void){}
 
 
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "dynamixel_controller");
 
-	DynamixelControll controller;
+	DynamixelController controller;
 
 	ros::Rate loop_rate(1000);
 

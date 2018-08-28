@@ -20,26 +20,22 @@ This package controls XL320, so 'dynamixel-workbench' and 'dynamixel-workbench-m
 
 * U2D2
 
-For connection setting of U2D2, please refer [here](https://gitlab.com/o2as/ur-o2as/blob/develop/udev_rules.md).
+For enabling the connection of the U2D2 controllers to a named port, please refer [here](https://gitlab.com/o2as/ur-o2as/blob/develop/udev_rules.md).
 
-I use U2D2 five with this package.
-Set param in 'demo.launch'.
+Five U2D2 controllers are used in this package. The parameters are set in `demo.launch`.
 Please set the maximum number of connections and connection destination.
 
 * ID of XL-320
 
-Must set motor id to move.
+The motor id needs to be set to move a motor. The ID has to be unique for each Dynamixel motor.
 
-It is a unique number to identify Dynamixel.
-
-Please excute 'motor_id_set.launch'.
-
+Execute 'motor_id_set.launch'.
 The information of a connected motor is displayed.
-Because an input screen of the ID setting starts, please set new ID.
+Through the input screen of the ID setting node, you can set a new ID.
 
-Please be cautious not to have the same IDs for the connected dynamixels. You may face communication issues or may not be able to search when IDs overlap.
+Take care not to have the same IDs for Dynamixels connected to the same controller. You may face communication issues or may not be able to search when IDs overlap.
 
-Specifically, please refer to [here](http://support.robotis.com/en/product/actuator/dynamixel_x/xl_series/xl-320.htm#Actuator_Address_03).
+Specifically, refer to [here](http://support.robotis.com/en/product/actuator/dynamixel_x/xl_series/xl-320.htm#Actuator_Address_03).
 
 * config/gripper.yaml
 
