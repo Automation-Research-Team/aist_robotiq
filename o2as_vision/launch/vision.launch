@@ -7,7 +7,7 @@
     
     <!-- o2as_vision -->
     <arg name="camera_list" default=""/>
-    <node name="o2as_vision_node" pkg="o2as_vision" type="o2as_vision_node.py" output="screen">
+    <node name="o2as_vision_server" pkg="o2as_vision" type="o2as_vision_server.py" output="screen">
         <param name="sleep_time" type="double" value="0.1"/>
         <param name="image_dir" type="string" value="$(find o2as_vision)/image"/>
         <rosparam param="camera_list" subst_value="True">$(arg camera_list)</rosparam> 

@@ -7,44 +7,44 @@ from o2as_realsense_camera.client import RealSenseCameraClient
 from o2as_cad_matching.cad_matching_client import CadMatchingClient
 from planning_scene_interface import PlanningSceneInterface
 
-class VisionGroupInterface(object):
-    def __init__(self, group_name=""):
-        rospy.logdebug("VisionGroupInterface.__init__() begin")
-        rospy.logdebug("group_name = %s", group_name)
+class VisionCouplet(object):
+    def __init__(self, couplet_name=""):
+        rospy.logdebug("VisionCouplet.__init__() begin")
+        rospy.logdebug("couplet_name = %s", couplet_name)
 
         # camera and cad matching
-        self._group_name = group_name
-        self._camera = RealSenseCameraClient("/"+group_name+"/")
-        self._cad_matching = CadMatchingClient("/"+group_name+"/")
+        self._couplet_name = couplet_name
+        self._camera = RealSenseCameraClient("/"+couplet_name+"/")
+        self._cad_matching = CadMatchingClient("/"+couplet_name+"/")
 
         # planning scene
-        #self._camera_frame = "/" + self._group_name + "_depth_frame"
-        self._camera_frame = "/" + self._group_name + "_depth_image_frame"
+        #self._camera_frame = "/" + self._couplet_name + "_depth_frame"
+        self._camera_frame = "/" + self._couplet_name + "_depth_image_frame"
         self._planning_scene = PlanningSceneInterface(self._camera_frame)
 
-        rospy.logdebug("VisionGroupInterface.__init__() end")
+        rospy.logdebug("VisionCouplet.__init__() end")
 
     def set_image_dir(self, image_dir):
-        rospy.logdebug("VisionGroupInterface.set_image_dir() begin")
+        rospy.logdebug("VisionCouplet.set_image_dir() begin")
 
         # point cloud file and image file is saved into the image_dir.
         self._image_dir = image_dir
-        self._pcloud_filename = self._image_dir + "/" + self._group_name + ".dat"
-        self._image_filename = self._image_dir + "/" + self._group_name + ".png"
+        self._pcloud_filename = self._image_dir + "/" + self._couplet_name + ".dat"
+        self._image_filename = self._image_dir + "/" + self._couplet_name + ".png"
 
-        rospy.logdebug("VisionGroupInterface.set_image_dir() end")
+        rospy.logdebug("VisionCouplet.set_image_dir() end")
 
     def prepare(self):
-        rospy.logdebug("VisionGroupInterface.prepare() begin")
+        rospy.logdebug("VisionCouplet.prepare() begin")
 
         # connect to the camera
         if not self._camera.connect():
     		rospy.logerr("camera connect failed")
 
-        rospy.logdebug("VisionGroupInterface.prepare() end")
+        rospy.logdebug("VisionCouplet.prepare() end")
 
     def find_objects(self, object_id):
-        rospy.logdebug("VisionGroupInterface.find_objects() begin")
+        rospy.logdebug("VisionCouplet.find_objects() begin")
 
         # get image from sensor
         rospy.logdebug("save frame for cad matching")
@@ -54,37 +54,37 @@ class VisionGroupInterface(object):
         rospy.logdebug("search object")
         response = self._cad_matching.search(self._pcloud_filename, self._image_filename, object_id)
 
-        rospy.logdebug("VisionGroupInterface.find_objects() end")
+        rospy.logdebug("VisionCouplet.find_objects() end")
         if not response.success:
             return []
         return response.search_result.detected_objects
 
     def find_object(self, object_id, expected_position, position_tolerance):
-        rospy.logdebug("VisionGroupInterface.find_object() begin")
+        rospy.logdebug("VisionCouplet.find_object() begin")
         detected_objects = self.find_objects(object_id)
 
         n = len(detected_objects) 
         if n > 0:
-            # choose nearest object from expected position within torelance
+            # choose nearest object from expected position within tolerance
             # expected position should be specified with depth image frame of the camera
-            rospy.logdebug("%d objects found. select nearest.", n)
-            i_min = 0
-            d_min = float("inf")
+            rospy.logdebug("%d objects found. Selecting nearest.", n)
+            ix_closest = 0
+            tolerance = float("inf")
             for i in range(n):
                 obj = detected_objects[i]
-                a = np.array([expected_position.pose.position.x, expected_position.pose.position.y, expected_position.pose.position.z])
-                b = np.array([obj.pose.position.x, obj.pose.position.y, obj.pose.position.z])
-                d = LA.norm(a-b)
-                if d < d_min:
-                    d_min = d
-                    i_min = i
-                rospy.logdebug("expected=({},{},{}), real=({},{},{}), d={}".format(a[0], a[1], a[2], b[0], b[1], b[2], d))
-            return detected_objects[i_min]
+                expected_pos = np.array([expected_position.pose.position.x, expected_position.pose.position.y, expected_position.pose.position.z])
+                seen_pos = np.array([obj.pose.position.x, obj.pose.position.y, obj.pose.position.z])
+                dist = LA.norm(expected_pos-seen_pos)
+                if dist < tolerance:
+                    tolerance = dist
+                    ix_closest = i
+                rospy.logdebug("expected=({},{},{}), seen=({},{},{}), d={}".format(a[0], a[1], a[2], b[0], b[1], b[2], d))
+            return detected_objects[ix_closest]
         else:
             return None
 
     def add_detected_object_to_planning_scene(self, name, pose, cad_filename, scale):
-        rospy.logdebug("VisionGroupInterface.add_detected_object_to_planning_scene() begin")
+        rospy.logdebug("VisionCouplet.add_detected_object_to_planning_scene() begin")
         rospy.logdebug("name: " + name)
         rospy.logdebug("cad_filename: " + cad_filename)
         rospy.logdebug("pose:")
@@ -95,4 +95,4 @@ class VisionGroupInterface(object):
         # # add box to planning scene (test)
         # a = 0.05
         # self._planning_scene.addBox(name=object_name+"_box", x=pose.position.x, y=pose.position.y, z=pose.position.z, size_x=a, size_y=a, size_z=a)
-        rospy.logdebug("VisionGroupInterface.add_detected_object_to_planning_scene() end")
+        rospy.logdebug("VisionCouplet.add_detected_object_to_planning_scene() end")

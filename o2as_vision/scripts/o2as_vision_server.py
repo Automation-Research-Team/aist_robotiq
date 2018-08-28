@@ -10,9 +10,9 @@ LOG_LEVEL = log_level=rospy.DEBUG
 
 FIND_OBJECT_SERVICE = "find_object"
 
-class VisionNode(object):
+class VisionServer(object):
     def __init__(self):
-        rospy.logdebug("VisionNode.__init__() begin")
+        rospy.logdebug("VisionServer.__init__() begin")
         try:
             # params
             image_dir = rospy.get_param("~image_dir")
@@ -32,12 +32,12 @@ class VisionNode(object):
         except rospy.ServiceException as e:
             rospy.logerr("Service call failed: %s", str(e)) 
 
-        rospy.logdebug("VisionNode.__init__() success")
+        rospy.logdebug("VisionServer.__init__() success")
 
     def find_object(self, req):
         return self.manager.find_object(req.camera, req.object_id, req.expected_position, req.position_tolerance)
 
 if __name__ == "__main__":
     rospy.init_node('o2as_vision', anonymous=True, log_level=LOG_LEVEL)
-    node = VisionNode()
+    node = VisionServer()
     rospy.spin()

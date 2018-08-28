@@ -1,37 +1,28 @@
 import rospy
 import rospkg
 import tf
-from util import *
 import geometry_msgs.msg
 from o2as_msgs.srv import *
 from o2as_parts_description.srv import *
-from vision_group_interface import VisionGroupInterface
+from vision_couplet import VisionCouplet
 
-GET_PARTS_INFO_SERVICE = "get_parts_info"
+#LOG_LEVEL = log_level=rospy.DEBUG
+LOG_LEVEL = log_level=rospy.INFO
 
 class VisionManager(object):
+    """
+    This is a helper class for the o2as_vision_server. It owns 
+    """
     def __init__(self):
         self._items = dict()
-        self._get_parts_info = ros_service_proxy(GET_PARTS_INFO_SERVICE, GetPartsInfo)
-    
-    def get_parts_info(self, object_id):
-        rospy.logdebug("VisionNode.get_parts_info() begin")
-        rospy.logdebug("object_id = %s", object_id)
-        try:
-            response = self._get_parts_info(object_id)
-            if response.exists:
-                rospy.logdebug("VisionNode.get_parts_info() end")
-                return response.parts_info
-        except rospy.ServiceException as e:
-            rospy.logerr("service call failed: %s", str(e)) 
-        return None
+        self._vision_couplets = dict()
+        parts_list = rospy.get_param("~parts_list")
+        for item in parts_list:
+            object_id = str(item['id'])
+            info = PartsInfo(object_id=object_id, name=item['name'], type=item['type'], cad=item['cad'], description=item['description'])
+            self._items[object_id] = info
+            rospy.logdebug("parts id=%s, name=%s, type=%s, cad=%s, desc=%s", object_id, info.name, info.type, info.cad, info.description)
         
-    def prepare(self):
-        rospy.logdebug("VisionNode.prepare() begin")
-        for key in self._items:
-            self._items[key].prepare()
-        rospy.logdebug("VisionNode.prepare() end")
-
     def find_object(self, camera, object_id, expected_position, position_tolerance):
         rospy.logdebug("VisionManager.find_object() begin")
         pos = expected_position.pose.position
@@ -42,15 +33,15 @@ class VisionManager(object):
 
         res = FindObjectResponse()
         res.success = False
-        group = self.get_group(camera)
-        detected_object = group.find_object(object_id, expected_position, position_tolerance)
+        couplet = self.get_couplet(camera)
+        detected_object = couplet.find_object(object_id, expected_position, position_tolerance)
         if detected_object == None:
             rospy.loginfo("no object found")
         else:
             rospy.logdebug("add detected object to planning scene")
-            self.add_detected_object_to_planning_scene(detected_object, group)
+            self.add_detected_object_to_planning_scene(detected_object, couplet)
 
-            # chage Pose to PoseStamped 
+            # change Pose to PoseStamped 
             # (cad matching always returns pose in depth image frame)
             depth_image_frame = camera + "_depth_image_frame"
             p = geometry_msgs.msg.PoseStamped()
@@ -62,9 +53,9 @@ class VisionManager(object):
         rospy.logdebug("VisionManager.find_object() end")
         return res
 
-    def add_detected_object_to_planning_scene(self, obj, group):
+    def add_detected_object_to_planning_scene(self, obj, couplet):
         # get parts info
-        parts_info = self.get_parts_info(str(obj.object_id))
+        parts_info = self._items[str(obj.object_id)]
         if parts_info is None:
             rospy.logerr("parts info was not found")
             return res
@@ -75,11 +66,11 @@ class VisionManager(object):
         name = parts_info.type+"_mesh"
         cad_filename = path + "/meshes/" + parts_info.cad
         scale = [0.001, 0.001, 0.001] # [mm to meter]
-        group.add_detected_object_to_planning_scene(name=name, pose=obj.pose, cad_filename=cad_filename, scale=scale)
+        couplet.add_detected_object_to_planning_scene(name=name, pose=obj.pose, cad_filename=cad_filename, scale=scale)
 
-    def add_group(self, name):
-        self._items[name] = VisionGroupInterface(name)
-        return self._items[name]
+    def add_couplet(self, name):
+        self._vision_couplets[name] = VisionCouplet(name)
+        return self._vision_couplets[name]
 
-    def get_group(self, name):
-        return self._items[name]
+    def get_couplet(self, name):
+        return self._vision_couplets[name]
