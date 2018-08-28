@@ -21,7 +21,7 @@ class USBDevice
     };
 
   protected:
-    USBDevice(uint16_t idVendor, uint16_t idProduct, uint8_t deviceClass);
+    USBDevice(uint16_t idVendor, uint16_t idProduct)			;
     ~USBDevice()							;
 
   public:
@@ -33,7 +33,7 @@ class USBDevice
     usb_dev_handle*	handle()		const	{ return _handle; }
 	 
   private:
-    usb_dev_handle* const	_handle;	//!< USB�ǥХ����Υϥ�ɥ�
+    usb_dev_handle* const	_handle;	//!< USBデバイスのハンドル
 
     static Initializer		_initializer;
 };
@@ -80,7 +80,7 @@ class USBHub : public USBDevice
     uint32_t	getStatus(u_int port)				const	;
     
   private:
-    u_int	_nports;	//!< USB�ϥ֤Υݡ��ȿ�
+    u_int	_nports;	//!< USBハブのポート数
 };
 
 inline u_int
@@ -90,63 +90,12 @@ USBHub::nports() const
 }
 
 /************************************************************************
-*  class USBPort							*
-************************************************************************/
-class USBPort
-{
-  public:
-    USBPort(USBHub& hub, u_int port)	:_hub(hub), _port(port)		{}
-
-    uint16_t	idVendor()					const	;
-    uint16_t	idProduct()					const	;
-    u_int	port()						const	;
-    USBPort&	setPower(bool on)					;
-    bool	isPowerOn()					const	;
-    
-  private:
-    USBHub&	_hub;
-    const u_int	_port;
-};
-
-inline uint16_t
-USBPort::idVendor() const
-{
-    return _hub.idVendor();
-}
-    
-inline uint16_t
-USBPort::idProduct() const
-{
-    return _hub.idProduct();
-}
-    
-inline u_int
-USBPort::port() const
-{
-    return _port;
-}
-    
-inline USBPort&
-USBPort::setPower(bool on)
-{
-    _hub.setPower(_port, on);
-    return *this;
-}
-
-inline bool
-USBPort::isPowerOn() const
-{
-    return _hub.isPowerOn(_port);
-}
-    
-/************************************************************************
 *  class USBHid								*
 ************************************************************************/
 class USBHid : public USBDevice
 {
   public:
-    USBHid(uint16_t idVendor=0x16c0,
-	   uint16_t idProduct=0x05df, bool useReportIDs=true)		;
+    USBHid(uint16_t idVendor, uint16_t idProduct, bool useReportIDs)	;
 
     USBHid&	setReport(const char *buffer, int len)			;
     int		getReport(int reportNumber, char* buffer, int maxLen)	;
@@ -155,5 +104,47 @@ class USBHid : public USBDevice
     const bool	_useReportIDs;
 };
     
+/************************************************************************
+*  class USBRelay							*
+************************************************************************/
+class USBRelay : public USBHid
+{
+  public:
+		USBRelay(uint16_t idVendor=0x16c0, uint16_t idProduct=0x05df)
+		    :USBHid(idVendor, idProduct, false), _state(0)
+		{
+		    setState();
+		}
+
+    USBRelay&	setPower(u_int channel, bool on)
+		{
+		    if (on)
+			_state |=  (0x1 << channel);
+		    else
+			_state &= ~(0x1 << channel);
+		    return setState();
+		}
+    
+    bool	isPowerOn(u_int channel) const
+		{
+		    return _state & (0x1 << channel);
+		}
+
+  private:
+    USBRelay&	setState()
+		{
+		    char	buffer[17];
+		    std::fill(std::begin(buffer), std::end(buffer), 0);
+		    buffer[1] = 0x81;
+		    buffer[2] = char(_state);
+		    setReport(buffer, sizeof(buffer));
+		    return *this;
+		}
+    
+  private:
+    u_int	_state;
+
+};
+
 }
 #endif	// !TU_USBPP_H

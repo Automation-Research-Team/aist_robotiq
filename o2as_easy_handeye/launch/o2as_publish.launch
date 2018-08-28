@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<!--
+This script will try to seek the calibration file:
+  /root/.ros/easy_handeye/o2as_easy_handeye_b_bot_eye_on_base.yaml
+You may need to run o2as_easy_handeye.launch before running
+this launch file.
+-->
+
+<launch>
+    <arg name="robot_name" default="b_bot" />
+
+    <!-- start easy_handeye publisher -->
+    <include file="$(find easy_handeye)/launch/publish.launch" >
+        <arg name="eye_on_hand" value="false" />
+        <arg name="namespace_prefix" default="o2as_easy_handeye_b_bot" />
+
+        <!--it is possible to override the link names saved in the yaml file
+            in case of name clashes, for example-->
+        <!-- Assume eye_on_hand is false -->
+        <arg name="robot_base_frame" value="$(arg robot_name)_base_link" />
+        <arg name="tracking_base_frame" default="camera_link_estimated" />
+
+        <arg name="inverse" default="false" />
+    </include>
+</launch>

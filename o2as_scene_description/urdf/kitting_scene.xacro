@@ -2,7 +2,9 @@
 
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kitting_scene">
   <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_bins.xacro" />
-  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray.xacro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray.xacro" /> -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray_with_partitions.xacro" />
+  <xacro:include filename="$(find realsense2_camera)/urdf/_d435.urdf.xacro" />
 
   <xacro:property name="bin1_width" value=".125"/>
   <xacro:property name="bin1_length" value=".128" />
@@ -13,10 +15,10 @@
   <xacro:property name="tray_width" value=".300" />
   <xacro:property name="tray_length" value=".210" />
 
-  <xacro:property name="rack_width" value=".640" />
+  <!-- <xacro:property name="rack_width" value=".640" /> -->
 
   <!-- A row of bin1 -->
-  <xacro:property name="set1_x" value=".00"/>
+  <xacro:property name="set1_x" value="+0.05"/>
   <xacro:property name="set1_y" value="${.32-bin1_width/2}"/>
   <xacro:property name="set1_z" value=".01" />
   <xacro:property name="z_origin_offset_1" value="-.008" />
@@ -42,8 +44,8 @@
   </xacro:kitting_bin_1>
 
   <!-- A row of bin2 and bin3 -->
-  <xacro:property name="set2_x_bin3" value="${bin1_length/2+bin3_length/2}" />
-  <xacro:property name="set2_x_bin2" value="${bin1_length/2+bin2_length/2}" />
+  <xacro:property name="set2_x_bin3" value="${bin1_length/2+bin3_length/2+0.05}" />
+  <xacro:property name="set2_x_bin2" value="${bin1_length/2+bin2_length/2+0.05}" />
   <xacro:property name="set2_y" value="${.32-bin3_width/2}" />
   <xacro:property name="set2_z" value=".00" />
   <xacro:property name="z_origin_offset_2" value="-.009" />
@@ -70,18 +72,35 @@
     <origin xyz="${set2_x_bin2} ${set2_y-bin3_width/2-bin2_width*7/2} ${set2_z - z_origin_offset_2}" rpy="0 0 0" />
   </xacro:kitting_bin_2>
 
+  <!-- add camera for pose matching on the table -->
+  <link name="workspace_cam_holder_link" />
+  <joint name="workspace_cam_holder_joint" type="fixed">
+    <parent link="workspace_center" />
+    <child  link="workspace_cam_holder_link" />
+    <origin xyz="-0.05 0 0.0" rpy="0.0 -${pi/2} 0.0" />
+  </joint>
+  <xacro:sensor_d435 prefix="workspace_" parent="workspace_cam_holder_link">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:sensor_d435>
+
   <!-- A row of tray -->
-  <xacro:property name="set3_x" value="${-(bin1_length/2+tray_length/2)}" />
+  <xacro:property name="set3_x" value="${-(bin1_length/2+tray_length/2)-0.05}" />
   <xacro:property name="set3_y" value="${.32-tray_width/2}" />
   <xacro:property name="set3_z" value=".007" />
 
   <!-- set3_tray_1 -->
-  <xacro:kitting_tray trayname="set3_tray_1" parent="workspace_center">
+  <!-- <xacro:kitting_tray trayname="set3_tray_1" parent="workspace_center"> -->
+  <!--   <origin xyz="${set3_x} ${set3_y} ${set3_z}" rpy="0 0 0" /> -->
+  <!-- </xacro:kitting_tray> -->
+  <xacro:kitting_tray1 trayname="set3_tray_1" parent="workspace_center">
     <origin xyz="${set3_x} ${set3_y} ${set3_z}" rpy="0 0 0" />
-  </xacro:kitting_tray>
+  </xacro:kitting_tray1>
   <!-- set3_tray_2 -->
-  <xacro:kitting_tray trayname="set3_tray_2" parent="workspace_center">
+  <!-- <xacro:kitting_tray trayname="set3_tray_2" parent="workspace_center"> -->
+  <!--   <origin xyz="${set3_x} ${set3_y-tray_width} ${set3_z}" rpy="0 0 0" /> -->
+  <!-- </xacro:kitting_tray> -->
+  <xacro:kitting_tray2 trayname="set3_tray_2" parent="workspace_center">
     <origin xyz="${set3_x} ${set3_y-tray_width} ${set3_z}" rpy="0 0 0" />
-  </xacro:kitting_tray>
+  </xacro:kitting_tray2>
   
 </robot>
