@@ -110,34 +110,36 @@ class CalibrationClass(O2ASBaseRoutines):
     return
   
   def check_robot_calibration(self):
-    rospy.loginfo("============ Testing robot calibration. ============")
-    rospy.loginfo("Each robot will move to a position in front of c_bot.")
     calib_pose = geometry_msgs.msg.PoseStamped()
     calib_pose.header.frame_id = "workspace_center"
     calib_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     calib_pose.pose.position.x = -0.15
     calib_pose.pose.position.z = 0.07
 
+    rospy.loginfo("============ Testing robot calibration. ============")
+    rospy.loginfo("Each robot will move to this position in front of c_bot:")
+    rospy.loginfo(calib_pose)
+
     self.go_to_named_pose("home", "a_bot")
     self.go_to_named_pose("home", "b_bot")
     self.go_to_named_pose("home", "c_bot")
 
-    rospy.loginfo("============ Press `Enter` to move a_bot to calibration position, enter 0 to skip.")
+    rospy.loginfo("============ Press `Enter` to move c_bot to calibration position, enter 0 to skip.")
     if raw_input() != "0":
-      self.send_gripper_command("precision_gripper_outer", "close")
-      self.go_to_pose_goal("a_bot", calib_pose)
+      self.send_gripper_command("c_bot", "close")
+      self.go_to_pose_goal("c_bot", calib_pose, speed=1.0)
 
     rospy.loginfo("============ Press `Enter` to move b_bot to calibration position, enter 0 to skip.")
     if raw_input() != "0":
-      self.go_to_named_pose("home", "a_bot")
+      self.go_to_named_pose("home", "c_bot")
       self.send_gripper_command("b_bot", "close")
-      self.go_to_pose_goal("b_bot", calib_pose)
+      self.go_to_pose_goal("b_bot", calib_pose, speed=1.0)
 
-    rospy.loginfo("============ Press `Enter` to move c_bot to calibration position, enter 0 to skip.")
+    rospy.loginfo("============ Press `Enter` to move a_bot to calibration position, enter 0 to skip.")
     if raw_input() != "0":
       self.go_to_named_pose("home", "b_bot")
-      self.send_gripper_command("c_bot", "close")
-      self.go_to_pose_goal("c_bot", calib_pose)
+      self.send_gripper_command("precision_gripper_inner", "close")
+      self.go_to_pose_goal("a_bot", calib_pose, speed=1.0)
 
     rospy.loginfo("============ Press `Enter` to move robots back home.")
     raw_input()
