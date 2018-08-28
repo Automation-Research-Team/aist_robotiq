@@ -25,6 +25,6 @@
     </include>
 
     <!-- routines -->
-	<node name="vision_integration" pkg="o2as_routines" type="vision_integration.py" output="screen">
+	<node name="cad_matching_demo" pkg="o2as_examples" type="cad_matching_demo.py" output="screen">
 	</node>
 </launch>
