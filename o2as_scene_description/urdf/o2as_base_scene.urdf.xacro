@@ -147,7 +147,8 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:sensor_d435>
   <xacro:sensor_d435 prefix="d_bot_" parent="o2as_ground">
-    <origin xyz="0 0 ${bots_z + 0.9}" rpy="0 ${pi/2} 0"/>
+    <!-- <origin xyz="0 0 ${bots_z + 0.9}" rpy="0 ${pi/2} ${pi}"/> -->
+    <origin xyz="0 0 2" rpy="0 ${pi/2} ${pi}"/>
   </xacro:sensor_d435>
 
   <!-- spawn and attach AR markers -->
