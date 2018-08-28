@@ -1,0 +1,24 @@
+<launch>
+    <!-- 
+    616205004841 : free @ osx used by shibata
+    612201001671 : b_bot_camera
+     -->
+    <arg name="serial_number" default=""/> <!-- specify serial number of your camera -->
+    <arg name="camera_name" default="camera"/>
+
+	<group ns="$(arg camera_name)">
+        <!-- server -->
+        <include file="$(find o2as_realsense_camera)/launch/camera.launch">
+            <arg name="serial_number" value="$(arg serial_number)"/>
+        </include>
+
+        <!-- client -->
+        <node name="camera_client" pkg="o2as_realsense_camera" type="demo.py" output="screen">
+            <param name="setting_filename" value="$(find o2as_realsense_camera)/image/relasense_$(arg serial_number).yaml"/>
+            <param name="pcloud_filename" value="$(find o2as_realsense_camera)/image/test.dat"/>
+            <param name="image_filename" value="$(find o2as_realsense_camera)/image/test.png"/>
+            <remap from="/connect" to="$(arg camera_name)/connect"/>
+            <remap from="/save_frame_for_cad_matching" to="$(arg camera_name)/save_frame_for_cad_matching"/>
+        </node>
+    </group>
+</launch>

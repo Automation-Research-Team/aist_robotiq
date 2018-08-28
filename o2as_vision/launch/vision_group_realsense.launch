@@ -1,0 +1,24 @@
+<launch>
+    <arg name="camera" default="b_bot_camera"/>
+    <arg name="camera_type" default="realsense"/>
+    <arg name="camera_serial_number" default="616205004841"/>
+
+	<group ns="$(arg camera)">
+		<include file="$(find o2as_realsense_camera)/launch/camera.launch">
+            <arg name="node_name" value="camera_node"/>
+            <arg name="serial_number" value="$(arg camera_serial_number)"/>
+        </include>
+
+        <arg name="model_name" value="$(arg camera)_$(arg camera_type)_$(arg camera_serial_number)"/>
+        <arg name="model_filename" value="$(find o2as_cad_matching)/data/model/$(arg model_name).dat"/>
+        <arg name="id_map_filename" value="$(find o2as_cad_matching)/data/model/$(arg model_name)/id_map.yaml"/>
+        <!-- <arg name="id_map_filename" value="$(find o2as_cad_matching)/data/model/$(arg model_name).yaml"/> -->
+        <arg name="search_param_filename" value="$(find o2as_cad_matching)/config/group/$(arg camera)_search_param.yaml"/>
+        <include file="$(find o2as_cad_matching)/launch/search_server.launch">
+            <arg name="group_name" value="$(arg camera)"/>
+            <arg name="model_filename" value="$(arg model_filename)"/>
+            <arg name="search_param_filename" value="$(arg search_param_filename)"/>
+            <arg name="id_map_filename" value="$(arg id_map_filename)"/>
+        </include>
+	</group>
+</launch>

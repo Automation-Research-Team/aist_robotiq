@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package>
+	<name>o2as_realsense_camera</name>
+	<version>0.0.0</version>
+	<description>management multiple realsense cameras</description>
+
+	<author email="yoshiya_shibata@omron.co.jp">Yoshiya Shibata</author>
+	<maintainer email="yoshiya_shibata@omron.co.jp">Yoshiya Shibata</maintainer>
+
+	<license>MIT</license>
+
+	<buildtool_depend>catkin</buildtool_depend>
+
+	<build_depend>roscpp</build_depend>
+	<run_depend>roscpp</run_depend>
+	<build_depend>dynamic_reconfigure</build_depend>
+	<run_depend>dynamic_reconfigure</run_depend>
+
+	<build_depend>geometry_msgs</build_depend>
+	<build_depend>librealsense2</build_depend>
+	<run_depend>librealsense2</run_depend>
+	<build_depend version_gte="3.3.0">opencv3</build_depend>
+	<run_depend version_gte="3.3.0">opencv3</run_depend>
+	<build_depend>cv_bridge</build_depend>
+	<run_depend>cv_bridge</run_depend>
+
+	<export>
+	</export>
+</package>
