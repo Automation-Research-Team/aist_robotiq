@@ -14,12 +14,19 @@ import o2as_msgs.msg
 from o2as_routines.base import O2ASBaseRoutines
 from o2as_routines.vision import VisionProxy
 
+# THIS FILE IS A STUB, NOT WORKING
 class AssemblyRoutines(O2ASBaseRoutines):
   """
   This contains the routine used to run the assembly task.
   """
   def __init__(self):
     super(AssemblyRoutines, self).__init__()
+    
+    self._parts_dict = dict()
+    parts_list = rospy.get_param("parts_list")
+    for item in parts_list:
+        self._parts_dict[item['name']] = item
+        rospy.logdebug(item)
 
 class AssemblyTask():
   def __init__(self):

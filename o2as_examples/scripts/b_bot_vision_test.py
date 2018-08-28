@@ -1,28 +1,26 @@
+#!/usr/bin/env python
+
 import rospy
-from parts_info import *
-from skill_proxy import SkillProxy
 from geometry_msgs.msg import PoseStamped
 
-class PipelineTest(object):
+LOG_LEVEL = log_level=rospy.INFO
+
+class BBotVisionTest(object):
     def __init__(self):
         self.init_parts_dict()
         self._proxy = SkillProxy()
 
     def init_parts_dict(self):
-        self._parts_name_dict = dict()
-
-        # initialize dict using yaml file
-        belt_drive_unit_parts = rospy.get_param("~belt_drive_unit_parts")
-        for item in belt_drive_unit_parts:
-            name = item.keys()[0]
-            info = PartsInfo(name=name, id=item[name]['id'], type=item[name]['type'], desc=item[name]['description'])
-            self._parts_name_dict[name] = info
-            rospy.logdebug("parts name=%s, id=%s, type=%s, desc=%s", name, info.id, info.type, info.desc)
-
-    def get_parts_info(self, name):
-        return self._parts_name_dict[name]
+        self._parts_dict = dict()
+        parts_list = rospy.get_param("~parts_list")
+        for item in parts_list:
+            self._parts_dict[item['name']] = item
+            rospy.logdebug(item)
 
     def pick(self):
+        rospy.loginfo("Will look for item 11 (output-shaft-pulley) and try to pick it up. Press enter to proceed.")
+        raw_input()
+
         # find parts
         expected_position   = PoseStamped()     # belt room center
         position_tolerance  = 0.2               # within 20 cm
@@ -32,17 +30,21 @@ class PipelineTest(object):
         while not rospy.core.is_shutdown():
             item_pose = self._proxy.find_object(expected_position, position_tolerance, object_id, camera)
             if item_pose is not None:
+                rospy.loginfo("Found the object at pose:")
+                rospy.loginfo(item_pose)
                 break
 
         # pick parts
         self._proxy.pick(robotname="b_bot", object_pose=item_pose, grasp_height=0.2, 
             approach_height=0.05, speed_fast=0.2, speed_slow=0.02, gripper_command="")
 
-        # pick parts
-        self._proxy.pick(robot_name="", item_pose=item_pose)
-
     def run(self, product_count = 1):
-        test = PipelineTest()
+        test = BBotVisionTest()
         test.pick()
         while not rospy.core.is_shutdown():
             rospy.rostime.wallsleep(0.5)
+
+if __name__ == "__main__":
+    rospy.init_node('o2as_assembly_task', anonymous=True, log_level=LOG_LEVEL)
+    test = PipelineTest()
+    test.run()
