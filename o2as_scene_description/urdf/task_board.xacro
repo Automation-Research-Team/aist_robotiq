@@ -46,6 +46,13 @@
   </joint>
   <link name="${boardname}_part1"/>
 
+  <joint name="${boardname}_tool" type="fixed">
+    <parent link="${boardname}_surface"/>
+    <child link="${boardname}_tool"/>
+    <origin rpy="0.0 0.0 ${pi/2}" xyz="-0.07 0.0 -0.02"/>
+  </joint>
+  <link name="${boardname}_tool"/>
+
   <joint name="${boardname}_part2" type="fixed">
     <parent link="${boardname}_surface"/>
     <child link="${boardname}_part2"/>

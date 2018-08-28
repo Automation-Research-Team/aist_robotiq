@@ -52,8 +52,8 @@ SkillServer::SkillServer() :
   c_bot_group_.setPlannerId("RRTConnectkConfigDefault");
   c_bot_group_.setEndEffectorLink("c_bot_robotiq_85_tip_link");
   c_bot_group_.setNumPlanningAttempts(5);
-  // front_bots_group_.setPlanningTime(PLANNING_TIME);
-  // front_bots_group_.setPlannerId("RRTConnectkConfigDefault");
+  front_bots_group_.setPlanningTime(PLANNING_TIME);
+  front_bots_group_.setPlannerId("RRTConnectkConfigDefault");
   // all_bots_group_.setPlanningTime(PLANNING_TIME);
   // all_bots_group_.setPlannerId("RRTConnectkConfigDefault");
 
@@ -238,7 +238,7 @@ moveit::planning_interface::MoveGroupInterface* SkillServer::robotNameToMoveGrou
   if (robot_name == "a_bot") return &a_bot_group_;
   if (robot_name == "b_bot") return &b_bot_group_;
   if (robot_name == "c_bot") return &c_bot_group_;
-  // if (robot_name == "front_bots") return &front_bots_group_;
+  if (robot_name == "front_bots") return &front_bots_group_;
   // if (robot_name == "all_bots") return &all_bots_group_;
 }
 
@@ -980,12 +980,14 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
     t.setOrigin(tf::Vector3(0.1, 0.0, 0.65)); 
     if (receiver_robot_name == "b_bot")
     {
-      q.setRPY(0, 0, -M_PI/2);
+      q.setRPY(M_PI/2, 0, -M_PI/2);
+      ROS_INFO_STREAM("receiver_robot: "<<receiver_robot_name);
     }
+    
     else
     {
       ROS_ERROR("This function should not arrive here.");
-      q.setRPY(0, 0, M_PI/2);   
+      q.setRPY(0, 0, 0);   
     }
   }
   t.setRotation(q);
@@ -994,8 +996,13 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
   geometry_msgs::PoseStamped handover_pose_giver, handover_pose_receiver;
   handover_pose_giver.header.frame_id = "handover_frame";
   handover_pose_receiver.header.frame_id = "handover_frame";
-  handover_pose_giver.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI/2, 0, M_PI); // Facing the receiver, rotated
-
+  // handover_pose_giver.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI/2, 0, M_PI); // Facing the receiver, rotated
+  if(giver_robot_name == "a_bot")
+  {
+    handover_pose_giver.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, M_PI); // Facing the receiver, rotated
+  }else 
+   handover_pose_giver.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI/2, 0, M_PI); 
+   
   publishMarker(handover_pose_receiver, "pick_pose");
   publishMarker(handover_pose_giver, "place_pose");
   ros::Duration(.1).sleep();

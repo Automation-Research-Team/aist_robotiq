@@ -407,21 +407,84 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          m3_feeder_link:
+          mat:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          m3_feeder_outlet_link:
+          mat_corner1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          m4_feeder_link:
+          mat_corner2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          m4_feeder_outlet_link:
+          mat_corner3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_corner4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part10:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part11:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part12:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part13:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part14:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part15:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part7:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part9:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -461,6 +524,107 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          taskboard:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_corner1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_corner2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_corner3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_corner4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part10:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_part11:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part12:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part13:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part14:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_part15:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_part6_large_pulley:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_part6_small_pulley:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_part7a:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part7b:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_part8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_part9:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_surface:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           workbox:
             Alpha: 1
             Show Axes: false
@@ -496,7 +660,7 @@ Visualization Manager:
         Goal State Color: 250; 128; 0
         Interactive Marker Size: 0.150000006
         Joint Violation Color: 255; 0; 255
-        Planning Group: b_bot
+        Planning Group: all_bots
         Query Goal State: true
         Query Start State: false
         Show Workspace: false
@@ -844,21 +1008,84 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          m3_feeder_link:
+          mat:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          m3_feeder_outlet_link:
+          mat_corner1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          m4_feeder_link:
+          mat_corner2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
-          m4_feeder_outlet_link:
+          mat_corner3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_corner4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part10:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part11:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part12:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part13:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part14:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part15:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part7:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part9:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -898,6 +1125,107 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          taskboard:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_corner1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_corner2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_corner3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_corner4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part10:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_part11:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part12:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part13:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part14:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_part15:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_part6_large_pulley:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_part6_small_pulley:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_part7a:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          taskboard_part7b:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_part8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_part9:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          taskboard_surface:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           workbox:
             Alpha: 1
             Show Axes: false
@@ -1058,13 +1386,45 @@ Visualization Manager:
           Value: true
         camera_right_ir_optical_frame:
           Value: true
-        m3_feeder_link:
+        mat:
           Value: true
-        m3_feeder_outlet_link:
+        mat_corner1:
           Value: true
-        m4_feeder_link:
+        mat_corner2:
           Value: true
-        m4_feeder_outlet_link:
+        mat_corner3:
+          Value: true
+        mat_corner4:
+          Value: true
+        mat_part1:
+          Value: true
+        mat_part10:
+          Value: true
+        mat_part11:
+          Value: true
+        mat_part12:
+          Value: true
+        mat_part13:
+          Value: true
+        mat_part14:
+          Value: true
+        mat_part15:
+          Value: true
+        mat_part2:
+          Value: true
+        mat_part3:
+          Value: true
+        mat_part4:
+          Value: true
+        mat_part5:
+          Value: true
+        mat_part6:
+          Value: true
+        mat_part7:
+          Value: true
+        mat_part8:
+          Value: true
+        mat_part9:
           Value: true
         o2as_ground:
           Value: true
@@ -1081,6 +1441,52 @@ Visualization Manager:
         screw_tool_m5_helper_link:
           Value: true
         screw_tool_m5_link:
+          Value: true
+        taskboard:
+          Value: true
+        taskboard_corner1:
+          Value: true
+        taskboard_corner2:
+          Value: true
+        taskboard_corner3:
+          Value: true
+        taskboard_corner4:
+          Value: true
+        taskboard_part1:
+          Value: true
+        taskboard_part10:
+          Value: true
+        taskboard_part11:
+          Value: true
+        taskboard_part12:
+          Value: true
+        taskboard_part13:
+          Value: true
+        taskboard_part14:
+          Value: true
+        taskboard_part15:
+          Value: true
+        taskboard_part2:
+          Value: true
+        taskboard_part3:
+          Value: true
+        taskboard_part4:
+          Value: true
+        taskboard_part5:
+          Value: true
+        taskboard_part6_large_pulley:
+          Value: true
+        taskboard_part6_small_pulley:
+          Value: true
+        taskboard_part7a:
+          Value: true
+        taskboard_part7b:
+          Value: true
+        taskboard_part8:
+          Value: true
+        taskboard_part9:
+          Value: true
+        taskboard_surface:
           Value: true
         workbox:
           Value: true
@@ -1113,9 +1519,7 @@ Visualization Manager:
                             a_bot_gripper_tip_link:
                               {}
             a_bot_base_smfl:
-              m3_feeder_link:
-                m3_feeder_outlet_link:
-                  {}
+              {}
             b_bot_base_link:
               b_bot_base:
                 {}
@@ -1193,9 +1597,6 @@ Visualization Manager:
                           c_bot_tool0:
                             {}
             c_bot_base_smfl:
-              m4_feeder_link:
-                m4_feeder_outlet_link:
-                  {}
               screw_tool_holder:
                 screw_tool_m3_link:
                   screw_tool_m3_helper_link:
@@ -1209,7 +1610,89 @@ Visualization Manager:
             workbox:
               {}
             workspace_center:
-              {}
+              taskboard:
+                mat:
+                  mat_corner1:
+                    {}
+                  mat_corner2:
+                    {}
+                  mat_corner3:
+                    {}
+                  mat_corner4:
+                    {}
+                  mat_part1:
+                    {}
+                  mat_part10:
+                    {}
+                  mat_part11:
+                    {}
+                  mat_part12:
+                    {}
+                  mat_part13:
+                    {}
+                  mat_part14:
+                    {}
+                  mat_part15:
+                    {}
+                  mat_part2:
+                    {}
+                  mat_part3:
+                    {}
+                  mat_part4:
+                    {}
+                  mat_part5:
+                    {}
+                  mat_part6:
+                    {}
+                  mat_part7:
+                    {}
+                  mat_part8:
+                    {}
+                  mat_part9:
+                    {}
+                taskboard_surface:
+                  taskboard_corner1:
+                    {}
+                  taskboard_corner2:
+                    {}
+                  taskboard_corner3:
+                    {}
+                  taskboard_corner4:
+                    {}
+                  taskboard_part1:
+                    {}
+                  taskboard_part10:
+                    {}
+                  taskboard_part11:
+                    {}
+                  taskboard_part12:
+                    {}
+                  taskboard_part13:
+                    {}
+                  taskboard_part14:
+                    {}
+                  taskboard_part15:
+                    {}
+                  taskboard_part2:
+                    {}
+                  taskboard_part3:
+                    {}
+                  taskboard_part4:
+                    {}
+                  taskboard_part5:
+                    {}
+                  taskboard_part6_large_pulley:
+                    {}
+                  taskboard_part6_small_pulley:
+                    {}
+                  taskboard_part7a:
+                    {}
+                  taskboard_part7b:
+                    {}
+                  taskboard_part8:
+                    {}
+                  taskboard_part9:
+                    {}
       Update Interval: 0
       Value: true
     - Class: rviz/Marker
@@ -1245,7 +1728,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.5854224
+      Distance: 3.03986597
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -1260,10 +1743,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.450397909
+      Pitch: 0.480398238
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.99539018
+      Yaw: 6.17857695
     Saved: ~
 Window Geometry:
   Displays:
@@ -1275,7 +1758,7 @@ Window Geometry:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd000000040000000000000280000003ccfc020000000cfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003a00000165000000c600fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000120020002d00200053006c00690064006500720000000000ffffffff0000000000000000fb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e006701000001a5000002610000016b00fffffffb0000002e004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d00200053006c00690064006500720000000000ffffffff0000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000003e00ffffff000000010000010f000003ccfc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003a000003cc0000009e00fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000074f0000003efc0100000002fb0000000800540069006d006500000000000000074f0000024400fffffffb0000000800540069006d00650100000000000004500000000000000000000004c9000003cc00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd000000040000000000000280000003ccfc020000000cfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003a00000165000000c600fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000120020002d00200053006c00690064006500720000000000ffffffff0000000000000000fb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e006701000001a5000002610000016b00fffffffb0000002e004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d00200053006c00690064006500720000000000ffffffff0000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000003e00ffffff000000010000010f000003ccfc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003a000003cc0000009e00fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000074f0000003efc0100000002fb0000000800540069006d006500000000000000074f0000024400fffffffb0000000800540069006d00650100000000000004500000000000000000000004b9000003cc00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -1284,6 +1767,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: true
-  Width: 1871
-  X: 49
+  Width: 1855
+  X: 65
   Y: 24

@@ -156,7 +156,39 @@ class O2ASBaseRoutines(object):
     current_pose = group.get_current_pose().pose
     return all_close(pose_goal_stamped.pose, current_pose, 0.01)
 
-  def horizontal_spiral_motion(self, robot_name, max_radius, radius_increment = .001, speed = 0.02):
+  def belt_spiral_motion(self, robot_name, start_pose, speed = 0.02):
+    group = self.groups[robot_name]
+    rospy.loginfo("Performing belt spiral motion " + str(speed))
+    rospy.loginfo("Setting velocity scaling to " + str(speed))
+    group.set_max_velocity_scaling_factor(speed)
+
+    r_belt=0.0068
+    theta_belt=0
+    theta_increase=15
+    
+    # ==== MISBEHAVING VERSION (see https://answers.ros.org/question/300978/movegroupcommander-get_current_pose-returns-incorrect-result-when-using-real-robot/ )
+    # start_pos_bugged = group.get_current_pose() 
+    # ==== WORKING VERSION:
+    gripper_pose = geometry_msgs.msg.PoseStamped()
+    gripper_pose.header.frame_id = "a_bot_gripper_tip_link"
+    gripper_pose.pose.orientation.w = 1.0
+    # start_pose = self.listener.transformPose("world", gripper_pose)
+
+    next_pose = start_pose
+    while theta_belt <= 360 and not rospy.is_shutdown():
+        #By default, the Spiral_Search function will maintain contact between both mating parts at all times
+         theta_belt=theta_belt+theta_increase
+         x=cos(radians(theta_belt))*r_belt
+         y=sin(radians(theta_belt))*r_belt
+         next_pose.pose.position.x = start_pose.pose.position.x + x
+         next_pose.pose.position.y = start_pose.pose.position.y - y
+         self.go_to_pose_goal(robot_name, next_pose)
+         rospy.sleep(0.1)
+      
+    # -------------
+    return True
+
+  def horizontal_spiral_motion(self, robot_name, max_radius, start_pos, radius_increment = .001, speed = 0.02):
     group = self.groups[robot_name]
     rospy.loginfo("Performing horizontal spiral motion " + str(speed))
     rospy.loginfo("Setting velocity scaling to " + str(speed))
@@ -175,7 +207,7 @@ class O2ASBaseRoutines(object):
     gripper_pos = geometry_msgs.msg.PoseStamped()
     gripper_pos.header.frame_id = "a_bot_gripper_tip_link"
     gripper_pos.pose.orientation.w = 1.0
-    start_pos = self.listener.transformPose("world", gripper_pos)
+    # start_pos = self.listener.transformPose("world", gripper_pos)
 
     next_pos = start_pos
     while RealRadius <= max_radius and not rospy.is_shutdown():
