@@ -1,22 +1,17 @@
 # Introduction
-Control the XL320 with ROS.
+This package controls our fastening tools which are driven by an XL320 motor. It offers an action server.
 
-It is implemented by Action Server.
-
-Turn in the 'CCW' direction.
-When the resistance increases and the speed becomes 0, the rotation stops.
+The motors turn counter-clockwise until the resistance increases and the speed drops to 0, at which point the rotation stops and the action returns.
 
 # Initial Setup
 * Dynamixel SDK
 
-Install the Dynamixel SDK to control XL320.
+The Dynamixel SDK needs to be installed to control the XL320 motors.
 
-The following is the part described in Dockerfile.
+This package depends on 'dynamixel-workbench' and 'dynamixel-workbench-msgs'. If you have any trouble building, try this:
 ```bash
-RUN apt-get update && apt-get install -y --no-install-recommends \
-	ros-kinetic-dynamixel-sdk \
+apt-get update && apt-get install -y --no-install-recommends ros-kinetic-dynamixel-sdk
 ```
-This package controls XL320, so 'dynamixel-workbench' and 'dynamixel-workbench-msgs' are dependent packages.
 
 * U2D2
 
@@ -37,11 +32,9 @@ Take care not to have the same IDs for Dynamixels connected to the same controll
 
 Specifically, refer to [here](http://support.robotis.com/en/product/actuator/dynamixel_x/xl_series/xl-320.htm#Actuator_Address_03).
 
-* config/gripper.yaml
+Enter the names of each motor ID and gripper in this file:
 
-Please set a name for the set motor ID.
-Item names are 'name' and 'motor_id'.
-You will set parameters with that name.
+* config/gripper.yaml
 
 # How to use
 To use the action, use the gripper name and rotation speed.

@@ -11,8 +11,8 @@
 #include "dynamixel_workbench_toolbox/dynamixel_driver.h"
 
 #include "dynamixel_workbench_msgs/GetDynamixelInfo.h"
-#include "o2as_fastener_gripper/DynamixelWriteCommand.h"
-#include "o2as_fastener_gripper/DynamixelReadState.h"
+#include "o2as_fastening_tools/DynamixelWriteCommand.h"
+#include "o2as_fastening_tools/DynamixelReadState.h"
 #include "message_header.h"
 
 namespace dynamixel_controller
@@ -63,11 +63,11 @@ class DynamixelController
   bool initMotor(int32_t index, uint8_t motor_id, bool baudrate_flag);
   int32_t searchMotor(uint8_t motor_id);
 
-  bool dynamixelCommandMsgCallback(o2as_fastener_gripper::DynamixelWriteCommand::Request &req,
-                                   o2as_fastener_gripper::DynamixelWriteCommand::Response &res);
+  bool dynamixelCommandMsgCallback(o2as_fastening_tools::DynamixelWriteCommand::Request &req,
+                                   o2as_fastening_tools::DynamixelWriteCommand::Response &res);
   
-  bool dynamixelReadMsgCallback(o2as_fastener_gripper::DynamixelReadState::Request &req,
-                                   o2as_fastener_gripper::DynamixelReadState::Response &res);
+  bool dynamixelReadMsgCallback(o2as_fastening_tools::DynamixelReadState::Request &req,
+                                   o2as_fastening_tools::DynamixelReadState::Response &res);
 };
 }
 

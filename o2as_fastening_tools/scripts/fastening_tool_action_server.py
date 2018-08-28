@@ -6,33 +6,33 @@ import actionlib_tutorials.msg
 import os.path
 import yaml
 from std_msgs.msg import String
-from o2as_fastener_gripper.srv import *
-from o2as_fastener_gripper.msg import *
+from o2as_fastening_gripper.srv import *
+from o2as_fastening_gripper.msg import *
 from util import *
 
-class FastenerGripperController(object):
-    _feedback = FastenerGripperControlFeedback()
-    _result = FastenerGripperControlResult()
+class FasteningToolController(object):
+    _feedback = FasteningToolControlFeedback()
+    _result = FasteningToolControlResult()
 
     def __init__(self):
-        conf_dir = rospy.get_param("~conf_dir")
-        parts    = rospy.get_param("~parts")
+        config_dir = rospy.get_param("~config_dir")
+        config_file = rospy.get_param("~fastening_tools")
 
         # get data for .yaml
-        self.conf_gripper_filename = conf_dir + "/" + parts + ".yaml"
-        obj_gripper_conf = read_object_yaml_config(self.conf_gripper_filename)
+        conf_gripper_filename = config_dir + "/" + config_file + ".yaml"
+        fastening_tools = read_object_yaml_config(conf_gripper_filename)
 
         # initialize motor id table
-        self.motor_id_table = dict()
-        data_list = obj_gripper_conf['grippers']
+        self.fastening_tools = dict()
+        data_list = fastening_tools['fastening_tools']
         for data in data_list:
-            self.motor_id_table.update({data['name'] : data['motor_id']})
+            self.fastening_tools.update({data['name'] : data['motor_id']})
 
         self.dynamixel_command_write = rospy.ServiceProxy('dynamixel_write_command', DynamixelWriteCommand)
         self.dynamixel_read_state = rospy.ServiceProxy('dynamixel_read_state', DynamixelReadState)
 
-        self._action_name = 'FastenerGripperAction'
-        self._as = actionlib.SimpleActionServer(self._action_name, FastenerGripperControlAction, execute_cb=self.execute_control, auto_start = False)
+        self._action_name = 'FasteningToolAction'
+        self._as = actionlib.SimpleActionServer(self._action_name, FasteningToolControlAction, execute_cb=self.execute_control, auto_start = False)
         self._as.start()
 
     def set_moving_speed(self, motor_id, value):
@@ -54,13 +54,13 @@ class FastenerGripperController(object):
     def execute_control(self, goal):
         self._result.control_result = True
 
-        if (goal.gripper_name in self.motor_id_table) == False :
-            rospy.logerr("'%s' is not exist in %s." % (goal.gripper_name, self.conf_gripper_filename))
+        if (goal.fastening_tool_name in self.fastening_tools) == False :
+            rospy.logerr("'%s' is not exist in %s." % (goal.fastening_tool_name, self.conf_gripper_filename))
             self._result.control_result = False
             self._as.set_succeeded(self._result)
             return
 
-        motor_id = self.motor_id_table[goal.gripper_name]
+        motor_id = self.fastening_tools[goal.fastening_tool_name]
 
         self._feedback.motor_speed = goal.speed
 
@@ -102,6 +102,6 @@ class FastenerGripperController(object):
 
         
 if __name__ == '__main__':
-    rospy.init_node('fastener_gripper_controller')
-    server = FastenerGripperController()
+    rospy.init_node('fastening_tool_controller')
+    server = FasteningToolController()
     rospy.spin()

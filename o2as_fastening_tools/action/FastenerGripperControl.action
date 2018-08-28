@@ -1,5 +1,5 @@
 # Define the goal
-string gripper_name
+string fastening_tool_name
 uint32 speed
 ---
 # Define the result
