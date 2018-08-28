@@ -1,9 +1,4 @@
 parts_list:
-  - id: 0
-    name: holder
-    type: 00_holder
-    cad: 00_holder.stl
-    description: Holder
   - id: 1
     name: base
     type: 01-BASE
@@ -37,12 +32,12 @@ parts_list:
   - id: 7
     name: bearing_housing
     type: 07_SBARB6200ZZ-30
-    cad: 07_SBARB6200ZZ-30.stl
+    cad: 07_SBARB6200ZZ_30.stl
     description: Bearings with Housings (Double Bearings)
   - id: 8
     name: drive_shaft
-    type: 08_KZAF10-75-NA4-WA55-GA20-AA0
-    cad: 08_KZAF10-75-NA4-WA55-GA20-AA0.stl
+    type: 08_KZAF1075NA4WA55GA20AA0
+    cad: 08_KZAF1075NA4WA55GA20AA0.stl
     description: Drive shaft (Straight) D10h6
   - id: 9
     name: end_cap
@@ -52,7 +47,7 @@ parts_list:
   - id: 10
     name: bearing_spacer
     type: 10_CLBPS10-17-4
-    cad: 10_CLBPS10-17-4.stl
+    cad: 10_CLBPS10_17_4.stl
     description: Bearing Spacers For Inner Ring (output pulley)
   - id: 11
     name: output_pulley
@@ -99,3 +94,8 @@ parts_list:
     type: 19_MSSFS3-6 
     cad: 19_MSSFS3-6.stl
     description: 6mm M3 Hex Socket Set Screw  (metric coarse thread)
+  - id: 99
+    name: holder
+    type: 99_holder
+    cad: 99_holder.stl
+    description: Holder
