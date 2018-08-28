@@ -4,8 +4,7 @@ Control the XL320 with ROS.
 It is implemented by Action Server.
 
 Turn in the 'CCW' direction.
-
-Hold a motor in check with a finger, and the turn stops if resistance becomes big.
+When the resistance increases and the speed becomes 0, the rotation stops.
 
 # Initial Setup
 * Dynamixel SDK
@@ -49,6 +48,32 @@ Item names are 'name' and 'motor_id'.
 You will set parameters with that name.
 
 # How to use
+To use the action, use the gripper name and rotation speed.
+
+The gripper name is set with gripper.yaml in the config folder.
+
+Speed can be specified as follows.
+
+If a value in the range of 0~1023 is used, it is stopped by setting to 0 while rotating to CCW direction.
+
+If a value in the range of 1024~2047 is used, it is stopped by setting to 1024 while rotating to CW direction.
+
+Specifically, please refer to [here](http://support.robotis.com/en/product/actuator/dynamixel_x/xl_series/xl-320.htm#Actuator_Address_03).
+
+As in demo.launch, set parameter.
+
+'max_access' is the number of U2D2 connections.
+
+'access_no' is set as many set by 'max_access'. 
+The value uses the connection name of U2D2.
+
+'conf_dir' sets the path of the config folder.
+
+'parts' sets the yaml name with gripper information.
+
+
+* Example of use 
+
 Appoint gripper name and rotary speed in 'fastener_gripper_action_client.py'.
 
 Please connect U2D2 and XL320 to PC and run 'demo.launch'.
