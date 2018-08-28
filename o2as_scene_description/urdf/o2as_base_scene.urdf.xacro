@@ -18,7 +18,7 @@
   <!-- common stuff -->
   <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro" />
   <xacro:include filename="$(find o2as_gazebo)/urdf/o2as_base_scene.gazebo" />
-  <xacro:include filename="$(find realsense2_camera)/urdf/_d435.urdf.xacro" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/_d435.urdf.xacro" />
 
   <!-- robots -->
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/ur10.urdf.xacro" /> -->
@@ -143,9 +143,9 @@
     <origin xyz="0.0 -0.06 0.16" rpy="0.0 0.0 ${pi/2}" />
   </joint>
 
-  <xacro:sensor_d435 prefix="b_bot_" parent="b_bot_cam_holder_link">
+  <xacro:o2as_sensor_d435 prefix="b_bot_" parent="b_bot_cam_holder_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
-  </xacro:sensor_d435>
+  </xacro:o2as_sensor_d435>
 
   <!-- <link name="d_bot_cam_holder_link" />
   <joint name="d_bot_cam_holder_joint" type="fixed">
