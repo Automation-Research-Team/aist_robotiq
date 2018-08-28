@@ -1,0 +1,13 @@
+grippers:
+  - name: gripper1
+    motor_id: 1
+  - name: gripper2
+    motor_id: 2
+  - name: gripper3
+    motor_id: 3
+  - name: gripper4
+    motor_id: 4
+  - name: gripper5
+    motor_id: 5
+
+test: 1
