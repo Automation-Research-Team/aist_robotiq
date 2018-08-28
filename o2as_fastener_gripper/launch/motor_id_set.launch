@@ -1,0 +1,4 @@
+<launch>
+    <node name="dynamixel_controller" pkg="o2as_fastener_gripper" type="dynamixel_controller" output="screen"/>
+    <node name="motor_id_set" pkg="o2as_fastener_gripper" type="motor_id_setup.py" output="screen"/>
+</launch>
