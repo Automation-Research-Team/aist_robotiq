@@ -75,13 +75,6 @@ aluminum peripherial evaluation case.
     </joint>
     <link name="${prefix}camera_depth_frame"/>
 
-    <joint name="camera_depth_image_joint" type="fixed">
-      <origin xyz="0 0 0" rpy="${M_PI/2} ${M_PI} ${M_PI/2}"/>
-      <parent link="${prefix}camera_depth_frame"/>
-      <child link="${prefix}camera_depth_image_frame" />
-    </joint>
-    <link name="${prefix}camera_depth_image_frame"/>
-
     <joint name="camera_depth_optical_joint" type="fixed">
       <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
       <parent link="${prefix}camera_depth_frame" />
