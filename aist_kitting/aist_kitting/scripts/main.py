@@ -57,7 +57,7 @@ def move_named_pose_test():
 
 def search_test():
     get_image = rospy.ServiceProxy("aist_kitting/get_image", GetImage)
-    # search = rospy.ServiceProxy("aist_kitting/search", Search)rospy.ServiceProxy("aist_kitting/move_named_pose", MoveNamedPose)
+    search = rospy.ServiceProxy("aist_kitting/search", Search)
 
     res_get_image = get_image()
     req_search = SearchRequest()
