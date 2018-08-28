@@ -51,7 +51,7 @@ class CalibrationClass(O2ASBaseRoutines):
   objects defined in the scene.
   """
 
-  def cycle_through_calibration_poses(self, poses, robot_name, speed=0.3, with_approach=True, go_home=False):
+  def cycle_through_calibration_poses(self, poses, robot_name, speed=0.3, with_approach=False, go_home=False):
     rospy.loginfo("Moving all robots home.")
     self.go_to_named_pose("home", "a_bot")
     self.go_to_named_pose("home", "b_bot")
@@ -60,24 +60,27 @@ class CalibrationClass(O2ASBaseRoutines):
     
     
       
-    rospy.loginfo("============ Moving " + robot_name + " to " + poses[0].header.frame_id)
+    # rospy.loginfo("============ Moving " + robot_name + " to " + poses[0].header.frame_id)
     if with_approach:                 # To calculate the approach, we publish the target pose to TF
-      ps_approach = geometry_msgs.msg.PoseStamped()
-      ps_approach.header.frame_id = "calibration_target_pose"
-      ps_approach.pose.position.x -= .05
+      rospy.logewarn("with_approach does not work yet. Do not use it.")
+      # ps_approach = geometry_msgs.msg.PoseStamped()
+      # ps_approach.header.frame_id = "calibration_target_pose"
+      # ps_approach.pose.position.x -= .05
 
     for pose in poses:  
       rospy.loginfo("============ Press `Enter` to move " + robot_name + " to " + pose.header.frame_id)
+      self.publish_marker(pose, "place_pose")
       raw_input()
       if go_home:
         self.go_to_named_pose(home_pose, robot_name)
       if with_approach:
-        br = tf.TransformBroadcaster()
-        br.sendTransform((pose.pose.position.x, pose.pose.position.y, pose.pose.position.z),
-                          (pose.pose.orientation.x, pose.pose.orientation.y,
-                           pose.pose.orientation.z, pose.pose.orientation.w), rospy.Time.now(),
-                           "calibration_target_pose", pose.header.frame_id)
-        rospy.sleep(.2)
+        ps_approach = copy.deepcopy(pose) # Dirty fix for the TF frame below not being found
+        # br = tf.TransformBroadcaster()
+        # br.sendTransform((pose.pose.position.x, pose.pose.position.y, pose.pose.position.z),
+        #                   (pose.pose.orientation.x, pose.pose.orientation.y,
+        #                    pose.pose.orientation.z, pose.pose.orientation.w), rospy.Time.now(),
+        #                    "calibration_target_pose", pose.header.frame_id)
+        # rospy.sleep(.5)
         self.go_to_pose_goal(robot_name, ps_approach,speed=speed)
       if rospy.is_shutdown():
         break
@@ -87,15 +90,15 @@ class CalibrationClass(O2ASBaseRoutines):
       else:
         self.go_to_pose_goal(robot_name, pose,speed=speed)
       
-      rospy.loginfo("============ Press `Enter` to move away ")
+      rospy.loginfo("============ Press `Enter` to proceed ")
       raw_input()
       if with_approach:
-        br = tf.TransformBroadcaster()
-        br.sendTransform((pose.pose.position.x, pose.pose.position.y, pose.pose.position.z),
-                          (pose.pose.orientation.x, pose.pose.orientation.y,
-                           pose.pose.orientation.z, pose.pose.orientation.w), rospy.Time.now(),
-                           "calibration_target_pose", pose.header.frame_id)
-        rospy.sleep(.2)
+        # br = tf.TransformBroadcaster()
+        # br.sendTransform((pose.pose.position.x, pose.pose.position.y, pose.pose.position.z),
+        #                   (pose.pose.orientation.x, pose.pose.orientation.y,
+        #                    pose.pose.orientation.z, pose.pose.orientation.w), rospy.Time.now(),
+        #                    "calibration_target_pose", pose.header.frame_id)
+        # rospy.sleep(.2)
         self.go_to_pose_goal(robot_name, ps_approach,speed=speed)
       if go_home:
         self.go_to_named_pose(home_pose, robot_name)
@@ -242,30 +245,64 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
     return 
 
-  def assembly_calibration_assembled_parts(self):
-    rospy.loginfo("============ Calibrating assembled parts for the assembly task. ============")
-    rospy.loginfo("a_bot gripper tip should be 3 mm above the surface.")
+  def assembly_calibration_base_plate(self):
+    rospy.loginfo("============ Calibrating base plate for the assembly task. ============")
+    rospy.loginfo("b_bot gripper tip should be 5 mm above each corner of the plate.")
     poses = []
 
     pose0 = geometry_msgs.msg.PoseStamped()
-    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    pose0.pose.position.z = .003
+    pose0.pose.orientation.w = 1.0
+    pose0.pose.position.x = -.005
 
     pose1 = copy.deepcopy(pose0)
     pose1.header.frame_id = "assembled_assy_part_01_corner_1"
     pose2 = copy.deepcopy(pose0)
     pose2.header.frame_id = "assembled_assy_part_01_corner_2"
     pose3 = copy.deepcopy(pose0)
-    pose3.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, pi/4, pi/2))
     pose3.header.frame_id = "assembled_assy_part_01_corner_3"
     pose4 = copy.deepcopy(pose0)
-    pose4.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, pi/4, pi/2))
     pose4.header.frame_id = "assembled_assy_part_01_corner_4"
     
     poses = [pose1, pose2, pose3, pose4]
 
     self.cycle_through_calibration_poses(poses, "b_bot", speed=0.3)
     return 
+
+  def assembly_calibration_assembled_parts(self):
+    rospy.loginfo("============ Calibrating full assembled parts for the assembly task. ============")
+    rospy.loginfo("b_bot gripper tip should go close to some important spots.")
+    poses = []
+
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.pose.orientation.w = 1.0
+    pose0.pose.position.x = -.02
+
+    pose1 = copy.deepcopy(pose0)
+    pose1.header.frame_id = "assembled_assy_part_03"   # Top of plate 2
+    pose1.pose.position.x = .058
+    pose1.pose.position.y = -.0025
+    pose1.pose.position.z = .095 + .01
+    pose1.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0) )
+
+    pose2 = copy.deepcopy(pose0)
+    pose2.header.frame_id = "assembled_assy_part_08_front_tip"  # Front of rotary shaft
+    pose2.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, -pi) )
+    pose2.pose.position.x = .03
+
+    pose3 = copy.deepcopy(pose0)
+    pose3.header.frame_id = "assembled_assy_part_14_screw_head"
+    pose3.pose.position.x = -.03
+
+    pose4 = copy.deepcopy(pose0)
+    pose4.header.frame_id = "assembled_assy_part_04_tip"
+    pose4.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi, 0, -pi) )
+    pose4.pose.position.x = .03
+    
+    poses = [pose1, pose2, pose3, pose4]
+
+    self.cycle_through_calibration_poses(poses, "b_bot", speed=0.3)
+    return 
+    
 
 
 if __name__ == '__main__':
@@ -280,7 +317,8 @@ if __name__ == '__main__':
       rospy.loginfo("3: Taskboard extended fun tour")
       rospy.loginfo("4: Placement mat (for the taskboard task)")
       rospy.loginfo("5: a_bot gripper frame (rotate around EEF axis)")
-      rospy.loginfo("6: Assembly, the base plate and assembled parts")
+      rospy.loginfo("6: Assembly base plate")
+      rospy.loginfo("7: Assembly assembled parts")
       rospy.loginfo("x: Exit ")
       rospy.loginfo(" ")
       r = raw_input()
@@ -295,6 +333,8 @@ if __name__ == '__main__':
       elif r == '5':
         c.gripper_frame_calibration_mat()
       elif r == '6':
+        c.assembly_calibration_base_plate()
+      elif r == '7':
         c.assembly_calibration_assembled_parts()
       elif r == 'x':
         break
