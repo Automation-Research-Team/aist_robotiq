@@ -2,4 +2,4 @@ uint8 motor_id
 string item_name
 ---
 bool comm_result
-int32 value
+uint32 value

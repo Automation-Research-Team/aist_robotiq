@@ -1,5 +1,6 @@
 # Define the goal
-#uint8 goal
+string gripper_name
+uint32 speed
 ---
 # Define the result
 bool control_result
