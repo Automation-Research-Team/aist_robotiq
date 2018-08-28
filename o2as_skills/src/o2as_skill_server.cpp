@@ -1103,7 +1103,11 @@ void SkillServer::executeInsert(const o2as_msgs::insertGoalConstPtr& goal)
     
     ROS_INFO("Waiting for the robot to finish the operation.");
     ros::Duration(.5).sleep();
-    waitForURProgram("/" + active_robot_name + "_controller");
+    try{
+      waitForURProgram("/" + active_robot_name + "_controller");
+    }
+    catch(ros::Exception e){;}
+    
 
     // Assume that the operation succeeded
     // ROS_WARN("Sleeping for 15 seconds because we get no feedback from the robot.");
@@ -1169,6 +1173,7 @@ int main(int argc, char **argv)
   SkillServer o2as_skill_server;
   ROS_INFO("O2AS skill server started");
 
+  // waitForURProgram("/b_bot_controller");
   // o2as_msgs::sendScriptToUR srv;
   // srv.request.program_id = "insertion";
   // srv.request.robot_name = "b_bot";

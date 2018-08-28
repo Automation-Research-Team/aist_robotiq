@@ -129,8 +129,8 @@ class O2ASBaseRoutines(object):
     req = o2as_msgs.srv.publishMarkerRequest()
     req.marker_pose = pose_stamped
     req.marker_type = marker_type
-    res = self.publishMarker_client.call(req)
-    return res.success
+    self.publishMarker_client.call(req)
+    return True
 
   def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, high_precision = False):
     group = self.groups[group_name]
