@@ -78,7 +78,7 @@ class VisionCouplet(object):
                 if dist < tolerance:
                     tolerance = dist
                     ix_closest = i
-                rospy.logdebug("expected=({},{},{}), seen=({},{},{}), d={}".format(a[0], a[1], a[2], b[0], b[1], b[2], d))
+                rospy.logdebug("expected=({},{},{}), seen=({},{},{}), d={}".format(expected_pos[0], expected_pos[1], expected_pos[2], seen_pos[0], seen_pos[1], seen_pos[2], dist))
             return detected_objects[ix_closest]
         else:
             return None

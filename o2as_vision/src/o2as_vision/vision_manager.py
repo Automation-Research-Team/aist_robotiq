@@ -3,11 +3,18 @@ import rospkg
 import tf
 import geometry_msgs.msg
 from o2as_msgs.srv import *
-from o2as_parts_description.srv import *
 from vision_couplet import VisionCouplet
 
 #LOG_LEVEL = log_level=rospy.DEBUG
 LOG_LEVEL = log_level=rospy.INFO
+
+class PartsInfo(object):
+    def __init__(self, object_id, name, type, cad, description):
+        self.object_id = object_id
+        self.name = name
+        self.type = type
+        self.cad = cad
+        self.description = description
 
 class VisionManager(object):
     """
@@ -16,7 +23,7 @@ class VisionManager(object):
     def __init__(self):
         self._items = dict()
         self._vision_couplets = dict()
-        parts_list = rospy.get_param("~parts_list")
+        parts_list = rospy.get_param("/parts_list")
         for item in parts_list:
             object_id = str(item['id'])
             info = PartsInfo(object_id=object_id, name=item['name'], type=item['type'], cad=item['cad'], description=item['description'])

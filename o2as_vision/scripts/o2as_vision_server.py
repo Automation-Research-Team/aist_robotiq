@@ -19,9 +19,9 @@ class VisionServer(object):
             # prepare
             self.manager = VisionManager()
             for camera in camera_list:
-                group = self.manager.add_group(camera)
+                group = self.manager.add_couplet(camera)
                 group.set_image_dir(image_dir)
-            self.manager.prepare()
+                group.prepare()
 
             # service
             rospy.logdebug("start service %s","find_object")

@@ -1,7 +1,7 @@
 <launch>
     <!-- parts info -->
 	<arg name="parts_list_filename" default="$(find o2as_parts_description)/config/assembly_parts_list.yaml"/>
-	<include file="$(find o2as_parts_description)/launch/demo.launch">
+	<include file="$(find o2as_parts_description)/launch/load_file_params.launch">
         <arg name="parts_list_filename" value="$(arg parts_list_filename)"/>
     </include>
     
