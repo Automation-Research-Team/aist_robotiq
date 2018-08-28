@@ -66,6 +66,19 @@ def search_test():
     res_search = search(req_search)
     rospy.loginfo(res_search)
 
+# def transform_phoxi_to_world(pose):
+#     T_phoxi = np.matrix([
+#         [-0.005532755388, 0.895263942347, -0.445501809369, 544.512175068866],
+#         [0.986069642027, -0.069178481132, -0.151264664816, 157.894106209722],
+#         [-0.166240938674, -0.440132720076, -0.882409847535, 1465.092961368773],
+#         [0, 0, 0, 1]
+#     ])
+#     q = tf.transformations.quaternion_from_matrix(T_phoxi)
+
+
+
+#     trans_pose = PoseStamped()
+
 if __name__ == '__main__':
     rospy.init_node("aist_kitting_demo")
 
@@ -73,10 +86,4 @@ if __name__ == '__main__':
     search_test()
     # move_named_pose_test()
 
-    # T_phoxi = np.matrix([
-    #     [-0.005532755388, 0.895263942347, -0.445501809369, 544.512175068866],
-    #     [0.986069642027, -0.069178481132, -0.151264664816, 157.894106209722],
-    #     [-0.166240938674, -0.440132720076, -0.882409847535, 1465.092961368773],
-    #     [0, 0, 0, 1]
-    # ])
-    # q = tf.transformations.quaternion_from_matrix(T_phoxi)
+    
