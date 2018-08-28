@@ -31,8 +31,8 @@ if __name__ == '__main__':
         controller = FastenerGripperController()
 
         name_list = [
-            "gripper2",
-            "gripper3",
+            "m4_tool",
+            "m3_tool",
         ]
 
         rospy.sleep(3)

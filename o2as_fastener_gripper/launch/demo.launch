@@ -1,20 +1,20 @@
 <launch>
     <arg name="max_access" default="5"/>
-    <arg name="access_1"   default="/dev/for_docker/fastener_gripper_1"/>
-    <arg name="access_2"   default="/dev/for_docker/fastener_gripper_2"/>
-    <arg name="access_3"   default="/dev/for_docker/fastener_gripper_3"/>
-    <arg name="access_4"   default="/dev/for_docker/fastener_gripper_4"/>
-    <arg name="access_5"   default="/dev/for_docker/fastener_gripper_5"/>
+    <arg name="serial_port_1"   default="/dev/for_docker/fastener_gripper_1"/>
+    <arg name="serial_port_2"   default="/dev/for_docker/fastener_gripper_2"/>
+    <arg name="serial_port_3"   default="/dev/for_docker/fastener_gripper_3"/>
+    <arg name="serial_port_4"   default="/dev/for_docker/fastener_gripper_4"/>
+    <arg name="serial_port_5"   default="/dev/for_docker/fastener_gripper_5"/>
     <arg name="conf_dir"   default="$(find o2as_fastener_gripper)/config"/>
     <arg name="parts"      default="gripper"/>
 
     <node name="dynamixel_controller" pkg="o2as_fastener_gripper" type="dynamixel_controller" output="screen">
         <param name="max_access" type= "int"   value="$(arg max_access)"/>
-        <param name="access_1"   type="string" value="$(arg access_1)"/>
-        <param name="access_2"   type="string" value="$(arg access_2)"/>
-        <param name="access_3"   type="string" value="$(arg access_3)"/>
-        <param name="access_4"   type="string" value="$(arg access_4)"/>
-        <param name="access_5"   type="string" value="$(arg access_5)"/>
+        <param name="serial_port_1"   type="string" value="$(arg serial_port_1)"/>
+        <param name="serial_port_2"   type="string" value="$(arg serial_port_2)"/>
+        <param name="serial_port_3"   type="string" value="$(arg serial_port_3)"/>
+        <param name="serial_port_4"   type="string" value="$(arg serial_port_4)"/>
+        <param name="serial_port_5"   type="string" value="$(arg serial_port_5)"/>
     </node>
 
     <node name="fastener_gripper_action_server" pkg="o2as_fastener_gripper" type="fastener_gripper_action_server.py" output="screen">

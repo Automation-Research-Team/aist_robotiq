@@ -1,11 +1,11 @@
 grippers:
-  - name: gripper1
+  - name: m5_tool
     motor_id: 1
-  - name: gripper2
+  - name: m4_tool
     motor_id: 2
-  - name: gripper3
+  - name: m3_tool
     motor_id: 3
-  - name: gripper4
+  - name: nut_tool_1
     motor_id: 4
-  - name: gripper5
+  - name: nut_tool_2
     motor_id: 5

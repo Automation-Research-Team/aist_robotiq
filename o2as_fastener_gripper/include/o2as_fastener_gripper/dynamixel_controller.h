@@ -17,7 +17,7 @@
 
 namespace dynamixel_controller
 {
-class DynamixelControll
+class DynamixelController
 {
  private:
   // ROS NodeHandle
@@ -45,8 +45,8 @@ class DynamixelControll
   //uint32_t baundrate = 1000000;
 
  public:
-  DynamixelControll(void);
-  ~DynamixelControll(void);
+  DynamixelController(void);
+  ~DynamixelController(void);
 
   std::vector<std::string> StringSplit(const std::string &str, char sep)
   {
