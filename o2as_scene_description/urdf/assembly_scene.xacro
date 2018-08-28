@@ -5,20 +5,13 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray.xacro" />
 
   <!-- Insert: -->
-  <!-- Tray 1 -->
-  <!-- Tray 2 -->
+  <xacro:kitting_tray1 trayname="tray_1" parent="workspace_center">
+    <origin xyz="-.2 -.27 0" rpy="0 0 ${pi/2}" />
+  </xacro:kitting_tray1>
+  <xacro:kitting_tray2 trayname="tray_2" parent="workspace_center">
+    <origin xyz="-.2 .27 0" rpy="0 0 ${-pi/2}" />
+  </xacro:kitting_tray2>
   <!-- The base plate -->
-
-  <!-- All the other parts need to be added somehow so that their frames can be updated, I guess. Hmmmmmmm. -->
-  
-
-  <!-- Manually defined pulley frame for the small test on 21 August. -->
-  <joint name="test_joint" type="fixed">
-    <parent link="workspace_center"/>
-    <child link="pulley_front_end"/>
-    <origin rpy="0.0 0.0 ${pi}" xyz="0.0 0.0 0.07 "/>
-  </joint>
-  <link name="pulley_front_end"/>
 
   <xacro:include filename="$(find o2as_parts_description)/urdf/assembly_parts_macros.urdf"/>
 
