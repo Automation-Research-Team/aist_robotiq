@@ -63,45 +63,116 @@ SkillServer::SkillServer() :
   // --- Define the screw tools.
   
   // Define one of the tools as a collision object
-  screw_tool_m5.header.frame_id = "screw_tool_m5_link";
-  screw_tool_m5.id = "screw_tool_m5";
+  //M6 tool
+  screw_tool_m6.header.frame_id = "screw_tool_m6_link";
+  screw_tool_m6.id = "screw_tool_m6";
 
-  screw_tool_m5.primitives.resize(3);
-  screw_tool_m5.primitive_poses.resize(3);
+  screw_tool_m6.primitives.resize(3);
+  screw_tool_m6.primitive_poses.resize(3);
   // The bit cushion and motor
-  screw_tool_m5.primitives[0].type = screw_tool_m5.primitives[0].BOX;
-  screw_tool_m5.primitives[0].dimensions.resize(3);
-  screw_tool_m5.primitives[0].dimensions[0] = 0.026;
-  screw_tool_m5.primitives[0].dimensions[1] = 0.04;
-  screw_tool_m5.primitives[0].dimensions[2] = 0.055;
-  screw_tool_m5.primitive_poses[0].position.x = 0;
-  screw_tool_m5.primitive_poses[0].position.y = -0.009;
-  screw_tool_m5.primitive_poses[0].position.z = 0.0275;
+  screw_tool_m6.primitives[0].type = screw_tool_m6.primitives[0].BOX;
+  screw_tool_m6.primitives[0].dimensions.resize(3);
+  screw_tool_m6.primitives[0].dimensions[0] = 0.026;
+  screw_tool_m6.primitives[0].dimensions[1] = 0.04;
+  screw_tool_m6.primitives[0].dimensions[2] = 0.055;
+  screw_tool_m6.primitive_poses[0].position.x = 0;
+  screw_tool_m6.primitive_poses[0].position.y = -0.009;
+  screw_tool_m6.primitive_poses[0].position.z = 0.0275;
 
   // The "shaft" + suction attachment
-  screw_tool_m5.primitives[1].type = screw_tool_m5.primitives[1].BOX;
-  screw_tool_m5.primitives[1].dimensions.resize(3);
-  screw_tool_m5.primitives[1].dimensions[0] = 0.02;
-  screw_tool_m5.primitives[1].dimensions[1] = 0.028;
-  screw_tool_m5.primitives[1].dimensions[2] = 0.08;
-  screw_tool_m5.primitive_poses[1].position.x = 0;
-  screw_tool_m5.primitive_poses[1].position.y = -0.0055;  // 21 mm distance from axis
-  screw_tool_m5.primitive_poses[1].position.z = -0.04;
+  screw_tool_m6.primitives[1].type = screw_tool_m6.primitives[1].BOX;
+  screw_tool_m6.primitives[1].dimensions.resize(3);
+  screw_tool_m6.primitives[1].dimensions[0] = 0.02;
+  screw_tool_m6.primitives[1].dimensions[1] = 0.03;
+  screw_tool_m6.primitives[1].dimensions[2] = 0.091;
+  screw_tool_m6.primitive_poses[1].position.x = 0;
+  screw_tool_m6.primitive_poses[1].position.y = -0.0055;  // 21 mm distance from axis
+  screw_tool_m6.primitive_poses[1].position.z = -0.041;
 
   // The cylinder representing the tip
-  screw_tool_m5.primitives[2].type = screw_tool_m5.primitives[2].CYLINDER;
-  screw_tool_m5.primitives[2].dimensions.resize(2);
-  screw_tool_m5.primitives[2].dimensions[0] = 0.02;    // Cylinder height
-  screw_tool_m5.primitives[2].dimensions[1] = 0.0035;   // Cylinder radius
-  screw_tool_m5.primitive_poses[2].position.x = 0;
-  screw_tool_m5.primitive_poses[2].position.y = 0;  // 21 mm distance from axis
-  screw_tool_m5.primitive_poses[2].position.z = -0.09;
-
-  screw_tool_m5.operation = screw_tool_m5.ADD;
+  screw_tool_m6.primitives[2].type = screw_tool_m6.primitives[2].CYLINDER;
+  screw_tool_m6.primitives[2].dimensions.resize(2);
+  screw_tool_m6.primitives[2].dimensions[0] = 0.019;    // Cylinder height
+  screw_tool_m6.primitives[2].dimensions[1] = 0.005;   // Cylinder radius
+  screw_tool_m6.primitive_poses[2].position.x = 0;
+  screw_tool_m6.primitive_poses[2].position.y = 0;  // 21 mm distance from axis
+  screw_tool_m6.primitive_poses[2].position.z = -0.096;
+  screw_tool_m6.operation = screw_tool_m6.ADD;
   
-  // The other tools
-  screw_tool_m4 = screw_tool_m5;
-  screw_tool_m3 = screw_tool_m5;
+
+  //M4 tool
+  screw_tool_m4.header.frame_id = "screw_tool_m4_link";
+  screw_tool_m4.id = "screw_tool_m4";
+
+  screw_tool_m4.primitives.resize(3);
+  screw_tool_m4.primitive_poses.resize(3);
+  // The bit cushion and motor
+  screw_tool_m4.primitives[0].type = screw_tool_m4.primitives[0].BOX;
+  screw_tool_m4.primitives[0].dimensions.resize(3);
+  screw_tool_m4.primitives[0].dimensions[0] = 0.026;
+  screw_tool_m4.primitives[0].dimensions[1] = 0.04;
+  screw_tool_m4.primitives[0].dimensions[2] = 0.055;
+  screw_tool_m4.primitive_poses[0].position.x = 0;
+  screw_tool_m4.primitive_poses[0].position.y = -0.009;
+  screw_tool_m4.primitive_poses[0].position.z = 0.0275;
+
+  // The "shaft" + suction attachment
+  screw_tool_m4.primitives[1].type = screw_tool_m4.primitives[1].BOX;
+  screw_tool_m4.primitives[1].dimensions.resize(3);
+  screw_tool_m4.primitives[1].dimensions[0] = 0.02;
+  screw_tool_m4.primitives[1].dimensions[1] = 0.03;
+  screw_tool_m4.primitives[1].dimensions[2] = 0.08;
+  screw_tool_m4.primitive_poses[1].position.x = 0;
+  screw_tool_m4.primitive_poses[1].position.y = -0.0055;  // 21 mm distance from axis
+  screw_tool_m4.primitive_poses[1].position.z = -0.04;
+
+  // The cylinder representing the tip
+  screw_tool_m4.primitives[2].type = screw_tool_m4.primitives[2].CYLINDER;
+  screw_tool_m4.primitives[2].dimensions.resize(2);
+  screw_tool_m4.primitives[2].dimensions[0] = 0.038;    // Cylinder height
+  screw_tool_m4.primitives[2].dimensions[1] = 0.0035;   // Cylinder radius
+  screw_tool_m4.primitive_poses[2].position.x = 0;
+  screw_tool_m4.primitive_poses[2].position.y = 0;  // 21 mm distance from axis
+  screw_tool_m4.primitive_poses[2].position.z = -0.099;
+  screw_tool_m4.operation = screw_tool_m4.ADD;
+
+
+  //M3 tool
+  screw_tool_m3.header.frame_id = "screw_tool_m3_link";
+  screw_tool_m3.id = "screw_tool_m3";
+
+  screw_tool_m3.primitives.resize(3);
+  screw_tool_m3.primitive_poses.resize(3);
+  // The bit cushion and motor
+  screw_tool_m3.primitives[0].type = screw_tool_m3.primitives[0].BOX;
+  screw_tool_m3.primitives[0].dimensions.resize(3);
+  screw_tool_m3.primitives[0].dimensions[0] = 0.026;
+  screw_tool_m3.primitives[0].dimensions[1] = 0.04;
+  screw_tool_m3.primitives[0].dimensions[2] = 0.055;
+  screw_tool_m3.primitive_poses[0].position.x = 0;
+  screw_tool_m3.primitive_poses[0].position.y = -0.009;
+  screw_tool_m3.primitive_poses[0].position.z = 0.0275;
+
+  // The "shaft" + suction attachment
+  screw_tool_m3.primitives[1].type = screw_tool_m3.primitives[1].BOX;
+  screw_tool_m3.primitives[1].dimensions.resize(3);
+  screw_tool_m3.primitives[1].dimensions[0] = 0.02;
+  screw_tool_m3.primitives[1].dimensions[1] = 0.03;
+  screw_tool_m3.primitives[1].dimensions[2] = 0.08;
+  screw_tool_m3.primitive_poses[1].position.x = 0;
+  screw_tool_m3.primitive_poses[1].position.y = -0.0055;  // 21 mm distance from axis
+  screw_tool_m3.primitive_poses[1].position.z = -0.04;
+
+  // The cylinder representing the tip
+  screw_tool_m3.primitives[2].type = screw_tool_m3.primitives[2].CYLINDER;
+  screw_tool_m3.primitives[2].dimensions.resize(2);
+  screw_tool_m3.primitives[2].dimensions[0] = 0.018;    // Cylinder height
+  screw_tool_m3.primitives[2].dimensions[1] = 0.0035;   // Cylinder radius
+  screw_tool_m3.primitive_poses[2].position.x = 0;
+  screw_tool_m3.primitive_poses[2].position.y = 0;  // 21 mm distance from axis
+  screw_tool_m3.primitive_poses[2].position.z = -0.089;
+  screw_tool_m3.operation = screw_tool_m3.ADD;
+
 }
 
 
@@ -437,7 +508,7 @@ bool SkillServer::spawnTool(std::string screw_tool_id)
   std::vector<moveit_msgs::CollisionObject> collision_objects;
   collision_objects.resize(1);
 
-  if (screw_tool_id == "screw_tool_m5") collision_objects[0] = screw_tool_m5;
+  if (screw_tool_id == "screw_tool_m6") collision_objects[0] = screw_tool_m6;
   else if (screw_tool_id == "screw_tool_m4") collision_objects[0] = screw_tool_m4;
   else if (screw_tool_id == "screw_tool_m3") collision_objects[0] = screw_tool_m3;
   
@@ -475,7 +546,7 @@ bool SkillServer::attachDetachTool(std::string screw_tool_id, std::string robot_
 {
   moveit_msgs::AttachedCollisionObject att_coll_object;
 
-  if (screw_tool_id == "screw_tool_m5") att_coll_object.object = screw_tool_m5;
+  if (screw_tool_id == "screw_tool_m6") att_coll_object.object = screw_tool_m6;
   else if (screw_tool_id == "screw_tool_m4") att_coll_object.object = screw_tool_m4;
   else if (screw_tool_id == "screw_tool_m3") att_coll_object.object = screw_tool_m3;
   else { ROS_WARN_STREAM("No screw tool specified to " << attach_or_detach); }
@@ -1080,9 +1151,15 @@ int main(int argc, char **argv)
   // else
   //   ROS_WARN("Could not call the service client");
 
-  //// ------------ Debugging procedures. Should be in a separate node, but ohwell.
+  // ------------ Spawns all of the screw tools (for visualization)
+  o2as_skill_server.spawnTool("screw_tool_m6");
+  o2as_skill_server.spawnTool("screw_tool_m4");
+   o2as_skill_server.spawnTool("screw_tool_m3");
+  // ------------
+
+  // ------------ Debugging procedures. Should be in a separate node, but ohwell.
   // ROS_INFO("Testing the screw tool mounting.");
-  // o2as_skill_server.equipScrewTool("b_bot", "screw_tool_m5");
+  // o2as_skill_server.equipScrewTool("b_bot", "screw_tool_m6");
 
   // ROS_INFO("Going to screw ready pose.");
   // o2as_skill_server.goToNamedPose("screw_ready_b", "b_bot");
@@ -1092,7 +1169,7 @@ int main(int argc, char **argv)
   // ps.header.frame_id = "m5_feeder_outlet_link";
   // ps.pose.position.z = .01;
   // ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(110.0/180.0 *M_PI));   // Z-axis pointing up.
-  // std::string link_name = "b_bot_screw_tool_m5_tip_link";
+  // std::string link_name = "b_bot_screw_tool_m6_tip_link";
   // std::string robot_name = "b_bot";
 
   // o2as_skill_server.pickFromAbove(ps, link_name, robot_name);
@@ -1112,7 +1189,7 @@ int main(int argc, char **argv)
   // ROS_INFO("Going to home pose.");
   // o2as_skill_server.goToNamedPose("home_b", "b_bot");
   // ROS_INFO("Done.");
-  //// ------------
+  // ------------
 
   while (ros::ok())
   {

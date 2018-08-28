@@ -259,7 +259,7 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          b_bot_screw_tool_m5_tip_link:
+          b_bot_screw_tool_m6_tip_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -370,7 +370,7 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          c_bot_screw_tool_m5_tip_link:
+          c_bot_screw_tool_m6_tip_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -537,11 +537,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          screw_tool_m5_helper_link:
+          screw_tool_m6_helper_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          screw_tool_m5_link:
+          screw_tool_m6_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -892,7 +892,7 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          b_bot_screw_tool_m5_tip_link:
+          b_bot_screw_tool_m6_tip_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -1003,7 +1003,7 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          c_bot_screw_tool_m5_tip_link:
+          c_bot_screw_tool_m6_tip_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -1170,11 +1170,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          screw_tool_m5_helper_link:
+          screw_tool_m6_helper_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          screw_tool_m5_link:
+          screw_tool_m6_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -1388,7 +1388,7 @@ Visualization Manager:
           Value: true
         b_bot_robotiq_85_tip_link:
           Value: true
-        b_bot_screw_tool_m5_tip_link:
+        b_bot_screw_tool_m6_tip_link:
           Value: true
         b_bot_shoulder_link:
           Value: true
@@ -1434,7 +1434,7 @@ Visualization Manager:
           Value: true
         c_bot_robotiq_85_tip_link:
           Value: true
-        c_bot_screw_tool_m5_tip_link:
+        c_bot_screw_tool_m6_tip_link:
           Value: true
         c_bot_shoulder_link:
           Value: true
@@ -1512,9 +1512,9 @@ Visualization Manager:
           Value: true
         screw_tool_m4_link:
           Value: true
-        screw_tool_m5_helper_link:
+        screw_tool_m6_helper_link:
           Value: true
-        screw_tool_m5_link:
+        screw_tool_m6_link:
           Value: true
         taskboard:
           Value: true
@@ -1640,7 +1640,7 @@ Visualization Manager:
                                 b_bot_robotiq_85_right_finger_link:
                                   {}
                               b_bot_robotiq_85_tip_link:
-                                b_bot_screw_tool_m5_tip_link:
+                                b_bot_screw_tool_m6_tip_link:
                                   {}
                           b_bot_tool0:
                             {}
@@ -1672,7 +1672,7 @@ Visualization Manager:
                                 c_bot_robotiq_85_right_finger_link:
                                   {}
                               c_bot_robotiq_85_tip_link:
-                                c_bot_screw_tool_m5_tip_link:
+                                c_bot_screw_tool_m6_tip_link:
                                   {}
                           c_bot_tool0:
                             {}
@@ -1687,8 +1687,8 @@ Visualization Manager:
                 screw_tool_m4_link:
                   screw_tool_m4_helper_link:
                     {}
-                screw_tool_m5_link:
-                  screw_tool_m5_helper_link:
+                screw_tool_m6_link:
+                  screw_tool_m6_helper_link:
                     {}
             workbox:
               {}
