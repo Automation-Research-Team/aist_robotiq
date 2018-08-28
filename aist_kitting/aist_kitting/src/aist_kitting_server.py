@@ -155,11 +155,16 @@ class AistKitting:
 
     def search_callback(self, req):
         rospy.loginfo("search started.")
+        cx = 1030.47471121
+        cy = 756.735726174
+        f = 2215.13350577
 
         fge = rospy.ServiceProxy('/FGE', Search)
         res_fge = fge(req)
+        for i in range(res_fge.result_num):
+            res_fge.pos3D[i].x = res_fge.pos3D[i].z * (res_fge.pos3D[i].x - cx) / f
+            res_fge.pos3D[i].y = res_fge.pos3D[i].z * (res_fge.pos3D[i].y - cy) / f
         rospy.loginfo("search finished.")
-        res_fge = SearchResponse()
         return res_fge
 
     def pick_callback(self, req):
