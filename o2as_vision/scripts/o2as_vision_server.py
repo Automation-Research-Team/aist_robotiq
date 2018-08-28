@@ -8,8 +8,6 @@ from o2as_vision.vision_manager import VisionManager
 LOG_LEVEL = log_level=rospy.DEBUG
 #LOG_LEVEL = log_level=rospy.INFO
 
-FIND_OBJECT_SERVICE = "find_object"
-
 class VisionServer(object):
     def __init__(self):
         rospy.logdebug("VisionServer.__init__() begin")
@@ -26,8 +24,8 @@ class VisionServer(object):
             self.manager.prepare()
 
             # service
-            rospy.logdebug("start service %s",FIND_OBJECT_SERVICE)
-            self._find_object_server = rospy.Service(FIND_OBJECT_SERVICE, FindObject, self.find_object)
+            rospy.logdebug("start service %s","find_object")
+            self._find_object_server = rospy.Service("find_object", FindObject, self.find_object)
 
         except rospy.ServiceException as e:
             rospy.logerr("Service call failed: %s", str(e)) 

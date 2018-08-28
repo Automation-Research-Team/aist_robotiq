@@ -21,7 +21,7 @@ if __name__ == "__main__":
         find_object = ros_service_proxy(FIND_OBJECT_SERVICE, FindObject)
 
         if ask_object_id:
-            object_id = raw_input("Enter the number of the part to be performed: ")
+            object_id = raw_input("Enter the number of the part to be published to the planning scene: ")
         while not rospy.core.is_shutdown():
             rospy.loginfo("search object with id: " + object_id)
             j = 0
