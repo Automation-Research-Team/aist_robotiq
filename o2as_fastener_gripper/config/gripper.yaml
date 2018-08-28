@@ -9,5 +9,3 @@ grippers:
     motor_id: 4
   - name: gripper5
     motor_id: 5
-
-test: 1
