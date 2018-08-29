@@ -132,12 +132,13 @@ class TaskboardClass(O2ASBaseRoutines):
   ################ ----- Routines  
   ################ 
   ################ 
-  def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.03):
+  def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05):
     self.publish_marker(object_pose, "pick_pose")
     #initial gripper_setup
     rospy.loginfo("Going above object to pick")
-    object_pose.pose.position.z = approach_height
+    object_pose.pose.position.z += approach_height
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
+    object_pose.pose.position.z -= approach_height
 
     if gripper_command=="complex_pick_from_inside":
       self.precision_gripper_inner_close() 
@@ -149,9 +150,10 @@ class TaskboardClass(O2ASBaseRoutines):
       self.send_gripper_command(gripper=robotname, command="open")
 
     rospy.loginfo("Moving down to object")
-    object_pose.pose.position.z = grasp_height
     rospy.loginfo(grasp_height)
+    object_pose.pose.position.z += grasp_height
     self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True)
+    object_pose.pose.position.z -= grasp_height
 
     # W = raw_input("waiting for the gripper")
     #gripper close
@@ -165,22 +167,25 @@ class TaskboardClass(O2ASBaseRoutines):
       self.precision_gripper_inner_open(this_action_grasps_an_object = True)
     else: 
       self.send_gripper_command(gripper=robotname, command="close")
-    rospy.sleep(2)
+    rospy.sleep(.5)
     rospy.loginfo("Going back up")
-    object_pose.pose.position.z = (approach_height)
+    object_pose.pose.position.z += approach_height
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
+    object_pose.pose.position.z -= approach_height
 
 ######
 
   def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, lift_up_after_place = True):
     self.publish_marker(object_pose, "place_pose")
     rospy.loginfo("Going above place target")
-    object_pose.pose.position.z = approach_height
+    object_pose.pose.position.z += approach_height
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
+    object_pose.pose.position.z -= approach_height
 
     rospy.loginfo("Moving to place target")
-    object_pose.pose.position.z = place_height
+    object_pose.pose.position.z += place_height
     self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True)
+    object_pose.pose.position.z -= place_height
 
     # print "============ Stopping at the placement height. Press `Enter` to keep moving moving the robot ..."
     # raw_input()
@@ -200,8 +205,9 @@ class TaskboardClass(O2ASBaseRoutines):
     
     if lift_up_after_place:
       rospy.loginfo("Moving back up")
-      object_pose.pose.position.z = (approach_height)
+      object_pose.pose.position.z += approach_height
       self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)  
+      object_pose.pose.position.z -= approach_height
     
   def belt_circle_motion(self, robot_name, speed = 0.02):
     self.toggle_collisions(collisions_on=False)
@@ -387,12 +393,6 @@ if __name__ == '__main__':
         taskboard.move_front_bots(taskboard.pick_poses[0], taskboard.place_poses[10], speed=0.04)
         rospy.loginfo("Waiting for enter before going home")
         raw_input()
-      if i == 55:
-        taskboard.toggle_collisions(collisions_on=False)
-        rospy.loginfo("Press Enter to turn collisions back on")
-        raw_input()
-        taskboard.toggle_collisions(collisions_on=True)
-
 
       if i == 21:
         taskboard.belt_circle_motion("a_bot")
@@ -434,27 +434,58 @@ if __name__ == '__main__':
         taskboard.horizontal_spiral_motion("a_bot", .002)
 
       if i == 6:
-        # Set the placement aid
-        # pick_tool_pose = geometry_msgs.msg.PoseStamped()
-        # pick_tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-        # pick_tool_pose.header.frame_id = "belt_placement_tool"
-        # taskboard.pick("c_bot", pick_tool_pose, 0.015, speed_fast = 0.2, speed_slow = 0.1, gripper_command="close",
-        #                         approach_height = 0.1)
-        # place_tool_pose = geometry_msgs.msg.PoseStamped()
-        # place_tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-        # place_tool_pose.header.frame_id = "taskboard_corner4"
-        # place_tool_pose.pose.position.y = 0.023
-        # place_tool_pose.pose.position.x = 0.015
-        # taskboard.place("c_bot", place_tool_pose, 0.015, speed_fast = 0.2, speed_slow = 0.02, gripper_command="open",
-        #                         approach_height = 0.1, lift_up_after_place = True)
-
         # Pick up the belt
-        # taskboard.belt_pick("b_bot")
-
+        taskboard.toggle_collisions(collisions_on=False)
+        taskboard.belt_pick("b_bot")
+        taskboard.toggle_collisions(collisions_on=True)
+        taskboard.go_to_named_pose("home", "b_bot")
         
+        # Set the placement aid
+        pick_tool_pose = geometry_msgs.msg.PoseStamped()
+        pick_tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+        pick_tool_pose.header.frame_id = "belt_placement_tool"
+        taskboard.pick("c_bot", pick_tool_pose, grasp_height=0.013, speed_fast = 0.2, speed_slow = 0.1, gripper_command="close",
+                                approach_height = 0.05)
+        place_tool_pose = geometry_msgs.msg.PoseStamped()
+        place_tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+        place_tool_pose.header.frame_id = "belt_placement_tool"
+        place_tool_pose.pose.position.x = 0.058
+        place_tool_pose.pose.position.z = 0.04
+        taskboard.toggle_collisions(collisions_on=False)
+        taskboard.place("c_bot", place_tool_pose, place_height=-0.005, speed_fast = 0.2, speed_slow = 0.03, gripper_command="open",
+                                approach_height = 0.03, lift_up_after_place = True)
+        taskboard.toggle_collisions(collisions_on=True)
+
+        # Place the belt
+        taskboard.go_to_named_pose("back", "c_bot")
+        belt_place_pose = geometry_msgs.msg.PoseStamped()
+        belt_place_pose.header.frame_id = "taskboard_part6_large_pulley"
+        belt_place_pose.pose.position.x = 0.0
+        belt_place_pose.pose.position.y = .068
+        belt_place_pose.pose.position.z = .06 + .1
+        belt_place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -170.0 * pi/180))
+        # 0.716; -0.09; -0.684; 0.1
+        taskboard.go_to_pose_goal("b_bot", belt_place_pose, speed=1.0)
+        belt_place_pose.pose.position.z = .06
+        taskboard.go_to_pose_goal("b_bot", belt_place_pose, speed=0.3)
+
+        # In large pulley frame
+        belt_place_pose.header.frame_id = "taskboard_part6_large_pulley"
+        belt_place_pose.pose.position.x = 0.0
+        belt_place_pose.pose.position.y = .01
+        belt_place_pose.pose.position.z = .0075
+        belt_place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -179.0 * pi/180))
+        taskboard.go_to_pose_goal("b_bot", belt_place_pose, speed=0.1)
+        
+        taskboard.send_gripper_command(gripper="b_bot", command=.01)
+        rospy.sleep(1)
+        taskboard.send_gripper_command(gripper="b_bot", command="open")
+        belt_place_pose.pose.position.z += .02
+        taskboard.go_to_pose_goal("b_bot", belt_place_pose, speed=1.0)
+        rospy.sleep(1)
+        taskboard.go_to_named_pose("home", "b_bot", wait=True)
 
         # Fiddle in the belt
-        taskboard.go_to_named_pose("back", "c_bot")
         rospy.logwarn("Doing belt spiral motion")
         taskboard.belt_circle_motion("a_bot")
 

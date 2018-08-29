@@ -341,7 +341,7 @@ class O2ASBaseRoutines(object):
       rospy.logerr("Could not parse gripper command")
 
     action_client.send_goal(goal)
-    rospy.loginfo("Sending command " + command + " to gripper: " + gripper)
+    rospy.loginfo("Sending command " + str(command) + " to gripper: " + gripper)
     action_client.wait_for_result(rospy.Duration(3.0))  # Default wait time: 3 s
     result = action_client.get_result()
     rospy.loginfo(result)
