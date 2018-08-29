@@ -19,6 +19,13 @@
         <remap from="robot_description" to="d_bot_camera_description"/>
     </node>-->
 
+    <!-- CameraInfo conversion for Phoxi in Gazebo:
+         from camera_info to camera_info2,
+         see convert_phoxi_camera_info_gazebo.py -->
+    <node name="convert_phoxi_camera_info_gazebo" pkg="o2as_easy_handeye"
+          type="convert_phoxi_camera_info_gazebo.py"
+          if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
+
     <!-- start ArUco -->
     <node name="aruco_tracker" pkg="aruco_ros" type="single">
         <!-- Remap topic names -->
@@ -28,7 +35,8 @@
         <!-- <remap from="/camera_info"
                   to="/$(arg camera_name)/rgb/camera_info" /> -->
         <!-- <remap from="/image" to="/$(arg camera_name)/rgb/image_raw" /> -->
-        <remap from="/camera_info" to="/$(arg camera_name)/camera_info"/>
+        <!-- Use camera_info2 instead of camera_info in Gazebo with Phoxi -->
+        <remap from="/camera_info" to="/$(arg camera_name)/camera_info2"/>
         <remap from="/image" to="/$(arg camera_name)/texture" />
 
         <!-- Other parameters -->
