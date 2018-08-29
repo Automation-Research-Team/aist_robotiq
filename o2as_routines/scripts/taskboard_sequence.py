@@ -40,6 +40,7 @@ import rospy
 import geometry_msgs.msg
 import tf_conversions
 from math import pi
+from math import *
 
 from o2as_msgs.srv import *
 import actionlib
@@ -199,27 +200,48 @@ class TaskboardClass(O2ASBaseRoutines):
       object_pose.pose.position.z = (approach_height)
       self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)  
     
-  def belt_circle_motion(self, robot_name, start_pose, speed = 0.02):
+  def belt_circle_motion(self, robot_name, speed = 0.02):
+    self.toggle_collisions(collisions_on=False)
     group = self.groups[robot_name]
     rospy.loginfo("Performing belt spiral motion " + str(speed))
     rospy.loginfo("Setting velocity scaling to " + str(speed))
     group.set_max_velocity_scaling_factor(speed)
 
-    r_belt=0.0068
-    theta_belt=0
+    r_pulley=0.034
+    theta_offset = 90  # To adjust the starting angle
+    theta_belt= 0 + theta_offset
     theta_increase=15
+
+    start_pose = geometry_msgs.msg.PoseStamped()
+    start_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    start_pose.header.frame_id = "taskboard_part6_large_pulley"
+    start_pose.pose.position.z = 0.07
+    start_pose.pose.position.x = cos(radians(theta_belt))*r_pulley
+    start_pose.pose.position.y = sin(radians(theta_belt))*r_pulley
+    self.go_to_pose_goal(robot_name, start_pose, speed=0.5)
+
+    start_pose.pose.position.z = 0
+    self.go_to_pose_goal(robot_name, start_pose, speed=0.02)
     
-    next_pose = start_pose
-    while theta_belt <= 360 and not rospy.is_shutdown():
+    next_pose = geometry_msgs.msg.PoseStamped()
+    next_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    next_pose.header.frame_id = "taskboard_part6_large_pulley"
+    while theta_belt <= 360+theta_offset and not rospy.is_shutdown():
         #By default, the Spiral_Search function will maintain contact between both mating parts at all times
          theta_belt=theta_belt+theta_increase
-         x=cos(radians(theta_belt))*r_belt
-         y=sin(radians(theta_belt))*r_belt
-         next_pose.pose.position.x = start_pose.pose.position.x + x
-         next_pose.pose.position.y = start_pose.pose.position.y - y
+         x=cos(radians(theta_belt))*r_pulley
+         y=sin(radians(theta_belt))*r_pulley
+         next_pose.pose.position.x = x
+         next_pose.pose.position.y = y
+         print(theta_belt)
+        #  print(radians(theta_belt))
+         print(cos(radians(theta_belt)))
+         print(cos(radians(theta_belt))*r_pulley)
+         print(next_pose.pose.position)
          self.go_to_pose_goal(robot_name, next_pose)
          rospy.sleep(0.1)
-      
+    
+    self.toggle_collisions(collisions_on=True)
     # -------------
     return True
   
@@ -424,18 +446,8 @@ if __name__ == '__main__':
         taskboard.belt_pick("b_bot")
 
         #belt spiral
-        # spiral_start_pose = geometry_msgs.msg.PoseStamped()
-        # spiral_start_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-        # spiral_start_pose.header.frame_id = "taskboard_part6_large_pulley"
-        # spiral_start_pose.pose.position.z = 0.07
-        # spiral_start_pose.pose.position.x = 0.0
-        # spiral_start_pose.pose.position.y = 0.034
-        # taskboard.go_to_pose_goal("a_bot", spiral_start_pose, speed=0.2)
-
-        # spiral_start_pose.pose.position.z = 0
-        # taskboard.go_to_pose_goal("a_bot", spiral_start_pose, speed=0.02)
-        # rospy.logwarn("Doing belt spiral motion")
-        # taskboard.belt_circle_motion("a_bot",spiral_start_pose)
+        rospy.logwarn("Doing belt spiral motion")
+        taskboard.belt_circle_motion("a_bot")
 
 
 
