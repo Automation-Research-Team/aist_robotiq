@@ -255,7 +255,6 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   waypoints.push_back(start_pose.pose);
   waypoints.push_back(pose.pose);
 
-  ROS_WARN("Speed scaling does not work for linear motions. Going at regular speed.");
   group_pointer->setMaxVelocityScalingFactor(velocity_scaling_factor); // This doesn't work for linear paths: https://answers.ros.org/question/288989/moveit-velocity-scaling-for-cartesian-path/
   b_bot_group_.setPlanningTime(LIN_PLANNING_TIME);
 
@@ -267,20 +266,42 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   ros::Duration d = ros::Time::now() - start_time;
   ROS_INFO_STREAM("Cartesian motion plan took " << d.toSec() << " s and was " << cartesian_success * 100.0 << "% successful.");
 
-  myplan.trajectory_ = trajectory;
-  // if (cartesian_success > .95) 
-  if (true) 
+  // Scale the trajectory. This is workaround to setting the VelocityScalingFactor. Copied from k-okada
+  if (cartesian_success > 0)
   {
-    if (wait) motion_done = group_pointer->execute(myplan);
-    else motion_done = group_pointer->asyncExecute(myplan);
-    if (motion_done) 
+    // Success
+    moveit_msgs::RobotTrajectory scaled_trajectory = moveit_msgs::RobotTrajectory(trajectory);
+    // Scaling (https://groups.google.com/forum/#!topic/moveit-users/MOoFxy2exT4)
+    // The trajectory needs to be modified so it will include velocities as well.
+    // First: create a RobotTrajectory object
+    robot_trajectory::RobotTrajectory rt(group_pointer->getRobotModel(), group_pointer->getName());
+    // Second: get a RobotTrajectory from trajectory
+    rt.setRobotTrajectoryMsg(*group_pointer->getCurrentState(), scaled_trajectory);
+    // Third: create a IterativeParabolicTimeParameterization object
+    trajectory_processing::IterativeParabolicTimeParameterization iptp;
+    // Fourth: compute computeTimeStamps
+    bool success =
+        iptp.computeTimeStamps(rt, velocity_scaling_factor, velocity_scaling_factor);  // The second value is actually acceleration
+    ROS_INFO("Computing time stamps for iptp scaling %s", success ? "SUCCEEDED" : "FAILED");
+    // Get RobotTrajectory_msg from RobotTrajectory
+    rt.getRobotTrajectoryMsg(scaled_trajectory);
+    // Fill in move_group_
+    myplan.trajectory_ = trajectory;
+  
+    if (true) 
     {
-      group_pointer->setMaxVelocityScalingFactor(1.0); // Reset the velocity
-      b_bot_group_.setPlanningTime(1.0);
-      if (cartesian_success > .95) return true;
-      else return false;
+      if (wait) motion_done = group_pointer->execute(myplan);
+      else motion_done = group_pointer->asyncExecute(myplan);
+      if (motion_done) 
+      {
+        group_pointer->setMaxVelocityScalingFactor(1.0); // Reset the velocity
+        b_bot_group_.setPlanningTime(1.0);
+        if (cartesian_success > .95) return true;
+        else return false;
+      }
     }
   }
+  ROS_ERROR_STREAM("Cartesian motion plan failed.");
   group_pointer->setMaxVelocityScalingFactor(1.0); // Reset the velocity
   b_bot_group_.setPlanningTime(1.0);
   return false;
@@ -420,8 +441,9 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
   // The tool is deposited a bit in front of the original position. The magnet pulls it to the final pose.
   ROS_INFO("Moving to pose in tool holder LIN.");
-  moveToCartPoseLIN(ps_tool_holder, robot_name);
+  moveToCartPoseLIN(ps_tool_holder, robot_name, true, "", 0.02);
   
+  // /// ALTERNATIVE: Send the linear motion request to the robot
   // o2as_msgs::sendScriptToUR srv;
   // srv.request.program_id = "move_lin_rel";
   // srv.request.robot_name = robot_name;
@@ -465,8 +487,8 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   
   // Plan & execute LINEAR motion away from the tool change position
   ROS_INFO("Moving back to screw tool approach pose LIN.");
-  moveToCartPoseLIN(ps_approach, robot_name);
-
+  moveToCartPoseLIN(ps_approach, robot_name, true, "", 0.02);
+  
   // Reactivate the collisions, with the updated entry about the tool
   planning_scene_interface_.applyPlanningScene(planning_scene_);
 

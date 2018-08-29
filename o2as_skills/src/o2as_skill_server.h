@@ -23,7 +23,11 @@
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit_msgs/GetPlanningScene.h>
 #include <moveit/collision_detection/collision_matrix.h>
-// #include <moveit_visual_tools/moveit_visual_tools.h>
+
+// For IPTP scaling
+#include <moveit_msgs/RobotTrajectory.h>
+#include <moveit/robot_trajectory/robot_trajectory.h>
+#include <moveit/trajectory_processing/iterative_time_parameterization.h>
 
 #include "visualization_msgs/Marker.h"
 
@@ -63,6 +67,7 @@ public:
   std::string getEELink(std::string robot_name);
   bool toggleCollisions(bool collisions_on);
   bool updatePlanningScene();
+  
 
   // Internal functions
   bool equipScrewTool(std::string robot_name, std::string screw_tool_id);
