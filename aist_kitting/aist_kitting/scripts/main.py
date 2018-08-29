@@ -11,6 +11,8 @@ from o2as_usb_relay.srv import *
 
 from geometry_msgs.msg import PoseStamped
 
+move_to_goal_pose = rospy.ServiceProxy("aist_kitting/move_to_goal_pose", MoveToGoalPose)
+
 def move_to_goal_pose_test(req):
 
     move_to_goal_pose = rospy.ServiceProxy("aist_kitting/move_to_goal_pose", MoveToGoalPose)
@@ -79,9 +81,15 @@ def suction_test():
         rospy.sleep(3)
 
 def transform_phoxi_to_world(pose):
-
+    # original matrix
+    # T_phoxi = np.array([
+    #     [-0.045899001285, 0.902472945015, -0.428294133975, 0.600556671213511],
+    #     [0.984380843543, -0.032086403336, -0.173103488082, 0.139281989152648 ],
+    #     [-0.169963633010, -0.429549818109, -0.886904345020, 1.467133761064637 ],
+    #     [0.000000000000, 0.000000000000, 0.000000000000, 1.000000000000 ]
+    # ])
     T_phoxi = np.array([
-        [-0.045899001285, 0.902472945015, -0.428294133975, 0.600556671213511],
+        [-0.045899001285, 0.902472945015, -0.428294133975, 0.594556671213511],
         [0.984380843543, -0.032086403336, -0.173103488082, 0.139281989152648 ],
         [-0.169963633010, -0.429549818109, -0.886904345020, 1.467133761064637 ],
         [0.000000000000, 0.000000000000, 0.000000000000, 1.000000000000 ]
@@ -102,9 +110,27 @@ def transform_phoxi_to_world(pose):
 
     return pose
 
+def move_midterm_position():
+    goal = MoveToGoalPoseRequest()
+    goal.robot_name = "b_bot"
+    goal.ee_link_name = "dual_suction_gripper_pad_link"
+    goal_pose = PoseStamped()
+    goal_pose.pose.orientation.x = -0.5
+    goal_pose.pose.orientation.y = 0.5
+    goal_pose.pose.orientation.z = 0.5
+    goal_pose.pose.orientation.w = 0.5
+    goal_pose.pose.position.x = 0.2
+    goal_pose.pose.position.y = 0.0
+    goal_pose.pose.position.z = 1.0
+    goal_pose.header.frame_id = "world"
+    goal.goal = goal_pose
 
-#     trans_pose = PoseStamped()
+    res_move_to_goal_pose = move_to_goal_pose(goal)
+    rospy.loginfo(res_move_to_goal_pose)
+
 def main():
+    
+
     # Go to initial pose.
     move_named_pose = rospy.ServiceProxy("aist_kitting/move_named_pose", MoveNamedPose)
     req_move_named_pose = MoveNamedPoseRequest()
@@ -139,6 +165,9 @@ def main():
     goal.header.frame_id = "world"
     rospy.loginfo(goal)
 
+    # move midterm pose
+    move_midterm_position()
+
     # Pick object.
     pick = rospy.ServiceProxy("aist_kitting/pick", Pick)
     req_pick = PickRequest()
@@ -154,66 +183,61 @@ def main():
     res_pick = pick(req_pick)
     rospy.loginfo(res_pick)
 
-    # Go to initial pose.
-    move_named_pose = rospy.ServiceProxy("aist_kitting/move_named_pose", MoveNamedPose)
-    req_move_named_pose = MoveNamedPoseRequest()
-    req_move_named_pose.robot_name = "b_bot"
-    req_move_named_pose.ee_link_name = "dual_suction_gripper_pad_link"
-    req_move_named_pose.named_pose = "home"
-    res_move_named_pose = move_named_pose(req_move_named_pose)
-    rospy.sleep(5)
-    rospy.loginfo(res_move_named_pose)
+    move_midterm_position()
+
+    # # Go to initial pose.
+    # move_named_pose = rospy.ServiceProxy("aist_kitting/move_named_pose", MoveNamedPose)
+    # req_move_named_pose = MoveNamedPoseRequest()
+    # req_move_named_pose.robot_name = "b_bot"
+    # req_move_named_pose.ee_link_name = "dual_suction_gripper_pad_link"
+    # req_move_named_pose.named_pose = "home"
+    # res_move_named_pose = move_named_pose(req_move_named_pose)
+    # rospy.sleep(5)
+    # rospy.loginfo(res_move_named_pose)
+
+
 
 
 if __name__ == '__main__':
     rospy.init_node("aist_kitting_demo")
 
-    # main()
+    main()
 
     # pick_test()
     # move_named_pose_test()
     # suction_test()
-    move_named_pose_test()
-
-    ## Test that the robot move to correct position.
-    # common settings
-    goal = MoveToGoalPoseRequest()
-    goal.robot_name = "b_bot"
-    goal.ee_link_name = "dual_suction_gripper_pad_link"
-    goal_pose = PoseStamped()
-    goal_pose.pose.orientation.x = -0.5
-    goal_pose.pose.orientation.y = 0.5
-    goal_pose.pose.orientation.z = 0.5
-    goal_pose.pose.orientation.w = 0.5
-    # test 01
-    goal_pose.pose.position.x = 0.0
-    goal_pose.pose.position.y = 0.0
-    goal_pose.pose.position.z = 1.0
-    goal_pose.header.frame_id = "world"
-    goal.goal = goal_pose
-    move_to_goal_pose_test(goal)
-
-    # # test 02
-    # goal_pose.pose.position.x = 0.0
-    # goal_pose.pose.position.y = 0.25
-    # goal_pose.pose.position.z = 1.0
-    # goal.goal = goal_pose
-    # move_to_goal_pose_test(goal)
-
-    # # test 03
-    # goal_pose.pose.position.x = 0.0
-    # goal_pose.pose.position.y = -0.25
-    # goal_pose.pose.position.z = 1.0
-    # goal.goal = goal_pose
-    # move_to_goal_pose_test(goal)
-
     # res_search = search_test()
-    # goal = PoseStamped()
-    # goal.pose.position = res_search.pos3D[0]
-    # rospy.loginfo("goal: " + str(goal))
-    # goal.pose.orientation = tf.transformations.quaternion_from_euler(res_search.rot3D[0].x, res_search.rot3D[0].y, res_search.rot3D[0].z)
-    # rospy.loginfo(goal)
-    # goal.pose = transform_phoxi_to_world(goal.pose)
-    # rospy.loginfo("position.x: " +  str(goal.pose.position.x))
-    # rospy.loginfo("position.y: " +str(goal.pose.position.y))
-    # rospy.loginfo("position.z: " +str(goal.pose.position.z))
+    # move_named_pose_test()
+
+    # ## Test that the robot move to correct position.
+    # # common settings
+    # goal = MoveToGoalPoseRequest()
+    # goal.robot_name = "b_bot"
+    # goal.ee_link_name = "dual_suction_gripper_pad_link"
+    # goal_pose = PoseStamped()
+    # goal_pose.pose.orientation.x = -0.5
+    # goal_pose.pose.orientation.y = 0.5
+    # goal_pose.pose.orientation.z = 0.5
+    # goal_pose.pose.orientation.w = 0.5
+    # # test 01
+    # goal_pose.pose.position.x = 0.0
+    # goal_pose.pose.position.y = 0.0
+    # goal_pose.pose.position.z = 1.0
+    # goal_pose.header.frame_id = "world"
+    # goal.goal = goal_pose
+    # move_to_goal_pose_test(goal)
+
+    # # # test 02
+    # # goal_pose.pose.position.x = 0.0
+    # # goal_pose.pose.position.y = 0.25
+    # # goal_pose.pose.position.z = 1.0
+    # # goal.goal = goal_pose
+    # # move_to_goal_pose_test(goal)
+
+    # # # test 03
+    # # goal_pose.pose.position.x = 0.0
+    # # goal_pose.pose.position.y = -0.25
+    # # goal_pose.pose.position.z = 1.0
+    # # goal.goal = goal_pose
+    # # move_to_goal_pose_test(goal)
+
