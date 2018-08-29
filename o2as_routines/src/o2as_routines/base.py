@@ -97,8 +97,8 @@ class O2ASBaseRoutines(object):
     self.robots = moveit_commander.RobotCommander()
     self.groups = {"a_bot":moveit_commander.MoveGroupCommander("a_bot"),
               "b_bot":moveit_commander.MoveGroupCommander("b_bot"),
-              "c_bot":moveit_commander.MoveGroupCommander("c_bot")}
-              # "front_bots":moveit_commander.MoveGroupCommander("front_bots"),
+              "c_bot":moveit_commander.MoveGroupCommander("c_bot"),
+              "front_bots":moveit_commander.MoveGroupCommander("front_bots")}
               # "all_bots":moveit_commander.MoveGroupCommander("all_bots") }
     self.gripper_action_clients = { "a_bot":actionlib.SimpleActionClient('precision_gripper_action', o2as_msgs.msg.PrecisionGripperCommandAction), 
                                "b_bot":actionlib.SimpleActionClient('/b_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction), 
@@ -155,6 +155,24 @@ class O2ASBaseRoutines(object):
 
     current_pose = group.get_current_pose().pose
     return all_close(pose_goal_stamped.pose, current_pose, 0.01)
+
+  def move_front_bots(self, pose_goal_a_bot, pose_goal_b_bot, speed = 0.05):
+    rospy.logwarn("CAUTION: Moving front bots together, but MoveIt does not do continuous collision checking.")
+    group = self.groups["front_bots"]
+    group.set_pose_target(pose_goal_a_bot, end_effector_link="a_bot_gripper_tip_link")
+    group.set_pose_target(pose_goal_b_bot, end_effector_link="b_bot_robotiq_85_tip_link")
+    rospy.loginfo("Setting velocity scaling to " + str(speed))
+    group.set_max_velocity_scaling_factor(speed)
+
+    success = group.go(wait=True)
+    group.stop()
+    # It is always good to clear your targets after planning with poses.
+    # Note: there is no equivalent function for clear_joint_value_targets()
+    group.clear_pose_targets()
+
+    rospy.loginfo("Received:")
+    rospy.loginfo(success)
+    return success
 
   def belt_spiral_motion(self, robot_name, start_pose, speed = 0.02):
     group = self.groups[robot_name]

@@ -317,8 +317,16 @@ if __name__ == '__main__':
     i =int(i)
     while(i):
 
+      # Testing
       if i == 50:
         taskboard.go_to_pose_goal("a_bot",  taskboard.pick_poses[0], "b_bot", taskboard.pick_poses[2])
+      if i == 51:
+        taskboard.move_front_bots(taskboard.place_poses[10], taskboard.pick_poses[0], speed=0.04)
+        rospy.loginfo("Moved robots to first pose. Press enter to move to the next")
+        raw_input()
+        taskboard.move_front_bots(taskboard.pick_poses[0], taskboard.place_poses[10], speed=0.04)
+        rospy.loginfo("Waiting for enter before going home")
+        raw_input()
 
       if i == 21:
         taskboard.belt_spiral_motion("a_bot")
