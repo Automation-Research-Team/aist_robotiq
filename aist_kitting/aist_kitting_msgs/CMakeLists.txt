@@ -62,6 +62,7 @@ add_service_files(
   Search.srv
   Pick.srv
   MoveNamedPose.srv
+  MoveToGoalPose.srv
 )
 
 ## Generate actions in the 'action' folder

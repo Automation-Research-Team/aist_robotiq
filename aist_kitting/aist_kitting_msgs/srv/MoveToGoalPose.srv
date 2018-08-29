@@ -1,0 +1,5 @@
+string robot_name
+string ee_link_name
+geometry_msgs/PoseStamped goal
+---
+bool success
