@@ -4,11 +4,12 @@
 
   <!-- This is the main file defining our robot arrangement and physical environment. -->
 
-  <!-- These values are still not fixed -->
-  <xacro:property name="a_bot_x" value="0.0"/>
-  <xacro:property name="a_bot_y" value="-0.65"/>
-  <xacro:property name="b_bot_x" value="0.0"/>
-  <xacro:property name="b_bot_y" value="0.65"/>
+  <!-- Calibration from 20 August 2018 -->
+  <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
+  <xacro:property name="a_bot_x" value="-0.011"/>
+  <xacro:property name="a_bot_y" value="-0.5"/>
+  <xacro:property name="b_bot_x" value="-0.004"/>
+  <xacro:property name="b_bot_y" value="0.5"/>
   <xacro:property name="c_bot_x" value="-0.5"/>
   <xacro:property name="c_bot_y" value="0.0"/>
 
@@ -17,7 +18,7 @@
   <!-- common stuff -->
   <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro" />
   <xacro:include filename="$(find o2as_gazebo)/urdf/o2as_base_scene.gazebo" />
-  <xacro:include filename="$(find realsense2_camera)/urdf/_d435.urdf.xacro" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/_d435.urdf.xacro" />
 
   <!-- robots -->
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/ur10.urdf.xacro" /> -->
@@ -25,11 +26,11 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur3.urdf.xacro" />
 
   <!-- Scene items (trays, bins...) -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/walls.xacro" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray_with_partitions.xacro" />
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/taskboard_scene.xacro" /> -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" />
-  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene_old.xacro" /> -->
-
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" /> -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/assembly_scene.xacro" />
+  
   <!-- Robot bases -->
   <!-- Putting these at height 0.0 makes them intersect with the ground, so they are elevated. -->
   <!-- There are some instabilities when the box is big, for some reason. -->
@@ -64,14 +65,14 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/screw_tools.xacro" />
 
   <!-- Feeders -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/screw_feeder.xacro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/screw_feeder.xacro" />
   <xacro:screw_feeder feedername="m3_feeder" parent="a_bot_base_smfl">
-    <origin xyz=".1 .4 .05" rpy="0 0 ${pi/2}" />   
+    <origin xyz=".3 .4 .05" rpy="0 0 ${pi/2}" />   
   </xacro:screw_feeder>
   <xacro:screw_feeder feedername="m4_feeder" parent="c_bot_base_smfl">
     <origin xyz=".45 .05 .05" rpy="0 0 0" />   
-  </xacro:screw_feeder>
-  <xacro:screw_feeder feedername="m5_feeder" parent="c_bot_base_smfl">
+  </xacro:screw_feeder> -->
+  <!-- <xacro:screw_feeder feedername="m5_feeder" parent="c_bot_base_smfl">
     <origin xyz=".45 .2 .05" rpy="0 0 0" />   
   </xacro:screw_feeder>
 
@@ -96,7 +97,7 @@
     shoulder_pan_lower_limit="0.0" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="0.0"
     elbow_joint_lower_limit="0.0" elbow_joint_upper_limit="${pi}"
-    wrist_1_lower_limit="${-pi}" wrist_1_upper_limit="0.3"
+    wrist_1_lower_limit="${-pi}" wrist_1_upper_limit="${pi}"
     wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
     wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
 
@@ -127,21 +128,50 @@
   </xacro:precision_gripper>
   
   <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_85_gripper_with_ft300.urdf.xacro" />
-  <xacro:robotiq_85_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link" />
+  <!-- <xacro:robotiq_85_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link" /> -->
   <xacro:robotiq_85_gripper_o2as prefix="c_bot_" parent = "c_bot_ee_link"/>
 
+  <!-- spawn and attach dual suction grippers -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro" />
+  <xacro:dual_suction_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:dual_suction_gripper_o2as>
 
   <!-- Add cameras -->
   <link name="b_bot_cam_holder_link" />
   <joint name="b_bot_cam_holder_joint" type="fixed">
     <parent link="b_bot_wrist_2_link" />
-    <child link = "b_bot_cam_holder_link" />
+    <child  link="b_bot_cam_holder_link" />
     <origin xyz="0.0 -0.06 0.16" rpy="0.0 0.0 ${pi/2}" />
   </joint>
 
-  <xacro:sensor_d435 prefix="b_bot_" parent="b_bot_cam_holder_link">
+  <xacro:o2as_sensor_d435 prefix="b_bot_" parent="b_bot_cam_holder_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
-  </xacro:sensor_d435>
+  </xacro:o2as_sensor_d435>
+
+  <!-- <link name="d_bot_cam_holder_link" />
+  <joint name="d_bot_cam_holder_joint" type="fixed">
+    <parent link="o2as_ground" />
+    <child  link="d_bot_cam_holder_link" />
+    <origin xyz="0.0 0.0 2.0" rpy="0.0 ${pi/2} 0.0" />
+  </joint>
+
+  <xacro:sensor_d435 prefix="d_bot_" parent="d_bot_cam_holder_link">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:sensor_d435> -->
+
+  <!-- spawn and attach AR marker -->
+  <xacro:include filename="$(find o2as_gazebo)/urdf/o2as_ar_marker.urdf.xacro"/>
+  <xacro:o2as_ar_marker prefix="b_bot_" parent="b_bot_wrist_3_link"
+   marker_id="26">
+    <origin xyz="0.0 -0.07 0.0" rpy="${pi/2} 0 0"/>
+  </xacro:o2as_ar_marker>
+
+  <!-- Add PhoXi 3D scanners -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />
+  <xacro:phoxi_m_camera_o2as prefix="a_" parent="o2as_ground">
+    <origin xyz="0.56 0 ${bots_z + .1 + .8}" rpy="${170*pi/180} 0 ${-pi/2}"/>
+  </xacro:phoxi_m_camera_o2as>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world" />

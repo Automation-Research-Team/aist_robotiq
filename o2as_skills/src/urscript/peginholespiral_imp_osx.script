@@ -1,4 +1,4 @@
-def myProg():
+def spiralSearchAndImpedanceInsert():
   set_standard_analog_input_domain(0, 1)
   set_standard_analog_input_domain(1, 1)
   set_tool_analog_input_domain(0, 1)
@@ -924,396 +924,392 @@ textmsg("disable external sensor")  # end: URCap Installation Node
   # end: URCap Installation Node
 
     # Peg-in-hole motion
-    while (True):
-        $ 1 "Robot Program"
-        $ 2 "Script: peginholespiral_imp_osx.script"
-        # begin: URCap Installation Node
-        #   Source: skills_imp, 1.0.0, Weiwei.
-        #   Type: Skills-Impedance
-        # Weiwei 2018
-        # Impedance Control Using FT300 Sensor
-    
-        # begin: URCap Installation Node
-        #   Source: skills_Linear_Search, 1.0.0, Robotiq inc.
-        #   Type: skills-Linear Search
-        # Robotiq inc. 2017
-        # Linear search function with the force/torque sensor
-        #
-        # FUNCTION:  rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 )
-        # Description: Move the robot on a tool axis until a force is detected within a specified range
-        #
-        #           The function will return True if the force is detected during the motion
-        #           The function will return False if the motion is completed without detecting the force
-        # PARAMETER:
-        #   Note:   All parameters are optional.
-        #   direction : direction of the motion in the tool reference frame   default "z+"
-        #   force:      in Newton, If the measured force exceed this value, the motion will be stopped
-        #   speed:      in m/s, robot motion speed
-        #   max_distance: in meters, define the maximum motion travel if no forces is detected
-        #
-        #       example:
-        #          rq_linear_search()
-        #              will move the robot in the Z+ axis of the tool
-        #              until the default force is measured by the sensor or default max distance is achieved
-        #
-        #          rq_linear_search("Y-", force = 20)
-        #              will move the robot in the Y- axis of the tool
-        #              until 20 Newtons are measured by the sensor or default max distance is achieved
-        #
-        #          if (not rq_linear_search("Z+", force = 10, speed = 0.010 , max_distance = 0.020)): popup
-        #              will move the robot at 10 mm/s in Z+ axis to find 10 Newtons
-        #              if the force is not measured within 20 mm, a popup will be shown
-    
-        # This variable contains a found location
-        global find_location = p[0,0,0,0,0,0]
-        # This variable contains the distance value between current and previous found locations
-        global find_distance_from_last = 0.0
-        # This variable contains the mid point location between the current and previous found locations
-        global find_mid_location_from_last = p[0,0,0,0,0,0]
-        # This variable contains a measured dimension based on distance between last found location and adjustment variable below
-        global find_dimension = 0.0
-        # To evaluate the dimension, adjust this variable to subtract the distance between
-        # point of contact and TCP, normally 2x.
-        global find_dimension_adjust = 0.0268
-    
-        #************************************************
-        #Function:  actual_force(direction)
-        #   Return the current force measured by the sensor in the specified axis
-        #************************************************
-        def actual_force(direction="X"):
-            if (direction == "X+") or (direction == "x+") or (direction == "X-") or (direction == "x-"):
-                return norm(Fx)
-            elif (direction == "Y+") or (direction == "y+") or (direction == "Y-") or (direction == "y-"):
-                return norm(Fy)
-            else:
-                return norm(Fz)
-            end
+    # begin: URCap Installation Node
+    #   Source: skills_imp, 1.0.0, Weiwei.
+    #   Type: Skills-Impedance
+    # Weiwei 2018
+    # Impedance Control Using FT300 Sensor
+
+    # begin: URCap Installation Node
+    #   Source: skills_Linear_Search, 1.0.0, Robotiq inc.
+    #   Type: skills-Linear Search
+    # Robotiq inc. 2017
+    # Linear search function with the force/torque sensor
+    #
+    # FUNCTION:  rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 )
+    # Description: Move the robot on a tool axis until a force is detected within a specified range
+    #
+    #           The function will return True if the force is detected during the motion
+    #           The function will return False if the motion is completed without detecting the force
+    # PARAMETER:
+    #   Note:   All parameters are optional.
+    #   direction : direction of the motion in the tool reference frame   default "z+"
+    #   force:      in Newton, If the measured force exceed this value, the motion will be stopped
+    #   speed:      in m/s, robot motion speed
+    #   max_distance: in meters, define the maximum motion travel if no forces is detected
+    #
+    #       example:
+    #          rq_linear_search()
+    #              will move the robot in the Z+ axis of the tool
+    #              until the default force is measured by the sensor or default max distance is achieved
+    #
+    #          rq_linear_search("Y-", force = 20)
+    #              will move the robot in the Y- axis of the tool
+    #              until 20 Newtons are measured by the sensor or default max distance is achieved
+    #
+    #          if (not rq_linear_search("Z+", force = 10, speed = 0.010 , max_distance = 0.020)): popup
+    #              will move the robot at 10 mm/s in Z+ axis to find 10 Newtons
+    #              if the force is not measured within 20 mm, a popup will be shown
+
+    # This variable contains a found location
+    global find_location = p[0,0,0,0,0,0]
+    # This variable contains the distance value between current and previous found locations
+    global find_distance_from_last = 0.0
+    # This variable contains the mid point location between the current and previous found locations
+    global find_mid_location_from_last = p[0,0,0,0,0,0]
+    # This variable contains a measured dimension based on distance between last found location and adjustment variable below
+    global find_dimension = 0.0
+    # To evaluate the dimension, adjust this variable to subtract the distance between
+    # point of contact and TCP, normally 2x.
+    global find_dimension_adjust = 0.0268
+
+    #************************************************
+    #Function:  actual_force(direction)
+    #   Return the current force measured by the sensor in the specified axis
+    #************************************************
+    def actual_force(direction="X"):
+        if (direction == "X+") or (direction == "x+") or (direction == "X-") or (direction == "x-"):
+            return norm(Fx)
+        elif (direction == "Y+") or (direction == "y+") or (direction == "Y-") or (direction == "y-"):
+            return norm(Fy)
+        else:
+            return norm(Fz)
         end
-    
-        #************************************************
-        #Function:  rq_linear_search(direction="Z+", force[N] = 10, speed[m/s] = 0.004, max_distance[m] = 0.02)
-        #   Find a specific force in the direction of "direction".
-        #   Robot will move towards a max_distance from the current position in the tool frame
-        #   Return True if the force is detected during the robot motion
-        #************************************************
-        def rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 ):
-            textmsg("tst1")
-            global pos_offset_setting = p[0,0,0,0,0,0]
-            if (direction == "X+") or (direction == "x+"):
-                pos_offset_setting = p[max_distance,0,0,0,0,0]
-            elif (direction == "X-") or (direction == "x-"):
-                pos_offset_setting = p[max_distance * -1,0,0,0,0,0]
-            elif (direction == "Y+") or (direction == "y+"):
-                pos_offset_setting = p[0,max_distance,0,0,0,0]
-            elif (direction == "Y-") or (direction == "y-"):
-                pos_offset_setting = p[0,max_distance * -1,0,0,0,0]
-            elif (direction == "Z+") or (direction == "z+"):
-                pos_offset_setting = p[0,0,max_distance,0,0,0]
-            elif (direction == "Z-") or (direction == "z-"):
-                pos_offset_setting = p[0,0,max_distance * -1,0,0,0]
-            else:
-                popup("direction parameter must be X+, X-, Y+, Y-, Z+ or Z-","ERROR rq_find")
-                halt
-            end
-            global speed_setting = speed
-            #The funtion will return the value True if the force is detected during the motion
-            global find_something = True
-            #Parameters validation
-            textmsg("tst2")
-            if (max_distance < 2):
-                if ((speed > 0) and (speed <= 0.1)):
-                    if ((force > 0) and (force < 200)):
-                        #Define a thread to perform the robot motion.
-                        #this thread will be stopped if the force is reached
-                        global thread_find_flag = 0
-                        thread thread_find():
-                            #Calculate the position at the max distance to go
-                            pose_temp = get_actual_tcp_pose()
-                            pose_temp = pose_trans(pose_temp,pos_offset_setting)
-                            #Move the robot to that position
-                            movel(pose_temp,a=1.2,v=speed_setting)
-                            #If the program reaches this line, the force has not been detected during the motion
-                            #The function will return the value False
-                            find_something = False
-                            thread_find_flag = 1
-                        end
-                        #Set the sensor to zero
-                        #sleep(0.1)
-                        #rq_set_zero()
-                        #sleep(0.05)
-                        #Run the thread to move the robot and continuously check the force measured
-                        if (actual_force(direction)<force):
-                            thread_find_handler = run thread_find()
-                            #Loop as long as the force is not detected and thread is not finished
-                            while ((actual_force(direction)<force) and (thread_find_flag ==0)):
-                                sync()
-                            end
-                            #The force is detected or max distance is reached, kill the thread to stop the motion
-                            kill thread_find_handler
-                            if (find_something == True):
-                                find_distance_from_last=point_dist(get_actual_tcp_pose(),find_location)
-                                find_dimension=find_distance_from_last - find_dimension_adjust
-                                find_mid_location_from_last=interpolate_pose(find_location,get_actual_tcp_pose(),0.5)
-                                find_location=get_actual_tcp_pose()
-                            end
-                            stopl(2.2)
-                        end
-                        #Error message for invalid parameters
-                    else:
-                    popup("Force parameter in Newtons must be between 0 and 200","ERROR rq_find")
-                    halt
+    end
+
+    #************************************************
+    #Function:  rq_linear_search(direction="Z+", force[N] = 10, speed[m/s] = 0.004, max_distance[m] = 0.02)
+    #   Find a specific force in the direction of "direction".
+    #   Robot will move towards a max_distance from the current position in the tool frame
+    #   Return True if the force is detected during the robot motion
+    #************************************************
+    def rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 ):
+        global pos_offset_setting = p[0,0,0,0,0,0]
+        if (direction == "X+") or (direction == "x+"):
+            pos_offset_setting = p[max_distance,0,0,0,0,0]
+        elif (direction == "X-") or (direction == "x-"):
+            pos_offset_setting = p[max_distance * -1,0,0,0,0,0]
+        elif (direction == "Y+") or (direction == "y+"):
+            pos_offset_setting = p[0,max_distance,0,0,0,0]
+        elif (direction == "Y-") or (direction == "y-"):
+            pos_offset_setting = p[0,max_distance * -1,0,0,0,0]
+        elif (direction == "Z+") or (direction == "z+"):
+            pos_offset_setting = p[0,0,max_distance,0,0,0]
+        elif (direction == "Z-") or (direction == "z-"):
+            pos_offset_setting = p[0,0,max_distance * -1,0,0,0]
+        else:
+            popup("direction parameter must be X+, X-, Y+, Y-, Z+ or Z-","ERROR rq_find")
+            halt
+        end
+        global speed_setting = speed
+        #The funtion will return the value True if the force is detected during the motion
+        global find_something = True
+        #Parameters validation
+        textmsg("linear_search parameters validated")
+        if (max_distance < 2):
+            if ((speed > 0) and (speed <= 0.1)):
+                if ((force > 0) and (force < 200)):
+                    #Define a thread to perform the robot motion.
+                    #this thread will be stopped if the force is reached
+                    global thread_find_flag = 0
+                    thread thread_find():
+                        #Calculate the position at the max distance to go
+                        pose_temp = get_actual_tcp_pose()
+                        pose_temp = pose_trans(pose_temp,pos_offset_setting)
+                        #Move the robot to that position
+                        movel(pose_temp,a=1.2,v=speed_setting)
+                        #If the program reaches this line, the force has not been detected during the motion
+                        #The function will return the value False
+                        find_something = False
+                        thread_find_flag = 1
                     end
+                    #Set the sensor to zero
+                    #sleep(0.1)
+                    #rq_set_zero()
+                    #sleep(0.05)
+                    #Run the thread to move the robot and continuously check the force measured
+                    if (actual_force(direction)<force):
+                        thread_find_handler = run thread_find()
+                        #Loop as long as the force is not detected and thread is not finished
+                        while ((actual_force(direction)<force) and (thread_find_flag ==0)):
+                            sync()
+                        end
+                        #The force is detected or max distance is reached, kill the thread to stop the motion
+                        kill thread_find_handler
+                        if (find_something == True):
+                            textmsg("Found something with linear search")
+                            find_distance_from_last=point_dist(get_actual_tcp_pose(),find_location)
+                            find_dimension=find_distance_from_last - find_dimension_adjust
+                            find_mid_location_from_last=interpolate_pose(find_location,get_actual_tcp_pose(),0.5)
+                            find_location=get_actual_tcp_pose()
+                        end
+                        stopl(2.2)
+                    end
+                    #Error message for invalid parameters
                 else:
-                    popup("speed parameter in m/s must be between 0 and 0.1","ERROR rq_find")
-                    halt
+                popup("Force parameter in Newtons must be between 0 and 200","ERROR rq_find")
+                halt
                 end
             else:
-                popup("max_distance parameter in meters must be between 0 and 1.9","ERROR rq_find")
+                popup("speed parameter in m/s must be between 0 and 0.1","ERROR rq_find")
                 halt
             end
-            #The function will return True if the force is detected during the motion
-            #The value returned will be False if the motion reaches the maximum distance without sensing the force
-            return find_something
+        else:
+            popup("max_distance parameter in meters must be between 0 and 1.9","ERROR rq_find")
+            halt
         end
-        # end: URCap Installation Node
-    
-        #**************************************
-        # FUNCTION:    rq_spiral_search(force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False)
-        # Description:
-        # PARAMETER:
-        #   force_threshold : If the force of contact drops below the force threshold, the hole has been found.
-        #   max_radius : Determines the maximum search radius.
-        #   radius_incr : Increases the trajectory of the search by a given radius per turn.
-        #   peck_mode : Enables the retreat of the tool in the z axis before moving to the next point.
-        #**************************************
-        def rq_spiral_search_new(stroke, force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False):
-            if (force_threshold < 0) or (force_threshold > 40):
+        #The function will return True if the force is detected during the motion
+        #The value returned will be False if the motion reaches the maximum distance without sensing the force
+        return find_something
+    end
+    # end: URCap Installation Node
+
+    #**************************************
+    # FUNCTION:    rq_spiral_search(force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False)
+    # Description:
+    # PARAMETER:
+    #   force_threshold : If the force of contact drops below the force threshold, the hole has been found.
+    #   max_radius : Determines the maximum search radius.
+    #   radius_incr : Increases the trajectory of the search by a given radius per turn.
+    #   peck_mode : Enables the retreat of the tool in the z axis before moving to the next point.
+    #**************************************
+    def rq_spiral_search_new(stroke, force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False):
+        if (force_threshold < 0) or (force_threshold > 40):
+            popup("force_threshold parameter in Newton must be between 0 and 40","ERROR rq_spiral_search")
+            halt
+        else:
+            if (max_radius < 0.5) or (max_radius > 10):
+                popup("max_radius parameter in mm must be between 0.5mm and 10mm","ERROR rq_spiral_search")
+                halt
+            else:
+                if (radius_incr < 0.01) or (radius_incr > 5.0):
+                    popup("radius_incr parameter in mm must be between 0.01mm and 5mm","ERROR rq_spiral_search")
+                    halt
+                else:
+                    global max_radius_set = max_radius / 1000
+                    global theta_incr=12.5
+                    global radius_inc_set = radius_incr / 1000 / (360 / theta_incr)
+                    global r=0.0003  #Start radius
+                    global z_insert_distance = 0.001  #in meter
+                    global x=0
+                    global y=0
+                    global z=0
+                    global pos=p[0,0,0,0,0,0]
+                    global next_position=p[0,0,0,0,0,0]
+                    global z_Insert=p[0,0,z_insert_distance,0,0,0]
+                    global current_pos=p[0,0,0,0,0,0]
+                    global theta=0
+                    global RealRadius=0
+                    global Search_result = False
+                    sync()
+                    #Find the bore of the part#
+                    current_pos=get_actual_tcp_pose()
+                    textmsg("Spiral search")
+                    sync()
+                    while ((RealRadius <= max_radius_set) and (norm(Fz) >= force_threshold)):
+                        #By default, the Spiral_Search function will maintain contact between both mating parts at all times
+                        if (peck_mode == False):
+                            # textmsg("norm Fx + norm Fy: ")
+                            # textmsg(norm(Fx) + norm(Fy))
+                            #standard method
+                            theta=theta+theta_incr
+                            x=cos(d2r(theta))*r
+                            y=sin(d2r(theta))*r
+                            pos[0] = x
+                            pos[1] = y
+                            r=r + radius_inc_set
+                            RealRadius = sqrt(pow(norm(x),2)+pow(norm(y),2))
+                            next_pos=pose_trans(current_pos,pos)
+                            movep(next_pos, a=0.6, v=0.025, r=0.0)
+                            sleep(0.1)
+                            #Operator enables "Peck Mode", the robot will retreat in the Z axis before moving to the next point
+                        else:
+                            #Fragile mode, the robot rises between each new point
+                            #Retreat from position
+                            pos[2]= -0.002
+                            next_pos=pose_trans(current_pos,pos)
+                            movep(next_pos, a=0.6, v=0.025, r=0.0005)
+                            sleep(0.1)
+                            #move to a new coordinate
+                            theta=theta+theta_incr
+                            x=cos(d2r(theta))*r
+                            y=sin(d2r(theta))*r
+                            pos[0] = x
+                            pos[1] = y
+                            r=r + radius_inc_set
+                            RealRadius = sqrt(pow(norm(x),2)+pow(norm(y),2))
+                            next_pos=pose_trans(current_pos,pos)
+                            movep(next_pos, a=0.6, v=0.025, r=0.0005)
+                            sleep(0.1)
+                            #Re-establish contact with the part
+                            pos[2]= 0.0005
+                            next_pos=pose_trans(current_pos,pos)
+                            movep(next_pos, a=0.6, v=0.01, r=0.0)
+                            sleep(0.2)
+                        end
+                    end
+                    if (RealRadius <= max_radius_set):
+                        current_pos=get_actual_tcp_pose()
+                        next_position=pose_trans(current_pos,z_Insert)
+                        movel(next_position, a=0.05, v=0.005)
+                        Search_result = True
+                    else:
+                        Search_result = False
+                    end
+                    return Search_result
+                end
+            end
+        end
+    end
+    # end: URCap Installation Node
+
+    #************************************************
+    #Function:  correct_force(current_force, force_threshold)
+    #   Return remaining force after removing noises
+    #************************************************
+
+    def correct_force(current_force=[0,0,0,0,0,0], force_threshold=[0,0,0,0,0,0]):
+        return_value = [0,0,0,0,0,0]
+        i = -1
+        while (i<5):
+            i = i+1
+            if ((norm(current_force[i])-force_threshold[i])<0):
+                return_value[i] = 0
+                continue
+            end
+            if (current_force[i] < 0):
+                return_value[i] = (current_force[i]+force_threshold[i])
+            else:
+                return_value[i] = (current_force[i]-force_threshold[i])
+            end
+        end
+        return return_value
+    end
+
+    #**************************************
+    # FUNCTION: rq_impedance(stroke, massm, force_threshold = [7,7,7,.1,.1,.1], dampc = [.1,.1,.1,.1,.1,.1], springk = [1,1,1,1,1,1])
+    # Description:
+    # PARAMETER:
+    #   massm: the mass of impedance control
+    #   force_threshold : If the maximum force that is counted as 0
+    #   dampc, springk : damper and spring coefficients.
+    #**************************************
+    def rq_impedance(stroke, massm, force_threshold = [3,3,5,.07,.07,.07], dampc = [50,50,50,1,1,1], springk = [100,100,100,100,100,100]):
+        i = 0
+        while (i<6):
+            if ((force_threshold[i]<0) or (force_threshold[i]>40)):
                 popup("force_threshold parameter in Newton must be between 0 and 40","ERROR rq_spiral_search")
                 halt
-            else:
-                if (max_radius < 0.5) or (max_radius > 10):
-                    popup("max_radius parameter in mm must be between 0.5mm and 10mm","ERROR rq_spiral_search")
-                    halt
-                else:
-                    if (radius_incr < 0.01) or (radius_incr > 5.0):
-                        popup("radius_incr parameter in mm must be between 0.01mm and 5mm","ERROR rq_spiral_search")
-                        halt
-                    else:
-                        global max_radius_set = max_radius / 1000
-                        global theta_incr=12.5
-                        global radius_inc_set = radius_incr / 1000 / (360 / theta_incr)
-                        global r=0.0003  #Start radius
-                        global z_insert_distance = 0.001  #in meter
-                        global x=0
-                        global y=0
-                        global z=0
-                        global pos=p[0,0,0,0,0,0]
-                        global next_position=p[0,0,0,0,0,0]
-                        global z_Insert=p[0,0,z_insert_distance,0,0,0]
-                        global current_pos=p[0,0,0,0,0,0]
-                        global theta=0
-                        global RealRadius=0
-                        global Search_result = False
-                        sync()
-                        #Find the bore of the part#
-                        current_pos=get_actual_tcp_pose()
-                        textmsg("Spiral search")
-                        sync()
-                        while ((RealRadius <= max_radius_set) and (norm(Fz) >= force_threshold)):
-                            #By default, the Spiral_Search function will maintain contact between both mating parts at all times
-                            if (peck_mode == False):
-                                textmsg(norm(Fx))
-                                textmsg(norm(Fy))
-                                #standard method
-                                theta=theta+theta_incr
-                                x=cos(d2r(theta))*r
-                                y=sin(d2r(theta))*r
-                                pos[0] = x
-                                pos[1] = y
-                                r=r + radius_inc_set
-                                RealRadius = sqrt(pow(norm(x),2)+pow(norm(y),2))
-                                next_pos=pose_trans(current_pos,pos)
-                                movep(next_pos, a=0.6, v=0.025, r=0.0)
-                                sleep(0.1)
-                                #Operator enables "Peck Mode", the robot will retreat in the Z axis before moving to the next point
-                            else:
-                                #Fragile mode, the robot rises between each new point
-                                #Retreat from position
-                                pos[2]= -0.002
-                                next_pos=pose_trans(current_pos,pos)
-                                movep(next_pos, a=0.6, v=0.025, r=0.0005)
-                                sleep(0.1)
-                                #move to a new coordinate
-                                theta=theta+theta_incr
-                                x=cos(d2r(theta))*r
-                                y=sin(d2r(theta))*r
-                                pos[0] = x
-                                pos[1] = y
-                                r=r + radius_inc_set
-                                RealRadius = sqrt(pow(norm(x),2)+pow(norm(y),2))
-                                next_pos=pose_trans(current_pos,pos)
-                                movep(next_pos, a=0.6, v=0.025, r=0.0005)
-                                sleep(0.1)
-                                #Re-establish contact with the part
-                                pos[2]= 0.0005
-                                next_pos=pose_trans(current_pos,pos)
-                                movep(next_pos, a=0.6, v=0.01, r=0.0)
-                                sleep(0.2)
-                            end
-                        end
-                        if (RealRadius <= max_radius_set):
-                            current_pos=get_actual_tcp_pose()
-                            next_position=pose_trans(current_pos,z_Insert)
-                            movel(next_position, a=0.05, v=0.005)
-                            Search_result = True
-                        else:
-                            Search_result = False
-                        end
-                        return Search_result
-                    end
-                end
             end
+            i = i+1
         end
-        # end: URCap Installation Node
-    
-        #************************************************
-        #Function:  correct_force(current_force, force_threshold)
-        #   Return remaining force after removing noises
-        #************************************************
-    
-        def correct_force(current_force=[0,0,0,0,0,0], force_threshold=[0,0,0,0,0,0]):
-            return_value = [0,0,0,0,0,0]
-            i = -1
-            while (i<5):
-                i = i+1
-                if ((norm(current_force[i])-force_threshold[i])<0):
-                    return_value[i] = 0
-                    continue
-                end
-                if (current_force[i] < 0):
-                    return_value[i] = (current_force[i]+force_threshold[i])
-                else:
-                    return_value[i] = (current_force[i]-force_threshold[i])
-                end
+        # prepare
+        starting_pos = get_actual_tcp_pose()
+        deltat = 0.008
+        goalp = p[0,0,0,0,0,0]
+        goalpp = p[0,0,0,0,0,0]
+        # suppose the object is a 10cm ball
+        massmi = [massm, massm, massm, massm/600, massm/600, massm/600]
+        while (True):
+            current_pos = get_actual_tcp_pose()
+            dist = pose_dist(current_pos, starting_pos)
+            textmsg("impedance dist")
+            textmsg(starting_pos)
+            textmsg(current_pos)
+            textmsg(norm(dist))
+            if (norm(dist) >= stroke):
+                halt
             end
-            return return_value
+            fp = correct_force([Fx,Fy,Fz,Mx,My,Mz],force_threshold)
+            fp[2] = fp[2]+50
+
+            mdt2 = [0,0,0,0,0,0]
+            cdt = [0,0,0,0,0,0]
+            mck = [0,0,0,0,0,0]
+            ppmp = pose_sub(goalpp, goalp)
+            ppmpmp = pose_sub(ppmp, goalp)
+            goal = p[0,0,0,0,0,0]
+            # 0
+            mdt2[0] = massmi[0]/(deltat*deltat)
+            cdt[0] = dampc[0]/deltat
+            mck[0] = mdt2[0]+cdt[0]+springk[0]
+            goal[0] = (fp[0]-mdt2[0]*ppmpmp[0]+cdt[0]*goalp[0])/mck[0]
+            # 1
+            mdt2[1] = massmi[1]/(deltat*deltat)
+            cdt[1] = dampc[1]/deltat
+            mck[1] = mdt2[1]+cdt[1]+springk[1]
+            goal[1] = (fp[1]-mdt2[1]*ppmpmp[1]+cdt[1]*goalp[1])/mck[1]
+            # 2
+            mdt2[2] = massmi[2]/(deltat*deltat)
+            cdt[2] = dampc[2]/deltat
+            mck[2] = mdt2[2]+cdt[2]+springk[2]
+            goal[2] = (fp[2]-mdt2[2]*ppmpmp[2]+cdt[2]*goalp[2])/mck[2]
+            # 3
+            mdt2[3] = massmi[3]/(deltat*deltat)
+            cdt[3] = dampc[3]/deltat
+            mck[3] = mdt2[3]+cdt[3]+springk[3]
+            goal[3] = (fp[3]-mdt2[3]*ppmpmp[3]+cdt[3]*goalp[3])/mck[3]
+            # 4
+            mdt2[4] = massmi[4]/(deltat*deltat)
+            cdt[4] = dampc[4]/deltat
+            mck[4] = mdt2[4]+cdt[4]+springk[4]
+            goal[4] = (fp[4]-mdt2[4]*ppmpmp[4]+cdt[4]*goalp[4])/mck[4]
+            # 5
+            mdt2[5] = massmi[5]/(deltat*deltat)
+            cdt[5] = dampc[5]/deltat
+            mck[5] = mdt2[5]+cdt[5]+springk[5]
+            goal[5] = (fp[5]-mdt2[5]*ppmpmp[5]+cdt[5]*goalp[5])/mck[5]
+
+            rel_pos = pose_sub(goal, goalp)
+            next_pos=pose_trans(current_pos,rel_pos)
+            movep(next_pos, a=0.4, v=.015, r=0.0)
+            goalpp[0] = goalp[0]
+            goalpp[1] = goalp[1]
+            goalpp[2] = goalp[2]
+            goalpp[3] = goalp[3]
+            goalpp[4] = goalp[4]
+            goalpp[5] = goalp[5]
+            goalp[0] = goal[0]
+            goalp[1] = goal[1]
+            goalp[2] = goal[2]
+            goalp[3] = goal[3]
+            goalp[4] = goal[4]
+            goalp[5] = goal[5]
+            textmsg("fp")
+            textmsg(fp)
+            textmsg("rel and goal")
+            textmsg(current_pos)
+            textmsg(rel_pos)
+            textmsg(next_pos)
+            # sleep(deltat)
+            sync()
         end
-    
-        #**************************************
-        # FUNCTION: rq_impedance(stroke, massm, force_threshold = [7,7,7,.1,.1,.1], dampc = [.1,.1,.1,.1,.1,.1], springk = [1,1,1,1,1,1])
-        # Description:
-        # PARAMETER:
-        #   massm: the mass of impedance control
-        #   force_threshold : If the maximum force that is counted as 0
-        #   dampc, springk : damper and spring coefficients.
-        #**************************************
-        def rq_impedance(stroke, massm, force_threshold = [3,3,5,.07,.07,.07], dampc = [50,50,50,1,1,1], springk = [100,100,100,100,100,100]):
-            i = 0
-            while (i<6):
-                if ((force_threshold[i]<0) or (force_threshold[i]>40)):
-                    popup("force_threshold parameter in Newton must be between 0 and 40","ERROR rq_spiral_search")
-                    halt
-                end
-                i = i+1
-            end
-            # prepare
-            starting_pos = get_actual_tcp_pose()
-            deltat = 0.008
-            goalp = p[0,0,0,0,0,0]
-            goalpp = p[0,0,0,0,0,0]
-            # suppose the object is a 10cm ball
-            massmi = [massm, massm, massm, massm/600, massm/600, massm/600]
-            while (True):
-                current_pos = get_actual_tcp_pose()
-                dist = pose_dist(current_pos, starting_pos)
-                textmsg("impedance dist")
-                textmsg(starting_pos)
-                textmsg(current_pos)
-                textmsg(norm(dist))
-                if (norm(dist) >= stroke):
-                    halt
-                end
-                fp = correct_force([Fx,Fy,Fz,Mx,My,Mz],force_threshold)
-                fp[2] = fp[2]+50
-    
-                mdt2 = [0,0,0,0,0,0]
-                cdt = [0,0,0,0,0,0]
-                mck = [0,0,0,0,0,0]
-                ppmp = pose_sub(goalpp, goalp)
-                ppmpmp = pose_sub(ppmp, goalp)
-                goal = p[0,0,0,0,0,0]
-                # 0
-                mdt2[0] = massmi[0]/(deltat*deltat)
-                cdt[0] = dampc[0]/deltat
-                mck[0] = mdt2[0]+cdt[0]+springk[0]
-                goal[0] = (fp[0]-mdt2[0]*ppmpmp[0]+cdt[0]*goalp[0])/mck[0]
-                # 1
-                mdt2[1] = massmi[1]/(deltat*deltat)
-                cdt[1] = dampc[1]/deltat
-                mck[1] = mdt2[1]+cdt[1]+springk[1]
-                goal[1] = (fp[1]-mdt2[1]*ppmpmp[1]+cdt[1]*goalp[1])/mck[1]
-                # 2
-                mdt2[2] = massmi[2]/(deltat*deltat)
-                cdt[2] = dampc[2]/deltat
-                mck[2] = mdt2[2]+cdt[2]+springk[2]
-                goal[2] = (fp[2]-mdt2[2]*ppmpmp[2]+cdt[2]*goalp[2])/mck[2]
-                # 3
-                mdt2[3] = massmi[3]/(deltat*deltat)
-                cdt[3] = dampc[3]/deltat
-                mck[3] = mdt2[3]+cdt[3]+springk[3]
-                goal[3] = (fp[3]-mdt2[3]*ppmpmp[3]+cdt[3]*goalp[3])/mck[3]
-                # 4
-                mdt2[4] = massmi[4]/(deltat*deltat)
-                cdt[4] = dampc[4]/deltat
-                mck[4] = mdt2[4]+cdt[4]+springk[4]
-                goal[4] = (fp[4]-mdt2[4]*ppmpmp[4]+cdt[4]*goalp[4])/mck[4]
-                # 5
-                mdt2[5] = massmi[5]/(deltat*deltat)
-                cdt[5] = dampc[5]/deltat
-                mck[5] = mdt2[5]+cdt[5]+springk[5]
-                goal[5] = (fp[5]-mdt2[5]*ppmpmp[5]+cdt[5]*goalp[5])/mck[5]
-    
-                rel_pos = pose_sub(goal, goalp)
-                next_pos=pose_trans(current_pos,rel_pos)
-                movep(next_pos, a=0.4, v=.015, r=0.0)
-                goalpp[0] = goalp[0]
-                goalpp[1] = goalp[1]
-                goalpp[2] = goalp[2]
-                goalpp[3] = goalp[3]
-                goalpp[4] = goalp[4]
-                goalpp[5] = goalp[5]
-                goalp[0] = goal[0]
-                goalp[1] = goal[1]
-                goalp[2] = goal[2]
-                goalp[3] = goal[3]
-                goalp[4] = goal[4]
-                goalp[5] = goal[5]
-                textmsg("fp")
-                textmsg(fp)
-                textmsg("rel and goal")
-                textmsg(current_pos)
-                textmsg(rel_pos)
-                textmsg(next_pos)
-                # sleep(deltat)
-                sync()
-            end
-        end
-        # end: URCap Installation Node
-    
-        # TODO: Zero the force sensor: rq_zero_sensor()
-        # TODO: Eliminate the while loop surrounding this comment?
-        # TODO: Eliminate the while loop below
-        # while (True):
-        #     textmsg("tst0")
-        #     rq_linear_search("Z+",10,0.02,0.2)
-        #     stroke = 0.035
-        #     if rq_spiral_search_new(stroke,10,7,.3,peck_mode=True):
-        #         #Insert the Part into the bore#
-        #         textmsg("Impedance insert")
-        #         massm = 10
-        #         rq_impedance(stroke, massm)
-        #     end
-        #     textmsg("running")
-        # end
-#     end
+    end
+    # end: URCap Installation Node
+
+    # TODO: Zero the force sensor: rq_zero_sensor()
+    # TODO: Eliminate the while loop surrounding this comment?
+    # TODO: Eliminate the while loop below
+    # while (True):
+    #     textmsg("tst0")
+    #     rq_linear_search("Z+",10,0.02,0.2)
+    #     stroke = 0.035
+    #     if rq_spiral_search_new(stroke,10,7,.3,peck_mode=True):
+    #         #Insert the Part into the bore#
+    #         textmsg("Impedance insert")
+    #         massm = 10
+    #         rq_impedance(stroke, massm)
+    #     end
+    #     textmsg("running")
+    # end
 # end

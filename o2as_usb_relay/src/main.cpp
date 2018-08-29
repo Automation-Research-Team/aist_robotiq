@@ -7,11 +7,21 @@
 
 namespace o2as_usb_relay
 {
-struct USBHub : public TU::USBHub
+template <class BASE>
+class USBRelay : public BASE
 {
-    using	super = TU::USBHub;
-    
-    USBHub()	:super()				{}
+  private:
+    using	super = BASE;
+
+  public:
+    USBRelay()
+	:super(),
+	 nh_("~"),
+	 service_(nh_.advertiseService("set_power",
+				       &USBRelay::setPower, this))
+    {
+	ROS_INFO("o2as_usb_relay_server is active.");
+    }
 
     bool
     setPower(SetPower::Request& req, SetPower::Response& res)
@@ -36,23 +46,32 @@ struct USBHub : public TU::USBHub
 
 	return true;
     }
+
+  private:
+    ros::NodeHandle		nh_;
+    const ros::ServiceServer	service_;
 };
+
 }	// namespace o2as_usb_relay
 
 int
 main(int argc, char** argv)
 {
+    using	USBRelay = o2as_usb_relay::USBRelay<TU::USBRelay>;
+    
     ros::init(argc, argv, "o2as_usb_relay_server");
 
-    auto		hub = boost::make_shared<o2as_usb_relay::USBHub>();
-    ros::NodeHandle	node("~");
-    auto		service = node.advertiseService(
-					"set_power",
-					&o2as_usb_relay::USBHub::setPower,
-					hub);
-    ROS_INFO("o2as_usb_relay_server is active.");
+    try
+    {
+	o2as_usb_relay::USBRelay<TU::USBRelay>	relay;
+	ros::spin();
+    }
+    catch (const std::exception& err)
+    {
+	ROS_INFO("%s", err.what());
 
-    ros::spin();
+	return 1;
+    }
 
     return 0;
 }
