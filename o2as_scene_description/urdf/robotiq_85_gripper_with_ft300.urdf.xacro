@@ -46,10 +46,10 @@
     <!-- Screw tool tip. Z-axis points along the screw into the hole. -->
     <joint name="${prefix}robotiq_85_m5_screw_tool_tip_joint" type="fixed">
       <parent link="${prefix}robotiq_85_tip_link"/>
-      <child link="${prefix}screw_tool_m5_tip_link"/>
+      <child link="${prefix}screw_tool_m6_tip_link"/>
       <origin rpy="0.0 0.0 0.0" xyz="-0.03 0.0 -0.12 "/>
     </joint>
-    <link name="${prefix}screw_tool_m5_tip_link"/>
+    <link name="${prefix}screw_tool_m6_tip_link"/>
 
   </xacro:macro>
 </robot>

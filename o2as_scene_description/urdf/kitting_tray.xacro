@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="kitting_bin">
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="kitting_tray">
 
   <!-- This file defines a tray that could be used for temporarily placing items for regrasping during the kitting tray -->
   <xacro:macro name="kitting_tray" params="trayname parent *origin">

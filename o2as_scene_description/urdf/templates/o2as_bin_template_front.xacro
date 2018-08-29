@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kitting_scene">
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_bin.xacro" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray.xacro" />
+  <xacro:property name="rack_width" value=".640" />
+  <xacro:property name="tray_width" value=".300" />
+  <xacro:property name="tray_length" value=".210" />

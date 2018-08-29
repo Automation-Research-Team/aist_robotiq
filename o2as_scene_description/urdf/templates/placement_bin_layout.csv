@@ -1,0 +1,12 @@
+parts_name,set,bin_type,bin_name
+part1,bin1,set1_bin1_1
+part2,bin1,set1_bin1_2
+part3,bin1,set1_bin1_3
+part4,bin1,set1_bin1_4
+part5,bin1,set1_bin1_5
+---
+part6,bin2,set2_bin2_1
+part7,bin2,set2_bin2_2
+part10,bin3,set2_bin3_1
+part8,bin2,set2_bin2_3
+part9,bin2,set2_bin2_4

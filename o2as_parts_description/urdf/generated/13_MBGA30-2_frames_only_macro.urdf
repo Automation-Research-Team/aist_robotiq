@@ -1,0 +1,30 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="assy_part_frames_only_13">
+  <xacro:macro name="assy_part_frames_only_13" params="prefix parent spawn_attached *origin">
+    <link name="${prefix}assy_part_13"/>
+
+    <xacro:if value="${spawn_attached}">
+      <joint name="${prefix}assy_part_13_joint" type="fixed">
+        <parent link="${parent}"/>
+        <child link="${prefix}assy_part_13"/>
+        <xacro:insert_block name="origin"/>
+      </joint>
+    </xacro:if>
+  
+  <!-- Extra frames for assembly and motion planning, if any -->
+    <joint name="${prefix}assy_part_13_center_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_13"/> 
+      <child link="${prefix}assy_part_13_center"/> 
+      <origin rpy="${0} ${0} ${0}" xyz="${0} ${0} ${0}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_13_center"/> 
+    
+    <joint name="${prefix}assy_part_13_screw_head_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_13"/> 
+      <child link="${prefix}assy_part_13_screw_head"/> 
+      <origin rpy="${0} ${pi/2} ${0}" xyz="${0} ${0} ${0.016}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_13_screw_head"/> 
+    
+
+  </xacro:macro>
+</robot>

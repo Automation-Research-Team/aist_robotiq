@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kitting_scene">
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_bins.xacro" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray.xacro" />
+
+  <!-- Insert: -->
+  <xacro:kitting_tray1 trayname="tray_1" parent="workspace_center">
+    <origin xyz="-.2 -.27 0" rpy="0 0 ${pi/2}" />
+  </xacro:kitting_tray1>
+  <xacro:kitting_tray2 trayname="tray_2" parent="workspace_center">
+    <origin xyz="-.2 .27 0" rpy="0 0 ${-pi/2}" />
+  </xacro:kitting_tray2>
+  <!-- The base plate -->
+
+  <xacro:include filename="$(find o2as_parts_description)/urdf/assembly_parts_macros.urdf"/>
+
+  <!-- <xacro:include filename="$(find o2as_parts_description)/urdf/display_all_parts.urdf"/> -->
+
+  <xacro:include filename="$(find o2as_parts_description)/urdf/generated/full_assembly.urdf"/>
+  <xacro:full_assembly prefix="assembled_" parent="workspace_center">
+    <origin xyz="0 0.1 .065" rpy="0 0 ${-pi/2}" />
+  </xacro:full_assembly>
+
+    <!-- <xacro:include filename="$(find o2as_parts_description)/urdf/generated/full_assembly_frames_only.urdf"/>
+  <xacro:full_assembly_frames_only prefix="assembled_frames_only_" parent="workspace_center">
+    <origin xyz="0 0.1 .065" rpy="0 0 ${-pi/2}" />   
+  </xacro:full_assembly_frames_only> -->
+  
+</robot>

@@ -1,0 +1,39 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="assy_part_10">
+  <xacro:macro name="assy_part_10" params="prefix parent spawn_attached *origin">
+    <link name="${prefix}assy_part_10">
+      <visual>
+        <origin rpy="1.5707 0 0" xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="package://o2as_parts_description/meshes/10_CLBPS10_17_4.dae" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="white">
+          <color rgba="1 1 1 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="1.5707 0 0" xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="package://o2as_parts_description/meshes/10_CLBPS10_17_4.vhacd.dae" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <xacro:if value="${spawn_attached}">
+      <joint name="${prefix}assy_part_10_joint" type="fixed">
+        <parent link="${parent}"/>
+        <child link="${prefix}assy_part_10"/>
+        <xacro:insert_block name="origin"/>
+      </joint>
+    </xacro:if>
+  
+  <!-- Extra frames for assembly and motion planning, if any -->
+    <joint name="${prefix}assy_part_10_center_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_10"/> 
+      <child link="${prefix}assy_part_10_center"/> 
+      <origin rpy="${0} ${0} ${0}" xyz="${0.002} ${0} ${0}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_10_center"/> 
+    
+
+  </xacro:macro>
+</robot>
