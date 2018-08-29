@@ -26,10 +26,10 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur3.urdf.xacro" />
 
   <!-- Scene items (trays, bins...) -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray_with_partitions.xacro" />
-  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/taskboard_scene.xacro" /> -->
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray_with_partitions.xacro" /> -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/taskboard_scene.xacro" />
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" /> -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/assembly_scene.xacro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/assembly_scene.xacro" /> -->
   
   <!-- Robot bases -->
   <!-- Putting these at height 0.0 makes them intersect with the ground, so they are elevated. -->
@@ -128,14 +128,14 @@
   </xacro:precision_gripper>
   
   <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_85_gripper_with_ft300.urdf.xacro" />
-  <!-- <xacro:robotiq_85_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link" /> -->
+  <xacro:robotiq_85_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link" />
   <xacro:robotiq_85_gripper_o2as prefix="c_bot_" parent = "c_bot_ee_link"/>
 
   <!-- spawn and attach dual suction grippers -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro" />
-  <xacro:dual_suction_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link">
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro" /> -->
+  <!-- <xacro:dual_suction_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
-  </xacro:dual_suction_gripper_o2as>
+  </xacro:dual_suction_gripper_o2as> -->
 
   <!-- Add cameras -->
   <link name="b_bot_cam_holder_link" />

@@ -6,6 +6,7 @@
 #include <string>
 #include "std_msgs/String.h"
 #include "std_msgs/Bool.h"
+#include "std_srvs/SetBool.h"
 #include "geometry_msgs/PoseStamped.h"
 
 #include <tf/transform_listener.h>    // Includes the TF conversions
@@ -22,9 +23,15 @@
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit_msgs/GetPlanningScene.h>
 #include <moveit/collision_detection/collision_matrix.h>
-// #include <moveit_visual_tools/moveit_visual_tools.h>
+
+// For IPTP scaling
+#include <moveit_msgs/RobotTrajectory.h>
+#include <moveit/robot_trajectory/robot_trajectory.h>
+#include <moveit/trajectory_processing/iterative_time_parameterization.h>
 
 #include "visualization_msgs/Marker.h"
+
+#include "o2as_msgs/RobotStatus.h"
 
 // Services
 #include "o2as_msgs/goToNamedPose.h"
@@ -40,6 +47,7 @@
 #include "o2as_msgs/regraspAction.h"
 #include "o2as_msgs/insertAction.h"
 #include "o2as_msgs/screwAction.h"
+#include "o2as_msgs/changeToolAction.h"
 
 #include <actionlib/client/simple_action_client.h>
 #include <robotiq_msgs/CModelCommandAction.h>
@@ -57,7 +65,9 @@ public:
   bool stop();                  // Stops the robot at the current position
   moveit::planning_interface::MoveGroupInterface* robotNameToMoveGroup(std::string robot_name);
   std::string getEELink(std::string robot_name);
+  bool toggleCollisions(bool collisions_on);
   bool updatePlanningScene();
+  
 
   // Internal functions
   bool equipScrewTool(std::string robot_name, std::string screw_tool_id);
@@ -71,7 +81,7 @@ public:
   bool goFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, double velocity_scaling_factor);
   bool placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name = "");
   bool pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name = "");
-  bool pickScrew(std::string object_id, std::string screw_tool_id, std::string robot_name);
+  bool pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::string screw_tool_id, std::string robot_name);
   bool publishMarker(geometry_msgs::PoseStamped marker_pose, std::string marker_type = "");
   bool publishPoseMarker(geometry_msgs::PoseStamped marker_pose);
 
@@ -84,6 +94,8 @@ public:
                         o2as_msgs::goToNamedPose::Response &res);
   bool publishMarkerCallback(o2as_msgs::publishMarker::Request &req,
                         o2as_msgs::publishMarker::Response &res);
+  bool toggleCollisionsCallback(std_srvs::SetBool::Request &req,
+                        std_srvs::SetBool::Response &res);
 
   // Actions
   void executeAlign(const o2as_msgs::alignGoalConstPtr& goal);
@@ -92,6 +104,7 @@ public:
   void executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal);
   void executeInsert(const o2as_msgs::insertGoalConstPtr& goal);
   void executeScrew(const o2as_msgs::screwGoalConstPtr& goal);
+  void executeChangeTool(const o2as_msgs::changeToolGoalConstPtr& goal);
   
 
 // private:
@@ -103,6 +116,8 @@ public:
   // Service declarations
   ros::ServiceServer goToNamedPoseService_;
   ros::ServiceServer publishMarkerService_;
+  ros::ServiceServer toggleCollisionsService_;
+
 
   // Service clients
   ros::ServiceClient sendScriptToURClient_;
@@ -115,6 +130,7 @@ public:
   actionlib::SimpleActionServer<o2as_msgs::regraspAction> regraspActionServer_;
   actionlib::SimpleActionServer<o2as_msgs::insertAction> insertActionServer_;
   actionlib::SimpleActionServer<o2as_msgs::screwAction> screwActionServer_;  
+  actionlib::SimpleActionServer<o2as_msgs::changeToolAction> changeToolActionServer_;  
 
   // Action clients
   // actionlib::SimpleActionClient<control_msgs::GripperCommandAction> a_bot_gripper_client_;
@@ -126,11 +142,8 @@ public:
   tf::TransformListener tflistener_;
   tf::TransformBroadcaster tfbroadcaster_;
   bool holding_object_ = false;
-  // A status of the robot. This should almost definitely be rosparams instead.
-  // /a_bot/status/carrying_object  (bool)
-  // /a_bot/status/carrying_tool    (bool)
-  // /a_bot/status/held_object_id   (string)
-  // /a_bot/status/held_tool_id     (string)
+  // A status of the robot. This should almost definitely be rosparams or a topic instead.
+  std::map<std::string, o2as_msgs::RobotStatus> robot_statuses_;
   // std::map<std::string robot_name, std::map<std::string attribute, std::string status>> robot_statuses;
   std::string held_object_id_ = "";
   std::string held_screw_tool_ = "";    // "m3", "m4", "m5", "nut"...

@@ -47,12 +47,12 @@
         <color rgba=".9 .9 .9 1"/>
       </material>
     </visual>
-    <collision>
+    <!-- <collision>
       <origin rpy="0 0 -.225" xyz="0 0 0"/>
       <geometry>
         <box size=".02 .04 .155"/>
       </geometry>
-    </collision>
+    </collision> -->
   </link>
   <joint name="screw_tool_m6_to_holder" type="fixed">
     <parent link="screw_tool_holder" />
@@ -75,12 +75,12 @@
         <color rgba=".9 .9 .9 1"/>
       </material>
     </visual>
-    <collision>
+    <!-- <collision>
       <origin rpy="0 0 -.225" xyz="0 0 0"/>
       <geometry>
         <box size=".02 .04 .155"/> 
       </geometry>
-    </collision>
+    </collision> -->
   </link>
   <joint name="screw_tool_m4_to_holder" type="fixed">
     <parent link="screw_tool_holder" />
@@ -105,12 +105,12 @@
         <color rgba=".9 .9 .9 1"/>
       </material>
     </visual>
-    <collision>
+    <!-- <collision>
       <origin rpy="0 0 -.225" xyz="0 0 0"/>
       <geometry>
         <box size=".02 .04 .155"/> 
       </geometry>
-    </collision>
+    </collision> -->
   </link>
   <joint name="screw_tool_m3_to_holder" type="fixed">
     <parent link="screw_tool_holder" />

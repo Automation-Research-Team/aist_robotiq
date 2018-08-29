@@ -2,8 +2,8 @@
 # Screws can be picked up via the pick action.
 
 # Request
-geometry_msgs/PoseStamped target_hole # x points into the screw hole
-float64 screw_height         # In m, measured from the bottom of the head (M3x5 has a screw_height of 0.005)
+# z points out of the screw hole, to the top
+bool equip_the_tool          # Otherwise, it is "unequip"
 uint8 screw_size             # M3, M4, M6 (without the M)
 string robot_name            # b_bot, c_bot
 ---

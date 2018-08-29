@@ -49,6 +49,7 @@ import moveit_msgs.msg
 import geometry_msgs.msg
 import std_msgs.msg
 import robotiq_msgs.msg
+import std_srvs.srv
 
 import o2as_msgs
 import o2as_msgs.msg
@@ -97,8 +98,8 @@ class O2ASBaseRoutines(object):
     self.robots = moveit_commander.RobotCommander()
     self.groups = {"a_bot":moveit_commander.MoveGroupCommander("a_bot"),
               "b_bot":moveit_commander.MoveGroupCommander("b_bot"),
-              "c_bot":moveit_commander.MoveGroupCommander("c_bot")}
-              # "front_bots":moveit_commander.MoveGroupCommander("front_bots"),
+              "c_bot":moveit_commander.MoveGroupCommander("c_bot"),
+              "front_bots":moveit_commander.MoveGroupCommander("front_bots")}
               # "all_bots":moveit_commander.MoveGroupCommander("all_bots") }
     self.gripper_action_clients = { "a_bot":actionlib.SimpleActionClient('precision_gripper_action', o2as_msgs.msg.PrecisionGripperCommandAction), 
                                "b_bot":actionlib.SimpleActionClient('/b_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction), 
@@ -114,6 +115,7 @@ class O2ASBaseRoutines(object):
     self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR)
     self.goToNamedPose_client = rospy.ServiceProxy('/o2as_skills/goToNamedPose', o2as_msgs.srv.goToNamedPose)
     self.publishMarker_client = rospy.ServiceProxy('/o2as_skills/publishMarker', o2as_msgs.srv.publishMarker)
+    self.toggleCollisions_client = rospy.ServiceProxy('/o2as_skills/toggleCollisions', std_srvs.srv.SetBool)
 
     # self.pick_client.wait_for_server() # wait for the clients to connect
     # self.place_client.wait_for_server() 
@@ -156,7 +158,25 @@ class O2ASBaseRoutines(object):
     current_pose = group.get_current_pose().pose
     return all_close(pose_goal_stamped.pose, current_pose, 0.01)
 
-  def horizontal_spiral_motion(self, robot_name, max_radius, radius_increment = .001, speed = 0.02):
+  def move_front_bots(self, pose_goal_a_bot, pose_goal_b_bot, speed = 0.05):
+    rospy.logwarn("CAUTION: Moving front bots together, but MoveIt does not do continuous collision checking.")
+    group = self.groups["front_bots"]
+    group.set_pose_target(pose_goal_a_bot, end_effector_link="a_bot_gripper_tip_link")
+    group.set_pose_target(pose_goal_b_bot, end_effector_link="b_bot_robotiq_85_tip_link")
+    rospy.loginfo("Setting velocity scaling to " + str(speed))
+    group.set_max_velocity_scaling_factor(speed)
+
+    success = group.go(wait=True)
+    group.stop()
+    # It is always good to clear your targets after planning with poses.
+    # Note: there is no equivalent function for clear_joint_value_targets()
+    group.clear_pose_targets()
+
+    rospy.loginfo("Received:")
+    rospy.loginfo(success)
+    return success
+
+  def horizontal_spiral_motion(self, robot_name, max_radius, start_pos, radius_increment = .001, speed = 0.02):
     group = self.groups[robot_name]
     rospy.loginfo("Performing horizontal spiral motion " + str(speed))
     rospy.loginfo("Setting velocity scaling to " + str(speed))
@@ -175,7 +195,7 @@ class O2ASBaseRoutines(object):
     gripper_pos = geometry_msgs.msg.PoseStamped()
     gripper_pos.header.frame_id = "a_bot_gripper_tip_link"
     gripper_pos.pose.orientation.w = 1.0
-    start_pos = self.listener.transformPose("world", gripper_pos)
+    # start_pos = self.listener.transformPose("world", gripper_pos)
 
     next_pos = start_pos
     while RealRadius <= max_radius and not rospy.is_shutdown():
@@ -281,6 +301,12 @@ class O2ASBaseRoutines(object):
     result = self.regrasp_client.get_result()
     return result
 
+  def toggle_collisions(self, collisions_on):
+    req = std_srvs.srv.SetBoolRequest()
+    req.data = collisions_on
+    res = self.toggleCollisions_client.call(req)
+    return res.success
+
 
   ################ ----- Gripper interfaces
   
@@ -315,7 +341,7 @@ class O2ASBaseRoutines(object):
       rospy.logerr("Could not parse gripper command")
 
     action_client.send_goal(goal)
-    rospy.loginfo("Sending command " + command + " to gripper: " + gripper)
+    rospy.loginfo("Sending command " + str(command) + " to gripper: " + gripper)
     action_client.wait_for_result(rospy.Duration(3.0))  # Default wait time: 3 s
     result = action_client.get_result()
     rospy.loginfo(result)

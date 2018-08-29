@@ -51,18 +51,18 @@ class CalibrationClass(O2ASBaseRoutines):
   objects defined in the scene.
   """
 
-  def cycle_through_calibration_poses(self, poses, robot_name, speed=0.3, with_approach=False, go_home=False):
+  def cycle_through_calibration_poses(self, poses, robot_name, speed=0.3, with_approach=False, go_home=True):
     rospy.loginfo("Moving all robots home.")
     self.go_to_named_pose("home", "a_bot")
     self.go_to_named_pose("home", "b_bot")
     self.go_to_named_pose("home", "c_bot")
-    home_pose = "home_" + robot_name[0]
+    home_pose = "home"
     
     
       
     # rospy.loginfo("============ Moving " + robot_name + " to " + poses[0].header.frame_id)
     if with_approach:                 # To calculate the approach, we publish the target pose to TF
-      rospy.logewarn("with_approach does not work yet. Do not use it.")
+      rospy.logwarn("with_approach does not work yet. Do not use it.")
       # ps_approach = geometry_msgs.msg.PoseStamped()
       # ps_approach.header.frame_id = "calibration_target_pose"
       # ps_approach.pose.position.x -= .05
@@ -302,7 +302,7 @@ class CalibrationClass(O2ASBaseRoutines):
     
     poses = [pose1, pose2, pose3, pose4]
 
-    self.cycle_through_calibration_poses(poses, "b_bot", speed=0.3)
+    self.cycle_through_calibration_poses(poses, "b_bot", speed=0.3, go_home=True)
     return 
     
 
