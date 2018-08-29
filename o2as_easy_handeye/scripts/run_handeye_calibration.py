@@ -16,46 +16,75 @@ from easy_handeye.srv import TakeSample, RemoveSample, ComputeCalibration
 # Poses taken during handeye calibration
 # TODO: These poses are specific for `d_bot` camera, need to modify for Phoxi
 posess = {
-  'a_bot': [
-    [-0.016, 0.547, 0.700, -1.591, 0.000, -0.000],  # a_bot, pose 1
-    [-0.016, 0.547, 0.700, -1.591, 0.313, -0.000],  # a_bot, pose 2
-    [-0.016, 0.547, 0.700, -1.591, 0.626, -0.000],  # a_bot, pose 3
-    [-0.016, 0.547, 0.700, -1.591, 0.313, -0.313],  # a_bot, pose 4
-    [-0.016, 0.547, 0.700, -1.591, 0.000, -0.626],  # a_bot, pose 5
-  ],
+  'd_bot_camera': {
+    'a_bot': [
+      [-0.016, 0.547, 0.700, -1.591, 0.000, -0.000],  # a_bot, pose 1
+      [-0.016, 0.547, 0.700, -1.591, 0.313, -0.000],  # a_bot, pose 2
+      [-0.016, 0.547, 0.700, -1.591, 0.626, -0.000],  # a_bot, pose 3
+      [-0.016, 0.547, 0.700, -1.591, 0.313, -0.313],  # a_bot, pose 4
+      [-0.016, 0.547, 0.700, -1.591, 0.000, -0.626],  # a_bot, pose 5
+    ],
 
-  'b_bot': [
-    [-0.016, 0.547, 0.700, -1.591,  0.000, -0.000],  # b_bot, pose 1
-    [-0.016, 0.547, 0.700, -1.591,  0.313, -0.000],  # b_bot, pose 2
-    [-0.016, 0.547, 0.700, -1.591,  0.626, -0.000],  # b_bot, pose 3
-    [-0.016, 0.547, 0.700, -1.591,  0.313, -0.313],  # b_bot, pose 4
-    [-0.016, 0.547, 0.700, -1.591,  0.000, -0.626],  # b_bot, pose 5
-    [-0.016, 0.547, 0.700, -1.272,  0.000, -0.313],  # b_bot, pose 6
-    [-0.016, 0.547, 0.700, -1.272,  0.313,  0.000],  # b_bot, pose 7
-    [-0.016, 0.547, 0.700, -1.272,  0.626,  0.313],  # b_bot, pose 8
-    [-0.016, 0.547, 0.700, -1.591,  0.313,  0.626],  # b_bot, pose 9
-    [-0.016, 0.547, 0.700, -1.750,  0.313,  0.626],  # b_bot, pose 10
-    [-0.016, 0.547, 0.650, -1.910,  0.626,  0.626],  # b_bot, pose 11
-    [-0.016, 0.547, 0.650, -1.750,  0.313,  0.313],  # b_bot, pose 12
-    [-0.016, 0.547, 0.650, -1.591,  0.000,  0.313],  # b_bot, pose 13
-    [-0.016, 0.547, 0.700, -1.400, -0.313, -0.313],  # b_bot, pose 14
-    [-0.016, 0.547, 0.650, -1.400, -0.313, -0.626],  # b_bot, pose 15
-    # [-0.016, 0.547, 0.650, -1.272,  0.626,  0.626],  # b_bot, pose 16
-    # [-0.016, 0.547, 0.650, -1.272, -0.626,  0.626],  # b_bot, pose 17
-    # [-0.016, 0.547, 0.650, -1.272,  0.626, -0.626],  # b_bot, pose 18
-    # [-0.016, 0.547, 0.650, -1.272, -0.626, -0.626],  # b_bot, pose 19
-  ],
+    'b_bot': [
+      [-0.016, 0.547, 0.700, -1.591,  0.000, -0.000],  # b_bot, pose 1
+      [-0.016, 0.547, 0.700, -1.591,  0.313, -0.000],  # b_bot, pose 2
+      [-0.016, 0.547, 0.700, -1.591,  0.626, -0.000],  # b_bot, pose 3
+      [-0.016, 0.547, 0.700, -1.591,  0.313, -0.313],  # b_bot, pose 4
+      [-0.016, 0.547, 0.700, -1.591,  0.000, -0.626],  # b_bot, pose 5
+      [-0.016, 0.547, 0.700, -1.272,  0.000, -0.313],  # b_bot, pose 6
+      [-0.016, 0.547, 0.700, -1.272,  0.313,  0.000],  # b_bot, pose 7
+      [-0.016, 0.547, 0.700, -1.272,  0.626,  0.313],  # b_bot, pose 8
+      [-0.016, 0.547, 0.700, -1.591,  0.313,  0.626],  # b_bot, pose 9
+      [-0.016, 0.547, 0.700, -1.750,  0.313,  0.626],  # b_bot, pose 10
+      [-0.016, 0.547, 0.650, -1.910,  0.626,  0.626],  # b_bot, pose 11
+      [-0.016, 0.547, 0.650, -1.750,  0.313,  0.313],  # b_bot, pose 12
+      [-0.016, 0.547, 0.650, -1.591,  0.000,  0.313],  # b_bot, pose 13
+      [-0.016, 0.547, 0.700, -1.400, -0.313, -0.313],  # b_bot, pose 14
+      [-0.016, 0.547, 0.650, -1.400, -0.313, -0.626],  # b_bot, pose 15
+      # [-0.016, 0.547, 0.650, -1.272,  0.626,  0.626],  # b_bot, pose 16
+      # [-0.016, 0.547, 0.650, -1.272, -0.626,  0.626],  # b_bot, pose 17
+      # [-0.016, 0.547, 0.650, -1.272,  0.626, -0.626],  # b_bot, pose 18
+      # [-0.016, 0.547, 0.650, -1.272, -0.626, -0.626],  # b_bot, pose 19
+    ],
 
-  'c_bot': [
-    [-0.111, 0.350, 0.400, -1.591, 0.000, -0.000],  # c_bot, pose 1
-    [-0.111, 0.350, 0.400, -1.591, 0.313, -0.000],  # c_bot, pose 2
-    [-0.111, 0.350, 0.400, -1.591, 0.626, -0.000],  # c_bot, pose 3
-    [-0.111, 0.350, 0.400, -1.591, 0.313, -0.313],  # c_bot, pose 4
-    [-0.111, 0.350, 0.400, -1.591, 0.000, -0.626],  # c_bot, pose 5
-  ],
+    'c_bot': [
+      [-0.111, 0.350, 0.400, -1.591, 0.000, -0.000],  # c_bot, pose 1
+      [-0.111, 0.350, 0.400, -1.591, 0.313, -0.000],  # c_bot, pose 2
+      [-0.111, 0.350, 0.400, -1.591, 0.626, -0.000],  # c_bot, pose 3
+      [-0.111, 0.350, 0.400, -1.591, 0.313, -0.313],  # c_bot, pose 4
+      [-0.111, 0.350, 0.400, -1.591, 0.000, -0.626],  # c_bot, pose 5
+    ],
+  },
+
+  'a_phoxi_m_camera': {
+    'a_bot': [
+      [0.245, 0.616, 0.485, -1.591,  0.000,  0.000],
+      [0.245, 0.616, 0.485, -1.591,  0.313,  0.000],
+      [0.245, 0.616, 0.485, -1.591,  0.626, -0.313],
+      [0.245, 0.616, 0.485, -1.591,  0.313, -0.626],
+      [0.245, 0.616, 0.485, -1.591,  0.000, -0.313],
+      [0.245, 0.616, 0.485, -1.591, -0.313,  0.000],
+    ],
+
+    'b_bot': [
+      [-0.273, 0.487, 0.480, -1.591,  0.000,  0.000],
+      [-0.273, 0.487, 0.480, -1.591,  0.313,  0.000],
+      [-0.273, 0.487, 0.480, -1.591,  0.626, -0.313],
+      [-0.273, 0.487, 0.480, -1.591,  0.313, -0.626],
+      [-0.273, 0.487, 0.480, -1.591,  0.000, -0.313],
+      [-0.273, 0.487, 0.480, -1.591, -0.313,  0.000],
+    ],
+
+    'c_bot': [
+      [-0.110,  0.433,  0.386, -0.900,  0.000,  0.000],
+      [-0.110,  0.415,  0.351, -0.570,  0.000,  0.000],
+      [-0.143,  0.424,  0.365, -0.699,  0.559, -0.428]
+    ]
+  }
 }
 
 
+# Initial poses are independent on cameras
 init_poses = {
   'a_bot': [-0.108, 0.183, 0.707, -1.571, 0.000, 0.000],
   'b_bot': [-0.108, 0.183, 0.707, -1.571, 0.000, 0.000],
@@ -134,17 +163,17 @@ class MoveGroupCommander(object):
     self.group.clear_pose_targets()
 
 
-def run_calibration(base_name):
-  """Run handeye calibration for the specified robot (base_name, e.g., b_bot)"""
+def run_calibration(camera_name, robot_name):
+  """Run handeye calibration for the specified robot (e.g., "b_bot")"""
   # Initialize move group and service proxies
-  mg = MoveGroupCommander(base_name)
-  take_sample = get_service_proxy("take_sample", base_name)
-  get_sample_list = get_service_proxy("get_sample_list", base_name)
-  remove_sample = get_service_proxy("remove_sample", base_name)
-  compute_calibration = get_service_proxy("compute_calibration", base_name)
-  save_calibration = get_service_proxy("save_calibration", base_name)
+  mg = MoveGroupCommander(robot_name)
+  take_sample = get_service_proxy("take_sample", robot_name)
+  get_sample_list = get_service_proxy("get_sample_list", robot_name)
+  remove_sample = get_service_proxy("remove_sample", robot_name)
+  compute_calibration = get_service_proxy("compute_calibration", robot_name)
+  save_calibration = get_service_proxy("save_calibration", robot_name)
 
-  print("=== Calibration started for {} ===".format(base_name))
+  print("=== Calibration started for {} ===".format(robot_name))
 
   # Clear samples in the buffer if exist
   n_samples = len(get_sample_list().samples.hand_world_samples.transforms)
@@ -152,8 +181,11 @@ def run_calibration(base_name):
     for _ in range(n_samples):
       remove_sample(0)
 
+  # Reset pose
+  mg.move(init_poses[robot_name])
+
   # Collect samples over pre-defined poses
-  for i, pose in enumerate(posess[base_name]):
+  for i, pose in enumerate(posess[camera_name][robot_name]):
     mg.move(pose)
     take_sample()
     rospy.sleep(1)  # Sleep for 1 seconds
@@ -168,15 +200,15 @@ def run_calibration(base_name):
   save_calibration()
 
   # Reset pose
-  mg.move(init_poses[base_name])
+  mg.move(init_poses[robot_name])
 
-  print("=== Calibration completed for {} ===".format(base_name))
+  print("=== Calibration completed for {} ===".format(robot_name))
 
 
-def main(base_name):
+def main(camera_name, robot_name):
   try:
     rospy.init_node('run_calibration', anonymous=True, log_level=rospy.INFO)
-    run_calibration(base_name)
+    run_calibration(camera_name, robot_name)
 
   except rospy.ROSInterruptException:
     return
@@ -186,5 +218,8 @@ def main(base_name):
 
 
 if __name__ == '__main__':
-  assert(sys.argv[1] in {"a_bot", "b_bot", "c_bot"})
-  main(sys.argv[1])
+  camera_name = sys.argv[1]
+  robot_name = sys.argv[2]
+  assert(robot_name in {"a_bot", "b_bot", "c_bot"})
+  assert(camera_name in {"d_bot_camera", "a_phoxi_m_camera"})
+  main(camera_name, robot_name)
