@@ -27,6 +27,8 @@
 
 #include "visualization_msgs/Marker.h"
 
+#include "o2as_msgs/RobotStatus.h"
+
 // Services
 #include "o2as_msgs/goToNamedPose.h"
 #include "o2as_msgs/sendScriptToUR.h"
@@ -73,7 +75,7 @@ public:
   bool goFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, double velocity_scaling_factor);
   bool placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name = "");
   bool pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name = "");
-  bool pickScrew(std::string object_id, std::string screw_tool_id, std::string robot_name);
+  bool pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::string screw_tool_id, std::string robot_name);
   bool publishMarker(geometry_msgs::PoseStamped marker_pose, std::string marker_type = "");
   bool publishPoseMarker(geometry_msgs::PoseStamped marker_pose);
 
@@ -132,11 +134,8 @@ public:
   tf::TransformListener tflistener_;
   tf::TransformBroadcaster tfbroadcaster_;
   bool holding_object_ = false;
-  // A status of the robot. This should almost definitely be rosparams instead.
-  // /a_bot/status/carrying_object  (bool)
-  // /a_bot/status/carrying_tool    (bool)
-  // /a_bot/status/held_object_id   (string)
-  // /a_bot/status/held_tool_id     (string)
+  // A status of the robot. This should almost definitely be rosparams or a topic instead.
+  std::map<std::string, o2as_msgs::RobotStatus> robot_statuses_;
   // std::map<std::string robot_name, std::map<std::string attribute, std::string status>> robot_statuses;
   std::string held_object_id_ = "";
   std::string held_screw_tool_ = "";    // "m3", "m4", "m5", "nut"...

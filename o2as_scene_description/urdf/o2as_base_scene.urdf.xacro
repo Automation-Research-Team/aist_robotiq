@@ -62,7 +62,7 @@
   </joint>
 
   <!-- Screw holder & screw tool visual -->
-  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/screw_tools.xacro" /> -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/screw_tools.xacro" />
 
   <!-- Feeders -->
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/screw_feeder.xacro" />
