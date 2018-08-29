@@ -2,7 +2,7 @@
 <launch>
     <arg name="robot_name" />  <!-- "a_bot", "b_bot", or "c_bot" -->
     <arg name="move_group" value="$(arg robot_name)" />
-    <arg name="camera_name" default="d_bot_camera"/>
+    <arg name="camera_name" default="a_phoxi_m_camera"/>
     <arg name="namespace_prefix" value="o2as_easy_handeye_$(arg robot_name)" />
     <arg name="marker_size" default="0.08"
          doc="Size of the ArUco marker used, in meters" />
@@ -14,15 +14,24 @@
     <!--<arg name="marker_id" default="26" doc="The ID of the ArUco marker used" />-->
 
     <!-- Camera state publisher -->
-    <node pkg="robot_state_publisher" type="robot_state_publisher"
+    <!--<node pkg="robot_state_publisher" type="robot_state_publisher"
         name="d_bot_st_pub">
         <remap from="robot_description" to="d_bot_camera_description"/>
-    </node>
+    </node>-->
 
     <!-- start ArUco -->
     <node name="aruco_tracker" pkg="aruco_ros" type="single">
-        <remap from="/camera_info" to="/$(arg camera_name)/rgb/camera_info" />
-        <remap from="/image" to="/$(arg camera_name)/rgb/image_raw" />
+        <!-- Remap topic names -->
+        <!-- String "/rgb/" is required for topics "camera_info" and
+        "image_raw" in realsense. Note that Phoxi publish topics named
+        "texture" instead of "image_raw". -->
+        <!-- <remap from="/camera_info"
+                  to="/$(arg camera_name)/rgb/camera_info" /> -->
+        <!-- <remap from="/image" to="/$(arg camera_name)/rgb/image_raw" /> -->
+        <remap from="/camera_info" to="/$(arg camera_name)/camera_info"/>
+        <remap from="/image" to="/$(arg camera_name)/texture" />
+
+        <!-- Other parameters -->
         <param name="image_is_rectified" value="false"/>
         <param name="marker_size"        value="$(arg marker_size)"/>
         <param name="marker_id"          value="$(arg marker_id)"/>
