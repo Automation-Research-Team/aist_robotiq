@@ -146,9 +146,9 @@
   <xacro:sensor_d435 prefix="b_bot_" parent="b_bot_cam_holder_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:sensor_d435>
-  <xacro:sensor_d435 prefix="d_bot_" parent="o2as_ground">
+  <!-- <xacro:sensor_d435 prefix="d_bot_" parent="o2as_ground">
     <origin xyz="0 0 ${bots_z + 0.9}" rpy="0 ${pi/2} 0"/>
-  </xacro:sensor_d435>
+  </xacro:sensor_d435> -->
 
   <!-- spawn and attach AR markers -->
   <xacro:include filename="$(find o2as_gazebo)/urdf/o2as_ar_marker.urdf.xacro"/>
@@ -162,7 +162,7 @@
   </xacro:o2as_ar_marker>
     <xacro:o2as_ar_marker prefix="c_bot_" parent="c_bot_wrist_3_link"
    marker_id="256">
-    <origin xyz="0.0 -0.06 0.0" rpy="${pi/2} 0 0"/>
+    <origin xyz="0.0 0.12 0.05" rpy="0 0 ${pi/2}"/>
   </xacro:o2as_ar_marker>
 
   <!-- Add PhoXi 3D scanners -->
