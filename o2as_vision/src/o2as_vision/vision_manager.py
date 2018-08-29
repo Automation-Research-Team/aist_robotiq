@@ -46,7 +46,6 @@ class VisionManager(object):
             rospy.loginfo("no object found")
         else:
             rospy.logdebug("add detected object to planning scene")
-            self.add_detected_object_to_planning_scene(detected_object, couplet)
 
             # change Pose to PoseStamped 
             # (cad matching always returns pose in depth image frame)
@@ -57,12 +56,14 @@ class VisionManager(object):
             res.object_pose = p
             res.success = True
 
+            self.add_detected_object_to_planning_scene(detected_object.object_id, p, couplet)
+
         rospy.logdebug("VisionManager.find_object() end")
         return res
 
-    def add_detected_object_to_planning_scene(self, obj, couplet):
+    def add_detected_object_to_planning_scene(self, object_id, pose, couplet):
         # get parts info
-        parts_info = self._items[str(obj.object_id)]
+        parts_info = self._items[str(object_id)]
         if parts_info is None:
             rospy.logerr("parts info was not found")
             return res
@@ -73,7 +74,7 @@ class VisionManager(object):
         name = parts_info.type+"_mesh"
         cad_filename = path + "/meshes/" + parts_info.cad
         scale = [0.001, 0.001, 0.001] # [mm to meter]
-        couplet.add_detected_object_to_planning_scene(name=name, pose=obj.pose, cad_filename=cad_filename, scale=scale)
+        couplet.add_detected_object_to_planning_scene(name=name, pose=pose, cad_filename=cad_filename, scale=scale)
 
     def add_couplet(self, name):
         self._vision_couplets[name] = VisionCouplet(name)

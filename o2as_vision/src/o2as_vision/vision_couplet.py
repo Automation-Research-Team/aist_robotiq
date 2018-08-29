@@ -5,7 +5,7 @@ import numpy as np
 from numpy import linalg as LA
 from o2as_realsense_camera.client import RealSenseCameraClient
 from o2as_cad_matching.cad_matching_client import CadMatchingClient
-from planning_scene_interface import PlanningSceneInterface
+import moveit_commander
 
 class VisionCouplet(object):
     def __init__(self, couplet_name=""):
@@ -20,7 +20,7 @@ class VisionCouplet(object):
         # planning scene
         #self._camera_frame = "/" + self._couplet_name + "_depth_frame"
         self._camera_frame = "/" + self._couplet_name + "_depth_image_frame"
-        self._planning_scene = PlanningSceneInterface(self._camera_frame)
+        self._planning_scene = moveit_commander.PlanningSceneInterface()
 
         rospy.logdebug("VisionCouplet.__init__() end")
 
@@ -91,8 +91,6 @@ class VisionCouplet(object):
         rospy.logdebug(pose)
         rospy.logdebug("scale: (%f, %f, %f)", scale[0], scale[1], scale[2])
 
-        self._planning_scene.addMesh(name=name, pose=pose, filename=cad_filename, scale=scale)
-        # # add box to planning scene (test)
-        # a = 0.05
-        # self._planning_scene.addBox(name=object_name+"_box", x=pose.position.x, y=pose.position.y, z=pose.position.z, size_x=a, size_y=a, size_z=a)
+        self._planning_scene.add_mesh(name=name, pose=pose, filename=cad_filename, size=scale)
+        #self._planning_scene.add_box(name=name+"_box", pose=pose, size=(0.2, 0.2, 0.2)) # debug
         rospy.logdebug("VisionCouplet.add_detected_object_to_planning_scene() end")
