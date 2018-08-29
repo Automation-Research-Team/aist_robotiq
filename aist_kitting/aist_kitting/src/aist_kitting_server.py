@@ -32,6 +32,8 @@ class AistKitting:
         eef_link = rospy.get_param("ee_link", "b_bot_dual_suction_gripper_pad_link")
         rospy.loginfo(eef_link)
         group = moveit_commander.MoveGroupCommander(group_name)
+        group.set_max_velocity_scaling_factor(0.01)
+
 
         display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
                                                     moveit_msgs.msg.DisplayTrajectory,
@@ -74,7 +76,7 @@ class AistKitting:
     ################################################################################
 
 
-    def all_close(self, goal, actual, tolerance):
+    def all_close(self, goal, actual, tolerance = 0.01):
         """
         Convenience method for testing if a list of values are within a tolerance of their counterparts in another list
         @param: goal       A list of floats, a Pose or a PoseStamped
@@ -192,6 +194,7 @@ class AistKitting:
         self.group = moveit_commander.MoveGroupCommander(robot_name)
         self.group.set_end_effector_link(robot_name + '_' + ee_link_name)
         self.group.set_planning_time(0.5)
+        self.group.set_max_velocity_scaling_factor(0.01)
         # self.group.set_planner_id("RRTConnectkConfigDefault")
         
         # The robot approaches to object from just above.
@@ -204,25 +207,27 @@ class AistKitting:
 
         pose_goal.pose.position.z += 0.2
         pose_goal.header.frame_id = frame_id
+        success = self.go_to_pose_goal(pose_goal)
+        if success:
+            rospy.sleep(3)
+        
+        pose_goal.pose.position.z -= 0.2
+        pose_goal.header.frame_id = frame_id
         if self.go_to_pose_goal(pose_goal):
             rospy.sleep(3)
         
-        # pose_goal.pose.position.z -= 0.2
-        # pose_goal.header.frame_id = frame_id
-        # if self.go_to_pose_goal(pose_goal):
-        #     rospy.sleep(3)
-        
-        req_suction = SetPower()
-        req_suction.port = 1
-        req_suction.on = True
-        res_suction = self.suction(req_suction)
-        if res_suction:
-            rospy.sleep(3)
+        if success:
+            req_suction = SetPowerRequest()
+            req_suction.port = 1
+            req_suction.on = True
+            res_suction = self.suction(req_suction)
+            if res_suction:
+                rospy.sleep(3)
 
-        # pose_goal.pose.position.z += 0.2
-        # pose_goal.header.frame_id = frame_id
-        # if self.go_to_pose_goal(pose_goal):
-        #     rospy.sleep(3)
+        pose_goal.pose.position.z += 0.2
+        pose_goal.header.frame_id = frame_id
+        if self.go_to_pose_goal(pose_goal):
+            rospy.sleep(3)
 
         rospy.loginfo("pick finished.")
         return True
