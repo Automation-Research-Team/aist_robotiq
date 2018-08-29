@@ -6,6 +6,7 @@
 #include <string>
 #include "std_msgs/String.h"
 #include "std_msgs/Bool.h"
+#include "std_srvs/SetBool.h"
 #include "geometry_msgs/PoseStamped.h"
 
 #include <tf/transform_listener.h>    // Includes the TF conversions
@@ -57,6 +58,7 @@ public:
   bool stop();                  // Stops the robot at the current position
   moveit::planning_interface::MoveGroupInterface* robotNameToMoveGroup(std::string robot_name);
   std::string getEELink(std::string robot_name);
+  bool toggleCollisions(bool collisions_on);
   bool updatePlanningScene();
 
   // Internal functions
@@ -84,6 +86,8 @@ public:
                         o2as_msgs::goToNamedPose::Response &res);
   bool publishMarkerCallback(o2as_msgs::publishMarker::Request &req,
                         o2as_msgs::publishMarker::Response &res);
+  bool toggleCollisionsCallback(std_srvs::SetBool::Request &req,
+                        std_srvs::SetBool::Response &res);
 
   // Actions
   void executeAlign(const o2as_msgs::alignGoalConstPtr& goal);
@@ -103,6 +107,8 @@ public:
   // Service declarations
   ros::ServiceServer goToNamedPoseService_;
   ros::ServiceServer publishMarkerService_;
+  ros::ServiceServer allowCollisionsService_;
+
 
   // Service clients
   ros::ServiceClient sendScriptToURClient_;

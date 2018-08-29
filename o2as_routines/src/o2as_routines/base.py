@@ -49,6 +49,7 @@ import moveit_msgs.msg
 import geometry_msgs.msg
 import std_msgs.msg
 import robotiq_msgs.msg
+import std_srvs.srv
 
 import o2as_msgs
 import o2as_msgs.msg
@@ -114,6 +115,7 @@ class O2ASBaseRoutines(object):
     self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR)
     self.goToNamedPose_client = rospy.ServiceProxy('/o2as_skills/goToNamedPose', o2as_msgs.srv.goToNamedPose)
     self.publishMarker_client = rospy.ServiceProxy('/o2as_skills/publishMarker', o2as_msgs.srv.publishMarker)
+    self.toggleCollisions_client = rospy.ServiceProxy('/o2as_skills/toggleCollisions', std_srvs.srv.SetBool)
 
     # self.pick_client.wait_for_server() # wait for the clients to connect
     # self.place_client.wait_for_server() 
@@ -330,6 +332,12 @@ class O2ASBaseRoutines(object):
     self.regrasp_client.wait_for_result(rospy.Duration(90.0))
     result = self.regrasp_client.get_result()
     return result
+
+  def toggle_collisions(self, collisions_on):
+    req = std_srvs.srv.SetBoolRequest()
+    req.data = collisions_on
+    res = self.toggleCollisions_client.call(req)
+    return res.success
 
 
   ################ ----- Gripper interfaces

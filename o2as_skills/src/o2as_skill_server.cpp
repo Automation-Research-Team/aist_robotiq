@@ -19,6 +19,8 @@ SkillServer::SkillServer() :
                                         this);
   publishMarkerService_ = n_.advertiseService("o2as_skills/publishMarker", &SkillServer::publishMarkerCallback,
                                         this);
+  publishMarkerService_ = n_.advertiseService("o2as_skills/toggleCollisions", &SkillServer::toggleCollisionsCallback,
+                                        this);
 
   // Services to subscribe to
   sendScriptToURClient_ = n_.serviceClient<o2as_msgs::sendScriptToUR>("o2as_skills/sendScriptToUR");
@@ -453,6 +455,33 @@ bool SkillServer::updatePlanningScene()
   }
 }
 
+
+bool SkillServer::toggleCollisions(bool collisions_on)
+{
+  if (!collisions_on)
+  {
+    updatePlanningScene();
+    ROS_INFO("Disabling all collisions.");
+    collision_detection::AllowedCollisionMatrix acm_no_collisions(planning_scene_.allowed_collision_matrix),
+                                                acm_original(planning_scene_.allowed_collision_matrix);
+    std::vector<std::string> entries;
+    acm_no_collisions.getAllEntryNames(entries);
+    for (auto i : entries)
+    {
+      acm_no_collisions.setEntry(i, true);
+    }
+    moveit_msgs::PlanningScene ps_no_collisions = planning_scene_;
+    acm_no_collisions.getMessage(ps_no_collisions.allowed_collision_matrix);
+    planning_scene_interface_.applyPlanningScene(ps_no_collisions);
+  }
+  else
+  {
+    ROS_INFO("Reenabling collisions with the scene as remembered.");
+    planning_scene_interface_.applyPlanningScene(planning_scene_);
+  }
+}
+
+
 bool SkillServer::openGripper(std::string robot_name, std::string gripper_name)
 {
   return sendGripperCommand(robot_name, 0.085, gripper_name);
@@ -830,7 +859,12 @@ bool SkillServer::publishMarkerCallback(o2as_msgs::publishMarker::Request &req,
   ROS_INFO("Received publishMarker callback.");
   return publishMarker(req.marker_pose, req.marker_type);
 }
-
+bool SkillServer::toggleCollisionsCallback(std_srvs::SetBool::Request &req,
+                        std_srvs::SetBool::Response &res)
+{
+  ROS_INFO("Received toggleCollisions callback.");
+  return toggleCollisions(req.data);
+}
 // ----------- Action servers
 
 // alignAction
