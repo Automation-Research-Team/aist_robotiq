@@ -28,8 +28,8 @@
   <!-- Scene items (trays, bins...) -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray_with_partitions.xacro" />
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/taskboard_scene.xacro" /> -->
-  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" /> -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/assembly_scene.xacro" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/assembly_scene.xacro" /> -->
   
   <!-- Robot bases -->
   <!-- Putting these at height 0.0 makes them intersect with the ground, so they are elevated. -->
@@ -145,11 +145,11 @@
     <origin xyz="0.0 -0.06 0.16" rpy="0.0 0.0 ${pi/2}" />
   </joint>
 
-  <xacro:o2as_sensor_d435 prefix="b_bot_" parent="b_bot_cam_holder_link">
+  <xacro:sensor_d435 prefix="b_bot_" parent="b_bot_cam_holder_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
-  </xacro:o2as_sensor_d435>
+  </xacro:sensor_d435>
 
-  <!-- <link name="d_bot_cam_holder_link" />
+  <link name="d_bot_cam_holder_link" />
   <joint name="d_bot_cam_holder_joint" type="fixed">
     <parent link="o2as_ground" />
     <child  link="d_bot_cam_holder_link" />
@@ -158,7 +158,7 @@
 
   <xacro:sensor_d435 prefix="d_bot_" parent="d_bot_cam_holder_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
-  </xacro:sensor_d435> -->
+  </xacro:sensor_d435>
 
   <!-- spawn and attach AR marker -->
   <xacro:include filename="$(find o2as_gazebo)/urdf/o2as_ar_marker.urdf.xacro"/>
