@@ -43,6 +43,7 @@
 #include "o2as_msgs/regraspAction.h"
 #include "o2as_msgs/insertAction.h"
 #include "o2as_msgs/screwAction.h"
+#include "o2as_msgs/changeToolAction.h"
 
 #include <actionlib/client/simple_action_client.h>
 #include <robotiq_msgs/CModelCommandAction.h>
@@ -98,6 +99,7 @@ public:
   void executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal);
   void executeInsert(const o2as_msgs::insertGoalConstPtr& goal);
   void executeScrew(const o2as_msgs::screwGoalConstPtr& goal);
+  void executeChangeTool(const o2as_msgs::changeToolGoalConstPtr& goal);
   
 
 // private:
@@ -123,6 +125,7 @@ public:
   actionlib::SimpleActionServer<o2as_msgs::regraspAction> regraspActionServer_;
   actionlib::SimpleActionServer<o2as_msgs::insertAction> insertActionServer_;
   actionlib::SimpleActionServer<o2as_msgs::screwAction> screwActionServer_;  
+  actionlib::SimpleActionServer<o2as_msgs::changeToolAction> changeToolActionServer_;  
 
   // Action clients
   // actionlib::SimpleActionClient<control_msgs::GripperCommandAction> a_bot_gripper_client_;

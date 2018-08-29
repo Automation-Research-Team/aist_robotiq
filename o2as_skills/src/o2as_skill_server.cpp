@@ -7,6 +7,7 @@ SkillServer::SkillServer() :
                   regraspActionServer_(n_, "o2as_skills/regrasp", boost::bind(&SkillServer::executeRegrasp, this, _1),false),
                   insertActionServer_(n_, "o2as_skills/insert", boost::bind(&SkillServer::executeInsert, this, _1),false),
                   screwActionServer_(n_, "o2as_skills/screw", boost::bind(&SkillServer::executeScrew, this, _1),false),
+                  changeToolActionServer_(n_, "o2as_skills/changeTool", boost::bind(&SkillServer::executeChangeTool, this, _1),false),
                   a_bot_group_("a_bot"), b_bot_group_("b_bot"), c_bot_group_("c_bot"),
                   b_bot_gripper_client_("/b_bot_gripper/gripper_action_controller", true),
                   c_bot_gripper_client_("/c_bot_gripper/gripper_action_controller", true)
@@ -33,6 +34,7 @@ SkillServer::SkillServer() :
   regraspActionServer_.start();
   insertActionServer_.start();
   screwActionServer_.start();
+  changeToolActionServer_.start();
 
   // Action clients
   // ROS_INFO("Waiting for action servers to start.");
@@ -358,10 +360,19 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     return false;
   }
 
-  // TODO: Use the status of the robot_name instead of a general one
-  if ( (robot_statuses_[robot_name].carrying_tool == true) || (robot_statuses_[robot_name].carrying_object == true))
+  if ((robot_statuses_[robot_name].carrying_object == true))
   {
-    ROS_ERROR_STREAM("Robot already holds an object or tool. Cannot " << equip_or_unequip << " screw tool.");
+    ROS_ERROR_STREAM("Robot holds an object. Cannot " << equip_or_unequip << " screw tool.");
+    return false;
+  }
+  if ( (robot_statuses_[robot_name].carrying_tool == true) && (equip))
+  {
+    ROS_ERROR_STREAM("Robot already holds a tool. Cannot equip another.");
+    return false;
+  }
+  if ( (robot_statuses_[robot_name].carrying_tool == false) && (unequip))
+  {
+    ROS_ERROR_STREAM("Robot is not holding a tool. Cannot unequip any.");
     return false;
   }
   
@@ -369,7 +380,9 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   geometry_msgs::PoseStamped ps_approach, ps_tool_holder;
   ps_approach.header.frame_id = screw_tool_id + "_helper_link";
 
-  ps_approach.pose.position.x = .0;   // If this is too far in the back, the LIN movement fails.
+  // Before we moved the robots back, this x-value caused the LIN movement to fail if it was too far in the back.
+  // This seemed to have to do with the IK solutions rather than the actual solvability. To note.
+  ps_approach.pose.position.x = -.03;
   ps_approach.pose.position.z = .017;
   ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
   ROS_INFO("Moving to screw tool approach pose PTP.");
@@ -431,7 +444,11 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   {
     closeGripper(robot_name);
     attachTool(screw_tool_id, robot_name);
-    acm_original.setEntry(screw_tool_id, robot_name + "_robotiq_85_tip_link", true);
+    acm_original.setEntry(screw_tool_id, robot_name + "_robotiq_85_tip_link", true);  // For afterwards
+    
+    acm_no_collisions.setEntry(screw_tool_id, true);      // To allow collisions now
+    planning_scene_interface_.applyPlanningScene(ps_no_collisions);
+    
     robot_statuses_[robot_name].carrying_tool = true;
     robot_statuses_[robot_name].held_tool_id = screw_tool_id;
   }
@@ -452,6 +469,14 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
   // Reactivate the collisions, with the updated entry about the tool
   planning_scene_interface_.applyPlanningScene(planning_scene_);
+
+  if (equip)
+  {
+    ROS_INFO("Moving higher up to facilitate later movements.");
+    ps_approach.pose.position.z +=.3;
+    moveToCartPosePTP(ps_approach, robot_name);
+  }
+  
 
   // Delete tool collision object only after collision reinitialization to avoid errors
   if (unequip) despawnTool(screw_tool_id);
@@ -1407,6 +1432,18 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
   screwActionServer_.setSucceeded();
 }
 
+void SkillServer::executeChangeTool(const o2as_msgs::changeToolGoalConstPtr& goal)
+{
+  std::string equip_or_unequip = "equip";
+  if (!goal->equip_the_tool) { equip_or_unequip = "unequip"; }
+
+  std::string screw_tool_id = "screw_tool_m" + std::to_string(goal->screw_size);
+  bool success = equipUnequipScrewTool(goal->robot_name, screw_tool_id, equip_or_unequip);
+  
+  if (success) { changeToolActionServer_.setSucceeded(); }
+  else changeToolActionServer_.setAborted();
+}
+
 // ----------- End of the class definitions
 
 int main(int argc, char **argv)
@@ -1431,14 +1468,14 @@ int main(int argc, char **argv)
   // waitForURProgram("/b_bot_controller");
 
   // ------------ Spawns all of the screw tools (for visualization)
-  o2as_skill_server.spawnTool("screw_tool_m6");
-  o2as_skill_server.spawnTool("screw_tool_m4");
-  o2as_skill_server.spawnTool("screw_tool_m3");
+  // o2as_skill_server.spawnTool("screw_tool_m6");
+  // o2as_skill_server.spawnTool("screw_tool_m4");
+  // o2as_skill_server.spawnTool("screw_tool_m3");
   // ------------
 
   // ------------ Debugging procedures. Should be in a separate node, but ohwell.
-  ROS_INFO("Testing the screw tool mounting.");
-  o2as_skill_server.equipScrewTool("b_bot", "screw_tool_m6");
+  // ROS_INFO("Testing the screw tool mounting.");
+  // o2as_skill_server.equipScrewTool("b_bot", "screw_tool_m6");
 
   // ROS_INFO("Going to screw ready pose.");
   // o2as_skill_server.goToNamedPose("screw_ready_b", "b_bot");
