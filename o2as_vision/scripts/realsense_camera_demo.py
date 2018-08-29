@@ -3,11 +3,19 @@
 import rospy
 from std_srvs.srv import *
 from o2as_msgs.srv import *
-from o2as_vision.util import *
 from o2as_vision.vision_manager import VisionManager
 
 MAX_TRIAL = 30
-FIND_OBJECT_SERVICE = "find_object"
+
+def ros_service_proxy(service_name, service_type):
+    proxy = None
+    try:
+        rospy.logdebug("wait for service %s", service_name)
+        rospy.wait_for_service(service_name)
+        proxy = rospy.ServiceProxy(service_name, service_type)
+    except rospy.ServiceException as e:
+        rospy.logerr("service error: %s", str(e)) 
+    return proxy
 
 if __name__ == "__main__":
     rospy.init_node('o2as_vision_demo', anonymous=True, log_level=rospy.DEBUG)
@@ -18,7 +26,7 @@ if __name__ == "__main__":
         ask_object_id = False
 
     try:
-        find_object = ros_service_proxy(FIND_OBJECT_SERVICE, FindObject)
+        find_object = ros_service_proxy("find_object", FindObject)
 
         if ask_object_id:
             object_id = raw_input("Enter the number of the part to be published to the planning scene: ")
