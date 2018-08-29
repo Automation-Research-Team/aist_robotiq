@@ -9,7 +9,8 @@ from aist_kitting_msgs.srv import *
 from std_srvs.srv import Trigger
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import Point, PoseStamped
-from o2as_usb_relay.srv import SetPowerRequest, SetPowerResponse
+from o2as_phoxi_camera.srv import SetInt
+from o2as_usb_relay.srv import SetPower, SetPowerRequest, SetPowerResponse
 
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
@@ -62,6 +63,7 @@ class AistKitting:
         self.search_service = rospy.Service('aist_kitting/search', Search, self.search_callback)
         self.pick_service = rospy.Service('aist_kitting/pick', Pick, self.pick_callback)
         self.move_named_pose_service = rospy.Service('aist_kitting/move_named_pose', MoveNamedPose, self.move_named_pose_callback)
+        self.move_to_goal_pose = rospy.Service('aist_kitting/move_to_goal_pose', MoveToGoalPose, self.move_to_goal_pose_callback)
 
         rospy.loginfo('AistKitting started up')
         rospy.spin()
@@ -146,13 +148,12 @@ class AistKitting:
             self.get(0)
 
         pcloud_filename = rospy.get_param('o2as_phoxi_camera/id')[1:-1]+".tiff"
-        io.imsave(os.environ.get('ROS_HOME')+"/data/"+pSetPowercloud_filename, self.depth_img)
+        io.imsave(os.environ.get('ROS_HOME')+"/data/"+pcloud_filename, self.depth_img)
 
         res_stop = self.stop()
         rospy.loginfo('get_image finished.')
 
         return GetImageResponse(True, '1711015.tiff')
-        
 
     def search_callback(self, req):
         rospy.loginfo("search started.")
@@ -162,11 +163,17 @@ class AistKitting:
 
         fge = rospy.ServiceProxy('/FGE', Search)
         res_fge = fge(req)
-        rospy.loginfo("res_fge: " + str(res_fge))
+        rospy.loginfo("pos3D[0].u: " + str(res_fge.pos3D[0].x))
+        rospy.loginfo("pos3D[0].v: " + str(res_fge.pos3D[0].y))
+        rospy.loginfo("pos3D[0].z: " + str(res_fge.pos3D[0].z))
 
         for i in range(res_fge.result_num):
             res_fge.pos3D[i].x = res_fge.pos3D[i].z * (res_fge.pos3D[i].x - cx) / f
             res_fge.pos3D[i].y = res_fge.pos3D[i].z * (res_fge.pos3D[i].y - cy) / f
+
+        rospy.loginfo("pos3D[0].x " + str(res_fge.pos3D[0].x))
+        rospy.loginfo("pos3D[0].y " + str(res_fge.pos3D[0].y))
+        rospy.loginfo("pos3D[0].z " + str(res_fge.pos3D[0].z))
 
         # rospy.loginfo("cam_fge: " + str(cam_fge))
         rospy.loginfo("res_fge: " + str(res_fge))
@@ -227,14 +234,28 @@ class AistKitting:
         ee_link_name = req.ee_link_name
         named_pose = req.named_pose
 
-        group = moveit_commander.MoveGroupCommander(robot_name)
-        group.set_end_effector_link(robot_name + ee_link_name)
-        group.set_planning_time(0.5)
+        self.group = moveit_commander.MoveGroupCommander(robot_name)
+        self.group.set_end_effector_link(robot_name + '_' + ee_link_name)
+        self.group.set_planning_time(0.5)
         # group.set_planner_id("RRTConnectkConfigDefault")
         
         self.go_to_named_goal(named_pose)
 
         return True
+
+    def move_to_goal_pose_callback(self, req):
+
+        rospy.loginfo('move_to_goal_pose started.') 
+        self.group = moveit_commander.MoveGroupCommander(req.robot_name)
+        self.group.set_end_effector_link(req.robot_name + '_' + req.ee_link_name)
+        self.group.set_planning_time(0.5)
+
+        # pose_goal.header.frame_id = req.frame_id
+        success = self.go_to_pose_goal(req.goal)
+        if success:
+            rospy.sleep(3)
+        
+        return success
 
 
 if __name__ == '__main__':
