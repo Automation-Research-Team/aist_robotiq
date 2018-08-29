@@ -19,7 +19,7 @@ SkillServer::SkillServer() :
                                         this);
   publishMarkerService_ = n_.advertiseService("o2as_skills/publishMarker", &SkillServer::publishMarkerCallback,
                                         this);
-  publishMarkerService_ = n_.advertiseService("o2as_skills/toggleCollisions", &SkillServer::toggleCollisionsCallback,
+  toggleCollisionsService_ = n_.advertiseService("o2as_skills/toggleCollisions", &SkillServer::toggleCollisionsCallback,
                                         this);
 
   // Services to subscribe to
@@ -477,6 +477,7 @@ bool SkillServer::toggleCollisions(bool collisions_on)
     ROS_INFO("Reenabling collisions with the scene as remembered.");
     planning_scene_interface_.applyPlanningScene(planning_scene_);
   }
+  return true;
 }
 
 

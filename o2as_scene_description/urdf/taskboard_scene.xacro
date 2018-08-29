@@ -16,5 +16,13 @@
   <xacro:o2as_mat matname="mat" mat_w="${p_w}" mat_l="${p_l}" mat_h=".0001" parent="taskboard">
     <origin xyz="0.0 0.41 0.0" rpy="0 0 0" />
   </xacro:o2as_mat>
+
+
+  <joint name="belt_placement_tool" type="fixed">
+    <parent link="taskboard"/>
+    <child link="belt_placement_tool"/>
+    <origin rpy="0.0 0.0 ${pi/2}" xyz="-0.07 0.0 0.0"/>
+  </joint>
+  <link name="belt_placement_tool"/>
   
 </robot>

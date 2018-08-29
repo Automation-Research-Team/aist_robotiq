@@ -107,7 +107,7 @@ public:
   // Service declarations
   ros::ServiceServer goToNamedPoseService_;
   ros::ServiceServer publishMarkerService_;
-  ros::ServiceServer allowCollisionsService_;
+  ros::ServiceServer toggleCollisionsService_;
 
 
   // Service clients

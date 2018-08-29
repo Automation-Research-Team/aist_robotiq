@@ -133,6 +133,7 @@ class TaskboardClass(O2ASBaseRoutines):
   ################ 
   ################ 
   def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.03):
+    self.publish_marker(object_pose, "pick_pose")
     #initial gripper_setup
     rospy.loginfo("Going above object to pick")
     object_pose.pose.position.z = approach_height
@@ -172,6 +173,7 @@ class TaskboardClass(O2ASBaseRoutines):
 ######
 
   def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, lift_up_after_place = True):
+    self.publish_marker(object_pose, "place_pose")
     rospy.loginfo("Going above place target")
     object_pose.pose.position.z = approach_height
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
@@ -184,16 +186,17 @@ class TaskboardClass(O2ASBaseRoutines):
     # raw_input()
 
     #gripper open
-    # if gripper_command=="complex_pick_from_inside":
-    #   self.precision_gripper_outer_open()
-    #   self.precision_gripper_inner_close()
-    # elif gripper_command=="complex_pick_from_outside":
-    #   self.precision_gripper_outer_open()
-    #   self.precision_gripper_inner_open()
-    # elif gripper_command=="easy_pick_only_inner":
-    #   self.precision_gripper_inner_close()
-    # else: 
-    #   rospy.logerr("No gripper command was set")
+    if gripper_command=="complex_pick_from_inside":
+      self.precision_gripper_outer_open()
+      self.precision_gripper_inner_close()
+    elif gripper_command=="complex_pick_from_outside":
+      self.precision_gripper_outer_open()
+      self.precision_gripper_inner_open()
+    elif gripper_command=="easy_pick_only_inner":
+      self.precision_gripper_inner_close()
+    else: 
+      self.send_gripper_command(gripper=robotname, command="open")
+
     
     if lift_up_after_place:
       rospy.loginfo("Moving back up")
@@ -431,21 +434,27 @@ if __name__ == '__main__':
         taskboard.horizontal_spiral_motion("a_bot", .002)
 
       if i == 6:
-        #tool set
+        # Set the placement aid
         # pick_tool_pose = geometry_msgs.msg.PoseStamped()
         # pick_tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-        # pick_tool_pose.header.frame_id = "taskboard_tool"
-        # taskboard.do_pick_action("c_bot", pick_tool_pose, z_axis_rotation = 0.0, use_complex_planning = False)
-
+        # pick_tool_pose.header.frame_id = "belt_placement_tool"
+        # taskboard.pick("c_bot", pick_tool_pose, 0.015, speed_fast = 0.2, speed_slow = 0.1, gripper_command="close",
+        #                         approach_height = 0.1)
         # place_tool_pose = geometry_msgs.msg.PoseStamped()
         # place_tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
         # place_tool_pose.header.frame_id = "taskboard_corner4"
-        # taskboard.do_place_action("c_bot",place_tool_pose)
+        # place_tool_pose.pose.position.y = 0.023
+        # place_tool_pose.pose.position.x = 0.015
+        # taskboard.place("c_bot", place_tool_pose, 0.015, speed_fast = 0.2, speed_slow = 0.02, gripper_command="open",
+        #                         approach_height = 0.1, lift_up_after_place = True)
 
-        #pick up the belt
-        taskboard.belt_pick("b_bot")
+        # Pick up the belt
+        # taskboard.belt_pick("b_bot")
 
-        #belt spiral
+        
+
+        # Fiddle in the belt
+        taskboard.go_to_named_pose("back", "c_bot")
         rospy.logwarn("Doing belt spiral motion")
         taskboard.belt_circle_motion("a_bot")
 
@@ -472,9 +481,9 @@ if __name__ == '__main__':
         taskboard.horizontal_spiral_motion("a_bot", .002)
         
       
-      taskboard.go_to_named_pose("home", "c_bot")
-      taskboard.go_to_named_pose("home", "b_bot")
       taskboard.go_to_named_pose("home", "a_bot")
+      taskboard.go_to_named_pose("home", "b_bot")
+      taskboard.go_to_named_pose("home", "c_bot")
       i = raw_input("Enter the number of the part to be performed: ")
       i =int(i)
     print "============ Done!"
