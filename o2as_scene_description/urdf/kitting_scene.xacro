@@ -14,63 +14,89 @@
   <xacro:property name="bin3_length" value=".285" />
   <xacro:property name="tray_width" value=".300" />
   <xacro:property name="tray_length" value=".210" />
-
-  <!-- <xacro:property name="rack_width" value=".640" /> -->
-
-  <!-- A row of bin1 -->
-  <xacro:property name="set1_x" value="+0.05"/>
-  <xacro:property name="set1_y" value="${.32-bin1_width/2}"/>
-  <xacro:property name="set1_z" value=".01" />
   <xacro:property name="z_origin_offset_1" value="-.008" />
-  <!-- set1_bin1_1 -->
-  <xacro:kitting_bin_1 binname="set1_bin1_1" parent="workspace_center" z_origin_offset="${z_origin_offset_1}">
-    <origin xyz="${set1_x} ${set1_y} ${set1_z - z_origin_offset_1}" rpy="0 0 0" />
-  </xacro:kitting_bin_1>
-  <!-- set1_bin1_2 -->
-  <xacro:kitting_bin_1 binname="set1_bin1_2" parent="workspace_center" z_origin_offset="${z_origin_offset_1}">
-    <origin xyz="${set1_x} ${set1_y - bin1_width*1} ${set1_z - z_origin_offset_1}" rpy="0 0 0" />   
-  </xacro:kitting_bin_1>
-  <!-- set1_bin1_3 -->
-  <xacro:kitting_bin_1 binname="set1_bin1_3" parent="workspace_center" z_origin_offset="${z_origin_offset_1}">
-    <origin xyz="${set1_x} ${set1_y - bin1_width*2} ${set1_z - z_origin_offset_1}" rpy="0 0 0" />   
-  </xacro:kitting_bin_1>
-  <!-- set1_bin1_4 -->
-  <xacro:kitting_bin_1 binname="set1_bin1_4" parent="workspace_center" z_origin_offset="${z_origin_offset_1}">
-    <origin xyz="${set1_x} ${set1_y - bin1_width*3} ${set1_z - z_origin_offset_1}" rpy="0 0 0" />   
-  </xacro:kitting_bin_1>
-  <!-- set1_bin1_5 -->
-  <xacro:kitting_bin_1 binname="set1_bin1_5" parent="workspace_center" z_origin_offset="${z_origin_offset_1}">
-    <origin xyz="${set1_x} ${set1_y - bin1_width*4} ${set1_z - z_origin_offset_1}" rpy="0 0 0" />   
-  </xacro:kitting_bin_1>
-
-  <!-- A row of bin2 and bin3 -->
-  <xacro:property name="set2_x_bin3" value="${bin1_length/2+bin3_length/2+0.05}" />
-  <xacro:property name="set2_x_bin2" value="${bin1_length/2+bin2_length/2+0.05}" />
-  <xacro:property name="set2_y" value="${.32-bin3_width/2}" />
-  <xacro:property name="set2_z" value=".00" />
   <xacro:property name="z_origin_offset_2" value="-.009" />
   <xacro:property name="z_origin_offset_3" value="-.004" />
 
-  <!-- set2_bin3 -->
-  <xacro:kitting_bin_3 binname="set2_bin3" parent="workspace_center" z_origin_offset="${z_origin_offset_3}">
+  <xacro:property name="set1_x" value="${bin3_length/2}" />
+  <xacro:property name="set1_y" value="${-.33 + bin3_width / 2}" />
+  <xacro:property name="set1_z" value="0.01" />
+  <xacro:kitting_bin_3 binname="part_6" parent="workspace_center" z_origin_offset="${z_origin_offset_3}">
+    <origin xyz="${set1_x} ${set1_y} ${set1_z - z_origin_offset_3}" rpy="0 0 ${pi}" />
+  </xacro:kitting_bin_3>
+  <xacro:kitting_bin_2 binname="part_4" parent="workspace_center" z_origin_offset="${z_origin_offset_2}">
+    <origin xyz="${set1_x} ${set1_y + bin3_width / 2 + bin2_width / 2} ${set1_z - z_origin_offset_2}" rpy="0 0 ${pi}" />
+  </xacro:kitting_bin_2>
+  <xacro:kitting_bin_2 binname="part_8" parent="workspace_center" z_origin_offset="${z_origin_offset_2}">
+    <origin xyz="${set1_x} ${set1_y + bin3_width / 2 + 3 * bin2_width / 2} ${set1_z - z_origin_offset_2}" rpy="0 0 ${pi}" />
+  </xacro:kitting_bin_2>
+  <xacro:kitting_bin_2 binname="part_11" parent="workspace_center" z_origin_offset="${z_origin_offset_2}">
+    <origin xyz="${set1_x} ${set1_y + bin3_width / 2 + 5 * bin2_width / 2} ${set1_z - z_origin_offset_2}" rpy="0 0 ${pi}" />
+  </xacro:kitting_bin_2>
+  <xacro:kitting_bin_2 binname="part_13" parent="workspace_center" z_origin_offset="${z_origin_offset_2}">
+    <origin xyz="${set1_x} ${set1_y + bin3_width / 2 + 7 * bin2_width / 2} ${set1_z - z_origin_offset_2}" rpy="0 0 ${pi}" />
+  </xacro:kitting_bin_2>
+
+  <xacro:property name="set2_x" value="${.42-bin1_length/2}" />
+  <xacro:property name="set2_y" value="0" />
+  <xacro:property name="set2_z" value="0.01" />
+  <xacro:kitting_bin_1 binname="part_9" parent="workspace_center" z_origin_offset="${z_origin_offset_1}">
+    <origin xyz="${set2_x} ${set2_y} ${set2_z - z_origin_offset_1}" rpy="0 0 ${pi}" />
+  </xacro:kitting_bin_1>
+  <xacro:kitting_bin_1 binname="part_12" parent="workspace_center" z_origin_offset="${z_origin_offset_1}">
+    <origin xyz="${set2_x} ${set2_y - bin1_width} ${set2_z - z_origin_offset_1}" rpy="0 0 ${pi}" />
+  </xacro:kitting_bin_1>
+  <xacro:kitting_bin_1 binname="part_16" parent="workspace_center" z_origin_offset="${z_origin_offset_1}">
+    <origin xyz="${set2_x} ${set2_y + bin1_width} ${set2_z - z_origin_offset_1}" rpy="0 0 ${pi}" />
+  </xacro:kitting_bin_1>
+  <xacro:kitting_bin_1 binname="part_17" parent="workspace_center" z_origin_offset="${z_origin_offset_1}">
+    <origin xyz="${set2_x} ${set2_y - 2 * bin1_width} ${set2_z - z_origin_offset_1}" rpy="0 0 ${pi}" />
+  </xacro:kitting_bin_1>
+  <xacro:kitting_bin_1 binname="part_18" parent="workspace_center" z_origin_offset="${z_origin_offset_1}">
+    <origin xyz="${set2_x} ${set2_y + 2 * bin1_width} ${set2_z - z_origin_offset_1}" rpy="0 0 ${pi}" />
+  </xacro:kitting_bin_1>
+
+  <!-- <xacro:property name="set1_x" value="+0.05"/>
+  <xacro:property name="set1_y" value="${.32-bin1_width/2}"/>
+  <xacro:property name="set1_z" value=".01" />
+  <xacro:kitting_bin_1 binname="set1_bin1_1" parent="workspace_center" z_origin_offset="${z_origin_offset_1}">
+    <origin xyz="${set1_x} ${set1_y} ${set1_z - z_origin_offset_1}" rpy="0 0 0" />
+  </xacro:kitting_bin_1>
+  <xacro:kitting_bin_1 binname="set1_bin1_2" parent="workspace_center" z_origin_offset="${z_origin_offset_1}">
+    <origin xyz="${set1_x} ${set1_y - bin1_width*1} ${set1_z - z_origin_offset_1}" rpy="0 0 0" />   
+  </xacro:kitting_bin_1>
+  <xacro:kitting_bin_1 binname="set1_bin1_3" parent="workspace_center" z_origin_offset="${z_origin_offset_1}">
+    <origin xyz="${set1_x} ${set1_y - bin1_width*2} ${set1_z - z_origin_offset_1}" rpy="0 0 0" />   
+  </xacro:kitting_bin_1>
+  <xacro:kitting_bin_1 binname="set1_bin1_4" parent="workspace_center" z_origin_offset="${z_origin_offset_1}">
+    <origin xyz="${set1_x} ${set1_y - bin1_width*3} ${set1_z - z_origin_offset_1}" rpy="0 0 0" />   
+  </xacro:kitting_bin_1>
+  <xacro:kitting_bin_1 binname="set1_bin1_5" parent="workspace_center" z_origin_offset="${z_origin_offset_1}">
+    <origin xyz="${set1_x} ${set1_y - bin1_width*4} ${set1_z - z_origin_offset_1}" rpy="0 0 0" />   
+  </xacro:kitting_bin_1> -->
+
+  <!-- A row of bin2 and bin3 -->
+  <!-- <xacro:property name="set2_x_bin3" value="${bin1_length/2+bin3_length/2+0.05}" />
+  <xacro:property name="set2_x_bin2" value="${bin1_length/2+bin2_length/2+0.05}" />
+  <xacro:property name="set2_y" value="${.32-bin3_width/2}" />
+  <xacro:property name="set2_z" value=".00" />
+   -->
+
+  <!-- <xacro:kitting_bin_3 binname="set2_bin3" parent="workspace_center" z_origin_offset="${z_origin_offset_3}">
     <origin xyz="${set2_x_bin3} ${set2_y} ${set2_z - z_origin_offset_3}" rpy="0 0 0" />
   </xacro:kitting_bin_3>
-  <!-- set2_bin2_1 -->
   <xacro:kitting_bin_2 binname="set2_bin2_1" parent="workspace_center" z_origin_offset="${z_origin_offset_2}">
     <origin xyz="${set2_x_bin2} ${set2_y-bin3_width/2-bin2_width/2*1} ${set2_z - z_origin_offset_2}" rpy="0 0 0" />
   </xacro:kitting_bin_2>
-  <!-- set2_bin2_2 -->
   <xacro:kitting_bin_2 binname="set2_bin2_2" parent="workspace_center" z_origin_offset="${z_origin_offset_2}"> 
     <origin xyz="${set2_x_bin2} ${set2_y-bin3_width/2-bin2_width*3/2} ${set2_z - z_origin_offset_2}" rpy="0 0 0" />
   </xacro:kitting_bin_2>
-  <!-- set2_bin2_3 -->
   <xacro:kitting_bin_2 binname="set2_bin2_3" parent="workspace_center" z_origin_offset="${z_origin_offset_2}">
     <origin xyz="${set2_x_bin2} ${set2_y-bin3_width/2-bin2_width*5/2} ${set2_z - z_origin_offset_2}" rpy="0 0 0" />
   </xacro:kitting_bin_2>
-  <!-- set2_bin2_4 -->
   <xacro:kitting_bin_2 binname="set2_bin2_4" parent="workspace_center" z_origin_offset="${z_origin_offset_2}">
     <origin xyz="${set2_x_bin2} ${set2_y-bin3_width/2-bin2_width*7/2} ${set2_z - z_origin_offset_2}" rpy="0 0 0" />
-  </xacro:kitting_bin_2>
+  </xacro:kitting_bin_2> -->
 
   <!-- add camera for pose matching on the table -->
   <link name="workspace_cam_holder_link" />

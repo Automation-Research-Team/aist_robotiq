@@ -9,7 +9,7 @@ from aist_kitting_msgs.srv import *
 from std_srvs.srv import Trigger
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import Point, PoseStamped
-from o2as_phoxi_camera.srv import SetInt
+from o2as_usb_relay.srv import SetPowerRequest, SetPowerResponse
 
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
@@ -26,9 +26,9 @@ class AistKitting:
 
         moveit_commander.roscpp_initialize(sys.argv)
         robot = moveit_commander.RobotCommander()
-        group_name = rospy.get_param("move_group_name", "a_bot")
+        group_name = rospy.get_param("move_group_name", "b_bot")
         rospy.loginfo(group_name)
-        eef_link = rospy.get_param("ee_link", "a_bot_dual_suction_gripper_pad_link")
+        eef_link = rospy.get_param("ee_link", "b_bot_dual_suction_gripper_pad_link")
         rospy.loginfo(eef_link)
         group = moveit_commander.MoveGroupCommander(group_name)
 
@@ -46,6 +46,7 @@ class AistKitting:
         self.trigger = rospy.ServiceProxy('o2as_phoxi_camera/trigger_frame', Trigger)
         self.get = rospy.ServiceProxy('o2as_phoxi_camera/get_frame', SetInt)
         self.stop = rospy.ServiceProxy('o2as_phoxi_camera/stop_acquisition', Trigger)
+        self.suction = rospy.ServiceProxy('o2as_usb_relay_server/set_power', SetPower)
 
         self.depth_image = None
 
@@ -145,7 +146,7 @@ class AistKitting:
             self.get(0)
 
         pcloud_filename = rospy.get_param('o2as_phoxi_camera/id')[1:-1]+".tiff"
-        io.imsave(os.environ.get('ROS_HOME')+"/data/"+pcloud_filename, self.depth_img)
+        io.imsave(os.environ.get('ROS_HOME')+"/data/"+pSetPowercloud_filename, self.depth_img)
 
         res_stop = self.stop()
         rospy.loginfo('get_image finished.')
@@ -161,11 +162,18 @@ class AistKitting:
 
         fge = rospy.ServiceProxy('/FGE', Search)
         res_fge = fge(req)
+        rospy.loginfo("res_fge: " + str(res_fge))
+
         for i in range(res_fge.result_num):
             res_fge.pos3D[i].x = res_fge.pos3D[i].z * (res_fge.pos3D[i].x - cx) / f
             res_fge.pos3D[i].y = res_fge.pos3D[i].z * (res_fge.pos3D[i].y - cy) / f
+
+        # rospy.loginfo("cam_fge: " + str(cam_fge))
+        rospy.loginfo("res_fge: " + str(res_fge))
+
         rospy.loginfo("search finished.")
         return res_fge
+        # return cam_fge
 
     def pick_callback(self, req):
         rospy.loginfo("pick started.")
@@ -177,10 +185,7 @@ class AistKitting:
         self.group = moveit_commander.MoveGroupCommander(robot_name)
         self.group.set_end_effector_link(robot_name + '_' + ee_link_name)
         self.group.set_planning_time(0.5)
-        self.group.set_planner_id("RRTConnectkConfigDefault")
-        
-        # if self.go_to_named_goal("home_a"):
-        #     rospy.sleep(3)
+        # self.group.set_planner_id("RRTConnectkConfigDefault")
         
         # The robot approaches to object from just above.
         pose_goal = copy.deepcopy(req.goal)
@@ -188,21 +193,29 @@ class AistKitting:
         pose_goal.pose.orientation.y = 0.5
         pose_goal.pose.orientation.z = 0.5
         pose_goal.pose.orientation.w = 0.5
+        # pose_goal.pose.position.y -= 0.07 # magic offset
 
-        pose_goal.pose.position.z += 0.1
+        pose_goal.pose.position.z += 0.2
         pose_goal.header.frame_id = frame_id
         if self.go_to_pose_goal(pose_goal):
             rospy.sleep(3)
         
-        pose_goal.pose.position.z -= 0.1
-        pose_goal.header.frame_id = frame_id
-        if self.go_to_pose_goal(pose_goal):
+        # pose_goal.pose.position.z -= 0.2
+        # pose_goal.header.frame_id = frame_id
+        # if self.go_to_pose_goal(pose_goal):
+        #     rospy.sleep(3)
+        
+        req_suction = SetPower()
+        req_suction.port = 1
+        req_suction.on = True
+        res_suction = self.suction(req_suction)
+        if res_suction:
             rospy.sleep(3)
 
-        pose_goal.pose.position.z += 0.1
-        pose_goal.header.frame_id = frame_id
-        if self.go_to_pose_goal(pose_goal):
-            rospy.sleep(3)
+        # pose_goal.pose.position.z += 0.2
+        # pose_goal.header.frame_id = frame_id
+        # if self.go_to_pose_goal(pose_goal):
+        #     rospy.sleep(3)
 
         rospy.loginfo("pick finished.")
         return True
@@ -217,7 +230,7 @@ class AistKitting:
         group = moveit_commander.MoveGroupCommander(robot_name)
         group.set_end_effector_link(robot_name + ee_link_name)
         group.set_planning_time(0.5)
-        group.set_planner_id("RRTConnectkConfigDefault")
+        # group.set_planner_id("RRTConnectkConfigDefault")
         
         self.go_to_named_goal(named_pose)
 
