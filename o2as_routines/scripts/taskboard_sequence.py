@@ -294,6 +294,14 @@ class TaskboardClass(O2ASBaseRoutines):
     
     self.go_to_pose_goal(robotname, picking_pose)
 
+  def belt_pick(self, robotname):
+    belt_pick_pose = copy.deepcopy(self.pick_poses[i])
+    belt_pick_pose.pose.position.y += .04
+    self.pick("b_bot", belt_pick_pose, grasp_height=.02
+                    speed_fast = 0.2, speed_slow = 0.02, gripper_command="close")
+
+
+
 if __name__ == '__main__':
   try:
     taskboard = TaskboardClass()
@@ -369,29 +377,32 @@ if __name__ == '__main__':
 
       if i == 6:
         #tool set
-        pick_tool_pose = geometry_msgs.msg.PoseStamped()
-        pick_tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-        pick_tool_pose.header.frame_id = "taskboard_tool"
-        taskboard.do_pick_action("c_bot", pick_tool_pose, z_axis_rotation = 0.0, use_complex_planning = False)
+        # pick_tool_pose = geometry_msgs.msg.PoseStamped()
+        # pick_tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+        # pick_tool_pose.header.frame_id = "taskboard_tool"
+        # taskboard.do_pick_action("c_bot", pick_tool_pose, z_axis_rotation = 0.0, use_complex_planning = False)
 
-        place_tool_pose = geometry_msgs.msg.PoseStamped()
-        place_tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-        place_tool_pose.header.frame_id = "taskboard_corner4"
-        taskboard.do_place_action("c_bot",place_tool_pose)
+        # place_tool_pose = geometry_msgs.msg.PoseStamped()
+        # place_tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+        # place_tool_pose.header.frame_id = "taskboard_corner4"
+        # taskboard.do_place_action("c_bot",place_tool_pose)
+
+        #pick up the belt
+        taskboard.belt_pick("b_bot")
 
         #belt spiral
-        spiral_start_pose = geometry_msgs.msg.PoseStamped()
-        spiral_start_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-        spiral_start_pose.header.frame_id = "taskboard_part6_large_pulley"
-        spiral_start_pose.pose.position.z = 0.07
-        spiral_start_pose.pose.position.x = 0.0
-        spiral_start_pose.pose.position.y = 0.034
-        taskboard.go_to_pose_goal("a_bot", spiral_start_pose, speed=0.2)
+        # spiral_start_pose = geometry_msgs.msg.PoseStamped()
+        # spiral_start_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+        # spiral_start_pose.header.frame_id = "taskboard_part6_large_pulley"
+        # spiral_start_pose.pose.position.z = 0.07
+        # spiral_start_pose.pose.position.x = 0.0
+        # spiral_start_pose.pose.position.y = 0.034
+        # taskboard.go_to_pose_goal("a_bot", spiral_start_pose, speed=0.2)
 
-        spiral_start_pose.pose.position.z = 0
-        taskboard.go_to_pose_goal("a_bot", spiral_start_pose, speed=0.02)
-        rospy.logwarn("Doing belt spiral motion")
-        taskboard.belt_spiral_motion("a_bot",spiral_start_pose)
+        # spiral_start_pose.pose.position.z = 0
+        # taskboard.go_to_pose_goal("a_bot", spiral_start_pose, speed=0.02)
+        # rospy.logwarn("Doing belt spiral motion")
+        # taskboard.belt_spiral_motion("a_bot",spiral_start_pose)
 
 
 
