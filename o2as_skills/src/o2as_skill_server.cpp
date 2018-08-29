@@ -54,8 +54,8 @@ SkillServer::SkillServer() :
   c_bot_group_.setPlannerId("RRTConnectkConfigDefault");
   c_bot_group_.setEndEffectorLink("c_bot_robotiq_85_tip_link");
   c_bot_group_.setNumPlanningAttempts(5);
-  front_bots_group_.setPlanningTime(PLANNING_TIME);
-  front_bots_group_.setPlannerId("RRTConnectkConfigDefault");
+  // front_bots_group_.setPlanningTime(PLANNING_TIME);
+  // front_bots_group_.setPlannerId("RRTConnectkConfigDefault");
   // all_bots_group_.setPlanningTime(PLANNING_TIME);
   // all_bots_group_.setPlannerId("RRTConnectkConfigDefault");
 
@@ -281,7 +281,6 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
 bool SkillServer::goToNamedPose(std::string pose_name, std::string robot_name)
 {
   ROS_INFO_STREAM("Going to named pose " << pose_name << " with robot group " << robot_name << ".");
-  // TODO: Test this.
   moveit::planning_interface::MoveGroupInterface* group_pointer;
   group_pointer = robotNameToMoveGroup(robot_name);
 
@@ -298,7 +297,6 @@ bool SkillServer::goToNamedPose(std::string pose_name, std::string robot_name)
   return true;
 }
 
-// TODO: Write this function/decide if it is needed
 bool SkillServer::stop()
 {
   return true;
@@ -311,7 +309,7 @@ moveit::planning_interface::MoveGroupInterface* SkillServer::robotNameToMoveGrou
   if (robot_name == "a_bot") return &a_bot_group_;
   if (robot_name == "b_bot") return &b_bot_group_;
   if (robot_name == "c_bot") return &c_bot_group_;
-  if (robot_name == "front_bots") return &front_bots_group_;
+  // if (robot_name == "front_bots") return &front_bots_group_;
   // if (robot_name == "all_bots") return &all_bots_group_;
 }
 
@@ -1095,7 +1093,7 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
     if (picker_robot_name == "b_bot")
     {
       q.setRPY(M_PI/2, 0, -M_PI/2);
-      ROS_INFO_STREAM("receiver_robot: "<<receiver_robot_name);
+      ROS_INFO_STREAM("picker_robot: " << picker_robot_name);
     }
     
     else
@@ -1110,12 +1108,11 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
   geometry_msgs::PoseStamped handover_pose_holder, handover_pose_picker;
   handover_pose_holder.header.frame_id = "handover_frame";
   handover_pose_picker.header.frame_id = "handover_frame";
-  // handover_pose_holder.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI/2, 0, M_PI); // Facing the receiver, rotated
-  if(giver_robot_name == "a_bot")
+  if(holder_robot_name == "a_bot")
   {
     handover_pose_holder.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, M_PI); // Facing the receiver, rotated
-  }else 
-   handover_pose_holder.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI/2, 0, M_PI); 
+  }
+  else handover_pose_holder.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI/2, 0, M_PI); 
    
   publishMarker(handover_pose_picker, "pick_pose");
   publishMarker(handover_pose_holder, "place_pose");
@@ -1148,8 +1145,6 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
   ROS_INFO_STREAM("Moving receiver robot (" << picker_robot_name << ") back to approach pose.");
   handover_pose_picker.pose.position.x = -gripper_distance_after_grasp;
   moveToCartPosePTP(handover_pose_picker, picker_robot_name);
-
-  // goToNamedPose("home", holder_robot_name);
 
   ROS_INFO("regraspAction is set as succeeded");
   regraspActionServer_.setSucceeded();

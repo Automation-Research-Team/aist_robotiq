@@ -70,7 +70,7 @@ class TaskboardClass(O2ASBaseRoutines):
                       "10 mm washer", "M3 set screw", "M3 bolt", 
                       "M4 bolt", "Pulley", "10 mm end cap"]
     self.item_pick_heights = [0.02, 0.02, 0.025, 
-                              0.047, 0.02, 0.02, 
+                              0.047, 0.02, 0.0, 
                               0.02, 0.02, -0.005, 
                               -0.005, 0.02, 0.02,
                               0.02, 0.007, -0.005]
@@ -144,7 +144,7 @@ class TaskboardClass(O2ASBaseRoutines):
     elif gripper_command=="easy_pick_only_inner":
       self.precision_gripper_inner_close()
     else: 
-      rospy.logerr("No gripper command was set")
+      self.send_gripper_command(gripper=robotname, command="open")
 
     rospy.loginfo("Moving down to object")
     object_pose.pose.position.z = grasp_height
@@ -161,6 +161,8 @@ class TaskboardClass(O2ASBaseRoutines):
       self.precision_gripper_outer_close()
     elif gripper_command=="easy_pick_only_inner":
       self.precision_gripper_inner_open(this_action_grasps_an_object = True)
+    else: 
+      self.send_gripper_command(gripper=robotname, command="close")
     rospy.sleep(2)
     rospy.loginfo("Going back up")
     object_pose.pose.position.z = (approach_height)
@@ -197,6 +199,31 @@ class TaskboardClass(O2ASBaseRoutines):
       object_pose.pose.position.z = (approach_height)
       self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)  
     
+  def belt_circle_motion(self, robot_name, start_pose, speed = 0.02):
+    group = self.groups[robot_name]
+    rospy.loginfo("Performing belt spiral motion " + str(speed))
+    rospy.loginfo("Setting velocity scaling to " + str(speed))
+    group.set_max_velocity_scaling_factor(speed)
+
+    r_belt=0.0068
+    theta_belt=0
+    theta_increase=15
+    
+    next_pose = start_pose
+    while theta_belt <= 360 and not rospy.is_shutdown():
+        #By default, the Spiral_Search function will maintain contact between both mating parts at all times
+         theta_belt=theta_belt+theta_increase
+         x=cos(radians(theta_belt))*r_belt
+         y=sin(radians(theta_belt))*r_belt
+         next_pose.pose.position.x = start_pose.pose.position.x + x
+         next_pose.pose.position.y = start_pose.pose.position.y - y
+         self.go_to_pose_goal(robot_name, next_pose)
+         rospy.sleep(0.1)
+      
+    # -------------
+    return True
+  
+  ####
 
   def full_taskboard_task(self):
     self.groups["a_bot"].set_goal_tolerance(.0001) 
@@ -295,9 +322,9 @@ class TaskboardClass(O2ASBaseRoutines):
     self.go_to_pose_goal(robotname, picking_pose)
 
   def belt_pick(self, robotname):
-    belt_pick_pose = copy.deepcopy(self.pick_poses[i])
-    belt_pick_pose.pose.position.y += .04
-    self.pick("b_bot", belt_pick_pose, grasp_height=.02
+    belt_pick_pose = copy.deepcopy(self.pick_poses[5])
+    belt_pick_pose.pose.position.y += .055
+    self.pick("b_bot", belt_pick_pose, grasp_height=.002,
                     speed_fast = 0.2, speed_slow = 0.02, gripper_command="close")
 
 
@@ -335,9 +362,15 @@ if __name__ == '__main__':
         taskboard.move_front_bots(taskboard.pick_poses[0], taskboard.place_poses[10], speed=0.04)
         rospy.loginfo("Waiting for enter before going home")
         raw_input()
+      if i == 55:
+        taskboard.toggle_collisions(collisions_on=False)
+        rospy.loginfo("Press Enter to turn collisions back on")
+        raw_input()
+        taskboard.toggle_collisions(collisions_on=True)
+
 
       if i == 21:
-        taskboard.belt_spiral_motion("a_bot")
+        taskboard.belt_circle_motion("a_bot")
 
       if i == 1:
         #taskboard.go_to_pose_goal("b_bot", taskboard.pick_poses[i-1], speed = 0.2)
@@ -402,7 +435,7 @@ if __name__ == '__main__':
         # spiral_start_pose.pose.position.z = 0
         # taskboard.go_to_pose_goal("a_bot", spiral_start_pose, speed=0.02)
         # rospy.logwarn("Doing belt spiral motion")
-        # taskboard.belt_spiral_motion("a_bot",spiral_start_pose)
+        # taskboard.belt_circle_motion("a_bot",spiral_start_pose)
 
 
 

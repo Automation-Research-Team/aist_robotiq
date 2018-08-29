@@ -302,7 +302,7 @@ class CalibrationClass(O2ASBaseRoutines):
     
     poses = [pose1, pose2, pose3, pose4]
 
-    self.cycle_through_calibration_poses(poses, "b_bot", speed=0.3)
+    self.cycle_through_calibration_poses(poses, "b_bot", speed=0.3, with_approach=True)
     return 
     
 
