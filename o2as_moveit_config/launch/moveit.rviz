@@ -10,6 +10,7 @@ Panels:
         - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
         - /TF1
+        - /TF1/Tree1
       Splitter Ratio: 0.5
     Tree Height: 221
   - Class: rviz/Selection
@@ -144,6 +145,297 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          assembled_assy_part_01:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_01_screw_hole_panel1_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_01_screw_hole_panel1_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_01_screw_hole_panel2_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_01_screw_hole_panel2_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_01_under_outer_hole:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_02_back_hole:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_bottom_screw_hole_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_bottom_screw_hole_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_bottom_screw_hole_aligner_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_bottom_screw_hole_aligner_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_motor_screw_hole_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_motor_screw_hole_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_motor_screw_hole_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_motor_screw_hole_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_motor_screw_hole_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_motor_screw_hole_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_03:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_03_bottom_screw_hole_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_03_bottom_screw_hole_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_03_bottom_screw_hole_aligner_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_03_bottom_screw_hole_aligner_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_03_front_hole:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_03_pulley_ridge_bottom:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_03_pulley_ridge_middle:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_03_pulley_ridge_top:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_04:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_04_inserted_02:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_04_inserted_13:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_04_tip:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_05:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_05_center:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_07:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_07_back_hole:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_07_back_tip:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_07_front_hole:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_07_inserted:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_07_screw_hole_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_07_screw_hole_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_07_screw_hole_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_07_screw_hole_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_08:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_08_back_tip:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_08_front_tip:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_08_inserted:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_09:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_09_inner_surface:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_09_screw_hole:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_10:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_10_center:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_11:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_11_back_hole:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_11_front_hole:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_11_screw_head_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_11_screw_head_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_12:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_12_center:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_13:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_13_center:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_13_screw_head:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_14:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_14_screw_head:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_14_screw_inserted:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_14_screw_tip:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_15:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_15_center:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_16:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_16_center:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_bot_base:
             Alpha: 1
             Show Axes: false
@@ -407,25 +699,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          m3_feeder_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          m3_feeder_outlet_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          m4_feeder_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          m4_feeder_outlet_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           o2as_ground:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          pulley_front_end:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -492,7 +770,7 @@ Visualization Manager:
         TextHeight: 0.0799999982
       Planning Request:
         Colliding Link Color: 255; 0; 0
-        Goal State Alpha: 0.400000006
+        Goal State Alpha: 0.0199999996
         Goal State Color: 250; 128; 0
         Interactive Marker Size: 0.150000006
         Joint Violation Color: 255; 0; 255
@@ -581,6 +859,297 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          assembled_assy_part_01:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_01_screw_hole_panel1_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_01_screw_hole_panel1_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_01_screw_hole_panel2_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_01_screw_hole_panel2_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_01_under_outer_hole:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_02_back_hole:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_bottom_screw_hole_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_bottom_screw_hole_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_bottom_screw_hole_aligner_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_bottom_screw_hole_aligner_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_motor_screw_hole_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_motor_screw_hole_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_motor_screw_hole_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_motor_screw_hole_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_motor_screw_hole_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_02_motor_screw_hole_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_03:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_03_bottom_screw_hole_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_03_bottom_screw_hole_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_03_bottom_screw_hole_aligner_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_03_bottom_screw_hole_aligner_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_03_front_hole:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_03_pulley_ridge_bottom:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_03_pulley_ridge_middle:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_03_pulley_ridge_top:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_04:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_04_inserted_02:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_04_inserted_13:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_04_tip:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_05:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_05_center:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_07:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_07_back_hole:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_07_back_tip:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_07_front_hole:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_07_inserted:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_07_screw_hole_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_07_screw_hole_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_07_screw_hole_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_07_screw_hole_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_08:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_08_back_tip:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_08_front_tip:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_08_inserted:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_09:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_09_inner_surface:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_09_screw_hole:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_10:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_10_center:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_11:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_11_back_hole:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_11_front_hole:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_11_screw_head_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_11_screw_head_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_12:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_12_center:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_13:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_13_center:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_13_screw_head:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_14:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_14_screw_head:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_14_screw_inserted:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_14_screw_tip:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_15:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_15_center:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          assembled_assy_part_16:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          assembled_assy_part_16_center:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_bot_base:
             Alpha: 1
             Show Axes: false
@@ -844,25 +1413,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          m3_feeder_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          m3_feeder_outlet_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          m4_feeder_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          m4_feeder_outlet_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           o2as_ground:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          pulley_front_end:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -945,6 +1500,144 @@ Visualization Manager:
         a_bot_wrist_2_link:
           Value: true
         a_bot_wrist_3_link:
+          Value: true
+        assembled_assy_part_01:
+          Value: true
+        assembled_assy_part_01_screw_hole_panel1_1:
+          Value: true
+        assembled_assy_part_01_screw_hole_panel1_2:
+          Value: true
+        assembled_assy_part_01_screw_hole_panel2_1:
+          Value: true
+        assembled_assy_part_01_screw_hole_panel2_2:
+          Value: true
+        assembled_assy_part_01_under_outer_hole:
+          Value: true
+        assembled_assy_part_02:
+          Value: true
+        assembled_assy_part_02_back_hole:
+          Value: true
+        assembled_assy_part_02_bottom_screw_hole_1:
+          Value: true
+        assembled_assy_part_02_bottom_screw_hole_2:
+          Value: true
+        assembled_assy_part_02_bottom_screw_hole_aligner_1:
+          Value: true
+        assembled_assy_part_02_bottom_screw_hole_aligner_2:
+          Value: true
+        assembled_assy_part_02_motor_screw_hole_1:
+          Value: true
+        assembled_assy_part_02_motor_screw_hole_2:
+          Value: true
+        assembled_assy_part_02_motor_screw_hole_3:
+          Value: true
+        assembled_assy_part_02_motor_screw_hole_4:
+          Value: true
+        assembled_assy_part_02_motor_screw_hole_5:
+          Value: true
+        assembled_assy_part_02_motor_screw_hole_6:
+          Value: true
+        assembled_assy_part_03:
+          Value: true
+        assembled_assy_part_03_bottom_screw_hole_1:
+          Value: true
+        assembled_assy_part_03_bottom_screw_hole_2:
+          Value: true
+        assembled_assy_part_03_bottom_screw_hole_aligner_1:
+          Value: true
+        assembled_assy_part_03_bottom_screw_hole_aligner_2:
+          Value: true
+        assembled_assy_part_03_front_hole:
+          Value: true
+        assembled_assy_part_03_pulley_ridge_bottom:
+          Value: true
+        assembled_assy_part_03_pulley_ridge_middle:
+          Value: true
+        assembled_assy_part_03_pulley_ridge_top:
+          Value: true
+        assembled_assy_part_04:
+          Value: true
+        assembled_assy_part_04_inserted_02:
+          Value: true
+        assembled_assy_part_04_inserted_13:
+          Value: true
+        assembled_assy_part_04_tip:
+          Value: true
+        assembled_assy_part_05:
+          Value: true
+        assembled_assy_part_05_center:
+          Value: true
+        assembled_assy_part_07:
+          Value: true
+        assembled_assy_part_07_back_hole:
+          Value: true
+        assembled_assy_part_07_back_tip:
+          Value: true
+        assembled_assy_part_07_front_hole:
+          Value: true
+        assembled_assy_part_07_inserted:
+          Value: true
+        assembled_assy_part_07_screw_hole_1:
+          Value: true
+        assembled_assy_part_07_screw_hole_2:
+          Value: true
+        assembled_assy_part_07_screw_hole_3:
+          Value: true
+        assembled_assy_part_07_screw_hole_4:
+          Value: true
+        assembled_assy_part_08:
+          Value: true
+        assembled_assy_part_08_back_tip:
+          Value: true
+        assembled_assy_part_08_front_tip:
+          Value: true
+        assembled_assy_part_08_inserted:
+          Value: true
+        assembled_assy_part_09:
+          Value: true
+        assembled_assy_part_09_inner_surface:
+          Value: true
+        assembled_assy_part_09_screw_hole:
+          Value: true
+        assembled_assy_part_10:
+          Value: true
+        assembled_assy_part_10_center:
+          Value: true
+        assembled_assy_part_11:
+          Value: true
+        assembled_assy_part_11_back_hole:
+          Value: true
+        assembled_assy_part_11_front_hole:
+          Value: true
+        assembled_assy_part_11_screw_head_1:
+          Value: true
+        assembled_assy_part_11_screw_head_2:
+          Value: true
+        assembled_assy_part_12:
+          Value: true
+        assembled_assy_part_12_center:
+          Value: true
+        assembled_assy_part_13:
+          Value: true
+        assembled_assy_part_13_center:
+          Value: true
+        assembled_assy_part_13_screw_head:
+          Value: true
+        assembled_assy_part_14:
+          Value: true
+        assembled_assy_part_14_screw_head:
+          Value: true
+        assembled_assy_part_14_screw_inserted:
+          Value: true
+        assembled_assy_part_14_screw_tip:
+          Value: true
+        assembled_assy_part_15:
+          Value: true
+        assembled_assy_part_15_center:
+          Value: true
+        assembled_assy_part_16:
+          Value: true
+        assembled_assy_part_16_center:
           Value: true
         b_bot_base:
           Value: true
@@ -1058,15 +1751,9 @@ Visualization Manager:
           Value: true
         camera_right_ir_optical_frame:
           Value: true
-        m3_feeder_link:
-          Value: true
-        m3_feeder_outlet_link:
-          Value: true
-        m4_feeder_link:
-          Value: true
-        m4_feeder_outlet_link:
-          Value: true
         o2as_ground:
+          Value: true
+        pulley_front_end:
           Value: true
         screw_tool_holder:
           Value: true
@@ -1088,7 +1775,7 @@ Visualization Manager:
           Value: true
         world:
           Value: true
-      Marker Scale: 0.100000001
+      Marker Scale: 0.0299999993
       Name: TF
       Show Arrows: false
       Show Axes: true
@@ -1113,9 +1800,7 @@ Visualization Manager:
                             a_bot_gripper_tip_link:
                               {}
             a_bot_base_smfl:
-              m3_feeder_link:
-                m3_feeder_outlet_link:
-                  {}
+              {}
             b_bot_base_link:
               b_bot_base:
                 {}
@@ -1193,9 +1878,6 @@ Visualization Manager:
                           c_bot_tool0:
                             {}
             c_bot_base_smfl:
-              m4_feeder_link:
-                m4_feeder_outlet_link:
-                  {}
               screw_tool_holder:
                 screw_tool_m3_link:
                   screw_tool_m3_helper_link:
@@ -1209,7 +1891,120 @@ Visualization Manager:
             workbox:
               {}
             workspace_center:
-              {}
+              assembled_assy_part_01:
+                assembled_assy_part_01_screw_hole_panel1_1:
+                  assembled_assy_part_03:
+                    assembled_assy_part_03_bottom_screw_hole_1:
+                      {}
+                    assembled_assy_part_03_bottom_screw_hole_2:
+                      {}
+                    assembled_assy_part_03_bottom_screw_hole_aligner_1:
+                      {}
+                    assembled_assy_part_03_bottom_screw_hole_aligner_2:
+                      {}
+                    assembled_assy_part_03_front_hole:
+                      assembled_assy_part_07:
+                        assembled_assy_part_07_back_hole:
+                          assembled_assy_part_09:
+                            assembled_assy_part_09_inner_surface:
+                              assembled_assy_part_08:
+                                assembled_assy_part_08_back_tip:
+                                  {}
+                                assembled_assy_part_08_front_tip:
+                                  {}
+                                assembled_assy_part_08_inserted:
+                                  {}
+                            assembled_assy_part_09_screw_hole:
+                              {}
+                        assembled_assy_part_07_back_tip:
+                          {}
+                        assembled_assy_part_07_front_hole:
+                          assembled_assy_part_10:
+                            assembled_assy_part_10_center:
+                              {}
+                          assembled_assy_part_11:
+                            assembled_assy_part_11_back_hole:
+                              {}
+                            assembled_assy_part_11_front_hole:
+                              {}
+                            assembled_assy_part_11_screw_head_1:
+                              {}
+                            assembled_assy_part_11_screw_head_2:
+                              {}
+                        assembled_assy_part_07_inserted:
+                          {}
+                        assembled_assy_part_07_screw_hole_1:
+                          {}
+                        assembled_assy_part_07_screw_hole_2:
+                          {}
+                        assembled_assy_part_07_screw_hole_3:
+                          {}
+                        assembled_assy_part_07_screw_hole_4:
+                          {}
+                    assembled_assy_part_03_pulley_ridge_bottom:
+                      {}
+                    assembled_assy_part_03_pulley_ridge_middle:
+                      assembled_assy_part_12:
+                        assembled_assy_part_12_center:
+                          assembled_assy_part_05:
+                            assembled_assy_part_05_center:
+                              assembled_assy_part_14:
+                                assembled_assy_part_14_screw_head:
+                                  {}
+                                assembled_assy_part_14_screw_inserted:
+                                  {}
+                                assembled_assy_part_14_screw_tip:
+                                  {}
+                      assembled_assy_part_16:
+                        assembled_assy_part_15:
+                          assembled_assy_part_15_center:
+                            {}
+                        assembled_assy_part_16_center:
+                          {}
+                    assembled_assy_part_03_pulley_ridge_top:
+                      {}
+                assembled_assy_part_01_screw_hole_panel1_2:
+                  {}
+                assembled_assy_part_01_screw_hole_panel2_1:
+                  assembled_assy_part_02:
+                    assembled_assy_part_02_back_hole:
+                      assembled_assy_part_04:
+                        assembled_assy_part_04_inserted_02:
+                          {}
+                        assembled_assy_part_04_inserted_13:
+                          assembled_assy_part_13:
+                            assembled_assy_part_13_center:
+                              {}
+                            assembled_assy_part_13_screw_head:
+                              {}
+                        assembled_assy_part_04_tip:
+                          {}
+                    assembled_assy_part_02_bottom_screw_hole_1:
+                      {}
+                    assembled_assy_part_02_bottom_screw_hole_2:
+                      {}
+                    assembled_assy_part_02_bottom_screw_hole_aligner_1:
+                      {}
+                    assembled_assy_part_02_bottom_screw_hole_aligner_2:
+                      {}
+                    assembled_assy_part_02_motor_screw_hole_1:
+                      {}
+                    assembled_assy_part_02_motor_screw_hole_2:
+                      {}
+                    assembled_assy_part_02_motor_screw_hole_3:
+                      {}
+                    assembled_assy_part_02_motor_screw_hole_4:
+                      {}
+                    assembled_assy_part_02_motor_screw_hole_5:
+                      {}
+                    assembled_assy_part_02_motor_screw_hole_6:
+                      {}
+                assembled_assy_part_01_screw_hole_panel2_2:
+                  {}
+                assembled_assy_part_01_under_outer_hole:
+                  {}
+              pulley_front_end:
+                {}
       Update Interval: 0
       Value: true
     - Class: rviz/Marker
@@ -1245,25 +2040,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.5854224
+      Distance: 0.215481967
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.233466014
-        Y: 0.135252997
-        Z: 1.05839193
+        X: 0.00773345213
+        Y: -0.0451692827
+        Z: 1.16966021
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.450397909
+      Pitch: 0.674796164
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.99539018
+      Yaw: 5.95356655
     Saved: ~
 Window Geometry:
   Displays:

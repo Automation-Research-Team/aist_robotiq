@@ -32,10 +32,6 @@ aluminum peripherial evaluation case.
     <xacro:property name="d435_cam_depth_py" value="-0.0075"/>
     <xacro:property name="d435_cam_depth_pz" value="${d435_cam_height/2}"/>
 
-    <!-- <material name="aluminum"> -->
-    <!--   <color rgba="0.5 0.5 0.5 1"/> -->
-    <!-- </material> -->
-
     <!-- camera body, with origin at bottom screw mount -->
     <joint name="${prefix}camera_joint" type="fixed">
       <xacro:insert_block name="origin" />
@@ -51,10 +47,9 @@ aluminum peripherial evaluation case.
 	        <mesh filename="package://realsense2_camera/meshes/d435.dae" />
 
         </geometry>
-	<material name="aluminum">
-	  <color rgba="0.5 0.5 0.5 1"/>
-	</material>
-        <!-- <material name="aluminum"/> -->
+        <material name="aluminum">
+          <color rgba="0.5 0.5 0.5 1"/>
+        </material>
       </visual>
       <collision>
         <origin xyz="0.0 0.0 ${d435_cam_height/2}" rpy="0 0 0"/>

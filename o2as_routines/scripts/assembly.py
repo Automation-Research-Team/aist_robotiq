@@ -39,6 +39,7 @@ import copy
 import rospy
 import geometry_msgs.msg
 import tf_conversions
+import tf
 from math import pi
 
 from o2as_msgs.srv import *
@@ -146,26 +147,157 @@ class AssemblyClass(O2ASBaseRoutines):
     ps = geometry_msgs.msg.PoseStamped()
     ps.header.frame_id = "workspace_center"
     ps.pose.orientation.w = 1.0
-    ps.pose.position.y = .1
-    ps.pose.position.z = .04
-    self.do_pick_action("b_bot", ps)
-    self.go_to_named_pose("home", "b_bot")
-    self.do_regrasp("b_bot", "c_bot", grasp_distance = .08)
+    ps.pose.position.x = -.32
+    ps.pose.position.y = -.315
+    ps.pose.position.z = .025
+    self.do_pick_action("c_bot", ps)
+    self.go_to_named_pose("home", "c_bot")
+    self.do_regrasp(giver_robot_name="c_bot", receiver_robot_name="b_bot", grasp_distance = -.01)
 
+    self.go_to_named_pose("home", "b_bot")
+    self.go_to_named_pose("home", "c_bot")
+
+  def insertion_demo(self):
     self.go_to_named_pose("home", "c_bot")
     self.go_to_named_pose("home", "b_bot")
     self.go_to_named_pose("home", "a_bot")
+    
+    # Pick the bearing
+    pick_bearing = False
+    pick_bearing = True
+    if pick_bearing:
+      ps = geometry_msgs.msg.PoseStamped()
+      ps.header.frame_id = "workspace_center"
+      ps.pose.orientation.w = 1.0
+      ps.pose.position.x = -.32
+      ps.pose.position.y = -.315
+      ps.pose.position.z = .025
+      self.do_pick_action("c_bot", ps)
+      self.go_to_named_pose("home", "c_bot")
 
+    # Pick the rod
+    ps = geometry_msgs.msg.PoseStamped()
+    ps.header.frame_id = "workspace_center"
+    ps.pose.orientation.w = 1.0
+    ps.pose.position.x = -.197
+    ps.pose.position.y = .333
+    ps.pose.position.z = .06
+    self.do_pick_action("b_bot", ps)
+    self.go_to_named_pose("home", "b_bot")
+
+    # Move to the insertion pose and do it
+    self.do_insert_action(active_robot_name = "b_bot", passive_robot_name = "c_bot",
+                          starting_offset = .05, max_approach_distance = .1,
+                          max_radius = 0.01, radius_increment = .0008)
+  
+  def belt_demo(self):
+    self.go_to_named_pose("home", "c_bot")
+    self.go_to_named_pose("home", "b_bot")
+    self.go_to_named_pose("home", "a_bot")
+    
+    # Go with b_bot to the belt, pick, pull
+    rospy.loginfo("Going to belt with b_bot")
+    psb = geometry_msgs.msg.PoseStamped()
+    psb.header.frame_id = "assembled_assy_part_05_center" # The middle of the idler pulley
+    psb.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(pi/2, 0.0, 0.0))
+    # psb.pose.orientation.w = 1.0
+    psb.pose.position.x = -0.05
+    psb.pose.position.y = 0.05
+    psb.pose.position.z = 0.0
+    self.go_to_pose_goal("b_bot", psb, 1.0)
+
+    # Move in and grasp
+    psb.pose.position.x = 0.005
+    self.go_to_pose_goal("b_bot", psb, 0.05)
+    self.send_gripper_command("b_bot", "close")
+
+    # Move belt out of the way
+    psb.pose.position.z += 0.01
+    self.go_to_pose_goal("b_bot", psb, 0.05)
+
+    psb.pose.position.x = -0.02
+    self.go_to_pose_goal("b_bot", psb, 0.05)
+
+    # psb.pose.position.y = 0.0
+    # self.go_to_pose_goal("b_bot", psb, 0.05)
+    psb.pose.position.z = 0.0
+    self.go_to_pose_goal("b_bot", psb, 0.05)
+
+
+    # Grasp the pulley, move it up
+    psc = geometry_msgs.msg.PoseStamped()
+    psc.header.frame_id = "assembled_assy_part_14_screw_tip" # The tip of the retainer pin
+    psc.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0, 0.0, pi))
+    
+
+    # Go to approach position, prepare gripper
+    psc.pose.position.x = -0.05
+    self.go_to_pose_goal("c_bot", psc, 0.05)
+    self.send_gripper_command("c_bot", command=.02)
+    
+    # Move in, grasp, move up
+    psc.pose.position.x = 0.005
+    self.go_to_pose_goal("c_bot", psc, 0.05)
+    self.send_gripper_command("c_bot", "close")
+    psc.pose.position.z += 0.02
+    self.go_to_pose_goal("c_bot", psc, 0.02)
+
+    # Put the belt under the pulley, move gripper to the left, put the pulley down a bit
+    psb.pose.position.x = 0.005
+    self.go_to_pose_goal("b_bot", psb, 0.05)
+    # Move the pulley down
+    psc.pose.position.z = 0.005
+    self.go_to_pose_goal("c_bot", psc, 0.02)
+
+    # Release the belt
+    self.send_gripper_command("b_bot", "open")
+    psb.pose.position.x = -0.05
+    self.go_to_pose_goal("b_bot", psb, 1.0)
+
+    #Move b_bot above the pulley, open slightly, move down via linear_search until a certain resistance force is encountered
+    psb.pose.position.x = 0.0
+    psb.pose.position.y = 0.0
+    psb.pose.position.z = 0.04
+    psb.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0.0, pi/2, 0.0)) # Facing downward on the pulley
+    self.go_to_pose_goal("b_bot", psb, 1.0)
+    self.send_gripper_command("b_bot", command=0.1)
+    self.do_linear_push("b_bot")
+
+    # Calculate position of pulley (it is touching both b_bot fingers)
+    pulley_pose = geometry_msgs.msg.PoseStamped()
+    pulley_pose.header.frame_id = "b_bot_robotiq_85_tip_link"
+    pulley_pose.pose.position.x = .01   # Minus a little bit because the gripper is open
+    pulley_pose.pose.position.z = .01
+    pulley_pose.pose.orientation.w = 1.0
+    pulley_pose = self.listener.transformPose("assembled_assy_part_14_screw_tip", pulley_pose)
+    # The z-component now holds the correct height of the pulley center.
+    pulley_pose.pose.position.x = -0.005
+    pulley_pose.pose.position.y = 0.0
+    pulley_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0.0, pi/2, 0.0))
+
+    # Move c_bot to nut, grasp, turn
+    pulley_pose.pose.position.x = -0.03
+    self.go_to_pose_goal("c_bot", psc, 0.05)
+    self.send_gripper_command("c_bot", command=.02)
+    psc.pose.position.x = 0.005
+    self.go_to_pose_goal("c_bot", psc, 0.05)
+    self.send_gripper_command("c_bot", "close")
+
+    # TODO: Turn gripper, or use fastening tool to tighten the nut (the latter would be better)
+
+    # self.go_to_named_pose("home", "b_bot")
+    # self.go_to_named_pose("home", "c_bot")
+    
 
 
 if __name__ == '__main__':
   try:
     assy = AssemblyClass()
     assy.set_up_item_parameters()
-
-    assy.handover_demo()
-
-
+    
+    # assy.handover_demo()
+    assy.insertion_demo()
+    # assy.belt_demo()
 
     print "============ Done!"
   except rospy.ROSInterruptException:

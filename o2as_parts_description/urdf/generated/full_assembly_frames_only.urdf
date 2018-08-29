@@ -1,0 +1,149 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="full_assembly_frames_only">
+  <xacro:include filename="$(find o2as_parts_description)/urdf/assembly_parts_frame_macros.urdf"/>
+  <xacro:macro name="full_assembly_frames_only" params="prefix parent *origin">
+      <xacro:assy_part_frames_only_01 prefix="${prefix}" parent="${parent}" spawn_attached="true"> 
+      <xacro:insert_block name="origin"/> 
+    </xacro:assy_part_frames_only_01> 
+    
+    <xacro:assy_part_frames_only_02 prefix="${prefix}" parent="${prefix}assy_part_01_screw_hole_panel2_1" spawn_attached="false"> 
+      <origin rpy="0 0 0" xyz="0 0 0"/> 
+    </xacro:assy_part_frames_only_02> 
+    
+    <joint name="${prefix}part_01_to_02_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_01_screw_hole_panel2_1"/> 
+      <child link="${prefix}assy_part_02"/> 
+      <origin rpy="${0.0} ${-1.57079632679} ${0.0}" xyz="${-8.67361737988e-19} ${0.015} ${-0.006}"/> 
+    </joint> 
+    
+    <xacro:assy_part_frames_only_03 prefix="${prefix}" parent="${prefix}assy_part_01_screw_hole_panel1_1" spawn_attached="false"> 
+      <origin rpy="0 0 0" xyz="0 0 0"/> 
+    </xacro:assy_part_frames_only_03> 
+    
+    <joint name="${prefix}part_01_to_03_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_01_screw_hole_panel1_1"/> 
+      <child link="${prefix}assy_part_03"/> 
+      <origin rpy="${0.0} ${-1.57079632679} ${0.0}" xyz="${-8.67361737988e-19} ${0.015} ${-0.006}"/> 
+    </joint> 
+    
+    <xacro:assy_part_frames_only_04 prefix="${prefix}" parent="${prefix}assy_part_02_back_hole" spawn_attached="false"> 
+      <origin rpy="0 0 0" xyz="0 0 0"/> 
+    </xacro:assy_part_frames_only_04> 
+    
+    <joint name="${prefix}part_02_to_04_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_02_back_hole"/> 
+      <child link="${prefix}assy_part_04"/> 
+      <origin rpy="${-3.14159265359} ${1.22464679915e-16} ${-1.57079632679}" xyz="${-0.021} ${0.019} ${-0.006}"/> 
+    </joint> 
+    
+    <xacro:assy_part_frames_only_13 prefix="${prefix}" parent="${prefix}assy_part_04_tip" spawn_attached="false"> 
+      <origin rpy="0 0 0" xyz="0 0 0"/> 
+    </xacro:assy_part_frames_only_13> 
+    
+    <joint name="${prefix}part_04_to_13_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_04_tip"/> 
+      <child link="${prefix}assy_part_13"/> 
+      <origin rpy="${0.0} ${-0.0} ${0.0}" xyz="${-0.005} ${0.0} ${0.0}"/> 
+    </joint> 
+    
+    <xacro:assy_part_frames_only_07 prefix="${prefix}" parent="${prefix}assy_part_03_front_hole" spawn_attached="false"> 
+      <origin rpy="0 0 0" xyz="0 0 0"/> 
+    </xacro:assy_part_frames_only_07> 
+    
+    <joint name="${prefix}part_03_to_07_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_03_front_hole"/> 
+      <child link="${prefix}assy_part_07"/> 
+      <origin rpy="${0.0} ${0.0} ${-3.14159265359}" xyz="${-0.008} ${-9.79717439318e-19} ${0.0}"/> 
+    </joint> 
+    
+    <xacro:assy_part_frames_only_10 prefix="${prefix}" parent="${prefix}assy_part_07_front_hole" spawn_attached="false"> 
+      <origin rpy="0 0 0" xyz="0 0 0"/> 
+    </xacro:assy_part_frames_only_10> 
+    
+    <joint name="${prefix}part_07_to_10_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_07_front_hole"/> 
+      <child link="${prefix}assy_part_10"/> 
+      <origin rpy="${0.0} ${-0.0} ${0.0}" xyz="${-0.001} ${0.0} ${0.0}"/> 
+    </joint> 
+    
+    <xacro:assy_part_frames_only_11 prefix="${prefix}" parent="${prefix}assy_part_10_center" spawn_attached="false"> 
+      <origin rpy="0 0 0" xyz="0 0 0"/> 
+    </xacro:assy_part_frames_only_11> 
+    
+    <joint name="${prefix}part_10_to_11_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_10_center"/> 
+      <child link="${prefix}assy_part_11"/> 
+      <origin rpy="${0.0} ${0.0} ${-3.14159265359}" xyz="${-0.007} ${-6.12323399574e-19} ${0.0}"/> 
+    </joint> 
+    
+    <xacro:assy_part_frames_only_09 prefix="${prefix}" parent="${prefix}assy_part_07_back_hole" spawn_attached="false"> 
+      <origin rpy="0 0 0" xyz="0 0 0"/> 
+    </xacro:assy_part_frames_only_09> 
+    
+    <joint name="${prefix}part_07_to_09_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_07_back_hole"/> 
+      <child link="${prefix}assy_part_09"/> 
+      <origin rpy="${0.0} ${-0.0} ${0.0}" xyz="${-0.001} ${0.0} ${0.0}"/> 
+    </joint> 
+    
+    <xacro:assy_part_frames_only_08 prefix="${prefix}" parent="${prefix}assy_part_09_inner_surface" spawn_attached="false"> 
+      <origin rpy="0 0 0" xyz="0 0 0"/> 
+    </xacro:assy_part_frames_only_08> 
+    
+    <joint name="${prefix}part_09_to_08_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_09_inner_surface"/> 
+      <child link="${prefix}assy_part_08"/> 
+      <origin rpy="${-0.0} ${-0.0} ${2.44929359829e-16}" xyz="${0.0} ${0.0} ${0.0}"/> 
+    </joint> 
+    
+    <xacro:assy_part_frames_only_12 prefix="${prefix}" parent="${prefix}assy_part_03_pulley_ridge_middle" spawn_attached="false"> 
+      <origin rpy="0 0 0" xyz="0 0 0"/> 
+    </xacro:assy_part_frames_only_12> 
+    
+    <joint name="${prefix}part_03_to_12_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_03_pulley_ridge_middle"/> 
+      <child link="${prefix}assy_part_12"/> 
+      <origin rpy="${0.0} ${-0.0} ${0.0}" xyz="${-0.0095} ${0.0} ${0.0}"/> 
+    </joint> 
+    
+    <xacro:assy_part_frames_only_05 prefix="${prefix}" parent="${prefix}assy_part_12_center" spawn_attached="false"> 
+      <origin rpy="0 0 0" xyz="0 0 0"/> 
+    </xacro:assy_part_frames_only_05> 
+    
+    <joint name="${prefix}part_12_to_05_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_12_center"/> 
+      <child link="${prefix}assy_part_05"/> 
+      <origin rpy="${0.001} ${-0.0} ${0.0}" xyz="${-0.00975} ${0.0} ${0.0}"/> 
+    </joint> 
+    
+    <xacro:assy_part_frames_only_14 prefix="${prefix}" parent="${prefix}assy_part_05_center" spawn_attached="false"> 
+      <origin rpy="0 0 0" xyz="0 0 0"/> 
+    </xacro:assy_part_frames_only_14> 
+    
+    <joint name="${prefix}part_05_to_14_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_05_center"/> 
+      <child link="${prefix}assy_part_14"/> 
+      <origin rpy="${0.0} ${-0.0} ${0.0}" xyz="${-0.004} ${0.0} ${0.0}"/> 
+    </joint> 
+    
+    <xacro:assy_part_frames_only_16 prefix="${prefix}" parent="${prefix}assy_part_03_pulley_ridge_middle" spawn_attached="false"> 
+      <origin rpy="0 0 0" xyz="0 0 0"/> 
+    </xacro:assy_part_frames_only_16> 
+    
+    <joint name="${prefix}part_03_to_16_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_03_pulley_ridge_middle"/> 
+      <child link="${prefix}assy_part_16"/> 
+      <origin rpy="${0.0} ${-0.0} ${0.0}" xyz="${0.006} ${0.0} ${0.0}"/> 
+    </joint> 
+    
+    <xacro:assy_part_frames_only_15 prefix="${prefix}" parent="${prefix}assy_part_16_center" spawn_attached="false"> 
+      <origin rpy="0 0 0" xyz="0 0 0"/> 
+    </xacro:assy_part_frames_only_15> 
+    
+    <joint name="${prefix}part_16_to_15_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_16_center"/> 
+      <child link="${prefix}assy_part_15"/> 
+      <origin rpy="${0.0} ${0.0} ${-3.14159265359}" xyz="${0.0035} ${4.28626379702e-19} ${0.0}"/> 
+    </joint> 
+    
+  </xacro:macro>
+</robot>
