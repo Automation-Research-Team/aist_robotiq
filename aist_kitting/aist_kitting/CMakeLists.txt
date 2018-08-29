@@ -13,6 +13,7 @@ find_package(catkin REQUIRED
     geometry_msgs
     o2as_phoxi_camera
     aist_kitting_msgs
+    o2as_usb_relay
 )
 
 ## System dependencies are found with CMake's conventions

@@ -5,33 +5,35 @@ import numpy as np
 import rospy
 import tf
 
-# from aist_kitting_msgs.srv import *
 from aist_kitting_msgs.srv import *
+# from o2as_usb_relay.srv import SetPower
+from o2as_usb_relay.srv import *
+
 from geometry_msgs.msg import PoseStamped
 
 def pick_test():
     pick = rospy.ServiceProxy("aist_kitting/pick", Pick)
     req_pick = PickRequest()
-    req_pick.robot_name = "a_bot"
+    req_pick.robot_name = "b_bot"
     req_pick.ee_link_name = "dual_suction_gripper_pad_link"
     req_pick.frame_id = "world"
     req_pick.goal = PoseStamped()
     req_pick.goal.pose.position.x = 0.0
     req_pick.goal.pose.position.y = 0.0
     # req_pick.goal.pose.position.z = 0.825
-    req_pick.goal.pose.position.z = 1.0
+    req_pick.goal.pose.position.z = 0.7
 
     res_pick = pick(req_pick)
     rospy.loginfo(res_pick)
 
-    req_pick.goal.pose.position.x = 0.3
-    res_pick = pick(req_pick)
-    rospy.loginfo(res_pick)
+    # req_pick.goal.pose.position.x = 0.3
+    # res_pick = pick(req_pick)
+    # rospy.loginfo(res_pick)
 
-    req_pick.goal.pose.position.y = 0.3
-    rospy.loginfo(req_pick.goal.pose)
-    res_pick = pick(req_pick)
-    rospy.loginfo(res_pick)
+    # req_pick.goal.pose.position.y = 0.3
+    # rospy.loginfo(req_pick.goal.pose)
+    # res_pick = pick(req_pick)
+    # rospy.loginfo(res_pick)
 
     # req_pick.goal.pose.position.x = -0.3
     # res_pick = pick(req_pick)
@@ -66,24 +68,117 @@ def search_test():
     res_search = search(req_search)
     rospy.loginfo(res_search)
 
-# def transform_phoxi_to_world(pose):
-#     T_phoxi = np.matrix([
-#         [-0.005532755388, 0.895263942347, -0.445501809369, 544.512175068866],
-#         [0.986069642027, -0.069178481132, -0.151264664816, 157.894106209722],
-#         [-0.166240938674, -0.440132720076, -0.882409847535, 1465.092961368773],
-#         [0, 0, 0, 1]
-#     ])
-#     q = tf.transformations.quaternion_from_matrix(T_phoxi)
+def suction_test():
+    rospy.wait_for_service("o2as_usb_relay_server/set_power")
+    suction_trigger = rospy.ServiceProxy("o2as_usb_relay_server/set_power", SetPower)
+    
+    req_suction_trigger = SetPowerRequest()
+    req_suction_trigger.port = 1
+    req_suction_trigger.on = True
 
+    res_suction_trigger = suction_trigger(req_suction_trigger)
+    rospy.loginfo(res_suction_trigger.message)
+    if res_suction_trigger.success:
+        rospy.sleep(3)
+
+    req_suction_trigger.on = False
+    res_suction_trigger = suction_trigger(req_suction_trigger)
+    rospy.loginfo(res_suction_trigger.message)
+    if res_suction_trigger.success:
+        rospy.sleep(3)
+
+def transform_phoxi_to_world(pose):
+
+    T_phoxi = np.array([
+        [-0.045899001285, 0.902472945015, -0.428294133975, 0.600556671213511],
+        [0.984380843543, -0.032086403336, -0.173103488082, 0.139281989152648 ],
+        [-0.169963633010, -0.429549818109, -0.886904345020, 1.467133761064637 ],
+        [0.000000000000, 0.000000000000, 0.000000000000, 1.000000000000 ]
+    ])
+
+    position = np.dot(T_phoxi, np.array([[pose.position.x],[pose.position.y],[pose.position.z],[1]]))
+    pose.position.x = position[0]
+    pose.position.y = position[1]
+    pose.position.z = position[2]
+
+    # pose_orient_mat = tf.transformations.quaternion_matrix(pose.orientation)
+    # orientation = tf.transformations.quaternion_from_matrix(np.dot(T_phoxi, pose_orient_mat))
+    # pose.orientation[0] = orientation[0]
+    # pose.orientation[1] = orientation[1]
+    # pose.orientation[2] = orientation[2]
+    # pose.orientation[3] = orientation[3]
+    rospy.loginfo(pose)
+
+    return pose
 
 
 #     trans_pose = PoseStamped()
+def main():
+    # Go to initial pose.
+    move_named_pose = rospy.ServiceProxy("aist_kitting/move_named_pose", MoveNamedPose)
+    req_move_named_pose = MoveNamedPoseRequest()
+    req_move_named_pose.robot_name = "b_bot"
+    req_move_named_pose.ee_link_name = "dual_suction_gripper_pad_link"
+    req_move_named_pose.named_pose = "home"
+    res_move_named_pose = move_named_pose(req_move_named_pose)
+    rospy.sleep(5)
+    rospy.loginfo(res_move_named_pose)
+
+    # pick_test()
+
+    # Search object.
+    get_image = rospy.ServiceProxy("aist_kitting/get_image", GetImage)
+    search = rospy.ServiceProxy("aist_kitting/search", Search)
+    res_get_image = get_image()
+    req_search = SearchRequest()
+    req_search.part_id = 5
+    req_search.pcloud_filename = res_get_image.pcloud_filename
+    res_search = search(req_search)
+    rospy.loginfo("search result: ")
+    rospy.loginfo(res_search)
+
+    goal = PoseStamped()
+    goal.pose.position = res_search.pos3D[0]
+    rospy.loginfo("goal: " + str(goal))
+    goal.pose.orientation = tf.transformations.quaternion_from_euler(res_search.rot3D[0].x, res_search.rot3D[0].y, res_search.rot3D[0].z)
+    rospy.loginfo(goal)
+    
+    # Convert target pose coordinates from camera to world.
+    goal.pose = transform_phoxi_to_world(goal.pose)
+    goal.header.frame_id = "world"
+    rospy.loginfo(goal)
+
+    # Pick object.
+    pick = rospy.ServiceProxy("aist_kitting/pick", Pick)
+    req_pick = PickRequest()
+    req_pick.robot_name = "b_bot"
+    req_pick.ee_link_name = "dual_suction_gripper_pad_link"
+    req_pick.frame_id = "world"
+    req_pick.goal.pose.position = goal.pose.position
+    # req_pick.goal.pose.orientation = goal.pose.orientation
+    # req_pick.goal.pose.position.x = 0.0
+    # req_pick.goal.pose.position.y = 0.0
+    # req_pick.goal.pose.position.z = 0.825
+    # req_pick.goal.pose.position.z = 1.0
+    res_pick = pick(req_pick)
+    rospy.loginfo(res_pick)
+
+    # Go to initial pose.
+    move_named_pose = rospy.ServiceProxy("aist_kitting/move_named_pose", MoveNamedPose)
+    req_move_named_pose = MoveNamedPoseRequest()
+    req_move_named_pose.robot_name = "b_bot"
+    req_move_named_pose.ee_link_name = "dual_suction_gripper_pad_link"
+    req_move_named_pose.named_pose = "home"
+    res_move_named_pose = move_named_pose(req_move_named_pose)
+    rospy.sleep(5)
+    rospy.loginfo(res_move_named_pose)
+
 
 if __name__ == '__main__':
     rospy.init_node("aist_kitting_demo")
 
     # pick_test()
-    search_test()
+    # search_test()
     # move_named_pose_test()
 
-    
+    suction_test()
