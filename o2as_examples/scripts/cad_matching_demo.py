@@ -12,6 +12,7 @@ from math import pi
 from std_srvs.srv import *
 from std_msgs.msg import Header
 from geometry_msgs.msg import PoseStamped, Pose, Point
+from visualization_msgs.msg import Marker
 from o2as_msgs.srv import *
 import actionlib
 import o2as_msgs.msg
@@ -35,7 +36,7 @@ class VisionDemo(O2ASBaseRoutines):
   This contains the routine used to run the vi task.
   """
   def __init__(self):
-    # super(VisionDemo, self).__init__()
+    super(VisionDemo, self).__init__()
     self._find_object = ros_service_proxy("find_object", FindObject)
     rospy.sleep(.5)   # Use this instead of waiting, so that simulation can be used
 
@@ -72,54 +73,53 @@ class VisionDemo(O2ASBaseRoutines):
   def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command = "", approach_height = 0.05, lift_up_after_place = True):
     rospy.loginfo("Going above place target")
 
+  def run(self):
+    try:
+      vision = VisionProxy()
+      
+      tf_buffer = tf2_ros.Buffer(rospy.Duration(1200.0)) #tf buffer length
+      tf_listener = tf2_ros.TransformListener(tf_buffer)
+      
+      i = raw_input("Enter the number of the part to be picked up:")
+      i = int(i)
+      if i > 0:
+        rospy.logdebug("find object")
+        expected_position = geometry_msgs.msg.PoseStamped()
+        object_id = str(i)    # The part number (see the definition in o2as_parts_description)
+        item_pose = vision.find_object(expected_position, position_tolerance = 0.2, object_id = object_id, camera = "b_bot_camera")
+        if item_pose != None:
+          # Transform pose from camera to workspace frame, so we can set the orientation more easily
+          target_frame = "workspace_center"
+          source_frame = item_pose.header.frame_id
+          transform = tf_buffer.lookup_transform(target_frame, source_frame, rospy.Time(0), rospy.Duration(1.0))
+          pick_pose = tf2_geometry_msgs.do_transform_pose(item_pose, transform)
 
+          downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+          pick_pose.pose.orientation = downward_orientation
 
+          rospy.logdebug("pick object")
+          self.publish_marker(pick_pose, "pick_pose") # debug
+          self.pick("b_bot", pick_pose, grasp_height = 0.1, approach_height = 0.1,
+                                  speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
 
+          # place_pose = pick_pose
+          # rospy.logdebug("place object")
+          # self.place("b_bot", place_pose, place_height = 0.03, approach_height = 0.05,
+          #                         speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
+          #                         lift_up_after_place = False)
+          
+      else:
+        rospy.loginfo("No valid entry. Skipping.")
+
+      # rospy.logdebug("Go to home position")
+      # self.go_to_named_pose("home_c", "c_bot")
+      # self.go_to_named_pose("home_b", "b_bot")
+      # self.go_to_named_pose("home_a", "a_bot")
+      rospy.loginfo("============ Done!")
+      
+    except rospy.ROSInterruptException:
+      pass
 
 if __name__ == '__main__':
-  try:
-    vision = VisionProxy()
-    vi = VisionDemo()
-    
-    tf_buffer = tf2_ros.Buffer(rospy.Duration(1200.0)) #tf buffer length
-    tf_listener = tf2_ros.TransformListener(tf_buffer)
-    
-    i = raw_input("Enter the number of the part to be picked up:")
-    i = int(i)
-    if i > 0:
-      rospy.logdebug("find object")
-      expected_position = geometry_msgs.msg.PoseStamped()
-      object_id = str(i)    # The part number (see the definition in o2as_parts_description)
-      item_pose = vision.find_object(expected_position, position_tolerance = 0.2, object_id = object_id, camera = "b_bot_camera")
-      if item_pose == None:
-        continue
-
-      # Transform pose from camera to workspace frame, so we can set the orientation more easily
-      target_frame = "workspace_center"
-      source_frame = item_pose.header.frame_id
-      transform = tf_buffer.lookup_transform(target_frame, source_frame, rospy.Time(0), rospy.Duration(1.0))
-      pick_pose = tf2_geometry_msgs.do_transform_pose(item_pose, transform)
-
-      downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-      pick_pose.pose.orientation = downward_orientation
-      place_pose = pick_pose
-      
-      rospy.logdebug("pick object")
-      vi.pick("b_bot", pick_pose, grasp_height = 0.03, approach_height = 0.05,
-                              speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
-
-      rospy.logdebug("place object")
-      vi.place("b_bot", place_pose, place_height = 0.03, approach_height = 0.05,
-                              speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
-                              lift_up_after_place = False)
-    else:
-      rospy.loginfo("No valid entry. Skipping.")
-
-    rospy.logdebug("Go to home position")
-    vi.go_to_named_pose("home_c", "c_bot")
-    vi.go_to_named_pose("home_b", "b_bot")
-    vi.go_to_named_pose("home_a", "a_bot")
-    rospy.loginfo("============ Done!")
-    
-  except rospy.ROSInterruptException:
-    pass
+  demo = VisionDemo()
+  demo.run()
