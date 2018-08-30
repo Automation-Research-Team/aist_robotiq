@@ -1,4 +1,5 @@
 
+import os
 import rospy
 import tf
 import numpy as np
@@ -29,8 +30,8 @@ class VisionCouplet(object):
 
         # point cloud file and image file is saved into the image_dir.
         self._image_dir = image_dir
-        self._pcloud_filename = self._image_dir + "/" + self._couplet_name + ".dat"
-        self._image_filename = self._image_dir + "/" + self._couplet_name + ".png"
+        self._pcloud_filename = os.path.join(self._image_dir, self._couplet_name + ".dat")
+        self._image_filename = os.path.join(self._image_dir, self._couplet_name + ".png")
 
         rospy.logdebug("VisionCouplet.set_image_dir() end")
 
