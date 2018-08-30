@@ -6,6 +6,7 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/task_board.xacro" />
   <xacro:task_board boardname="taskboard" parent="workspace_center">
     <origin xyz="-0.35 0.2 0.0" rpy="0 0 ${-pi/2}" />   
+    <!-- <origin xyz="-0.35 0.1 0.0" rpy="0 0 ${-pi/2}" />  -->
   </xacro:task_board>
   
   <!-- Placement mat -->
@@ -15,5 +16,13 @@
   <xacro:o2as_mat matname="mat" mat_w="${p_w}" mat_l="${p_l}" mat_h=".0001" parent="taskboard">
     <origin xyz="0.0 0.41 0.0" rpy="0 0 0" />
   </xacro:o2as_mat>
+
+
+  <joint name="belt_placement_tool" type="fixed">
+    <parent link="taskboard"/>
+    <child link="belt_placement_tool"/>
+    <origin rpy="0.0 0.0 0" xyz="-0.06 0.06 0"/>
+  </joint>
+  <link name="belt_placement_tool"/>
   
 </robot>

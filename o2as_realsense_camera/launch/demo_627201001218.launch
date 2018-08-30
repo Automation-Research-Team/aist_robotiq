@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find o2as_realsense_camera)/launch/demo.launch">
+        <arg name="serial_number" value="627201001218"/>
+    </include>
+</launch>

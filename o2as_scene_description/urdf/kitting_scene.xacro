@@ -100,6 +100,7 @@
     <origin xyz="${set2_x_bin2} ${set2_y-bin3_width/2-bin2_width*7/2} ${set2_z - z_origin_offset_2}" rpy="0 0 0" />
   </xacro:kitting_bin_2> -->
 
+
   <!-- add camera for pose matching on the table -->
   <link name="workspace_cam_holder_link" />
   <joint name="workspace_cam_holder_joint" type="fixed">

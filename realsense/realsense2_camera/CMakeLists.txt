@@ -76,36 +76,37 @@ catkin_package(
     )
 
 add_library(${PROJECT_NAME}
-    include/constants.h
-    include/realsense_node_factory.h
-    include/base_realsense_node.h
-    include/rs415_node.h
-    include/rs435_node.h
-    include/sr300_node.h
-    src/realsense_node_factory.cpp
-    src/base_realsense_node.cpp
-    src/rs415_node.cpp
-    src/rs435_node.cpp
-    src/sr300_node.cpp
+     src/dummy.cpp
+#    include/constants.h
+#    include/realsense_node_factory.h
+#    include/base_realsense_node.h
+#    include/rs415_node.h
+#    include/rs435_node.h
+#    include/sr300_node.h
+#    src/realsense_node_factory.cpp
+#    src/base_realsense_node.cpp
+#    src/rs415_node.cpp
+#    src/rs435_node.cpp
+#    src/sr300_node.cpp
     )
 
-add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_generate_messages_cpp)
-add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
+#add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_generate_messages_cpp)
+#add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg)
 
 
-target_link_libraries(${PROJECT_NAME}
-    realsense2
-    ${catkin_LIBRARIES}
-    ${CMAKE_THREAD_LIBS_INIT}
-    )
+#target_link_libraries(${PROJECT_NAME}
+#    realsense2
+#    ${catkin_LIBRARIES}
+#    ${CMAKE_THREAD_LIBS_INIT}
+#    )
 
 # Install nodelet library
-install(TARGETS ${PROJECT_NAME}
-    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-    )
+#install(TARGETS ${PROJECT_NAME}
+#    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+#    )
 
 # Install header files
 install(DIRECTORY include/
