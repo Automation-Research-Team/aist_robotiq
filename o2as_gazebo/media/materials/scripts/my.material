@@ -40,3 +40,17 @@ material Aruco/marker17
 		}
 	}
 }
+
+material Aruco/marker256
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture aruco-256-8-1.png
+			}
+		}
+	}
+}

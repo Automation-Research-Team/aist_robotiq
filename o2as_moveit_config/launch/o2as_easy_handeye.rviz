@@ -4,16 +4,12 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Global Options1
-        - /Status1
-        - /MotionPlanning1
         - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
         - /TF1
         - /TF1/Frames1
-        - /Image1
       Splitter Ratio: 0.5
-    Tree Height: 140
+    Tree Height: 333
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -84,6 +80,11 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
+          a_bot_ar_marker:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           a_bot_base:
             Alpha: 1
             Show Axes: false
@@ -308,6 +309,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          c_bot_ar_marker:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           c_bot_base:
             Alpha: 1
             Show Axes: false
@@ -423,24 +429,6 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          m3_feeder_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          m3_feeder_outlet_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          m4_feeder_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          m4_feeder_outlet_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           o2as_ground:
             Alpha: 1
             Show Axes: false
@@ -553,16 +541,6 @@ Visualization Manager:
             Show Trail: false
             Value: true
           set3_tray_2_screw_holder:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          wall_a:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          wall_c:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -625,6 +603,11 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
+          a_bot_ar_marker:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           a_bot_base:
             Alpha: 1
             Show Axes: false
@@ -849,6 +832,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          c_bot_ar_marker:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           c_bot_base:
             Alpha: 1
             Show Axes: false
@@ -961,24 +949,6 @@ Visualization Manager:
             Show Trail: false
             Value: true
           camera_right_ir_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          m3_feeder_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          m3_feeder_outlet_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          m4_feeder_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          m4_feeder_outlet_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -1098,16 +1068,6 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          wall_a:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          wall_c:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           workbox:
             Alpha: 1
             Show Axes: false
@@ -1130,6 +1090,8 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        a_bot_ar_marker:
+          Value: false
         a_bot_base:
           Value: false
         a_bot_base_link:
@@ -1141,9 +1103,9 @@ Visualization Manager:
         a_bot_forearm_link:
           Value: false
         a_bot_gripper:
-          Value: true
+          Value: false
         a_bot_gripper_tip_link:
-          Value: true
+          Value: false
         a_bot_shoulder_link:
           Value: false
         a_bot_tool0:
@@ -1157,9 +1119,9 @@ Visualization Manager:
         a_bot_wrist_3_link:
           Value: false
         a_phoxi_m_camera:
-          Value: true
+          Value: false
         a_phoxi_m_sensor:
-          Value: true
+          Value: false
         b_bot_ar_marker:
           Value: false
         b_bot_base:
@@ -1191,7 +1153,7 @@ Visualization Manager:
         b_bot_forearm_link:
           Value: false
         b_bot_ft300_link:
-          Value: true
+          Value: false
         b_bot_robotiq_85_base_link:
           Value: false
         b_bot_robotiq_85_left_finger_link:
@@ -1213,7 +1175,7 @@ Visualization Manager:
         b_bot_robotiq_85_tip_link:
           Value: false
         b_bot_screw_tool_m5_tip_link:
-          Value: true
+          Value: false
         b_bot_shoulder_link:
           Value: false
         b_bot_tool0:
@@ -1226,6 +1188,8 @@ Visualization Manager:
           Value: false
         b_bot_wrist_3_link:
           Value: false
+        c_bot_ar_marker:
+          Value: false
         c_bot_base:
           Value: false
         c_bot_base_link:
@@ -1237,7 +1201,7 @@ Visualization Manager:
         c_bot_forearm_link:
           Value: false
         c_bot_ft300_link:
-          Value: true
+          Value: false
         c_bot_robotiq_85_base_link:
           Value: false
         c_bot_robotiq_85_left_finger_link:
@@ -1259,7 +1223,7 @@ Visualization Manager:
         c_bot_robotiq_85_tip_link:
           Value: false
         c_bot_screw_tool_m5_tip_link:
-          Value: true
+          Value: false
         c_bot_shoulder_link:
           Value: false
         c_bot_tool0:
@@ -1273,8 +1237,12 @@ Visualization Manager:
         c_bot_wrist_3_link:
           Value: false
         camera_link:
+          Value: false
+        camera_link_from_a_bot_estimated:
           Value: true
-        camera_marker:
+        camera_link_from_b_bot_estimated:
+          Value: true
+        camera_link_from_c_bot_estimated:
           Value: true
         camera_right_ir_optical_frame:
           Value: false
@@ -1300,30 +1268,22 @@ Visualization Manager:
           Value: false
         d_bot_link:
           Value: false
-        m3_feeder_link:
-          Value: true
-        m3_feeder_outlet_link:
-          Value: true
-        m4_feeder_link:
-          Value: true
-        m4_feeder_outlet_link:
-          Value: true
         o2as_ground:
           Value: false
         screw_tool_holder:
-          Value: true
+          Value: false
         screw_tool_m3_helper_link:
-          Value: true
+          Value: false
         screw_tool_m3_link:
-          Value: true
+          Value: false
         screw_tool_m4_helper_link:
-          Value: true
+          Value: false
         screw_tool_m4_link:
-          Value: true
+          Value: false
         screw_tool_m5_helper_link:
-          Value: true
+          Value: false
         screw_tool_m5_link:
-          Value: true
+          Value: false
         set1_bin1_1:
           Value: false
         set1_bin1_2:
@@ -1347,18 +1307,14 @@ Visualization Manager:
         set3_tray_1:
           Value: false
         set3_tray_1_partition1_1:
-          Value: true
+          Value: false
         set3_tray_1_partition1_2:
-          Value: true
+          Value: false
         set3_tray_2:
           Value: false
         set3_tray_2_partition2:
-          Value: true
+          Value: false
         set3_tray_2_screw_holder:
-          Value: true
-        wall_a:
-          Value: true
-        wall_c:
           Value: false
         workbox:
           Value: false
@@ -1366,11 +1322,11 @@ Visualization Manager:
           Value: false
         world:
           Value: false
-      Marker Scale: 1
+      Marker Scale: 0.25
       Name: TF
       Show Arrows: false
-      Show Axes: false
-      Show Names: false
+      Show Axes: true
+      Show Names: true
       Tree:
         world:
           d_bot_base:
@@ -1399,6 +1355,8 @@ Visualization Manager:
                     a_bot_wrist_1_link:
                       a_bot_wrist_2_link:
                         a_bot_wrist_3_link:
+                          a_bot_ar_marker:
+                            {}
                           a_bot_ee_link:
                             {}
                           a_bot_tool0:
@@ -1406,10 +1364,10 @@ Visualization Manager:
                               {}
                             a_bot_gripper_tip_link:
                               {}
+              camera_link_from_a_bot_estimated:
+                {}
             a_bot_base_smfl:
-              m3_feeder_link:
-                m3_feeder_outlet_link:
-                  {}
+              {}
             a_phoxi_m_camera:
               a_phoxi_m_sensor:
                 {}
@@ -1458,9 +1416,8 @@ Visualization Manager:
                                   {}
                           b_bot_tool0:
                             {}
-              camera_link:
-                camera_marker:
-                  {}
+              camera_link_from_b_bot_estimated:
+                {}
             b_bot_base_smfl:
               {}
             c_bot_base_link:
@@ -1472,6 +1429,8 @@ Visualization Manager:
                     c_bot_wrist_1_link:
                       c_bot_wrist_2_link:
                         c_bot_wrist_3_link:
+                          c_bot_ar_marker:
+                            {}
                           c_bot_ee_link:
                             c_bot_ft300_link:
                               {}
@@ -1493,10 +1452,11 @@ Visualization Manager:
                                   {}
                           c_bot_tool0:
                             {}
+              camera_link:
+                {}
+              camera_link_from_c_bot_estimated:
+                {}
             c_bot_base_smfl:
-              m4_feeder_link:
-                m4_feeder_outlet_link:
-                  {}
               screw_tool_holder:
                 screw_tool_m3_link:
                   screw_tool_m3_helper_link:
@@ -1540,10 +1500,6 @@ Visualization Manager:
                   {}
                 set3_tray_2_screw_holder:
                   {}
-          wall_a:
-            {}
-          wall_c:
-            {}
       Update Interval: 0
       Value: true
     - Class: rviz/Image
@@ -1583,7 +1539,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.91891491
+      Distance: 3.78759766
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -1598,15 +1554,15 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.30539751
+      Pitch: 0.209796742
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.0503921658
+      Yaw: 1.80857754
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 965
+  Height: 1056
   Hide Left Dock: false
   Hide Right Dock: true
   Image:
@@ -1615,7 +1571,7 @@ Window Geometry:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000028000000371fc020000000dfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003a000000c6000000c600fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000120020002d00200053006c00690064006500720000000000ffffffff0000000000000000fb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e006701000001060000017b0000016b00fffffffb0000002e004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d00200053006c00690064006500720000000000ffffffff0000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000003e00fffffffb0000000a0049006d0061006700650100000287000001240000001600ffffff000000010000010f000003ccfc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003a000003cc0000009e00fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000074f0000003efc0100000002fb0000000800540069006d006500000000000000074f0000024400fffffffb0000000800540069006d00650100000000000004500000000000000000000004c70000037100000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd000000040000000000000280000003ccfc020000000dfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003a00000187000000c600fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000120020002d00200053006c00690064006500720000000000ffffffff0000000000000000fb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e006700000001060000017b0000017600fffffffb0000002e004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d00200053006c00690064006500720000000000ffffffff0000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000003e00fffffffb0000000a0049006d00610067006501000001c70000023f0000001600ffffff000000010000010f000003ccfc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003a000003cc0000009e00fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000074f0000003efc0100000002fb0000000800540069006d006500000000000000074f0000024400fffffffb0000000800540069006d00650100000000000004500000000000000000000004c9000003cc00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -1624,6 +1580,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: true
-  Width: 1869
+  Width: 1871
   X: 49
   Y: 24
