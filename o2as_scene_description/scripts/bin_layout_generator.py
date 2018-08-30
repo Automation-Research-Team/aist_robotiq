@@ -192,7 +192,7 @@ def main():
     directory=os.getcwd()
 
     set_list,bin_definition=read_csv_and_calc_bins_positions(directory) 
-    outfile = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf/templates", 'kitting_scene.xacro'),'w+')
+    outfile = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf", 'kitting_bins.xacro'),'w+')
     write_file(outfile,directory,set_list,bin_definition)
     
 if __name__ == "__main__":

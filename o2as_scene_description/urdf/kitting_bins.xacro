@@ -1,62 +1,76 @@
-<?xml version="1.0" ?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="kitting_bin">
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kitting_scene">
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_bin_macros.xacro" />
+  <xacro:property name="rack_width" value=".640" />
+
+
+ <!-- space for bin -->
+
+ <!-- bin1_definition -->
+ <xacro:property name="bin1_width" value="0.125"/>
+ <xacro:property name="bin1_length" value="0.128"/>
+ <xacro:property name="z_origin_offset_1" value="-.008" />
+
+ <!-- bin2_definition -->
+ <xacro:property name="bin2_width" value="0.112"/>
+ <xacro:property name="bin2_length" value="0.201"/>
+ <xacro:property name="z_origin_offset_2" value="-.009" />
+
+ <!-- bin3_definition -->
+ <xacro:property name="bin3_width" value="0.192"/>
+ <xacro:property name="bin3_length" value="0.285"/>
+ <xacro:property name="z_origin_offset_3" value="-.004" />
+
+ <!-- A row of bin1 -->
+ <xacro:property name="set1_x" value=".0"/>
+ <xacro:property name="set1_y" value="0.33"/>
+ <xacro:property name="set1_z" value=".01"/>
+ <!-- A row of bin2 -->
+ <xacro:property name="set2_x" value=".20"/>
+ <xacro:property name="set2_y" value="0.33"/>
+ <xacro:property name="set2_z" value=".00"/>
+ <!--set1_bin1_1_-->
+  <xacro:kitting_bin_1 binname="set1_bin1_1" parent="workspace_center" z_origin_offset="-.008">
+      <origin xyz=".0 0.2675 0.018" rpy="0 0 0" />
+  </xacro:kitting_bin_1>
+  <!--set1_bin1_2_-->
+  <xacro:kitting_bin_1 binname="set1_bin1_2" parent="workspace_center" z_origin_offset="-.008">
+      <origin xyz=".0 0.1425 0.018" rpy="0 0 0" />
+  </xacro:kitting_bin_1>
+  <!--set1_bin1_3_-->
+  <xacro:kitting_bin_1 binname="set1_bin1_3" parent="workspace_center" z_origin_offset="-.008">
+      <origin xyz=".0 0.0175 0.018" rpy="0 0 0" />
+  </xacro:kitting_bin_1>
+  <!--set1_bin1_4_-->
+  <xacro:kitting_bin_1 binname="set1_bin1_4" parent="workspace_center" z_origin_offset="-.008">
+      <origin xyz=".0 -0.1075 0.018" rpy="0 0 0" />
+  </xacro:kitting_bin_1>
+  <!--set1_bin1_5_-->
+  <xacro:kitting_bin_1 binname="set1_bin1_5" parent="workspace_center" z_origin_offset="-.008">
+      <origin xyz=".0 -0.2325 0.018" rpy="0 0 0" />
+  </xacro:kitting_bin_1>
+  <!--set2_bin2_1_-->
+  <xacro:kitting_bin_2 binname="set2_bin2_1" parent="workspace_center" z_origin_offset="-.009">
+      <origin xyz=".20 0.274 0.009" rpy="0 0 0" />
+  </xacro:kitting_bin_2>
+  <!--set2_bin2_2_-->
+  <xacro:kitting_bin_2 binname="set2_bin2_2" parent="workspace_center" z_origin_offset="-.009">
+      <origin xyz=".20 0.162 0.009" rpy="0 0 0" />
+  </xacro:kitting_bin_2>
+  <!--set2_bin2_3_-->
+  <xacro:kitting_bin_2 binname="set2_bin2_3" parent="workspace_center" z_origin_offset="-.009">
+      <origin xyz=".20 0.05 0.009" rpy="0 0 0" />
+  </xacro:kitting_bin_2>
+  <!--set2_bin2_4_-->
+  <xacro:kitting_bin_2 binname="set2_bin2_4" parent="workspace_center" z_origin_offset="-.009">
+      <origin xyz=".20 -0.062 0.009" rpy="0 0 0" />
+  </xacro:kitting_bin_2>
+  <!--set2_bin3_1_-->
+  <xacro:kitting_bin_3 binname="set2_bin3_1" parent="workspace_center" z_origin_offset="-.004">
+      <origin xyz=".20 -0.214 0.004" rpy="0 0 0" />
+  </xacro:kitting_bin_3>
+ 
+
   
-  <!-- z-origin-offset should be set such that the frame is on the surface of the bin -->
-  <xacro:macro name="kitting_bin_internal" params="binname parent filename z_origin_offset *origin">
-    <xacro:property name="mesh_file" value="package://o2as_scene_description/meshes/${filename}.stl" />
-    <xacro:property name="mesh_file_col" value="package://o2as_scene_description/meshes/${filename}.vhacd.dae" />
-
-    <link name="${binname}">
-      <inertial>
-        <origin rpy="0 0 0" xyz="0 0 ${z_origin_offset}"/>
-        <mass value="1.0"/>
-        <inertia ixx="1.0" ixy="0" ixz="0" iyy="1.0" iyz="0" izz="1.0"/>
-      </inertial>
-      <visual>
-        <origin rpy="${pi/2} 0 ${pi/2}" xyz="0 0 ${z_origin_offset}"/>
-        <geometry>
-          <mesh filename="${mesh_file}" scale="0.001 0.001 0.001"/>
-          <!-- <mesh filename="package://ur_description/meshes/ur5/visual/shoulder.dae"/> -->
-        </geometry>
-        <material name="orange">
-          <color rgba="1 0.5088 0.0468 1"/>
-        </material>
-      </visual>
-      <collision>
-        <origin rpy="${pi/2} 0 ${pi/2}" xyz="0 0 ${z_origin_offset}"/>
-        <geometry>
-          <mesh filename="${mesh_file_col}" scale="0.001 0.001 0.001"/>
-          <!-- <mesh filename="package://ur_description/meshes/ur5/collision/shoulder.stl"/> -->
-        </geometry>
-      </collision>
-    </link>
-    <gazebo reference="${binname}">
-      <material>Gazebo/Orange</material>
-    </gazebo>
-
-    <joint name="${binname}" type="fixed">
-      <parent link="${parent}" />
-      <child link = "${binname}" />
-      <xacro:insert_block name="origin"/>
-    </joint>
-  </xacro:macro>
-
-  <xacro:macro name="kitting_bin_1" params="binname parent z_origin_offset *origin">
-    <xacro:kitting_bin_internal binname="${binname}" parent="${parent}" filename="bin1_EA661CA-11" z_origin_offset="${z_origin_offset}">
-      <xacro:insert_block name="origin"/>
-    </xacro:kitting_bin_internal>
-  </xacro:macro>
-
-  <xacro:macro name="kitting_bin_2" params="binname parent z_origin_offset *origin">
-    <xacro:kitting_bin_internal binname="${binname}" parent="${parent}" filename="bin2_SK-HL1-BL" z_origin_offset="${z_origin_offset}">
-      <xacro:insert_block name="origin"/>
-    </xacro:kitting_bin_internal>
-  </xacro:macro>
-
-  <xacro:macro name="kitting_bin_3" params="binname parent z_origin_offset *origin">
-    <xacro:kitting_bin_internal binname="${binname}" parent="${parent}" filename="bin3_T3-YG" z_origin_offset="${z_origin_offset}">
-      <xacro:insert_block name="origin"/>
-    </xacro:kitting_bin_internal>
-  </xacro:macro>
-
 </robot>
