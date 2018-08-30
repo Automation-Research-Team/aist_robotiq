@@ -980,6 +980,18 @@ bool SkillServer::publishMarker(geometry_msgs::PoseStamped marker_pose, std::str
       marker.color.g = 0.4;
       marker.color.a = 0.8;
     }
+    if (marker_type == "aist_vision_result")
+    {
+      // Add a sphere
+      marker.type = visualization_msgs::Marker::SPHERE;
+      marker.scale.x = .01;
+      marker.scale.y = .01;
+      marker.scale.z = .01;
+      marker.color.r = 0.8;
+      marker.color.g = 0.4;
+      marker.color.b = 0.0;
+      marker.color.a = 0.8;
+    }
     else if (marker_type == "")
     {
       marker.type = visualization_msgs::Marker::SPHERE;
