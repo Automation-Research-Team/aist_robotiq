@@ -13,7 +13,7 @@
         <arg name="model_filename" value="$(find o2as_cad_matching)/data/model/$(arg model_name).dat"/>
         <arg name="id_map_filename" value="$(find o2as_cad_matching)/data/model/$(arg model_name)/id_map.yaml"/>
         <!-- <arg name="id_map_filename" value="$(find o2as_cad_matching)/data/model/$(arg model_name).yaml"/> -->
-        <arg name="search_param_filename" value="$(find o2as_cad_matching)/config/group/$(arg camera)_search_param.yaml"/>
+        <arg name="search_param_filename" value="$(find o2as_cad_matching)/config/camera/$(arg camera_type)_search_param.yaml"/>
         <include file="$(find o2as_cad_matching)/launch/search_server.launch">
             <arg name="group_name" value="$(arg camera)"/>
             <arg name="model_filename" value="$(arg model_filename)"/>
