@@ -429,7 +429,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   // Disable all collisions to allow movement into the tool
   // NOTE: This could be done cleaner by disabling only gripper + tool, but it is good enough for now.
   updatePlanningScene();
-  ROS_INFO("Updating collision matrix.");
+  ROS_INFO("Disabling all collisions Updating collision matrix.");
   collision_detection::AllowedCollisionMatrix acm_no_collisions(planning_scene_.allowed_collision_matrix),
                                               acm_original(planning_scene_.allowed_collision_matrix);
   acm_no_collisions.setEntry(screw_tool_id, true);   // Allow collisions with screw tool during pickup,
@@ -580,7 +580,7 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
   ROS_INFO_STREAM("Sending opening_width " << opening_width << " to gripper of: " << robot_name);
   if ((robot_name == "a_bot"))
   {
-    ROS_INFO_STREAM("Gripper: " << gripper_name);
+    ROS_DEBUG_STREAM("Gripper: " << gripper_name);
     o2as_msgs::PrecisionGripperCommand srv;
     
     if (gripper_name == "")
@@ -603,7 +603,7 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
     PrecisionGripperClient_.call(srv);
     if (srv.response.success == true)
     {
-      ROS_INFO("Successfully sent the precision gripper command.");
+      ROS_DEBUG("Successfully sent the precision gripper command.");
       // srv.request.stop = true;
       // PrecisionGripperClient_.call(srv);
     }
@@ -631,14 +631,14 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
       finished_before_timeout = c_bot_gripper_client_.waitForResult(ros::Duration(4.0));
       result = c_bot_gripper_client_.getResult();
     }
-    ROS_INFO_STREAM("Action " << (finished_before_timeout ? "returned" : "did not return before timeout") <<", with result: " << result->reached_goal);
+    ROS_DEBUG_STREAM("Action " << (finished_before_timeout ? "returned" : "did not return before timeout") <<", with result: " << result->reached_goal);
   }
   else
   {
     ROS_ERROR("The specified gripper is not defined!");
     return false;
   }
-  ROS_INFO("Returning from gripper command.");
+  ROS_DEBUG("Returning from gripper command.");
   return finished_before_timeout;
 }
 
@@ -703,7 +703,7 @@ bool SkillServer::attachDetachTool(std::string screw_tool_id, std::string robot_
 
 bool SkillServer::goFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, double velocity_scaling_factor)
 {
-  ROS_INFO_STREAM("Received goFromAbove command.");
+  ROS_DEBUG_STREAM("Received goFromAbove command.");
 
   // Move above the target pose
   target_tip_link_pose.pose.position.z += .1;
@@ -728,7 +728,7 @@ bool SkillServer::goFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, s
 bool SkillServer::placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name)
 {
   publishMarker(target_tip_link_pose, "place_pose");
-  ROS_INFO_STREAM("Received placeFromAbove command.");
+  ROS_DEBUG_STREAM("Received placeFromAbove command.");
 
   // Move above the target pose
   target_tip_link_pose.pose.position.z += .1;
@@ -762,14 +762,14 @@ bool SkillServer::placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose
   //   moveToCartPosePTP(target_tip_link_pose, robot_name, true, end_effector_link_name);  // Force the move even if LIN fails
   // }
 
-  ROS_INFO_STREAM("Finished placing object.");
+  ROS_DEBUG_STREAM("Finished placing object.");
   return true;
 }
 
 bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name)
 {
   publishMarker(target_tip_link_pose, "pick_pose");
-  ROS_INFO_STREAM("Received pickFromAbove command.");
+  ROS_DEBUG_STREAM("Received pickFromAbove command.");
   
   // Move above the object
   openGripper(robot_name, gripper_name);

@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="screw_feeder">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="screw_feeder">
 
   <xacro:macro name="screw_feeder" params="feedername parent *origin">
   <!-- This creates a screw feeder (roughly) with the origin in the back right corner. -->

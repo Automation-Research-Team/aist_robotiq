@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="o2as_box">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   
   <xacro:macro name="o2as_box" params="boxname box_w box_l box_h parent *origin">
     <!-- This creates a box with the origin in the bottom corner, fixed to the world link. -->
