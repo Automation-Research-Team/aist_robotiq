@@ -184,7 +184,17 @@ SkillServer::SkillServer() :
   robot_statuses_["a_bot"] = r1;
   robot_statuses_["b_bot"] = r2;
   robot_statuses_["c_bot"] = r3;
-  // Would 
+  
+  n_.getParam("use_real_robot", use_real_robot_);
+  ROS_INFO_STREAM((use_real_robot_ ? "Using real robot!" : "Using simulated robot."));
+  if (use_real_robot_)
+  {
+    ROS_INFO_STREAM("Using real robot!");
+  }
+  else
+  {
+    ROS_INFO_STREAM("Using simulated robot.");
+  }
 }
 
 

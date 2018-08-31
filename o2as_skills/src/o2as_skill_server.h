@@ -109,6 +109,7 @@ public:
 
 // private:
   ros::NodeHandle n_;
+  bool use_real_robot_;
 
   ros::Publisher pubMarker_;
   int marker_id_count = 0;
