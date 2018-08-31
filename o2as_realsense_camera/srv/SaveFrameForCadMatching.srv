@@ -1,0 +1,4 @@
+string pcloud_filename
+string image_filename
+---
+bool success

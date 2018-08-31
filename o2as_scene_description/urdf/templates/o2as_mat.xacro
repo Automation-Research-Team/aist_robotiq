@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="o2as_mat">
+  
+  <xacro:macro name="o2as_mat" params="matname mat_w mat_l mat_h parent *origin">
+    <!-- This creates a box with the origin in the bottom corner, fixed to the world link. -->
+    
+    <link name="${matname}">
+      <!-- w is in x, l is in y, h is in z -->
+      <visual>
+        <origin xyz="${mat_w/2} ${mat_l/2} ${mat_h/2}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${mat_w} ${mat_l} ${mat_h}"/> 
+        </geometry>
+        <material name="white">
+          <color rgba="1 1 1 1"/>
+        </material>
+      </visual>
+      <visual>
+        <origin xyz="${mat_w-.01} ${mat_l/2} ${mat_h}" rpy="0 0 ${pi/2}"/>
+        <geometry>
+          <box size=".38 .002 ${mat_h}"/> 
+        </geometry>
+        <material name="black">
+          <color rgba=".1 .1 .1 1"/>
+        </material>
+      </visual>
+      <visual>
+        <origin xyz=".01 ${mat_l/2} ${mat_h}" rpy="0 0 ${pi/2}"/>
+        <geometry>
+          <box size=".38 .002 ${mat_h}"/> 
+        </geometry>
+        <material name="black">
+          <color rgba=".1 .1 .1 1"/>
+        </material>
+      </visual>
+
+      <visual>
+        <origin xyz="${mat_w/2} ${mat_l-.01} ${mat_h}" rpy="0 0 0"/>
+        <geometry>
+          <box size=".38 .002 ${mat_h}"/> 
+        </geometry>
+        <material name="black">
+          <color rgba=".1 .1 .1 1"/>
+        </material>
+      </visual>
+      <visual>
+        <origin xyz="${mat_w/2} .01 ${mat_h}" rpy="0 0 0"/>
+        <geometry>
+          <box size=".38 .002 ${mat_h}"/> 
+        </geometry>
+        <material name="black">
+          <color rgba=".1 .1 .1 1"/>
+        </material>
+      </visual>
+      <!-- Done with boundary drawing -->
+      <collision>
+        <geometry>
+          <box size="${mat_w} ${mat_l} ${mat_h}"/> 
+        </geometry>
+      </collision>
+
+      <!-- This is required for Gazebo. -->
+      <inertial>
+        <mass value="1.0" />
+        <!-- <origin xyz="${box_w/2} ${box_l} ${box_h/2}" rpy="0 0 0"/> -->
+        <inertia ixx="0.0" ixy="0.0" ixz="0.0"
+          iyy="0.0" iyz="0.0"
+          izz="0.0" />
+      </inertial>
+    </link>
+    <gazebo reference="${matname}">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <joint name="${matname}" type="fixed">
+      <parent link="${parent}" />
+      <child link = "${matname}" />
+      <xacro:insert_block name="origin"/>
+    </joint>
+        <joint name="${matname}_part1" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part1"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.073 0.285 0.0"/>
+    </joint>
+    <link name="${matname}_part1"/>
+
+    <joint name="${matname}_part2" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part2"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.0525 0.207 0.0"/>
+    </joint>
+    <link name="${matname}_part2"/>
+
+    <joint name="${matname}_part3" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part3"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.261 0.323 0.0"/>
+    </joint>
+    <link name="${matname}_part3"/>
+
+    <joint name="${matname}_part4" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part4"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.343 0.3235 0.0"/>
+    </joint>
+    <link name="${matname}_part4"/>
+
+    <joint name="${matname}_part5" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part5"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.328 0.163 0.0"/>
+    </joint>
+    <link name="${matname}_part5"/>
+
+    <joint name="${matname}_part6" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part6"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.2 0.2 0.0"/>
+    </joint>
+    <link name="${matname}_part6"/>
+
+    <joint name="${matname}_part7" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part7"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.011 0.011 0.0"/>
+    </joint>
+    <link name="${matname}_part7"/>
+
+    <joint name="${matname}_part8" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part8"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.011 0.013 0.0"/>
+    </joint>
+    <link name="${matname}_part8"/>
+
+    <joint name="${matname}_part9" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part9"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.155 0.094 0.0"/>
+    </joint>
+    <link name="${matname}_part9"/>
+
+    <joint name="${matname}_part10" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part10"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.252 0.106 0.0"/>
+    </joint>
+    <link name="${matname}_part10"/>
+
+    <joint name="${matname}_part11" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part11"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.0 0.001 0.0"/>
+    </joint>
+    <link name="${matname}_part11"/>
+
+    <joint name="${matname}_part12" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part12"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.002 0.003 0.0"/>
+    </joint>
+    <link name="${matname}_part12"/>
+
+    <joint name="${matname}_part13" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part13"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.003 0.003 0.0"/>
+    </joint>
+    <link name="${matname}_part13"/>
+
+    <joint name="${matname}_part14" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part14"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.249 0.0445 0.0"/>
+    </joint>
+    <link name="${matname}_part14"/>
+
+    <joint name="${matname}_part15" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part15"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.3465 0.051 0.0"/>
+    </joint>
+    <link name="${matname}_part15"/>
+

@@ -19,7 +19,7 @@ this launch file.
             in case of name clashes, for example-->
         <!-- Assume eye_on_hand is false -->
         <arg name="robot_base_frame" value="$(arg robot_name)_base_link" />
-        <arg name="tracking_base_frame" default="camera_link_estimated" />
+        <arg name="tracking_base_frame" default="camera_link_from_$(arg robot_name)_estimated" />
 
         <arg name="inverse" default="false" />
     </include>

@@ -1,29 +1,45 @@
 <?xml version="1.0" ?>
 <launch>
-    <arg name="robot_name" default="b_bot" />
-    <arg name="move_group" default="b_bot" />
-    <arg name="camera_name" default="d_bot_camera"/>
-    <arg name="namespace_prefix" default="o2as_easy_handeye_b_bot" />
+    <arg name="robot_name" />  <!-- "a_bot", "b_bot", or "c_bot" -->
+    <arg name="move_group" value="$(arg robot_name)" />
+    <arg name="camera_name" default="a_phoxi_m_camera"/>
+    <arg name="namespace_prefix" value="o2as_easy_handeye_$(arg robot_name)" />
     <arg name="marker_size" default="0.08"
          doc="Size of the ArUco marker used, in meters" />
-    <arg name="marker_id" default="26" doc="The ID of the ArUco marker used" />
 
-    <!-- Add camera in Gazebo -->
-    <param name="d_bot_camera_description"
-           command="$(find xacro)/xacro --inorder '$(find o2as_gazebo)/urdf/d_bot_camera.urdf.xacro'" />
-    <node name="spawn_gazebo_model2" pkg="gazebo_ros" type="spawn_model"
-          args="-urdf -param d_bot_camera_description -model o2as_d_bot -unpause" respawn="false" output="screen"/>
+    <!-- Set AR marker ID -->
+    <arg name="marker_id" value="17" if="$(eval arg('robot_name') == 'a_bot')"/>
+    <arg name="marker_id" value="26" if="$(eval arg('robot_name') == 'b_bot')"/>
+    <arg name="marker_id" value="256" if="$(eval arg('robot_name') == 'c_bot')"/>
+    <!--<arg name="marker_id" default="26" doc="The ID of the ArUco marker used" />-->
 
     <!-- Camera state publisher -->
-    <node pkg="robot_state_publisher" type="robot_state_publisher"
+    <!--<node pkg="robot_state_publisher" type="robot_state_publisher"
         name="d_bot_st_pub">
         <remap from="robot_description" to="d_bot_camera_description"/>
-    </node>
+    </node>-->
+
+    <!-- CameraInfo conversion for Phoxi in Gazebo:
+         from camera_info to camera_info2,
+         see convert_phoxi_camera_info_gazebo.py -->
+    <node name="convert_phoxi_camera_info_gazebo" pkg="o2as_easy_handeye"
+          type="convert_phoxi_camera_info_gazebo.py"
+          if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
 
     <!-- start ArUco -->
     <node name="aruco_tracker" pkg="aruco_ros" type="single">
-        <remap from="/camera_info" to="/$(arg camera_name)/rgb/camera_info" />
-        <remap from="/image" to="/$(arg camera_name)/rgb/image_raw" />
+        <!-- Remap topic names -->
+        <!-- String "/rgb/" is required for topics "camera_info" and
+        "image_raw" in realsense. Note that Phoxi publish topics named
+        "texture" instead of "image_raw". -->
+        <!-- <remap from="/camera_info"
+                  to="/$(arg camera_name)/rgb/camera_info" /> -->
+        <!-- <remap from="/image" to="/$(arg camera_name)/rgb/image_raw" /> -->
+        <!-- Use camera_info2 instead of camera_info in Gazebo with Phoxi -->
+        <remap from="/camera_info" to="/$(arg camera_name)/camera_info2"/>
+        <remap from="/image" to="/$(arg camera_name)/texture" />
+
+        <!-- Other parameters -->
         <param name="image_is_rectified" value="false"/>
         <param name="marker_size"        value="$(arg marker_size)"/>
         <param name="marker_id"          value="$(arg marker_id)"/>
