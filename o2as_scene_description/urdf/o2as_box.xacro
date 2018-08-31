@@ -17,6 +17,7 @@
         </material>
       </visual>
       <collision>
+        <origin xyz="${box_w/2} ${box_l/2} ${box_h/2}" rpy="0 0 0"/>
         <geometry>
           <box size="${box_w} ${box_l} ${box_h}"/> 
         </geometry>

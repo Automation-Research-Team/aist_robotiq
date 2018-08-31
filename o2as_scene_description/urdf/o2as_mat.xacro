@@ -55,6 +55,7 @@
       </visual>
       <!-- Done with boundary drawing -->
       <collision>
+        <origin xyz="${mat_w/2} .01 ${mat_h}" rpy="0 0 0"/>
         <geometry>
           <box size="${mat_w} ${mat_l} ${mat_h}"/> 
         </geometry>
