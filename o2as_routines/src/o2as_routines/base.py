@@ -134,7 +134,8 @@ class O2ASBaseRoutines(object):
     self.publishMarker_client.call(req)
     return True
 
-  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, high_precision = False):
+  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, high_precision = False, end_effector_link = ""):
+    self.publish_marker(pose_goal_stamped, "pose")
     group = self.groups[group_name]
     group.set_pose_target(pose_goal_stamped)
     rospy.loginfo("Setting velocity scaling to " + str(speed))
