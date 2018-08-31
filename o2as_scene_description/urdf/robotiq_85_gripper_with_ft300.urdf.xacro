@@ -7,7 +7,7 @@
 
   <!-- This seems too long when measuring the sensor,
        but works out when calibrating the tip_link to the world. -->
-  <xacro:property name="ft300_length" value="0.0555"/>
+  <xacro:property name="ft300_length" value="0.0525"/>
 
   <xacro:macro name="robotiq_85_gripper_o2as" params="prefix parent">
     <!-- Add the force sensor in front of the gripper. -->

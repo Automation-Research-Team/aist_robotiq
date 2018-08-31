@@ -5,10 +5,10 @@
 
   <!-- Insert: -->
   <xacro:kitting_tray1 trayname="tray_1" parent="workspace_center">
-    <origin xyz="-.2 -.27 0" rpy="0 0 ${pi/2}" />
+    <origin xyz="-.3 -.1 0" rpy="0 0 ${-pi/2}" />
   </xacro:kitting_tray1>
   <xacro:kitting_tray2 trayname="tray_2" parent="workspace_center">
-    <origin xyz="-.2 .27 0" rpy="0 0 ${-pi/2}" />
+    <origin xyz="-.3 .3 0" rpy="0 0 ${-pi/2}" />
   </xacro:kitting_tray2>
   <!-- The base plate -->
 
