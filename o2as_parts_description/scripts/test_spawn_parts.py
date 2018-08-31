@@ -6,7 +6,7 @@ import random
 from gazebo_msgs.srv import DeleteModel, SpawnModel, SpawnModelRequest
 from geometry_msgs.msg import *
 
-urdf_dir = '/root/catkin_ws/src/o2as_parts_description/urdf/'
+urdf_dir = '/root/catkin_ws/src/o2as_parts_description/urdf/gereated/'
 urdf_files = {
     4: urdf_dir + '/04_37D-GEARMOTOR-50-70.urdf',
     5: urdf_dir + '/05_MBRFA30-2-P6.urdf',

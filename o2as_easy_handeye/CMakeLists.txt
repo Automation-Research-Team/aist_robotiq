@@ -146,6 +146,10 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
+catkin_install_python(PROGRAMS scripts/run_handeye_calibration.py
+                               scripts/convert_phoxi_camera_info_gazebo.py
+                      DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
 #############
 ## Install ##
 #############
