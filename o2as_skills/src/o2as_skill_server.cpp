@@ -277,7 +277,7 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   ROS_INFO_STREAM("Cartesian motion plan took " << d.toSec() << " s and was " << cartesian_success * 100.0 << "% successful.");
 
   // Scale the trajectory. This is workaround to setting the VelocityScalingFactor. Copied from k-okada
-  if (cartesian_success > 0)
+  if (cartesian_success > 0.5)
   {
     // Success
     moveit_msgs::RobotTrajectory scaled_trajectory = moveit_msgs::RobotTrajectory(trajectory);
@@ -413,11 +413,17 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
   // Before we moved the robots back, this x-value caused the LIN movement to fail if it was too far in the back.
   // This seemed to have to do with the IK solutions rather than the actual solvability. To note.
-  ps_approach.pose.position.x = -.03;
+  ps_approach.pose.position.x = -.06;
   ps_approach.pose.position.z = .017;
   ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
   ROS_INFO("Moving to screw tool approach pose PTP.");
-  moveToCartPosePTP(ps_approach, robot_name);
+
+  bool preparation_succeeded = moveToCartPosePTP(ps_approach, robot_name);
+  if (!preparation_succeeded)
+  {
+    ROS_ERROR("Could not go to approach pose. Aborting tool pickup.");
+    return false;
+  }
 
   if (equip) {
     openGripper(robot_name);
@@ -446,29 +452,43 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
   // Plan & execute linear motion to the tool change position
   ps_tool_holder = ps_approach;
-  if (equip)        ps_tool_holder.pose.position.x = 0.03;
-  else if (unequip) ps_tool_holder.pose.position.x = 0.025;  
+  if (equip)        ps_tool_holder.pose.position.x = 0.025;
+  else if (unequip) ps_tool_holder.pose.position.x = 0.02;  
 
   // The tool is deposited a bit in front of the original position. The magnet pulls it to the final pose.
   ROS_INFO("Moving to pose in tool holder LIN.");
-  moveToCartPoseLIN(ps_tool_holder, robot_name, true, "", 0.02);
+  bool moved_to_tool_holder = true;
+  if (use_real_robot_)
+  {
+    o2as_msgs::sendScriptToUR srv;
+    srv.request.program_id = "lin_move_rel";
+    srv.request.robot_name = robot_name;
+    srv.request.velocity = .05;
+    geometry_msgs::Point t_rel;
+    t_rel.z = (ps_tool_holder.pose.position.x - ps_approach.pose.position.x);
+    srv.request.relative_translation = t_rel;
+    sendScriptToURClient_.call(srv);
+    if (srv.response.success == true)
+    {
+      ROS_INFO("Successfully called the URScript client to perform a linear movement forward.");
+      waitForURProgram("/" + robot_name +"_controller");
+    }
+    else
+    {
+      ROS_WARN("Could not call the URScript client to perform a linear movement forward.");
+    }
+  }
+  else 
+  {
+    moved_to_tool_holder = moveToCartPoseLIN(ps_tool_holder, robot_name, true, "", 0.02);
+  }
   
-  // /// ALTERNATIVE: Send the linear motion request to the robot
-  // o2as_msgs::sendScriptToUR srv;
-  // srv.request.program_id = "move_lin_rel";
-  // srv.request.robot_name = robot_name;
-  // geometry_msgs::PointStamped t_rel;
-  // t_rel.header.frame_id = ps_tool_holder.header.frame_id;
-  // t_rel.x = .03;
-  // srv.request.relative_translation = t_rel;
-  // sendScriptToURClient_.call(srv);
-  // if (srv.response.success == true)
-  // {
-  //   ROS_INFO("Successfully called the URScript client to perform a linear movement forward.");
-  //   waitForURProgram("/" + robot_name +"_controller");
-  // }
-  // else
-  //   ROS_WARN("Could not call the URScript client to perform a linear movement forward.");
+  if (!moved_to_tool_holder) 
+  {
+    ROS_ERROR("Was not able to move to tool holder. ABORTING!");
+    throw;
+  }
+  // I normally avoid exceptions, but dropping the screw tool has to be avoided at all costs.
 
   // Close gripper, attach the tool object to the gripper in the Planning Scene.
   // Its collision with the parent link is set to allowed in the original planning scene.
@@ -477,6 +497,8 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     closeGripper(robot_name);
     attachTool(screw_tool_id, robot_name);
     acm_original.setEntry(screw_tool_id, robot_name + "_robotiq_85_tip_link", true);  // For afterwards
+    acm_original.setEntry(screw_tool_id, robot_name + "_robotiq_85_left_finger_tip_link", true);  // For afterwards
+    acm_original.setEntry(screw_tool_id, robot_name + "_robotiq_85_right_finger_tip_link", true);  // For afterwards
     
     acm_no_collisions.setEntry(screw_tool_id, true);      // To allow collisions now
     planning_scene_interface_.applyPlanningScene(ps_no_collisions);
@@ -494,6 +516,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     robot_statuses_[robot_name].held_tool_id = "";
   }
   acm_original.getMessage(planning_scene_.allowed_collision_matrix);
+  ros::Duration(1.0).sleep();
   
   // Plan & execute LINEAR motion away from the tool change position
   ROS_INFO("Moving back to screw tool approach pose LIN.");
@@ -502,12 +525,9 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   // Reactivate the collisions, with the updated entry about the tool
   planning_scene_interface_.applyPlanningScene(planning_scene_);
 
-  if (equip)
-  {
-    ROS_INFO("Moving higher up to facilitate later movements.");
-    ps_approach.pose.position.z +=.3;
-    moveToCartPosePTP(ps_approach, robot_name);
-  }
+  ROS_INFO("Moving higher up to facilitate later movements.");
+  ps_approach.pose.position.z +=.3;
+  moveToCartPosePTP(ps_approach, robot_name);
   
 
   // Delete tool collision object only after collision reinitialization to avoid errors
@@ -622,12 +642,14 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
     if (robot_name == "b_bot")
     {
       b_bot_gripper_client_.sendGoal(goal);
+      ros::Duration(0.5).sleep();
       finished_before_timeout = b_bot_gripper_client_.waitForResult(ros::Duration(2.0));
       result = b_bot_gripper_client_.getResult();
     }
     else if (robot_name == "c_bot")
     {
       c_bot_gripper_client_.sendGoal(goal);
+      ros::Duration(0.5).sleep();
       finished_before_timeout = c_bot_gripper_client_.waitForResult(ros::Duration(4.0));
       result = c_bot_gripper_client_.getResult();
     }
@@ -1089,6 +1111,14 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
   ROS_INFO("pickAction was called");
   geometry_msgs::PoseStamped target_pose = goal->item_pose;
   target_pose = transform_pose_now(target_pose, "world", tflistener_);
+
+  if ((robot_statuses_[robot_name].carrying_tool == true) && (goal->tool_name != "screw_tool"))
+  {
+    ROS_ERROR("Robot is already carrying a tool. Nothing can be picked except screws.");
+    pickActionServer_.setAborted();
+    return;
+  }
+
   if (!goal->use_complex_planning)
   {
     ROS_INFO_STREAM("Using simple pick planning. Gripper will face downward, with z_axis_rotation = " << goal->z_axis_rotation);
