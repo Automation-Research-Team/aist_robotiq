@@ -6,10 +6,10 @@
   <xacro:include filename="$(find realsense2_camera)/urdf/_d435.urdf.xacro" />
 
   <!-- spawn and attach dual suction grippers -->
-  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro" /> -->
-  <!-- <xacro:dual_suction_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link">
+  <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro" />
+  <xacro:dual_suction_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
-  </xacro:dual_suction_gripper_o2as> -->
+  </xacro:dual_suction_gripper_o2as>
 
   <xacro:property name="tray_width" value=".300" />
   <xacro:property name="tray_length" value=".210" />
@@ -27,9 +27,9 @@
   <!-- TODO: Deal with this camera? -->
 
   <!-- A row of tray -->
-  <xacro:property name="set3_x" value="${-.3}" />
-  <xacro:property name="set3_y" value="${0}" />
-  <xacro:property name="set3_z" value=".00" />
+  <xacro:property name="set3_x" value="${-tray_length-.05}" />
+  <xacro:property name="set3_y" value="0" />
+  <xacro:property name="set3_z" value="0" />
 
   <xacro:kitting_tray1 trayname="set3_tray_1" parent="workspace_center">
     <origin xyz="${set3_x} ${set3_y} ${set3_z}" rpy="0 0 0" />

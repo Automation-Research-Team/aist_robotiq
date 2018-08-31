@@ -154,22 +154,22 @@ class MoveGroupPythonInterfaceTutorial(object):
     pose_goal.pose.orientation.y = 0.5
     pose_goal.pose.orientation.z = 0.5
     pose_goal.pose.orientation.w = 0.5
-    pose_goal.pose.position.z = 0.025
+    pose_goal.pose.position.z = 0.005
 
     # First use a_bot
-    self.group = moveit_commander.MoveGroupCommander("a_bot")
+    self.group = moveit_commander.MoveGroupCommander("b_bot")
     success = True
+    self.eef_link = "b_bot_dual_suction_gripper_pad_link"
 
     # bin_header_ids = ['/set2_bin1', '/set2_bin2', '/set2_bin3', '/set2_bin4', '/set1_bin1', '/set1_bin2', '/set1_bin3']
     # bin_header_ids = ['/set2_bin1', '/set2_bin2']
     bin_header_ids = [
-      '/set1_bin1_1', '/set1_bin1_2', '/set1_bin1_3','/set1_bin1_4','/set1_bin1_5',
-      '/set2_bin3', '/set2_bin2_1','/set2_bin2_2','/set2_bin2_3','/set2_bin2_4',
-      '/set3_tray_1', '/set3_tray_2'
+      'set1_bin3_1', 'set1_bin2_1', 'set1_bin2_2', 'set1_bin2_3', 'set1_bin2_4',
+      'set2_bin1_1', 'set2_bin1_2', 'set2_bin1_3', 'set2_bin1_4', 'set2_bin1_5'
     ]
     for bin_id in bin_header_ids:
       pose_goal.header.frame_id = bin_id
-      rospy.loginfo("Trying to move a_bot to bin:" + bin_id)
+      rospy.loginfo("Trying to move b_bot to bin:" + bin_id)
       if self.go_to_pose_goal(pose_goal):
         rospy.sleep(2)
       else:
