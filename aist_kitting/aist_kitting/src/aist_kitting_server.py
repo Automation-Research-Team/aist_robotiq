@@ -137,20 +137,25 @@ class AistKitting:
         rospy.loginfo('get_image started.')
  
         res_start = self.start()
-        rospy.sleep(1)
-       
-        res_trigger = self.trigger()
         rospy.sleep(3)
+        
+        while True:
+            res_trigger = self.trigger()
+            if (res_trigger.success):
+                break
         rospy.loginfo("triggered")
-        res_get = self.get(0)
-        rospy.sleep(1)
-        if not (res_trigger.success and res_get.success):
-            rospy.sleep(5)
-            self.trigger()
-            self.get(0)
+        rospy.sleep(3)
+        
+        while True:
+            # res_get = self.get(0)
+            res_get = self.get(0)
+            if (res_get.success):
+                break
+        rospy.sleep(3)
 
         pcloud_filename = rospy.get_param('o2as_phoxi_camera/id')[1:-1]+".tiff"
         io.imsave(os.environ.get('ROS_HOME')+"/data/"+pcloud_filename, self.depth_img)
+        rospy.sleep(3)
 
         res_stop = self.stop()
         rospy.loginfo('get_image finished.')
