@@ -16,9 +16,11 @@ get_frame = rospy.ServiceProxy("/o2as_phoxi_camera/get_frame", SetInt)
 
 # Initialize Phoxi services
 start_acquisition()
+rospy.sleep(1.0)
+trigger_frame()
 
 # Trigger loop
 while True:
     trigger_frame()
     get_frame(0)
-    rospy.sleep(1.0)
+    rospy.sleep(0.5)
