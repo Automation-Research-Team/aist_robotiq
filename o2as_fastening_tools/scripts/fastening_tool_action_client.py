@@ -4,8 +4,8 @@ from __future__ import print_function
 import sys
 import rospy
 from std_msgs.msg import String
-from o2as_fastening_tool.srv import *
-from o2as_fastening_tool.msg import *
+from o2as_fastening_tools.srv import *
+from o2as_fastening_tools.msg import *
 
 import actionlib
 import actionlib_tutorials.msg
