@@ -6,7 +6,7 @@
     <arg name="serial_port_4"   default="/dev/for_docker/fastener_gripper_4"/>
     <arg name="serial_port_5"   default="/dev/for_docker/fastener_gripper_5"/>
     <arg name="config_dir"   default="$(find o2as_fastening_tools)/config"/>
-    <arg name="fastening_tools"      default="motors"/>
+    <arg name="fastening_tools"      default="fastening_tools"/>
 
     <node name="dynamixel_controller" pkg="o2as_fastening_tools" type="dynamixel_controller" output="screen">
         <param name="max_access" type= "int"   value="$(arg max_access)"/>

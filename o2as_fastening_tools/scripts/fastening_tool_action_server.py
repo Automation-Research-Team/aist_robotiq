@@ -6,13 +6,13 @@ import actionlib_tutorials.msg
 import os.path
 import yaml
 from std_msgs.msg import String
-from o2as_fastening_gripper.srv import *
-from o2as_fastening_gripper.msg import *
+from o2as_fastening_tools.srv import *
+from o2as_fastening_tools.msg import *
 from util import *
 
 class FasteningToolController(object):
-    _feedback = FasteningToolControlFeedback()
-    _result = FasteningToolControlResult()
+    _feedback = FastenerGripperControlFeedback()
+    _result = FastenerGripperControlResult()
 
     def __init__(self):
         config_dir = rospy.get_param("~config_dir")
@@ -31,7 +31,7 @@ class FasteningToolController(object):
         self.dynamixel_command_write = rospy.ServiceProxy('dynamixel_write_command', DynamixelWriteCommand)
         self.dynamixel_read_state = rospy.ServiceProxy('dynamixel_read_state', DynamixelReadState)
 
-        self._action_name = 'FasteningToolAction'
+        self._action_name = 'FastenerGripperControlAction'
         self._as = actionlib.SimpleActionServer(self._action_name, FasteningToolControlAction, execute_cb=self.execute_control, auto_start = False)
         self._as.start()
 

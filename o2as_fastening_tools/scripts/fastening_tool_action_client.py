@@ -12,9 +12,9 @@ import actionlib_tutorials.msg
 
 class FasteningToolController:
     def fasten(self,name):
-        client = actionlib.SimpleActionClient('FasteningToolAction', FasteningToolControlAction)
+        client = actionlib.SimpleActionClient('FastenerGripperControlAction', FastenerGripperControlAction)
         client.wait_for_server()
-        goal = FasteningToolControlGoal()
+        goal = FastenerGripperControlGoal()
 
         goal.fastening_tool_name = name
         goal.speed = 60
