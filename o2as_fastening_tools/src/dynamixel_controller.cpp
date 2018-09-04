@@ -84,11 +84,16 @@ bool DynamixelController::initMotor(int32_t index, uint8_t motor_id, bool baudra
 		ROS_ERROR("The value of Control_Mode could not be set to 1.");
 		return false;
 	}
-	if (! dynamixel_driver[index]->writeRegister(motor_id, "Torque_Limit", 1023))
+	if (! dynamixel_driver[index]->writeRegister(motor_id, "Torque_Enable", 1))
 	{
-		ROS_ERROR("The value of Torque_Limit could not be set to 1023.");
+		ROS_ERROR("The value of Torque_Enable could not be set to 1.");
 		return false;
 	}
+	// if (! dynamixel_driver[index]->writeRegister(motor_id, "Torque_Limit", 1023))
+	// {
+	// 	ROS_ERROR("The value of Torque_Limit could not be set to 1023.");
+	// 	return false;
+	// }
 
 	return true;
 }
@@ -111,7 +116,7 @@ DynamixelController::DynamixelController(void)
 	}
 
 	for(int no=1; no <= max_access; no++){
-		access = "access_" + std::to_string(no);
+		access = "serial_port_" + std::to_string(no);
 		if (nh.getParam(access, access)) access_point_list.push_back(access);
 		else
 		{
@@ -125,10 +130,11 @@ DynamixelController::DynamixelController(void)
     //init and serach XL-320
 	for(int index=0; index < access_point_list.size(); index++)
 	{
+		u2d2_connect_id_list.push_back("");
 		std::ifstream ifs(access_point_list[index]);
-	    if (ifs.is_open())
+	    
+		if (ifs.is_open())
 	    {
-			u2d2_connect_id_list.push_back("");
 			dynamixel_driver[index] = new DynamixelDriver;
 	        for(int n=0; n<4; n++)
 			{
