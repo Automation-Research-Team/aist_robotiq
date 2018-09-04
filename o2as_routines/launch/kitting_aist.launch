@@ -1,0 +1,8 @@
+<launch>
+  <include file="$(find o2as_aist_config)/launch/demo.launch" />
+  <node name="o2as_skill_server" pkg="o2as_skills" type="o2as_skill_server" output="screen"/>
+  <!-- <include file="$(find o2as_vision)/launch/vision.launch" /> -->
+
+  <!-- <rosparam command="load" file="$(find o2as_parts_description)/config/assembly_parts_list.yaml"/> -->
+  <!-- <node name="kitting_task" pkg="o2as_routines" type="kitting.py" output="screen"/> -->
+</launch>
