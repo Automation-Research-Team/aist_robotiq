@@ -32,7 +32,7 @@ class FasteningToolController(object):
         self.dynamixel_read_state = rospy.ServiceProxy('dynamixel_read_state', DynamixelReadState)
 
         self._action_name = 'FastenerGripperControlAction'
-        self._as = actionlib.SimpleActionServer(self._action_name, FasteningToolControlAction, execute_cb=self.execute_control, auto_start = False)
+        self._as = actionlib.SimpleActionServer(self._action_name, FastenerGripperControlAction, execute_cb=self.execute_control, auto_start = False)
         self._as.start()
 
     def set_moving_speed(self, motor_id, value):
