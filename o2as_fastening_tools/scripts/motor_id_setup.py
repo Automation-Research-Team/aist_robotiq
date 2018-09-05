@@ -14,6 +14,7 @@ class FasteningToolController(object):
         self.dynamixel_command_write = rospy.ServiceProxy('dynamixel_write_command', DynamixelWriteCommand)
 
     def set_motor_id(self, motor_id, value):
+        res = self.dynamixel_command_write(motor_id, "Torque_Enable", 0)
         res = self.dynamixel_command_write(motor_id, "ID", value)
         if res.comm_result:
             rospy.loginfo('Changed the ID of the motor (ID=%i)' %value)
