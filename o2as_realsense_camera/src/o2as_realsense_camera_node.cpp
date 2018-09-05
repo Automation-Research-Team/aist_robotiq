@@ -154,13 +154,8 @@ protected:
 		servers_.dump_frame = nh_.advertiseService("dump_frame" , &RealSenseCameraNode::dumpFrameCallback , this);
 
 		// activate publishers
-#ifdef USE_IMAGE_TRANSPORT
 		publishers_.color_image = image_transport_.advertise("color", 1, true);
 		publishers_.depth_image = image_transport_.advertise("depth", 1, true);
-#else
-		publishers_.color_image = nh_.advertise<sensor_msgs::Image>("color", 1, true);
-		publishers_.depth_image = nh_.advertise<sensor_msgs::Image>("depth", 1, true);
-#endif
 		publishers_.point_cloud = nh_.advertise<PointCloud>("cloud", 1, true);
 
 		// start image publishing timer
@@ -456,17 +451,9 @@ private:
 
 	struct Publishers {
 		/// Publisher for publishing color images.
-#ifdef USE_IMAGE_TRANSPORT
 		image_transport::Publisher color_image;
-#else
-		ros::Publisher color_image;
-#endif
 		/// Publisher for publishing depth images.
-#ifdef USE_IMAGE_TRANSPORT
 		image_transport::Publisher depth_image;
-#else
-		ros::Publisher depth_image;
-#endif
 		/// Publisher for publishing raw point clouds.
 		ros::Publisher point_cloud;
 	} publishers_;

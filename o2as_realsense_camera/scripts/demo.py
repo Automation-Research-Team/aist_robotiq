@@ -17,8 +17,7 @@ if __name__ == "__main__":
     
     try:
         while not rospy.is_shutdown():
-            resp = camera.get_frame(dump=False, publish=True)
-            resp = camera.get_frame(dump=True, publish=True)
+            resp = camera.get_frame(dump=False, publish=False)
 
             # display captured frame
             cv_color_image = bridge.imgmsg_to_cv2(resp.color_image, desired_encoding="passthrough")
