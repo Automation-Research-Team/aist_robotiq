@@ -1,0 +1,5 @@
+string camera_data_path
+string color_image_filename
+string depth_image_filename
+string point_cloud_filename
+---

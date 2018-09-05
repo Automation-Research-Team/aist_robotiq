@@ -1,24 +1,26 @@
 <launch>
-    <!-- 
-    616205004841 : free @ osx used by shibata
-    612201001671 : b_bot_camera
-     -->
-    <arg name="serial_number" default=""/> <!-- specify serial number of your camera -->
+    <!-- cameras
+    616205004841 : osx
+    612201001671 : osx/b_bot_camera
+	605201001486 : osx
+	627201001218 : osx
+    -->
     <arg name="camera_name" default="camera"/>
+    <arg name="serial_number" default="616205004841"/> <!-- specify serial number of your camera -->
 
-	<group ns="$(arg camera_name)">
-        <!-- server -->
-        <include file="$(find o2as_realsense_camera)/launch/camera.launch">
-            <arg name="serial_number" value="$(arg serial_number)"/>
-        </include>
+    <include file="$(find o2as_realsense_camera)/launch/camera.launch">
+        <arg name="node_name" value="$(arg camera_name)"/>
+        <arg name="serial_number" value="$(arg serial_number)"/>
+    </include>
 
-        <!-- client -->
-        <node name="camera_client" pkg="o2as_realsense_camera" type="demo.py" output="screen">
-            <param name="setting_filename" value="$(find o2as_realsense_camera)/image/relasense_$(arg serial_number).yaml"/>
-            <param name="pcloud_filename" value="$(find o2as_realsense_camera)/image/test.dat"/>
-            <param name="image_filename" value="$(find o2as_realsense_camera)/image/test.png"/>
-            <remap from="/connect" to="$(arg camera_name)/connect"/>
-            <remap from="/save_frame_for_cad_matching" to="$(arg camera_name)/save_frame_for_cad_matching"/>
-        </node>
-    </group>
+    <node name="camera_client" pkg="o2as_realsense_camera" type="demo.py" output="screen">
+        <param name="camera_node_name" type="string" value="$(arg camera_name)"/>
+        <param name="camera_data_path" type="string" value="$(find o2as_realsense_camera)/image"/>
+        <param name="color_image_filename" type="string" value="color.png"/>
+        <param name="depth_image_filename" type="string" value="depth.png"/>
+        <param name="point_cloud_filename" type="string" value="cloud.pcd"/>
+    </node>
+
+    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find o2as_realsense_camera)/rviz/pointcloud.rviz" required="true" /> -->
+
 </launch>
