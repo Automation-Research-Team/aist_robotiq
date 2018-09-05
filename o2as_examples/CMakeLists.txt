@@ -18,6 +18,8 @@ find_package(catkin REQUIRED COMPONENTS
   moveit_ros_planning_interface
   robotiq_msgs
   o2as_vision
+  o2as_skills
+  o2as_routines
 )
 
 ## System dependencies are found with CMake's conventions
