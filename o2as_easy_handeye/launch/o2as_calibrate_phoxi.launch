@@ -13,11 +13,12 @@
   <arg name="marker_id" value="256" if="$(eval arg('robot_name') == 'c_bot')"/>
   <!--<arg name="marker_id" default="26" doc="The ID of the ArUco marker used" />-->
 
-  <!-- Camera state publisher -->
-  <node pkg="robot_state_publisher" type="robot_state_publisher"
-        name="a_phoxi_m_camera_st_pub">
-        <remap from="robot_description" to="a_phoxi_m_camera_escription"/>
-  </node>
+  <!-- CameraInfo conversion for Phoxi in Gazebo:
+       from camera_info to camera_info2,
+       see convert_phoxi_camera_info_gazebo.py -->
+  <node name="convert_phoxi_camera_info_gazebo"
+	pkg="o2as_easy_handeye" type="convert_phoxi_camera_info_gazebo.py"
+        if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
 
   <!-- start ArUco -->
   <node name="aruco_tracker" pkg="aruco_ros" type="single">
