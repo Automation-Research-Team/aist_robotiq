@@ -27,7 +27,7 @@ class FasteningToolController(object):
         data_list = fastening_tools['fastening_tools']
         for data in data_list:
             self.fastening_tools.update({data['name'] : data['motor_id']})
-
+        
         self.dynamixel_command_write = rospy.ServiceProxy('dynamixel_write_command', DynamixelWriteCommand)
         self.dynamixel_read_state = rospy.ServiceProxy('dynamixel_read_state', DynamixelReadState)
 
@@ -52,13 +52,16 @@ class FasteningToolController(object):
             return -1
 
     def execute_control(self, goal):
+        rospy.wait_for_service('dynamixel_write_command')
+        rospy.wait_for_service('dynamixel_read_state')
+
         self._result.control_result = True
 
         if (goal.fastening_tool_name in self.fastening_tools) == False :
             rospy.logerr("'%s' is not exist in %s." % (goal.fastening_tool_name, self.conf_gripper_filename))
             self._result.control_result = False
             self._as.set_succeeded(self._result)
-            return
+            return 
 
         motor_id = self.fastening_tools[goal.fastening_tool_name]
 
@@ -70,7 +73,7 @@ class FasteningToolController(object):
             self._as.set_succeeded(self._result)
             return
 
-        rospy.sleep(0.1)
+        rospy.sleep(1)
 
         while self._feedback.motor_speed > 0:
             if self._as.is_preempt_requested():
@@ -87,7 +90,7 @@ class FasteningToolController(object):
             self._feedback.motor_speed = current_speed
             self._as.publish_feedback(self._feedback)
             # print('%d' %current_speed)
-            rospy.sleep(0.1)
+            rospy.sleep(0.5)
 
         if not self.set_moving_speed(motor_id, 0) :
             self._result.control_result = False

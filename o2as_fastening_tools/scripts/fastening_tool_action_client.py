@@ -35,7 +35,7 @@ if __name__ == '__main__':
             "m3_tool",
         ]
 
-        rospy.sleep(3)
+        # rospy.sleep(3)
 
         for name in name_list:
             if not controller.fasten(name).control_result :
