@@ -37,9 +37,12 @@
     </group>
 
     <!-- Run the ViSP solver to determine the extrinsic parameters -->
+    <!-- <node ns="$(arg namespace)" name="hand_eye_solver" -->
+    <!--       pkg="visp_hand2eye_calibration" -->
+    <!--       type="visp_hand2eye_calibration_calibrator"> -->
     <node ns="$(arg namespace)" name="hand_eye_solver"
-          pkg="visp_hand2eye_calibration"
-          type="visp_hand2eye_calibration_calibrator">
+          pkg="o2as_easy_handeye"
+          type="o2as_easy_handeye_calibrator">
         <remap from="/compute_effector_camera_quick" to="compute_effector_camera_quick"/>
     </node>
 
