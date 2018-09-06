@@ -227,6 +227,118 @@ class KittingClass(O2ASBaseRoutines):
 
     # TODO
 
+  @staticmethod
+  def _get_approach_pose(grasp_pose, approach_height):
+    approach_pose = copy.deepcopy(grasp_pose)
+    approach_pose.pose.position.z += approach_height
+    approach_pose.pose.orientation.x = -0.5
+    approach_pose.pose.orientation.y = 0.5
+    approach_pose.pose.orientation.z = 0.5
+    approach_pose.pose.orientation.w = 0.5
+
+    return approach_pose
+
+  def _get_depth_image(self):
+    """Get depth image from phoxi via ROS.
+
+    The return value must include not only depth, but also x and y coordinate
+    in order to get the position of the pose in the camera frame
+    (e.g., "o2as_easy_handeye_b_bot"). `img_z` in the returned values
+    corresponds to the depth image.
+    """
+    img_x = None
+    img_y = None
+    img_z = None
+
+    return img_x, img_y, img_z
+
+  def _get_cropped_area(self, object_id):
+    """Get cropped region based on object id.
+
+    The area includes the specific bin for an object to be picked.
+    The corresponding area for each object type is assumed to be obtained
+    in some way (it can be manually or automatic) just before the trial.
+    """
+    # self.cropped_areas might be a dict
+    return self.cropped_areas[object_id]
+
+  def _crop_image(self, img, cropped_area):
+    """Crop image.
+
+    `img` is a ndarray of the image. `cropped_area` is an instance of
+    CroppedArea structure (namedtuple) defined in this file.
+    """
+    return img[cropped_area.y_min:cropped_area.y_max,
+           cropped_area.x_min:cropped_area.x_max, ]
+
+  def _get_suction_pose(self, img_x, img_y, img_z, camera_frame):
+    """Get a good suction pose based on depth image (`img_z`).
+    """
+    # row and col correspond to a pixel
+    row, col = self._get_suction_point_with_matlab(img_z)
+
+    # Position in the camera frame
+    x, y, z = img_x[row, col], img_y[row, col], img_z[row, col]
+
+    # Prepare pose object as returned value
+    # pose.orientation will be overwritten outside this method
+    pose = geometry_msgs.msg.PoseStamped()
+    pose.header.frame_id = camera_frame
+    pose.pose.position.x = x
+    pose.pose.position.y = y
+    pose.pose.position.z = z
+    pose.pose.orientation.x = -0.5
+    pose.pose.orientation.y = 0.5
+    pose.pose.orientation.z = 0.5
+    pose.pose.orientation.w = 0.5
+
+    return pose
+
+  def _tranform_reference_frame(self, pose, ref_new):
+    # Not implemented
+    pass
+
+  def pick_with_phoxi(self, robot_name, object_id, speed_fast, speed_slow,
+                      approach_height=0.03):
+    """Pick an object whose ID is given by `object_id` with the suction gripper.
+    """
+    self.go_to_mid_point(robot_name, speed=speed_fast)
+
+    # self.publish_marker(object_pose, "aist_vision_result")
+    if robot_name == "b_bot":
+      self.groups[robot_name].set_end_effector_link(
+        robot_name + '_dual_suction_gripper_pad_link')
+
+    # Get a good suction pose for suction hand based on depth image
+    img_x, img_y, img_z = self._get_depth_image()
+    cropped_area = self._get_cropped_area(object_id)
+    img_x = self._crop_image(img_x, cropped_area)
+    img_y = self._crop_image(img_y, cropped_area)
+    img_z = self._crop_image(img_z, cropped_area)
+    suction_pose = self.get_suction_pose(img_x, img_y, img_z)
+
+    # Transform reference frame for making control the orientation intuitive
+    reference_new = robot_name + "base_link"
+    suction_pose = self._transform_reference_frame(suction_pose, reference_new)
+
+    # Set approach pose based on grasp pose
+    approach_pose = self._set_approach_pose(suction_pose, approach_height)
+
+    rospy.loginfo("Going above object to pick")
+    self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast)
+
+    rospy.loginfo("Moving down to object")
+    self.go_to_pose_goal(robot_name, suction_pose, speed=speed_slow,
+                         high_precision=True)
+
+    rospy.loginfo("Picking up on suction")
+    # self.switch_suction(True)
+    rospy.sleep(2)
+
+    rospy.loginfo("Going back up")
+    self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast)
+
+
 if __name__ == '__main__':
   try:
     kit = KittingClass()
