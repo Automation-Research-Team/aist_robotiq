@@ -7,6 +7,7 @@ import geometry_msgs.msg
 import tf_conversions
 import tf
 from math import pi
+import numpy as np
 
 from o2as_msgs.srv import *
 import actionlib
@@ -23,6 +24,7 @@ class KittingClass(O2ASBaseRoutines):
     super(KittingClass, self).__init__()
     self.set_up_item_parameters()
     self.set_up_end_effector()
+    self.set_up_place_position()
     rospy.sleep(.5)
 
   def set_up_item_parameters(self):
@@ -33,6 +35,35 @@ class KittingClass(O2ASBaseRoutines):
   def set_up_end_effector(self):
     self.suction = rospy.ServiceProxy("o2as_usb_relay_server/set_power", SetPower)
 
+  def set_up_place_position(self):
+    self.part_id = [i for i in range(4,17,1)]
+    self.place_id = [
+      "set3_tray_1_partition_4",
+      "set3_tray_2_partition_6",
+      "set3_tray_1_partition_3",
+      "set3_tray_1_partition_2",
+      "set3_tray_2_partition_1",
+      "set3_tray_2_partition_4",
+      "set3_tray_2_partition_7",
+      "set3_tray_1_partition_1",
+      "set3_tray_2_partition_3",
+      "set3_tray_1_partition_5",
+      "set3_tray_2_partition_2",
+      "set3_tray_2_partition_5",
+      "set3_tray_2_partition_8"
+    ]
+    
+  def go_to_mid_point(self, robot_name, speed=1.0):
+    mid_pose = geometry_msgs.msg.PoseStamped()
+    mid_pose.header.frame_id = "workspace_center"
+    mid_pose.pose.orientation.x = -0.5
+    mid_pose.pose.orientation.y = 0.5
+    mid_pose.pose.orientation.z = 0.5
+    mid_pose.pose.orientation.w = 0.5
+    for i in np.arange(0.5, 0.09, -0.05):
+      mid_pose.pose.position.z = i
+      self.go_to_pose_goal(robot_name, mid_pose, speed=speed)
+
   ################ ----- Routines  
   ################ 
   ################ 
@@ -40,11 +71,9 @@ class KittingClass(O2ASBaseRoutines):
   def switch_suction(self, on=False):
     return self.suction(1, on)
 
-  def pick(self, robot_name, object_pose, speed_fast, speed_slow, approach_height=0.03):
+  def pick(self, robot_name, object_id, object_pose, speed_fast, speed_slow, approach_height=0.03):
 
-    self.go_to_named_pose("home", "c_bot")
-    self.go_to_named_pose("home", "b_bot")
-    self.go_to_named_pose("home", "a_bot")
+    self.go_to_mid_point(robot_name, speed=speed_fast)
 
     self.publish_marker(object_pose, "aist_vision_result")
     if robot_name=="b_bot":
@@ -70,10 +99,14 @@ class KittingClass(O2ASBaseRoutines):
     rospy.loginfo("Going back up")
     self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast)
 
-  def place(self, robot_name, tray_id, place_height, speed_fast, speed_slow, approach_height=0.05):
+  def place(self, robot_name, object_id, place_height, speed_fast, speed_slow, approach_height=0.05):
 
+    if object_id < 3 and object_id > 16:
+      rospy.logerr("This object_id is wrong!!")
+      return
+    self.go_to_mid_point(robot_name, speed=speed_fast)
     goal_pose = geometry_msgs.msg.PoseStamped()
-    goal_pose.header.frame_id = tray_id
+    goal_pose.header.frame_id = self.place_id[self.part_id.index(int(object_id))]
     goal_pose.pose.orientation.x = -0.5
     goal_pose.pose.orientation.y = 0.5
     goal_pose.pose.orientation.z = 0.5
@@ -96,6 +129,10 @@ class KittingClass(O2ASBaseRoutines):
     self.go_to_named_pose("home", "b_bot")
     self.go_to_named_pose("home", "a_bot")
 
+  ################ ----- Demos  
+  ################ 
+  ################ 
+
   def check_accessibility_by_b_bot(self):
     object_pose = geometry_msgs.msg.PoseStamped()
 
@@ -105,10 +142,10 @@ class KittingClass(O2ASBaseRoutines):
     object_pose.pose.position.z = 0.01
     object_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/4, pi/2, 0))
     rospy.loginfo("Picking up an demo object.")
-    self.pick("b_bot", object_pose, 1.0, 1.0)
+    self.pick("b_bot", 4, object_pose, 1.0, 1.0)
     tray_id = "set3_tray_1_partition_2"
     rospy.loginfo("Place down an demo object on tray partition.")
-    self.place("b_bot", tray_id, 0.005, 1.0, 1.0)
+    self.place("b_bot", 4, 0.005, 1.0, 1.0)
 
     object_pose.header.frame_id = "set2_bin1_5"
     object_pose.pose.position.x = 0.03
@@ -116,10 +153,9 @@ class KittingClass(O2ASBaseRoutines):
     object_pose.pose.position.z = 0.01
     object_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/4, pi/4, 0))
     rospy.loginfo("Picking up an demo object.")
-    self.pick("b_bot", object_pose, 1.0, 1.0)
-    tray_id = "set3_tray_1_partition_2"
+    self.pick("b_bot", 16, object_pose, 1.0, 1.0)
     rospy.loginfo("Place down an demo object on tray partition.")
-    self.place("b_bot", tray_id, 0.005, 1.0, 1.0)
+    self.place("b_bot", 16, 0.005, 1.0, 1.0)
 
     
     object_pose.header.frame_id = "set2_bin1_1"
@@ -148,33 +184,35 @@ class KittingClass(O2ASBaseRoutines):
 
   def pick_and_place_demo(self):
 
-    object_pose = geometry_msgs.msg.PoseStamped()
+    robot_name = "b_bot"
+    speed_fast = 1.0
+    speed_slow = 1.0
 
-    object_pose.header.frame_id = "set1_bin3_1"
-    object_pose.pose.position.x = -0.1
-    object_pose.pose.position.y = -0.05
-    object_pose.pose.position.z = 0.01
-    object_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/4, pi/2, 0))
-    rospy.loginfo("Picking up an demo object.")
-    self.pick("b_bot", object_pose, 1.0, 1.0)
-    tray_id = "set3_tray_1_partition_2"
-    rospy.loginfo("Place down an demo object on tray partition.")
-    self.place("b_bot", tray_id, 0.005, 1.0, 1.0)
+    item_list = {
+      "part_4": "set1_bin2_1",
+      "part_8": "set1_bin2_2",
+      "part_11": "set1_bin2_3",
+      "part_13": "set1_bin2_4",
+      "part_6": "set1_bin3_1",
+      "part_9": "set2_bin1_1",
+      "part_12": "set2_bin1_2",
+      "part_16": "set2_bin1_3"
+    }
+
+    items = item_list.keys()
+    part_ids = [i.strip("part_") for i in items]
     
-    object_pose.header.frame_id = "set1_bin2_1"
-    object_pose.pose.position.x = -0.08
-    object_pose.pose.position.y = 0.03
-    object_pose.pose.position.z = 0.01
+    object_pose = geometry_msgs.msg.PoseStamped()
+    object_pose.pose.position.z = 0.03
     object_pose.pose.orientation.x = -0.5
     object_pose.pose.orientation.y = 0.5
     object_pose.pose.orientation.z = 0.5
     object_pose.pose.orientation.w = 0.5
-    rospy.loginfo("Picking up an demo object.")
-    self.pick("b_bot", object_pose, 1.0, 1.0)
-    tray_id = "set3_tray_2_partition_1"
-    rospy.loginfo("Place down an demo object on tray partition.")
-    self.place("b_bot", tray_id, 0.005, 1.0, 1.0)
 
+    for idx in part_ids:
+      object_pose.header.frame_id = item_list["part_"+str(idx)]
+      self.pick(robot_name, idx, object_pose, speed_fast, speed_slow)
+      self.place(robot_name, idx, 0.03, speed_fast, speed_slow)
 
   def kitting_task(self):
     self.go_to_named_pose("home", "c_bot")
