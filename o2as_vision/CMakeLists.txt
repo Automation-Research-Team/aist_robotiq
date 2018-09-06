@@ -8,11 +8,12 @@ find_package(catkin REQUIRED
   roscpp
   std_srvs
   phoxi_camera
+  o2as_phoxi_camera
   o2as_realsense_camera
   shape_msgs
   geometry_msgs
   geometric_shapes
-  o2as_cad_matching_msgs
+  o2as_cad_matching
 )
 
 # find_package(Boost REQUIRED COMPONENTS system)
