@@ -4,8 +4,9 @@ from o2as_realsense_camera.srv import *
 def ros_service_proxy(service_name, service_type):
     proxy = None
     try:
-        rospy.logdebug("wait for service %s", service_name)
+        rospy.logwarn("wait for service " + service_name)
         rospy.wait_for_service(service_name)
+        rospy.logdebug("service " + service_name + " is ready.")
         proxy = rospy.ServiceProxy(service_name, service_type)
     except rospy.ServiceException as e:
         rospy.logerr("service error: %s", str(e)) 

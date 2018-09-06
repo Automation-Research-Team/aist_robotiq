@@ -1,6 +1,4 @@
 #include <ros/ros.h>
-#include <o2as_realsense_camera/RealSenseCameraConfig.h>
-
 #include <librealsense2/rs.hpp>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
