@@ -11,6 +11,10 @@
     <include file="$(find o2as_realsense_camera)/launch/camera.launch">
         <arg name="node_name" value="$(arg camera_name)"/>
         <arg name="serial_number" value="$(arg serial_number)"/>
+        <arg name="trigger_mode" value="true"/>
+        <arg name="send_color" value="false"/>
+        <arg name="send_depth" value="false"/>
+        <arg name="send_cloud" value="false"/>
     </include>
 
     <node name="camera_client" pkg="o2as_realsense_camera" type="demo.py" output="screen">
@@ -21,6 +25,7 @@
         <param name="point_cloud_filename" type="string" value="cloud.pcd"/>
     </node>
 
+    <node name="reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
     <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find o2as_realsense_camera)/rviz/pointcloud.rviz" required="true" /> -->
 
 </launch>

@@ -6,6 +6,7 @@ add_compile_options(-std=gnu++11 -O2 -fopenmp)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp 
+    dynamic_reconfigure
     message_generation
     std_srvs
     cv_bridge
@@ -33,6 +34,7 @@ message(STATUS "OpenCV Include Dir: " ${OpenCV_INCLUDE_DIRS})
 find_package(PCL 1.3 REQUIRED COMPONENTS common io)
 
 catkin_python_setup()
+generate_dynamic_reconfigure_options(cfg/RealSenseCamera.cfg)
 
 add_service_files(DIRECTORY srv)
 generate_messages(DEPENDENCIES sensor_msgs)
