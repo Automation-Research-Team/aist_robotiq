@@ -299,7 +299,7 @@ class KittingClass(O2ASBaseRoutines):
 
   def _tranform_reference_frame(self, pose, ref_new):
     # Not implemented
-    pass
+    return pose
 
   def pick_with_phoxi(self, robot_name, object_id, speed_fast, speed_slow,
                       approach_height=0.03):
