@@ -8,6 +8,7 @@ import tf_conversions
 import tf
 from math import pi
 import numpy as np
+from collections import namedtuple
 
 from o2as_msgs.srv import *
 import actionlib
@@ -15,6 +16,8 @@ import o2as_msgs.msg
 from o2as_usb_relay.srv import *
 
 from o2as_routines.base import O2ASBaseRoutines
+
+CroppedArea = namedtuple("CroppedArea", ["min_row, max_row, min_col, max_col"])
 
 class KittingClass(O2ASBaseRoutines):
   """
@@ -268,8 +271,8 @@ class KittingClass(O2ASBaseRoutines):
     `img` is a ndarray of the image. `cropped_area` is an instance of
     CroppedArea structure (namedtuple) defined in this file.
     """
-    return img[cropped_area.y_min:cropped_area.y_max,
-           cropped_area.x_min:cropped_area.x_max, ]
+    return img[cropped_area.min_row:cropped_area.max_row,
+               cropped_area.min_col:cropped_area.max_col]
 
   def _get_suction_pose(self, img_x, img_y, img_z, camera_frame):
     """Get a good suction pose based on depth image (`img_z`).
