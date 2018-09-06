@@ -36,22 +36,40 @@ class KittingClass(O2ASBaseRoutines):
     self.suction = rospy.ServiceProxy("o2as_usb_relay_server/set_power", SetPower)
 
   def set_up_place_position(self):
-    self.part_id = [i for i in range(4,17,1)]
-    self.place_id = [
-      "set3_tray_1_partition_4",
-      "set3_tray_2_partition_6",
-      "set3_tray_1_partition_3",
-      "set3_tray_1_partition_2",
-      "set3_tray_2_partition_1",
-      "set3_tray_2_partition_4",
-      "set3_tray_2_partition_7",
-      "set3_tray_1_partition_1",
-      "set3_tray_2_partition_3",
-      "set3_tray_1_partition_5",
-      "set3_tray_2_partition_2",
-      "set3_tray_2_partition_5",
-      "set3_tray_2_partition_8"
-    ]
+    self.part_id = ["part_" + str(i) for i in range(4,17,1)]
+    self.place_id = {
+      "part_4" : "set3_tray_1_partition_4",
+      "part_5" : "set3_tray_2_partition_6",
+      "part_6" : "set3_tray_1_partition_3",
+      "part_7" : "set3_tray_1_partition_2",
+      "part_8" : "set3_tray_2_partition_1",
+      "part_9" : "set3_tray_2_partition_4",
+      "part_10": "set3_tray_2_partition_7",
+      "part_11": "set3_tray_1_partition_1",
+      "part_12": "set3_tray_2_partition_3",
+      "part_13": "set3_tray_1_partition_5",
+      "part_14": "set3_tray_2_partition_2",
+      "part_15": "set3_tray_2_partition_5",
+      "part_16": "set3_tray_2_partition_8"
+    }
+
+    self.gripper_id = {
+      "part_4" : "suction",
+      "part_5" : "suction",
+      "part_6" : "gripper",
+      "part_7" : "suction",
+      "part_8" : "suction",
+      "part_9" : "gripper",
+      "part_10": "gripper",
+      "part_11": "suction",
+      "part_12": "suction",
+      "part_13": "suction",
+      "part_14": "gripper",
+      "part_15": "gripper",
+      "part_16": "gripper",
+      "part_17": "gripper",
+      "part_18": "gripper"
+    }
 
   ################ ----- Routines  
   ################ 
@@ -60,9 +78,9 @@ class KittingClass(O2ASBaseRoutines):
   def switch_suction(self, on=False):
     return self.suction(1, on)
 
-  def pick(self, robot_name, object_id, object_pose, speed_fast, speed_slow, approach_height=0.03):
+  def pick(self, robot_name, gripper_name, object_id, object_pose, speed_fast, speed_slow, approach_height=0.03):
     
-    if robot_name=="b_bot":
+    if gripper_name=="suction":
       self.groups[robot_name].set_end_effector_link(robot_name + '_dual_suction_gripper_pad_link')
 
     self.publish_marker(object_pose, "aist_vision_result")
@@ -86,16 +104,16 @@ class KittingClass(O2ASBaseRoutines):
     rospy.loginfo("Going back up")
     self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast)
 
-  def place(self, robot_name, object_id, place_height, speed_fast, speed_slow, approach_height=0.05):
+  def place(self, robot_name, gripper_name, object_id, place_height, speed_fast, speed_slow, approach_height=0.05):
 
     if object_id < 3 and object_id > 16:
       rospy.logerr("This object_id is wrong!!")
       return
-    if robot_name=="b_bot":
+    if gripper_name=="suction":
       self.groups[robot_name].set_end_effector_link(robot_name + '_dual_suction_gripper_pad_link')
 
     goal_pose = geometry_msgs.msg.PoseStamped()
-    goal_pose.header.frame_id = self.place_id[self.part_id.index(int(object_id))]
+    goal_pose.header.frame_id = self.place_id["part_" + object_id]
     goal_pose.pose.orientation.x = -0.5
     goal_pose.pose.orientation.y = 0.5
     goal_pose.pose.orientation.z = 0.5
@@ -179,19 +197,19 @@ class KittingClass(O2ASBaseRoutines):
     speed_fast = 1.0
     speed_slow = 1.0
 
-    item_list = {
+    bin_id = {
       "part_4": "set1_bin2_1",
       "part_8": "set1_bin2_2",
       "part_11": "set1_bin2_3",
       "part_13": "set1_bin2_4",
+      "part_6": "set1_bin3_1",
       "part_9": "set2_bin1_1",
       "part_12": "set2_bin1_2",
-      "part_16": "set2_bin1_3"
+      "part_16": "set2_bin1_3",
+      "part_17": "set2_bin1_4",
+      "part_18": "set2_bin1_5"
     }
 
-    items = item_list.keys()
-    part_ids = [i.strip("part_") for i in items]
-    
     object_pose = geometry_msgs.msg.PoseStamped()
     object_pose.pose.position.z = 0.01
     object_pose.pose.orientation.x = -0.5
@@ -207,12 +225,16 @@ class KittingClass(O2ASBaseRoutines):
     intermediate_pose.pose.orientation.z = 0.5
     intermediate_pose.pose.orientation.w = 0.5
 
-    for idx in part_ids:
-      object_pose.header.frame_id = item_list["part_"+str(idx)]
-      self.go_to_pose_goal(robot_name, intermediate_pose, speed_fast)
-      self.pick(robot_name, idx, object_pose, speed_fast, speed_slow)
-      self.go_to_pose_goal(robot_name, intermediate_pose, speed_fast)
-      self.place(robot_name, idx, 0.01, speed_fast, speed_slow)
+    for set_num in range(1,4):
+      item_list = rospy.get_param("/set_"+str(set_num))
+      rospy.loginfo("set_"+str(set_num))
+      for item in item_list:
+        object_pose.header.frame_id = bin_id["part_" + item["id"]]
+        if self.gripper_id["part_" + item["id"]] == "suction":
+          self.go_to_pose_goal(robot_name, intermediate_pose, speed_fast)
+          self.pick(robot_name, self.gripper_id["part_" + item["id"]], item["id"], object_pose, speed_fast, speed_slow)
+          self.go_to_pose_goal(robot_name, intermediate_pose, speed_fast)
+          self.place(robot_name, self.gripper_id["part_" + item["id"]], item["id"], 0.01, speed_fast, speed_slow)
 
   def kitting_task(self):
     self.go_to_named_pose("home", "c_bot")

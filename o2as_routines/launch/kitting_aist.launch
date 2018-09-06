@@ -1,4 +1,7 @@
 <launch>
+  <arg name="kitting_item_list_filename" default="$(find kitting_list_loader)/config/kitting_item_list.yaml"/>
+  <rosparam command="load" file="$(arg kitting_item_list_filename)"/>
+
   <include file="$(find o2as_aist_config)/launch/demo.launch" />
   <node name="o2as_skill_server" pkg="o2as_skills" type="o2as_skill_server" output="screen"/>
   <!-- <include file="$(find o2as_vision)/launch/vision.launch" /> -->
