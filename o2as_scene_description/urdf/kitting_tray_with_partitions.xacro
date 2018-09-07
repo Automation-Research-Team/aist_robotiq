@@ -157,37 +157,37 @@
     </xacro:tray_contents>
 
     <!-- ========== The extra frames to place and pick items are defined below -->
-    <!-- <xacro:auxiliary_frame parent="${trayname}" framename="partition_1">
-      <origin rpy="0.0 0.0 0.0" xyz="0.04 0.16 0.02"/>
+    <xacro:auxiliary_frame parent="${trayname}" framename="partition_1">
+      <origin rpy="0.0 0.0 0.0" xyz="0.17 0.1375 0.02"/>
     </xacro:auxiliary_frame>
 
     <xacro:auxiliary_frame parent="${trayname}" framename="partition_2">
-      <origin rpy="0.0 0.0 0.0" xyz="0.11 0.13 0.02"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.105 0.1725 0.02"/>
     </xacro:auxiliary_frame>
 
     <xacro:auxiliary_frame parent="${trayname}" framename="partition_3">
-      <origin rpy="0.0 0.0 0.0" xyz="0.17 0.13 0.02"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.04 0.1725 0.02"/>
     </xacro:auxiliary_frame>
 
     <xacro:auxiliary_frame parent="${trayname}" framename="partition_4">
-      <origin rpy="0.0 0.0 0.0" xyz="0.11 0.19 0.02"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.105 0.1125 0.02"/>
     </xacro:auxiliary_frame>
 
     <xacro:auxiliary_frame parent="${trayname}" framename="partition_5">
-      <origin rpy="0.0 0.0 0.0" xyz="0.17 0.19 0.02"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.04 0.1125 0.02"/>
     </xacro:auxiliary_frame>
 
     <xacro:auxiliary_frame parent="${trayname}" framename="partition_6">
-      <origin rpy="0.0 0.0 0.0" xyz="0.04 0.25 0.02"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.17 0.0525 0.02"/>
     </xacro:auxiliary_frame>
 
     <xacro:auxiliary_frame parent="${trayname}" framename="partition_7">
-      <origin rpy="0.0 0.0 0.0" xyz="0.11 0.25 0.02"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.105 0.0525 0.02"/>
     </xacro:auxiliary_frame>
 
     <xacro:auxiliary_frame parent="${trayname}" framename="partition_8">
-      <origin rpy="0.0 0.0 0.0" xyz="0.17 0.25 0.02"/>
-    </xacro:auxiliary_frame> -->
+      <origin rpy="0.0 0.0 0.0" xyz="0.04 0.0525 0.02"/>
+    </xacro:auxiliary_frame>
     <!-- TODO: Insert the rest and fine tune -->
 
     <!-- <xacro:property name="m4_x_0" value="0.18"/>
