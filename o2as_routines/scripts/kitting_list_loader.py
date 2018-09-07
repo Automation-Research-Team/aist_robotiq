@@ -18,8 +18,11 @@ def main():
         reader = csv.reader(csvfile)
         header = next(csvfile)
         for data in reader:
-            kitting_list["set_"+data[0]] = dict() if kitting_list["set_"+data[0]] is None
-            kitting_list["set_"+data[0]]["part_"+ data[2]] = data[3]
+            try:
+                kitting_list["set_"+data[0]]["part_"+ data[2]] = data[3]
+            except KeyError:
+                kitting_list["set_"+data[0]] = dict()
+                kitting_list["set_"+data[0]]["part_"+ data[2]] = data[3]
             
     with open(os.path.join(rp.get_path("o2as_routines"), "config", "kitting_item_list.yaml"), 'w') as yamlfile:
         yaml.dump(kitting_list, yamlfile)

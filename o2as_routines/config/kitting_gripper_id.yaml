@@ -1,0 +1,16 @@
+gripper_id:
+  part_4 : "suction",
+  part_5 : "suction",
+  part_6 : "gripper",
+  part_7 : "suction",
+  part_8 : "suction",
+  part_9 : "gripper",
+  part_10: "gripper",
+  part_11: "suction",
+  part_12: "suction",
+  part_13: "suction",
+  part_14: "gripper",
+  part_15: "gripper",
+  part_16: "gripper",
+  part_17: "gripper",
+  part_18: "gripper"
