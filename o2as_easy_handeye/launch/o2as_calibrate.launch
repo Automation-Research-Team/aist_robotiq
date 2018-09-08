@@ -32,7 +32,7 @@
   <!-- <include file="$(find o2as_phoxi_camera)/launch/o2as_phoxi_camera.launch" -->
   <!-- 	   unless="$(eval arg('site') == 'sim')" > -->
   <!--   <arg name="camera_name"  value="$(arg camera_name)" /> -->
-  <!--   <arg name="trigger_mode" value="0" />		<\!-- freerun mode -\-> -->
+  <!--   <arg name="trigger_mode" value="0" /> -->
   <!--   <arg name="id"	     value="$(arg phoxi_id)" /> -->
   <!-- </include> -->
   

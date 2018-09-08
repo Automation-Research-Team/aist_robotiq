@@ -66,21 +66,21 @@ posess = {
 
   'a_phoxi_m_camera': {
     'a_bot': [
-      [0.245, 0.616, 0.30,  radians(180),  0.000,        radians(90)],
-      [0.245, 0.616, 0.30,  radians(180), -radians(30),  radians(90)],
-      [0.245, 0.616, 0.30,  radians(210), -radians(30),  radians(90)],
-      [0.245, 0.616, 0.30,  radians(210),  0.000,        radians(90)],
-      [0.245, 0.616, 0.30,  radians(150),  0.000,        radians(90)],
-      [0.245, 0.616, 0.30,  radians(150), -radians(30),  radians(90)],
+      [0.245, 0.3, 0.30, radians(  0),  radians(  0), radians(90)],
+      [0.245, 0.3, 0.30, radians(  0),  radians(-30), radians(90)],
+      [0.245, 0.3, 0.30, radians( 30),  radians(-30), radians(90)],
+      [0.245, 0.3, 0.30, radians( 30),  radians(  0), radians(90)],
+      [0.245, 0.3, 0.30, radians(-30),  radians(  0), radians(90)],
+      [0.245, 0.3, 0.30, radians(-30),  radians(-30), radians(90)],
     ],
 
     'b_bot': [
-      [-0.273, 0.487, 0.30,  radians(180),  0.000,        radians(90)],
-      [-0.273, 0.487, 0.30,  radians(180), -radians(30),  radians(90)],
-      [-0.273, 0.487, 0.30,  radians(210), -radians(30),  radians(90)],
-      [-0.273, 0.487, 0.30,  radians(210),  0.000,        radians(90)],
-      [-0.273, 0.487, 0.30,  radians(150),  0.000,        radians(90)],
-      [-0.273, 0.487, 0.30,  radians(150), -radians(30),  radians(90)],
+      [-0.273, 0.487, 0.30, radians(- 90), radians(  0), radians(90)],
+      [-0.273, 0.487, 0.30, radians(- 90), radians(-30), radians(90)],
+      [-0.273, 0.487, 0.30, radians(-120), radians(-30), radians(90)],
+      [-0.273, 0.487, 0.30, radians(-120), radians(  0), radians(90)],
+      [-0.273, 0.487, 0.30, radians(- 60), radians(  0), radians(90)],
+      [-0.273, 0.487, 0.30, radians(- 60), radians(-30), radians(90)],
       # [-0.273, 0.487, 0.480, 0.000,  radians(18),  0.000],
       # [-0.273, 0.487, 0.480, 0.000,  radians(36), -radians(18)],
       # [-0.273, 0.487, 0.480, 0.000,  radians(18), -radians(36)],
@@ -110,29 +110,29 @@ posess = {
 }
 
 
-# def get_service_proxy(service_name, base_name):
-#   """Return ROS service proxy"""
-#   ns = "/o2as_easy_handeye_{}_eye_on_base/".format(base_name)
+def get_service_proxy(service_name, base_name):
+  """Return ROS service proxy"""
+  ns = "/o2as_easy_handeye_{}_eye_on_base/".format(base_name)
 
-#   if service_name is "take_sample":
-#     service_type = TakeSample
-#     service_name_full = ns + "take_sample"
-#   elif service_name is "get_sample_list":
-#     service_type = TakeSample
-#     service_name_full = ns + "get_sample_list"
-#   elif service_name is "remove_sample":
-#     service_type = RemoveSample
-#     service_name_full = ns + "remove_sample"
-#   elif service_name is "compute_calibration":
-#     service_type = ComputeCalibration
-#     service_name_full = ns + "compute_calibration"
-#   elif service_name is "save_calibration":
-#     service_type = Empty
-#     service_name_full = ns + "save_calibration"
-#   else:
-#     raise NameError("Service name {} does not exist".format(service_name))
+  if service_name is "take_sample":
+    service_type = TakeSample
+    service_name_full = ns + "take_sample"
+  elif service_name is "get_sample_list":
+    service_type = TakeSample
+    service_name_full = ns + "get_sample_list"
+  elif service_name is "remove_sample":
+    service_type = RemoveSample
+    service_name_full = ns + "remove_sample"
+  elif service_name is "compute_calibration":
+    service_type = ComputeCalibration
+    service_name_full = ns + "compute_calibration"
+  elif service_name is "save_calibration":
+    service_type = Empty
+    service_name_full = ns + "save_calibration"
+  else:
+    raise NameError("Service name {} does not exist".format(service_name))
 
-#   return rospy.ServiceProxy(service_name_full, service_type)
+  return rospy.ServiceProxy(service_name_full, service_type)
 
 
 class MoveGroupCommander(object):
@@ -179,7 +179,7 @@ class MoveGroupCommander(object):
   def go_home(self):
     self.baseRoutines.go_to_named_pose("home", self.robot_name)
 
-def run_calibration(baseRoutines, robot_name, camera_name):
+def run_calibration(baseRoutines, camera_name, robot_name):
   """Run handeye calibration for the specified robot (e.g., "b_bot")"""
   # Initialize move group and service proxies
   mg = MoveGroupCommander(baseRoutines, robot_name)
@@ -223,15 +223,10 @@ def run_calibration(baseRoutines, robot_name, camera_name):
   print("=== Calibration completed for {} ===".format(robot_name))
 
 
-def main():
+def main(camera_name, robot_name):
   try:
     baseRoutines = O2ASBaseRoutines()
-    robot_name   = rospy.get_param("robot_name",  "b_bot")
-    camera_name  = rospy.get_param("camera_name", "a_phoxi_m_camera")
-    assert(robot_name  in {"a_bot", "b_bot", "c_bot"})
-    assert(camera_name in {"d_bot_camera", "a_phoxi_m_camera"})
-
-    run_calibration(baseRoutines, robot_name, camera_name)
+    run_calibration(baseRoutines, camera_name, robot_name)
 
   except rospy.ROSInterruptException:
     return
@@ -241,5 +236,8 @@ def main():
 
 
 if __name__ == '__main__':
-  main()
-  
+  camera_name = sys.argv[1]
+  robot_name  = sys.argv[2]
+  assert(robot_name in {"a_bot", "b_bot", "c_bot"})
+  assert(camera_name in {"d_bot_camera", "a_phoxi_m_camera"})
+  main(camera_name, robot_name)
