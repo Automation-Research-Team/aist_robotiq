@@ -66,22 +66,21 @@ posess = {
 
   'a_phoxi_m_camera': {
     'a_bot': [
-      [0.245, 0.616, 0.485, -1.591,  0.000,  0.000],
-      [0.245, 0.616, 0.485, -1.591,  0.313,  0.000],
-      [0.245, 0.616, 0.485, -1.591,  0.626, -0.313],
-      [0.245, 0.616, 0.485, -1.591,  0.313, -0.626],
-      [0.245, 0.616, 0.485, -1.591,  0.000, -0.313],
-      [0.245, 0.616, 0.485, -1.591, -0.313,  0.000],
+      [0.245, 0.616, 0.30,  radians(180),  0.000,        radians(90)],
+      [0.245, 0.616, 0.30,  radians(180), -radians(30),  radians(90)],
+      [0.245, 0.616, 0.30,  radians(210), -radians(30),  radians(90)],
+      [0.245, 0.616, 0.30,  radians(210),  0.000,        radians(90)],
+      [0.245, 0.616, 0.30,  radians(150),  0.000,        radians(90)],
+      [0.245, 0.616, 0.30,  radians(150), -radians(30),  radians(90)],
     ],
 
     'b_bot': [
-      [-0.273, 0.487, 0.20,  radians(180),  0.000,        radians(85)],
-      [-0.273, 0.487, 0.20,  radians(180),  0.000,        radians(85)],
-      [-0.273, 0.487, 0.20,  radians(180),  radians(18),  radians(85)],
-      [-0.273, 0.487, 0.20,  radians(180),  radians(18),  radians(85)],
-      [-0.273, 0.487, 0.20,  radians(180),  0.000,        radians(85)],
-      [-0.273, 0.487, 0.20,  radians(180), -radians(18),  radians(85)],
-      [-0.273, 0.487, 0.20,  radians(180), -radians(18),  radians(85)],
+      [-0.273, 0.487, 0.30,  radians(180),  0.000,        radians(90)],
+      [-0.273, 0.487, 0.30,  radians(180), -radians(30),  radians(90)],
+      [-0.273, 0.487, 0.30,  radians(210), -radians(30),  radians(90)],
+      [-0.273, 0.487, 0.30,  radians(210),  0.000,        radians(90)],
+      [-0.273, 0.487, 0.30,  radians(150),  0.000,        radians(90)],
+      [-0.273, 0.487, 0.30,  radians(150), -radians(30),  radians(90)],
       # [-0.273, 0.487, 0.480, 0.000,  radians(18),  0.000],
       # [-0.273, 0.487, 0.480, 0.000,  radians(36), -radians(18)],
       # [-0.273, 0.487, 0.480, 0.000,  radians(18), -radians(36)],
@@ -138,11 +137,9 @@ posess = {
 
 class MoveGroupCommander(object):
   """Wrapper of MoveGroupCommander specific for this script"""
-  def __init__(self, robot_name):
+  def __init__(self, baseRoutines, robot_name):
     ## Initialize `moveit_commander`
-    moveit_commander.roscpp_initialize(sys.argv)  # TODO: see if it is required
-    group = moveit_commander.MoveGroupCommander(robot_name)
-    #group = baseRoutines.groups[robot_name]
+    group = baseRoutines.groups[robot_name]
 
     # Set `_ee_link` as end effector wrt `_base_link` of the robot
     group.set_pose_reference_frame(robot_name + "_base_link")
@@ -164,33 +161,28 @@ class MoveGroupCommander(object):
     print()
 
     # Misc variables
-    # self.baseRoutines = baseRoutines
-    # self.robot_name   = robot_name
-    self.group = group
+    self.baseRoutines = baseRoutines
+    self.robot_name   = robot_name
     
   def move(self, pose, speed=1):
     """Move the end effector"""
     # TODO: check type of `pose`
-    # group = self.baseRoutines.groups[self.robot_name]
-    self.group.set_pose_target(pose)
-    self.group.go(wait=True)
-    self.group.clear_pose_targets()
+    group                       = self.baseRoutines.groups[self.robot_name]
+    poseStamped                 = geometry_msgs.msg.PoseStamped()
+    poseStamped.header.frame_id = self.robot_name + "_base_link"
+    poseStamped.pose.position.x = pose[0]
+    poseStamped.pose.position.y = pose[1]
+    poseStamped.pose.position.z = pose[2]
+    poseStamped.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pose[3], pose[4], pose[5]))
+    self.baseRoutines.go_to_pose_goal(self.robot_name, poseStamped, speed)
 
-    # poseStamped = geometry_msgs.msg.PoseStamped()
-    # poseStamped.header.frame_id = self.robot_name + "_base_link"
-    # poseStamped.pose.position.x = pose[0]
-    # poseStamped.pose.position.y = pose[1]
-    # poseStamped.pose.position.z = pose[2]
-    # poseStamped.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pose[3], pose[4], pose[5]))
-    # self.baseRoutines.go_to_pose_goal(self.robot_name, poseStamped, speed)
+  def go_home(self):
+    self.baseRoutines.go_to_named_pose("home", self.robot_name)
 
-  # def go_home(self):
-  #   self.baseRoutines.go_to_named_pose("home", self.robot_name)
-
-def run_calibration(robot_name, camera_name):
+def run_calibration(baseRoutines, robot_name, camera_name):
   """Run handeye calibration for the specified robot (e.g., "b_bot")"""
   # Initialize move group and service proxies
-  mg = MoveGroupCommander(robot_name)
+  mg = MoveGroupCommander(baseRoutines, robot_name)
   # take_sample         = get_service_proxy("take_sample",         robot_name)
   # get_sample_list     = get_service_proxy("get_sample_list",     robot_name)
   # remove_sample       = get_service_proxy("remove_sample",       robot_name)
@@ -206,11 +198,11 @@ def run_calibration(robot_name, camera_name):
   #     remove_sample(0)
 
   # Reset pose
-  #mg.go_home()
+  mg.go_home()
 
   # Collect samples over pre-defined poses
   for i, pose in enumerate(posess[camera_name][robot_name]):
-    mg.move(pose)
+    mg.move(pose, 0.05)
     # take_sample()
     # rospy.sleep(1)  # Sleep for 1 seconds
     # sample_list = get_sample_list()
@@ -226,20 +218,20 @@ def run_calibration(robot_name, camera_name):
   # save_calibration()
 
   # Reset pose
-  #mg.go_home()
+  mg.go_home()
 
   print("=== Calibration completed for {} ===".format(robot_name))
 
 
 def main():
   try:
-    rospy.init_node('run_calibration', anonymous=True, log_level=rospy.INFO)
-    robot_name  = rospy.get_param("robot_name",  "b_bot")
-    camera_name = rospy.get_param("camera_name", "a_phoxi_m_camera")
+    baseRoutines = O2ASBaseRoutines()
+    robot_name   = rospy.get_param("robot_name",  "b_bot")
+    camera_name  = rospy.get_param("camera_name", "a_phoxi_m_camera")
     assert(robot_name  in {"a_bot", "b_bot", "c_bot"})
     assert(camera_name in {"d_bot_camera", "a_phoxi_m_camera"})
 
-    run_calibration(robot_name, camera_name)
+    run_calibration(baseRoutines, robot_name, camera_name)
 
   except rospy.ROSInterruptException:
     return

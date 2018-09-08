@@ -6,6 +6,8 @@
   <arg name="namespace_prefix"	value  ="o2as_easy_handeye_$(arg robot_name)"/>
   <arg name="marker_size"	default="0.07"
        doc="Size of the ArUco marker used, in meters"/>
+  <arg name="site"		default="sim"/>
+  <arg name="phoxi_id"		default='"1711015"'/>
 
   <!-- Set AR marker ID -->
   <arg name="marker_id" value="17"  if="$(eval arg('robot_name') == 'a_bot')"/>
@@ -22,22 +24,33 @@
   <!-- CameraInfo conversion for Phoxi in Gazebo:
        from camera_info to camera_info2,
        see convert_phoxi_camera_info_gazebo.py -->
-  <node name="convert_phoxi_camera_info_gazebo"
-	pkg="o2as_easy_handeye" type="convert_phoxi_camera_info_gazebo.py"
-        if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
+  <!-- <node name="convert_phoxi_camera_info_gazebo" -->
+  <!-- 	pkg="o2as_easy_handeye" type="convert_phoxi_camera_info_gazebo.py" -->
+  <!--       if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/> -->
 
+  <!-- start real cameras -->
+  <!-- <include file="$(find o2as_phoxi_camera)/launch/o2as_phoxi_camera.launch" -->
+  <!-- 	   unless="$(eval arg('site') == 'sim')" > -->
+  <!--   <arg name="camera_name"  value="$(arg camera_name)" /> -->
+  <!--   <arg name="trigger_mode" value="0" />		<\!-- freerun mode -\-> -->
+  <!--   <arg name="id"	     value="$(arg phoxi_id)" /> -->
+  <!-- </include> -->
+  
   <!-- start ArUco -->
   <node name="aruco_tracker" pkg="aruco_ros" type="single">
     <!-- Remap topic names -->
     <!-- String "/rgb/" is required for topics "camera_info" and
          "image_raw" in realsense. Note that Phoxi publish topics named
          "texture" instead of "image_raw". -->
-    <!-- <remap from="/camera_info"
-         to="/$(arg camera_name)/rgb/camera_info" /> -->
-    <!-- <remap from="/image" to="/$(arg camera_name)/rgb/image_raw" /> -->
     <!-- Use camera_info2 instead of camera_info in Gazebo with Phoxi -->
-    <remap from="/camera_info"	to="/$(arg camera_name)/camera_info2"/>
-    <remap from="/image"	to="/$(arg camera_name)/texture" />
+    <remap from="/camera_info"	to="/$(arg camera_name)/camera_info"
+	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
+    <remap from="/image"	to="/$(arg camera_name)/texture"
+	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
+    <remap from="/camera_info"	to="/$(arg camera_name)/rgb/camera_info"
+	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
+    <remap from="/image"	to="/$(arg camera_name)/rgb/image_raw"
+	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
 
     <!-- Other parameters -->
     <param name="image_is_rectified" value="false"/>
@@ -48,9 +61,18 @@
     <param name="marker_frame"       value="camera_marker" />
   </node>
 
-  <include
-      file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch">
+  <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch"
+	   if="$(eval arg('site') == 'sim')">
     <arg name="sim" value="true" />
+  </include>
+  <include file="$(find o2as_examples)/launch/connect_real_robots.launch"
+	   if="$(eval arg('site') == 'real')">
+  </include>
+  <include file="$(find o2as_examples)/launch/connect_aist_robots.launch"
+	   if="$(eval arg('site') == 'aist')">
+  </include>
+  <include file="$(find o2as_examples)/launch/connect_osaka_robots.launch"
+	   if="$(eval arg('site') == 'osaka')">
   </include>
 
   <!-- start easy_handeye calibrator -->
