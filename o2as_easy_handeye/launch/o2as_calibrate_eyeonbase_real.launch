@@ -3,8 +3,9 @@
     <arg name="robot_name" />  <!-- "a_bot", "b_bot", or "c_bot" -->
     <arg name="camera_name" default="a_phoxi_m_camera"/>
     <arg name="namespace_prefix" value="o2as_easy_handeye_$(arg robot_name)" />
-    <arg name="marker_size" default="0.08"
+    <arg name="marker_size" default="0.07"
          doc="Size of the ArUco marker used, in meters" />
+    <arg name="sim" default="false" />
 
     <!-- Move group -->
     <arg name="move_group" value="$(arg robot_name)" />
@@ -43,7 +44,7 @@
 
     <include
         file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch">
-        <arg name="sim" value="false" />
+        <arg name="sim" value="$(arg sim)" />
     </include>
 
     <!-- start easy_handeye calibrator -->
@@ -55,7 +56,7 @@
         <arg name="tracking_marker_frame" value="camera_marker" />
         <arg name="robot_base_frame" value="$(arg robot_name)_base_link" />
         <arg name="robot_effector_frame"
-             value="$(arg robot_name)_wrist_3_link" />
+             value="$(arg robot_name)_ee_link" />
 
         <arg name="freehand_robot_movement" value="true" />
         <arg name="robot_velocity_scaling" value="0.5" />

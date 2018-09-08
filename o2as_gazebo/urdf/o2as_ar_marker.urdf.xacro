@@ -13,13 +13,13 @@
     <link name="${prefix}ar_marker">
       <visual name="${prefix}ar_marker_visual">
         <geometry>
-          <box size="0.09 0.09 0.001" />
+          <box size="0.08 0.08 0.005" />
         </geometry>
         <!--<material name="orange" />-->
       </visual>
       <collision name="${prefix}ar_marker_collision">
         <geometry>
-          <box size="0.09 0.09 0.02" />
+          <box size="0.08 0.08 0.005" />
         </geometry>
       </collision>
     </link>

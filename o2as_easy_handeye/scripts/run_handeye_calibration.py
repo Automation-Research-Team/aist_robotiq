@@ -138,9 +138,9 @@ class MoveGroupCommander(object):
     robot = moveit_commander.RobotCommander()
     group = moveit_commander.MoveGroupCommander(base_name)
 
-    # Set `_wrist_3_link` as end effector wrt `_base_link` of the robot
+    # Set `_ee_link` as end effector wrt `_base_link` of the robot
     ref_link = base_name + "_base_link"
-    ee_link = base_name + "_wrist_3_link"  # the link AR marker is put on
+    ee_link = base_name + "_ee_link"  # the link AR marker is put on
     group.set_pose_reference_frame(ref_link)
     group.set_end_effector_link(ee_link)
 
