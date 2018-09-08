@@ -12,14 +12,14 @@
 
     <link name="${prefix}ar_marker">
       <visual name="${prefix}ar_marker_visual">
-	<origin xyz="0 0 0" rpy="0 0 ${pi}"/>
+	<origin xyz="0 0 -0.0025" rpy="0 0 ${pi}"/>
         <geometry>
           <box size="0.08 0.08 0.005" />
         </geometry>
         <!--<material name="orange" />-->
       </visual>
       <collision name="${prefix}ar_marker_collision">
-	<origin xyz="0 0 0" rpy="0 0 ${pi}"/>
+	<origin xyz="0 0 -0.0025" rpy="0 0 ${pi}"/>
         <geometry>
           <box size="0.08 0.08 0.005" />
         </geometry>
