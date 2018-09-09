@@ -3,21 +3,14 @@
 import sys
 import copy
 import rospy
-import moveit_commander
 import moveit_msgs.msg
 import geometry_msgs.msg
 import tf_conversions
-import tf
 from math import radians, degrees
 
 from std_msgs.msg import String
-from moveit_commander.conversions import pose_to_list
 from std_srvs.srv import Empty
 from easy_handeye.srv import TakeSample, RemoveSample, ComputeCalibration
-
-from o2as_msgs.srv import *
-import actionlib
-import o2as_msgs.msg
 
 from o2as_routines.base import O2ASBaseRoutines
 
@@ -138,9 +131,11 @@ def get_service_proxy(service_name, base_name):
 
 class MoveGroupCommander(object):
   """Wrapper of MoveGroupCommander specific for this script"""
-  def __init__(self, baseRoutines, robot_name):
+  def __init__(self, robot_name):
     ## Initialize `moveit_commander`
-    group = baseRoutines.groups[robot_name]
+    self.baseRoutines = O2ASBaseRoutines()
+    self.robot_name   = robot_name
+    group = self.baseRoutines.groups[robot_name]
 
     # Set `_ee_link` as end effector wrt `_base_link` of the robot
     group.set_pose_reference_frame(robot_name + "_base_link")
@@ -160,10 +155,6 @@ class MoveGroupCommander(object):
     # print("============ Printing robot state")
     # print(robot.get_current_state())
     print()
-
-    # Misc variables
-    self.baseRoutines = baseRoutines
-    self.robot_name   = robot_name
     
   def move(self, pose, speed=1):
     """Move the end effector"""
@@ -182,10 +173,10 @@ class MoveGroupCommander(object):
   def go_home(self):
     self.baseRoutines.go_to_named_pose("home", self.robot_name)
 
-def run_calibration(baseRoutines, camera_name, robot_name):
+def run_calibration(camera_name, robot_name):
   """Run handeye calibration for the specified robot (e.g., "b_bot")"""
   # Initialize move group and service proxies
-  mg                  = MoveGroupCommander(baseRoutines, robot_name)
+  mg                  = MoveGroupCommander(robot_name)
   take_sample         = get_service_proxy("take_sample",         robot_name)
   get_sample_list     = get_service_proxy("get_sample_list",     robot_name)
   remove_sample       = get_service_proxy("remove_sample",       robot_name)
@@ -205,7 +196,7 @@ def run_calibration(baseRoutines, camera_name, robot_name):
 
   # Collect samples over pre-defined poses
   for i, pose in enumerate(posess[camera_name][robot_name]):
-    mg.move(pose, 1)
+    mg.move(pose, 0.05)
     take_sample()
     rospy.sleep(1)  # Sleep for 1 seconds
     sample_list = get_sample_list()
@@ -224,10 +215,13 @@ def run_calibration(baseRoutines, camera_name, robot_name):
   print("=== Calibration completed for {} ===".format(robot_name))
 
 
-def main(camera_name, robot_name):
+def main():
   try:
-    baseRoutines = O2ASBaseRoutines()
-    run_calibration(baseRoutines, camera_name, robot_name)
+    camera_name = sys.argv[1]
+    robot_name  = sys.argv[2]
+    assert(camera_name in {"d_bot_camera", "a_phoxi_m_camera"})
+    assert(robot_name  in {"a_bot", "b_bot", "c_bot"})
+    run_calibration(camera_name, robot_name)
 
   except rospy.ROSInterruptException:
     return
@@ -237,8 +231,4 @@ def main(camera_name, robot_name):
 
 
 if __name__ == '__main__':
-  camera_name = sys.argv[1]
-  robot_name  = sys.argv[2]
-  assert(robot_name in {"a_bot", "b_bot", "c_bot"})
-  assert(camera_name in {"d_bot_camera", "a_phoxi_m_camera"})
-  main(camera_name, robot_name)
+  main()

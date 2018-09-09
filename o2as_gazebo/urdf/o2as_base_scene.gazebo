@@ -109,7 +109,7 @@
       <plugin name="a_phoxi_m_cam_controller" filename="libgazebo_ros_openni_kinect.so">
         <baseline>0.35</baseline>
         <alwaysOn>true</alwaysOn>
-        <updateRate>5.0</updateRate>
+        <updateRate>2.5</updateRate>
         <cameraName>a_phoxi_m_camera</cameraName>
         <frameName>a_phoxi_m_camera_link</frameName>
         <imageTopicName>texture</imageTopicName>

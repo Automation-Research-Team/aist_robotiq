@@ -51,6 +51,7 @@ add_dependencies(${PROJECT_NAME}_calibrator
 catkin_install_python(
   PROGRAMS
     scripts/run_handeye_calibration.py
+    scripts/go_home.py
     scripts/convert_phoxi_camera_info_gazebo.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
