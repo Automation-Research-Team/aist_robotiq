@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import os
 import copy
 import rospy
 import moveit_msgs.msg
@@ -68,12 +69,12 @@ posess = {
     ],
 
     'b_bot': [
-      [-0.273, 0.487, 0.30, radians(- 90), radians(  0), radians(90)],
-      [-0.273, 0.487, 0.30, radians(- 90), radians(-30), radians(90)],
-      [-0.273, 0.487, 0.30, radians(-120), radians(-30), radians(90)],
-      [-0.273, 0.487, 0.30, radians(-120), radians(  0), radians(90)],
-      [-0.273, 0.487, 0.30, radians(- 60), radians(  0), radians(90)],
-      [-0.273, 0.487, 0.30, radians(- 60), radians(-30), radians(90)],
+      [-0.3, 0.487, 0.3, radians(-110), radians(  0), radians(90)],
+      [-0.3, 0.487, 0.3, radians(-110), radians(-30), radians(90)],
+      [-0.3, 0.487, 0.3, radians(-140), radians(-30), radians(90)],
+      [-0.3, 0.487, 0.3, radians(-140), radians(  0), radians(90)],
+      [-0.3, 0.487, 0.3, radians(- 80), radians(  0), radians(90)],
+      [-0.3, 0.487, 0.3, radians(- 80), radians(-30), radians(90)],
 
       # [-0.273, 0.487, 0.480, 0.000,  radians(18),  0.000],
       # [-0.273, 0.487, 0.480, 0.000,  radians(36), -radians(18)],
@@ -154,7 +155,6 @@ class MoveGroupCommander(object):
     # print("============ Robot Groups:",        robot.get_group_names())
     # print("============ Printing robot state")
     # print(robot.get_current_state())
-    print()
     
   def move(self, pose, speed=1):
     """Move the end effector"""
@@ -214,6 +214,26 @@ def run_calibration(camera_name, robot_name):
 
   print("=== Calibration completed for {} ===".format(robot_name))
 
+def visit_calibration_points(camera_name, robot_name):
+  """Run handeye calibration for the specified robot (e.g., "b_bot")"""
+  # Initialize move group and service proxies
+  mg = MoveGroupCommander(robot_name)
+
+  print("=== Visiting started for {} ===".format(robot_name))
+
+  # Reset pose
+  mg.go_home()
+
+  # Move to each calibration point
+  for i, pose in enumerate(posess[camera_name][robot_name]):
+    mg.move(pose, 0.05)
+    rospy.sleep(1)  # Sleep for 1 seconds
+    print(("Loop {}").format(i))
+
+  # Reset pose
+  mg.go_home()
+
+  print("=== Visiting completed for {} ===".format(robot_name))
 
 def main():
   try:
@@ -221,7 +241,11 @@ def main():
     robot_name  = sys.argv[2]
     assert(camera_name in {"d_bot_camera", "a_phoxi_m_camera"})
     assert(robot_name  in {"a_bot", "b_bot", "c_bot"})
-    run_calibration(camera_name, robot_name)
+
+    if (os.path.basename(sys.argv[0]) == "run_handeye_calibration.py"):
+      run_calibration(camera_name, robot_name)
+    else:
+      visit_calibration_points(camera_name, robot_name)
 
   except rospy.ROSInterruptException:
     return
