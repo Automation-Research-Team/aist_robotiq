@@ -1112,7 +1112,7 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
   geometry_msgs::PoseStamped target_pose = goal->item_pose;
   target_pose = transform_pose_now(target_pose, "world", tflistener_);
 
-  if ((robot_statuses_[robot_name].carrying_tool == true) && (goal->tool_name != "screw_tool"))
+  if ((robot_statuses_[goal->robot_name].carrying_tool == true) && (goal->tool_name != "screw_tool"))
   {
     ROS_ERROR("Robot is already carrying a tool. Nothing can be picked except screws.");
     pickActionServer_.setAborted();
@@ -1527,14 +1527,17 @@ int main(int argc, char **argv)
   spinner.start();
 
   // Create an object of class SkillServer that will take care of everything
-  SkillServer o2as_skill_server;
+  SkillServer ss;
   ROS_INFO("O2AS skill server started");
+  
 
+  
+  std::vector<const robot_state::AttachedBody*> ab;
   
   // o2as_msgs::sendScriptToUR srv;
   // srv.request.program_id = "insertion";
   // srv.request.robot_name = "b_bot";
-  // o2as_skill_server.sendScriptToURClient_.call(srv);
+  // ss.sendScriptToURClient_.call(srv);
   // if (srv.response.success == true)
   //   ROS_INFO("Successfully called the service client");
   // else
@@ -1542,17 +1545,17 @@ int main(int argc, char **argv)
   // waitForURProgram("/b_bot_controller");
 
   // ------------ Spawns all of the screw tools (for visualization)
-  // o2as_skill_server.spawnTool("screw_tool_m6");
-  // o2as_skill_server.spawnTool("screw_tool_m4");
-  // o2as_skill_server.spawnTool("screw_tool_m3");
+  // ss.spawnTool("screw_tool_m6");
+  // ss.spawnTool("screw_tool_m4");
+  // ss.spawnTool("screw_tool_m3");
   // ------------
 
   // ------------ Debugging procedures. Should be in a separate node, but ohwell.
   // ROS_INFO("Testing the screw tool mounting.");
-  // o2as_skill_server.equipScrewTool("b_bot", "screw_tool_m6");
+  // ss.equipScrewTool("b_bot", "screw_tool_m6");
 
   // ROS_INFO("Going to screw ready pose.");
-  // o2as_skill_server.goToNamedPose("screw_ready_b", "b_bot");
+  // ss.goToNamedPose("screw_ready_b", "b_bot");
 
   // ROS_INFO("Picking screw from feeder.");
   // geometry_msgs::PoseStamped ps = makePoseStamped();
@@ -1562,25 +1565,200 @@ int main(int argc, char **argv)
   // std::string link_name = "b_bot_screw_tool_m6_tip_link";
   // std::string robot_name = "b_bot";
 
-  // o2as_skill_server.pickFromAbove(ps, link_name, robot_name);
+  // ss.pickFromAbove(ps, link_name, robot_name);
 
   // ROS_INFO("Picking screw from tray 1.");
   // ps.header.frame_id = "set3_tray_1";
   // ps.pose.position.y = .05;
   // ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(90.0/180.0 *M_PI));   // Z-axis pointing up.
-  // o2as_skill_server.pickFromAbove(ps, link_name, robot_name);
+  // ss.pickFromAbove(ps, link_name, robot_name);
 
   // ROS_INFO("Going back to screw ready pose.");
-  // o2as_skill_server.goToNamedPose("screw_ready_b", "b_bot");
+  // ss.goToNamedPose("screw_ready_b", "b_bot");
 
   // ROS_INFO("Testing the screw tool unmounting.");
-  // o2as_skill_server.unequipScrewTool("b_bot");
+  // ss.unequipScrewTool("b_bot");
 
   // ROS_INFO("Going to home pose.");
-  // o2as_skill_server.goToNamedPose("home", "b_bot");
+  // ss.goToNamedPose("home", "b_bot");
   // ROS_INFO("Done.");
   // ------------
 
+
+  while (ros::ok())
+  {
+    // ----
+    int c;    
+
+    moveit_msgs::CollisionObject tool = ss.screw_tool_m4;
+    tool.header.frame_id = "b_bot_robotiq_85_tip_link";
+    tool.id = "screw_tool_m4";
+    tool.primitives.resize(1);
+    tool.primitive_poses.resize(1);
+    tool.primitives[0].type = tool.primitives[0].BOX;
+    tool.primitives[0].dimensions.resize(3);
+    tool.primitives[0].dimensions[0] = 0.02;
+    tool.primitives[0].dimensions[1] = 0.05;
+    tool.primitives[0].dimensions[2] = 0.1;
+    tool.primitive_poses[0].position.x = 0.02;
+    tool.primitive_poses[0].position.y = 0.05;
+    tool.primitive_poses[0].position.z = 0.1;
+    tool.named_frames.resize(1);
+    tool.frame_names.resize(1);
+    tool.named_frames[0].position.z = -.1;
+    tool.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(90.0/180.0 *M_PI));
+    tool.frame_names[0] = "screw_tool_m4_tip";
+
+    moveit_msgs::CollisionObject screw;
+    screw.header.frame_id = "b_bot_robotiq_85_tip_link";
+    screw.id = "screw_m4";
+    screw.primitives.resize(1);
+    screw.primitive_poses.resize(1);
+    screw.primitives[0].type = tool.primitives[0].CYLINDER;
+    screw.primitives[0].dimensions.resize(2);
+    screw.primitives[0].dimensions[0] = 0.015; // height (along x)
+    screw.primitives[0].dimensions[1] = 0.005; // radius
+    screw.primitive_poses[0].position.x = 0.0;
+    screw.primitive_poses[0].position.y = 0.0;
+    screw.primitive_poses[0].position.z = -0.01;
+    screw.named_frames.resize(1);
+    screw.frame_names.resize(1);
+    screw.named_frames[0].position.z = -.03;
+    screw.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, (90.0/180.0 *M_PI), 0);
+    screw.frame_names[0] = "screw_m4_tip";
+
+    geometry_msgs::PoseStamped ps;
+    ps = makePoseStamped();
+    ps.header.frame_id = "workspace_center";
+    ps.pose.position.z = .3;
+    ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, (90.0/180.0 *M_PI), 0);
+
+    ROS_INFO("Press key to start test stuff. \n0 to exit. \n1 to spawn tool and screw. \n11 to spawn another thing. \n2 to connect them. \n3 to attach tool to the gripper \n33 to attach screw to the gripper \n333 to attach tool to the gripper while specifying all its data again \n4 to reset scene \n5 to move to center with EE \n6 with screw_tool_m4 \n7 with screw_tool_m4_tip \n8 with screw_m4. \n9 with screw_m4_tip \n10 to move home.");
+    std::cin >> c;
+    if (c == 0)
+    {
+      return true;
+    }
+    if (c == 1)
+    {
+      ROS_INFO_STREAM("Spawning test tool and screw.");
+      moveit_msgs::CollisionObject co;
+      co = tool;
+      co.operation = moveit_msgs::CollisionObject::ADD;
+      ss.planning_scene_interface_.applyCollisionObject(co);
+      co = screw;
+      co.operation = moveit_msgs::CollisionObject::ADD;
+      ss.planning_scene_interface_.applyCollisionObject(co);
+    }
+    if (c == 11)
+    {
+      ROS_INFO_STREAM("Spawning another test object.");
+      moveit_msgs::CollisionObject co;
+      co = screw;
+      co.id = "test_obj";
+      co.primitive_poses[0].position.x = .05;
+      co.operation = moveit_msgs::CollisionObject::ADD;
+      ss.planning_scene_interface_.applyCollisionObject(co);
+    }
+    if (c == 2)
+    {
+      ROS_INFO_STREAM("Connecting test tool and screw via updating tool's connected object list.");
+      moveit_msgs::CollisionObject co;
+      co = tool;
+      co.connected_objects.resize(1);
+      co.connected_objects[0] = "screw_m4";
+      co.operation = moveit_msgs::CollisionObject::ADD;
+      ss.planning_scene_interface_.applyCollisionObject(co);
+    }
+    if (c == 3)
+    {
+      moveit_msgs::AttachedCollisionObject att_coll_object;
+      att_coll_object.object.id = "screw_tool_m4";
+      att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
+      att_coll_object.object.operation = att_coll_object.object.ADD;
+      ROS_INFO_STREAM("Attaching test tool.");
+      ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);
+    }
+    if (c == 33)
+    {
+      moveit_msgs::AttachedCollisionObject att_coll_object;
+      att_coll_object.object.id = "screw_m4";
+      att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
+      att_coll_object.object.operation = att_coll_object.object.ADD;
+      ROS_INFO_STREAM("Attaching screw.");
+      ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);
+    }
+    if (c == 333)
+    {
+      moveit_msgs::AttachedCollisionObject att_coll_object;
+      att_coll_object.object = tool;
+      att_coll_object.object.id = "screw_tool_m4";
+      att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
+      att_coll_object.object.operation = att_coll_object.object.ADD;
+      ROS_INFO_STREAM("Attaching test tool WITH NAMED FRAMES.");
+      ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);
+    }
+    if (c == 4)
+    {
+      ROS_INFO_STREAM("Removing tool and screw.");
+      moveit_msgs::AttachedCollisionObject att_coll_object;
+      att_coll_object.object = tool;
+      att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
+      att_coll_object.object.operation = att_coll_object.object.REMOVE;
+      try {ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);}
+      catch (std::exception exc) {;}
+      att_coll_object.object = screw;
+      att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
+      att_coll_object.object.operation = att_coll_object.object.REMOVE;
+      try {ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);}
+      catch (std::exception exc) {;}
+
+      moveit_msgs::CollisionObject co;
+      co = tool;
+      co.operation = moveit_msgs::CollisionObject::REMOVE;
+      try {ss.planning_scene_interface_.applyCollisionObject(co);}
+      catch (std::exception exc) {;}
+      co = screw;
+      co.operation = moveit_msgs::CollisionObject::REMOVE;
+      try {ss.planning_scene_interface_.applyCollisionObject(co);}
+      catch (std::exception exc) {;}
+    }
+    if (c == 5)
+    {
+      ss.moveToCartPosePTP(ps, "b_bot", true, "", 1.0);
+    }
+    if (c == 6)
+    {
+      ss.moveToCartPosePTP(ps, "b_bot", true, "screw_tool_m4", 1.0);
+    }
+    if (c == 7)
+    {
+      ss.moveToCartPosePTP(ps, "b_bot", true, "screw_tool_m4_tip", 1.0);
+    }
+    if (c == 8)
+    {
+      ss.moveToCartPosePTP(ps, "b_bot", true, "screw_m4", 1.0);
+    }
+    if (c == 9)
+    {
+      ss.moveToCartPosePTP(ps, "b_bot", true, "screw_m4_tip", 1.0);
+    }
+    if (c == 10)
+    {
+      ss.goToNamedPose("home", "b_bot");
+    }
+      // ss.equipScrewTool("b_bot", "screw_tool_m4");
+      
+
+    // robot_state::RobotState state(*ss.b_bot_group_.getCurrentState());
+    // state.getAttachedBodies(ab);
+    ROS_INFO_STREAM("T");
+    ss.b_bot_group_.getCurrentState()->getAttachedBodies(ab);
+    ROS_INFO_STREAM("Current state has " << ab.size() << " attached bodies.");
+
+  
+    ros::spinOnce();
+  }
   while (ros::ok())
   {
     ros::spinOnce();
