@@ -11,13 +11,14 @@ import actionlib
 import actionlib_tutorials.msg
 
 class FasteningToolController:
-    def fasten(self,name):
+    def fasten(self, name):
         client = actionlib.SimpleActionClient('FastenerGripperControlAction', FastenerGripperControlAction)
         client.wait_for_server()
         goal = FastenerGripperControlGoal()
 
         goal.fastening_tool_name = name
-        goal.speed = 60
+        goal.speed = speed
+        goal.direction = "CCW"
 
         client.send_goal_and_wait(goal,rospy.Duration(10),rospy.Duration(10))
         client.wait_for_result()

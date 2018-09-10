@@ -1,6 +1,7 @@
 # Define the goal
 string fastening_tool_name
 uint32 speed
+string direction
 ---
 # Define the result
 bool control_result
