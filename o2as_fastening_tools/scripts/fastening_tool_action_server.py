@@ -55,6 +55,14 @@ class FasteningToolController(object):
         rospy.wait_for_service('dynamixel_write_command')
         rospy.wait_for_service('dynamixel_read_state')
 
+        if goal.direction == "CW" :
+            goal.speed = 1024 + goal.speed
+            if goal.speed > 2047 :
+                goal.speed = 2047
+        elif goal.direction == "CCW" :
+            if goal.speed > 1023 :
+                goal.speed = 1023
+
         self._result.control_result = True
 
         if (goal.fastening_tool_name in self.fastening_tools) == False :
@@ -81,16 +89,36 @@ class FasteningToolController(object):
                 self._result.control_result = False
                 break
 
-            current_speed = self.get_present_speed(motor_id)
-            if current_speed == -1 :
+            first_speed = self.get_present_speed(motor_id)
+
+            while first_speed > 1023 :
+                first_speed = self.get_present_speed(motor_id)
+
+            if first_speed == -1 :
                 self._result.control_result = False
                 self._as.set_succeeded(self._result)
-                return
+                return 
+            
+            current_speed = first_speed
+
+            rospy.sleep(0.1)
+
+            second_speed = 9999
+            while second_speed > 1023 :
+                second_speed = self.get_present_speed(motor_id)
+
+            if second_speed == -1 :
+                self._result.control_result = False
+                self._as.set_succeeded(self._result)
+                return 
+
+            if first_speed <= 0 and second_speed <=0:
+                current_speed = 0
+            elif second_speed > 0 :
+                current_speed = second_speed
 
             self._feedback.motor_speed = current_speed
             self._as.publish_feedback(self._feedback)
-            # print('%d' %current_speed)
-            rospy.sleep(0.5)
 
         if not self.set_moving_speed(motor_id, 0) :
             self._result.control_result = False
