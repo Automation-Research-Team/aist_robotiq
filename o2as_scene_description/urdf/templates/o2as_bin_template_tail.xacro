@@ -1,16 +1,2 @@
-
-  <!-- A row of tray -->
-  <xacro:property name="set3_x" value="${-(bin1_length/2+tray_length/2)}" />
-  <xacro:property name="set3_y" value="${.32-tray_width/2}" />
-  <xacro:property name="set3_z" value=".007" />
-
-  <!-- set3_tray_1 -->
-  <xacro:kitting_tray trayname="set3_tray_1" parent="workspace_center">
-    <origin xyz="${set3_x} ${set3_y} ${set3_z}" rpy="0 0 0" />
-  </xacro:kitting_tray>
-  <!-- set3_tray_2 -->
-  <xacro:kitting_tray trayname="set3_tray_2" parent="workspace_center">
-    <origin xyz="${set3_x} ${set3_y-tray_width} ${set3_z}" rpy="0 0 0" />
-  </xacro:kitting_tray>
   
 </robot>

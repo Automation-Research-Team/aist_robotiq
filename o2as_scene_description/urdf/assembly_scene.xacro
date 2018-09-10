@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kitting_scene">
-  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_bins.xacro" />
-  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray.xacro" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray_with_partitions.xacro" />
 
   <!-- Insert: -->
   <xacro:kitting_tray1 trayname="tray_1" parent="workspace_center">
