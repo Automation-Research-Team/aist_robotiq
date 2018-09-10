@@ -36,16 +36,17 @@
   <joint name="rack_trays_joint" type="fixed">
     <parent link="workspace_center" />
     <child link="rack_trays_center"/>
+    <origin xyz="-.13 0 0.015" rpy="0 0 0"/>
   </joint>
 
   <!-- add trays -->
   <xacro:property name="set3_x" value="${-tray_length-.05}" />
   <xacro:property name="set3_y" value="0" />
   <xacro:property name="set3_z" value="0.015" />
-  <xacro:kitting_tray1 trayname="set3_tray_1" parent="rack_trays_center">
+  <xacro:kitting_tray1 trayname="set3_tray_1" parent="workspace_center">
     <origin xyz="${set3_x} ${set3_y} ${set3_z}" rpy="0 0 0" />
   </xacro:kitting_tray1>
-  <xacro:kitting_tray2 trayname="set3_tray_2" parent="rack_trays_center">
+  <xacro:kitting_tray2 trayname="set3_tray_2" parent="workspace_center">
     <origin xyz="${set3_x} ${set3_y-tray_width} ${set3_z}" rpy="0 0 0" />
   </xacro:kitting_tray2>
   

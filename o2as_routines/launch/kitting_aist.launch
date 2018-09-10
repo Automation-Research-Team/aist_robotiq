@@ -1,6 +1,9 @@
 <launch>
-  <arg name="kitting_item_list_filename" default="$(find kitting_list_loader)/config/kitting_item_list.yaml"/>
-  <rosparam command="load" file="$(arg kitting_item_list_filename)"/>
+  <rosparam command="load" file="$(find o2as_routines)/config/kitting_item_list.yaml"/>
+  <rosparam command="load" file="$(find o2as_routines)/config/kitting_gripper_list.yaml" />
+  <rosparam command="load" file="$(find o2as_routines)/config/kitting_part_bin_list.yaml" />
+  <rosparam command="load" file="$(find o2as_routines)/config/kitting_tray_list.yaml" />
+
 
   <include file="$(find o2as_aist_config)/launch/demo.launch" />
   <node name="o2as_skill_server" pkg="o2as_skills" type="o2as_skill_server" output="screen"/>
