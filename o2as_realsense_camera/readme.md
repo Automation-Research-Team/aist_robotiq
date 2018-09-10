@@ -19,7 +19,3 @@ point cloud data is saved to the file with name fcloud_filename
 color image data is saved to the file with name image_filename
 
 # ToDo
-
-- Add service to get color image
-- Add service to get depth image 
-- Add service to get point cloud
