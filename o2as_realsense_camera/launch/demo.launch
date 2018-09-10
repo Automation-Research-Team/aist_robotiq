@@ -12,9 +12,9 @@
         <arg name="node_name" value="$(arg camera_name)"/>
         <arg name="serial_number" value="$(arg serial_number)"/>
         <arg name="trigger_mode" value="true"/>
-        <arg name="send_color" value="false"/>
-        <arg name="send_depth" value="false"/>
-        <arg name="send_cloud" value="false"/>
+        <arg name="send_color" value="true"/>
+        <arg name="send_depth" value="true"/>
+        <arg name="send_cloud" value="true"/>
     </include>
 
     <node name="camera_client" pkg="o2as_realsense_camera" type="demo.py" output="screen">
