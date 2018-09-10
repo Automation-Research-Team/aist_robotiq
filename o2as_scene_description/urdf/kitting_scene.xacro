@@ -4,6 +4,8 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_bins.xacro" />
   <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray_with_partitions.xacro" />
   <xacro:include filename="$(find realsense2_camera)/urdf/_d435.urdf.xacro" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro"/>
+
 
   <!-- spawn and attach dual suction grippers -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro" />
@@ -26,11 +28,21 @@
   </xacro:sensor_d435>
   <!-- TODO: Deal with this camera? -->
 
-  <!-- A row of tray -->
+  <!-- add tray rack -->
+  <xacro:o2as_box boxname="rack_trays" box_w="0.21" box_l="0.60" box_h=".015" parent="workspace_center">
+    <origin xyz="-.26 -0.3 0" rpy="0 0 0" />   
+  </xacro:o2as_box>
+  <link name="rack_trays_center" />
+  <joint name="rack_trays_joint" type="fixed">
+    <parent link="workspace_center" />
+    <child link="rack_trays_center"/>
+    <origin xyz="-.13 0 0.015" rpy="0 0 0"/>
+  </joint>
+
+  <!-- add trays -->
   <xacro:property name="set3_x" value="${-tray_length-.05}" />
   <xacro:property name="set3_y" value="0" />
-  <xacro:property name="set3_z" value="0" />
-
+  <xacro:property name="set3_z" value="0.015" />
   <xacro:kitting_tray1 trayname="set3_tray_1" parent="workspace_center">
     <origin xyz="${set3_x} ${set3_y} ${set3_z}" rpy="0 0 0" />
   </xacro:kitting_tray1>

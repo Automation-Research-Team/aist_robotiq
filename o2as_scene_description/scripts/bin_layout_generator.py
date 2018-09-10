@@ -2,6 +2,7 @@
 import csv
 import os
 import sys
+import yaml
 
 import rospy
 import rospkg
@@ -187,6 +188,20 @@ def read_csv_and_calc_bins_positions(directory):
     set_list=calc_position_of_bins(set_list,bin_definition)
     return set_list,bin_definition
 
+def make_pair_part_bin(set_list):
+    pairs = dict()
+    pairs["part_bin_list"] = dict()
+
+    for s in set_list:
+        for i in range(len(s.bins)):
+            pairs["part_bin_list"][s.bins[i].parts_name] = s.bins[i].bin_name
+    
+    return pairs
+
+def write_pair_part_bin(outfilepath, set_list):
+    with open(outfilepath, 'w') as outfile:
+        yaml.dump(set_list, outfile)
+
 def main():
     os.chdir('../')
     directory=os.getcwd()
@@ -194,6 +209,10 @@ def main():
     set_list,bin_definition=read_csv_and_calc_bins_positions(directory) 
     outfile = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf", 'kitting_bins.xacro'),'w+')
     write_file(outfile,directory,set_list,bin_definition)
+
+    # Make ros parameter file
+    pairs = make_pair_part_bin(set_list)
+    write_pair_part_bin(os.path.join(rp.get_path("o2as_routines"), "config", 'kitting_part_bin_list.yaml'), pairs)
     
 if __name__ == "__main__":
     main()
