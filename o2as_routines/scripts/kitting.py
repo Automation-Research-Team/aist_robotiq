@@ -44,17 +44,17 @@ class KittingClass(O2ASBaseRoutines):
   def switch_suction(self, on=False):
     return self.suction(1, on)
 
-  def pick(self, robot_name, gripper_name, object_pose, speed_fast, speed_slow, approach_height=0.03):
+  def pick(self, robot_name, gripper_name, goal_pose, speed_fast, speed_slow, approach_height=0.03):
     
     if gripper_name=="suction":
       self.groups[robot_name].set_end_effector_link(robot_name + '_dual_suction_gripper_pad_link')
 
-    self.publish_marker(object_pose, "aist_vision_result")
+    self.publish_marker(goal_pose, "aist_vision_result")
     rospy.loginfo("Going above object to pick")
     self.go_to_check_point(robot_name, 'before_pick', speed_fast)
 
     approach_pose = geometry_msgs.msg.PoseStamped()
-    approach_pose = copy.deepcopy(object_pose)
+    approach_pose = copy.deepcopy(goal_pose)
     approach_pose.pose.position.z += approach_height
     approach_pose.pose.orientation.x = -0.5
     approach_pose.pose.orientation.y = 0.5
@@ -63,7 +63,7 @@ class KittingClass(O2ASBaseRoutines):
     self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast)
 
     rospy.loginfo("Moving down to object")
-    self.go_to_pose_goal(robot_name, object_pose, speed=speed_slow, high_precision=True)
+    self.go_to_pose_goal(robot_name, goal_pose, speed=speed_slow, high_precision=True)
     
     rospy.loginfo("Picking up on suction")
     # self.switch_suction(True)
@@ -74,7 +74,7 @@ class KittingClass(O2ASBaseRoutines):
     self.go_to_check_point(robot_name, 'after_pick', speed_fast)
 
 
-  def place(self, robot_name, gripper_name, object_pose, speed_fast, speed_slow, approach_height=0.05):
+  def place(self, robot_name, gripper_name, goal_pose, speed_fast, speed_slow, approach_height=0.05):
 
     if gripper_name=="suction":
       self.groups[robot_name].set_end_effector_link(robot_name + '_dual_suction_gripper_pad_link')
@@ -82,7 +82,7 @@ class KittingClass(O2ASBaseRoutines):
     self.go_to_check_point(robot_name, 'before_place', speed_fast)
 
     approach_pose = geometry_msgs.msg.PoseStamped()
-    approach_pose = copy.deepcopy(object_pose)
+    approach_pose = copy.deepcopy(goal_pose)
     approach_pose.pose.position.z += approach_height
     approach_pose.pose.orientation.x = -0.5
     approach_pose.pose.orientation.y = 0.5
@@ -91,7 +91,7 @@ class KittingClass(O2ASBaseRoutines):
     self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast)
 
     rospy.loginfo("Moving down to object")
-    self.go_to_pose_goal(robot_name, object_pose, speed=speed_slow, high_precision=True)
+    self.go_to_pose_goal(robot_name, goal_pose, speed=speed_slow, high_precision=True)
     rospy.loginfo("Place down from suction")
     # self.switch_suction(False)
     rospy.sleep(2)
