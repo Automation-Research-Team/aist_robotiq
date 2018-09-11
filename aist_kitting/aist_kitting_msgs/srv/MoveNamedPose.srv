@@ -1,5 +1,0 @@
-string robot_name
-string ee_link_name
-string named_pose
----
-bool success
