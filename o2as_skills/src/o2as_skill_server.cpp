@@ -1669,50 +1669,66 @@ int main(int argc, char **argv)
     // ----
     int c;    
 
-    moveit_msgs::CollisionObject tool = ss.screw_tool_m4;
-    tool.header.frame_id = "b_bot_robotiq_85_tip_link";
-    tool.id = "screw_tool_m4";
-    tool.primitives.resize(1);
-    tool.primitive_poses.resize(1);
-    tool.primitives[0].type = tool.primitives[0].BOX;
-    tool.primitives[0].dimensions.resize(3);
-    tool.primitives[0].dimensions[0] = 0.02;
-    tool.primitives[0].dimensions[1] = 0.05;
-    tool.primitives[0].dimensions[2] = 0.1;
-    tool.primitive_poses[0].position.x = 0.02;
-    tool.primitive_poses[0].position.y = 0.05;
-    tool.primitive_poses[0].position.z = 0.1;
-    tool.named_frames.resize(1);
-    tool.frame_names.resize(1);
-    tool.named_frames[0].position.z = -.1;
-    tool.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(90.0/180.0 *M_PI));
-    tool.frame_names[0] = "screw_tool_m4_tip";
+    moveit_msgs::CollisionObject box;
+    box.header.frame_id = "b_bot_robotiq_85_tip_link";
+    box.id = "box";
+    box.primitives.resize(1);
+    box.primitive_poses.resize(1);
+    box.primitives[0].type = box.primitives[0].BOX;
+    box.primitives[0].dimensions.resize(3);
+    box.primitives[0].dimensions[0] = 0.02;
+    box.primitives[0].dimensions[1] = 0.05;
+    box.primitives[0].dimensions[2] = 0.1;
+    box.named_frames.resize(3);
+    box.frame_names.resize(3);
+    box.named_frames[0].position.z = -.05;
+    box.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(90.0/180.0 *M_PI));
+    box.frame_names[0] = "box_bottom";
+    box.named_frames[1].position.x = -.01;
+    box.named_frames[1].position.y = -.025;
+    box.named_frames[1].position.z = -.05;
+    box.named_frames[1].orientation.w = 1.0;
+    box.frame_names[1] = "box_corner_1";
+    box.named_frames[2].position.x = -.01;
+    box.named_frames[2].position.y = .025;
+    box.named_frames[2].position.z = -.05;
+    box.named_frames[2].orientation.w = 1.0;
+    box.frame_names[2] = "box_corner_2";
 
-    moveit_msgs::CollisionObject screw;
-    screw.header.frame_id = "b_bot_robotiq_85_tip_link";
-    screw.id = "screw_m4";
-    screw.primitives.resize(1);
-    screw.primitive_poses.resize(1);
-    screw.primitives[0].type = tool.primitives[0].CYLINDER;
-    screw.primitives[0].dimensions.resize(2);
-    screw.primitives[0].dimensions[0] = 0.015; // height (along x)
-    screw.primitives[0].dimensions[1] = 0.005; // radius
-    screw.primitive_poses[0].position.x = 0.0;
-    screw.primitive_poses[0].position.y = 0.0;
-    screw.primitive_poses[0].position.z = -0.01;
-    screw.named_frames.resize(1);
-    screw.frame_names.resize(1);
-    screw.named_frames[0].position.z = -.03;
-    screw.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, (90.0/180.0 *M_PI), 0);
-    screw.frame_names[0] = "screw_m4_tip";
+    moveit_msgs::CollisionObject cylinder;
+    cylinder.header.frame_id = "b_bot_robotiq_85_tip_link";
+    cylinder.id = "cylinder";
+    cylinder.primitives.resize(1);
+    cylinder.primitive_poses.resize(1);
+    cylinder.primitives[0].type = box.primitives[0].CYLINDER;
+    cylinder.primitives[0].dimensions.resize(2);
+    cylinder.primitives[0].dimensions[0] = 0.04; // height (along x)
+    cylinder.primitives[0].dimensions[1] = 0.005; // radius
+    cylinder.primitive_poses[0].position.x = 0.0;
+    cylinder.primitive_poses[0].position.y = -0.05;
+    cylinder.primitive_poses[0].position.z = 0.0;
+    cylinder.named_frames.resize(1);
+    cylinder.frame_names.resize(1);
+    cylinder.named_frames[0].position.y = -.05;
+    cylinder.named_frames[0].position.z = -.02;
+    box.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(90.0/180.0 *M_PI));
+    cylinder.frame_names[0] = "cylinder_tip";
 
-    geometry_msgs::PoseStamped ps;
+    geometry_msgs::PoseStamped ps, ps_0;
     ps = makePoseStamped();
-    ps.header.frame_id = "workspace_center";
+    ps.header.frame_id = "b_bot_base";
+    ps.pose.position.y = -.5;
     ps.pose.position.z = .3;
     ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, (90.0/180.0 *M_PI), 0);
+    // ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, (90.0/180.0 *M_PI), 0);
+    ps_0 = makePoseStamped();
 
-    ROS_INFO("Press key to start test stuff. \n0 to exit. \n1 to spawn tool and screw. \n11 to spawn another thing. \n2 to connect them. \n3 to attach tool to the gripper \n33 to attach screw to the gripper \n333 to attach tool to the gripper while specifying all its data again \n4 to reset scene \n5 to move to center with EE \n6 with screw_tool_m4 \n7 with screw_tool_m4_tip \n8 with screw_m4. \n9 with screw_m4_tip \n10 to move home.");
+    ROS_INFO("Press key to start test stuff. \n0 to exit. \n1 to spawn box and cylinder. \n11 to spawn another thing. "
+            "\n2 to attach box to the gripper \n22 to attach cylinder to the gripper "
+            "\n222 to attach box to the gripper while specifying all its data again \n3 to reset scene "
+            "\n4 to move to example point with EE \n5 with box \n6 with box_bottom \n7 with cylinder. "
+            "\n8 with cylinder_tip \n9 to move cylinder tip to box bottom \n10 to move home. "
+            "\n101-104 to move gripper to: 101 box center, 102 cylinder center, 103 box bottom, 104 cylinder tip");
     std::cin >> c;
     if (c == 0)
     {
@@ -1720,20 +1736,20 @@ int main(int argc, char **argv)
     }
     if (c == 1)
     {
-      ROS_INFO_STREAM("Spawning test tool and screw.");
+      ROS_INFO_STREAM("Spawning test box and cylinder.");
       moveit_msgs::CollisionObject co;
-      co = tool;
+      co = box;
       co.operation = moveit_msgs::CollisionObject::ADD;
       ss.planning_scene_interface_.applyCollisionObject(co);
-      co = screw;
+      co = cylinder;
       co.operation = moveit_msgs::CollisionObject::ADD;
       ss.planning_scene_interface_.applyCollisionObject(co);
     }
     if (c == 11)
     {
-      ROS_INFO_STREAM("Spawning another test object.");
+      ROS_INFO_STREAM("Spawning another test cylinder.");
       moveit_msgs::CollisionObject co;
-      co = screw;
+      co = cylinder;
       co.id = "test_obj";
       co.primitive_poses[0].position.x = .05;
       co.operation = moveit_msgs::CollisionObject::ADD;
@@ -1741,101 +1757,118 @@ int main(int argc, char **argv)
     }
     if (c == 2)
     {
-      ROS_INFO_STREAM("Connecting test tool and screw via updating tool's connected object list.");
-      moveit_msgs::CollisionObject co;
-      co = tool;
-      co.connected_objects.resize(1);
-      co.connected_objects[0] = "screw_m4";
-      co.operation = moveit_msgs::CollisionObject::ADD;
-      ss.planning_scene_interface_.applyCollisionObject(co);
+      moveit_msgs::AttachedCollisionObject att_coll_object;
+      att_coll_object.object.id = "box";
+      att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
+      att_coll_object.object.operation = att_coll_object.object.ADD;
+      ROS_INFO_STREAM("Attaching test box.");
+      ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);
+    }
+    if (c == 22)
+    {
+      moveit_msgs::AttachedCollisionObject att_coll_object;
+      att_coll_object.object.id = "cylinder";
+      att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
+      att_coll_object.object.operation = att_coll_object.object.ADD;
+      ROS_INFO_STREAM("Attaching cylinder.");
+      ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);
+    }
+    if (c == 222)
+    {
+      moveit_msgs::AttachedCollisionObject att_coll_object;
+      att_coll_object.object = box;
+      att_coll_object.object.id = "box";
+      att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
+      att_coll_object.object.operation = att_coll_object.object.ADD;
+      ROS_INFO_STREAM("Attaching test box WITH NAMED FRAMES.");
+      ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);
     }
     if (c == 3)
     {
+      ROS_INFO_STREAM("Removing box and cylinder.");
       moveit_msgs::AttachedCollisionObject att_coll_object;
-      att_coll_object.object.id = "screw_tool_m4";
-      att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
-      att_coll_object.object.operation = att_coll_object.object.ADD;
-      ROS_INFO_STREAM("Attaching test tool.");
-      ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);
-    }
-    if (c == 33)
-    {
-      moveit_msgs::AttachedCollisionObject att_coll_object;
-      att_coll_object.object.id = "screw_m4";
-      att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
-      att_coll_object.object.operation = att_coll_object.object.ADD;
-      ROS_INFO_STREAM("Attaching screw.");
-      ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);
-    }
-    if (c == 333)
-    {
-      moveit_msgs::AttachedCollisionObject att_coll_object;
-      att_coll_object.object = tool;
-      att_coll_object.object.id = "screw_tool_m4";
-      att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
-      att_coll_object.object.operation = att_coll_object.object.ADD;
-      ROS_INFO_STREAM("Attaching test tool WITH NAMED FRAMES.");
-      ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);
-    }
-    if (c == 4)
-    {
-      ROS_INFO_STREAM("Removing tool and screw.");
-      moveit_msgs::AttachedCollisionObject att_coll_object;
-      att_coll_object.object = tool;
+      att_coll_object.object = box;
       att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
       att_coll_object.object.operation = att_coll_object.object.REMOVE;
       try {ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);}
       catch (std::exception exc) {;}
-      att_coll_object.object = screw;
+      att_coll_object.object = cylinder;
       att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
       att_coll_object.object.operation = att_coll_object.object.REMOVE;
       try {ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);}
       catch (std::exception exc) {;}
 
       moveit_msgs::CollisionObject co;
-      co = tool;
+      co = box;
       co.operation = moveit_msgs::CollisionObject::REMOVE;
       try {ss.planning_scene_interface_.applyCollisionObject(co);}
       catch (std::exception exc) {;}
-      co = screw;
+      co = cylinder;
       co.operation = moveit_msgs::CollisionObject::REMOVE;
       try {ss.planning_scene_interface_.applyCollisionObject(co);}
       catch (std::exception exc) {;}
     }
-    if (c == 5)
+    if (c == 4)
     {
       ss.moveToCartPosePTP(ps, "b_bot", true, "", 1.0);
     }
+    if (c == 5)
+    {
+      ss.moveToCartPosePTP(ps, "b_bot", true, "box", 1.0);
+    }
     if (c == 6)
     {
-      ss.moveToCartPosePTP(ps, "b_bot", true, "screw_tool_m4", 1.0);
+      ss.moveToCartPosePTP(ps, "b_bot", true, "box_bottom", 1.0);
     }
     if (c == 7)
     {
-      ss.moveToCartPosePTP(ps, "b_bot", true, "screw_tool_m4_tip", 1.0);
+      ss.moveToCartPosePTP(ps, "b_bot", true, "cylinder", 1.0);
     }
     if (c == 8)
     {
-      ss.moveToCartPosePTP(ps, "b_bot", true, "screw_m4", 1.0);
+      ss.moveToCartPosePTP(ps, "b_bot", true, "cylinder_tip", 1.0);
     }
     if (c == 9)
     {
-      ss.moveToCartPosePTP(ps, "b_bot", true, "screw_m4_tip", 1.0);
+      ps_0.header.frame_id = "box_bottom";
+      ps_0.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, (180.0/180.0 *M_PI), 0);
+      ps_0.pose.position.z = -0.01;
+      ss.publishMarker(ps_0, "pose");
+      ss.moveToCartPosePTP(ps_0, "b_bot", true, "cylinder_tip", 1.0);
+      ps_0.header.frame_id = "b_bot_base";
     }
     if (c == 10)
     {
       ss.goToNamedPose("home", "b_bot");
     }
-      // ss.equipScrewTool("b_bot", "screw_tool_m4");
-      
-
-    // robot_state::RobotState state(*ss.b_bot_group_.getCurrentState());
-    // state.getAttachedBodies(ab);
-    ROS_INFO_STREAM("T");
-    ss.b_bot_group_.getCurrentState()->getAttachedBodies(ab);
-    ROS_INFO_STREAM("Current state has " << ab.size() << " attached bodies.");
-
-  
+    if (c == 101)
+    {
+      ps_0.header.frame_id = "box";
+      ss.publishMarker(ps_0, "pose");
+      ss.moveToCartPosePTP(ps_0, "b_bot", true, "", 1.0);
+      ps_0.header.frame_id = "b_bot_base";
+    }
+    if (c == 102)
+    {
+      ps_0.header.frame_id = "cylinder";
+      ss.publishMarker(ps_0, "pose");
+      ss.moveToCartPosePTP(ps_0, "b_bot", true, "", 1.0);
+      ps_0.header.frame_id = "b_bot_base";
+    }
+    if (c == 103)
+    {
+      ps_0.header.frame_id = "cylinder_tip";
+      ss.publishMarker(ps_0, "pose");
+      ss.moveToCartPosePTP(ps_0, "b_bot", true, "", 1.0);
+      ps_0.header.frame_id = "b_bot_base";
+    }
+    if (c == 104)
+    {
+      ps_0.header.frame_id = "screw_tool_m4_tip";
+      ss.publishMarker(ps_0, "pose");
+      ss.moveToCartPosePTP(ps_0, "b_bot", true, "", 1.0);
+      ps_0.header.frame_id = "b_bot_base";
+    }
     ros::spinOnce();
   }
   while (ros::ok())
