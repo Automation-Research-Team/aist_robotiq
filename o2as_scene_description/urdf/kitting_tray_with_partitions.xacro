@@ -6,10 +6,8 @@
 
   <xacro:property name="tray_width" value=".300" />
   <xacro:property name="tray_length" value=".210" />
-  <!-- TODO: Please adjust the width and length so that the origin is at the corner of the tray (this is easier to calibrate later) -->
   <xacro:property name="mesh_offset_x" value="-.045" />
   <xacro:property name="mesh_offset_y" value=".045" />
-  <!-- TODO: Is this mesh centered? Where is the coordinate origin? Check the dividers too. -->
 
   <!-- ========== The basic tray, without partitions -->
   <xacro:macro name="kitting_tray" params="trayname parent *origin">

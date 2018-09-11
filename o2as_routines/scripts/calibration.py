@@ -249,12 +249,12 @@ class CalibrationClass(O2ASBaseRoutines):
 
   def assembly_calibration_base_plate(self):
     rospy.loginfo("============ Calibrating base plate for the assembly task. ============")
-    rospy.loginfo("b_bot gripper tip should be 5 mm above each corner of the plate.")
+    rospy.loginfo("c_bot gripper tip should be 5 mm above each corner of the plate.")
     poses = []
 
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.pose.orientation.w = 1.0
-    pose0.pose.position.x = -.005
+    pose0.pose.position.x = -.015
 
     pose1 = copy.deepcopy(pose0)
     pose1.header.frame_id = "assembled_assy_part_01_corner_1"
@@ -267,7 +267,7 @@ class CalibrationClass(O2ASBaseRoutines):
     
     poses = [pose1, pose2, pose3, pose4]
 
-    self.cycle_through_calibration_poses(poses, "b_bot", speed=0.3)
+    self.cycle_through_calibration_poses(poses, "c_bot", speed=0.3)
     return 
 
   def assembly_calibration_assembled_parts(self):
@@ -340,26 +340,6 @@ class CalibrationClass(O2ASBaseRoutines):
       self.go_to_pose_goal("c_bot", pose_c, speed=0.01)
       self.go_to_pose_goal("b_bot", pose_b, speed=0.01)
 
-    # rospy.loginfo("============ Press enter to go to 2 cm above next pose. ============")
-    # i = raw_input()
-    # if not rospy.is_shutdown():
-    #   pose_b.pose.position.x = -.3
-    #   pose_b.pose.position.y = .3
-    #   pose_b.pose.position.z = .02
-    #   pose_c.pose.position.x = -.1
-    #   pose_c.pose.position.y = 0.0
-    #   pose_c.pose.position.z = .02
-    #   self.go_to_pose_goal("c_bot", pose_c, speed=0.05)
-    #   self.go_to_pose_goal("b_bot", pose_b, speed=0.05)
-    
-    # rospy.loginfo("============ Press enter to go to .1 cm above the table. ============")
-    # i = raw_input()
-    # if not rospy.is_shutdown():
-    #   pose_b.pose.position.z = .001
-    #   pose_c.pose.position.z = .001
-    #   self.go_to_pose_goal("c_bot", pose_c, speed=0.01)
-    #   self.go_to_pose_goal("b_bot", pose_b, speed=0.01)
-
     rospy.loginfo("============ Press enter to go home. ============")
     raw_input()
     self.go_to_named_pose("home", "a_bot")
@@ -407,6 +387,51 @@ class CalibrationClass(O2ASBaseRoutines):
     self.go_to_named_pose("screw_ready", "b_bot")
     return
 
+  def parts_tray_tests(self):
+    rospy.loginfo("============ Going to parts tray positions with c_bot. ============")
+    self.go_to_named_pose("home", "c_bot")
+    poses = []
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.header.frame_id = "initial_assy_part_01"
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.position.z = .03
+
+    for i in range(6):
+      poses.append(copy.deepcopy(pose0))
+
+    poses[0].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    poses[0].pose.position.z = .0
+    poses[1].header.frame_id = "tray_2_screw_m3_5"
+    poses[1].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    poses[1].pose.position.z = .0
+    poses[2].header.frame_id = "tray_2_partition_4"
+    poses[3].header.frame_id = "tray_1_partition_1"
+    poses[4].header.frame_id = "tray_1_partition_2"
+    poses[5].header.frame_id = "tray_1_partition_5"
+
+    self.cycle_through_calibration_poses(poses, "c_bot", speed=0.3, go_home=True)
+    return
+  
+  def assembly_calibration_initial_plates(self):
+    rospy.loginfo("============ Going to above plate 2 and 3 with c_bot. ============")
+    self.go_to_named_pose("home", "c_bot")
+    poses = []
+
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.header.frame_id = "initial_assy_part_03"
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.position.x = .116
+    pose0.pose.position.z = .095
+    
+    for i in range(2):
+      poses.append(copy.deepcopy(pose0))
+
+    poses[1].header.frame_id = "initial_assy_part_02"
+    poses[1].pose.position.x = .07
+    poses[1].pose.position.z = .065
+
+    self.cycle_through_calibration_poses(poses, "c_bot", speed=0.3, go_home=True)
+    return
 
 if __name__ == '__main__':
   try:
@@ -416,35 +441,44 @@ if __name__ == '__main__':
       rospy.loginfo("============ Calibration procedures ============ ")
       rospy.loginfo("Enter a number to check calibrations for the following things: ")
       rospy.loginfo("1: The robots")
+      rospy.loginfo("11: Touch the table")
       rospy.loginfo("2: Taskboard")
-      rospy.loginfo("3: Taskboard extended fun tour")
-      rospy.loginfo("4: Placement mat (for the taskboard task)")
-      rospy.loginfo("5: a_bot gripper frame (rotate around EEF axis)")
-      rospy.loginfo("6: Assembly base plate")
-      rospy.loginfo("7: Assembly assembled parts")
-      rospy.loginfo("8: Touch the table")
-      rospy.loginfo("9: Screw tool tests")
+      rospy.loginfo("21: Taskboard extended fun tour")
+      rospy.loginfo("22: Placement mat (for the taskboard task)")
+      rospy.loginfo("23: a_bot gripper frame (rotate around EEF axis on taskboard)")
+      rospy.loginfo("3: TODO: Kitting bins")
+      rospy.loginfo("4: Parts tray tests (assembly/kitting)")
+      rospy.loginfo("5: Assembly base plate")
+      rospy.loginfo("51: Assembly assembled parts")
+      rospy.loginfo("52: Assembly initial part locations (the plates)")
+      rospy.loginfo("6: TODO: Screw tool tests")
       rospy.loginfo("x: Exit ")
       rospy.loginfo(" ")
       r = raw_input()
       if r == '1':
         c.check_robot_calibration()
+      elif r == '11':
+        c.touch_the_table()
       elif r == '2':
         c.taskboard_calibration()
-      elif r == '3':
+      elif r == '21':
         c.taskboard_calibration_extended()
-      elif r == '4':
+      elif r == '22':
         c.taskboard_calibration_mat()
-      elif r == '5':
+      elif r == '23':
         c.gripper_frame_calibration_mat()
-      elif r == '6':
+      elif r == '3':
+        rospy.loginfo("NOT YET IMPLEMENTED")
+      elif r == '4':
+        c.parts_tray_tests()
+      elif r == '5':
         c.assembly_calibration_base_plate()
-      elif r == '7':
+      elif r == '51':
         c.assembly_calibration_assembled_parts()
-      elif r == '8':
-        c.touch_the_table()
-      elif r == '9':
-        c.screw_tool_tests()
+      elif r == '52':
+        c.assembly_calibration_initial_plates()
+      elif r == '6':
+        c.screw_tool_tests()      
       elif r == 'x':
         break
       else:

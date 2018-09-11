@@ -93,7 +93,7 @@ class O2ASBaseRoutines(object):
     self.listener = tf.TransformListener()
 
     moveit_commander.roscpp_initialize(sys.argv)
-    rospy.init_node('assembly_example', anonymous=False, log_level=rospy.DEBUG)
+    rospy.init_node('assembly_example', anonymous=False)
 
     self.robots = moveit_commander.RobotCommander()
     self.groups = {"a_bot":moveit_commander.MoveGroupCommander("a_bot"),
