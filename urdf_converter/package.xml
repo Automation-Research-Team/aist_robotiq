@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>o2as_urdf_converter</name>
+  <name>urdf_converter</name>
   <version>0.0.0</version>
-  <description>The o2as_urdf_converter package</description>
+  <description>The urdf_converter package</description>
 
   <maintainer email="f.drigalski@sinicx.com">Felix von Drigalski</maintainer>
 

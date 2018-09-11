@@ -1,4 +1,4 @@
-#include "o2as_urdf_converter.h"
+#include "urdf_converter.h"
 
 int main(int argc, char** argv){
   ros::init(argc, argv, "my_urdf_converter");

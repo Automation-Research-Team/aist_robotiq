@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(o2as_urdf_converter)
+project(urdf_converter)
 
 ## Add support for C++11, supported in ROS Kinetic and newer
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
@@ -65,7 +65,7 @@ find_package(Eigen3 REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES o2as_urdf_converter
+#  LIBRARIES urdf_converter
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
@@ -80,7 +80,7 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS} ${EIGEN
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/o2as_urdf_converter.cpp
+#   src/${PROJECT_NAME}/urdf_converter.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -90,14 +90,14 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS} ${EIGEN
 
 ## Declare a C++ executable
 
-add_executable(o2as_urdf_converter src/o2as_urdf_converter.cpp)
-add_dependencies(o2as_urdf_converter
+add_executable(urdf_converter src/urdf_converter.cpp)
+add_dependencies(urdf_converter
 	${${PROJECT_NAME}_EXPORTED_TARGETS}
   	${catkin_EXPORTED_TARGETS}	
 )
-target_link_libraries(o2as_urdf_converter ${catkin_LIBRARIES})
+target_link_libraries(urdf_converter ${catkin_LIBRARIES})
 
-# catkin_install_python(PROGRAMS scripts/o2as_urdf_converter.py
+# catkin_install_python(PROGRAMS scripts/urdf_converter.py
 #                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ## Rename C++ executable without prefix
@@ -120,7 +120,7 @@ target_link_libraries(o2as_urdf_converter ${catkin_LIBRARIES})
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_o2as_examples.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_examples.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
