@@ -17,7 +17,85 @@ from o2as_usb_relay.srv import *
 
 from o2as_routines.base import O2ASBaseRoutines
 
-CroppedArea = namedtuple("CroppedArea", ["min_row, max_row, min_col, max_col"])
+CroppedArea = namedtuple("CroppedArea", ["min_row", "max_row", "min_col", "max_col"])
+
+part_poses_def = {
+  "part_4":
+  {
+    "position": geometry_msgs.msg.Point(0, 0, 0.02),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+  },
+  "part_5":
+  {
+    "position": geometry_msgs.msg.Point(0, 0, 0.02),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+  },
+  "part_6":
+  {
+    "position": geometry_msgs.msg.Point(0, 0, 0.02),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+  },
+  "part_7":
+  {
+    "position": geometry_msgs.msg.Point(0, 0, 0.02),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+  },
+  "part_8":
+  {
+    "position": geometry_msgs.msg.Point(0, 0, 0.02),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+  },
+  "part_9":
+  {
+    "position": geometry_msgs.msg.Point(0, 0, 0.02),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+  },
+  "part_10":
+  {
+    "position": geometry_msgs.msg.Point(0, 0, 0.02),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+  },
+  "part_11":
+  {
+    "position": geometry_msgs.msg.Point(0, 0, 0.02),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+  },
+  "part_12":
+  {
+    "position": geometry_msgs.msg.Point(0, 0, 0.02),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+  },
+  "part_13":
+  {
+    "position": geometry_msgs.msg.Point(0, 0, 0.02),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+  },
+  "part_14":
+  {
+    "position": geometry_msgs.msg.Point(0, 0, 0.02),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+  },
+  "part_15":
+  {
+    "position": geometry_msgs.msg.Point(0, 0, 0.02),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+  },
+  "part_16":
+  {
+    "position": geometry_msgs.msg.Point(0, 0, 0.02),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+  },
+  "part_17":
+  {
+    "position": geometry_msgs.msg.Point(0, 0, 0.02),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+  },
+  "part_18":
+  {
+    "position": geometry_msgs.msg.Point(0, 0, 0.02),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+  }
+}
 
 class KittingClass(O2ASBaseRoutines):
   """
@@ -66,6 +144,7 @@ class KittingClass(O2ASBaseRoutines):
     self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast)
 
     rospy.loginfo("Moving down to object")
+    goal_pose.pose.orientation = tf.transformations.quaternion_inverse(goal_pose.pose.orientation)
     self.go_to_pose_goal(robot_name, goal_pose, speed=speed_slow, high_precision=True)
     
     rospy.loginfo("Picking up on suction")
@@ -150,14 +229,7 @@ class KittingClass(O2ASBaseRoutines):
     self.groups[robot_name].set_end_effector_link(robot_name + '_dual_suction_gripper_pad_link')
 
     speed_fast = 1.0
-    speed_slow = 1.0    
-
-    object_pose = geometry_msgs.msg.PoseStamped()
-    object_pose.pose.position.z = 0.01
-    object_pose.pose.orientation.x = -0.5
-    object_pose.pose.orientation.y = 0.5
-    object_pose.pose.orientation.z = 0.5
-    object_pose.pose.orientation.w = 0.5
+    speed_slow = 1.0
 
     for set_num in range(1,4):
       item_list = rospy.get_param("/set_"+str(set_num))
@@ -166,12 +238,17 @@ class KittingClass(O2ASBaseRoutines):
 
     # TODO: insert vision system
       for item in item_list:
-        object_pose.header.frame_id = self.bin_id[item]
         if self.gripper_id[item] == "suction":
+          object_pose = geometry_msgs.msg.PoseStamped()
+          object_pose.header.frame_id = self.bin_id[item]
+          rospy.logdebug(object_pose.header.stamp)
+          object_pose.pose.position = copy.deepcopy(part_poses_def[item]["position"])
+          object_pose.pose.orientation = copy.deepcopy(part_poses_def[item]["orientation"])
           self.pick(robot_name, self.gripper_id[item], object_pose, speed_fast, speed_slow)
+
           place_pose = geometry_msgs.msg.PoseStamped()
           place_pose.header.frame_id = self.tray_id[item]
-          place_pose.pose.position.z = 0.01
+          place_pose.pose.position.z = part_poses_def[item]["position"].z + 0.01
           place_pose.pose.orientation.x = -0.5
           place_pose.pose.orientation.y = 0.5
           place_pose.pose.orientation.z = 0.5
