@@ -1,7 +1,0 @@
-int32 part_id
-string pcloud_filename
----
-bool success
-int32 result_num
-geometry_msgs/Point[] pos3D
-geometry_msgs/Point[] rot3D
