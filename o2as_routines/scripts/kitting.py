@@ -19,81 +19,92 @@ from o2as_routines.base import O2ASBaseRoutines
 
 CroppedArea = namedtuple("CroppedArea", ["min_row", "max_row", "min_col", "max_col"])
 
-part_poses_def = {
+part_poses_demo = {
   "part_4":
   {
-    "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    "position": geometry_msgs.msg.Point(0, 0, 0.07),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+    "goal_position": geometry_msgs.msg.Point(0, 0, 0.045),
+    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_5":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_6":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_7":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_8":
   {
-    "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    "position": geometry_msgs.msg.Point(0, 0, 0.025),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+    "goal_position": geometry_msgs.msg.Point(0, 0, 0.01),
+    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_9":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_10":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_11":
   {
-    "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    "position": geometry_msgs.msg.Point(0, 0, 0.04),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+    "goal_position": geometry_msgs.msg.Point(0, 0, 0.02),
+    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_12":
   {
-    "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    "position": geometry_msgs.msg.Point(0, 0, 0.009),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+    "goal_position": geometry_msgs.msg.Point(0, 0, 0.009),
+    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+    
   },
   "part_13":
   {
-    "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    "position": geometry_msgs.msg.Point(0, 0, 0.024),
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+    "goal_position": geometry_msgs.msg.Point(0, 0, 0.012),
+    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_14":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_15":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_16":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_17":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_18":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   }
 }
 
@@ -116,7 +127,7 @@ class KittingClass(O2ASBaseRoutines):
     # 
     
   def set_up_end_effector(self):
-    self.suction = rospy.ServiceProxy("o2as_usb_relay_server/set_power", SetPower)
+    self.suction = rospy.ServiceProxy("o2as_usb_relay/set_power", SetPower)
 
   ################ ----- Routines  
   ################ 
@@ -133,7 +144,6 @@ class KittingClass(O2ASBaseRoutines):
     self.publish_marker(goal_pose, "aist_vision_result")
     rospy.loginfo("Going above object to pick")
     self.go_to_check_point(robot_name, 'before_pick', speed_fast)
-
     approach_pose = geometry_msgs.msg.PoseStamped()
     approach_pose = copy.deepcopy(goal_pose)
     approach_pose.pose.position.z += approach_height
@@ -144,12 +154,10 @@ class KittingClass(O2ASBaseRoutines):
     self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast)
 
     rospy.loginfo("Moving down to object")
-    goal_pose.pose.orientation = tf.transformations.quaternion_inverse(goal_pose.pose.orientation)
     self.go_to_pose_goal(robot_name, goal_pose, speed=speed_slow, high_precision=True)
-    
     rospy.loginfo("Picking up on suction")
-    # self.switch_suction(True)
-    rospy.sleep(2)
+    self.switch_suction(True)
+    rospy.sleep(1)
 
     rospy.loginfo("Going back up")
     self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast)
@@ -175,8 +183,8 @@ class KittingClass(O2ASBaseRoutines):
     rospy.loginfo("Moving down to object")
     self.go_to_pose_goal(robot_name, goal_pose, speed=speed_slow, high_precision=True)
     rospy.loginfo("Place down from suction")
-    # self.switch_suction(False)
-    rospy.sleep(2)
+    self.switch_suction(False)
+    rospy.sleep(1)
 
     rospy.loginfo("Going back up")
     self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast)
@@ -229,31 +237,37 @@ class KittingClass(O2ASBaseRoutines):
     self.groups[robot_name].set_end_effector_link(robot_name + '_dual_suction_gripper_pad_link')
 
     speed_fast = 1.0
-    speed_slow = 1.0
+    speed_slow = 0.05
 
     for set_num in range(1,4):
       item_list = rospy.get_param("/set_"+str(set_num))
       rospy.loginfo(item_list)
       rospy.loginfo("kitintg set_"+str(set_num) +" started!")
 
-    # TODO: insert vision system
+      # TODO: insert vision system
       for item in item_list:
         if self.gripper_id[item] == "suction":
           object_pose = geometry_msgs.msg.PoseStamped()
           object_pose.header.frame_id = self.bin_id[item]
           rospy.logdebug(object_pose.header.stamp)
-          object_pose.pose.position = copy.deepcopy(part_poses_def[item]["position"])
-          object_pose.pose.orientation = copy.deepcopy(part_poses_def[item]["orientation"])
+          object_pose.pose.position = copy.deepcopy(part_poses_demo[item]["position"])
+          object_pose.pose.orientation = copy.deepcopy(part_poses_demo[item]["orientation"])
           self.pick(robot_name, self.gripper_id[item], object_pose, speed_fast, speed_slow)
 
           place_pose = geometry_msgs.msg.PoseStamped()
           place_pose.header.frame_id = self.tray_id[item]
-          place_pose.pose.position.z = part_poses_def[item]["position"].z + 0.01
-          place_pose.pose.orientation.x = -0.5
-          place_pose.pose.orientation.y = 0.5
-          place_pose.pose.orientation.z = 0.5
-          place_pose.pose.orientation.w = 0.5
+          place_pose.pose.position = copy.deepcopy(part_poses_demo[item]["goal_position"])
+          place_pose.pose.orientation = copy.deepcopy(part_poses_demo[item]["goal_orientation"])
           self.place(robot_name, self.gripper_id[item], place_pose, speed_fast, speed_slow)
+
+      print(" ____  _   _ ____  ____  _____ _   _ ____  ")
+      print("/ ___|| | | / ___||  _ \| ____| \ | |  _ \ ")
+      print("\___ \| | | \___ \| |_) |  _| |  \| | | | |")
+      print(" ___) | |_| |___) |  __/| |___| |\  | |_| |")
+      print("|____/ \___/|____/|_|   |_____|_| \_|____/ ")
+      print("                                           ")
+                                                                                
+      raw_input()
 
   def kitting_task(self):
     self.go_to_named_pose("home", "c_bot")
