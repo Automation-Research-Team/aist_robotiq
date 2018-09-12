@@ -302,7 +302,6 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   // Scale the trajectory. This is workaround to setting the VelocityScalingFactor. Copied from k-okada
   if (cartesian_success > 0.5)
   {
-    // Success
     moveit_msgs::RobotTrajectory scaled_trajectory = moveit_msgs::RobotTrajectory(trajectory);
     // Scaling (https://groups.google.com/forum/#!topic/moveit-users/MOoFxy2exT4)
     // The trajectory needs to be modified so it will include velocities as well.
@@ -315,11 +314,11 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
     // Fourth: compute computeTimeStamps
     bool success =
         iptp.computeTimeStamps(rt, velocity_scaling_factor, velocity_scaling_factor);  // The second value is actually acceleration
-    ROS_INFO("Computing time stamps for iptp scaling %s", success ? "SUCCEEDED" : "FAILED");
+    ROS_INFO_STREAM("Computing time stamps for iptp scaling with factor " << velocity_scaling_factor << " " << success ? "SUCCEEDED" : "FAILED");
     // Get RobotTrajectory_msg from RobotTrajectory
     rt.getRobotTrajectoryMsg(scaled_trajectory);
     // Fill in move_group_
-    myplan.trajectory_ = trajectory;
+    myplan.trajectory_ = scaled_trajectory;
   
     if (true) 
     {
@@ -1010,19 +1009,27 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
   }
 
   // Perform spiral motion
-  o2as_msgs::sendScriptToUR srv;
-  srv.request.program_id = "spiral_motion";
-  srv.request.robot_name = "b_bot";
-  srv.request.max_radius = .002;
-  srv.request.radius_increment = .001;
-  sendScriptToURClient_.call(srv);
-  if (srv.response.success == true)
+  if (use_real_robot_)
   {
-    ROS_INFO("Successfully called the service client to do spiral motion. Waiting for it to finish.");
-    waitForURProgram("/" + robot_name +"_controller");
+    o2as_msgs::sendScriptToUR srv;
+    srv.request.program_id = "spiral_motion";
+    srv.request.robot_name = "b_bot";
+    srv.request.max_radius = .002;
+    srv.request.radius_increment = .001;
+    sendScriptToURClient_.call(srv);
+    if (srv.response.success == true)
+    {
+      ROS_INFO("Successfully called the service client to do spiral motion. Waiting for it to finish.");
+      waitForURProgram("/" + robot_name +"_controller");
+    }
+    else
+      ROS_WARN("Could not call the service client to do spiral motion. Waiting for it to finish.");
   }
   else
-    ROS_WARN("Could not call the service client to do spiral motion. Waiting for it to finish.");
+  {
+    ROS_INFO("This is where the spiral motion would happen, but we currently only do it with the real robot.");
+    ros::Duration(7.0).sleep();
+  }
 
   ROS_INFO_STREAM("Moving back a bit slowly.");
   screw_head_pose.pose.position.x = -.01;
@@ -1204,6 +1211,11 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
 {
   ROS_INFO("pickAction was called");
   geometry_msgs::PoseStamped target_pose = goal->item_pose;
+  if (target_pose.header.frame_id == "")
+  {
+    ROS_ERROR("FIXME");
+    target_pose.header.frame_id = "world";
+  }
   target_pose = transform_pose_now(target_pose, "world", tflistener_);
 
   if ((robot_statuses_[goal->robot_name].carrying_tool == true) && (goal->tool_name != "screw_tool"))

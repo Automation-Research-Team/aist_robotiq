@@ -57,6 +57,8 @@ with open(extra_joint_filename, 'r') as f:
 # --- This is ignored for now
 
 # Write the macros
+if not os.path.exists(out_dir):
+    os.makedirs(out_dir)
 for part_num, partname in enumerate(partnames):
     print("Writing partname")
     macrofile = open(os.path.join(out_dir, partname+"_macro.urdf.xacro"),'w+')
