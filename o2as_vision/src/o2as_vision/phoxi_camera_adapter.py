@@ -29,7 +29,7 @@ class PhoXiCamera(object):
         if (res_trigger.success == False):
             rospy.logerr("Trigger frame request to the phoxi camera was failed.")
 
-        res_get_frame = self._get_frame(0)
+        res_get_frame = self._get_frame(0, False, False)
         if (res_get_frame.success == False):
             rospy.logerr("Get frame request to the phoxi camera was failed.")
 
