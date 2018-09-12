@@ -1,4 +1,3 @@
-bool dump                             # If true, stores the image and point cloud.
 bool publish                          # If true, publishes the point cloud over a ros topic
 ---
 sensor_msgs/Image color_image         # A synchronized color image.

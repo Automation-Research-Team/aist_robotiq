@@ -5,8 +5,8 @@
 
   <!-- phoxi -->
   <node name="phoxi" pkg="o2as_phoxi_camera" type="o2as_phoxi_camera" output="screen">
-    <param name="id" value="InstalledExamples-PhoXi-example(File3DCamera)"/>
-    <!-- <param name="id" value="2018-03-027-LC3"/> -->
+    <!-- <param name="id" value="InstalledExamples-PhoXi-example(File3DCamera)"/> -->
+    <param name="id" value="2018-03-027-LC3"/>
     <param name="trigger_mode" value="1"/>
   </node>
 
@@ -27,8 +27,8 @@
   
   <!-- object_id is defined in o2as_parts_description/config/assembly_parts_list.yaml -->
   <arg name="object_id" default="11"/>
-  <arg name="camera" default="b_bot_camera"/>
-  <!-- <arg name="camera" default="phoxi"/> -->
+  <!-- <arg name="camera" default="b_bot_camera"/> -->
+  <arg name="camera" default="phoxi"/>
   <node name="o2as_vision_demo" pkg="o2as_vision" type="cad_matching_demo.py" output="screen">
     <param name="object_id" type="string" value="$(arg object_id)"/>
     <param name="camera" type="string" value="$(arg camera)"/>

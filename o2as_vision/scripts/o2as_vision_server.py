@@ -111,11 +111,10 @@ class VisionServer(object):
     pcloud_filename = os.path.join(self._image_dir, req.camera + ".dat")
     image_filename = os.path.join(self._image_dir, req.camera + ".png")
     camera = self.get_camera(req.camera)
-    cloud, image = camera.get_frame()
-    rospy.logdebug("cloud" + str(cloud.fields) + ", " + str(cloud.point_step) + ", " + str(cloud.row_step))
+    camera.dump_frame(pcloud_filename, image_filename)
 
     # find object
-    response = self.find_objects(req.object_id, req.camera, "", "", cloud, image)
+    response = self.find_objects(req.object_id, req.camera, pcloud_filename, image_filename, "")
 
     # choose nearest object from expected position within tolerance
     # expected position should be specified with depth image frame of the camera

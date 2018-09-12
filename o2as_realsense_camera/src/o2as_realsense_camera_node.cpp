@@ -108,10 +108,6 @@ protected:
         ros::param::get("~depth_width", depth_width_);
         ros::param::get("~depth_height", depth_height_);
         ros::param::get("~camera_frame", camera_frame_);
-        ros::param::get("~camera_data_path", camera_data_path_);
-        ros::param::get("~color_image_filename", color_image_filename_);
-        ros::param::get("~depth_image_filename", depth_image_filename_);
-        ros::param::get("~point_cloud_filename", point_cloud_filename_);
         ros::param::get("~send_color", send_color_);
         ros::param::get("~send_depth", send_depth_);
         ros::param::get("~send_cloud", send_cloud_);
@@ -316,47 +312,12 @@ protected:
         return cloud;
     }
 
-    /// Conversion from depth image to point cloud using camera parameter
-    PointCloud::Ptr getPointCloud2(rs2::frame& depth_frame)
-    {
-        // realsense frame to cv image
-        int width  = depth_frame.as<rs2::video_frame>().get_width();
-        int height = depth_frame.as<rs2::video_frame>().get_height();
-        cv::Mat cv_depth_image = cv::Mat(height, width, CV_16SC1, const_cast<void*>(depth_frame.get_data()));
-
-        // cv image to point cloud
-        PointCloud::Ptr cloud(new PointCloud);
-        cloud->width    = width;
-        cloud->height   = height;
-        cloud->is_dense = true;
-        cloud->points.resize(width * height);
-        unsigned short *ptr_depth;
-
-        int pos = 0;
-        double proj_x, proj_y, depth;
-        const float max_depth = 1e+6f + 1.0f;
-        for (int y = 0; y < height; y++) {
-            ptr_depth = cv_depth_image.ptr<unsigned short>(y);
-            for (int x = 0; x < width; x++) {
-                proj_x = inv_param_[0] * (double)x + inv_param_[1] * (double)y + inv_param_[2];
-                proj_y = inv_param_[3] * (double)x + inv_param_[4] * (double)y + inv_param_[5];
-                depth  = depth_scale_  * (double)ptr_depth[x];
-                cloud->points[pos].x = (float)(proj_x * depth); 
-                cloud->points[pos].y = (float)(proj_y * depth);
-                cloud->points[pos].z = (float)depth;
-                pos++;
-            }
-        }
-        return cloud;
-    }
-
-    bool getFrame(bool dump = false, bool publish = false, 
+    bool getFrame(bool publish = false, 
         sensor_msgs::Image* color_image_msg = NULL, 
         sensor_msgs::Image* depth_image_msg = NULL, 
         sensor_msgs::PointCloud2* point_cloud_msg = NULL)
     {
         ROS_DEBUG_STREAM("getFrame"
-            << "dump: "         << dump          << ", "
             << "publish: "      << publish       << ", "
             << "trigger_mode: " << trigger_mode_ << ", "
             << "send_color: "   << send_color_   << ", "
@@ -376,14 +337,7 @@ protected:
         // get cv image
         getCvColorImage(color_frame, cv_color.image);
         getCvDepthImage(depth_frame, cv_depth.image);
-        // Note: getPointCloud and getPointCloud2 expected to have same result
-        //PointCloud::Ptr point_cloud = getPointCloud(depth_frame);
-        PointCloud::Ptr point_cloud = getPointCloud2(depth_frame);
-        
-        // store image and point cloud
-        if (dump) {
-            dumpFrame(cv_color.image, cv_depth.image, point_cloud);
-        }
+        PointCloud::Ptr point_cloud = getPointCloud(depth_frame);
         
         // to ros message
         if (color_image_msg!=NULL && send_color_==true) {
@@ -407,36 +361,7 @@ protected:
         o2as_realsense_camera::GetFrame::Request & req, 
         o2as_realsense_camera::GetFrame::Response & res) 
     {
-        return getFrame(req.dump, req.publish, &res.color_image, &res.depth_image, &res.point_cloud);
-    }
-
-    void dumpFrame(cv::Mat const & color_image, cv::Mat const & depth_image, PointCloud::Ptr point_cloud) {
-        // create path if it does not exist
-        boost::filesystem::path path(camera_data_path_);
-        if (!boost::filesystem::is_directory(path)) {
-            boost::filesystem::create_directory(camera_data_path_);
-        }
-
-        camera_data_path_;
-        std::string color_image_filename = camera_data_path_ + "/" + color_image_filename_;
-        std::string depth_image_filename = camera_data_path_ + "/" + depth_image_filename_;
-        std::string point_cloud_filename = camera_data_path_ + "/" + point_cloud_filename_;
-        cv::imwrite((char*)color_image_filename.c_str(), color_image);
-        cv::imwrite((char*)depth_image_filename.c_str(), depth_image);
-        pcl::io::savePCDFile((char*)point_cloud_filename.c_str(), *point_cloud);
-    }
-
-    bool dumpFrameCallback(
-        o2as_realsense_camera::DumpFrame::Request & req, 
-        o2as_realsense_camera::DumpFrame::Response & res) 
-    {
-        // path to the destination directory and file names are cached
-        camera_data_path_     = req.camera_data_path;
-        color_image_filename_ = req.color_image_filename;
-        depth_image_filename_ = req.depth_image_filename;
-        point_cloud_filename_ = req.point_cloud_filename;
-        getFrame(true, false);
-        return true;
+        return getFrame(req.publish, &res.color_image, &res.depth_image, &res.point_cloud);
     }
 
     inline void publishFrame(
@@ -460,7 +385,82 @@ protected:
         sensor_msgs::Image color_image_msg;
         sensor_msgs::Image depth_image_msg; 
         sensor_msgs::PointCloud2 point_cloud_msg;
-        getFrame(false, true, &color_image_msg, &depth_image_msg, &point_cloud_msg);
+        getFrame(true, &color_image_msg, &depth_image_msg, &point_cloud_msg);
+    }
+
+    /// Conversion from depth image to point cloud using camera parameter
+    float* getPointCloud2(cv::Mat& cv_depth_image)
+    {
+        int width  = cv_depth_image.cols;
+        int height = cv_depth_image.rows;
+        float *cloud = (float*)malloc(width * height * 3 * sizeof(float));
+        if (cloud == NULL) {
+            ROS_ERROR_STREAM("get point cloud : memory allocation error");
+            return NULL;
+        }
+
+        int pos = 0;
+        double proj_x, proj_y, depth;
+        const float max_depth = 1e+6f + 1.0f;
+        unsigned short *ptr_depth;
+        double scale = depth_scale_ * 1000; // in mm unit
+        for (int y = 0; y < height; y++) {
+            ptr_depth = cv_depth_image.ptr<unsigned short>(y);
+            for (int x = 0; x < width; x++) {
+                proj_x = inv_param_[0] * (double)x + inv_param_[1] * (double)y + inv_param_[2];
+                proj_y = inv_param_[3] * (double)x + inv_param_[4] * (double)y + inv_param_[5];
+                depth  = scale  * (double)ptr_depth[x];
+                cloud[pos  ] = (float)(proj_x * depth); 
+                cloud[pos+1] = (float)(proj_y * depth);
+                cloud[pos+2] = (float)depth;
+                pos += 3;
+            }
+        }
+        return cloud;
+    }
+
+    bool save_cloud_binary(const char* filename, int width, int height, float *cloud)
+    {
+        FILE *fout = fopen(filename, "wb");
+        if (fout == NULL) {
+            ROS_ERROR_STREAM("cannot open point cloud file - " << filename);
+            return false;
+        }
+        fwrite(cloud, sizeof(float), width * height * 3, fout);
+        fclose(fout);
+        return true;
+    }
+
+    bool dumpFrameCallback(
+        o2as_realsense_camera::DumpFrame::Request & req, 
+        o2as_realsense_camera::DumpFrame::Response & res) 
+    {
+        // get frame
+        rs2::frame color_frame, depth_frame;
+        getAlignedFrame(color_frame, depth_frame);
+
+        // save color image
+        if (!req.color_image_filename.empty()) {
+            cv::Mat cv_color_image;
+            getCvColorImage(color_frame, cv_color_image);
+            cv::imwrite((char*)req.color_image_filename.c_str(), cv_color_image);
+        }
+
+        // save depth image and point cloud
+        if (!req.depth_image_filename.empty() || !req.point_cloud_filename.empty()) {
+            cv::Mat cv_depth_image;
+            getCvDepthImage(depth_frame, cv_depth_image);
+            if (!req.depth_image_filename.empty()) {
+                cv::imwrite((char*)req.depth_image_filename.c_str(), cv_depth_image);
+            }
+            if (!req.point_cloud_filename.empty()) {
+                float* cloud = getPointCloud2(cv_depth_image);
+                save_cloud_binary((char*)req.point_cloud_filename.c_str(), cv_depth_image.cols, cv_depth_image.rows, cloud);
+                free(cloud);
+            }
+        }
+
+        return true;
     }
 
     //###################################################### 

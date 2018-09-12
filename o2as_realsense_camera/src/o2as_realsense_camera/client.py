@@ -22,5 +22,5 @@ class RealSenseCameraClient(object):
     def get_frame(self, dump=False, publish=False):
         return self._get_frame(dump, publish)
 
-    def dump_frame(self, path, color_image_filename, depth_image_filename, point_cloud_filename):
-        return self._dump_frame(path, color_image_filename, depth_image_filename, point_cloud_filename)
+    def dump_frame(self, color_image_filename, depth_image_filename, point_cloud_filename):
+        return self._dump_frame(color_image_filename, depth_image_filename, point_cloud_filename)
