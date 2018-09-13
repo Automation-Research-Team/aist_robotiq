@@ -1,5 +1,5 @@
-string camera_data_path        # The destination to save the image files
-string color_image_filename    # filename of the color image
-string depth_image_filename    # filename of the depth image
-string point_cloud_filename    # filename of the point cloud
+string point_cloud_filename   # filename of the point cloud
+string depth_image_filename   # filename of the depth image
+string color_image_filename   # filename of the color image
 ---
+bool success

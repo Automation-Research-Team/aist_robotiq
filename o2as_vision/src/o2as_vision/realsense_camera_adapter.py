@@ -10,9 +10,11 @@ class RealSenseCamera(object):
     def start(self):
         return True
 
+    def dump_frame(self, cloud_filename, image_filename):
+        return self._client.dump_frame(cloud_filename, "", image_filename)
+
     def get_frame(self):
-        resp = self._client.get_frame()
-        return resp.point_cloud, resp.color_image
+        return self._client.get_frame()
 
     def get_depth_image_frame(self):
         return self._name + "_depth_image_frame"

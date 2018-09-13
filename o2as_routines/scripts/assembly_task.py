@@ -12,7 +12,7 @@ import actionlib
 import o2as_msgs.msg
 
 from o2as_routines.base import O2ASBaseRoutines
-from o2as_routines.vision import VisionProxy
+from o2as_vision.client import VisionClient
 
 # THIS FILE IS A STUB, NOT WORKING
 class AssemblyRoutines(O2ASBaseRoutines):
@@ -30,7 +30,7 @@ class AssemblyRoutines(O2ASBaseRoutines):
 
 class AssemblyTask():
   def __init__(self):
-    self.vision = VisionProxy()
+    self.vision = VisionClient()
     self.routines = AssemblyRoutines()
 
   ################
