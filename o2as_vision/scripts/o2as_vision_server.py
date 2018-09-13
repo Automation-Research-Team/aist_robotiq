@@ -11,8 +11,9 @@ from numpy import linalg as LA
 import moveit_commander
 from o2as_vision.phoxi_camera_adapter import PhoXiCamera
 from o2as_vision.realsense_camera_adapter import RealSenseCamera
-from o2as_cad_matching.srv import FindObjects
+from o2as_cad_matching.srv import FindObjects, FindObjects2
 from o2as_msgs.srv import *
+from sensor_msgs.msg import Image
 
 def ros_service_proxy(service_name, service_type):
   proxy = None
@@ -49,6 +50,7 @@ class VisionServer(object):
 
       # The cad matching service 
       self.find_objects = ros_service_proxy("/cad_matching/find_objects", FindObjects)
+      self.find_objects2 = ros_service_proxy("/cad_matching/find_objects2", FindObjects2)
 
       # Init cameras
       self._cameras = dict()
@@ -101,6 +103,7 @@ class VisionServer(object):
     return objects[ix_closest]
 
   def find_object(self, req):
+    use_file = True
     rospy.logdebug("find object")
     rospy.logdebug("camera = %s", req.camera)
     rospy.logdebug("object_id = %s", req.object_id)
@@ -108,13 +111,15 @@ class VisionServer(object):
     rospy.logdebug("position_tolerance = %f", req.position_tolerance)
 
     # get image data from the camera
-    pcloud_filename = os.path.join(self._image_dir, req.camera + ".dat")
-    image_filename = os.path.join(self._image_dir, req.camera + ".png")
     camera = self.get_camera(req.camera)
-    camera.dump_frame(pcloud_filename, image_filename)
-
-    # find object
-    response = self.find_objects(req.object_id, req.camera, pcloud_filename, image_filename, "")
+    if use_file:
+      pcloud_filename = os.path.join(self._image_dir, req.camera + ".dat")
+      image_filename = os.path.join(self._image_dir, req.camera + ".png")
+      camera.dump_frame(pcloud_filename, image_filename)
+      response = self.find_objects(req.object_id, req.camera, pcloud_filename, image_filename, "")
+    else:
+      cloud, texture = camera.get_frame()
+      response = self.find_objects2(req.object_id, req.camera, cloud, texture, Image())
 
     # choose nearest object from expected position within tolerance
     # expected position should be specified with depth image frame of the camera

@@ -20,6 +20,7 @@ class PhoXiCamera(object):
         self._start_acquisition = ros_service_proxy(ns+'start_acquisition', Trigger)
         self._trigger_frame = ros_service_proxy(ns+'trigger_frame', Trigger)
         self._dump_frame = ros_service_proxy(ns+'dump_frame', DumpFrame)
+        self._get_frame = ros_service_proxy(ns+'get_frame', GetFrame)
     
     def start(self):
         return self._start_acquisition()
@@ -30,6 +31,14 @@ class PhoXiCamera(object):
             rospy.logerr("Trigger frame request to the phoxi camera was failed.")
 
         return self._dump_frame(cloud_filename, image_filename)
+
+    def get_frame(self):
+        res_trigger = self._trigger_frame()
+        if (res_trigger.success == False):
+            rospy.logerr("Trigger frame request to the phoxi camera was failed.")
+
+        res_get_frame = self._get_frame()
+        return res_get_frame.cloud, res_get_frame.texture
 
     def get_depth_image_frame(self):
         return "phoxi"        

@@ -19,8 +19,8 @@ class RealSenseCameraClient(object):
         self._get_frame = ros_service_proxy(ns+"get_frame", GetFrame)
         self._dump_frame = ros_service_proxy(ns+"dump_frame", DumpFrame)
 
-    def get_frame(self, dump=False, publish=False):
-        return self._get_frame(dump, publish)
+    def get_frame(self, publish=False):
+        return self._get_frame(publish)
 
     def dump_frame(self, color_image_filename, depth_image_filename, point_cloud_filename):
         return self._dump_frame(color_image_filename, depth_image_filename, point_cloud_filename)
