@@ -260,6 +260,7 @@ class KittingClass(O2ASBaseRoutines):
           place_pose.pose.orientation = copy.deepcopy(part_poses_demo[item]["goal_orientation"])
           self.place(robot_name, self.gripper_id[item], place_pose, speed_fast, speed_slow)
 
+
       print(" ____  _   _ ____  ____  _____ _   _ ____  ")
       print("/ ___|| | | / ___||  _ \| ____| \ | |  _ \ ")
       print("\___ \| | | \___ \| |_) |  _| |  \| | | | |")
@@ -268,17 +269,42 @@ class KittingClass(O2ASBaseRoutines):
       print("                                           ")
                                                                                 
       raw_input()
+  
+  def check_point_test(self):
+    robot_name = "b_bot"
+    self.groups[robot_name].set_end_effector_link(robot_name + '_dual_suction_gripper_pad_link')
+
+    speed_fast = 0.075
+    speed_slow = 0.05
+
+    self.go_to_named_pose("home", robot_name, speed_fast)
+
+    pose = geometry_msgs.msg.PoseStamped()
+    pose.header.frame_id = "world"
+    pose.pose.position.z = 0.84
+    pose.pose.orientation.x = -0.5
+    pose.pose.orientation.y = 0.5
+    pose.pose.orientation.z = 0.5
+    pose.pose.orientation.w = 0.5
+
+    self.publish_marker(pose, "aist_vision_result")
+    rospy.loginfo("Going above object to pick")
+    self.go_to_pose_goal(robot_name, pose, speed_fast)
+
+    robot_pose = self.groups[robot_name].get_current_pose()
+    print(robot_pose.header.frame_id)
+    print(robot_pose.pose.position)
 
   def kitting_task(self):
-    self.go_to_named_pose("home", "c_bot")
+    # self.go_to_named_pose("home", "c_bot")
     self.go_to_named_pose("home", "b_bot")
-    self.go_to_named_pose("home", "a_bot")
+    # self.go_to_named_pose("home", "a_bot")
 
     self.pick_and_place_demo()
 
-    self.go_to_named_pose("home", "c_bot")
+    # self.go_to_named_pose("home", "c_bot")
     self.go_to_named_pose("home", "b_bot")
-    self.go_to_named_pose("home", "a_bot")
+    # self.go_to_named_pose("home", "a_bot")
 
     # TODO
 
@@ -399,7 +425,8 @@ if __name__ == '__main__':
     kit = KittingClass()
     kit.set_up_item_parameters()
     
-    kit.kitting_task()
+    # kit.kitting_task()
+    kit.check_point_test()
 
     print "============ Done!"
   except rospy.ROSInterruptException:

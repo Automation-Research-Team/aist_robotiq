@@ -25,7 +25,7 @@
         <joint name="b_bot_wrist_1_joint" />
         <joint name="b_bot_wrist_2_joint" />
         <joint name="b_bot_wrist_3_joint" />
-        <chain base_link="b_bot_base_link" tip_link="b_bot_dual_suction_pad_link" />
+        <chain base_link="b_bot_base_link" tip_link="b_bot_dual_suction_gripper_pad_link" />
     </group>
     <group name="c_bot">
         <joint name="c_bot_shoulder_pan_joint" />
