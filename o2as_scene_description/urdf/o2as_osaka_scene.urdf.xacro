@@ -21,7 +21,7 @@
   <xacro:include filename="$(find realsense2_camera)/urdf/_d435.urdf.xacro" />
 
   <!-- robots -->
-  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/ur10.urdf.xacro" /> -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/ur10.urdf.xacro" />
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur5.urdf.xacro" />
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur3.urdf.xacro" />
 

@@ -358,6 +358,53 @@ class TaskboardClass(O2ASBaseRoutines):
     self.pick("b_bot", belt_pick_pose, grasp_height=.002,
                     speed_fast = 0.2, speed_slow = 0.02, gripper_command="close")
 
+  def precision(self, robotname, object_pose, grasp_height, object_place, place_height, approach_height = 0.05, speed_fast=0.2, speed_slow=0.02):
+    #grasp
+
+    rospy.loginfo("Going above object to pick")
+    object_pose.pose.position.z += approach_height
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
+    object_pose.pose.position.z -= approach_height
+
+    rospy.loginfo("Moving down to object")
+    rospy.loginfo(grasp_height)
+    object_pose.pose.position.z = grasp_height
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True)
+ 
+
+    W = raw_input("waiting for the gripper")
+    self.precision_gripper_outer_close()
+    self.precision_gripper_inner_close()
+
+    
+    rospy.loginfo("Going back up")
+    object_pose.pose.position.z += 0.2
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
+    object_pose.pose.position.z -= 0.2
+########################################
+    #place approach
+
+    #"Moving to place target
+
+    object_place.pose.position.z += approach_height
+    self.go_to_pose_goal(robotname, object_place, speed=speed_fast)  
+    object_place.pose.position.z -= approach_height
+
+    rospy.loginfo("Moving to place target")
+    object_place.pose.position.z = place_height
+    self.go_to_pose_goal(robotname, object_place, speed=speed_slow, high_precision=True)
+
+
+    print "============ Stopping at the placement height. Press `Enter` to keep moving moving the robot ..."
+    raw_input()
+    self.precision_gripper_outer_open()
+    self.precision_gripper_inner_open()
+
+    rospy.loginfo("Moving back up")
+    object_place.pose.position.z += 0.2
+    self.go_to_pose_goal(robotname, object_place, speed=speed_fast)  
+    object_place.pose.position.z -= 0.2
+
 
 
 if __name__ == '__main__':
@@ -382,7 +429,9 @@ if __name__ == '__main__':
     i = raw_input("Enter the number of the part to be performed: ")
     i =int(i)
     while(i):
-
+      if i == 111:
+        #taskboard.precision("a_bot", taskboard.pick_poses[3], taskboard.item_pick_heights[3]-0.012, taskboard.place_poses[3], taskboard.item_place_heights[3]-0.02)
+        taskboard.precision("a_bot", taskboard.pick_poses[3], taskboard.item_pick_heights[3]-0.026, taskboard.place_poses[3], taskboard.item_place_heights[3]-0.025)
       # Testing
       if i == 50:
         taskboard.go_to_pose_goal("a_bot",  taskboard.pick_poses[0], "b_bot", taskboard.pick_poses[2])

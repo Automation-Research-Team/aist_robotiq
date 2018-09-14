@@ -351,10 +351,11 @@ class O2ASBaseRoutines(object):
     try:
         goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
         goal.close_outer_gripper_fully = True
-        self.gripper_action_clients["c_bot"].send_goal(goal)
+        goal.open_outer_gripper_fully = False
+        self.gripper_action_clients["a_bot"].send_goal(goal)
         rospy.loginfo("close outer gripper")
-        self.gripper_action_clients["c_bot"].wait_for_result()
-        result = self.gripper_action_clients["c_bot"].get_result()
+        self.gripper_action_clients["a_bot"].wait_for_result()
+        result = self.gripper_action_clients["a_bot"].get_result()
         rospy.loginfo(result)
     except rospy.ROSInterruptException:
         rospy.loginfo("program interrupted before completion", file=sys.stderr)
@@ -365,10 +366,10 @@ class O2ASBaseRoutines(object):
         goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
         goal.open_outer_gripper_fully = True
         goal.close_outer_gripper_fully = False
-        self.gripper_action_clients["c_bot"].send_goal(goal)
+        self.gripper_action_clients["a_bot"].send_goal(goal)
         rospy.loginfo("open outer gripper")
-        self.gripper_action_clients["c_bot"].wait_for_result()
-        result = self.gripper_action_clients["c_bot"].get_result()
+        self.gripper_action_clients["a_bot"].wait_for_result()
+        result = self.gripper_action_clients["a_bot"].get_result()
         rospy.loginfo(result)
     except rospy.ROSInterruptException:
         rospy.loginfo("program interrupted before completion", file=sys.stderr)
@@ -378,10 +379,10 @@ class O2ASBaseRoutines(object):
         goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
         goal.close_inner_gripper_fully = True
         goal.this_action_grasps_an_object = this_action_grasps_an_object
-        self.gripper_action_clients["c_bot"].send_goal(goal)
+        self.gripper_action_clients["a_bot"].send_goal(goal)
         rospy.loginfo("Closing inner gripper")
-        self.gripper_action_clients["c_bot"].wait_for_result()
-        result = self.gripper_action_clients["c_bot"].get_result()
+        self.gripper_action_clients["a_bot"].wait_for_result()
+        result = self.gripper_action_clients["a_bot"].get_result()
         rospy.loginfo(result)
     except rospy.ROSInterruptException:
         rospy.loginfo("program interrupted before completion", file=sys.stderr)
@@ -393,10 +394,10 @@ class O2ASBaseRoutines(object):
         goal.open_inner_gripper_fully = True
         goal.close_inner_gripper_fully = False
         goal.this_action_grasps_an_object = this_action_grasps_an_object
-        self.gripper_action_clients["c_bot"].send_goal(goal)
+        self.gripper_action_clients["a_bot"].send_goal(goal)
         rospy.loginfo("Opening inner gripper")
-        self.gripper_action_clients["c_bot"].wait_for_result()
-        result = self.gripper_action_clients["c_bot"].get_result()
+        self.gripper_action_clients["a_bot"].wait_for_result()
+        result = self.gripper_action_clients["a_bot"].get_result()
         rospy.loginfo(result)
     except rospy.ROSInterruptException:
         rospy.loginfo("program interrupted before completion", file=sys.stderr)
