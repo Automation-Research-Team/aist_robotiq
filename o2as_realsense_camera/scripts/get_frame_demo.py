@@ -17,7 +17,7 @@ if __name__ == "__main__":
     
     try:
         while not rospy.is_shutdown():
-            resp = camera.get_frame(dump=False, publish=False)
+            resp = camera.get_frame(publish=False)
 
             # display captured frame
             if resp.color_image.width > 0 and resp.color_image.height > 0:

@@ -17,15 +17,10 @@
         <arg name="send_cloud" value="true"/>
     </include>
 
-    <node name="camera_client" pkg="o2as_realsense_camera" type="demo.py" output="screen">
+    <node name="get_frame_demo" pkg="o2as_realsense_camera" type="get_frame_demo.py" output="screen">
         <param name="camera_node_name" type="string" value="$(arg camera_name)"/>
-        <param name="camera_data_path" type="string" value="$(find o2as_realsense_camera)/image"/>
-        <param name="color_image_filename" type="string" value="color.png"/>
-        <param name="depth_image_filename" type="string" value="depth.png"/>
-        <param name="point_cloud_filename" type="string" value="cloud.pcd"/>
     </node>
 
     <node name="reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
-    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find o2as_realsense_camera)/rviz/pointcloud.rviz" required="true" /> -->
 
 </launch>
