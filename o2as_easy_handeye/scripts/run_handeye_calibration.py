@@ -105,24 +105,24 @@ posess = {
 }
 
 
-def get_service_proxy(service_name, base_name):
+def get_service_proxy(service_name, robot_name):
   """Return ROS service proxy"""
-  ns = "/o2as_easy_handeye_{}_eye_on_base/".format(base_name)
+  ns = "/o2as_easy_handeye_{}_eye_on_base/".format(robot_name)
 
   if service_name is "take_sample":
-    service_type = TakeSample
+    service_type      = TakeSample
     service_name_full = ns + "take_sample"
   elif service_name is "get_sample_list":
-    service_type = TakeSample
+    service_type      = TakeSample
     service_name_full = ns + "get_sample_list"
   elif service_name is "remove_sample":
-    service_type = RemoveSample
+    service_type      = RemoveSample
     service_name_full = ns + "remove_sample"
   elif service_name is "compute_calibration":
-    service_type = ComputeCalibration
+    service_type      = ComputeCalibration
     service_name_full = ns + "compute_calibration"
   elif service_name is "save_calibration":
-    service_type = Empty
+    service_type      = Empty
     service_name_full = ns + "save_calibration"
   else:
     raise NameError("Service name {} does not exist".format(service_name))
