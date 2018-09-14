@@ -11,7 +11,7 @@ from numpy import linalg as LA
 import moveit_commander
 from o2as_vision.phoxi_camera_adapter import PhoXiCamera
 from o2as_vision.realsense_camera_adapter import RealSenseCamera
-from o2as_cad_matching.srv import FindObjects, FindObjects2
+from o2as_cad_matching.client import *
 from o2as_msgs.srv import *
 from sensor_msgs.msg import Image
 
@@ -49,8 +49,7 @@ class VisionServer(object):
         self._parts_dict[object_id] = parts_info
 
       # The cad matching service 
-      self.find_objects = ros_service_proxy("/cad_matching/find_objects", FindObjects)
-      self.find_objects2 = ros_service_proxy("/cad_matching/find_objects2", FindObjects2)
+      self.cad_matching = CadMatchingClient()
 
       # Init cameras
       self._cameras = dict()
@@ -112,14 +111,17 @@ class VisionServer(object):
 
     # get image data from the camera
     camera = self.get_camera(req.camera)
+    self.cad_matching.select_camera(req.camera)
+    self.cad_matching.select_object(req.object_id)
+
     if use_file:
-      pcloud_filename = os.path.join(self._image_dir, req.camera + ".dat")
+      cloud_filename = os.path.join(self._image_dir, req.camera + ".dat")
       image_filename = os.path.join(self._image_dir, req.camera + ".png")
-      camera.dump_frame(pcloud_filename, image_filename)
-      response = self.find_objects(req.object_id, req.camera, pcloud_filename, image_filename, "")
+      camera.dump_frame(cloud_filename, image_filename)
+      response = self.cad_matching.search_objects(cloud_filename, image_filename, "")
     else:
       cloud, texture = camera.get_frame()
-      response = self.find_objects2(req.object_id, req.camera, cloud, texture, Image())
+      response = self.cad_matching.search_objects(cloud, texture, Image())
 
     # choose nearest object from expected position within tolerance
     # expected position should be specified with depth image frame of the camera
