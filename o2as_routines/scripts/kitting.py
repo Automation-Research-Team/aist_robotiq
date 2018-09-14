@@ -24,7 +24,7 @@ part_poses_demo = {
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.07),
     "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
-    "goal_position": geometry_msgs.msg.Point(0, 0, 0.045),
+    "goal_position": geometry_msgs.msg.Point(0, 0, 0.04),
     "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_5":
@@ -44,7 +44,7 @@ part_poses_demo = {
   },
   "part_8":
   {
-    "position": geometry_msgs.msg.Point(0, 0, 0.025),
+    "position": geometry_msgs.msg.Point(0, 0, 0.024),
     "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
     "goal_position": geometry_msgs.msg.Point(0, 0, 0.01),
     "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
@@ -61,7 +61,7 @@ part_poses_demo = {
   },
   "part_11":
   {
-    "position": geometry_msgs.msg.Point(0, 0, 0.04),
+    "position": geometry_msgs.msg.Point(0, 0, 0.037),
     "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
     "goal_position": geometry_msgs.msg.Point(0, 0, 0.02),
     "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
@@ -160,8 +160,8 @@ class KittingClass(O2ASBaseRoutines):
     rospy.sleep(1)
 
     rospy.loginfo("Going back up")
-    self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast)
-    self.go_to_check_point(robot_name, 'after_pick', speed_fast)
+    self.go_to_pose_goal(robot_name, approach_pose, speed=speed_slow)
+    self.go_to_check_point(robot_name, 'after_pick', speed_slow)
 
 
   def place(self, robot_name, gripper_name, goal_pose, speed_fast, speed_slow, approach_height=0.05):
@@ -169,7 +169,7 @@ class KittingClass(O2ASBaseRoutines):
     if gripper_name=="suction":
       self.groups[robot_name].set_end_effector_link(robot_name + '_dual_suction_gripper_pad_link')
 
-    self.go_to_check_point(robot_name, 'before_place', speed_fast)
+    self.go_to_check_point(robot_name, 'before_place', speed_slow)
 
     approach_pose = geometry_msgs.msg.PoseStamped()
     approach_pose = copy.deepcopy(goal_pose)
@@ -178,7 +178,7 @@ class KittingClass(O2ASBaseRoutines):
     approach_pose.pose.orientation.y = 0.5
     approach_pose.pose.orientation.z = 0.5
     approach_pose.pose.orientation.w = 0.5
-    self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast)
+    self.go_to_pose_goal(robot_name, approach_pose, speed=speed_slow)
 
     rospy.loginfo("Moving down to object")
     self.go_to_pose_goal(robot_name, goal_pose, speed=speed_slow, high_precision=True)
@@ -425,8 +425,8 @@ if __name__ == '__main__':
     kit = KittingClass()
     kit.set_up_item_parameters()
     
-    # kit.kitting_task()
-    kit.check_point_test()
+    kit.kitting_task()
+    # kit.check_point_test()
 
     print "============ Done!"
   except rospy.ROSInterruptException:
