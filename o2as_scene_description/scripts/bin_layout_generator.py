@@ -3,6 +3,7 @@ import csv
 import os
 import sys
 import yaml
+from operator import itemgetter
 
 import rospy
 import rospkg
@@ -140,6 +141,51 @@ def read_bin_layout(directory,set_origin):
                 set_number = set_number+1
         return set_list
 
+def read_order_list(directory, set_origin):
+    part_set = set()
+    with open(os.path.join(rp.get_path("o2as_scene_description"), "urdf/templates", "ExampleOfSetListFile.csv"), 'r') as f:
+        reader = csv.reader(f)
+        header = next(reader)
+        # [0, 1, 2, 3] = ["Set", "No.", "ID", "Name", "Note"]
+        for data in reader:
+            part_set.add("part_" + data[2])
+
+    part_bin_definition = dict()
+    with open(os.path.join(rp.get_path("o2as_scene_description"), "urdf/templates", "part_bin_definitions.csv"), 'r') as f:
+        reader = csv.reader(f)
+        header = next(reader)
+
+        for data in reader:
+            part_bin_definition[data[0]] = data[1]
+
+    part_bin_list = list()
+    for part in part_set:
+        part_bin_list.append([part, part_bin_definition[part]])
+
+    part_bin_list_sorted = sorted(part_bin_list, key=itemgetter(1), reverse=True)
+
+    sets = [part_bin_list_sorted[4::-1], part_bin_list_sorted[5:]]
+
+    set_number = 0
+    set_list = set_origin
+
+    for s in sets:
+        bin_num = 1
+        previous_bin_type = ''
+        for b in s:
+            if previous_bin_type == b[1]:
+                bin_num += 1
+            else:
+                bin_num = 1
+            parts_name = b[0]
+            bin_type = b[1]
+            bin_name = "set" + str(set_number+1) + "_" + b[1] + "_" + str(bin_num)
+            bin = Bin(parts_name, bin_type, bin_name)
+            set_list[set_number].add_bin(bin)
+            previous_bin_type = b[1]
+        set_number += 1
+    return set_list
+
 def read_bins_origin(directory):
     with open(os.path.join(rp.get_path("o2as_scene_description"), "urdf/templates", 'bins_origin.csv'), 'r') as f:
         reader = csv.reader(f)
@@ -183,7 +229,8 @@ def read_csv_and_calc_bins_positions(directory):
     #read csv files
     bin_definition=read_bin_definition(directory)
     set_origin=read_bins_origin(directory)
-    set_list=read_bin_layout(directory,set_origin)
+    # set_list=read_bin_layout(directory,set_origin)
+    set_list=read_order_list(directory,set_origin)
     #calc bins positions
     set_list=calc_position_of_bins(set_list,bin_definition)
     return set_list,bin_definition
