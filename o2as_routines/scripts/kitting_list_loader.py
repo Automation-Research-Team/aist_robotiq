@@ -3,6 +3,7 @@
 import os
 import csv
 import yaml
+from collections import OrderedDict
 
 import rospy
 import rospkg
@@ -12,7 +13,7 @@ rp = rospkg.RosPack()
 
 def main():
 
-    kitting_list = dict()
+    kitting_list = OrderedDict()
     
     with open(os.path.join(rp.get_path("o2as_routines"),"config", "ExampleOfSetListFile.csv"), 'r') as csvfile:
         reader = csv.reader(csvfile)
