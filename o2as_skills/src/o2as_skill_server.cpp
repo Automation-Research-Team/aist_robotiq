@@ -1335,17 +1335,19 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
   moveToCartPosePTP(handover_pose_picker, picker_robot_name);
   
   // Close the Receiver's gripper
-  closeGripper(goal->receiver_robot_name);
-  ros::Duration(1).sleep();
-  openGripper(goal->giver_robot_name);
+  
+  if(holder_robot_name != "a_bot")
+  {
+    closeGripper(goal->receiver_robot_name);
+    ros::Duration(1).sleep();
+    openGripper(goal->giver_robot_name);
 
-  // Move back.
-  ROS_INFO_STREAM("Moving receiver robot (" << picker_robot_name << ") back to approach pose.");
-  handover_pose_picker.pose.position.x = -gripper_distance_after_grasp;
-  moveToCartPosePTP(handover_pose_picker, picker_robot_name);
-
-  ROS_INFO("regraspAction is set as succeeded");
-  regraspActionServer_.setSucceeded();
+    // Move back.
+    ROS_INFO_STREAM("Moving receiver robot (" << picker_robot_name << ") back to approach pose.");
+    handover_pose_picker.pose.position.x = -gripper_distance_after_grasp;
+    ROS_INFO("regraspAction is set as succeeded");
+    regraspActionServer_.setSucceeded();
+  }
 }
 
 // insertAction
