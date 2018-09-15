@@ -59,7 +59,7 @@ class PrecisionGripperAction:
             else:
                 command_is_sent = False
         elif goal.open_outer_gripper_fully:        
-            command_is_sent = self.outer_gripper_open_fully(60)
+            command_is_sent = self.outer_gripper_open_fully(30)
         elif goal.close_outer_gripper_fully:
             command_is_sent = self.outer_gripper_close_fully(self.outer_force)
         elif goal.open_inner_gripper_fully:
