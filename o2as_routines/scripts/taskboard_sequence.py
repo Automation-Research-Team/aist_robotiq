@@ -70,13 +70,13 @@ class TaskboardClass(O2ASBaseRoutines):
                       "M6 Nut & Bolt", "M12 nut", "6 mm washer", 
                       "10 mm washer", "M3 set screw", "M3 bolt", 
                       "M4 bolt", "Pulley", "10 mm end cap"]
-    self.item_pick_heights = [0.02, 0.02, 0.025, 
+    self.item_pick_heights = [0.02, 0.02, 0.047,                  #3-0.25
                               0.047, 0.02, 0.0, 
                               0.02, 0.02, -0.005, 
                               -0.005, 0.02, 0.02,
                               0.02, 0.007, -0.005]
 
-    self.item_place_heights = [0.04, 0.04, 0.035,
+    self.item_place_heights = [0.04, 0.04, 0.046,                 #3-0.35
                                0.046, 0.04, 0.04, 
                                0.04, 0.04, 0.002, 
                                0.002, 0.04, 0.04, 
@@ -100,6 +100,12 @@ class TaskboardClass(O2ASBaseRoutines):
       place_pose.pose.position.z = self.item_place_heights[i]
       self.place_poses.append(place_pose)
     
+     m3_feeder_pose = geometry_msgs.msg.PoseStamped()
+     m3_feeder_pick_pose = geometry_msgs.msg.PoseStamped()
+     m3_screw_tool_pose = geometry_msgs.msg.PoseStamped()
+     m3_feeder_pose.frame_id = "m3_feeder_link"
+     m3_feeder_pick_pose.frame_id = "m3_feeder_outlet_link"
+     m3_screw_tool_pose.frame_id = "screw_tool_m3_link"
 
   # def 
   # calib_pose = geometry_msgs.msg.PoseStamped()
@@ -498,12 +504,15 @@ if __name__ == '__main__':
         taskboard.tilt_up_gripper(speed_fast=0.1, speed_slow=0.02)
         #Pick up by screw tool(unfinished)
 
+        taskboard.pick("b_bot",taskboard.pick_poses[3],grasp_height=0.01,
+                        speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
+                        approach_height = 0.1, special_pick = False)
         
         #place
-        #taskboard.place("b_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],
-        #                        speed_fast = 0.2, speed_slow = 0.02, gripper_command="",
-        #                        approach_height = 0.15, lift_up_after_place = False)
-        #taskboard.horizontal_spiral_motion("a_bot", .002, taskboard.place_poses[i-1])
+        taskboard.place("b_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],
+                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="",
+                                approach_height = 0.15, lift_up_after_place = False)
+        taskboard.horizontal_spiral_motion("a_bot", .002, taskboard.place_poses[i-1])
 
       if i == 3: #unadjusted
         taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],

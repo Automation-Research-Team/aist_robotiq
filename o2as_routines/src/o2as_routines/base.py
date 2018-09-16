@@ -330,7 +330,7 @@ class O2ASBaseRoutines(object):
     elif gripper == "b_bot" or gripper == "c_bot":
       goal = robotiq_msgs.msg.CModelCommandGoal()
       action_client = self.gripper_action_clients[gripper]
-      goal.velocity = 0.1   # from 0.013 to 0.1
+      goal.velocity = 0.05   # from 0.013 to 0.1
       if command == "close":
         goal.position = 0.0
       elif command == "open":
@@ -401,6 +401,11 @@ class O2ASBaseRoutines(object):
         rospy.loginfo(result)
     except rospy.ROSInterruptException:
         rospy.loginfo("program interrupted before completion", file=sys.stderr)
+  
+  def precision_gripper_inner_open_slightly(self, this_action_grasps_an_object = False):
+    try:
+      action_client = self.gripper_action_clients["a_bot"]
+      goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
 
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
