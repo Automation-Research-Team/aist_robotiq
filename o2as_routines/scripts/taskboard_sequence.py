@@ -100,12 +100,21 @@ class TaskboardClass(O2ASBaseRoutines):
       place_pose.pose.position.z = self.item_place_heights[i]
       self.place_poses.append(place_pose)
     
-     m3_feeder_pose = geometry_msgs.msg.PoseStamped()
-     m3_feeder_pick_pose = geometry_msgs.msg.PoseStamped()
-     m3_screw_tool_pose = geometry_msgs.msg.PoseStamped()
-     m3_feeder_pose.frame_id = "m3_feeder_link"
-     m3_feeder_pick_pose.frame_id = "m3_feeder_outlet_link"
-     m3_screw_tool_pose.frame_id = "screw_tool_m3_link"
+    self.m3_feeder_pose = geometry_msgs.msg.PoseStamped()
+    self.m3_feeder_pick_pose = geometry_msgs.msg.PoseStamped()
+    self.m3_screw_tool_pose = geometry_msgs.msg.PoseStamped()
+
+    self.m3_feeder_pose.header.frame_id = "m3_feeder_link"
+    self.m3_feeder_pick_pose.header.frame_id = "m3_feeder_outlet_link"
+    self.m3_screw_tool_pose.header.frame_id = "screw_tool_m3_link"
+    
+    self.pick_screw_pose = geometry_msgs.msg.PoseStamped()
+    self.pick_screw_pose.header.frame_id = "a_bot_tip_link_joint"
+
+    self.m3_feeder_pose.pose.orientation = downward_orientation
+    self.m3_feeder_pick_pose.pose.orientation = downward_orientation
+    self.m3_screw_tool_pose.pose.orientation = downward_orientation
+    self.m3_screw_tool_pose.pose.orientation = downward_orientation
 
   # def 
   # calib_pose = geometry_msgs.msg.PoseStamped()
@@ -154,7 +163,7 @@ class TaskboardClass(O2ASBaseRoutines):
       self.precision_gripper_inner_open()
     elif gripper_command=="easy_pick_only_inner":
       self.precision_gripper_inner_close()
-    elif gripper_command==" easy_pick_outside_only_inner":
+    elif gripper_command=="easy_pick_outside_only_inner":
       self.precision_gripper_inner_open()
     elif gripper_command=="none":
       pass
@@ -177,12 +186,15 @@ class TaskboardClass(O2ASBaseRoutines):
       self.precision_gripper_outer_close()
     elif gripper_command=="easy_pick_only_inner":
       self.precision_gripper_inner_open(this_action_grasps_an_object = True)
-    elif gripper_command==" easy_pick_outside_only_inner":
+    elif gripper_command=="easy_pick_outside_only_inner":
       self.precision_gripper_inner_close()
     elif gripper_command=="none":
       pass
     else: 
       self.send_gripper_command(gripper=robotname, command="close")
+
+    if special_pick == True:
+      object_pose.pose.orientation =  geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     rospy.sleep(.5)
     rospy.loginfo("Going back up")
     object_pose.pose.position.z += approach_height
@@ -215,6 +227,8 @@ class TaskboardClass(O2ASBaseRoutines):
       self.precision_gripper_inner_open()
     elif gripper_command=="easy_pick_only_inner":
       self.precision_gripper_inner_close()
+    elif gripper_command=="easy_pick_outside_only_inner":
+      self.precision_gripper_inner_open()
     elif gripper_command=="none":
       pass
     else: 
@@ -498,14 +512,18 @@ if __name__ == '__main__':
         taskboard.horizontal_spiral_motion("a_bot", .006, taskboard.place_poses[i-1])
 
       if i == 2: #unadjusted
-        taskboard.pick("a_bot",taskboard.pick_poses[3],taskboard.item_pick_heights[3],
+        taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
                                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
                                 approach_height = 0.1, special_pick = True)
         taskboard.tilt_up_gripper(speed_fast=0.1, speed_slow=0.02)
-        #Pick up by screw tool(unfinished)
 
-        taskboard.pick("b_bot",taskboard.pick_poses[3],grasp_height=0.01,
+        #Pick up by screw tool(screw tool control unfinished)
+        taskboard.pick("b_bot",taskboard.screw_tool_pose,grasp_height=0.01,
                         speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
+                        approach_height = 0.1, special_pick = False)
+        
+        taskboard.pick("b_bot",taskboard.pick_screw_pose,grasp_height=0.01,
+                        speed_fast = 0.2, speed_slow = 0.02, gripper_command="none",
                         approach_height = 0.1, special_pick = False)
         
         #place
@@ -655,18 +673,42 @@ if __name__ == '__main__':
         pass
 
       if i == 12:      #unadjusted
-         taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
+        taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
                                  speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
                                  approach_height = 0.1, special_pick = True)
-         #move to feed
-         #throw and pick up by screw tool
+        #move to feed
+        #throw and pick up by screw tool
 
       if i == 13:      #unadjusted
-         taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
-                                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
-                                 approach_height = 0.1, special_pick = True)    
-         #move to feed
-         #throw and pick up by screw tool
+        taskboard.pick("a_bot",taskboard.pick_poses[4],taskboard.item_pick_heights[4],
+                               speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
+                               approach_height = 0.1, special_pick = True)    
+        #move to feeder
+        taskboard.m3_feeder_pose.pose.position.x +=0.1
+        taskboard.m3_feeder_pose.pose.position.y +=0.1
+        taskboard.m3_feeder_pose.pose.position.z +=0.2
+        taskboard.place("a_bot",taskboard.m3_feeder_pose, place_height=0.05,
+                        speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
+                        approach_height = 0.1) 
+        taskboard.go_to_named_pose("home","a_bot")
+          
+        #pick up by screw tool
+        taskboard.pick("b_bot",taskboard.m3_screw_tool_pose,grasp_height=0.05,
+               speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
+               approach_height = 0.1, special_pick = False) 
+
+        taskboard.pick("b_bot",taskboard.m3_feeder_pick_pose,grasp_height=0.05,
+                        speed_fast = 0.2, speed_slow = 0.02, gripper_command="none",
+                        approach_height = 0.1, special_pick = False)
+        #place and fasten(unfinished) 
+        taskboard.place("b_bot",taskboard.place_poses[i-1], place_height=0.0,
+               speed_fast = 0.2, speed_slow = 0.02, gripper_command="none",
+               approach_height = 0.05)
+        #return the screw tool
+        taskboard.place("b_bot",taskboard.m3_screw_tool_pose, place_height=0.05,
+               speed_fast = 0.2, speed_slow = 0.02, gripper_command="none",
+               approach_height = 0.1)
+
       if i == 14:
         taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1], approach_height = 0.05,
                                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
@@ -675,26 +717,23 @@ if __name__ == '__main__':
                                 lift_up_after_place = False)
         taskboard.horizontal_spiral_motion("a_bot", .002)
         
+
+      if i == 15:     #unadjusted
+       taskboard.do_pick_action("b_bot", taskboard.pick_poses[i-1], z_axis_rotation = 0.0, use_complex_planning = False)
+       taskboard.do_regrasp("b_bot", "a_bot", grasp_distance = .02)
+       taskboard.send_gripper_command(gripper="precision_gripper_inner", command="open")
+       taskboard.send_gripper_command(gripper="precision_gripper_outer", command="close")
+       taskboard.send_gripper_command(gripper="b_bot", command=0.01)
+       taskboard.go_to_named_pose("back", "b_bot")
+       taskboard.place("a_bot", taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],
+                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside",
+                                approach_height = 0.10, lift_up_after_place = False)
       
       # taskboard.go_to_named_pose("home", "a_bot")
       # taskboard.go_to_named_pose("home", "b_bot")
       # taskboard.go_to_named_pose("home", "c_bot")
       i = raw_input("Enter the number of the part to be performed: ")
-      i =int(i)
-
-      if i == 15:     #unadjusted
-        taskboard.do_pick_action("b_bot", taskboard.pick_poses[i-1], z_axis_rotation = 0.0, use_complex_planning = False)
-        taskboard.do_regrasp("b_bot", "a_bot", grasp_distance = .02)
-        taskboard.send_gripper_command(gripper="precision_gripper_inner", command="open")
-        taskboard.send_gripper_command(gripper="precision_gripper_outer", command="close")
-        taskboard.send_gripper_command(gripper="b_bot", command=0.01)
-        taskboard.go_to_named_pose("back", "b_bot")
-
-        taskboard.place("a_bot", taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],
-                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside",
-                                approach_height = 0.10, lift_up_after_place = False)
-        
-
+      i =int(i)  
 
     print "============ Done!"
   except rospy.ROSInterruptException:
