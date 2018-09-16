@@ -28,6 +28,7 @@ class PrecisionGripperAction:
         self.speed_limit = rospy.get_param(name + "/speed_limit", 10)
         self.inner_open_motor_position = rospy.get_param(name + "/inner_open_motor_position", 3320)
         self.inner_close_motor_position = rospy.get_param(name + "/inner_close_motor_position", 3900)
+        self.inner_slight_open = rospy.get_param(name + "/inner_slight_open", 70)
         rospy.loginfo("inner_open_motor_position = " + str(self.inner_open_motor_position))
 
         #define the action
@@ -74,6 +75,10 @@ class PrecisionGripperAction:
                 command_is_sent = self.inner_gripper_close_fully(self.grasping_inner_force)
             else:
                 command_is_sent = self.inner_gripper_close_fully(self.inner_force)
+        elif goal.open_inner_gripper_slightly:
+            rospy.loginfo("inner gripper open slightly")
+            command_is_sent = self.inner_gripper_open_slightly(self.inner_slight_open)
+
         else:
             rospy.logerr('No command sent to the gripper, service request was empty.')
             command_is_sent = False
@@ -263,20 +268,21 @@ class PrecisionGripperAction:
             self.p1.set_current(current)
             self.p1.set_goal_position(self.inner_close_motor_position)
             rospy.logerr(self.inner_close_motor_position)
-            rospy.logerr("1111111122211")
             rospy.sleep(0.1)
             return True
         except:
             rospy.logerr("Failed to run commands.")
             return False
 
-    def inner_gripper_open_slightly(self, current_position):
+    def inner_gripper_open_slightly(self, open_range):
         try:
             self.p1.set_operating_mode("currentposition")
             self.p1.set_current(8)
-            #current_position=self.p1.read_current_position()
-            #current_position = current_position-130
+            current_position = self.p1.read_current_position()
+            current_position = current_position-open_range
             self.p1.set_goal_position(current_position)
+            rospy.sleep(0.1)
+            return True
         except:
             rospy.logerr("Failed to run commands.")
 
