@@ -572,7 +572,7 @@ class CalibrationClass(O2ASBaseRoutines):
     rospy.loginfo("============ Moving the screw tool m4 to the four corners of the base plate ============")
     rospy.loginfo("============ The screw tool m4 has to be carried by b_bot! ============")
     self.go_to_named_pose("back", "c_bot")
-    self.go_to_named_pose("screw_ready", "b_bot")
+    # self.go_to_named_pose("screw_ready", "b_bot")
     poses = []
 
     pose0 = geometry_msgs.msg.PoseStamped()
@@ -588,6 +588,28 @@ class CalibrationClass(O2ASBaseRoutines):
     poses[3].header.frame_id = "assembled_assy_part_01_corner_4"
 
     self.cycle_through_calibration_poses(poses, "b_bot", speed=0.3, go_home=False, end_effector_link="b_bot_screw_tool_m4_tip_link")
+    return
+  
+  def screw_tool_test_tray(self):
+    rospy.loginfo("============ Moving the screw tool m4 to the screw ============")
+    rospy.loginfo("============ The screw tool m4 has to be carried by b_bot! ============")
+    self.go_to_named_pose("back", "c_bot")
+    # self.go_to_named_pose("screw_ready", "b_bot")
+    poses = []
+
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.header.frame_id = "tray_2_screw_m3_1"
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, 0, 0))
+    pose0.pose.position.x -= .02
+    
+    for i in range(4):
+      poses.append(copy.deepcopy(pose0))
+
+    poses[1].header.frame_id = "tray_2_screw_m3_6"
+    poses[2].header.frame_id = "tray_2_screw_m4_1"
+    poses[3].header.frame_id = "tray_2_screw_m4_9"
+
+    self.cycle_through_calibration_poses(poses, "b_bot", speed=0.3, go_home=False, move_lin=True, end_effector_link="b_bot_screw_tool_m4_tip_link")
     return
 
 
@@ -621,6 +643,7 @@ if __name__ == '__main__':
       rospy.loginfo("61: Go to screw holder (with b_bot)")
       rospy.loginfo("62: Go to screw holder (with c_bot)")
       rospy.loginfo("63: Assembly screw tool calibration (m4 tool has to be equipped)")
+      rospy.loginfo("64: Go to tray positions with m4 tool (tool has to be equipped)")
       rospy.loginfo("x: Exit ")
       rospy.loginfo(" ")
       r = raw_input()
@@ -670,6 +693,8 @@ if __name__ == '__main__':
         c.screw_holder_tests(robot_name="c_bot")      
       elif r == '63':
         c.screw_tool_test_assembly()
+      elif r == '64':
+        c.screw_tool_test_tray()
       elif r == 'x':
         break
       else:
