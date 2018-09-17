@@ -70,9 +70,9 @@
   <!-- <node ns="$(arg namespace)" name="hand_eye_solver" -->
   <!--       pkg="visp_hand2eye_calibration" -->
   <!--       type="visp_hand2eye_calibration_calibrator"> -->
-  <node ns="$(arg namespace)" name="hand_eye_solver"
-        pkg="o2as_easy_handeye"
-        type="o2as_easy_handeye_calibrator">
+  <node name="hand_eye_solver"
+        pkg="o2as_easy_handeye"	type="o2as_easy_handeye_calibrator"
+	ns="$(arg namespace)" output="screen">
     <remap from="/compute_effector_camera_quick" to="compute_effector_camera_quick"/>
   </node>
 
@@ -85,25 +85,10 @@
   </group>
 
   <!-- Connect the tracker to the solver -->
-  <node name="hand_eye_connector"
-        ns="$(arg namespace)"
-        pkg="easy_handeye"
-        type="calibrate.py"
-        output="screen" />
-  
-  
+  <node name="hand_eye_connector" pkg="easy_handeye" type="calibrate.py"
+        ns="$(arg namespace)" output="screen" />
+    
   <!-- start GUI (Rviz and rqt_easy_handeye) -->
-  
-  <!--TODO: use this as soon as rviz rqt plugin accepts config parameter-->
-  <!--<group ns="$(arg namespace)" >
-      <node if="$(arg start_rqt)" unless="$(arg eye_on_hand)" name="$(arg namespace)_rqt" pkg="rqt" type="rqt" respawn="false" 
-      args="clear-config perspective-file $(arg rqt_perspective_file)" output="screen" />
-      </group>-->
-  
-  <!--TODO: remove as soon as rviz rqt plugin accepts config parameter-->
-  <!--<node if="$(arg start_rviz)" name="$(anon rviz)" pkg="rviz"
-      type="rviz" respawn="true"
-      args="-d $(arg rviz_config_file)" output="screen" />-->
   <node unless="$(arg freehand_robot_movement)"
 	name="calibration_mover"
         pkg="rqt_easy_handeye" type="rqt_calibrationmovements" respawn="false" >

@@ -31,6 +31,8 @@ add_executable(${PROJECT_NAME}_calibrator
   src/calibrator.cpp
   src/calibrator.h
   src/calibrator_main.cpp
+  src/aistCalibration.cpp
+  src/vpMatrix.cpp
   src/names.cpp
   src/names.h
 )
@@ -38,6 +40,7 @@ add_executable(${PROJECT_NAME}_calibrator
 target_link_libraries(${PROJECT_NAME}_calibrator
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
+  gsl
 )
 
 add_dependencies(${PROJECT_NAME}_calibrator
