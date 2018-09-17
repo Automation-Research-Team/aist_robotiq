@@ -106,10 +106,10 @@ SkillServer::SkillServer() :
   screw_tool_m6.operation = screw_tool_m6.ADD;
 
   // The tool tip
-  screw_tool_m6.named_frames.resize(1);
+  screw_tool_m6.frame_poses.resize(1);
   screw_tool_m6.frame_names.resize(1);
-  screw_tool_m6.named_frames[0].position.z = -.11;
-  screw_tool_m6.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
+  screw_tool_m6.frame_poses[0].position.z = -.11;
+  screw_tool_m6.frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
   screw_tool_m6.frame_names[0] = "screw_tool_m6_tip";
   
 
@@ -150,10 +150,10 @@ SkillServer::SkillServer() :
   screw_tool_m4.operation = screw_tool_m4.ADD;
 
   // The tool tip
-  screw_tool_m4.named_frames.resize(1);
+  screw_tool_m4.frame_poses.resize(1);
   screw_tool_m4.frame_names.resize(1);
-  screw_tool_m4.named_frames[0].position.z = -.12;
-  screw_tool_m4.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
+  screw_tool_m4.frame_poses[0].position.z = -.12;
+  screw_tool_m4.frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
   screw_tool_m4.frame_names[0] = "screw_tool_m4_tip";
 
 
@@ -194,10 +194,10 @@ SkillServer::SkillServer() :
   screw_tool_m3.operation = screw_tool_m3.ADD;
 
   // The tool tip
-  screw_tool_m3.named_frames.resize(1);
+  screw_tool_m3.frame_poses.resize(1);
   screw_tool_m3.frame_names.resize(1);
-  screw_tool_m3.named_frames[0].position.z = -.11;
-  screw_tool_m3.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
+  screw_tool_m3.frame_poses[0].position.z = -.11;
+  screw_tool_m3.frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
   screw_tool_m3.frame_names[0] = "screw_tool_m3_tip";
 
 
@@ -1726,20 +1726,20 @@ int main(int argc, char **argv)
     box.primitives[0].dimensions[0] = 0.02;
     box.primitives[0].dimensions[1] = 0.05;
     box.primitives[0].dimensions[2] = 0.1;
-    box.named_frames.resize(3);
+    box.frame_poses.resize(3);
     box.frame_names.resize(3);
-    box.named_frames[0].position.z = -.05;
-    box.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(90.0/180.0 *M_PI));
+    box.frame_poses[0].position.z = -.05;
+    box.frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(90.0/180.0 *M_PI));
     box.frame_names[0] = "box_bottom";
-    box.named_frames[1].position.x = -.01;
-    box.named_frames[1].position.y = -.025;
-    box.named_frames[1].position.z = -.05;
-    box.named_frames[1].orientation.w = 1.0;
+    box.frame_poses[1].position.x = -.01;
+    box.frame_poses[1].position.y = -.025;
+    box.frame_poses[1].position.z = -.05;
+    box.frame_poses[1].orientation.w = 1.0;
     box.frame_names[1] = "box_corner_1";
-    box.named_frames[2].position.x = -.01;
-    box.named_frames[2].position.y = .025;
-    box.named_frames[2].position.z = -.05;
-    box.named_frames[2].orientation.w = 1.0;
+    box.frame_poses[2].position.x = -.01;
+    box.frame_poses[2].position.y = .025;
+    box.frame_poses[2].position.z = -.05;
+    box.frame_poses[2].orientation.w = 1.0;
     box.frame_names[2] = "box_corner_2";
 
     moveit_msgs::CollisionObject cylinder;
@@ -1754,11 +1754,11 @@ int main(int argc, char **argv)
     cylinder.primitive_poses[0].position.x = 0.0;
     cylinder.primitive_poses[0].position.y = -0.05;
     cylinder.primitive_poses[0].position.z = 0.0;
-    cylinder.named_frames.resize(1);
+    cylinder.frame_poses.resize(1);
     cylinder.frame_names.resize(1);
-    cylinder.named_frames[0].position.y = -.05;
-    cylinder.named_frames[0].position.z = -.02;
-    box.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(90.0/180.0 *M_PI));
+    cylinder.frame_poses[0].position.y = -.05;
+    cylinder.frame_poses[0].position.z = -.02;
+    box.frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(90.0/180.0 *M_PI));
     cylinder.frame_names[0] = "cylinder_tip";
 
     geometry_msgs::PoseStamped ps, ps_0;
