@@ -51,11 +51,12 @@ class CalibrationClass(O2ASBaseRoutines):
   objects defined in the scene.
   """
 
-  def cycle_through_calibration_poses(self, poses, robot_name, speed=0.3, with_approach=False, go_home=True):
-    rospy.loginfo("Moving all robots home.")
-    self.go_to_named_pose("home", "a_bot")
-    self.go_to_named_pose("home", "b_bot")
-    self.go_to_named_pose("home", "c_bot")
+  def cycle_through_calibration_poses(self, poses, robot_name, speed=0.3, with_approach=False, move_lin=False, go_home=True, end_effector_link=""):
+    if go_home:
+      rospy.loginfo("Moving all robots home.")
+      self.go_to_named_pose("home", "a_bot")
+      self.go_to_named_pose("home", "b_bot")
+      self.go_to_named_pose("home", "c_bot")
     home_pose = "home"
     
     
@@ -81,14 +82,14 @@ class CalibrationClass(O2ASBaseRoutines):
         #                    pose.pose.orientation.z, pose.pose.orientation.w), rospy.Time.now(),
         #                    "calibration_target_pose", pose.header.frame_id)
         # rospy.sleep(.5)
-        self.go_to_pose_goal(robot_name, ps_approach,speed=speed)
+        self.go_to_pose_goal(robot_name, ps_approach,speed=speed,end_effector_link=end_effector_link)
       if rospy.is_shutdown():
         break
       if with_approach:
-        self.go_to_pose_goal(robot_name, ps_approach,speed=speed)
-        self.go_to_pose_goal(robot_name, pose,speed=speed)
+        self.go_to_pose_goal(robot_name, ps_approach,speed=speed,end_effector_link=end_effector_link)
+        self.go_to_pose_goal(robot_name, pose,speed=speed,end_effector_link=end_effector_link)
       else:
-        self.go_to_pose_goal(robot_name, pose,speed=speed)
+        self.go_to_pose_goal(robot_name, pose,speed=speed,end_effector_link=end_effector_link)
       
       rospy.loginfo("============ Press `Enter` to proceed ")
       raw_input()
@@ -99,14 +100,15 @@ class CalibrationClass(O2ASBaseRoutines):
         #                    pose.pose.orientation.z, pose.pose.orientation.w), rospy.Time.now(),
         #                    "calibration_target_pose", pose.header.frame_id)
         # rospy.sleep(.2)
-        self.go_to_pose_goal(robot_name, ps_approach,speed=speed)
+        self.go_to_pose_goal(robot_name, ps_approach,speed=speed,end_effector_link=end_effector_link)
       if go_home:
         self.go_to_named_pose(home_pose, robot_name)
     
-    rospy.loginfo("Moving all robots home again.")
-    self.go_to_named_pose("home", "a_bot")
-    self.go_to_named_pose("home", "b_bot")
-    self.go_to_named_pose("home", "c_bot")
+    if go_home:
+      rospy.loginfo("Moving all robots home again.")
+      self.go_to_named_pose("home", "a_bot")
+      self.go_to_named_pose("home", "b_bot")
+      self.go_to_named_pose("home", "c_bot")
     return
   
   def check_robot_calibration(self):
@@ -347,46 +349,6 @@ class CalibrationClass(O2ASBaseRoutines):
     self.go_to_named_pose("home", "c_bot")
     return
 
-  def screw_tool_tests(self):
-    rospy.loginfo("============ Calibrating screw_tool M4 with b_bot. ============")
-    self.go_to_named_pose("screw_ready", "b_bot")
-    poses = []
-
-    ps = geometry_msgs.msg.PoseStamped()
-    ps.header.frame_id = "workspace_center"
-    ps.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi, 0))
-    ps.pose.position.x = .0
-    ps.pose.position.y = .0
-    ps.pose.position.z = .05
-
-    # rospy.loginfo("============ Going to hold tool 5 cm above the table, horizontal. ============")
-    
-    # self.publish_marker(ps, "pose")
-    # self.groups["b_bot"].set_pose_target(ps, end_effector_link="b_bot_screw_tool_m4_tip_link")
-    # self.groups["b_bot"].set_max_velocity_scaling_factor(.05)
-    # self.groups["b_bot"].go()
-    # self.groups["b_bot"].stop()
-    # self.groups["b_bot"].clear_pose_targets()
-
-    rospy.loginfo("============ Press enter to hold tool vertically. ============")
-    i = raw_input()
-
-    ps.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
-    ps.pose.position.x = -.01
-    ps.pose.position.y = .0
-    ps.pose.position.z = .05
-    self.publish_marker(ps, "pose")
-    self.groups["b_bot"].set_pose_target(ps, end_effector_link="b_bot_screw_tool_m4_tip_link")
-    self.groups["b_bot"].set_max_velocity_scaling_factor(.05)
-    self.groups["b_bot"].go()
-    self.groups["b_bot"].stop()
-    self.groups["b_bot"].clear_pose_targets()
-
-    rospy.loginfo("============ Press enter to go home. ============")
-    raw_input()
-    self.go_to_named_pose("screw_ready", "b_bot")
-    return
-
   def parts_tray_tests(self):
     rospy.loginfo("============ Going to parts tray positions with c_bot. ============")
     self.go_to_named_pose("home", "c_bot")
@@ -433,6 +395,59 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, "c_bot", speed=0.3, go_home=True)
     return
 
+  def screw_tool_tests(self):
+    rospy.loginfo("============ Calibrating screw_tool M4 with b_bot. ============")
+    self.go_to_named_pose("screw_ready", "b_bot")
+    poses = []
+
+    ps = geometry_msgs.msg.PoseStamped()
+    ps.header.frame_id = "workspace_center"
+    ps.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi, 0))
+    ps.pose.position.x = .0
+    ps.pose.position.y = .0
+    ps.pose.position.z = .05
+
+    rospy.loginfo("============ Press enter to hold tool vertically. ============")
+    i = raw_input()
+
+    ps.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+    ps.pose.position.x = -.01
+    ps.pose.position.y = .0
+    ps.pose.position.z = .05
+    self.publish_marker(ps, "pose")
+    self.groups["b_bot"].set_pose_target(ps, end_effector_link="b_bot_screw_tool_m4_tip_link")
+    self.groups["b_bot"].set_max_velocity_scaling_factor(.05)
+    self.groups["b_bot"].go()
+    self.groups["b_bot"].stop()
+    self.groups["b_bot"].clear_pose_targets()
+
+    rospy.loginfo("============ Press enter to go home. ============")
+    raw_input()
+    self.go_to_named_pose("screw_ready", "b_bot")
+    return
+
+  def screw_tool_test_assembly(self):
+    rospy.loginfo("============ Moving the screw tool m4 to the four corners of the base plate ============")
+    rospy.loginfo("============ The screw tool m4 has to be carried by b_bot! ============")
+    self.go_to_named_pose("back", "c_bot")
+    self.go_to_named_pose("screw_ready", "b_bot")
+    poses = []
+
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.header.frame_id = "assembled_assy_part_01_corner_1"
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    pose0.pose.position.x -= .05
+    
+    for i in range(4):
+      poses.append(copy.deepcopy(pose0))
+
+    poses[1].header.frame_id = "assembled_assy_part_01_corner_2"
+    poses[2].header.frame_id = "assembled_assy_part_01_corner_3"
+    poses[3].header.frame_id = "assembled_assy_part_01_corner_4"
+
+    self.cycle_through_calibration_poses(poses, "b_bot", speed=0.3, go_home=False, end_effector_link="b_bot_screw_tool_m4_tip_link")
+    return
+
 if __name__ == '__main__':
   try:
     c = CalibrationClass()
@@ -452,6 +467,7 @@ if __name__ == '__main__':
       rospy.loginfo("51: Assembly assembled parts")
       rospy.loginfo("52: Assembly initial part locations (the plates)")
       rospy.loginfo("6: TODO: Screw tool tests")
+      rospy.loginfo("61: Assembly screw tool calibration")
       rospy.loginfo("x: Exit ")
       rospy.loginfo(" ")
       r = raw_input()
@@ -479,6 +495,8 @@ if __name__ == '__main__':
         c.assembly_calibration_initial_plates()
       elif r == '6':
         c.screw_tool_tests()      
+      elif r == '61':
+        c.screw_tool_test_assembly()
       elif r == 'x':
         break
       else:
