@@ -51,10 +51,14 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro" />
   <xacro:property name="plate_w" value="0.9"/>
   <xacro:property name="plate_l" value="0.75"/>
-  <xacro:o2as_box boxname="workbox" box_w="${plate_w}" box_l="${plate_l}" box_h=".01" parent="o2as_ground">
-    <origin xyz="${-plate_w/2 +.08} ${-plate_l/2} ${bots_z}" rpy="0 0 0" />   
+  <xacro:property name="plate_cut_w" value="0.03"/>
+  <xacro:property name="plate_cut_l" value="0.14"/>
+  <xacro:o2as_box boxname="workbox1" box_w="${plate_w}" box_l="${plate_l-plate_cut_l}" box_h=".01" parent="o2as_ground">
+    <origin xyz="${-plate_w/2 +.08} ${-(plate_l/2)} ${bots_z}" rpy="0 0 0" />   
   </xacro:o2as_box>
-
+  <xacro:o2as_box boxname="workbox2" box_w="${plate_w-plate_cut_w}" box_l="${plate_cut_l}" box_h=".01" parent="o2as_ground">
+    <origin xyz="${-plate_w/2 +.08+0.03} ${-plate_l/2+plate_l-plate_cut_l} ${bots_z}" rpy="0 0 0" />   
+  </xacro:o2as_box>
   <link name="workspace_center" />
   <joint name="world_to_workspace" type="fixed">
     <parent link="o2as_ground" />
