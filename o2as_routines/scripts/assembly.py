@@ -309,6 +309,7 @@ class AssemblyClass(O2ASBaseRoutines):
     pscrew = geometry_msgs.msg.PoseStamped()
     pscrew.header.frame_id = "tray_2_screw_m4_1" # The top corner of the big plate
     pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(-pi/2, 0,0))
+    # pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0, 0,0))
     goal.item_pose = pscrew
     rospy.loginfo("Sending pick action goal")
     rospy.loginfo(goal)
@@ -362,7 +363,8 @@ class AssemblyClass(O2ASBaseRoutines):
     # Move b_bot to the hole and screw
     pscrew = geometry_msgs.msg.PoseStamped()
     pscrew.header.frame_id = "assembled_assy_part_03_bottom_screw_hole_1" # The top corner of the big plate
-    pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(pi/2, 0,0))
+    pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0, 0,0))
+    # pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(pi/2, 0,0))
     self.do_screw_action("b_bot", pscrew, screw_height = 0.02, screw_size = 4)
 
 

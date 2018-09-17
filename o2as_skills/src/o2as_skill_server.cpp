@@ -109,7 +109,7 @@ SkillServer::SkillServer() :
   screw_tool_m6.named_frames.resize(1);
   screw_tool_m6.frame_names.resize(1);
   screw_tool_m6.named_frames[0].position.z = -.11;
-  screw_tool_m6.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, 0);
+  screw_tool_m6.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
   screw_tool_m6.frame_names[0] = "screw_tool_m6_tip";
   
 
@@ -153,7 +153,7 @@ SkillServer::SkillServer() :
   screw_tool_m4.named_frames.resize(1);
   screw_tool_m4.frame_names.resize(1);
   screw_tool_m4.named_frames[0].position.z = -.12;
-  screw_tool_m4.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, 0);
+  screw_tool_m4.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
   screw_tool_m4.frame_names[0] = "screw_tool_m4_tip";
 
 
@@ -197,7 +197,7 @@ SkillServer::SkillServer() :
   screw_tool_m3.named_frames.resize(1);
   screw_tool_m3.frame_names.resize(1);
   screw_tool_m3.named_frames[0].position.z = -.11;
-  screw_tool_m3.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, 0);
+  screw_tool_m3.named_frames[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
   screw_tool_m3.frame_names[0] = "screw_tool_m3_tip";
 
 
@@ -480,7 +480,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
   ROS_INFO("Moving to screw tool approach pose LIN.");
   // std::cin >> debug;
-  bool preparation_succeeded = moveToCartPoseLIN(ps_approach, robot_name);
+  bool preparation_succeeded = moveToCartPoseLIN(ps_approach, robot_name, true, robot_name + "_robotiq_85_tip_link");
   if (!preparation_succeeded)
   {
     ROS_ERROR("Could not go to approach pose. Aborting tool pickup.");
@@ -1609,8 +1609,8 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
 
   // Set target pose for the end effector
   geometry_msgs::PoseStamped target_tip_link_pose = goal->target_hole;
-  // std::string screw_tool_link = goal->robot_name + "_" + held_screw_tool_ + "_tip_link";
-  std::string screw_tool_link = held_screw_tool_ + "_tip";
+  std::string screw_tool_link = goal->robot_name + "_" + held_screw_tool_ + "_tip_link";
+  // std::string screw_tool_link = held_screw_tool_ + "_tip";
   ROS_INFO_STREAM("screw tool link:  " << screw_tool_link);
 
   target_tip_link_pose.pose.position.x -= goal->screw_height+.005;  // Add the screw height and tolerance
