@@ -13,26 +13,8 @@
   <arg name="marker_id" value="26"  if="$(eval arg('robot_name') == 'b_bot')"/>
   <arg name="marker_id" value="256" if="$(eval arg('robot_name') == 'c_bot')"/>
 
-  <!-- Camera state publisher -->
-  <!--<node pkg="robot_state_publisher" type="robot_state_publisher"
-      name="d_bot_st_pub">
-      <remap from="robot_description" to="d_bot_camera_description"/>
-      </node>-->
-
-  <!-- CameraInfo conversion for Phoxi in Gazebo:
-       from camera_info to camera_info2,
-       see convert_phoxi_camera_info_gazebo.py -->
-  <!-- <node name="convert_phoxi_camera_info_gazebo" -->
-  <!-- 	pkg="o2as_easy_handeye" type="convert_phoxi_camera_info_gazebo.py" -->
-  <!--       if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/> -->
-
-  <!-- start ArUco -->
+  <!-- Start ArUco -->
   <node name="aruco_tracker" pkg="aruco_ros" type="single">
-    <!-- Remap topic names -->
-    <!-- String "/rgb/" is required for topics "camera_info" and
-         "image_raw" in realsense. Note that Phoxi publish topics named
-         "texture" instead of "image_raw". -->
-    <!-- Use camera_info2 instead of camera_info in Gazebo with Phoxi -->
     <remap from="/camera_info"	to="/$(arg camera_name)/camera_info"
 	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/image"	to="/$(arg camera_name)/texture"
@@ -51,6 +33,7 @@
     <param name="marker_frame"       value="camera_marker"/>
   </node>
 
+  <!-- Start robot controller -->
   <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch"
 	   if="$(eval arg('config') == 'sim')">
     <arg name="sim" value="true"/>
@@ -65,7 +48,7 @@
 	   if="$(eval arg('config') == 'osaka')">
   </include>
 
-  <!-- start easy_handeye calibrator -->
+  <!-- Start easy_handeye calibrator -->
   <include file="$(find o2as_easy_handeye)/launch/calibrate.launch">
     <arg name="namespace_prefix"	value="$(arg namespace_prefix)"/>
     <arg name="eye_on_hand"		value="false"/>

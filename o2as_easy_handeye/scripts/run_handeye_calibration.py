@@ -70,11 +70,11 @@ posess = {
 
     'b_bot': [
       [-0.3, 0.487, 0.3, radians(-110), radians(  0), radians(90)],
-      [-0.3, 0.487, 0.3, radians(-110), radians(-30), radians(90)],
-      [-0.3, 0.487, 0.3, radians(-140), radians(-30), radians(90)],
-      [-0.3, 0.487, 0.3, radians(-140), radians(  0), radians(90)],
-      [-0.3, 0.487, 0.3, radians(- 80), radians(  0), radians(90)],
-      [-0.3, 0.487, 0.3, radians(- 80), radians(-30), radians(90)],
+      [-0.2, 0.487, 0.4, radians(-110), radians(-30), radians(90)],
+      [-0.3, 0.55, 0.4, radians(-140), radians(-30), radians(90)],
+      [-0.2, 0.4, 0.5, radians(-140), radians(  0), radians(90)],
+      [-0.2, 0.35, 0.5, radians(- 80), radians(  0), radians(90)],
+      [-0.2, 0.35, 0.4, radians(- 80), radians(-30), radians(90)],
 
       # [-0.273, 0.487, 0.480, 0.000,  radians(18),  0.000],
       # [-0.273, 0.487, 0.480, 0.000,  radians(36), -radians(18)],
@@ -196,7 +196,7 @@ def run_calibration(camera_name, robot_name):
 
   # Collect samples over pre-defined poses
   for i, pose in enumerate(posess[camera_name][robot_name]):
-    mg.move(pose, 0.05)
+    mg.move(pose, 1)
     take_sample()
     rospy.sleep(3)  # Sleep for 1 seconds
     sample_list = get_sample_list()
@@ -226,7 +226,7 @@ def visit_calibration_points(camera_name, robot_name):
 
   # Move to each calibration point
   for i, pose in enumerate(posess[camera_name][robot_name]):
-    mg.move(pose, 0.05)
+    mg.move(pose, 1)
     rospy.sleep(1)  # Sleep for 1 seconds
     print(("Loop {}").format(i))
 
