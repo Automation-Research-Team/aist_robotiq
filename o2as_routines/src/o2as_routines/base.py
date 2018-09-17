@@ -140,8 +140,9 @@ class O2ASBaseRoutines(object):
     self.publish_marker(pose_goal_stamped, "pose")
     group = self.groups[group_name]
     group.set_pose_target(pose_goal_stamped)
-    rospy.loginfo("Setting end effector link to " + end_effector_link)
-    group.set_end_effector_link(end_effector_link)
+    if end_effector_link:
+      rospy.loginfo("Setting end effector link to " + end_effector_link)
+      group.set_end_effector_link(end_effector_link)
     rospy.loginfo("Setting velocity scaling to " + str(speed))
     group.set_max_velocity_scaling_factor(speed)
 

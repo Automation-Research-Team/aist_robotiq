@@ -7,9 +7,11 @@
   <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
   <xacro:property name="a_bot_x" value="-0.01"/>
   <xacro:property name="a_bot_y" value="-0.5"/>
-  <xacro:property name="b_bot_x" value="-0.005"/>
-  <xacro:property name="b_bot_y" value="0.5"/>
-  <xacro:property name="c_bot_x" value="-0.5"/>
+  <xacro:property name="b_bot_x" value="-0.009"/>
+  <xacro:property name="b_bot_y" value="0.503"/>
+  <xacro:property name="b_bot_theta" value="-3.12832815"/>
+  <!-- The above is 0.76 degrees away from pi (Sep 17; not perfect) -->
+  <xacro:property name="c_bot_x" value="-0.499"/>
   <xacro:property name="c_bot_y" value="0.0"/>
 
   <xacro:property name="bots_z" value="0.75"/>
@@ -108,7 +110,7 @@
   <joint name="world_b_bot_joint" type="fixed">
     <parent link="o2as_ground" />
     <child link = "b_bot_base_link" />
-    <origin xyz="${b_bot_x} ${b_bot_y} ${bots_z}" rpy="0.0 0.0 ${-pi}" />
+    <origin xyz="${b_bot_x} ${b_bot_y} ${bots_z}" rpy="0.0 0.0 ${b_bot_theta}" />
   </joint>
 
   <joint name="world_c_bot_joint" type="fixed">

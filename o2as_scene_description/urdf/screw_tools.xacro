@@ -42,7 +42,8 @@
   <joint name="screw_holder_to_base" type="fixed">
     <parent link="c_bot_base_smfl" />
     <child link="screw_tool_holder" />
-    <origin xyz="${0.65-0.045} ${0.65+.004} 0.06" rpy="0.0 0.0 0.0" />
+    <origin xyz="${0.65-0.045 +.005} ${0.65+.004} 0.06" rpy="0.0 0.0 0.0" />
+    <!-- +.005 is a MAGIC NUMBER added on Sep 17 to put the tool roughly between c_bot and b_bot's physical position. -->
   </joint>
 
   <!-- ++++++++++++++++++++++++++++ -->
