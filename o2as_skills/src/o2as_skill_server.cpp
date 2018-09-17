@@ -626,6 +626,27 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   // Delete tool collision object only after collision reinitialization to avoid errors
   if (unequip) despawnTool(screw_tool_id);
 
+  if (unequip)
+  {
+    goToNamedPose("home", robot_name);
+  }
+  else // Go nearby the tray area, which is where the next move will almost certainly go
+  {
+    if (robot_name == "b_bot")
+    {
+      ROS_INFO("Going near tray.");
+      ps_approach.pose.position.x +=.2;
+      ps_approach.pose.position.y +=.2;
+      ps_approach.pose.position.z -=.2;
+      moveToCartPoseLIN(ps_approach, robot_name);
+    }
+    else if (robot_name == "c_bot")
+    {
+      // TODO: Do anything special?
+    }
+    // goToNamedPose("screw_ready", robot_name);
+  }
+
   return true;
 }
 
@@ -983,7 +1004,7 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
   ROS_INFO_STREAM("Moving far above screw.");
   screw_head_pose.pose.position.x = -.05;
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  moveToCartPosePTP(screw_head_pose, robot_name, true, screw_tool_link, 1.0);
+  moveToCartPoseLIN(screw_head_pose, robot_name, true, screw_tool_link, 1.0);
 
   ROS_INFO_STREAM("Moving close to screw.");
   screw_head_pose.pose.position.x = -.01;
@@ -997,6 +1018,8 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
   }
 
   ROS_WARN_STREAM("TODO: TURN ON MOTOR");
+  ROS_WARN_STREAM("TODO: TURN ON SUCTION");
+  planning_scene_interface_.allowCollisions(screw_tool_id, "tray_2_screw_holder");
   ROS_INFO_STREAM("Moving into screw.");
   screw_head_pose.pose.position.x = .01;
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -1042,7 +1065,9 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     moveToCartPosePTP(screw_head_pose, robot_name, true, screw_tool_link, 0.1);  // Force the move even if LIN fails
   }
-
+  
+  planning_scene_interface_.disallowCollisions(screw_tool_id, "tray_2_screw_holder");
+  ROS_WARN_STREAM("TODO: TURN OFF MOTOR");
   ROS_INFO_STREAM("Moving back completely.");
   screw_head_pose.pose.position.x = -.05;
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -1322,7 +1347,7 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
   else if (goal->tool_name == "screw_tool")
   {
     std::string screw_tool_id = goal->tool_name + "_m" + std::to_string(goal->screw_size);
-    pickScrew(goal->screw_head_pose, screw_tool_id, goal->robot_name);
+    pickScrew(goal->item_pose, screw_tool_id, goal->robot_name);
   }
   else if (goal->tool_name == "suction")
   {;} // TODO: Here is space for code from AIST.
@@ -1586,20 +1611,25 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
   geometry_msgs::PoseStamped target_tip_link_pose = goal->target_hole;
   // std::string screw_tool_link = goal->robot_name + "_" + held_screw_tool_ + "_tip_link";
   std::string screw_tool_link = held_screw_tool_ + "_tip";
+  ROS_INFO_STREAM("screw tool link:  " << screw_tool_link);
 
   target_tip_link_pose.pose.position.x -= goal->screw_height+.005;  // Add the screw height and tolerance
 
   if (goal->screw_height < 0.001) {target_tip_link_pose.pose.position.x -= .02;}   // In case screw_height was not set
 
   // Move above the screw hole
+  ROS_INFO("Moving above the screw hole.");
   target_tip_link_pose.pose.position.x -= .05;
-  // TODO: Do not allow random PTP motion! Force linear motion from safe position for each robot.
-  moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, screw_tool_link);
+  moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link);
 
   // TODO: Turn on the motor
-  // TODO: Disable collision for screw tool 
+  // Disable collision for screw tool 
+  updatePlanningScene();
+  collision_detection::AllowedCollisionMatrix acm_original(planning_scene_.allowed_collision_matrix);
+  planning_scene_interface_.allowCollisions("screw_tool_m" + std::to_string(goal->screw_size));
 
   // Move 1 cm into to the screw hole
+  ROS_INFO("Pushing into the screw hole.");
   target_tip_link_pose.pose.position.x += .05 + .01;
   bool success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link, 0.001);
   if (!success) moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, screw_tool_link);  // Force the move even if LIN fails
@@ -1631,8 +1661,12 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
   success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link);
   if (!success) moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, screw_tool_link);  // Force the move even if LIN fails
   
-  // TODO: Enable collision for screw tool again
-  // TODO: Return success
+  // Enable collision for screw tool again
+  moveit_msgs::PlanningScene ps_reset_collisions = planning_scene_;
+  acm_original.getMessage(ps_reset_collisions.allowed_collision_matrix);
+  planning_scene_interface_.applyPlanningScene(ps_reset_collisions);
+  
+  // TODO: Return success or not
 
   ROS_INFO("screwAction is set as succeeded");
   screwActionServer_.setSucceeded();
@@ -1640,6 +1674,7 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
 
 void SkillServer::executeChangeTool(const o2as_msgs::changeToolGoalConstPtr& goal)
 {
+  ROS_INFO("Received changeToolAction goal.");
   std::string equip_or_unequip = "equip";
   if (!goal->equip_the_tool) { equip_or_unequip = "unequip"; }
 
