@@ -1,4 +1,4 @@
-# Only one command can be set at a time. Requests are interpreted from the top (the stop command overrides all)
+# Only one command can be set at a time. 
 bool stop
 bool peg_fasten
 bool big_nut_fasten
