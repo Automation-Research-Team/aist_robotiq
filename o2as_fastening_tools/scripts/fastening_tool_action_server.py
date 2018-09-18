@@ -28,12 +28,20 @@ class FasteningToolController(object):
         for data in data_list:
             self.fastening_tools.update({data['name'] : data['motor_id']})
         
-        self.dynamixel_command_write = rospy.ServiceProxy('dynamixel_write_command', DynamixelWriteCommand)
-        self.dynamixel_read_state = rospy.ServiceProxy('dynamixel_read_state', DynamixelReadState)
+        self.dynamixel_command_write = rospy.ServiceProxy('o2as_fastening_tools/dynamixel_write_command', DynamixelWriteCommand)
+        self.dynamixel_read_state = rospy.ServiceProxy('o2as_fastening_tools/dynamixel_read_state', DynamixelReadState)
 
-        self._action_name = 'FastenerGripperControlAction'
+        self._action_name = 'o2as_fastening_tools/fastener_gripper_control_action'
         self._as = actionlib.SimpleActionServer(self._action_name, FastenerGripperControlAction, execute_cb=self.execute_control, auto_start = False)
         self._as.start()
+
+    def set_torque_enable(self, motor_id, value):
+        res = self.dynamixel_command_write(motor_id, "Torque_Enable", value)
+        if res.comm_result:
+            return True
+        else:
+            rospy.logerr('Can not set torque_enable to XL-320. (ID=%i)' %motor_id)
+            return False
 
     def set_moving_speed(self, motor_id, value):
         res = self.dynamixel_command_write(motor_id, "Moving_Speed", value)
@@ -52,28 +60,30 @@ class FasteningToolController(object):
             return -1
 
     def execute_control(self, goal):
-        rospy.wait_for_service('dynamixel_write_command')
-        rospy.wait_for_service('dynamixel_read_state')
+        t_duration = 1
+        motor_id = self.fastening_tools[goal.fastening_tool_name]
+        self._result.control_result = True
+        self._feedback.motor_speed = goal.speed
 
-        if goal.direction == "CW" :
+        rospy.wait_for_service('o2as_fastening_tools/dynamixel_write_command')
+        rospy.wait_for_service('o2as_fastening_tools/dynamixel_read_state')
+
+        if goal.direction == "loosen" :
+            t_duration = goal.duration
+            if t_duration == 0.0 :
+                t_duration = 1
             goal.speed = 1024 + goal.speed
             if goal.speed > 2047 :
                 goal.speed = 2047
-        elif goal.direction == "CCW" :
+        elif goal.direction == "tighten" :
             if goal.speed > 1023 :
                 goal.speed = 1023
-
-        self._result.control_result = True
 
         if (goal.fastening_tool_name in self.fastening_tools) == False :
             rospy.logerr("'%s' is not exist in %s." % (goal.fastening_tool_name, self.conf_gripper_filename))
             self._result.control_result = False
             self._as.set_succeeded(self._result)
-            return 
-
-        motor_id = self.fastening_tools[goal.fastening_tool_name]
-
-        self._feedback.motor_speed = goal.speed
+            return
 
         if not self.set_moving_speed(motor_id, goal.speed) :
             print('')
@@ -81,8 +91,21 @@ class FasteningToolController(object):
             self._as.set_succeeded(self._result)
             return
 
-        rospy.sleep(1)
+        rospy.sleep(t_duration)
 
+        # process for loosen
+        if goal.direction == "loosen" :
+            if not self.set_moving_speed(motor_id, 0) :
+                self.set_torque_enable(motor_id, 0)
+                self._result.control_result = True
+                self._as.set_succeeded(self._result)
+            else :
+                self.set_torque_enable(motor_id, 0)
+                self._result.control_result = False
+                self._as.set_succeeded(self._result)
+            return
+
+        # process for tighten
         while self._feedback.motor_speed > 0:
             if self._as.is_preempt_requested():
                 self._as.set_preempted()
@@ -95,6 +118,7 @@ class FasteningToolController(object):
                 first_speed = self.get_present_speed(motor_id)
 
             if first_speed == -1 :
+                self.set_torque_enable(motor_id, 0)
                 self._result.control_result = False
                 self._as.set_succeeded(self._result)
                 return 
@@ -108,6 +132,7 @@ class FasteningToolController(object):
                 second_speed = self.get_present_speed(motor_id)
 
             if second_speed == -1 :
+                self.set_torque_enable(motor_id, 0)
                 self._result.control_result = False
                 self._as.set_succeeded(self._result)
                 return 
@@ -121,6 +146,12 @@ class FasteningToolController(object):
             self._as.publish_feedback(self._feedback)
 
         if not self.set_moving_speed(motor_id, 0) :
+            self.set_torque_enable(motor_id, 0)
+            self._result.control_result = False
+            self._as.set_succeeded(self._result)
+            return
+
+        if not self.set_torque_enable(motor_id, 0) :
             self._result.control_result = False
             self._as.set_succeeded(self._result)
             return

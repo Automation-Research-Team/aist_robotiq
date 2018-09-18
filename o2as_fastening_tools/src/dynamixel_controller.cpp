@@ -176,8 +176,8 @@ DynamixelController::DynamixelController(void)
 		}
 	}
 	
-	dynamixel_command_server_ = node_handle_.advertiseService("dynamixel_write_command", &DynamixelController::dynamixelCommandMsgCallback,this);
-	dynamixel_info_server_ = node_handle_.advertiseService("dynamixel_read_state", &DynamixelController::dynamixelReadMsgCallback,this);
+	dynamixel_command_server_ = node_handle_.advertiseService("o2as_fastening_tools/dynamixel_write_command", &DynamixelController::dynamixelCommandMsgCallback,this);
+	dynamixel_info_server_ = node_handle_.advertiseService("o2as_fastening_tools/dynamixel_read_state", &DynamixelController::dynamixelReadMsgCallback,this);
 }
 
 DynamixelController::~DynamixelController(void){}
