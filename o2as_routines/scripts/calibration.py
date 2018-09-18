@@ -656,6 +656,7 @@ if __name__ == '__main__':
       rospy.loginfo("63: Assembly screw tool calibration for b_bot (m4 tool has to be equipped)")
       rospy.loginfo("64: Assembly screw tool calibration for c_bot (m4 tool has to be equipped)")
       rospy.loginfo("65: Go to tray positions with m4 tool (tool has to be equipped)")
+      rospy.loginfo("71: Go to screw feeder outlets with m4 tool for c_bot (tool has to be equipped)")
       rospy.loginfo("x: Exit ")
       rospy.loginfo(" ")
       r = raw_input()
@@ -713,6 +714,8 @@ if __name__ == '__main__':
         c.screw_tool_test_assembly(robot_name="c_bot")
       elif r == '65':
         c.screw_tool_test_tray()
+      elif r == '71':
+        c.screw_feeder_calibration(robot_name="c_bot")
       elif r == 'x':
         break
       else:
