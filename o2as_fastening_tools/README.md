@@ -23,9 +23,6 @@ apt-get update && apt-get install -y --no-install-recommends ros-kinetic-dynamix
 
 For enabling the connection of the U2D2 controllers to a named port, please refer [here](https://gitlab.com/o2as/ur-o2as/blob/develop/udev_rules.md).
 
-Five U2D2 controllers are used in this package. The parameters are set in `demo.launch`.
-Please set the maximum number of connections and connection destination.
-
 ## ID of XL-320
 
 The motor id needs to be set to move a motor. The ID has to be unique for each Dynamixel motor.
