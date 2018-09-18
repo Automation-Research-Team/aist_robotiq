@@ -135,7 +135,7 @@
         <joint name="a_bot_wrist_2_joint" value="-1.57" />
         <joint name="a_bot_wrist_3_joint" value="0" />
     </group_state>
-    <group_state name="above_ws" group="b_bot">
+    <!-- <group_state name="above_ws" group="b_bot">
         <joint name="b_bot_elbow_joint" value="1.69128" />
         <joint name="b_bot_shoulder_lift_joint" value="-1.47778" />
         <joint name="b_bot_shoulder_pan_joint" value="1.36049" />
@@ -158,7 +158,7 @@
         <joint name="b_bot_wrist_1_joint" value="-1.7395" />
         <joint name="b_bot_wrist_2_joint" value="-1.57051" />
         <joint name="b_bot_wrist_3_joint" value="2.69795" />
-    </group_state>
+    </group_state> -->
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="c_bot_gripper" parent_link="c_bot_robotiq_85_tip_link" group="c_bot" />
     <end_effector name="b_bot_gripper" parent_link="b_bot_dual_suction_gripper_pad_link" group="b_bot" />
