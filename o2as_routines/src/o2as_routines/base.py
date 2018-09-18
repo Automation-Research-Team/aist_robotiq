@@ -136,7 +136,9 @@ class O2ASBaseRoutines(object):
     self.publishMarker_client.call(req)
     return True
 
-  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, high_precision = False, end_effector_link = ""):
+  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, high_precision = False, end_effector_link = "", move_lin = True):
+    if move_lin:
+      return self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link)
     self.publish_marker(pose_goal_stamped, "pose")
     group = self.groups[group_name]
     if end_effector_link:
@@ -167,9 +169,12 @@ class O2ASBaseRoutines(object):
   def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, end_effector_link = ""):
     self.publish_marker(pose_goal_stamped, "pose")
     group = self.groups[group_name]
+    if end_effector_link:
+      group.set_end_effector_link(end_effector_link)
     group.set_pose_target(pose_goal_stamped)
     rospy.loginfo("Setting velocity scaling to " + str(speed))
     group.set_max_velocity_scaling_factor(speed)
+    
 
     waypoints = []
     wpose = group.get_current_pose().pose

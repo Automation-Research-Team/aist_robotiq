@@ -492,14 +492,14 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
     ps_near_tray = ps_high_up;
     ps_near_tray.pose.position.x +=.2;
-    ps_near_tray.pose.position.y -=.2;
+    ps_near_tray.pose.position.y +=.2;
     ps_near_tray.pose.position.z -=.1;
   }
   else if (robot_name == "c_bot")
   {
-    ps_approach.pose.position.x = -.03;
+    ps_approach.pose.position.x = -.04;
     ps_approach.pose.position.y = -.002;  // ATTENTION: MAGIC NUMBER!
-    ps_approach.pose.position.z = .06;
+    ps_approach.pose.position.z = .07;
     ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, M_PI/2, 0);
 
     ps_tool_holder = ps_approach;
@@ -514,8 +514,9 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     ps_move_away.pose.position.z = .03;
 
     ps_high_up = ps_move_away;
-    ps_high_up.pose.position.z +=.1;
-    ps_high_up.pose.position.x +=.03;
+    ps_high_up.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, M_PI*3/4, 0);
+    ps_high_up.pose.position.z +=.25;
+    ps_high_up.pose.position.y +=.05;
   }
 
 
@@ -556,7 +557,6 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
   // Plan & execute linear motion to the tool change position
   ROS_INFO("Moving to pose in tool holder LIN.");
-  // std::cin >> debug;
   bool moved_to_tool_holder = true;
   if ( (use_real_robot_) && (robot_name == "b_bot") )
   {
@@ -588,9 +588,8 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   if (!moved_to_tool_holder) 
   {
     ROS_ERROR("Was not able to move to tool holder. ABORTING!");
-    throw;
+    return false;
   }
-  // I normally avoid exceptions, but dropping the screw tool has to be avoided at all costs.
 
   // Close gripper, attach the tool object to the gripper in the Planning Scene.
   // Its collision with the parent link is set to allowed in the original planning scene.
@@ -629,6 +628,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   moveToCartPoseLIN(ps_move_away, robot_name, true, "", lin_speed);
 
   // After unequipping, the tool must be pushed back to where it was.
+  // This section didn't work when I last tried it, but in principle it should work.
   // if (unequip) 
   // {
   //   if (use_real_robot_)
