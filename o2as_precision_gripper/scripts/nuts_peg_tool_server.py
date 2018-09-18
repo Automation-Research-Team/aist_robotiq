@@ -5,19 +5,18 @@ import time
 import rospy
 import actionlib
 import o2as_msgs.msg
-import o2as_msgs.srv
-
 class ToolsAction:
     def __init__(self):
         name = rospy.get_name()
-        serial_port = rospy.get_param(name + "/serial_port", "/dev/ttyUSB1")
+        serial_port = rospy.get_param(name + "/serial_port", "/dev/ttyUSB0")
         rospy.loginfo("Starting up on serial port: " + serial_port)
         self.dynamixel = xm430.USB2Dynamixel_Device( serial_port, baudrate = 57600 )
         self.p1 = xm430.Robotis_Servo2( self.dynamixel, 1, series = "XM" )  #Peg
-        self.p2 = xm430.Robotis_Servo2( self.dynamixel, 2, series = "XM" )  #Big nut
-        self.p3 = xm430.Robotis_Servo2( self.dynamixel, 3, series = "XM" )  #small nut
+        # self.p2 = xm430.Robotis_Servo2( self.dynamixel, 2, series = "XM" )  #Big nut
+        # self.p3 = xm430.Robotis_Servo2( self.dynamixel, 3, series = "XM" )  #small nut
 
-
+        self._feedback = o2as_msgs.msg.ToolsCommandFeedback()
+        self._result = o2as_msgs.msg.ToolsCommandResult()
         #define the action
         self._action_name = "tools_action"
         self._action_server = actionlib.SimpleActionServer(self._action_name, o2as_msgs.msg.ToolsCommandAction, execute_cb=self.action_callback, auto_start = False)
@@ -71,9 +70,9 @@ class ToolsAction:
                     self._feedback.motor_speed = self.p3.read_current_velocity()
              
             countTime = 0
-            while self._feedback.motor_speed > self.speed_limit or countTime > 50:
+            while self._feedback.motor_speed > 10 or countTime > 50:
                 rospy.sleep(0.1)
-                countTime++
+                countTime += 1
                 # check that preempt has not been requested by the client
                 if self._action_server.is_preempt_requested():
                     rospy.loginfo('%s: Preempted' % self._action_name)
