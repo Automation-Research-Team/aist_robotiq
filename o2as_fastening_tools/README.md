@@ -1,7 +1,10 @@
 # Introduction
-This package controls our fastening tools which are driven by an XL320 motor. It offers an action server.
+This package controls our fastening tools which are driven by an XL320 motor. 
 
-The motors turn counter-clockwise until the resistance increases and the speed drops to 0, at which point the rotation stops and the action returns.
+The action service name published is 'o2as_fastening_tools/fastener_gripper_control_action'.
+The definition of that message is in '/action/FastenerGripperControl.action'.
+
+Please read 'How to use' for details. 
 
 # Initial Setup
 * Dynamixel SDK
@@ -37,19 +40,28 @@ Enter the names of each motor ID and gripper in this file:
 * config/gripper.yaml
 
 # How to use
-To use the action, use the gripper name and rotation speed.
+To use the action service, use the gripper name and rotation speed or rotation time and drirection of rotation.
+The return value is the boolean type.
+The feedback value is current the rotation speed of uint32 type.
 
 The gripper name is set with gripper.yaml in the config folder.
+In this file, the motor are listed.
+If you want to add a new motor, please add it to this file.
+However, please do not duplicate the motor name and id.
 
-Speed can be specified as follows.
+The drirection of rotation can be either 'tighten' or 'loosen'.
+The motion is different in each direction.
 
-If a value in the range of 0~1023 is used, it is stopped by setting to 0 while rotating to CCW direction.
+'tighten' will rotate until the motor stops rotating.
+The rotation speed is mandatory for 'tighten'.
+The rotation speed can be between 0 and 1023.
+The rotation speed is uint32 type.
 
-If a value in the range of 1024~2047 is used, it is stopped by setting to 1024 while rotating to CW direction.
+'loosen' will rotate for the specified time.
+The rotation time is mandatory for 'loosen'.
+The rotation time is float32 type.
 
-Specifically, please refer to [here](http://support.robotis.com/en/product/actuator/dynamixel_x/xl_series/xl-320.htm#Actuator_Address_03).
-
-As in demo.launch, set parameter.
+As in fastening_tools.launch, set parameter.
 
 'max_access' is the number of U2D2 connections.
 
@@ -73,7 +85,7 @@ ID is 1,2 respectively.
 I think that the following operation is possible.
 
 * 1. Turn on the torque of XL-320 and rotate clockwise (wheel mode)
-* 2. Stop rotation of the motor with fingers, generate load (assuming screws close)
+* 2. Stop rotation of the motor with fingers, generate load.
 * 3. When the load is detected (rotation speed = 0), the torque of XL-320 is turned off and the rotation stop
 * 4. To next motor id .
 
