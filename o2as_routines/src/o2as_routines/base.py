@@ -167,7 +167,7 @@ class O2ASBaseRoutines(object):
   def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, end_effector_link = ""):
     self.publish_marker(pose_goal_stamped, "pose")
     group = self.groups[group_name]
-    group.set_pose_target(pose_goal_stamped)
+    group.set_pose_target(pose_goal_stamped, end_effector_link=end_effector_link)
     rospy.loginfo("Setting velocity scaling to " + str(speed))
     group.set_max_velocity_scaling_factor(speed)
 

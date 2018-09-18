@@ -122,8 +122,8 @@ class KittingClass(O2ASBaseRoutines):
     self.tray_id = rospy.get_param('tray_id')
     
     # services
-    self.suction = rospy.ServiceProxy("o2as_usb_relay/set_power", SetPower)
-    self.search_grasp = rospy.ServiceProxy("o2as_graspability_estimation/search_grasp", SearchGrasp)
+    # self.suction = rospy.ServiceProxy("o2as_usb_relay/set_power", SetPower)
+    # self.search_grasp = rospy.ServiceProxy("o2as_graspability_estimation/search_grasp", SearchGrasp)
 
     self.set_up_item_parameters()
     rospy.sleep(.5)
@@ -132,9 +132,6 @@ class KittingClass(O2ASBaseRoutines):
     self.item_names = []
     downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     # 
-    
-  def set_up_end_effector(self):
-    
 
   ################ ----- Routines  
   ################ 
@@ -143,14 +140,11 @@ class KittingClass(O2ASBaseRoutines):
   def switch_suction(self, on=False):
     return self.suction(1, on)
 
-  def pick(self, robot_name, gripper_name, goal_pose, speed_fast, speed_slow, approach_height=0.03):
+  def pick(self, robot_name, ee_link_name, goal_pose, speed_fast, speed_slow, approach_height=0.03):
     
-    if gripper_name=="suction":
-      self.groups[robot_name].set_end_effector_link(robot_name + '_dual_suction_gripper_pad_link')
-
     self.publish_marker(goal_pose, "aist_vision_result")
     rospy.loginfo("Going above object to pick")
-    self.go_to_check_point(robot_name, 'before_pick', speed_fast)
+    self.go_to_check_point(robot_name, ee_link_name, 'before_pick', speed_fast)
     approach_pose = geometry_msgs.msg.PoseStamped()
     approach_pose = copy.deepcopy(goal_pose)
     approach_pose.pose.position.z += approach_height
@@ -158,25 +152,22 @@ class KittingClass(O2ASBaseRoutines):
     approach_pose.pose.orientation.y = 0.5
     approach_pose.pose.orientation.z = 0.5
     approach_pose.pose.orientation.w = 0.5
-    self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast)
+    self.move_lin(robot_name, approach_pose, speed=speed_fast, end_effector_link=ee_link_name)
 
     rospy.loginfo("Moving down to object")
-    self.go_to_pose_goal(robot_name, goal_pose, speed=speed_slow, high_precision=True)
+    self.move_lin(robot_name, goal_pose, speed=speed_slow, end_effector_link=ee_link_name)
     rospy.loginfo("Picking up on suction")
-    self.switch_suction(True)
+    # self.switch_suction(True)
     rospy.sleep(1)
 
     rospy.loginfo("Going back up")
-    self.go_to_pose_goal(robot_name, approach_pose, speed=speed_slow)
-    self.go_to_check_point(robot_name, 'after_pick', speed_slow)
+    self.move_lin(robot_name, approach_pose, speed=speed_slow, end_effector_link=ee_link_name)
+    self.go_to_check_point(robot_name, ee_link_name, 'after_pick', speed_slow)
 
 
-  def place(self, robot_name, gripper_name, goal_pose, speed_fast, speed_slow, approach_height=0.05):
+  def place(self, robot_name, ee_link_name, goal_pose, speed_fast, speed_slow, approach_height=0.05):
 
-    if gripper_name=="suction":
-      self.groups[robot_name].set_end_effector_link(robot_name + '_dual_suction_gripper_pad_link')
-
-    self.go_to_check_point(robot_name, 'before_place', speed_slow)
+    self.go_to_check_point(robot_name, ee_link_name, 'before_place', speed_slow)
 
     approach_pose = geometry_msgs.msg.PoseStamped()
     approach_pose = copy.deepcopy(goal_pose)
@@ -185,17 +176,17 @@ class KittingClass(O2ASBaseRoutines):
     approach_pose.pose.orientation.y = 0.5
     approach_pose.pose.orientation.z = 0.5
     approach_pose.pose.orientation.w = 0.5
-    self.go_to_pose_goal(robot_name, approach_pose, speed=speed_slow)
+    self.move_lin(robot_name, approach_pose, speed=speed_slow, end_effector_link=ee_link_name)
 
     rospy.loginfo("Moving down to object")
-    self.go_to_pose_goal(robot_name, goal_pose, speed=speed_slow, high_precision=True)
+    self.move_lin(robot_name, goal_pose, speed=speed_slow, end_effector_link=ee_link_name)
     rospy.loginfo("Place down from suction")
-    self.switch_suction(False)
+    # self.switch_suction(False)
     rospy.sleep(1)
 
     rospy.loginfo("Going back up")
-    self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast)
-    self.go_to_check_point(robot_name, 'after_place', speed_fast)
+    self.move_lin(robot_name, approach_pose, speed=speed_fast, end_effector_link=ee_link_name)
+    self.go_to_check_point(robot_name, ee_link_name, 'after_place', speed_fast)
 
     self.go_to_named_pose("home", "c_bot")
     self.go_to_named_pose("home", "b_bot")
@@ -204,7 +195,7 @@ class KittingClass(O2ASBaseRoutines):
   ################ ----- Supply methods
   ################ 
   ################ 
-  def go_to_check_point(self, robot_name, task, speed):
+  def go_to_check_point(self, robot_name, ee_link_name, task, speed):
     pose = geometry_msgs.msg.PoseStamped()
     pose.pose.position.z = 0.15
     pose.pose.orientation.x = -0.5
@@ -214,24 +205,24 @@ class KittingClass(O2ASBaseRoutines):
 
     if task == "before_pick":
       pose.header.frame_id = "workspace_center"
-      self.go_to_pose_goal(robot_name, pose, speed)
+      self.move_lin(robot_name, pose, speed, end_effector_link=ee_link_name)
       pose.header.frame_id = "rack_bins_center"
-      self.go_to_pose_goal(robot_name, pose, speed)
+      self.move_lin(robot_name, pose, speed, end_effector_link=ee_link_name)
     elif task == "after_pick":
       pose.header.frame_id = "rack_bins_center"
-      self.go_to_pose_goal(robot_name, pose, speed)
+      self.move_lin(robot_name, pose, speed, end_effector_link=ee_link_name)
       pose.header.frame_id = "workspace_center"
-      self.go_to_pose_goal(robot_name, pose, speed)
+      self.move_lin(robot_name, pose, speed, end_effector_link=ee_link_name)
     elif task == "before_place":
       pose.header.frame_id = "workspace_center"
-      self.go_to_pose_goal(robot_name, pose, speed)
+      self.move_lin(robot_name, pose, speed, end_effector_link=ee_link_name)
       pose.header.frame_id = "rack_trays_center"
-      self.go_to_pose_goal(robot_name, pose, speed)
+      self.move_lin(robot_name, pose, speed, end_effector_link=ee_link_name)
     elif task == "after_place":
       pose.header.frame_id = "rack_trays_center"
-      self.go_to_pose_goal(robot_name, pose, speed)
+      self.move_lin(robot_name, pose, speed, end_effector_link=ee_link_name)
       pose.header.frame_id = "workspace_center"
-      self.go_to_pose_goal(robot_name, pose, speed)
+      self.move_lin(robot_name, pose, speed, end_effector_link=ee_link_name)
 
 
   ################ ----- Demos  
@@ -240,11 +231,8 @@ class KittingClass(O2ASBaseRoutines):
 
   def pick_and_place_demo(self):
 
-    robot_name = "b_bot"
-    self.groups[robot_name].set_end_effector_link(robot_name + '_dual_suction_gripper_pad_link')
-
     speed_fast = 1.0
-    speed_slow = 0.05
+    speed_slow = 1.0
 
     for set_num in range(1,4):
       item_list = rospy.get_param("/set_"+str(set_num))
@@ -259,13 +247,13 @@ class KittingClass(O2ASBaseRoutines):
           rospy.logdebug(object_pose.header.stamp)
           object_pose.pose.position = copy.deepcopy(part_poses_demo[item]["position"])
           object_pose.pose.orientation = copy.deepcopy(part_poses_demo[item]["orientation"])
-          self.pick(robot_name, self.gripper_id[item], object_pose, speed_fast, speed_slow)
+          self.pick("b_bot", "b_bot_dual_suction_gripper_pad_link", object_pose, speed_fast, speed_slow)
 
           place_pose = geometry_msgs.msg.PoseStamped()
           place_pose.header.frame_id = self.tray_id[item]
           place_pose.pose.position = copy.deepcopy(part_poses_demo[item]["goal_position"])
           place_pose.pose.orientation = copy.deepcopy(part_poses_demo[item]["goal_orientation"])
-          self.place(robot_name, self.gripper_id[item], place_pose, speed_fast, speed_slow)
+          self.place("b_bot", "b_bot_dual_suction_gripper_pad_link", place_pose, speed_fast, speed_slow)
 
 
       print(" ____  _   _ ____  ____  _____ _   _ ____  ")
