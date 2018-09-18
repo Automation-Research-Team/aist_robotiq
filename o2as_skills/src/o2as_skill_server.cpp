@@ -406,7 +406,6 @@ bool SkillServer::unequipScrewTool(std::string robot_name)
 
 bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string screw_tool_id, std::string equip_or_unequip)
 {
-  int debug;
   // Sanity check on the input instruction
   bool equip = (equip_or_unequip == "equip");
   bool unequip = (equip_or_unequip == "unequip");
@@ -439,28 +438,48 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
   if (robot_name == "b_bot")
   {
-    // Go to the correct joint pose in front of all the holders, so the gripper is not twisted.
+    // Go to two joint poses so the movement to the holder is not too messy and the gripper is in the correct orientation
     moveit::planning_interface::MoveGroupInterface* group_pointer;
     group_pointer = robotNameToMoveGroup(robot_name);
-    // moveit::core::RobotStatePtr current_state = move_groups_[robot_name].getCurrentState();
     moveit::core::RobotStatePtr current_state = group_pointer->getCurrentState();
-    std::vector<double> joint_group_positions;
+    std::vector<double> joint_group_positions_1, joint_group_positions_2;
     const robot_state::JointModelGroup* joint_model_group =
       group_pointer->getCurrentState()->getJointModelGroup(robot_name);
-    current_state->copyJointGroupPositions(joint_model_group, joint_group_positions);
-    joint_group_positions[0] = -30.0 * M_PI/180.0;
-    joint_group_positions[1] = -48 * M_PI/180.0; 
-    joint_group_positions[2] = 96 * M_PI/180.0; 
-    joint_group_positions[3] = -50 * M_PI/180.0; 
-    joint_group_positions[4] = -27 * M_PI/180.0; 
-    joint_group_positions[5] = -180 * M_PI/180.0; 
-    group_pointer->setJointValueTarget(joint_group_positions);
+    current_state->copyJointGroupPositions(joint_model_group, joint_group_positions_1);
 
+    // This position puts the gripper up high
+    joint_group_positions_1[0] = 0.20882;
+    joint_group_positions_1[1] = -2.3188;
+    joint_group_positions_1[2] = 1.7198;
+    joint_group_positions_1[3] = 0.5989;
+    joint_group_positions_1[4] = 1.6538;
+    joint_group_positions_1[5] = -3.141;
+    group_pointer->setJointValueTarget(joint_group_positions_1);
     moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-    moveit::planning_interface::MoveItErrorCode success = 
-            (group_pointer->plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+    moveit::planning_interface::MoveItErrorCode success, motion_done;
+    
+    success = (group_pointer->plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
     if (success)
-      moveit::planning_interface::MoveItErrorCode motion_done = group_pointer->execute(my_plan);
+      motion_done = group_pointer->execute(my_plan);
+    else
+    {
+      ROS_ERROR("Could not plan to before_tool_pickup joint state. Abort!");
+      return false;
+    }
+
+    // This position is in front of the tool holder
+    joint_group_positions_2 = joint_group_positions_1;
+    joint_group_positions_2[0] = -0.561;
+    joint_group_positions_2[1] = -0.848;
+    joint_group_positions_2[2] = 1.689;
+    joint_group_positions_2[3] = -0.841;
+    joint_group_positions_2[4] = -0.548;
+    joint_group_positions_2[5] = -3.142;
+    group_pointer->setJointValueTarget(joint_group_positions_2);
+
+    success = (group_pointer->plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+    if (success)
+      motion_done = group_pointer->execute(my_plan);
     else
     {
       ROS_ERROR("Could not plan to before_tool_pickup joint state. Abort!");
@@ -469,7 +488,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   }
 
   // Set up poses
-  geometry_msgs::PoseStamped ps_approach, ps_tool_holder, ps_move_away, ps_high_up, ps_near_tray;
+  geometry_msgs::PoseStamped ps_approach, ps_tool_holder, ps_move_away, ps_high_up, ps_end;
   ps_approach.header.frame_id = screw_tool_id + "_helper_link";
 
   if (robot_name == "b_bot")
@@ -490,10 +509,10 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     ps_high_up.pose.position.z +=.5;
     ps_high_up.pose.position.x -=.1;
 
-    ps_near_tray = ps_high_up;
-    ps_near_tray.pose.position.x +=.2;
-    ps_near_tray.pose.position.y +=.2;
-    ps_near_tray.pose.position.z -=.1;
+    ps_end = ps_high_up;
+    ps_end.pose.position.x +=.3;
+    ps_end.pose.position.y +=.4;
+    ps_end.pose.position.z -=.1;
   }
   else if (robot_name == "c_bot")
   {
@@ -675,18 +694,17 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   {
     goToNamedPose("home", robot_name);
   }
-  else // Go nearby the tray area, which is where the next move will almost certainly go
+  else
   {
     if (robot_name == "b_bot")
     {
-      ROS_INFO("Going near tray.");
-      moveToCartPoseLIN(ps_near_tray, robot_name);
+      moveToCartPoseLIN(ps_end, robot_name);
+      goToNamedPose("screw_ready", robot_name);
     }
     else if (robot_name == "c_bot")
     {
-      ; // TODO: Do anything special?
+      goToNamedPose("screw_ready", robot_name);
     }
-    // goToNamedPose("screw_ready", robot_name);
   }
 
   return true;
@@ -1738,232 +1756,6 @@ int main(int argc, char **argv)
   // Create an object of class SkillServer that will take care of everything
   SkillServer ss;
   ROS_INFO("O2AS skill server started");
-  
-
-  
-  std::vector<const robot_state::AttachedBody*> ab;
-  
-  // o2as_msgs::sendScriptToUR srv;
-  // srv.request.program_id = "insertion";
-  // srv.request.robot_name = "b_bot";
-  // ss.sendScriptToURClient_.call(srv);
-  // if (srv.response.success == true)
-  //   ROS_INFO("Successfully called the service client");
-  // else
-  //   ROS_WARN("Could not call the service client");
-  // waitForURProgram("/b_bot_controller");
-
-  while (ros::ok())
-  {
-    // ----
-    int c;    
-
-    moveit_msgs::CollisionObject box;
-    box.header.frame_id = "b_bot_robotiq_85_tip_link";
-    box.id = "box";
-    box.primitives.resize(1);
-    box.primitive_poses.resize(1);
-    box.primitives[0].type = box.primitives[0].BOX;
-    box.primitives[0].dimensions.resize(3);
-    box.primitives[0].dimensions[0] = 0.02;
-    box.primitives[0].dimensions[1] = 0.05;
-    box.primitives[0].dimensions[2] = 0.1;
-    box.frame_poses.resize(3);
-    box.frame_names.resize(3);
-    box.frame_poses[0].position.z = -.05;
-    box.frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(90.0/180.0 *M_PI));
-    box.frame_names[0] = "box_bottom";
-    box.frame_poses[1].position.x = -.01;
-    box.frame_poses[1].position.y = -.025;
-    box.frame_poses[1].position.z = -.05;
-    box.frame_poses[1].orientation.w = 1.0;
-    box.frame_names[1] = "box_corner_1";
-    box.frame_poses[2].position.x = -.01;
-    box.frame_poses[2].position.y = .025;
-    box.frame_poses[2].position.z = -.05;
-    box.frame_poses[2].orientation.w = 1.0;
-    box.frame_names[2] = "box_corner_2";
-
-    moveit_msgs::CollisionObject cylinder;
-    cylinder.header.frame_id = "b_bot_robotiq_85_tip_link";
-    cylinder.id = "cylinder";
-    cylinder.primitives.resize(1);
-    cylinder.primitive_poses.resize(1);
-    cylinder.primitives[0].type = box.primitives[0].CYLINDER;
-    cylinder.primitives[0].dimensions.resize(2);
-    cylinder.primitives[0].dimensions[0] = 0.04; // height (along x)
-    cylinder.primitives[0].dimensions[1] = 0.005; // radius
-    cylinder.primitive_poses[0].position.x = 0.0;
-    cylinder.primitive_poses[0].position.y = -0.05;
-    cylinder.primitive_poses[0].position.z = 0.0;
-    cylinder.frame_poses.resize(1);
-    cylinder.frame_names.resize(1);
-    cylinder.frame_poses[0].position.y = -.05;
-    cylinder.frame_poses[0].position.z = -.02;
-    box.frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, -(90.0/180.0 *M_PI));
-    cylinder.frame_names[0] = "cylinder_tip";
-
-    geometry_msgs::PoseStamped ps, ps_0;
-    ps = makePoseStamped();
-    ps.header.frame_id = "b_bot_base";
-    ps.pose.position.y = -.5;
-    ps.pose.position.z = .3;
-    ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, (90.0/180.0 *M_PI), 0);
-    // ps.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, (90.0/180.0 *M_PI), 0);
-    ps_0 = makePoseStamped();
-
-    ROS_INFO("Press key to start test stuff. \n0 to exit. \n1 to spawn box and cylinder. \n11 to spawn another thing. "
-            "\n2 to attach box to the gripper \n22 to attach cylinder to the gripper "
-            "\n222 to attach box to the gripper while specifying all its data again \n3 to reset scene "
-            "\n4 to move to example point with EE \n5 with box \n6 with box_bottom \n7 with cylinder. "
-            "\n8 with cylinder_tip \n9 to move cylinder tip to box bottom \n10 to move home. "
-            "\n101-104 to move gripper to: 101 box center, 102 cylinder center, 103 box bottom, 104 cylinder tip");
-    std::cin >> c;
-    if (c == 0)
-    {
-      return true;
-    }
-    if (c == 1)
-    {
-      ROS_INFO_STREAM("Spawning test box and cylinder.");
-      moveit_msgs::CollisionObject co;
-      co = box;
-      co.operation = moveit_msgs::CollisionObject::ADD;
-      ss.planning_scene_interface_.applyCollisionObject(co);
-      co = cylinder;
-      co.operation = moveit_msgs::CollisionObject::ADD;
-      ss.planning_scene_interface_.applyCollisionObject(co);
-    }
-    if (c == 11)
-    {
-      ROS_INFO_STREAM("Spawning another test cylinder.");
-      moveit_msgs::CollisionObject co;
-      co = cylinder;
-      co.id = "test_obj";
-      co.primitive_poses[0].position.x = .05;
-      co.operation = moveit_msgs::CollisionObject::ADD;
-      ss.planning_scene_interface_.applyCollisionObject(co);
-    }
-    if (c == 2)
-    {
-      moveit_msgs::AttachedCollisionObject att_coll_object;
-      att_coll_object.object.id = "box";
-      att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
-      att_coll_object.object.operation = att_coll_object.object.ADD;
-      ROS_INFO_STREAM("Attaching test box.");
-      ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);
-    }
-    if (c == 22)
-    {
-      moveit_msgs::AttachedCollisionObject att_coll_object;
-      att_coll_object.object.id = "cylinder";
-      att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
-      att_coll_object.object.operation = att_coll_object.object.ADD;
-      ROS_INFO_STREAM("Attaching cylinder.");
-      ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);
-    }
-    if (c == 222)
-    {
-      moveit_msgs::AttachedCollisionObject att_coll_object;
-      att_coll_object.object = box;
-      att_coll_object.object.id = "box";
-      att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
-      att_coll_object.object.operation = att_coll_object.object.ADD;
-      ROS_INFO_STREAM("Attaching test box WITH NAMED FRAMES.");
-      ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);
-    }
-    if (c == 3)
-    {
-      ROS_INFO_STREAM("Removing box and cylinder.");
-      moveit_msgs::AttachedCollisionObject att_coll_object;
-      att_coll_object.object = box;
-      att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
-      att_coll_object.object.operation = att_coll_object.object.REMOVE;
-      try {ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);}
-      catch (std::exception exc) {;}
-      att_coll_object.object = cylinder;
-      att_coll_object.link_name = "b_bot_robotiq_85_tip_link";
-      att_coll_object.object.operation = att_coll_object.object.REMOVE;
-      try {ss.planning_scene_interface_.applyAttachedCollisionObject(att_coll_object);}
-      catch (std::exception exc) {;}
-
-      moveit_msgs::CollisionObject co;
-      co = box;
-      co.operation = moveit_msgs::CollisionObject::REMOVE;
-      try {ss.planning_scene_interface_.applyCollisionObject(co);}
-      catch (std::exception exc) {;}
-      co = cylinder;
-      co.operation = moveit_msgs::CollisionObject::REMOVE;
-      try {ss.planning_scene_interface_.applyCollisionObject(co);}
-      catch (std::exception exc) {;}
-    }
-    if (c == 4)
-    {
-      ss.moveToCartPosePTP(ps, "b_bot", true, "", 1.0);
-    }
-    if (c == 5)
-    {
-      ss.moveToCartPosePTP(ps, "b_bot", true, "box", 1.0);
-    }
-    if (c == 6)
-    {
-      ss.moveToCartPosePTP(ps, "b_bot", true, "box_bottom", 1.0);
-    }
-    if (c == 7)
-    {
-      ss.moveToCartPosePTP(ps, "b_bot", true, "cylinder", 1.0);
-    }
-    if (c == 8)
-    {
-      ss.moveToCartPosePTP(ps, "b_bot", true, "cylinder_tip", 1.0);
-    }
-    if (c == 9)
-    {
-      ps_0.header.frame_id = "box_bottom";
-      ps_0.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, (180.0/180.0 *M_PI), 0);
-      ps_0.pose.position.z = -0.01;
-      ss.publishMarker(ps_0, "pose");
-      ss.moveToCartPosePTP(ps_0, "b_bot", true, "cylinder_tip", 1.0);
-      ps_0.header.frame_id = "b_bot_base";
-    }
-    if (c == 10)
-    {
-      ss.goToNamedPose("home", "b_bot");
-    }
-    if (c == 101)
-    {
-      ps_0.header.frame_id = "box";
-      ss.publishMarker(ps_0, "pose");
-      ss.moveToCartPosePTP(ps_0, "b_bot", true, "", 1.0);
-      ps_0.header.frame_id = "b_bot_base";
-    }
-    if (c == 102)
-    {
-      ps_0.header.frame_id = "cylinder";
-      ss.publishMarker(ps_0, "pose");
-      ss.moveToCartPosePTP(ps_0, "b_bot", true, "", 1.0);
-      ps_0.header.frame_id = "b_bot_base";
-    }
-    if (c == 103)
-    {
-      ps_0.header.frame_id = "cylinder_tip";
-      ss.publishMarker(ps_0, "pose");
-      ss.moveToCartPosePTP(ps_0, "b_bot", true, "", 1.0);
-      ps_0.header.frame_id = "b_bot_base";
-    }
-    if (c == 104)
-    {
-      ps_0.header.frame_id = "screw_tool_m4_tip";
-      ss.publishMarker(ps_0, "pose");
-      ss.moveToCartPosePTP(ps_0, "b_bot", true, "", 1.0);
-      ps_0.header.frame_id = "b_bot_base";
-    }
-    ros::spinOnce();
-  }
-  while (ros::ok())
-  {
-    ros::spinOnce();
-  }
 
   return 0;
 }
