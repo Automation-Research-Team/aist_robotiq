@@ -35,11 +35,10 @@ Take care not to have the same IDs for Dynamixels connected to the same controll
 
 Specifically, refer to [here](http://support.robotis.com/en/product/actuator/dynamixel_x/xl_series/xl-320.htm#Actuator_Address_03).
 
-Enter the names of each motor ID and gripper in this file:
-
-* config/gripper.yaml
+Enter the names of each motor ID and gripper in this file: config/gripper.yaml
 
 # How to use
+* About arguments of action service
 To use the action service, use the gripper name and rotation speed or rotation time and drirection of rotation.
 The return value is the boolean type.
 The feedback value is current the rotation speed of uint32 type.
@@ -60,6 +59,9 @@ The rotation speed is uint32 type.
 'loosen' will rotate for the specified time.
 The rotation time is mandatory for 'loosen'.
 The rotation time is float32 type.
+In this case, there is no feedback.
+
+* The actual launch file
 
 As in fastening_tools.launch, set parameter.
 
@@ -70,7 +72,7 @@ The value uses the connection name of U2D2.
 
 'conf_dir' sets the path of the config folder.
 
-'parts' sets the yaml name with gripper information.
+'fastening_tools' sets the yaml name with gripper information.
 
 
 * Example of use 
