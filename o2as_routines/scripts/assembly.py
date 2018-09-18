@@ -327,39 +327,39 @@ class AssemblyClass(O2ASBaseRoutines):
     p_screw_rest.pose.orientation.w = 1.0
     self.move_lin("b_bot", p_screw_rest, 0.05)
 
-    # ===========
+    ###### ===========
     
-    rospy.loginfo("Going to pick up plate_3 with c_bot")
-    # TODO: Attach a spawned object, use its frames to plan the next motion
-    # TEMPORARY WORKAROUND: Use initial+assembled position. This does not do collision avoidance!!
-    self.send_gripper_command("c_bot", "open")
-    psc = geometry_msgs.msg.PoseStamped()
-    psc.header.frame_id = "initial_assy_part_03_pulley_ridge_bottom" # The top corner of the big plate
-    psc.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0, pi/2, -pi/2))
-    psc.pose.position.x = -0.002
-    psc.pose.position.y = 0.0
-    psc.pose.position.z = 0.05
-    self.go_to_pose_goal("c_bot", psc, 1.0)
-    psc.pose.position.z = -0.03
-    self.move_lin("c_bot", psc, 1.0)
-    self.send_gripper_command("c_bot", "close")
+    # rospy.loginfo("Going to pick up plate_3 with c_bot")
+    # # TODO: Attach a spawned object, use its frames to plan the next motion
+    # # TEMPORARY WORKAROUND: Use initial+assembled position. This does not do collision avoidance!!
+    # self.send_gripper_command("c_bot", "open")
+    # ps_approach = geometry_msgs.msg.PoseStamped()
+    # ps_approach.header.frame_id = "initial_assy_part_03_pulley_ridge_bottom" # The top corner of the big plate
+    # ps_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+    # ps_approach.pose.position.x = 0.0025
+    # ps_approach.pose.position.y = 0.0
+    # ps_approach.pose.position.z = 0.05
+    # ps_approach = copy.deepcopy(ps_approach)
+    # ps_pickup = copy.deepcopy(ps_approach)
+    # ps_pickup.pose.position.z = -0.03
+    # ps_high = copy.deepcopy(ps_approach)
+    # ps_high.pose.position.z = 0.13
 
-    # Go up and back a bit
-    psc.pose.position.z = 0.05
-    self.move_lin("c_bot", psc, 1.0)
-    psc.pose.position.z = 0.13
-    psc.pose.position.y = 0.07
-    self.move_lin("c_bot", psc, 1.0)
-    psc.pose.position.y = 0.0
+    # self.move_lin("c_bot", ps_approach, 1.0)
 
-    # Go to place the thing and hope there's no collision
-    psc.header.frame_id = "assembled_assy_part_03_pulley_ridge_bottom"
-    psc.pose.position.z = -.029
-    self.move_lin("c_bot", psc, .02)
-    self.send_gripper_command("c_bot", 0.008)
+    # self.move_lin("c_bot", ps_pickup, 1.0)
+    # self.send_gripper_command("c_bot", "close")
+    # # raw_input() # Uncomment this to draw the contour as it is grasped
 
+    # self.move_lin("c_bot", ps_high, 1.0)
 
-    # ==========
+    # # Go to the same pose at the assembly position
+    # ps_pickup.header.frame_id = "assembled_assy_part_03_pulley_ridge_bottom"
+    # ps_pickup.pose.position.z += .001
+    # self.move_lin("c_bot", ps_pickup, .02)
+    # self.send_gripper_command("c_bot", 0.008)
+
+    ###### ==========
     # Move b_bot to the hole and screw
     pscrew = geometry_msgs.msg.PoseStamped()
     pscrew.header.frame_id = "assembled_assy_part_03_bottom_screw_hole_1" # The top corner of the big plate
@@ -367,8 +367,57 @@ class AssemblyClass(O2ASBaseRoutines):
     # pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(pi/2, 0,0))
     self.do_screw_action("b_bot", pscrew, screw_height = 0.02, screw_size = 4)
 
+  def place_plate_2(self):
+    # Requires the tool to be equipped on b_bot
+    
+    rospy.loginfo("Going to pick up and place plate_2 with c_bot")
+    
+    self.go_to_named_pose("home", "c_bot")
+    self.send_gripper_command("c_bot", "open")
+    ps_approach = geometry_msgs.msg.PoseStamped()
+    ps_approach.header.frame_id = "initial_assy_part_02_back_hole" # The top corner of the big plate
+    ps_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0, pi/2, pi/2))
+    ps_approach.pose.position.x = 0.0025
+    ps_approach.pose.position.y = 0.0
+    ps_approach.pose.position.z = 0.05
+    ps_approach = copy.deepcopy(ps_approach)
+    ps_pickup = copy.deepcopy(ps_approach)
+    ps_pickup.pose.position.z = -0.03
+    ps_high = copy.deepcopy(ps_approach)
+    ps_high.pose.position.z = 0.13
+
+    self.move_lin("c_bot", ps_approach, 1.0)
+
+    self.move_lin("c_bot", ps_pickup, 1.0)
+    self.send_gripper_command("c_bot", "close")
+    # raw_input() # Uncomment this to draw the contour as it is grasped
+
+    self.move_lin("c_bot", ps_high, 1.0)
+
+    # Go to the same pose at the assembly position
+    ps_pickup.header.frame_id = "assembled_assy_part_02_back_hole"
+    ps_pickup.pose.position.z += .001
+    self.move_lin("c_bot", ps_pickup, .02)
+    self.send_gripper_command("c_bot", 0.008)
+
+    rospy.sleep(.5)
+    self.send_gripper_command("c_bot", 0.08)
+    ps_move_away = copy.deepcopy(ps_pickup)
+    ps_move_away.pose.position.x -= .01
+    ps_move_away.pose.position.y -= .06
+    self.move_lin("c_bot", ps_move_away, 1.0)
+    ps_move_away.pose.position.x -= .1
+    self.move_lin("c_bot", ps_move_away, 1.0)
+    self.go_to_named_pose("home", "c_bot")
 
 
+    # # ==========
+    # # Move b_bot to the hole and screw
+    # pscrew = geometry_msgs.msg.PoseStamped()
+    # pscrew.header.frame_id = "assembled_assy_part_03_bottom_screw_hole_1" # The top corner of the big plate
+    # pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0, 0,0))
+    # # pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(pi/2, 0,0))
+    # self.do_screw_action("b_bot", pscrew, screw_height = 0.02, screw_size = 4)
 
 
 
@@ -381,6 +430,7 @@ if __name__ == '__main__':
     # assy.insertion_demo()
     # assy.belt_demo()
     assy.place_plate_3_and_screw_demo()
+    # assy.place_plate_2()
 
     print "============ Done!"
   except rospy.ROSInterruptException:

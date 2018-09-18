@@ -5,10 +5,10 @@
 
   <!-- Trays: 30 cm x 21 cm -->
   <xacro:kitting_tray1 trayname="tray_1" parent="workspace_center">
-    <origin xyz="0.1 -0.315 0" rpy="0 0 ${pi/2}" />
+    <origin xyz="0.05 0. 0" rpy="0 0 ${-pi/2}" />
   </xacro:kitting_tray1>
   <xacro:kitting_tray2 trayname="tray_2" parent="workspace_center">
-    <origin xyz="-0.2 0.315 0" rpy="0 0 ${-pi/2}" />
+    <origin xyz="0.35 0. 0" rpy="0 0 ${pi/2}" />
   </xacro:kitting_tray2>
   <!-- The base plate -->
 
@@ -31,12 +31,12 @@
     <origin xyz="0 0 0" rpy="0 0 0" />   
   </xacro:assy_part_01>
 
-  <xacro:assy_part_02 prefix="initial_" parent="workspace_center" spawn_attached="true">
-    <origin xyz="-.2 0.06 0" rpy="0 0 ${pi}" />   
-  </xacro:assy_part_02>
+  <xacro:assy_part_frames_only_02 prefix="initial_" parent="workspace_center" spawn_attached="true">
+    <origin xyz="-.18 -0.1 0" rpy="0 0 ${pi}" />   
+  </xacro:assy_part_frames_only_02>
 
-  <xacro:assy_part_03 prefix="initial_" parent="workspace_center" spawn_attached="true">
-    <origin xyz="-.2 -0.05 0" rpy="0 0 ${pi}" />   
-  </xacro:assy_part_03>
+  <xacro:assy_part_frames_only_03 prefix="initial_" parent="workspace_center" spawn_attached="true">
+    <origin xyz="-.18 0.095 0" rpy="0 0 ${pi}" />   
+  </xacro:assy_part_frames_only_03>
   
 </robot>
