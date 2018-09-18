@@ -7,7 +7,6 @@ find_package(catkin REQUIRED
   rospy
   roscpp
   std_srvs
-  phoxi_camera
   o2as_phoxi_camera
   o2as_realsense_camera
   shape_msgs
