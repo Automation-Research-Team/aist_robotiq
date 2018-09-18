@@ -176,8 +176,15 @@ class O2ASBaseRoutines(object):
     group.set_max_velocity_scaling_factor(speed)
     
 
+    # FIXME: At the start of the program, get_current_pose() did not return the correct value. Should be a bug report.
     waypoints = []
     wpose = group.get_current_pose().pose
+    # rospy.loginfo("Wpose1:")
+    # rospy.loginfo(wpose)
+    rospy.sleep(.05)
+    wpose = group.get_current_pose().pose
+    # rospy.loginfo("Wpose2:")
+    # rospy.loginfo(wpose)
     waypoints.append(wpose)
     pose_goal_world = self.listener.transformPose("world", pose_goal_stamped).pose
     waypoints.append(pose_goal_world)
@@ -185,6 +192,7 @@ class O2ASBaseRoutines(object):
                                       waypoints,   # waypoints to follow
                                       0.01,        # eef_step
                                       0.0)         # jump_threshold
+    rospy.loginfo("compute cartesian path succeeded with " + str(fraction*100) + "%")
 
     plan = group.execute(plan, wait=True)
     group.stop()
