@@ -49,23 +49,23 @@ To use the action service, use the gripper name and rotation speed or rotation t
 The return value is the boolean type.
 The feedback value is current the rotation speed of uint32 type.
 
-- gripper name
+- gripper name : 
 The gripper name is set with gripper.yaml in the config folder.
 In this file, the motor are listed.
 If you want to add a new motor, please add it to this file.
 However, please do not duplicate the motor name and id.
 
-- drirection
+- drirection : 
 The drirection of rotation can be either 'tighten' or 'loosen'.
 The motion is different in each direction.
 
-- rotation speed
+- rotation speed : 
 'tighten' will rotate until the motor stops rotating.
 The rotation speed is mandatory for 'tighten'.
 The rotation speed can be between 0 and 1023.
 The rotation speed is uint32 type.
 
-- drirection of rotation
+- drirection of rotation : 
 'loosen' will rotate for the specified time.
 The rotation time is mandatory for 'loosen'.
 The rotation time is float32 type.
