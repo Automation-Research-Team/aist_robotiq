@@ -93,7 +93,7 @@ class O2ASBaseRoutines(object):
     self.listener = tf.TransformListener()
 
     moveit_commander.roscpp_initialize(sys.argv)
-    rospy.init_node('assembly_example', anonymous=False, log_level=rospy.DEBUG)
+    rospy.init_node('assembly_example', anonymous=False)
 
     self.robots = moveit_commander.RobotCommander()
     self.groups = {"a_bot":moveit_commander.MoveGroupCommander("a_bot"),
@@ -111,6 +111,8 @@ class O2ASBaseRoutines(object):
     self.align_client = actionlib.SimpleActionClient('/o2as_skills/align', o2as_msgs.msg.alignAction)
     self.insert_client = actionlib.SimpleActionClient('/o2as_skills/insert', o2as_msgs.msg.insertAction)
     self.screw_client = actionlib.SimpleActionClient('/o2as_skills/screw', o2as_msgs.msg.screwAction)
+    self.change_tool_client = actionlib.SimpleActionClient('/o2as_skills/changeTool', o2as_msgs.msg.changeToolAction)
+    
 
     self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR)
     self.goToNamedPose_client = rospy.ServiceProxy('/o2as_skills/goToNamedPose', o2as_msgs.srv.goToNamedPose)
@@ -134,9 +136,13 @@ class O2ASBaseRoutines(object):
     self.publishMarker_client.call(req)
     return True
 
-  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, high_precision = False):
+  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, high_precision = False, end_effector_link = ""):
+    self.publish_marker(pose_goal_stamped, "pose")
     group = self.groups[group_name]
     group.set_pose_target(pose_goal_stamped)
+    if end_effector_link:
+      rospy.loginfo("Setting end effector link to " + end_effector_link)
+      group.set_end_effector_link(end_effector_link)
     rospy.loginfo("Setting velocity scaling to " + str(speed))
     group.set_max_velocity_scaling_factor(speed)
 
@@ -154,6 +160,30 @@ class O2ASBaseRoutines(object):
     if high_precision:
       group.set_goal_tolerance(.0001) 
       group.set_planning_time(3) 
+
+    current_pose = group.get_current_pose().pose
+    return all_close(pose_goal_stamped.pose, current_pose, 0.01)
+
+  def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, end_effector_link = ""):
+    self.publish_marker(pose_goal_stamped, "pose")
+    group = self.groups[group_name]
+    group.set_pose_target(pose_goal_stamped)
+    rospy.loginfo("Setting velocity scaling to " + str(speed))
+    group.set_max_velocity_scaling_factor(speed)
+
+    waypoints = []
+    wpose = group.get_current_pose().pose
+    waypoints.append(wpose)
+    pose_goal_world = self.listener.transformPose("world", pose_goal_stamped).pose
+    waypoints.append(pose_goal_world)
+    (plan, fraction) = group.compute_cartesian_path(
+                                      waypoints,   # waypoints to follow
+                                      0.01,        # eef_step
+                                      0.0)         # jump_threshold
+
+    plan = group.execute(plan, wait=True)
+    group.stop()
+    group.clear_pose_targets()
 
     current_pose = group.get_current_pose().pose
     return all_close(pose_goal_stamped.pose, current_pose, 0.01)
@@ -271,6 +301,29 @@ class O2ASBaseRoutines(object):
     self.insert_client.send_goal(goal)
     self.insert_client.wait_for_result()
     return self.insert_client.get_result()
+
+  def do_change_tool_action(self, robot_name, equip=True, 
+                        screw_size = 4):
+    goal = o2as_msgs.msg.changeToolGoal()
+    goal.robot_name = robot_name
+    goal.equip_the_tool = equip
+    goal.screw_size = screw_size
+    rospy.loginfo("Sending changeTool action goal.")    
+    self.change_tool_client.send_goal(goal)
+    self.change_tool_client.wait_for_result()
+    return self.change_tool_client.get_result()
+  
+  def do_screw_action(self, robot_name, target_hole, screw_height = 0.02, 
+                        screw_size = 4):
+    goal = o2as_msgs.msg.screwGoal()
+    goal.target_hole = target_hole
+    goal.screw_height = screw_height
+    goal.screw_size = screw_size
+    goal.robot_name = robot_name
+    rospy.loginfo("Sending screw action goal.")
+    self.screw_client.send_goal(goal)
+    self.screw_client.wait_for_result()
+    return self.screw_client.get_result()
 
   def do_insertion(self, robot_name):
     # Directly calls the UR service rather than the action of the skill_server
