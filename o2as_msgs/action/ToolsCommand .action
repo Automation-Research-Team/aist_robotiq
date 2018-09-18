@@ -1,0 +1,13 @@
+# Only one command can be set at a time. Requests are interpreted from the top (the stop command overrides all)
+bool stop
+bool peg_fasten
+bool big_nut_fasten
+bool small_nut_fasten
+
+---
+# Define the result
+bool success
+
+---
+# Define a feedback message
+uint32 motor_speed
