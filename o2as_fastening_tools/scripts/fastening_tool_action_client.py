@@ -12,13 +12,13 @@ import actionlib_tutorials.msg
 
 class FasteningToolController:
     def fasten(self, name):
-        client = actionlib.SimpleActionClient('FastenerGripperControlAction', FastenerGripperControlAction)
+        client = actionlib.SimpleActionClient('o2as_fastening_tools/fastener_gripper_control_action', FastenerGripperControlAction)
         client.wait_for_server()
         goal = FastenerGripperControlGoal()
 
         goal.fastening_tool_name = name
-        goal.speed = speed
-        goal.direction = "CCW"
+        goal.speed = 100
+        goal.direction = "tighten"
 
         client.send_goal_and_wait(goal,rospy.Duration(10),rospy.Duration(10))
         client.wait_for_result()
@@ -36,10 +36,8 @@ if __name__ == '__main__':
             "m3_tool",
         ]
 
-        # rospy.sleep(3)
-
         for name in name_list:
-            if not controller.fasten(name).control_result :
+            if not controller.fasten(name) :
                 break
 
         print('')
