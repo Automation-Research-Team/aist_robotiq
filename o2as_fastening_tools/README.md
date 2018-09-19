@@ -42,30 +42,33 @@ Enter the names of each motor ID and gripper in this file: config/gripper.yaml
 
 load gripper info file. (fastening_tools.yaml)
 
-To use the action service, use the gripper name and rotation speed or rotation time and drirection of rotation.
+To use the action service, use "fastening_tool_name" and "speed" or "duration" and "direction".
 The return value is the boolean type.
 The feedback value is current the rotation speed of uint32 type.
 
-- gripper name : 
+- "fastening_tool_name" : 
 The gripper name is set with gripper.yaml in the config folder.
 In this file, the motor are listed.
 If you want to add a new motor, please add it to this file.
+The gripper name can be any string.
 However, please do not duplicate the motor name and id.
 
-- drirection : 
-The drirection of rotation can be either 'tighten' or 'loosen'.
-The motion is different in each direction.
+- "direction" : 
+The valid strings for "direction" is "tighten" or "loosen".
+The motion is different in each valid strings.
 
-- rotation speed : 
-'tighten' will rotate until the motor stops rotating.
-The rotation speed is mandatory for 'tighten'.
-The rotation speed can be between 0 and 1023.
-The rotation speed is uint32 type.
+- "speed" : 
+When the "direction" is "tighten" mode, this will rotate until the motor stops rotating.
+When the "direction" is "loosen" mode, this will rotate until the "duration" seconds.
+The "speed" is mandatory for "tighten" and "loosen" mode.
+The "speed" can be between 0 and 1023.
+The "speed" is uint32 type.
 
-- drirection of rotation : 
-'loosen' will rotate for the specified time.
-The rotation time is mandatory for 'loosen'.
-The rotation time is float32 type.
+- "duration" : 
+When the "direction" is "loosen" mode, this will rotate for the specified time.
+The "duration" is mandatory for "loosen" mode.
+The "duration" can be in seconds.
+The "duration" is float32 type. (ex. "duration" = 1.0 : one second)
 In this case, there is no feedback.
 
 ## About the actual launch file
