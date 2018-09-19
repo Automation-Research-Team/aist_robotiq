@@ -122,7 +122,7 @@ class URScriptRelay():
 
             program = program_front + "\n" + program_back
         elif req.program_id == "lin_move":
-            rospy.logwarn("LIN MOVE IS NOT IMPLEMENTED CORRECTLY YET") 
+            rospy.loginfo("lin move uses the ee_link of the robot, not the EE of the move group.") 
             if not req.acceleration:
                 req.acceleration = 0.5
             if not req.velocity:
@@ -144,8 +144,6 @@ class URScriptRelay():
             program += "    textmsg(\"Done.\")\n"
             program += "end\n"
             rospy.loginfo(program)
-            rospy.logwarn("Not sending this.")
-            return True
         elif req.program_id == "lin_move_rel":
             if not req.acceleration:
                 req.acceleration = 0.5
@@ -194,6 +192,25 @@ class URScriptRelay():
             while program_line:
                 program += program_line
                 program_line = program_file.read(1024)
+        elif req.program_id == "movej":
+            if not len(req.joint_positions) == 6:
+                rospy.logwarn("Joint pose vector not of the correct length")
+                return False
+            if not req.acceleration:
+                req.acceleration = 0.1
+            if not req.velocity:
+                req.velocity = .03
+
+            program = ""
+            program += "def move_to_joint_pose():\n"
+            program += "    textmsg(\"Move_j to a pose.\")\n"
+            program += "    target_pos=[" + str(joint_positions[0]) + "," + str(joint_positions[1]) + "," + str(joint_positions[2]) + "," \
+                                      + str(joint_positions[3]) + "," + str(joint_positions[4]) + "," + str(joint_pose[5]) + "]\n"
+            program += "    movej(target_pos, " + \
+                            "a = " + str(req.acceleration) + ", v = " + str(req.velocity) + ")\n"
+            program += "    textmsg(\"Done.\")\n"
+            program += "end\n"
+            rospy.loginfo(program)
         else:
             rospy.logerr("The program could not be recognized: " + req.program_id)
             return False
