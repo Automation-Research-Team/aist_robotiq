@@ -4,7 +4,6 @@ import rospy
 import os.path
 from std_msgs.msg import String
 from o2as_fastening_tools.srv import *
-from o2as_fastening_tools.msg import *
 
 class FasteningToolController(object):
     _feedback = FastenerGripperControlFeedback()

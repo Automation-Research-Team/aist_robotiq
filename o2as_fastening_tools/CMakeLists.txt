@@ -30,7 +30,7 @@ add_service_files(
   DynamixelReadState.srv
 )
 
-add_action_files(DIRECTORY action FILES FastenerGripperControl.action)
+# add_action_files(DIRECTORY action FILES FastenerGripperControl.action)
 
 generate_messages(
   DEPENDENCIES actionlib_msgs std_msgs 
