@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<!-- This script launch nodelet manager and o2as_debug_monitor -->
+<launch>
+  <!-- Nodelet manager -->
+  <node pkg="nodelet" type="nodelet" name="standalone_nodelet" args="manager"
+        output="screen"/>
+
+  <!-- o2as_debug_monitor -->
+  <node pkg="nodelet" type="nodelet" name="o2as_debug_monitor"
+        args="load o2as_debug_monitor/O2asDebugMonitor standalone_nodelet"
+        output="screen">
+    <!--<remap from="/Plus/out" to="remapped_output"/>-->
+  </node>
+</launch>
