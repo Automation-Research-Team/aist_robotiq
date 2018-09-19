@@ -405,6 +405,54 @@ bool SkillServer::unequipScrewTool(std::string robot_name)
   return equipUnequipScrewTool(robot_name, held_screw_tool_, "unequip");
 }
 
+geometry_msgs::PoseStamped transformTargetPoseFromTipLinkToEE(geometry_msgs::PoseStamped ps, std::string robot_name, tf::TransformListener& listener)
+{
+  tf::StampedTransform st;
+  // tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "workspace_center", "in_hand_insertion_frame"));
+  listener.lookupTransform(robot_name + "_robotiq_85_tip_link", robot_name + "_ee_link", ros::Time::now(), st);
+  // tf::Quaternion q1(ps.pose.orientation.x, ps.pose.orientation.y, ps.pose.orientation.z, ps.pose.orientation.w), q2;
+  // tf::Vector3 v1(ps.pose.position.x, ps.pose.position.y, ps.pose.position.z), v2;
+  // First, we find out the offset from tip link to EE base frame
+
+  tf::Quaternion q0(0, 0, 0, 1.0), q1(ps.pose.orientation.x, ps.pose.orientation.y, ps.pose.orientation.z, ps.pose.orientation.w), q2, q_out;
+  tf::Vector3 v0(0, 0, 0), v1(ps.pose.position.x, ps.pose.position.y, ps.pose.position.z), v2, v_out;
+  // q2 = st*q0;
+  // v2 = st*v0;
+
+  ROS_INFO_STREAM("Received pose to transform to EE link:");
+  ROS_INFO_STREAM(ps.pose.position.x << ", " << ps.pose.position.y  << ", " << ps.pose.position.z);
+  ROS_INFO_STREAM(ps.pose.orientation.x << ", " << ps.pose.orientation.y  << ", " << ps.pose.orientation.z  << ", " << ps.pose.orientation.w);
+
+  // Then we "subtract" that from the target point, so that we get the orientation of the EE link at that target configuration.
+  // tf::Transform t;
+  // t.setOrigin(v2);
+  // t.setRotation(q2);
+  // v2 = t*v1;
+  // q2 = t*q1;
+  // Although it kind of looks like that is the same as transforming it directly.
+
+  // // Try this instead:
+  // v_out = v1-v0;
+  // q_out = q1*q0;
+
+  // Apply the transformation from tip link to EE to the pose, without changing header
+  v_out = st*v1;
+  q_out = st*q1;
+  ps.pose.orientation.x = q_out.getX();
+  ps.pose.orientation.y = q_out.getY();
+  ps.pose.orientation.z = q_out.getZ();
+  ps.pose.orientation.w = q_out.getW();
+  ps.pose.position.x = v_out.getX();
+  ps.pose.position.y = v_out.getY();
+  ps.pose.position.z = v_out.getZ();
+  
+  ROS_INFO_STREAM("New pose:");
+  ROS_INFO_STREAM(ps.pose.position.x << ", " << ps.pose.position.y  << ", " << ps.pose.position.z);
+  ROS_INFO_STREAM(ps.pose.orientation.x << ", " << ps.pose.orientation.y  << ", " << ps.pose.orientation.z  << ", " << ps.pose.orientation.w);
+
+  return ps;
+}
+
 bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string screw_tool_id, std::string equip_or_unequip)
 {
   // Sanity check on the input instruction
@@ -438,6 +486,25 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   // STEP 0:
   moveit::planning_interface::MoveGroupInterface* group_pointer;
   std::vector<double> joint_group_positions_1, joint_group_positions_2;
+
+  // TODO: Do joint pose motions with real robot
+  // o2as_msgs::sendScriptToUR UR_srv2;
+  // UR_srv2.request.program_id = "movej";
+  // UR_srv2.request.robot_name = robot_name;  
+  // UR_srv2.request.joint_positions = joint_group_positions_1;
+  // UR_srv.request.velocity = .05;
+  // if (UR_srv.response.success == true)
+  // {
+  //   ROS_INFO("Successfully called the URScript client to move joints.");
+  //   waitForURProgram("/" + robot_name +"_controller");
+  // }
+  // else
+  // {
+  //   ROS_ERROR("Could not go to approach pose. Aborting tool pickup.");
+  //   planning_scene_interface_.applyPlanningScene(planning_scene_);
+  //   return false;
+  // }
+
   if (robot_name == "b_bot")
   {
     // Go to two joint poses so the movement to the holder is not too messy and the gripper is in the correct orientation
@@ -452,12 +519,12 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     if (joint_group_positions_1[0] > 0)
     {
       // This position puts the gripper up high, in preparation of going to the holder
-      joint_group_positions_1[0] = 0.20882;
-      joint_group_positions_1[1] = -2.3188;
-      joint_group_positions_1[2] = 1.7198;
-      joint_group_positions_1[3] = 0.5989;
-      joint_group_positions_1[4] = 1.6538;
-      joint_group_positions_1[5] = -3.141;
+      joint_group_positions_1[0] = 1.5722;
+      joint_group_positions_1[1] = -2.6696;
+      joint_group_positions_1[2] = 1.7915;
+      joint_group_positions_1[3] = 0.872;
+      joint_group_positions_1[4] = 1.5723;
+      joint_group_positions_1[5] = -3.1413;
       group_pointer->setJointValueTarget(joint_group_positions_1);
       
       success = (group_pointer->plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
@@ -572,12 +639,38 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
   ROS_INFO("Moving to screw tool approach pose LIN.");
   // std::cin >> debug;
+  geometry_msgs::PoseStamped ps_approach_on_ee_link = transformTargetPoseFromTipLinkToEE(ps_tool_holder, robot_name, tflistener_);
   bool preparation_succeeded = moveToCartPoseLIN(ps_approach, robot_name, true, robot_name + "_robotiq_85_tip_link", 1.0);
   if (!preparation_succeeded)
   {
-    ROS_ERROR("Could not go to approach pose. Aborting tool pickup.");
-    planning_scene_interface_.applyPlanningScene(planning_scene_);
-    return false;
+    if (use_real_robot_)
+    {
+      ROS_WARN("MoveIt failed to do linear plan. Trying move_l with the UR.");
+      ros::Duration(2).sleep();
+      o2as_msgs::sendScriptToUR UR_srv2;
+      UR_srv2.request.program_id = "lin_move";
+      UR_srv2.request.robot_name = robot_name;  
+      UR_srv2.request.target_pose = ps_approach_on_ee_link;
+      UR_srv2.request.velocity = .1;
+      sendScriptToURClient_.call(UR_srv2);
+      if (UR_srv2.response.success == true)
+      {
+        ROS_INFO("Successfully called the URScript client to do linear motion to approach pose.");
+        waitForURProgram("/" + robot_name +"_controller");
+      }
+      else
+      {
+        ROS_ERROR("Could not go to approach pose. Aborting tool pickup.");
+        planning_scene_interface_.applyPlanningScene(planning_scene_);
+        return false;
+      }
+    }
+    else
+    {
+      ROS_ERROR("Could not go to approach pose. Aborting tool pickup.");
+      planning_scene_interface_.applyPlanningScene(planning_scene_);
+      return false;
+    }
   }
 
   // Plan & execute linear motion to the tool change position
@@ -587,7 +680,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   o2as_msgs::sendScriptToUR UR_srv;
   geometry_msgs::Point t_rel;
   UR_srv.request.program_id = "lin_move_rel";
-  UR_srv.request.robot_name = robot_name;
+  UR_srv.request.robot_name = robot_name;  
   if ( (use_real_robot_) && (robot_name == "b_bot") )
   {
     ros::Duration(.3).sleep();
