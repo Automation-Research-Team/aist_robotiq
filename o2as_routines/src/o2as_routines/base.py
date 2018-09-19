@@ -91,6 +91,7 @@ class O2ASBaseRoutines(object):
     # super(O2ASBaseRoutines, self).__init__()
     
     self.listener = tf.TransformListener()
+    self.use_real_robot = rospy.get_param("use_real_robot")
 
     moveit_commander.roscpp_initialize(sys.argv)
     rospy.init_node('assembly_example', anonymous=False)
@@ -166,11 +167,44 @@ class O2ASBaseRoutines(object):
     current_pose = group.get_current_pose().pose
     return all_close(pose_goal_stamped.pose, current_pose, 0.01)
 
+  def transformTargetPoseFromTipLinkToEE(self, ps, robot_name):
+    rospy.loginfo("Received pose to transform to EE link:")
+    rospy.loginfo(str(ps.pose.position.x) + ", " + str(ps.pose.position.y)  + ", " + str(ps.pose.position.z))
+    rospy.loginfo(str(ps.pose.orientation.x) + ", " + str(ps.pose.orientation.y)  + ", " + str(ps.pose.orientation.z)  + ", " + str(ps.pose.orientation.w))
+
+    # We know t_to_target_tip and want t_to_target_ee_link
+    # Between the tip and the ee_link is a transformation that we know
+    # Its translation has to be *added* to the original target pose, and the orientation of the target pose rotated by the transformation
+    t = self.listener.lookupTransform(robot_name + "_robotiq_85_tip_link", robot_name + "_tool0", rospy.Time())
+    # t is (xyz, q)
+    ps_new = ps
+    ## FIXME: This probably does not work if the original rotation is not neutral
+    ps_new.pose.position.x += t[0][0]
+    ps_new.pose.position.y += t[0][1]
+    ps_new.pose.position.z += t[0][2]
+    q_new = tf.transformations.quaternion_multiply(t[1], [ps.pose.orientation.x, ps.pose.orientation.y, ps.pose.orientation.z, ps.pose.orientation.w])
+    ps_new.pose.orientation.x = q_new[0]
+    ps_new.pose.orientation.y = q_new[1]
+    ps_new.pose.orientation.z = q_new[2]
+    ps_new.pose.orientation.w = q_new[3]
+    
+    rospy.loginfo("New pose:")
+    rospy.loginfo(str(ps_new.pose.position.x) + ", " + str(ps_new.pose.position.y)  + ", " + str(ps_new.pose.position.z))
+    rospy.loginfo(str(ps_new.pose.orientation.x) + ", " + str(ps_new.pose.orientation.y)  + ", " + str(ps_new.pose.orientation.z)  + ", " + str(ps_new.pose.orientation.w))
+
+    return ps_new
+
   def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, end_effector_link = ""):
     self.publish_marker(pose_goal_stamped, "pose")
+
     group = self.groups[group_name]
     if end_effector_link:
       group.set_end_effector_link(end_effector_link)
+    else:
+      if group_name == "c_bot":
+        group.set_end_effector_link("c_bot_robotiq_85_tip_link")
+      elif group_name == "b_bot":
+        group.set_end_effector_link("b_bot_robotiq_85_tip_link")
     group.set_pose_target(pose_goal_stamped)
     rospy.loginfo("Setting velocity scaling to " + str(speed))
     group.set_max_velocity_scaling_factor(speed)
@@ -193,6 +227,17 @@ class O2ASBaseRoutines(object):
                                       0.01,        # eef_step
                                       0.0)         # jump_threshold
     rospy.loginfo("compute cartesian path succeeded with " + str(fraction*100) + "%")
+
+    # if fraction < 0.95 and self.use_real_robot:
+    if self.use_real_robot:
+      rospy.loginfo("MoveIt failed to plan linear motion. Attempting linear motion via URScript.")
+      req = o2as_msgs.srv.sendScriptToURRequest()
+      req.program_id = "lin_move"
+      req.robot_name = group_name
+      req.target_pose = self.transformTargetPoseFromTipLinkToEE(pose_goal_stamped, group_name)
+      req.velocity = speed
+      res = self.urscript_client.call(req)
+      return res.success
 
     plan = group.execute(plan, wait=True)
     group.stop()

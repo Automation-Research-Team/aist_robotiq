@@ -277,7 +277,7 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   
   // Plan cartesian motion
   std::vector<geometry_msgs::Pose> waypoints;
-  geometry_msgs::PoseStamped start_pose;
+  geometry_msgs::PoseStamped start_pose, end_pose;
   if (end_effector_link == "") {
     if (robot_name == "a_bot") start_pose.header.frame_id = "a_bot_gripper_tip_link";
     else start_pose.header.frame_id = robot_name + "_robotiq_85_tip_link";
@@ -285,9 +285,9 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   else start_pose.header.frame_id = end_effector_link;
   start_pose.pose = makePose();
   start_pose = transform_pose_now(start_pose, "world", tflistener_);
-  pose = transform_pose_now(pose, "world", tflistener_);
+  end_pose = transform_pose_now(pose, "world", tflistener_);
   waypoints.push_back(start_pose.pose);
-  waypoints.push_back(pose.pose);
+  waypoints.push_back(end_pose.pose);
 
   group_pointer->setMaxVelocityScalingFactor(velocity_scaling_factor); // This doesn't work for linear paths: https://answers.ros.org/question/288989/moveit-velocity-scaling-for-cartesian-path/
   b_bot_group_.setPlanningTime(LIN_PLANNING_TIME);
@@ -320,6 +320,33 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
     rt.getRobotTrajectoryMsg(scaled_trajectory);
     // Fill in move_group_
     myplan.trajectory_ = scaled_trajectory;
+
+    if (false)
+    // if ( (cartesian_success < .95) && use_real_robot_)
+    // if (use_real_robot_)
+    {
+      ROS_WARN("MoveIt failed to do linear plan. Trying move_l with the UR.");
+      ros::Duration(2).sleep();
+      o2as_msgs::sendScriptToUR UR_srv;
+      UR_srv.request.program_id = "lin_move";
+      UR_srv.request.robot_name = robot_name;  
+      UR_srv.request.target_pose = transformTargetPoseFromTipLinkToEE(pose, robot_name, tflistener_);
+      publishMarker(transformTargetPoseFromTipLinkToEE(pose, robot_name, tflistener_), "pose");
+      UR_srv.request.velocity = .05;
+      sendScriptToURClient_.call(UR_srv);
+      if (UR_srv.response.success == true)
+      {
+        ROS_INFO("Successfully called the URScript client to do linear motion to approach pose.");
+        waitForURProgram("/" + robot_name +"_controller");
+        return true;
+      }
+      else
+      {
+        ROS_ERROR("Could not go to approach pose. Aborting tool pickup.");
+        planning_scene_interface_.applyPlanningScene(planning_scene_);
+        return false;
+      }
+    }
   
     if (true) 
     {
@@ -403,54 +430,6 @@ bool SkillServer::unequipScrewTool(std::string robot_name)
 {
   ROS_INFO_STREAM("Unequipping screw tool " << held_screw_tool_);
   return equipUnequipScrewTool(robot_name, held_screw_tool_, "unequip");
-}
-
-geometry_msgs::PoseStamped transformTargetPoseFromTipLinkToEE(geometry_msgs::PoseStamped ps, std::string robot_name, tf::TransformListener& listener)
-{
-  tf::StampedTransform st;
-  // tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "workspace_center", "in_hand_insertion_frame"));
-  listener.lookupTransform(robot_name + "_robotiq_85_tip_link", robot_name + "_ee_link", ros::Time::now(), st);
-  // tf::Quaternion q1(ps.pose.orientation.x, ps.pose.orientation.y, ps.pose.orientation.z, ps.pose.orientation.w), q2;
-  // tf::Vector3 v1(ps.pose.position.x, ps.pose.position.y, ps.pose.position.z), v2;
-  // First, we find out the offset from tip link to EE base frame
-
-  tf::Quaternion q0(0, 0, 0, 1.0), q1(ps.pose.orientation.x, ps.pose.orientation.y, ps.pose.orientation.z, ps.pose.orientation.w), q2, q_out;
-  tf::Vector3 v0(0, 0, 0), v1(ps.pose.position.x, ps.pose.position.y, ps.pose.position.z), v2, v_out;
-  // q2 = st*q0;
-  // v2 = st*v0;
-
-  ROS_INFO_STREAM("Received pose to transform to EE link:");
-  ROS_INFO_STREAM(ps.pose.position.x << ", " << ps.pose.position.y  << ", " << ps.pose.position.z);
-  ROS_INFO_STREAM(ps.pose.orientation.x << ", " << ps.pose.orientation.y  << ", " << ps.pose.orientation.z  << ", " << ps.pose.orientation.w);
-
-  // Then we "subtract" that from the target point, so that we get the orientation of the EE link at that target configuration.
-  // tf::Transform t;
-  // t.setOrigin(v2);
-  // t.setRotation(q2);
-  // v2 = t*v1;
-  // q2 = t*q1;
-  // Although it kind of looks like that is the same as transforming it directly.
-
-  // // Try this instead:
-  // v_out = v1-v0;
-  // q_out = q1*q0;
-
-  // Apply the transformation from tip link to EE to the pose, without changing header
-  v_out = st*v1;
-  q_out = st*q1;
-  ps.pose.orientation.x = q_out.getX();
-  ps.pose.orientation.y = q_out.getY();
-  ps.pose.orientation.z = q_out.getZ();
-  ps.pose.orientation.w = q_out.getW();
-  ps.pose.position.x = v_out.getX();
-  ps.pose.position.y = v_out.getY();
-  ps.pose.position.z = v_out.getZ();
-  
-  ROS_INFO_STREAM("New pose:");
-  ROS_INFO_STREAM(ps.pose.position.x << ", " << ps.pose.position.y  << ", " << ps.pose.position.z);
-  ROS_INFO_STREAM(ps.pose.orientation.x << ", " << ps.pose.orientation.y  << ", " << ps.pose.orientation.z  << ", " << ps.pose.orientation.w);
-
-  return ps;
 }
 
 bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string screw_tool_id, std::string equip_or_unequip)
@@ -638,39 +617,12 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
 
   ROS_INFO("Moving to screw tool approach pose LIN.");
-  // std::cin >> debug;
-  geometry_msgs::PoseStamped ps_approach_on_ee_link = transformTargetPoseFromTipLinkToEE(ps_tool_holder, robot_name, tflistener_);
   bool preparation_succeeded = moveToCartPoseLIN(ps_approach, robot_name, true, robot_name + "_robotiq_85_tip_link", 1.0);
   if (!preparation_succeeded)
   {
-    if (use_real_robot_)
-    {
-      ROS_WARN("MoveIt failed to do linear plan. Trying move_l with the UR.");
-      ros::Duration(2).sleep();
-      o2as_msgs::sendScriptToUR UR_srv2;
-      UR_srv2.request.program_id = "lin_move";
-      UR_srv2.request.robot_name = robot_name;  
-      UR_srv2.request.target_pose = ps_approach_on_ee_link;
-      UR_srv2.request.velocity = .1;
-      sendScriptToURClient_.call(UR_srv2);
-      if (UR_srv2.response.success == true)
-      {
-        ROS_INFO("Successfully called the URScript client to do linear motion to approach pose.");
-        waitForURProgram("/" + robot_name +"_controller");
-      }
-      else
-      {
-        ROS_ERROR("Could not go to approach pose. Aborting tool pickup.");
-        planning_scene_interface_.applyPlanningScene(planning_scene_);
-        return false;
-      }
-    }
-    else
-    {
-      ROS_ERROR("Could not go to approach pose. Aborting tool pickup.");
-      planning_scene_interface_.applyPlanningScene(planning_scene_);
-      return false;
-    }
+    ROS_ERROR("Could not go to approach pose. Aborting tool pickup.");
+    planning_scene_interface_.applyPlanningScene(planning_scene_);
+    return false;
   }
 
   // Plan & execute linear motion to the tool change position

@@ -74,6 +74,49 @@ geometry_msgs::PoseStamped transform_pose_now(geometry_msgs::PoseStamped& pose, 
   return pose;
 }
 
+
+geometry_msgs::PoseStamped transformTargetPoseFromTipLinkToEE(geometry_msgs::PoseStamped ps, std::string robot_name, tf::TransformListener& listener)
+{
+  tf::StampedTransform st;
+  listener.lookupTransform(robot_name + "_robotiq_85_tip_link", robot_name + "_ee_link", ros::Time::now(), st);
+
+  tf::Quaternion q0(0, 0, 0, 1.0), q1(ps.pose.orientation.x, ps.pose.orientation.y, ps.pose.orientation.z, ps.pose.orientation.w), q2, q_out;
+  tf::Vector3 v0(0, 0, 0), v1(ps.pose.position.x, ps.pose.position.y, ps.pose.position.z), v2, v_out, v_offset;
+  tf::Transform t(q1, v1), t_out;
+
+  ROS_INFO_STREAM("Received pose to transform to EE link:");
+  ROS_INFO_STREAM(ps.pose.position.x << ", " << ps.pose.position.y  << ", " << ps.pose.position.z);
+  ROS_INFO_STREAM(ps.pose.orientation.x << ", " << ps.pose.orientation.y  << ", " << ps.pose.orientation.z  << ", " << ps.pose.orientation.w);
+
+
+
+  // Apply the transformation from tip link to EE to the pose, without changing header
+  v_offset = st*v0;
+  tf::Transform t_ps(q1, v0);
+  v_out = v1 + t_ps * v_offset;
+  q_out = st*q1;
+
+  ///// v2
+  // t_out = st * t;
+  // v_out = t_out.getOrigin();
+  // q_out = t_out.getRotation();
+
+  ps.pose.orientation.x = q_out.getX();
+  ps.pose.orientation.y = q_out.getY();
+  ps.pose.orientation.z = q_out.getZ();
+  ps.pose.orientation.w = q_out.getW();
+  ps.pose.position.x = v_out.getX();
+  ps.pose.position.y = v_out.getY();
+  ps.pose.position.z = v_out.getZ();
+
+  
+  ROS_INFO_STREAM("New pose:");
+  ROS_INFO_STREAM(ps.pose.position.x << ", " << ps.pose.position.y  << ", " << ps.pose.position.z);
+  ROS_INFO_STREAM(ps.pose.orientation.x << ", " << ps.pose.orientation.y  << ", " << ps.pose.orientation.z  << ", " << ps.pose.orientation.w);
+
+  return ps;
+}
+
 // This may be useful, but needs the helper object we don't have for the UR.
 
 // bool isRobotNearTarget(geometry_msgs::Pose& target_pose, iiwa_ros::iiwaRos& iiwa_ros_object)

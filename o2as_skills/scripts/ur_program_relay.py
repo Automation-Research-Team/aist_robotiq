@@ -127,20 +127,30 @@ class URScriptRelay():
                 req.acceleration = 0.5
             if not req.velocity:
                 req.velocity = .03
+            rospy.loginfo("original pose:")
+            rospy.loginfo(req.target_pose)
             robot_pose = self.listener.transformPose(req.robot_name + "_base", req.target_pose)
             xyz = [robot_pose.pose.position.x, robot_pose.pose.position.y, robot_pose.pose.position.z]
+            
             q = [robot_pose.pose.orientation.x, robot_pose.pose.orientation.y, 
                  robot_pose.pose.orientation.z, robot_pose.pose.orientation.w]
             rpy = tf.transformations.euler_from_quaternion(q)
+            # rpy needs to be in axis-angle representation
+            # http://www.zacobria.com/universal-robots-knowledge-base-tech-support-forum-hints-tips/python-code-example-of-converting-rpyeuler-angles-to-rotation-vectorangle-axis-for-universal-robots/
+            rospy.loginfo("q in robot base:")
+            rospy.loginfo(q)
 
-            # This works, but it uses the ee_link TCP of the robot.
+            # This seems to work, but it uses the ee_link TCP of the robot.
             program = ""
             program += "def move_to_pose_lin():\n"
             program += "    textmsg(\"Move_l to a pose.\")\n"
+            program += "    rv = rpy2rotvec([" + str(rpy[0]) + "," + str(rpy[1]) + "," + str(rpy[2]) + "])\n"
             program += "    target_pos=p[" + str(xyz[0]) + "," + str(xyz[1]) + "," + str(xyz[2]) + "," \
-                                      + str(rpy[0]) + "," + str(rpy[1]) + "," + str(rpy[2]) + "]\n"
+                                      "rv[0], rv[1], rv[2]]\n"
             program += "    movel(pose_trans(p[0.0,0.0,0.0,0.0,0.0,0.0], target_pos), " + \
                             "a = " + str(req.acceleration) + ", v = " + str(req.velocity) + ")\n"
+            # program += "    movel(target_pos, " + \
+            #                 "a = " + str(req.acceleration) + ", v = " + str(req.velocity) + ")\n"
             program += "    textmsg(\"Done.\")\n"
             program += "end\n"
             rospy.loginfo(program)
