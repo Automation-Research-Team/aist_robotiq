@@ -168,22 +168,37 @@ class O2ASBaseRoutines(object):
     rospy.loginfo(str(ps.pose.position.x) + ", " + str(ps.pose.position.y)  + ", " + str(ps.pose.position.z))
     rospy.loginfo(str(ps.pose.orientation.x) + ", " + str(ps.pose.orientation.y)  + ", " + str(ps.pose.orientation.z)  + ", " + str(ps.pose.orientation.w))
 
-    # We know t_to_target_tip and want t_to_target_ee_link
-    # Between the tip and the ee_link is a transformation that we know
-    # Its translation has to be *added* to the original target pose, and the orientation of the target pose rotated by the transformation
     t = self.listener.lookupTransform(robot_name + "_robotiq_85_tip_link", robot_name + "_tool0", rospy.Time())
-    # t is (xyz, q)
-    ps_new = ps
-    ## FIXME: This probably does not work if the original rotation is not neutral
-    ps_new.pose.position.x += t[0][0]
-    ps_new.pose.position.y += t[0][1]
-    ps_new.pose.position.z += t[0][2]
-    q_new = tf.transformations.quaternion_multiply(t[1], [ps.pose.orientation.x, ps.pose.orientation.y, ps.pose.orientation.z, ps.pose.orientation.w])
-    ps_new.pose.orientation.x = q_new[0]
-    ps_new.pose.orientation.y = q_new[1]
-    ps_new.pose.orientation.z = q_new[2]
-    ps_new.pose.orientation.w = q_new[3]
-    
+
+    m = geometry_msgs.msg.TransformStamped()
+    m.header.frame_id = ps.header.frame_id
+    m.child_frame_id = "temp_goal_pose__"
+    m.transform.translation.x = ps.pose.position.x
+    m.transform.translation.y = ps.pose.position.y
+    m.transform.translation.z = ps.pose.position.z
+    m.transform.rotation.x = ps.pose.orientation.x
+    m.transform.rotation.y = ps.pose.orientation.y
+    m.transform.rotation.z = ps.pose.orientation.z
+    m.transform.rotation.w = ps.pose.orientation.w
+    self.listener.setTransform(m)
+
+    m.header.frame_id = "temp_goal_pose__"
+    m.child_frame_id = "temp_wrist_pose__"
+    m.transform.translation.x = t[0][0]
+    m.transform.translation.y = t[0][1]
+    m.transform.translation.z = t[0][2]
+    m.transform.rotation.x = t[1][0]
+    m.transform.rotation.y = t[1][1]
+    m.transform.rotation.z = t[1][2]
+    m.transform.rotation.w = t[1][3]
+    self.listener.setTransform(m)
+
+    ps_wrist = geometry_msgs.msg.PoseStamped()
+    ps_wrist.header.frame_id = "temp_wrist_pose__"
+    ps_wrist.pose.orientation.w = 1.0
+
+    ps_new = self.listener.transformPose(ps.header.frame_id, ps_wrist)
+
     rospy.loginfo("New pose:")
     rospy.loginfo(str(ps_new.pose.position.x) + ", " + str(ps_new.pose.position.y)  + ", " + str(ps_new.pose.position.z))
     rospy.loginfo(str(ps_new.pose.orientation.x) + ", " + str(ps_new.pose.orientation.y)  + ", " + str(ps_new.pose.orientation.z)  + ", " + str(ps_new.pose.orientation.w))
