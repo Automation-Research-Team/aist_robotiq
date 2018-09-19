@@ -22,14 +22,18 @@ RealSenseCamera::RealSenseCamera(ros::NodeHandle nh, ros::NodeHandle private_nh)
     // Initialize camera parameters
     depth_scale_ = 0.0;
     memset(inv_param_, 0, 9 * sizeof(double));
-    configure();
+    if (configure() == false) {
+        throw "failed to configure realsense camera device.";
+    }
 
     // Pubilsh static transform
     publishStaticTransforms();
 
     // Activate
     active_ = false;
-    activate();
+    if (activate() == false) {
+        throw "failed to activate realsense camera device.";
+    }
 }
 
 RealSenseCamera::~RealSenseCamera()
@@ -89,7 +93,7 @@ void RealSenseCamera::dynamicReconfigureCallback(o2as_realsense_camera::RealSens
 }
 
 /// Load parameters and connect to the camera
-int RealSenseCamera::configure() 
+bool RealSenseCamera::configure() 
 {
     ROS_INFO("get ros parameters.");
 
@@ -109,13 +113,13 @@ int RealSenseCamera::configure()
     // Enable camera
     if (!deviceExists(serial_number_)) {
         ROS_ERROR("realsense device with serial number %s not exists", serial_number_.c_str());
-        return 1;
+        return false;
     }
     ROS_INFO("enable device and stream.");
     rs_config_.enable_device(serial_number_);
     rs_config_.enable_stream(rs2_stream::RS2_STREAM_COLOR, color_width_, color_height_, rs2_format::RS2_FORMAT_BGR8);
     rs_config_.enable_stream(rs2_stream::RS2_STREAM_DEPTH, depth_width_, depth_height_, rs2_format::RS2_FORMAT_Z16 );
-    return 0;
+    return true;
 }
 
 //###################################################### 
@@ -170,7 +174,7 @@ bool RealSenseCamera::prepareConversion()
 //###################################################### 
 
 /// Activate ROS service servers and publishers
-int RealSenseCamera::activate()
+bool RealSenseCamera::activate()
 {
     // start pipeline
     rs2::pipeline_profile pipeline_profile = rs_pipe_.start(rs_config_);
@@ -189,7 +193,7 @@ int RealSenseCamera::activate()
     publish_frame_timer_ = nh_.createTimer(ros::Rate(30), &RealSenseCamera::publishFrameCallback, this);
     set_trigger_mode(trigger_mode_);
     active_ = true;
-    return 0;
+    return true;
 }
 void RealSenseCamera::set_trigger_mode(bool mode)
 {
@@ -298,6 +302,7 @@ bool RealSenseCamera::getFrame(bool publish,
     sensor_msgs::Image* depth_image_msg, 
     sensor_msgs::PointCloud2* point_cloud_msg)
 {
+    ROS_ASSERT(active_ == true);
     ROS_DEBUG_STREAM("getFrame"
         << "publish: "      << publish       << ", "
         << "trigger_mode: " << trigger_mode_ << ", "

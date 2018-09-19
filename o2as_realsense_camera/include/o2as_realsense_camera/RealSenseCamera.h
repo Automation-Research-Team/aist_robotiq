@@ -44,7 +44,7 @@ protected:
 
     void setParam(o2as_realsense_camera::RealSenseCameraConfig &config, config_entry param);
     void dynamicReconfigureCallback(o2as_realsense_camera::RealSenseCameraConfig &config, uint32_t level);
-    int configure();
+    bool configure();
 
     //###################################################### 
     // camera info
@@ -57,7 +57,7 @@ protected:
     // Activate / Deactivate
     //###################################################### 
 
-    int activate();
+    bool activate();
     void set_trigger_mode(bool mode);
     void deactivate();
 
