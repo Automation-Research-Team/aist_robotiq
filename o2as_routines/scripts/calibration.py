@@ -660,6 +660,45 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, go_home=False, move_lin=True, end_effector_link=robot_name + "_screw_tool_m4_tip_link")
     return
 
+  def assembly_calibration_tray_non_screw(self, robot_name="b_bot"):
+    rospy.loginfo("============ Calibrating base pla for the assembly task. ============")
+    rospy.loginfo(robot_name + "gripper tip should be 5 mm above each corner of the plate.")
+    poses = []
+
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.header.frame_id = "tray_2_partition_1"
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.position.x = 0
+    pose0.pose.position.z = 0.2
+
+    for i in range(8):
+      poses.append(copy.deepcopy(pose0))
+
+    poses[1].header.frame_id = "tray_2_partition_2"
+    poses[2].header.frame_id = "tray_2_partition_3"
+    poses[3].header.frame_id = "tray_2_partition_4"
+    poses[4].header.frame_id = "tray_2_partition_5"
+    poses[5].header.frame_id = "tray_2_partition_6"
+    poses[6].header.frame_id = "tray_2_partition_7"
+    poses[7].header.frame_id = "tray_2_partition_8"
+
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.header.frame_id = "tray_1_partition_1"
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+    pose0.pose.position.x = 0
+    pose0.pose.position.z = 0.2
+    for i in range(5):
+      poses.append(copy.deepcopy(pose0))
+
+    poses[8].header.frame_id = "tray_1_partition_1"
+    poses[9].header.frame_id = "tray_1_partition_2"
+    poses[10].header.frame_id = "tray_1_partition_3"
+    poses[11].header.frame_id = "tray_1_partition_4"
+    poses[12].header.frame_id = "tray_1_partition_5"
+
+    self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, go_home=False)
+    return 
+
 if __name__ == '__main__':
   try:
     c = CalibrationClass()
@@ -696,6 +735,7 @@ if __name__ == '__main__':
       rospy.loginfo("65: Go to tray positions with m4 tool for b_bot (tool has to be equipped)")
       rospy.loginfo("66: Go to tray positions with m4 tool for c_bot (tool has to be equipped)")
       rospy.loginfo("71: Go to screw feeder outlets with m4 tool for c_bot (tool has to be equipped)")
+      rospy.loginfo("81: Go to tray partitions using b_bot")
       rospy.loginfo("x: Exit ")
       rospy.loginfo(" ")
       r = raw_input()
@@ -757,6 +797,8 @@ if __name__ == '__main__':
         c.screw_tool_test_tray(robot_name="c_bot")
       elif r == '71':
         c.screw_feeder_calibration(robot_name="c_bot")
+      elif r == '81':
+        c.assembly_calibration_tray_non_screw(robot_name="b_bot")
       elif r == 'x':
         break
       else:
