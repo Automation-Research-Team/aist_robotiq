@@ -100,7 +100,7 @@ bool DynamixelController::initMotor(int32_t index, uint8_t motor_id, bool baudra
 
 DynamixelController::DynamixelController(void)
 {
-	int max_access = 0;
+	int num_controllers = 0;
     int value = 10;
 	bool exist_flag = true;
 	std::string access;
@@ -109,25 +109,27 @@ DynamixelController::DynamixelController(void)
 	
 	// check access point
     ros::NodeHandle nh("~");
-	if (! nh.getParam("max_access", max_access))
+	if (! nh.getParam("num_controllers", num_controllers))
 	{
-		ROS_ERROR("No exist param. (max_access)");
-		return;
+		ROS_ERROR("No parameter set for num_controllers. Setting to 1.");
+		num_controllers = 1;
 	}
+	
 
-	for(int no=1; no <= max_access; no++){
+	for(int no=1; no <= num_controllers; no++){
 		access = "serial_port_" + std::to_string(no);
+		ROS_INFO_STREAM("Trying to find controller connected on port " << access);
 		if (nh.getParam(access, access)) access_point_list.push_back(access);
 		else
 		{
-			ROS_ERROR("No exist param. (%s)", access.c_str());
+			ROS_ERROR("More controllers requested via num_controllers parameter than exist in config file. (%s)", access.c_str());
 			exist_flag = false;
 		}
 	}
 	if (! exist_flag) return;
 
 
-    //init and serach XL-320
+    //init and search for XL-320
 	for(int index=0; index < access_point_list.size(); index++)
 	{
 		u2d2_connect_id_list.push_back("");
@@ -135,6 +137,7 @@ DynamixelController::DynamixelController(void)
 	    
 		if (ifs.is_open())
 	    {
+			ROS_INFO_STREAM("Trying to connect to controller: " << access_point_list[index]);
 			dynamixel_driver[index] = new DynamixelDriver;
 	        for(int n=0; n<4; n++)
 			{
@@ -145,7 +148,7 @@ DynamixelController::DynamixelController(void)
 			    {
 			    	for(int i=0; i < id_cnt; i++)
 			    	{
-			    		if (i==0) ROS_INFO("Connection wsa found. (%s)" , access_point_list[index].c_str());
+			    		if (i==0) ROS_INFO("Connection to controller was found. (%s)" , access_point_list[index].c_str());
 			    		ROS_INFO("[ID] %u, [Model Name] %s, [VERSION] %.1f",
 			    						id_list[i], dynamixel_driver[index]->getModelName(id_list[i]), dynamixel_driver[index]->getProtocolVersion());
 			    		
@@ -165,8 +168,8 @@ DynamixelController::DynamixelController(void)
 			}
 			if (! exist_flag)
 			{
-				ROS_INFO("Connection wsa found. (%s)" , access_point_list[index].c_str());
-				ROS_ERROR("Can not find XL-320.");
+				ROS_INFO("Connection to controller was found. (%s)" , access_point_list[index].c_str());
+				ROS_ERROR("But no XL-320 motors seem to be connected.");
 			}
 	    }
 	    else

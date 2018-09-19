@@ -1,5 +1,5 @@
 <launch>
-    <arg name="max_access"           default="1"/>
+    <arg name="num_controllers"           default="1"/>
     <arg name="serial_port_1"        default="/dev/for_docker/fastener_gripper_1"/>
     <arg name="serial_port_2"        default="/dev/for_docker/fastener_gripper_2"/>
     <arg name="serial_port_3"        default="/dev/for_docker/fastener_gripper_3"/>
@@ -9,7 +9,7 @@
     <arg name="fastening_tools"      default="fastening_tools"/>
 
     <node name="dynamixel_controller" pkg="o2as_fastening_tools" type="dynamixel_controller" output="screen">
-        <param name="max_access"      type="int"    value="$(arg max_access)"/>
+        <param name="num_controllers"      type="int"    value="$(arg num_controllers)"/>
         <param name="serial_port_1"   type="string" value="$(arg serial_port_1)"/>
         <param name="serial_port_2"   type="string" value="$(arg serial_port_2)"/>
         <param name="serial_port_3"   type="string" value="$(arg serial_port_3)"/>
