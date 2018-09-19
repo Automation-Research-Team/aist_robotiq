@@ -134,7 +134,7 @@ class O2ASBaseRoutines(object):
     self.publishMarker_client.call(req)
     return True
 
-  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, high_precision = False):
+  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 0.2, high_precision = False):
     group = self.groups[group_name]
     group.set_pose_target(pose_goal_stamped)
     rospy.loginfo("Setting velocity scaling to " + str(speed))
@@ -212,7 +212,7 @@ class O2ASBaseRoutines(object):
     # -------------
     return True
 
-  def go_to_named_pose(self, pose_name, robot_name, speed = 1.0):
+  def go_to_named_pose(self, pose_name, robot_name, speed = 0.3):
     # pose_name should be "home", "back" etc.
     self.groups[robot_name].set_named_target(pose_name)
     rospy.loginfo("Setting velocity scaling to " + str(speed))
@@ -406,7 +406,15 @@ class O2ASBaseRoutines(object):
     try:
       action_client = self.gripper_action_clients["a_bot"]
       goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
-
+      goal.open_inner_gripper_slightly = True
+      goal.open_inner_gripper_fully = False
+      goal.close_inner_gripper_fully = False
+      goal.this_action_grasps_an_object = this_action_grasps_an_object
+      self.gripper_action_clients["a_bot"].send_goal(goal)
+      rospy.loginfo("Opening inner gripper slightly")
+      self.gripper_action_clients["a_bot"].wait_for_result()
+      result = self.gripper_action_clients["a_bot"].get_result()
+      rospy.loginfo(result)
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
 

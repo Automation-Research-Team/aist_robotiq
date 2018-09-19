@@ -385,6 +385,7 @@ class TaskboardClass(O2ASBaseRoutines):
     tilt_pose.pose.orientation = before_tilt_orientation
     self.go_to_pose_goal('a_bot', tilt_pose, speed=speed_fast)
     #gripper slight open
+    self.precision_gripper_inner_open_slightly()
 
     #tilt up
     after_tilt_up = geometry_msgs.msg.PoseStamped()
@@ -394,7 +395,9 @@ class TaskboardClass(O2ASBaseRoutines):
     after_tilt_up.pose.position.z = 1.1004
     after_tilt_up.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi, -pi/5, pi/2))
     self.go_to_pose_goal('a_bot', after_tilt_up, speed=speed_fast)
+
     #return
+    rospy.sleep(2)
     self.go_to_pose_goal('a_bot', tilt_pose, speed=speed_fast)
 
   def precision_test(self, robotname, object_pose, grasp_height, object_place, place_height, approach_height = 0.05, speed_fast=0.2, speed_slow=0.02):
@@ -482,7 +485,13 @@ if __name__ == '__main__':
         rospy.loginfo("Waiting for enter before going home")
         raw_input()
       if i == 22:
+        taskboard.pick("a_bot",taskboard.pick_poses[3],taskboard.item_pick_heights[3]-0.026-0.06,
+                                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
+                                 approach_height = 0.1, special_pick = True)
         taskboard.tilt_up_gripper()
+
+      if i ==23:
+        taskboard.precision_gripper_inner_open_slightly()
 
       if i == 20:
         rospy.loginfo("doing spiral motion")

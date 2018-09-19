@@ -69,10 +69,10 @@ class ToolsAction:
                 elif goal.small_nut_fasten:
                     self._feedback.motor_speed = self.p3.read_current_velocity()
              
-            countTime = 0
-            while self._feedback.motor_speed > 10 or countTime > 50:
+            self._feedback.countTime = 0
+            while self._feedback.motor_speed > 10 and self._feedback.countTime < 50:
                 rospy.sleep(0.1)
-                countTime += 1
+                self._feedback.countTime += 1
                 # check that preempt has not been requested by the client
                 if self._action_server.is_preempt_requested():
                     rospy.loginfo('%s: Preempted' % self._action_name)
