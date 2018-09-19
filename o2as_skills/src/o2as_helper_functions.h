@@ -77,44 +77,41 @@ geometry_msgs::PoseStamped transform_pose_now(geometry_msgs::PoseStamped& pose, 
 
 geometry_msgs::PoseStamped transformTargetPoseFromTipLinkToEE(geometry_msgs::PoseStamped ps, std::string robot_name, tf::TransformListener& listener)
 {
-  tf::StampedTransform st;
-  listener.lookupTransform(robot_name + "_robotiq_85_tip_link", robot_name + "_ee_link", ros::Time::now(), st);
+  tf::StampedTransform st_tip_to_wrist, st_ref_to_goal;
+  listener.lookupTransform(robot_name + "_robotiq_85_tip_link", robot_name + "_tool0", ros::Time::now(), st_tip_to_wrist);
 
-  tf::Quaternion q0(0, 0, 0, 1.0), q1(ps.pose.orientation.x, ps.pose.orientation.y, ps.pose.orientation.z, ps.pose.orientation.w), q2, q_out;
-  tf::Vector3 v0(0, 0, 0), v1(ps.pose.position.x, ps.pose.position.y, ps.pose.position.z), v2, v_out, v_offset;
-  tf::Transform t(q1, v1), t_out;
+  tf::Quaternion q1(ps.pose.orientation.x, ps.pose.orientation.y, ps.pose.orientation.z, ps.pose.orientation.w);
+  tf::Vector3 v1(ps.pose.position.x, ps.pose.position.y, ps.pose.position.z);
 
   ROS_INFO_STREAM("Received pose to transform to EE link:");
   ROS_INFO_STREAM(ps.pose.position.x << ", " << ps.pose.position.y  << ", " << ps.pose.position.z);
   ROS_INFO_STREAM(ps.pose.orientation.x << ", " << ps.pose.orientation.y  << ", " << ps.pose.orientation.z  << ", " << ps.pose.orientation.w);
 
+  st_ref_to_goal.setOrigin(v1);
+  st_ref_to_goal.setRotation(q1);
+  st_ref_to_goal.frame_id_ = ps.header.frame_id;
+  st_ref_to_goal.child_frame_id_ = "temp_goal_pose__";
+  st_ref_to_goal.stamp_ = ros::Time::now()-ros::Duration(.05);
+  listener.setTransform(st_ref_to_goal);
+  st_ref_to_goal.stamp_ = ros::Time::now();
+  listener.setTransform(st_ref_to_goal);
 
-
-  // Apply the transformation from tip link to EE to the pose, without changing header
-  v_offset = st*v0;
-  tf::Transform t_ps(q1, v0);
-  v_out = v1 + t_ps * v_offset;
-  q_out = st*q1;
-
-  ///// v2
-  // t_out = st * t;
-  // v_out = t_out.getOrigin();
-  // q_out = t_out.getRotation();
-
-  ps.pose.orientation.x = q_out.getX();
-  ps.pose.orientation.y = q_out.getY();
-  ps.pose.orientation.z = q_out.getZ();
-  ps.pose.orientation.w = q_out.getW();
-  ps.pose.position.x = v_out.getX();
-  ps.pose.position.y = v_out.getY();
-  ps.pose.position.z = v_out.getZ();
-
+  st_tip_to_wrist.frame_id_ = "temp_goal_pose__";
+  st_tip_to_wrist.child_frame_id_ = "temp_wrist_pose__";
+  listener.setTransform(st_tip_to_wrist);
+  st_tip_to_wrist.stamp_ = ros::Time::now();
+  listener.setTransform(st_tip_to_wrist);
+  
+  geometry_msgs::PoseStamped ps_wrist, ps_new;
+  ps_wrist.header.frame_id = "temp_wrist_pose__";
+  ps_wrist.pose.orientation.w = 1.0;
+  listener.transformPose(ps.header.frame_id, ps_wrist, ps_new);
   
   ROS_INFO_STREAM("New pose:");
-  ROS_INFO_STREAM(ps.pose.position.x << ", " << ps.pose.position.y  << ", " << ps.pose.position.z);
-  ROS_INFO_STREAM(ps.pose.orientation.x << ", " << ps.pose.orientation.y  << ", " << ps.pose.orientation.z  << ", " << ps.pose.orientation.w);
+  ROS_INFO_STREAM(ps_new.pose.position.x << ", " << ps_new.pose.position.y  << ", " << ps_new.pose.position.z);
+  ROS_INFO_STREAM(ps_new.pose.orientation.x << ", " << ps_new.pose.orientation.y  << ", " << ps_new.pose.orientation.z  << ", " << ps_new.pose.orientation.w);
 
-  return ps;
+  return ps_new;
 }
 
 // This may be useful, but needs the helper object we don't have for the UR.

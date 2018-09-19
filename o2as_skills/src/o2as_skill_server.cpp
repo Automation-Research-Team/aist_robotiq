@@ -302,7 +302,7 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   ROS_INFO_STREAM("Cartesian motion plan took " << d.toSec() << " s and was " << cartesian_success * 100.0 << "% successful.");
 
   // Scale the trajectory. This is workaround to setting the VelocityScalingFactor. Copied from k-okada
-  if (cartesian_success > 0.5)
+  if (cartesian_success > 0.95)
   {
     moveit_msgs::RobotTrajectory scaled_trajectory = moveit_msgs::RobotTrajectory(trajectory);
     // Scaling (https://groups.google.com/forum/#!topic/moveit-users/MOoFxy2exT4)
@@ -321,10 +321,23 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
     rt.getRobotTrajectoryMsg(scaled_trajectory);
     // Fill in move_group_
     myplan.trajectory_ = scaled_trajectory;
-
-    if (false)
-    // if ( (cartesian_success < .95) && use_real_robot_)
-    // if (use_real_robot_)
+  
+    if (true) 
+    {
+      if (wait) motion_done = group_pointer->execute(myplan);
+      else motion_done = group_pointer->asyncExecute(myplan);
+      if (motion_done) 
+      {
+        group_pointer->setMaxVelocityScalingFactor(1.0); // Reset the velocity
+        group_pointer->setPlanningTime(1.0);
+        if (cartesian_success > .95) return true;
+        else return false;
+      }
+    }
+  }
+  else
+  {
+    if (use_real_robot_)
     {
       ROS_WARN("MoveIt failed to do linear plan. Trying move_l with the UR.");
       ros::Duration(2).sleep();
@@ -348,22 +361,6 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
         return false;
       }
     }
-  
-    if (true) 
-    {
-      if (wait) motion_done = group_pointer->execute(myplan);
-      else motion_done = group_pointer->asyncExecute(myplan);
-      if (motion_done) 
-      {
-        group_pointer->setMaxVelocityScalingFactor(1.0); // Reset the velocity
-        group_pointer->setPlanningTime(1.0);
-        if (cartesian_success > .95) return true;
-        else return false;
-      }
-    }
-  }
-  else
-  {
     ROS_ERROR_STREAM("Cartesian motion plan failed.");
     group_pointer->setMaxVelocityScalingFactor(1.0); // Reset the velocity
     group_pointer->setPlanningTime(1.0);
