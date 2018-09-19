@@ -113,19 +113,15 @@ class O2ASBaseRoutines(object):
     self.insert_client = actionlib.SimpleActionClient('/o2as_skills/insert', o2as_msgs.msg.insertAction)
     self.screw_client = actionlib.SimpleActionClient('/o2as_skills/screw', o2as_msgs.msg.screwAction)
     self.change_tool_client = actionlib.SimpleActionClient('/o2as_skills/changeTool', o2as_msgs.msg.changeToolAction)
-    
+
+    self.fastening_tool_client = actionlib.SimpleActionClient('/o2as_fastening_tools/fastener_gripper_control_action', o2as_msgs.msg.FastenerGripperControlAction)
 
     self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR)
     self.goToNamedPose_client = rospy.ServiceProxy('/o2as_skills/goToNamedPose', o2as_msgs.srv.goToNamedPose)
     self.publishMarker_client = rospy.ServiceProxy('/o2as_skills/publishMarker', o2as_msgs.srv.publishMarker)
     self.toggleCollisions_client = rospy.ServiceProxy('/o2as_skills/toggleCollisions', std_srvs.srv.SetBool)
 
-    # self.pick_client.wait_for_server() # wait for the clients to connect
-    # self.place_client.wait_for_server() 
-    # self.align_client.wait_for_server() 
-    # self.insert_client.wait_for_server() 
-    # self.screw_client.wait_for_server() 
-    rospy.sleep(.5)   # 
+    rospy.sleep(.5)
     rospy.loginfo("Finished initializing class")
     
   ############## ------ Internal functions (and convenience functions)
@@ -382,6 +378,18 @@ class O2ASBaseRoutines(object):
     self.screw_client.send_goal(goal)
     self.screw_client.wait_for_result()
     return self.screw_client.get_result()
+
+  def set_motor(self, motor_name, direction = "tighten", wait=False, speed = 0, duration = 0):
+    goal = o2as_msgs.msg.FastenerGripperControlGoal()
+    goal.fastening_tool_name = motor_name
+    goal.direction = direction
+    goal.speed = speed
+    goal.duration = duration
+    rospy.loginfo("Sending fastening_tool action goal.")
+    self.fastening_tool_client.send_goal(goal)
+    if wait:
+      self.fastening_tool_client.wait_for_result()
+    return self.fastening_tool_client.get_result()
 
   def do_insertion(self, robot_name):
     # Directly calls the UR service rather than the action of the skill_server

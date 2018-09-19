@@ -10,7 +10,8 @@ SkillServer::SkillServer() :
                   changeToolActionServer_(n_, "o2as_skills/changeTool", boost::bind(&SkillServer::executeChangeTool, this, _1),false),
                   a_bot_group_("a_bot"), b_bot_group_("b_bot"), c_bot_group_("c_bot"),
                   b_bot_gripper_client_("/b_bot_gripper/gripper_action_controller", true),
-                  c_bot_gripper_client_("/c_bot_gripper/gripper_action_controller", true)
+                  c_bot_gripper_client_("/c_bot_gripper/gripper_action_controller", true),
+                  fastening_tool_client("/o2as_fastening_tools/fastener_gripper_control_action", true)
 { 
   // Topics to publish
   pubMarker_ = n_.advertise<visualization_msgs::Marker>("visualization_marker", 10);
@@ -922,6 +923,32 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
   return finished_before_timeout;
 }
 
+bool SkillServer::sendFasteningToolCommand(std::string fastening_tool_name, std::string direction, bool wait, double duration)
+{
+  // Send a goal to the action
+  o2as_msgs::FastenerGripperControlGoal goal;
+  o2as_msgs::FastenerGripperControlResultConstPtr result;
+
+  goal.fastening_tool_name = fastening_tool_name;
+  goal.direction = direction;
+  goal.duration = duration;
+  fastening_tool_client.sendGoal(goal);
+  ros::Duration(0.5).sleep();
+  bool finished_before_timeout = false;
+  if (wait)
+  {
+    finished_before_timeout = fastening_tool_client.waitForResult(ros::Duration(10.0));
+    result = fastening_tool_client.getResult();
+    ROS_DEBUG_STREAM("Action " << (finished_before_timeout ? "returned" : "did not return before timeout") <<", with result: " << result->control_result);
+    return result->control_result;
+  }
+  else
+    return true;
+  result = fastening_tool_client.getResult();
+  ROS_DEBUG("Returning from motor command.");
+  return result->control_result;
+}
+
 // Add the screw tool as a Collision Object to the scene, so that it can be attached to the robot
 bool SkillServer::spawnTool(std::string screw_tool_id)
 {
@@ -1129,6 +1156,7 @@ bool SkillServer::pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose,
 bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::string screw_tool_id, std::string robot_name)
 {
   std::string screw_tool_link = robot_name + "_" + screw_tool_id + "_tip_link";
+  std::string fastening_tool_name = "m" + screw_tool_id.substr(1,1) +  "_tool";
   
   // Strategy: 
   // - Move 1 cm above the screw head pose
@@ -1161,7 +1189,7 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
     moveToCartPosePTP(screw_head_pose, robot_name, true, screw_tool_link, 0.1);  // Force the move even if LIN fails
   }
 
-  ROS_WARN_STREAM("TODO: TURN ON MOTOR");
+  sendFasteningToolCommand(fastening_tool_name, "tighten");
   ROS_WARN_STREAM("TODO: TURN ON SUCTION");
   planning_scene_interface_.allowCollisions(screw_tool_id, "tray_2_screw_holder");
   ROS_INFO_STREAM("Moving into screw.");

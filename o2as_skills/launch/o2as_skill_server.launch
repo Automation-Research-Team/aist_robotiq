@@ -3,7 +3,7 @@
   <arg name="use_real_robot" default="false"/>
 
   <include file="$(find o2as_fastening_tools)/launch/fastening_tools.launch">
-    <arg name="max_access"    default="1"/>
+    <arg name="num_controllers"    default="1"/>
     <arg name="serial_port_1" default="/dev/for_docker/screw"/>
   </include>
     
