@@ -59,6 +59,8 @@ from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
 
+log_level = LOG_LEVEL = rospy.DEBUG
+
 def all_close(goal, actual, tolerance):
   """
   Convenience method for testing if a list of values are within a tolerance of their counterparts in another list
@@ -93,7 +95,7 @@ class O2ASBaseRoutines(object):
     self.listener = tf.TransformListener()
 
     moveit_commander.roscpp_initialize(sys.argv)
-    rospy.init_node('assembly_example', anonymous=False)
+    rospy.init_node('assembly_example', anonymous=False, log_level=LOG_LEVEL)
 
     self.robots = moveit_commander.RobotCommander()
     self.groups = {"a_bot":moveit_commander.MoveGroupCommander("a_bot"),
@@ -167,7 +169,7 @@ class O2ASBaseRoutines(object):
   def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, end_effector_link = ""):
     self.publish_marker(pose_goal_stamped, "pose")
     group = self.groups[group_name]
-    group.set_pose_target(pose_goal_stamped, end_effector_link=end_effector_link)
+    group.set_pose_target(pose_goal_stamped)
     rospy.loginfo("Setting velocity scaling to " + str(speed))
     group.set_max_velocity_scaling_factor(speed)
 

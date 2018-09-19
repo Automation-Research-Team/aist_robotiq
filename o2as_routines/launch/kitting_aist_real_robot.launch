@@ -7,6 +7,12 @@
 
   <!-- <include file="$(find o2as_aist_config)/launch/demo.launch" /> -->
   <include file="$(find o2as_examples)/launch/connect_aist_robots.launch"/>
+
+  <arg name="id" default=""/>
+  <node name="o2as_phoxi_camera" pkg="o2as_phoxi_camera" type="o2as_phoxi_camera" output="screen">
+    <param name="id" value="$(arg id)"/>
+  </node>
+  <node name="o2as_graspability_estimation" pkg="o2as_graspability_estimation" type="graspability_estimation_server.py" respawn="false" output="screen"/>
   <node name="o2as_skill_server" pkg="o2as_skills" type="o2as_skill_server" output="screen"/>
   <node name="o2as_usb_relay" pkg="o2as_usb_relay" type="o2as_relay_server" output="screen"/>
   <!-- <include file="$(find o2as_vision)/launch/vision.launch" /> -->

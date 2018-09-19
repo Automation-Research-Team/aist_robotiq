@@ -1,15 +1,17 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro"
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
        name="o2as_base_scene" >
 
 
   <!-- Calibration from 20 August 2018 -->
   <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
-  <xacro:property name="a_bot_x" value="-0.00"/>
-  <xacro:property name="a_bot_y" value="-0.45"/>
-  <xacro:property name="b_bot_x" value="0.00"/>
-  <xacro:property name="b_bot_y" value="0.55"/>
-  <xacro:property name="c_bot_x" value="-0.5"/>
+  <xacro:property name="a_bot_x" value="-0.01"/>
+  <xacro:property name="a_bot_y" value="-0.5"/>
+  <xacro:property name="b_bot_x" value="-0.009"/>
+  <xacro:property name="b_bot_y" value="0.503"/>
+  <xacro:property name="b_bot_theta" value="-3.12832815"/>
+  <!-- The above is 0.76 degrees away from pi (Sep 17; not perfect) -->
+  <xacro:property name="c_bot_x" value="-0.499"/>
   <xacro:property name="c_bot_y" value="0.0"/>
 
   <xacro:property name="bots_z" value="0.75"/>
@@ -35,24 +37,28 @@
   <!-- There are some instabilities when the box is big, for some reason. -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_base.xacro" />
   <xacro:o2as_base boxname="a_bot_base_smfl" parent="o2as_ground">
-    <origin xyz="${a_bot_x-.65/2} ${a_bot_y-.65/2} 0.65" rpy="0 0 0" />   
+    <origin xyz="${a_bot_x-.65/2} ${a_bot_y-.65/2} 0.69" rpy="0 0 0" />   
   </xacro:o2as_base>
   <xacro:o2as_base boxname="b_bot_base_smfl" parent="o2as_ground">
-    <origin xyz="${b_bot_x-.65/2} ${b_bot_y-.65/2} 0.65" rpy="0 0 0" />   
+    <origin xyz="${b_bot_x-.65/2} ${b_bot_y-.65/2} 0.69" rpy="0 0 0" />   
   </xacro:o2as_base>
   <xacro:o2as_base boxname="c_bot_base_smfl" parent="o2as_ground">
-    <origin xyz="${c_bot_x-.65/2-.22} ${c_bot_y-.65/2-.22} 0.65" rpy="0 0 0" />   
+    <origin xyz="${c_bot_x-.65/2-.165} ${c_bot_y-.65/2-.095} 0.69" rpy="0 0 0" />   
   </xacro:o2as_base>
 
   <!-- Main workspace -->
   <!-- The surface is 0.01 m below the robot bases and the "workspace_center" frame. -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro" />
-  <xacro:property name="plate_w" value="0.84"/>
-  <xacro:property name="plate_l" value="0.62"/>
-  <xacro:o2as_box boxname="workbox" box_w="${plate_w}" box_l="${plate_l}" box_h=".01" parent="o2as_ground">
-    <origin xyz="${-plate_w/2} ${-plate_l/2} ${bots_z}" rpy="0 0 0" />   
+  <xacro:property name="plate_w" value="0.9"/>
+  <xacro:property name="plate_l" value="0.75"/>
+  <xacro:property name="plate_cut_w" value="0.03"/>
+  <xacro:property name="plate_cut_l" value="0.14"/>
+  <xacro:o2as_box boxname="workbox1" box_w="${plate_w}" box_l="${plate_l-plate_cut_l}" box_h=".01" parent="o2as_ground">
+    <origin xyz="${-plate_w/2 +.08} ${-(plate_l/2)} ${bots_z}" rpy="0 0 0" />   
   </xacro:o2as_box>
-
+  <xacro:o2as_box boxname="workbox2" box_w="${plate_w-plate_cut_w}" box_l="${plate_cut_l}" box_h=".01" parent="o2as_ground">
+    <origin xyz="${-plate_w/2 +.08+0.03} ${-plate_l/2+plate_l-plate_cut_l} ${bots_z}" rpy="0 0 0" />   
+  </xacro:o2as_box>
   <link name="workspace_center" />
   <joint name="world_to_workspace" type="fixed">
     <parent link="o2as_ground" />
@@ -81,7 +87,7 @@
     wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
     wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
   
-  <xacro:ur5_robot prefix="b_bot_" joint_limited="true"
+  <xacro:ur5_robot prefix="b_bot_" joint_limited="false"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
     elbow_joint_lower_limit="0.0" elbow_joint_upper_limit="${pi}"
@@ -108,7 +114,7 @@
   <joint name="world_b_bot_joint" type="fixed">
     <parent link="o2as_ground" />
     <child link = "b_bot_base_link" />
-    <origin xyz="${b_bot_x} ${b_bot_y} ${bots_z}" rpy="0.0 0.0 ${-pi}" />
+    <origin xyz="${b_bot_x} ${b_bot_y} ${bots_z}" rpy="0.0 0.0 ${b_bot_theta}" />
   </joint>
 
   <joint name="world_c_bot_joint" type="fixed">
@@ -125,19 +131,18 @@
 
   <!-- spawn and attach dual robotiq 85 grippers -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_85_gripper_with_ft300.urdf.xacro" />
-  <!-- b_bot uses dual suction gripper for kitting task. -->
   <!-- <xacro:robotiq_85_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link" /> -->
   <xacro:robotiq_85_gripper_o2as prefix="c_bot_" parent = "c_bot_ee_link"/>
 
   <!-- Add cameras -->
   <xacro:include filename="$(find o2as_realsense2_camera)/urdf/_d435.urdf.xacro" />
-  <link name="b_bot_cam_holder_link" />
-  <joint name="b_bot_cam_holder_joint" type="fixed">
-    <parent link="b_bot_wrist_2_link" />
-    <child  link="b_bot_cam_holder_link" />
-    <origin xyz="0.0 -0.06 0.16" rpy="0.0 0.0 ${pi/2}" />
+  <link name="c_bot_cam_holder_link" />
+  <joint name="c_bot_cam_holder_joint" type="fixed">
+    <parent link="c_bot_wrist_2_link" />
+    <child  link="c_bot_cam_holder_link" />
+    <origin xyz="0.0 -0.06 ${0.09465 + .13}" rpy="0.0 0.0 ${pi/2}" />
   </joint>
-  <xacro:sensor_d435 prefix="b_bot_" parent="b_bot_cam_holder_link">
+  <xacro:sensor_d435 prefix="c_bot_" parent="c_bot_cam_holder_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:sensor_d435>
   <!-- <xacro:sensor_d435 prefix="d_bot_" parent="o2as_ground">
@@ -145,7 +150,7 @@
   </xacro:sensor_d435> -->
 
   <!-- spawn and attach AR markers -->
-  <xacro:include filename="$(find o2as_gazebo)/urdf/o2as_ar_marker.urdf.xacro"/>
+  <!-- <xacro:include filename="$(find o2as_gazebo)/urdf/o2as_ar_marker.urdf.xacro"/>
   <xacro:o2as_ar_marker prefix="a_bot_" parent="a_bot_wrist_3_link"
    marker_id="17">
     <origin xyz="0.0 -0.07 0.0" rpy="${pi/2} 0 0"/>
@@ -157,12 +162,15 @@
     <xacro:o2as_ar_marker prefix="c_bot_" parent="c_bot_wrist_3_link"
    marker_id="256">
     <origin xyz="0.0 0.12 0.05" rpy="0 0 ${pi/2}"/>
-  </xacro:o2as_ar_marker>
+  </xacro:o2as_ar_marker> -->
 
   <!-- Add PhoXi 3D scanners -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />
   <xacro:phoxi_m_camera prefix="a_" parent="o2as_ground">
-    <origin xyz="0.61696890577  0.17103542533 1.42309125675" rpy="-2.626594398897875 0.2001733992896885 1.5970042364211503"/>
+    <!-- osx phoxi setting (maybe) -->
+    <!-- <origin xyz="0.46 0 ${bots_z + .1 + .8}" rpy="${-160*pi/180} 0 ${pi/2}"/> -->
+    <!-- aist phoxi setting  -->
+    <origin xyz="0.616968905765895 0.171035425329841 1.423091256751067" rpy="-2.626594398897875 0.2001733992896885 1.5970042364211503"/> 
   </xacro:phoxi_m_camera>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->

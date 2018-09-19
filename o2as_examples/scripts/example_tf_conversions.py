@@ -54,5 +54,5 @@ def quaternion_eular_test():
     return
 
 if __name__ == '__main__':
-    # phoxi_transformation_examples()
-    quaternion_eular_test()
+    phoxi_transformation_examples()
+    # quaternion_eular_test()

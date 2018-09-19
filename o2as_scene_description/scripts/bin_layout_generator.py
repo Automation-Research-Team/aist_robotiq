@@ -144,7 +144,7 @@ def read_bin_layout(directory,set_origin):
 
 def read_order_list(directory, set_origin):
     part_set = set()
-    kitting_list = OrderedDict()
+    kitting_list = dict()
 
     with open(os.path.join(rp.get_path("o2as_scene_description"), "urdf/templates", "ExampleOfSetListFile.csv"), 'r') as f:
         reader = csv.reader(f)
@@ -260,20 +260,20 @@ def write_pair_part_bin(outfilepath, set_list):
 
 def write_kitting_parts_list(outfilepath, kitting_list):
     with open(outfilepath, 'w') as outfile:
-        yaml.dump(kitting_list)
+        yaml.dump(kitting_list, outfile)
 
 def main():
     os.chdir('../')
     directory=os.getcwd()
 
-    set_list,bin_definition, kitting_list=read_csv_and_calc_bins_positions(directory) 
-    outfile = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf", 'kitting_bins_auto.xacro'),'w+')
+    set_list,bin_definition, kitting_list=read_csv_and_calc_bins_positions(directory)
+    outfile = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf", 'kitting_bins.xacro'),'w+')
     write_file(outfile,directory,set_list,bin_definition)
 
     # Make ros parameter file
     pairs = make_pair_part_bin(set_list)
-    write_pair_part_bin(os.path.join(rp.get_path("o2as_routines"), "config", 'kitting_part_bin_list_auto.yaml'), pairs)
-    write_kitting_parts_list(os.path.join(rp.get_path("o2as_routines"), "config", 'kitting_item_list_auto.yaml'), kitting_list)
+    write_pair_part_bin(os.path.join(rp.get_path("o2as_routines"), "config", 'kitting_part_bin_list.yaml'), pairs)
+    write_kitting_parts_list(os.path.join(rp.get_path("o2as_routines"), "config", 'kitting_item_list.yaml'), kitting_list)
     
     
 if __name__ == "__main__":
