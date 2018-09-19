@@ -8,6 +8,7 @@ import yaml
 from std_msgs.msg import String
 from o2as_fastening_tools.srv import *
 from o2as_fastening_tools.msg import *
+from o2as_msgs.msg import *
 from util import *
 
 class FasteningToolController(object):

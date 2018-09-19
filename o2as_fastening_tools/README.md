@@ -40,6 +40,8 @@ Enter the names of each motor ID and gripper in this file: config/gripper.yaml
 # How to use
 ## About action service
 
+The action topic is "o2as_fastening_tools/fastening_gripper_control_action" and the action is defined in o2as_msgs.
+
 load gripper info file. (fastening_tools.yaml)
 
 To use the action service, use "fastening_tool_name" and "speed" or "duration" and "direction".
