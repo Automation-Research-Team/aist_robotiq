@@ -151,7 +151,7 @@ class URScriptRelay():
                 req.acceleration = 0.5
             if not req.velocity:
                 req.velocity = .03
-            rospy.logwarn("The frame_id of the Point is ignored!")
+            # rospy.logwarn("The frame_id of the Point is ignored!")
             xyz = [req.relative_translation.x, req.relative_translation.y, req.relative_translation.z]
 
             program = ""

@@ -271,6 +271,7 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   group_pointer = robotNameToMoveGroup(robot_name);
 
   group_pointer->clearPoseTargets();
+  group_pointer->setPoseReferenceFrame("world");
   group_pointer->setStartStateToCurrentState();
   group_pointer->setEndEffectorLink(end_effector_link);
   
@@ -435,46 +436,50 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   
   ROS_INFO("Going to before_tool_pickup pose.");
   // STEP 0:
-
+  moveit::planning_interface::MoveGroupInterface* group_pointer;
+  std::vector<double> joint_group_positions_1, joint_group_positions_2;
   if (robot_name == "b_bot")
   {
     // Go to two joint poses so the movement to the holder is not too messy and the gripper is in the correct orientation
-    moveit::planning_interface::MoveGroupInterface* group_pointer;
     group_pointer = robotNameToMoveGroup(robot_name);
     moveit::core::RobotStatePtr current_state = group_pointer->getCurrentState();
-    std::vector<double> joint_group_positions_1, joint_group_positions_2;
     const robot_state::JointModelGroup* joint_model_group =
       group_pointer->getCurrentState()->getJointModelGroup(robot_name);
     current_state->copyJointGroupPositions(joint_model_group, joint_group_positions_1);
 
-    // This position puts the gripper up high
-    joint_group_positions_1[0] = 0.20882;
-    joint_group_positions_1[1] = -2.3188;
-    joint_group_positions_1[2] = 1.7198;
-    joint_group_positions_1[3] = 0.5989;
-    joint_group_positions_1[4] = 1.6538;
-    joint_group_positions_1[5] = -3.141;
-    group_pointer->setJointValueTarget(joint_group_positions_1);
     moveit::planning_interface::MoveGroupInterface::Plan my_plan;
     moveit::planning_interface::MoveItErrorCode success, motion_done;
-    
-    success = (group_pointer->plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-    if (success)
-      motion_done = group_pointer->execute(my_plan);
-    else
+    if (joint_group_positions_1[0] > 0)
     {
-      ROS_ERROR("Could not plan to before_tool_pickup joint state. Abort!");
-      return false;
+      // This position puts the gripper up high, in preparation of going to the holder
+      joint_group_positions_1[0] = 0.20882;
+      joint_group_positions_1[1] = -2.3188;
+      joint_group_positions_1[2] = 1.7198;
+      joint_group_positions_1[3] = 0.5989;
+      joint_group_positions_1[4] = 1.6538;
+      joint_group_positions_1[5] = -3.141;
+      group_pointer->setJointValueTarget(joint_group_positions_1);
+      
+      success = (group_pointer->plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+      if (success)
+        motion_done = group_pointer->execute(my_plan);
+      else
+      {
+        ROS_ERROR("Could not plan to before_tool_pickup joint state. Abort!");
+        return false;
+      }
     }
+    else
+      ROS_INFO("Skipping intermediate high approach pose with b_bot");
 
     // This position is in front of the tool holder
     joint_group_positions_2 = joint_group_positions_1;
-    joint_group_positions_2[0] = -0.561;
-    joint_group_positions_2[1] = -0.848;
-    joint_group_positions_2[2] = 1.689;
-    joint_group_positions_2[3] = -0.841;
-    joint_group_positions_2[4] = -0.548;
-    joint_group_positions_2[5] = -3.142;
+    joint_group_positions_2[0] = -30 * M_PI/180.0;
+    joint_group_positions_2[1] = -48 * M_PI/180.0;
+    joint_group_positions_2[2] = 96 * M_PI/180.0;
+    joint_group_positions_2[3] = -50 * M_PI/180.0;
+    joint_group_positions_2[4] = -27 * M_PI/180.0;
+    joint_group_positions_2[5] = -180 * M_PI/180.0;
     group_pointer->setJointValueTarget(joint_group_positions_2);
 
     success = (group_pointer->plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
@@ -571,23 +576,26 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   if (!preparation_succeeded)
   {
     ROS_ERROR("Could not go to approach pose. Aborting tool pickup.");
+    planning_scene_interface_.applyPlanningScene(planning_scene_);
     return false;
   }
 
   // Plan & execute linear motion to the tool change position
   ROS_INFO("Moving to pose in tool holder LIN.");
   bool moved_to_tool_holder = true;
+
+  o2as_msgs::sendScriptToUR UR_srv;
+  geometry_msgs::Point t_rel;
+  UR_srv.request.program_id = "lin_move_rel";
+  UR_srv.request.robot_name = robot_name;
   if ( (use_real_robot_) && (robot_name == "b_bot") )
   {
-    o2as_msgs::sendScriptToUR srv;
-    srv.request.program_id = "lin_move_rel";
-    srv.request.robot_name = robot_name;
-    srv.request.velocity = .05;
-    geometry_msgs::Point t_rel;
+    ros::Duration(.3).sleep();
+    UR_srv.request.velocity = .05;
     t_rel.z = (ps_tool_holder.pose.position.x - ps_approach.pose.position.x);
-    srv.request.relative_translation = t_rel;
-    sendScriptToURClient_.call(srv);
-    if (srv.response.success == true)
+    UR_srv.request.relative_translation = t_rel;
+    sendScriptToURClient_.call(UR_srv);
+    if (UR_srv.response.success == true)
     {
       ROS_INFO("Successfully called the URScript client to perform a linear movement forward.");
       waitForURProgram("/" + robot_name +"_controller");
@@ -643,8 +651,27 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   // Plan & execute linear motion away from the tool change position
   ROS_INFO("Moving back to screw tool approach pose LIN.");
   if (equip)        lin_speed = 0.08;
-  else if (unequip) lin_speed = 0.3;  
-  moveToCartPoseLIN(ps_move_away, robot_name, true, "", lin_speed);
+  else if (unequip) lin_speed = 0.3;
+
+  if ( (use_real_robot_) && (robot_name == "b_bot") )
+  {
+    ros::Duration(.3).sleep();
+    UR_srv.request.velocity = .05;
+    t_rel.z = -(ps_tool_holder.pose.position.x - ps_approach.pose.position.x);
+    UR_srv.request.relative_translation = t_rel;
+    sendScriptToURClient_.call(UR_srv);
+    if (UR_srv.response.success == true)
+    {
+      ROS_INFO("Successfully called the URScript client to perform a linear movement backward.");
+      waitForURProgram("/" + robot_name +"_controller");
+    }
+    else
+    {
+      ROS_WARN("Could not call the URScript client to perform a linear movement backward.");
+    }
+  }
+  else 
+    moveToCartPoseLIN(ps_tool_holder, robot_name, true, "", lin_speed);
 
   // After unequipping, the tool must be pushed back to where it was.
   // This section didn't work when I last tried it, but in principle it should work.
@@ -685,7 +712,19 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   planning_scene_interface_.applyPlanningScene(planning_scene_);
 
   ROS_INFO("Moving higher up to facilitate later movements.");
-  moveToCartPoseLIN(ps_high_up, robot_name);
+  if (!moveToCartPoseLIN(ps_high_up, robot_name))
+  {
+    if (robot_name == "b_bot")
+    {
+      ROS_INFO("Going to joint pose 2.");
+      group_pointer->setJointValueTarget(joint_group_positions_2);
+      group_pointer->move();
+      ROS_INFO("Going to joint pose 1.");
+      group_pointer->setJointValueTarget(joint_group_positions_1);
+      group_pointer->move();
+      ROS_INFO("Done with joint poses, and with life.");
+    }
+  }
   
   // Delete tool collision object only after collision reinitialization to avoid errors
   if (unequip) despawnTool(screw_tool_id);
@@ -1756,6 +1795,11 @@ int main(int argc, char **argv)
   // Create an object of class SkillServer that will take care of everything
   SkillServer ss;
   ROS_INFO("O2AS skill server started");
-
+  while (ros::ok())
+  {
+    ros::Duration(.1).sleep();
+    ros::spinOnce();
+  }
+  
   return 0;
 }
