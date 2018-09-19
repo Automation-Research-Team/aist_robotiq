@@ -51,11 +51,9 @@ namespace o2as_debug_monitor
 
       void realsenseCallback(const sensor_msgs::ImageConstPtr &msg)
       {
-        cv::Rect rect;
-
         // Show window at the first time
         if (!cvGetWindowHandle("Monitor")) {
-          cv::namedWindow("Monitor", cv::WINDOW_AUTOSIZE);
+          cv::namedWindow("Monitor", cv::WINDOW_NORMAL);
           cv::moveWindow("Monitor", 128, 128);
         }
 
@@ -71,8 +69,13 @@ namespace o2as_debug_monitor
         // Copy realsense image to the image buffer
         realsense_img_ = convert2OpenCV(
           *msg, sensor_msgs::image_encodings::RGB8) -> image;
-        rect = cv::Rect(0, 0, 640, 480);
-        realsense_img_.copyTo(monitor_(rect));
+        cv::Size size = cv::Size(320, 240);
+        cv::Rect rect = cv::Rect(0, 0, 320, 240);
+        cv::Mat resized;
+        cv::resize(realsense_img_, resized, size, 0, 0, cv::INTER_CUBIC);
+
+        //realsense_img_.copyTo(monitor_(rect));
+        resized.copyTo(monitor_(rect));
 
         // Copy the image buffer in the window
         cv::imshow("Monitor", monitor_);
