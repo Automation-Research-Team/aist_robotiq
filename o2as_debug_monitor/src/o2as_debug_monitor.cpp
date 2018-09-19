@@ -23,10 +23,6 @@ namespace o2as_debug_monitor
   {
     cv_bridge::CvImagePtr cv_ptr;
     try {
-        // For debugging
-        //ROS_INFO("image.width: %d", img.width);
-        //ROS_INFO("image.height: %d", img.height);
-
       cv_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::BGR8);
     }
     catch (cv_bridge::Exception &e) {
@@ -44,8 +40,6 @@ namespace o2as_debug_monitor
         cv::namedWindow("Monitor", cv::WINDOW_NORMAL);
         cv::moveWindow("Monitor", 128, 128);
       }
-
-      ROS_INFO("Image callback was invoked.");
 
       // Convert sent message into cv::Mat
       cv::Mat img = convert2OpenCV(
@@ -69,26 +63,68 @@ namespace o2as_debug_monitor
     public:
       Monitor(ros::NodeHandle &nh)
       {
-        // Initialize shared objects in this class
-        image_transport::ImageTransport it_(nh);
-        monitor_ = cv::Mat(480, 640, CV_8UC3, cv::Scalar(255, 0, 0));
+        // Set global parameters
+        XmlRpc::XmlRpcValue global;
+        nh.getParam("o2as_debug_monitor/global", global);
+        setGlobalParams(global);
 
-        // Append callback functions
-        imgcbs.push_back(
-          getCallbackForImage(cv::Rect(0, 0, 320, 240), monitor_)
-        );
-        sub_rs_ = it_.subscribe("/b_bot_camera/rgb/image_raw", 1,
-                                imgcbs.back());
+        // Initialize shared objects in this class
+        monitor_ = cv::Mat(height, width, CV_8UC3, cv::Scalar(0, 0, 0));
+
+        // Set callback functions for image topics
+        XmlRpc::XmlRpcValue image_topics;
+        nh.getParam("o2as_debug_monitor/image_topics", image_topics);
+        setImageCallbacks(nh, image_topics);
       }
 
     private:
-      image_transport::Subscriber sub_rs_;
-
-//      boost::function<void(const sensor_msgs::ImageConstPtr&)> callback;
-      std::vector<ImageCallback> imgcbs;
+      std::vector<image_transport::Subscriber> sub_rs_;
+      std::vector<ImageCallback> imgcbs_;
 
       cv::Mat monitor_;
-      cv::Mat realsense_img_;
+
+      int width;
+      int height;
+      int n_cols;
+      int n_rows;
+      int d_cols;
+      int d_rows;
+
+      void setGlobalParams(XmlRpc::XmlRpcValue params)
+      {
+        width = params["width"];
+        height = params["height"];
+        n_cols = params["n_cols"];
+        n_rows = params["n_rows"];
+        d_cols = width / n_cols;
+        d_rows = height / n_rows;
+      }
+
+      void setImageCallbacks(ros::NodeHandle &nh,
+                             XmlRpc::XmlRpcValue image_topics)
+      {
+        image_transport::ImageTransport it_(nh);
+
+        for (auto it = image_topics.begin(); it != image_topics.end(); it++)
+        {
+          auto params = image_topics[it->first];
+          std::string topic_name = params["topic_name"];
+          int col_min = params["col"][0];
+          int col_max = params["col"][1];
+          int row_min = params["row"][0];
+          int row_max = params["row"][1];
+          int x = col_min * d_cols;
+          int y = row_min * d_rows;
+          int w = (col_max - col_min + 1) * d_cols - 1;
+          int h = (row_max - row_min + 1) * d_rows - 1;
+          imgcbs_.push_back(
+            getCallbackForImage(cv::Rect(x, y, w, h), monitor_)
+          );
+          sub_rs_.push_back(it_.subscribe(topic_name, 1, imgcbs_.back()));
+          ROS_INFO("%s", topic_name.c_str());
+          ROS_INFO("%d, %d, %d, %d", x, y, w, h);
+        }
+      }
   };
 
   class O2asDebugMonitor : public nodelet::Nodelet
