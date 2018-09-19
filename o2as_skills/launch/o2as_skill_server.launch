@@ -1,11 +1,16 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="use_real_robot" default="false"/>
-  
+
+  <include file="$(find o2as_fastening_tools)/launch/fastening_tools.launch">
+    <arg name="max_access"    default="1"/>
+    <arg name="serial_port_1" default="/dev/for_docker/screw"/>
+  </include>
+    
   <!-- <group ns="o2as_skill_server"> -->
   <node name="ur_program_relay" pkg="o2as_skills" type="ur_program_relay.py" respawn="false" output="screen"/>
   <node name="o2as_skill_server" pkg="o2as_skills" type="o2as_skill_server" respawn="false" output="screen"/>
   <param name="use_real_robot" type="boolean" value="$(arg use_real_robot)"/>
-    
+  
   <!-- </group> -->
 </launch>
