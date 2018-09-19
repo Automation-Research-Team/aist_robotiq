@@ -68,8 +68,8 @@ The "speed" is uint32 type.
 When the "direction" is "loosen" mode, this will rotate for the specified time.
 The "duration" is mandatory for "loosen" mode.
 The "duration" can be in seconds.
-The "duration" is float32 type. (ex. "duration" = 1.0 : one second)
-In this case, there is no feedback.
+The "duration" is float32 type. (ex. "duration" = 1.0 : one second) 
+In this mode, there is no feedback.
 
 ## About the actual launch file
 
