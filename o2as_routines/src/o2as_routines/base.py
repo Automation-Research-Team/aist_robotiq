@@ -274,6 +274,7 @@ class O2ASBaseRoutines(object):
                                       0.01,        # eef_step
                                       0.0)         # jump_threshold
     rospy.loginfo("compute cartesian path succeeded with " + str(fraction*100) + "%")
+    plan = group.retime_trajectory(self.robots.get_current_state(), plan, speed)
 
     if fraction < 0.95 and self.use_real_robot:
       rospy.loginfo("MoveIt failed to plan linear motion. Attempting linear motion via URScript.")
