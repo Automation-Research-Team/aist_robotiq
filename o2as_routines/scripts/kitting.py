@@ -25,14 +25,14 @@ CroppedArea = namedtuple("CroppedArea", ["min_row", "max_row", "min_col", "max_c
 
 # Temporary variable for integration of graspability estimation in AIST
 bin_id_for_graspability_estimation = {
-  "part_6": 1,
+  "part_7": 1,
   "part_13": 2,
   "part_11": 3,
   "part_8": 4,
   "part_4": 5,
-  "part_18": 6,
+  "part_14": 6,
   "part_17": 7,
-  "part_16": 8,
+  "part_5": 8,
   "part_12": 9,
   "part_9": 10
 }
@@ -150,9 +150,6 @@ class KittingClass(O2ASBaseRoutines):
     self.item_names = []
     downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     # 
-    
-  def set_up_end_effector(self):
-    
 
   ################ ----- Routines  
   ################ 
@@ -225,38 +222,6 @@ class KittingClass(O2ASBaseRoutines):
 
     return True
 
-  ################ ----- Supply methods
-  ################ 
-  ################ 
-  def go_to_check_point(self, robot_name, task, speed):
-    pose = geometry_msgs.msg.PoseStamped()
-    pose.pose.position.z = 0.15
-    pose.pose.orientation.x = -0.5
-    pose.pose.orientation.y = 0.5
-    pose.pose.orientation.z = 0.5
-    pose.pose.orientation.w = 0.5
-
-    if task == "before_pick":
-      pose.header.frame_id = "workspace_center"
-      self.move_lin(robot_name, pose, speed=speed, end_effector_link=ee_link_name)
-      pose.header.frame_id = "rack_bins_center"
-      self.move_lin(robot_name, pose, speed=speed, end_effector_link=ee_link_name)
-    elif task == "after_pick":
-      pose.header.frame_id = "rack_bins_center"
-      self.move_lin(robot_name, pose, speed=speed, end_effector_link=ee_link_name)
-      pose.header.frame_id = "workspace_center"
-      self.move_lin(robot_name, pose, speed=speed, end_effector_link=ee_link_name)
-    elif task == "before_place":
-      pose.header.frame_id = "workspace_center"
-      self.move_lin(robot_name, pose, speed=speed, end_effector_link=ee_link_name)
-      pose.header.frame_id = "rack_trays_center"
-      self.move_lin(robot_name, pose, speed=speed, end_effector_link=ee_link_name)
-    elif task == "after_place":
-      pose.header.frame_id = "rack_trays_center"
-      self.move_lin(robot_name, pose, speed=speed, end_effector_link=ee_link_name)
-      pose.header.frame_id = "workspace_center"
-      self.move_lin(robot_name, pose, speed=speed, end_effector_link=ee_link_name)
-
   ################ ----- Demos  
   ################ 
   ################ 
@@ -309,6 +274,9 @@ class KittingClass(O2ASBaseRoutines):
       print("/ ___|| | | / ___||  _ \| ____| \ | |  _ \ ")
       print("\___ \| | | \___ \| |_) |  _| |  \| | | | |")
       print(" ___) | |_| |___) |  __/| |___| |\  | |_| |")
+      print("|____/ \___/|____/|_|   |_____|_| \_|____/ ")
+      print("                                           ")
+
       raw_input()
   
   def kitting_task(self):
