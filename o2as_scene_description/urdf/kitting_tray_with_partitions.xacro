@@ -192,7 +192,7 @@
     <xacro:property name="m4_x_delta" value="0.03"/>
     <xacro:property name="m4_y_0" value="0.275"/>
     <xacro:property name="m4_y_delta" value="-0.03"/>
-    <xacro:property name="m4_z_0" value="0.025"/>
+    <xacro:property name="m4_z_0" value="0.035"/>
     
     <xacro:auxiliary_frame parent="${trayname}" framename="screw_m4_1">
       <origin xyz="${m4_x_0 + m4_x_delta*0} ${m4_y_0 + m4_y_delta*0} ${m4_z_0}" rpy="0 ${pi/2} 0" />   
@@ -228,7 +228,7 @@
     <xacro:property name="m3_x_delta" value="0.03"/>
     <xacro:property name="m3_y_0" value="0.275"/>
     <xacro:property name="m3_y_delta" value="-0.03"/>
-    <xacro:property name="m3_z_0" value="0.025"/>
+    <xacro:property name="m3_z_0" value="0.035"/>
     
     <xacro:auxiliary_frame parent="${trayname}" framename="screw_m3_1">
       <origin xyz="${m3_x_0 + m3_x_delta*0} ${m3_y_0 + m3_y_delta*0} ${m3_z_0}" rpy="0 ${pi/2} 0" />   

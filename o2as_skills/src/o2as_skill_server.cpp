@@ -583,8 +583,8 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
     // The tool is deposited a bit in front of the original position. The robot pushes it to the final pose after placing it.
     ps_tool_holder = ps_approach;
-    if (equip)        ps_tool_holder.pose.position.x = 0.025;
-    else if (unequip) ps_tool_holder.pose.position.x = 0.024;  
+    if (equip)        ps_tool_holder.pose.position.x = 0.030;
+    else if (unequip) ps_tool_holder.pose.position.x = 0.029;  
 
     ps_high_up = ps_approach;
     // ps_high_up.pose.position.z +=.5;
