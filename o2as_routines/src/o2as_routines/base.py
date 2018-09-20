@@ -492,7 +492,7 @@ class O2ASBaseRoutines(object):
 
   ################ ----- Gripper interfaces
   
-  def send_gripper_command(self, gripper, command, this_action_grasps_an_object = False):
+  def send_gripper_command(self, gripper, command, this_action_grasps_an_object = False, force = 5.0, velocity = .1):
     if gripper == "precision_gripper_outer" or gripper == "precision_gripper_inner":
       goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
       if command == "stop":
@@ -512,19 +512,21 @@ class O2ASBaseRoutines(object):
     elif gripper == "b_bot" or gripper == "c_bot":
       goal = robotiq_msgs.msg.CModelCommandGoal()
       action_client = self.gripper_action_clients[gripper]
-      goal.velocity = 0.05   # from 0.013 to 0.1
+      goal.velocity = velocity   # from 0.013 to 0.1
+      goal.force = force
       if command == "close":
         goal.position = 0.0
       elif command == "open":
         goal.position = 0.085
       else:
         goal.position = command     # This sets the opening width directly
+        rospy.loginfo(command)
     else:
       rospy.logerr("Could not parse gripper command")
 
     action_client.send_goal(goal)
     rospy.loginfo("Sending command " + str(command) + " to gripper: " + gripper)
-    action_client.wait_for_result(rospy.Duration(3.0))  # Default wait time: 3 s
+    action_client.wait_for_result(rospy.Duration(6.0))  # Default wait time: 6 s
     result = action_client.get_result()
     rospy.loginfo(result)
     return 
