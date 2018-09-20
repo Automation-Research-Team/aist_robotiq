@@ -220,6 +220,49 @@ SkillServer::SkillServer() :
   }
 }
 
+bool SkillServer::moveToJointPose(std::vector<double> joint_positions, std::string robot_name, bool wait, double velocity_scaling_factor, bool use_UR_script)
+{
+  if (joint_positions.size() != 6)
+  {
+    ROS_ERROR_STREAM("Size of joint positions in moveToJointPose is not correct! Expected 6, got " << joint_positions.size());
+    return false;
+  }
+  if (use_UR_script)
+  {
+    o2as_msgs::sendScriptToUR UR_srv;
+    UR_srv.request.program_id = "movej";
+    UR_srv.request.robot_name = robot_name;  
+    UR_srv.request.joint_positions = joint_positions;
+    UR_srv.request.velocity = velocity_scaling_factor;
+    if (UR_srv.response.success == true)
+    {
+      ROS_INFO("Successfully called the URScript client to move joints.");
+      return waitForURProgram("/" + robot_name +"_controller");
+    }
+    else
+    {
+      ROS_ERROR("Could not move joints with URscript.");
+      return false;
+    }
+  }
+
+  moveit::planning_interface::MoveGroupInterface* group_pointer = robotNameToMoveGroup(robot_name);;
+  moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+  moveit::planning_interface::MoveItErrorCode success, motion_done;
+  group_pointer->setJointValueTarget(joint_positions);
+    
+  success = (group_pointer->plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+  if (success)
+  {
+    motion_done = group_pointer->execute(my_plan);
+    return (motion_done == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+  }
+  else
+  {
+    ROS_ERROR("Could not plan to before_tool_pickup joint state. Abort!");
+    return false;
+  }
+}
 
 // This works only for a single robot.
 bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait, std::string end_effector_link, double velocity_scaling_factor)
@@ -462,38 +505,31 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   ROS_INFO("Going to before_tool_pickup pose.");
   // STEP 0:
   moveit::planning_interface::MoveGroupInterface* group_pointer;
-  std::vector<double> joint_group_positions_1, joint_group_positions_2;
-
-  // TODO: Do joint pose motions with real robot
-  // o2as_msgs::sendScriptToUR UR_srv2;
-  // UR_srv2.request.program_id = "movej";
-  // UR_srv2.request.robot_name = robot_name;  
-  // UR_srv2.request.joint_positions = joint_group_positions_1;
-  // UR_srv.request.velocity = .05;
-  // if (UR_srv.response.success == true)
-  // {
-  //   ROS_INFO("Successfully called the URScript client to move joints.");
-  //   waitForURProgram("/" + robot_name +"_controller");
-  // }
-  // else
-  // {
-  //   ROS_ERROR("Could not go to approach pose. Aborting tool pickup.");
-  //   planning_scene_interface_.applyPlanningScene(planning_scene_);
-  //   return false;
-  // }
+  std::vector<double> joint_group_positions_1, joint_group_positions_2, joint_group_positions_3;
 
   if (robot_name == "b_bot")
   {
     // Go to two joint poses so the movement to the holder is not too messy and the gripper is in the correct orientation
     group_pointer = robotNameToMoveGroup(robot_name);
     moveit::core::RobotStatePtr current_state = group_pointer->getCurrentState();
-    const robot_state::JointModelGroup* joint_model_group =
-      group_pointer->getCurrentState()->getJointModelGroup(robot_name);
+    const robot_state::JointModelGroup* joint_model_group = 
+                group_pointer->getCurrentState()->getJointModelGroup(robot_name);
     current_state->copyJointGroupPositions(joint_model_group, joint_group_positions_1);
+    ROS_INFO_STREAM("Current joint state: " << joint_group_positions_1[0] << ", " << joint_group_positions_1[1] << "...");
+
+    current_state = group_pointer->getCurrentState();
+    joint_model_group = group_pointer->getCurrentState()->getJointModelGroup(robot_name);
+    current_state->copyJointGroupPositions(joint_model_group, joint_group_positions_1);
+    ROS_INFO_STREAM("Current joint state: " << joint_group_positions_1[0] << ", " << joint_group_positions_1[1] << "...");
+
+    current_state = group_pointer->getCurrentState();
+    joint_model_group = group_pointer->getCurrentState()->getJointModelGroup(robot_name);
+    current_state->copyJointGroupPositions(joint_model_group, joint_group_positions_1);
+    ROS_INFO_STREAM("Current joint state: " << joint_group_positions_1[0] << ", " << joint_group_positions_1[1] << "...");
 
     moveit::planning_interface::MoveGroupInterface::Plan my_plan;
     moveit::planning_interface::MoveItErrorCode success, motion_done;
-    if (joint_group_positions_1[0] > 0)
+    if (joint_group_positions_1[0] > -0.2)
     {
       // This position puts the gripper up high, in preparation of going to the holder
       joint_group_positions_1[0] = 1.5722;
@@ -504,36 +540,34 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
       joint_group_positions_1[5] = -3.1413;
       group_pointer->setJointValueTarget(joint_group_positions_1);
       
-      success = (group_pointer->plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-      if (success)
-        motion_done = group_pointer->execute(my_plan);
-      else
+      if (!moveToJointPose(joint_group_positions_1, robot_name, true, 1.0, false))
       {
         ROS_ERROR("Could not plan to before_tool_pickup joint state. Abort!");
         return false;
       }
+      joint_group_positions_2 = joint_group_positions_1;
+      joint_group_positions_2[0] = -0.5722;
+      joint_group_positions_2[1] = -2.6696;
+      joint_group_positions_2[2] = 1.7915;
+      joint_group_positions_2[3] = 0.872;
+      joint_group_positions_2[4] = -0.5723;
+      joint_group_positions_2[5] = -3.1413;
+      group_pointer->setJointValueTarget(joint_group_positions_2);
+      group_pointer->move();
     }
     else
       ROS_INFO("Skipping intermediate high approach pose with b_bot");
 
     // This position is in front of the tool holder
-    joint_group_positions_2 = joint_group_positions_1;
-    joint_group_positions_2[0] = -30 * M_PI/180.0;
-    joint_group_positions_2[1] = -48 * M_PI/180.0;
-    joint_group_positions_2[2] = 96 * M_PI/180.0;
-    joint_group_positions_2[3] = -50 * M_PI/180.0;
-    joint_group_positions_2[4] = -27 * M_PI/180.0;
-    joint_group_positions_2[5] = -180 * M_PI/180.0;
-    group_pointer->setJointValueTarget(joint_group_positions_2);
-
-    success = (group_pointer->plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-    if (success)
-      motion_done = group_pointer->execute(my_plan);
-    else
-    {
-      ROS_ERROR("Could not plan to before_tool_pickup joint state. Abort!");
-      return false;
-    }
+    joint_group_positions_3 = joint_group_positions_1;
+    joint_group_positions_3[0] = -0.561;
+    joint_group_positions_3[1] = -0.848;
+    joint_group_positions_3[2] = 1.689;
+    joint_group_positions_3[3] = -0.841;
+    joint_group_positions_3[4] = -0.548;
+    joint_group_positions_3[5] = -3.142;
+    group_pointer->setJointValueTarget(joint_group_positions_3);
+    group_pointer->move();
   }
 
   // Set up poses
@@ -542,8 +576,6 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
   if (robot_name == "b_bot")
   {
-    // Before we moved the robots back, this x-value caused the LIN movement to fail if it was too far in the back.
-    // This seemed to have to do with the IK solutions rather than the actual solvability. To note.
     ps_approach.pose.position.x = -.06;
     ps_approach.pose.position.z = .017;
     ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
@@ -555,13 +587,13 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     else if (unequip) ps_tool_holder.pose.position.x = 0.024;  
 
     ps_high_up = ps_approach;
-    ps_high_up.pose.position.z +=.5;
-    ps_high_up.pose.position.x -=.1;
+    // ps_high_up.pose.position.z +=.5;
+    // ps_high_up.pose.position.x -=.1;
 
     ps_end = ps_high_up;
-    ps_end.pose.position.x +=.3;
-    ps_end.pose.position.y +=.4;
-    ps_end.pose.position.z -=.1;
+    // ps_end.pose.position.x +=.3;
+    // ps_end.pose.position.y +=.4;
+    // ps_end.pose.position.z -=.1;
   }
   else if (robot_name == "c_bot")
   {
@@ -578,15 +610,14 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     
     ps_move_away = ps_tool_holder;
     ps_move_away.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, M_PI/2, 0);
-    ps_move_away.pose.position.x = -.06;
-    ps_move_away.pose.position.z = .03;
+    ps_move_away.pose.position.x = -.12;
+    ps_move_away.pose.position.z = .06;
 
     ps_high_up = ps_move_away;
-    ps_high_up.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, M_PI*3/4, 0);
-    ps_high_up.pose.position.z +=.25;
-    ps_high_up.pose.position.y +=.05;
+    // ps_high_up.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, M_PI*3/4, 0);
+    // ps_high_up.pose.position.z +=.25;
+    // ps_high_up.pose.position.y +=.05;
   }
-
 
   if (equip) {
     openGripper(robot_name);
@@ -714,7 +745,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     }
   }
   else 
-    moveToCartPoseLIN(ps_tool_holder, robot_name, true, "", lin_speed);
+    moveToCartPoseLIN(ps_move_away, robot_name, true, "", lin_speed);
 
   // After unequipping, the tool must be pushed back to where it was.
   // This section didn't work when I last tried it, but in principle it should work.
