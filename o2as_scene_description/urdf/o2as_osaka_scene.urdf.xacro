@@ -21,7 +21,7 @@
   <xacro:include filename="$(find realsense2_camera)/urdf/_d435.urdf.xacro" />
 
   <!-- robots -->
-  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/ur10.urdf.xacro" /> -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/ur10.urdf.xacro" />
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur5.urdf.xacro" />
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur3.urdf.xacro" />
 
@@ -64,13 +64,14 @@
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/screw_tools.xacro" /> -->
 
   <!-- Feeders -->
-  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/screw_feeder.xacro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/screw_feeder.xacro" /> 
   <xacro:screw_feeder feedername="m3_feeder" parent="a_bot_base_smfl">
-    <origin xyz=".1 .4 .05" rpy="0 0 ${pi/2}" />   
-  </xacro:screw_feeder>
-  <xacro:screw_feeder feedername="m4_feeder" parent="c_bot_base_smfl">
-    <origin xyz=".45 .05 .05" rpy="0 0 0" />   
+    <origin xyz=".1 .4 -.01" rpy="0 0 ${pi/2}" />   
   </xacro:screw_feeder> -->
+  
+  <!-- <xacro:screw_feeder feedername="m4_feeder" parent="c_bot_base_smfl">
+    <origin xyz=".45 .05 .05" rpy="0 0 0" />   
+  </xacro:screw_feeder> --> -->
   <!-- <xacro:screw_feeder feedername="m5_feeder" parent="c_bot_base_smfl">
     <origin xyz=".45 .2 .05" rpy="0 0 0" />   
   </xacro:screw_feeder> -->

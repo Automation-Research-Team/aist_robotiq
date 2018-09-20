@@ -5,6 +5,7 @@ bool open_outer_gripper_fully
 bool close_outer_gripper_fully
 bool open_inner_gripper_fully
 bool close_inner_gripper_fully
+bool open_inner_gripper_slightly
 
 bool this_action_grasps_an_object
 
