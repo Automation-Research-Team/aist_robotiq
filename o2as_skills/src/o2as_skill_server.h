@@ -83,14 +83,14 @@ public:
   bool goFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, double velocity_scaling_factor);
   bool placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name = "");
   bool pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name = "");
-  bool pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::string screw_tool_id, std::string robot_name);
+  bool pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::string screw_tool_id, std::string robot_name, std::string screw_tool_link, std::string fastening_tool_name);
   bool publishMarker(geometry_msgs::PoseStamped marker_pose, std::string marker_type = "");
   bool publishPoseMarker(geometry_msgs::PoseStamped marker_pose);
 
   bool openGripper(std::string robot_name, std::string gripper_name = "");
   bool closeGripper(std::string robot_name, std::string gripper_name = "");
   bool sendGripperCommand(std::string robot_name, double opening_width, std::string gripper_name = "");
-  bool sendFasteningToolCommand(std::string fastening_tool_name, std::string direction = "tighten", bool wait = false, double duration = 0.0);
+  bool sendFasteningToolCommand(std::string fastening_tool_name, std::string direction = "tighten", bool wait = false, double duration = 20.0, int speed = 500);
 
   // Callback declarations
   bool goToNamedPoseCallback(o2as_msgs::goToNamedPose::Request &req,
