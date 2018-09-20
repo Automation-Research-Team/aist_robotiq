@@ -610,7 +610,7 @@ class CalibrationClass(O2ASBaseRoutines):
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "tray_2_screw_m4_1"
     if robot_name=="b_bot":
-      pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi, 0, 0))
+      pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, 0, 0))
       pose0.pose.position.x = -.01
     elif robot_name=="c_bot":
       pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, 0, 0))
@@ -646,18 +646,27 @@ class CalibrationClass(O2ASBaseRoutines):
 
     poses = []
     pose0 = geometry_msgs.msg.PoseStamped()
+    self.toggle_collisions(collisions_on=False)
     pose0.header.frame_id = "m3_feeder_outlet_link"
     if robot_name=="c_bot":
       pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
       pose0.pose.position.x = -.02
       pose0.pose.position.z = -.0
     
-    for i in range(2):
+    for i in range(3):
       poses.append(copy.deepcopy(pose0))
 
-    poses[1].header.frame_id = "m4_feeder_outlet_link"
+    poses[1].pose.position.x = .02
+    poses[2].pose.position.x = -.02
+
+    # poses[3].header.frame_id = "m4_feeder_outlet_link"
+    # poses[4].header.frame_id = "m4_feeder_outlet_link"
+    # poses[4].pose.position.x = .02
+    # poses[5].header.frame_id = "m4_feeder_outlet_link"
+    # poses[5].pose.position.x = -.02
     
     self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, go_home=False, move_lin=True, end_effector_link=robot_name + "_screw_tool_m4_tip_link")
+    self.toggle_collisions(collisions_on=True)
     return
 
   def assembly_calibration_tray_non_screw(self, robot_name="b_bot"):

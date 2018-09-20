@@ -133,14 +133,22 @@ class O2ASBaseRoutines(object):
     self.publishMarker_client.call(req)
     return True
 
-  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, high_precision = False, end_effector_link = "", move_lin = True):
+  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, high_precision = False, 
+                      end_effector_link = "", move_lin = True):
     if move_lin:
       return self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link)
     self.publish_marker(pose_goal_stamped, "pose")
     group = self.groups[group_name]
-    if end_effector_link:
-      rospy.loginfo("Setting end effector link to " + end_effector_link)
-      group.set_end_effector_link(end_effector_link)
+    
+    if not end_effector_link:
+      if group_name == "c_bot":
+        end_effector_link = "c_bot_robotiq_85_tip_link"
+      elif group_name == "b_bot":
+        end_effector_link = "b_bot_robotiq_85_tip_link"
+      elif group_name == "a_bot":
+        end_effector_link = "a_bot_gripper_tip_link"
+    group.set_end_effector_link(end_effector_link)
+    
     group.set_pose_target(pose_goal_stamped)
     rospy.loginfo("Setting velocity scaling to " + str(speed))
     group.set_max_velocity_scaling_factor(speed)

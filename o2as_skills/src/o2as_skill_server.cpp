@@ -658,14 +658,17 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   ROS_INFO("Moving to pose in tool holder LIN.");
   bool moved_to_tool_holder = true;
 
+  
   o2as_msgs::sendScriptToUR UR_srv;
   geometry_msgs::Point t_rel;
+  if (equip)        lin_speed = 0.3;
+  else if (unequip) lin_speed = 0.08;  
   UR_srv.request.program_id = "lin_move_rel";
   UR_srv.request.robot_name = robot_name;  
   if ( (use_real_robot_) && (robot_name == "b_bot") )
   {
     ros::Duration(.3).sleep();
-    UR_srv.request.velocity = .05;
+    UR_srv.request.velocity = lin_speed;
     t_rel.z = (ps_tool_holder.pose.position.x - ps_approach.pose.position.x);
     UR_srv.request.relative_translation = t_rel;
     sendScriptToURClient_.call(UR_srv);
@@ -720,7 +723,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     robot_statuses_[robot_name].held_tool_id = "";
   }
   acm_original.getMessage(planning_scene_.allowed_collision_matrix);
-  ros::Duration(1.0).sleep();
+  ros::Duration(.5).sleep();
   
   // Plan & execute linear motion away from the tool change position
   ROS_INFO("Moving back to screw tool approach pose LIN.");
@@ -790,6 +793,9 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   {
     if (robot_name == "b_bot")
     {
+      ROS_INFO("Going to joint pose 3.");
+      group_pointer->setJointValueTarget(joint_group_positions_3);
+      group_pointer->move();
       ROS_INFO("Going to joint pose 2.");
       group_pointer->setJointValueTarget(joint_group_positions_2);
       group_pointer->move();
