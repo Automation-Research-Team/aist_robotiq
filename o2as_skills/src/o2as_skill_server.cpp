@@ -1412,6 +1412,7 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
     return;
   }
 
+  // TODO: Change the field name to something more sensible
   if (!goal->use_complex_planning)
   {
     ROS_INFO_STREAM("Using simple pick planning. Gripper will face downward, with z_axis_rotation = " << goal->z_axis_rotation);

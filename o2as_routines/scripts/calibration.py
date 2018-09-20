@@ -578,7 +578,7 @@ class CalibrationClass(O2ASBaseRoutines):
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "assembled_assy_part_01_corner_2"
     if robot_name=="b_bot":
-      pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+      pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, 0, 0))
       pose0.pose.position.x -= .02
     elif robot_name=="c_bot":
       pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, 0, 0))
@@ -604,13 +604,15 @@ class CalibrationClass(O2ASBaseRoutines):
       self.go_to_named_pose("back", "b_bot")
 
     self.go_to_named_pose("screw_ready", robot_name)
+    if robot_name=="b_bot":
+      self.go_to_named_pose("screw_pick_ready", robot_name)
 
     poses = []
 
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "tray_2_screw_m4_1"
     if robot_name=="b_bot":
-      pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi*5/4, 0, 0))
+      pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, 0, 0))
       pose0.pose.position.x = -.01
     elif robot_name=="c_bot":
       pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, 0, 0))
@@ -794,7 +796,7 @@ if __name__ == '__main__':
       rospy.loginfo("53: Assembly base plate (a_bot)")
       rospy.loginfo("54: Assembly assembled parts")
       rospy.loginfo("55: Assembly initial part locations (the plates)")
-      rospy.loginfo("6: TODO: Screw tool tests")
+      rospy.loginfo("6: Go to screw_ready with c and b (a goes to back)")
       rospy.loginfo("61: Go to screw holder (with b_bot)")
       rospy.loginfo("62: Go to screw holder (with c_bot)")
       rospy.loginfo("63: Go to assembly base plate with m4 screw tool (b_bot; m4 tool has to be equipped)")
@@ -852,7 +854,9 @@ if __name__ == '__main__':
       elif r == '55':
         c.assembly_calibration_initial_plates()
       elif r == '6':
-        c.screw_tool_tests()      
+        c.go_to_named_pose("back", "a_bot")
+        c.go_to_named_pose("screw_ready", "b_bot")
+        c.go_to_named_pose("screw_ready", "c_bot")
       elif r == '61':
         c.screw_holder_tests(robot_name="b_bot")      
       elif r == '62':
