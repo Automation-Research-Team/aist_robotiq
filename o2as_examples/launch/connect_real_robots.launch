@@ -84,7 +84,7 @@
   </include>
 
   <include file="$(find o2as_precision_gripper)/launch/precision_gripper.launch">
-    <arg name="serial_port" default="/dev/ttyUSB2" />
+    <arg name="serial_port" default="/dev/for_docker/gripper" />
   </include>
 
   <!-- <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch">
