@@ -330,12 +330,13 @@ class O2ASBaseRoutines(object):
     self.groups[robot_name].clear_pose_targets()
     return True
 
-  def do_pick_action(self, robot_name, pose_stamped, z_axis_rotation = 0.0, use_complex_planning = False, tool_name = ""):
+  def do_pick_action(self, robot_name, pose_stamped, screw_size = 0.0, z_axis_rotation = 0.0, use_complex_planning = False, tool_name = ""):
     # Call the pick action
     goal = o2as_msgs.msg.pickGoal()
     goal.robot_name = robot_name
     goal.item_pose = pose_stamped
     goal.tool_name = tool_name
+    goal.screw_size = screw_size
     goal.use_complex_planning = use_complex_planning
     goal.z_axis_rotation = z_axis_rotation
     rospy.loginfo("Sending pick action goal")
