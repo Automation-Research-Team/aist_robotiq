@@ -9,7 +9,7 @@
       <visual>
         <origin xyz="0.187 -0.035 -0.035" rpy="0 0 ${pi/2}"/>
 	<geometry>
-          <mesh filename="package://o2as_scene_description/meshes/dual_suction_gripper.stl"/>
+          <mesh filename="package://o2as_scene_description/meshes/dual_suction_gripper.stl" scale="0.001 0.001 0.001"/>
 	</geometry>
 	<material name="light_grey">
 	  <color rgba="0.8 0.8 0.8 1"/>
@@ -17,10 +17,10 @@
       </visual>
       <collision>
       <!-- avoid collision -->
-	<origin xyz="0.192 -0.035 -0.035" rpy="0 0 ${pi/2}"/>
+	<origin xyz="0.188 -0.035 -0.035" rpy="0 0 ${pi/2}"/>
 	<!-- <origin xyz="0.187 -0.035 -0.035" rpy="0 0 ${pi/2}"/> -->
 	<geometry>
-	  <mesh filename="package://o2as_scene_description/meshes/dual_suction_gripper.vhacd.dae"/>
+	  <mesh filename="package://o2as_scene_description/meshes/dual_suction_gripper.vhacd.dae" scale="0.001 0.001 0.001"/>
 	</geometry>
       </collision>
       <inertial>
