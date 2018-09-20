@@ -1771,7 +1771,7 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
 
   // Set target pose for the end effector
   geometry_msgs::PoseStamped target_tip_link_pose = goal->target_hole;
-  std::string screw_tool_link = goal->robot_name + "_" + held_screw_tool_ + "_tip_link";
+  std::string screw_tool_link = goal->robot_name + "_screw_tool_" + "m" + std::to_string(goal->screw_size) + "_tip_link";
   // std::string screw_tool_link = held_screw_tool_ + "_tip";
   ROS_INFO_STREAM("screw tool link:  " << screw_tool_link);
 
@@ -1784,17 +1784,16 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
   target_tip_link_pose.pose.position.x -= .05;
   moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link);
 
-  // TODO: Turn on the motor
+  sendFasteningToolCommand("m" + std::to_string(goal->screw_size) + "_tool", "tighten", false, 30.0, 600);
   // Disable collision for screw tool 
   updatePlanningScene();
   collision_detection::AllowedCollisionMatrix acm_original(planning_scene_.allowed_collision_matrix);
   planning_scene_interface_.allowCollisions("screw_tool_m" + std::to_string(goal->screw_size));
 
   // Move 1 cm into to the screw hole
-  ROS_INFO("Pushing into the screw hole.");
+  ROS_INFO("Pushing into the screw hole and doing spiral motion.");
   target_tip_link_pose.pose.position.x += .05 + .01;
-  bool success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link, 0.001);
-  if (!success) moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, screw_tool_link);  // Force the move even if LIN fails
+  bool success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link, 0.02);
 
   // Do spiral motion
   if (use_real_robot_)
@@ -1803,25 +1802,26 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
     srv.request.program_id = "spiral_motion";
     srv.request.robot_name = goal->robot_name;
     srv.request.max_radius = .002;
-    srv.request.radius_increment = .001;
+    srv.request.radius_increment = .0005;
     sendScriptToURClient_.call(srv);
     if (srv.response.success == true)
     {
-      ROS_INFO("Successfully called the service client to do spiral motion. Waiting for it to finish.");
-      waitForURProgram("/" + goal->robot_name +"_controller");
+      ROS_DEBUG("Successfully called the service client to do spiral motion.");
+      // waitForURProgram("/" + goal->robot_name +"_controller");
     }
     else
-      ROS_WARN("Could not call the service client to do spiral motion.");
+      ROS_ERROR("Could not call the service client to do spiral motion.");
   }
-  
-  // TODO: Wait for motor completion, check success
-  ROS_WARN("MOTOR COMPLETION IS NOT TRACKED. WAITING FOR 5 SECONDS TO SIMULATE.");
-  ros::Duration(5.0).sleep();
+
+  bool finished_before_timeout = fastening_tool_client.waitForResult(ros::Duration(20.0));
+  auto result = fastening_tool_client.getResult();
+  ROS_INFO_STREAM("Screw tool motor command " << (finished_before_timeout ? "returned" : "did not return before timeout") <<". Result: " << result->control_result);
 
   // Move back up a little
   target_tip_link_pose.pose.position.x -= .05;
   success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link);
-  if (!success) moveToCartPosePTP(target_tip_link_pose, goal->robot_name, true, screw_tool_link);  // Force the move even if LIN fails
+
+  // TODO: If suction is lost, then the screw got stuck. Should try again at the same spot.
   
   // Enable collision for screw tool again
   moveit_msgs::PlanningScene ps_reset_collisions = planning_scene_;
