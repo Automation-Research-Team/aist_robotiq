@@ -74,6 +74,7 @@ def is_program_running(topic_namespace = ""):
 
 def wait_for_UR_program(topic_namespace = "", timeout_duration = rospy.Duration.from_sec(20.0)):
   rospy.loginfo("Waiting for UR program to finish. Only run this after sending custom URScripts and not the regular motion commands, or this call will not terminate before the timeout.")
+  rospy.sleep(1.0)
   t_start = rospy.Time.now()
   time_passed = rospy.Time.now() - t_start
   while is_program_running(topic_namespace):
@@ -283,7 +284,7 @@ class O2ASBaseRoutines(object):
       req.target_pose = self.transformTargetPoseFromTipLinkToEE(pose_goal_stamped, group_name, end_effector_link)
       req.velocity = speed
       res = self.urscript_client.call(req)
-      wait_for_UR_program("/" + group_name +"_controller", rospy.Duration.from_sec(10.0))
+      wait_for_UR_program("/" + group_name +"_controller", rospy.Duration.from_sec(30.0))
       return res.success
 
     plan = group.execute(plan, wait=True)
