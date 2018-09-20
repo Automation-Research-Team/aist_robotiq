@@ -95,11 +95,7 @@ class O2ASBaseRoutines(object):
     self.listener = tf.TransformListener()
 
     moveit_commander.roscpp_initialize(sys.argv)
-<<<<<<< HEAD
     rospy.init_node('assembly_example', anonymous=False, log_level=LOG_LEVEL)
-=======
-    rospy.init_node('assembly_example', anonymous=False)
->>>>>>> f288f00d6fb056babfdfaf47d25aafbb0ed7d455
 
     self.robots = moveit_commander.RobotCommander()
     self.groups = {"a_bot":moveit_commander.MoveGroupCommander("a_bot"),
@@ -142,13 +138,9 @@ class O2ASBaseRoutines(object):
     self.publishMarker_client.call(req)
     return True
 
-<<<<<<< HEAD
-  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, high_precision = False, end_effector_link = ""):
-=======
   def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, high_precision = False, end_effector_link = "", move_lin = True):
     if move_lin:
       return self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link)
->>>>>>> f288f00d6fb056babfdfaf47d25aafbb0ed7d455
     self.publish_marker(pose_goal_stamped, "pose")
     group = self.groups[group_name]
     if end_effector_link:
@@ -182,14 +174,6 @@ class O2ASBaseRoutines(object):
   def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, end_effector_link = ""):
     self.publish_marker(pose_goal_stamped, "pose")
     group = self.groups[group_name]
-<<<<<<< HEAD
-    group.set_pose_target(pose_goal_stamped)
-    rospy.loginfo("Setting velocity scaling to " + str(speed))
-    group.set_max_velocity_scaling_factor(speed)
-
-    waypoints = []
-    wpose = group.get_current_pose().pose
-=======
     if end_effector_link:
       group.set_end_effector_link(end_effector_link)
     group.set_pose_target(pose_goal_stamped)
@@ -206,7 +190,6 @@ class O2ASBaseRoutines(object):
     wpose = group.get_current_pose().pose
     # rospy.loginfo("Wpose2:")
     # rospy.loginfo(wpose)
->>>>>>> f288f00d6fb056babfdfaf47d25aafbb0ed7d455
     waypoints.append(wpose)
     pose_goal_world = self.listener.transformPose("world", pose_goal_stamped).pose
     waypoints.append(pose_goal_world)
@@ -214,10 +197,7 @@ class O2ASBaseRoutines(object):
                                       waypoints,   # waypoints to follow
                                       0.01,        # eef_step
                                       0.0)         # jump_threshold
-<<<<<<< HEAD
-=======
     rospy.loginfo("compute cartesian path succeeded with " + str(fraction*100) + "%")
->>>>>>> f288f00d6fb056babfdfaf47d25aafbb0ed7d455
 
     plan = group.execute(plan, wait=True)
     group.stop()
