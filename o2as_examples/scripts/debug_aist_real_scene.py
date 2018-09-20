@@ -60,8 +60,8 @@ class DebugAistRealRobotClass(O2ASBaseRoutines):
                 goal_pose.pose.position.z = 0.15
                 goal_pose.pose.orientation = copy.deepcopy(self.downward_orientation)
                 self.move_lin("b_bot", goal_pose, self.speed_slow, "b_bot_dual_suction_gripper_pad_link")
-
                 raw_input()
+
         except rospy.ROSInterruptException:
             return
 
@@ -78,6 +78,7 @@ class DebugAistRealRobotClass(O2ASBaseRoutines):
                 goal_pose.pose.position.z = 0.05
                 goal_pose.pose.orientation = copy.deepcopy(self.downward_orientation)
                 self.move_lin("b_bot", goal_pose, self.speed_slow, "b_bot_dual_suction_gripper_pad_link")
+                raw_input()
 
         except rospy.ROSInterruptException:
             return
@@ -88,7 +89,8 @@ if __name__ == '__main__':
   try:
     debug = DebugAistRealRobotClass()
     debug.set_up_item_parameters()
-    debug.go_to_each_tray()
+    debug.go_to_each_bin()
+    # debug.go_to_each_tray()
 
     print "============ Done!"
   except rospy.ROSInterruptException:

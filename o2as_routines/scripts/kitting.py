@@ -48,17 +48,23 @@ part_poses_demo = {
   "part_5":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_6":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_7":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_8":
   {
@@ -70,12 +76,16 @@ part_poses_demo = {
   "part_9":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_10":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_11":
   {
@@ -102,27 +112,37 @@ part_poses_demo = {
   "part_14":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_15":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_16":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_17":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   },
   "part_18":
   {
     "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
   }
 }
 
@@ -256,7 +276,7 @@ class KittingClass(O2ASBaseRoutines):
           goal_pose.pose.position = self.listener.transformPoint(goal_pose.header.frame_id, object_position).point
           goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(-0.5, 0.5, 0.5, 0.5)
 
-          res = self.pick("b_bot", goal_pose, speed_fast, speed_slow, "b_bot_dual_suction_gripper_link")
+          res = self.pick("b_bot", goal_pose, speed_fast, speed_slow, "b_bot_dual_suction_gripper_pad_link")
           if not res:
             rospy.logerr("Failed to pick target object.")
             return
@@ -265,7 +285,7 @@ class KittingClass(O2ASBaseRoutines):
           place_pose.header.frame_id = self.tray_id[item]
           place_pose.pose.position = copy.deepcopy(part_poses_demo[item]["goal_position"])
           place_pose.pose.orientation = copy.deepcopy(part_poses_demo[item]["goal_orientation"])
-          res = self.place("b_bot", place_pose, speed_fast, speed_slow, "b_bot_dual_suction_gripper_link")
+          res = self.place("b_bot", place_pose, speed_fast, speed_slow, "b_bot_dual_suction_gripper_pad_link")
           if not res:
             rospy.logerr("Failed to place target object.")
             return

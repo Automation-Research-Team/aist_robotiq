@@ -4,6 +4,7 @@
   <rosparam command="load" file="$(find o2as_routines)/config/kitting_part_bin_list.yaml" />
   <rosparam command="load" file="$(find o2as_routines)/config/kitting_tray_list.yaml" /> -->
   <rosparam command="load" file="$(find o2as_examples)/config/bin_list.yaml"/>
+  <rosparam command="load" file="$(find o2as_examples)/config/tray_partition_list.yaml"/>
 
   <!-- <include file="$(find o2as_aist_config)/launch/demo.launch" /> -->
   <include file="$(find o2as_examples)/launch/connect_aist_robots.launch"/>
