@@ -630,7 +630,7 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, go_home=False, move_lin=True, end_effector_link=robot_name + "_screw_tool_m4_tip_link")
     return
 
-  def screw_tool_pickup_test(self, robot_name = "b_bot"):
+  def screw_pickup_test(self, robot_name = "b_bot"):
     rospy.loginfo("============ Picking up an m4 screw with the tool ============")
     rospy.loginfo("============ The screw tool m4 has to be carried by the robot! ============")
     if robot_name=="b_bot":
@@ -831,9 +831,9 @@ if __name__ == '__main__':
       elif r == '66':
         c.screw_tool_test_tray(robot_name="c_bot")
       elif r == '67':
-        c.screw_tool_pickup_test(robot_name="b_bot")
+        c.screw_pickup_test(robot_name="b_bot")
       elif r == '68':
-        c.screw_tool_pickup_test(robot_name="c_bot")
+        c.screw_pickup_test(robot_name="c_bot")
       elif r == '71':
         c.screw_feeder_calibration(robot_name="c_bot")
       elif r == '81':
