@@ -163,12 +163,12 @@ class O2ASBaseRoutines(object):
     current_pose = group.get_current_pose().pose
     return all_close(pose_goal_stamped.pose, current_pose, 0.01)
 
-  def transformTargetPoseFromTipLinkToEE(self, ps, robot_name):
+  def transformTargetPoseFromTipLinkToEE(self, ps, robot_name, end_effector_link):
     rospy.loginfo("Received pose to transform to EE link:")
     rospy.loginfo(str(ps.pose.position.x) + ", " + str(ps.pose.position.y)  + ", " + str(ps.pose.position.z))
     rospy.loginfo(str(ps.pose.orientation.x) + ", " + str(ps.pose.orientation.y)  + ", " + str(ps.pose.orientation.z)  + ", " + str(ps.pose.orientation.w))
 
-    t = self.listener.lookupTransform(robot_name + "_robotiq_85_tip_link", robot_name + "_tool0", rospy.Time())
+    t = self.listener.lookupTransform(end_effector_link, robot_name + "_tool0", rospy.Time())
 
     m = geometry_msgs.msg.TransformStamped()
     m.header.frame_id = ps.header.frame_id
@@ -209,13 +209,15 @@ class O2ASBaseRoutines(object):
     self.publish_marker(pose_goal_stamped, "pose")
 
     group = self.groups[group_name]
-    if end_effector_link:
-      group.set_end_effector_link(end_effector_link)
-    else:
+    if not end_effector_link:
       if group_name == "c_bot":
-        group.set_end_effector_link("c_bot_robotiq_85_tip_link")
+        end_effector_link = "c_bot_robotiq_85_tip_link"
       elif group_name == "b_bot":
-        group.set_end_effector_link("b_bot_robotiq_85_tip_link")
+        end_effector_link = "b_bot_robotiq_85_tip_link"
+      elif group_name == "a_bot":
+        end_effector_link = "a_bot_gripper_tip_link"
+      
+    group.set_end_effector_link(end_effector_link)
     group.set_pose_target(pose_goal_stamped)
     rospy.loginfo("Setting velocity scaling to " + str(speed))
     group.set_max_velocity_scaling_factor(speed)
@@ -239,13 +241,12 @@ class O2ASBaseRoutines(object):
                                       0.0)         # jump_threshold
     rospy.loginfo("compute cartesian path succeeded with " + str(fraction*100) + "%")
 
-    # if fraction < 0.95 and self.use_real_robot:
-    if self.use_real_robot:
+    if fraction < 0.95 and self.use_real_robot:
       rospy.loginfo("MoveIt failed to plan linear motion. Attempting linear motion via URScript.")
       req = o2as_msgs.srv.sendScriptToURRequest()
       req.program_id = "lin_move"
       req.robot_name = group_name
-      req.target_pose = self.transformTargetPoseFromTipLinkToEE(pose_goal_stamped, group_name)
+      req.target_pose = self.transformTargetPoseFromTipLinkToEE(pose_goal_stamped, group_name, end_effector_link)
       req.velocity = speed
       res = self.urscript_client.call(req)
       return res.success

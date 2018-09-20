@@ -75,17 +75,17 @@ geometry_msgs::PoseStamped transform_pose_now(geometry_msgs::PoseStamped& pose, 
 }
 
 
-geometry_msgs::PoseStamped transformTargetPoseFromTipLinkToEE(geometry_msgs::PoseStamped ps, std::string robot_name, tf::TransformListener& listener)
+geometry_msgs::PoseStamped transformTargetPoseFromTipLinkToEE(geometry_msgs::PoseStamped ps, std::string robot_name, std::string end_effector_link, tf::TransformListener& listener)
 {
   tf::StampedTransform st_tip_to_wrist, st_ref_to_goal;
-  listener.lookupTransform(robot_name + "_robotiq_85_tip_link", robot_name + "_tool0", ros::Time::now(), st_tip_to_wrist);
+  listener.lookupTransform(end_effector_link, robot_name + "_tool0", ros::Time::now(), st_tip_to_wrist);
 
   tf::Quaternion q1(ps.pose.orientation.x, ps.pose.orientation.y, ps.pose.orientation.z, ps.pose.orientation.w);
   tf::Vector3 v1(ps.pose.position.x, ps.pose.position.y, ps.pose.position.z);
 
-  ROS_INFO_STREAM("Received pose to transform to EE link:");
-  ROS_INFO_STREAM(ps.pose.position.x << ", " << ps.pose.position.y  << ", " << ps.pose.position.z);
-  ROS_INFO_STREAM(ps.pose.orientation.x << ", " << ps.pose.orientation.y  << ", " << ps.pose.orientation.z  << ", " << ps.pose.orientation.w);
+  // ROS_INFO_STREAM("Received pose to transform to EE link:");
+  // ROS_INFO_STREAM(ps.pose.position.x << ", " << ps.pose.position.y  << ", " << ps.pose.position.z);
+  // ROS_INFO_STREAM(ps.pose.orientation.x << ", " << ps.pose.orientation.y  << ", " << ps.pose.orientation.z  << ", " << ps.pose.orientation.w);
 
   st_ref_to_goal.setOrigin(v1);
   st_ref_to_goal.setRotation(q1);
@@ -107,9 +107,9 @@ geometry_msgs::PoseStamped transformTargetPoseFromTipLinkToEE(geometry_msgs::Pos
   ps_wrist.pose.orientation.w = 1.0;
   listener.transformPose(ps.header.frame_id, ps_wrist, ps_new);
   
-  ROS_INFO_STREAM("New pose:");
-  ROS_INFO_STREAM(ps_new.pose.position.x << ", " << ps_new.pose.position.y  << ", " << ps_new.pose.position.z);
-  ROS_INFO_STREAM(ps_new.pose.orientation.x << ", " << ps_new.pose.orientation.y  << ", " << ps_new.pose.orientation.z  << ", " << ps_new.pose.orientation.w);
+  // ROS_INFO_STREAM("New pose:");
+  // ROS_INFO_STREAM(ps_new.pose.position.x << ", " << ps_new.pose.position.y  << ", " << ps_new.pose.position.z);
+  // ROS_INFO_STREAM(ps_new.pose.orientation.x << ", " << ps_new.pose.orientation.y  << ", " << ps_new.pose.orientation.z  << ", " << ps_new.pose.orientation.w);
 
   return ps_new;
 }

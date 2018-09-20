@@ -344,8 +344,8 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
       o2as_msgs::sendScriptToUR UR_srv;
       UR_srv.request.program_id = "lin_move";
       UR_srv.request.robot_name = robot_name;  
-      UR_srv.request.target_pose = transformTargetPoseFromTipLinkToEE(pose, robot_name, tflistener_);
-      publishMarker(transformTargetPoseFromTipLinkToEE(pose, robot_name, tflistener_), "pose");
+      UR_srv.request.target_pose = transformTargetPoseFromTipLinkToEE(pose, robot_name, end_effector_link, tflistener_);
+      publishMarker(transformTargetPoseFromTipLinkToEE(pose, robot_name, end_effector_link, tflistener_), "pose");
       UR_srv.request.velocity = .05;
       sendScriptToURClient_.call(UR_srv);
       if (UR_srv.response.success == true)
