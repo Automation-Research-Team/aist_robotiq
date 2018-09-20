@@ -35,9 +35,8 @@
   <run_depend>o2as_msgs</run_depend>
   <build_depend>o2as_msgs</build_depend>
 
-  <!-- TODO: Move the definitions to o2as_msgs -->
-  <run_depend>o2as_skills</run_depend>
-  <build_depend>o2as_skills</build_depend>
+  <run_depend>ur_modern_driver</run_depend>
+  <build_depend>ur_modern_driver</build_depend>
 
   <build_depend>message_generation</build_depend>
   

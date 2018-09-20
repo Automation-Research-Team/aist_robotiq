@@ -59,6 +59,32 @@ from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
 
+import ur_modern_driver.msg
+
+
+def is_program_running(topic_namespace = ""):
+  """Checks if a program is running on the UR"""
+  msg = rospy.wait_for_message(topic_namespace + "/ur_driver/robot_mode_state", ur_modern_driver.msg.RobotModeDataMsg)
+  if msg:
+    return msg.is_program_running
+  else:
+    rospy.logerror("No message received from the robot. Is everything running? Is the namespace entered correctly with a leading slash?")
+    return False
+    # throw()
+
+def wait_for_UR_program(topic_namespace = "", timeout_duration = rospy.Duration.from_sec(20.0)):
+  rospy.loginfo("Waiting for UR program to finish. Only run this after sending custom URScripts and not the regular motion commands, or this call will not terminate before the timeout.")
+  t_start = rospy.Time.now()
+  time_passed = rospy.Time.now() - t_start
+  while is_program_running(topic_namespace):
+    rospy.sleep(.05)
+    time_passed = rospy.Time.now() - t_start
+    if time_passed > timeout_duration:
+      rospy.loginfo("Timeout reached.")
+      return False
+  rospy.loginfo("UR Program has terminated.")
+  return True
+
 def all_close(goal, actual, tolerance):
   """
   Convenience method for testing if a list of values are within a tolerance of their counterparts in another list
@@ -257,6 +283,7 @@ class O2ASBaseRoutines(object):
       req.target_pose = self.transformTargetPoseFromTipLinkToEE(pose_goal_stamped, group_name, end_effector_link)
       req.velocity = speed
       res = self.urscript_client.call(req)
+      wait_for_UR_program("/" + group_name +"_controller", rospy.Duration.from_sec(10.0))
       return res.success
 
     plan = group.execute(plan, wait=True)
