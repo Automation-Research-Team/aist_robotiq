@@ -14,6 +14,8 @@ float64 forward_speed           # The speed at which "insertion" moves forward. 
 float64 max_approach_distance   # For the linear search approach
 bool peck_mode                  # 
 
+string spiral_axis              # "X", "Y", "Z". For the "spiral_motion" program.
+
 float64 max_insertion_distance
 float64 impedance_mass          # Mass used for impedance control (default: 10 kg)
 
