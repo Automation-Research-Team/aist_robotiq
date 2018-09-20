@@ -1166,10 +1166,10 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
   tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), screw_head_pose.header.frame_id, "screw_pick_frame"));
   ROS_INFO_STREAM("Received pickScrew command.");
   
-  ROS_INFO_STREAM("Moving far above screw.");
-  screw_head_pose.pose.position.x = -.05;
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  moveToCartPoseLIN(screw_head_pose, robot_name, true, screw_tool_link, 1.0);
+  // ROS_INFO_STREAM("Moving far above screw.");
+  // screw_head_pose.pose.position.x = -.05;
+  // std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  // moveToCartPoseLIN(screw_head_pose, robot_name, true, screw_tool_link, 1.0);
 
   ROS_INFO_STREAM("Moving close to screw.");
   screw_head_pose.pose.position.x = -.01;
@@ -1181,47 +1181,62 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
     return false;
   }
 
-  sendFasteningToolCommand(fastening_tool_name, "tighten", false, 5.0);
-  ROS_WARN_STREAM("TODO: TURN ON SUCTION");
   planning_scene_interface_.allowCollisions(screw_tool_id, "tray_2_screw_holder");
-  ROS_INFO_STREAM("Moving into screw.");
-  screw_head_pose.pose.position.x = .01;
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  moveToCartPoseLIN(screw_head_pose, robot_name, true, screw_tool_link, 0.05);
+  ROS_WARN_STREAM("TODO: TURN ON SUCTION");
 
-  // Perform spiral motion
-  if (use_real_robot_)
-  {
-    o2as_msgs::sendScriptToUR srv;
-    srv.request.program_id = "spiral_motion";
-    srv.request.robot_name = "b_bot";
-    srv.request.max_radius = .004;
-    srv.request.radius_increment = .001;
-    srv.request.spiral_axis = "Y";
-    sendScriptToURClient_.call(srv);
-    if (srv.response.success == true)
-    {
-      ROS_INFO("Successfully called the service client to do spiral motion. Waiting for it to finish.");
-      waitForURProgram("/" + robot_name +"_controller", ros::Duration(8.0));
-    }
-    else
-      ROS_WARN("Could not call the service client to do spiral motion.");
-  }
-  else
-  {
-    ROS_INFO("This is where the spiral motion would happen, but we currently only do it with the real robot.");
-    ros::Duration(7.0).sleep();
-  }
-
-  ROS_INFO_STREAM("Moving back a bit slowly.");
-  screw_head_pose.pose.position.x = -.01;
+  auto adjusted_pose = screw_head_pose;
+  auto search_start_pose = screw_head_pose;
+  bool screw_picked = false;
   
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  success = moveToCartPoseLIN(screw_head_pose, robot_name, true, screw_tool_link, 0.1);
+  double max_radius = .0025;
+  double theta_incr = M_PI/3;
+  double radius_increment = .001;
+  double radius_inc_set = radius_increment / (2*M_PI / theta_incr);
+  double r=0.0003;
+  double theta=0;
+  double RealRadius=0;
+  double y, z;
+  
+  // Try to pick the screw, but go around in a spiral while trying to pick it
+  while (!screw_picked)
+  {
+    sendFasteningToolCommand(fastening_tool_name, "loosen", false, 2.0);
+
+    ROS_INFO_STREAM("Moving into screw.");
+    adjusted_pose.pose.position.x = .01;
+    moveToCartPoseLIN(adjusted_pose, robot_name, true, screw_tool_link, 0.05);
+
+    ROS_INFO_STREAM("Moving back a bit slowly.");
+    adjusted_pose.pose.position.x = -.01;
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    moveToCartPoseLIN(adjusted_pose, robot_name, true, screw_tool_link, 0.1);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    // TODO: Wait for message from suction topic
+    // if (screw_tool_id == "screw_tool_m4")
+    //   screw_picked = ros::topic::waitForMessage("/m4_tool/screw_suctioned", ros::Duration(1.0));
+    // else if (screw_tool_id == "screw_tool_m3")
+    //   screw_picked = ros::topic::waitForMessage("/m3_tool/screw_suctioned", ros::Duration(1.0));
+    // else if (screw_tool_id == "screw_tool_m6")
+    //   screw_picked = ros::topic::waitForMessage("/m6_tool/screw_suctioned", ros::Duration(1.0));
+    screw_picked = false;  // TODO: Replace this with the block above checking for pick success
+    if ((RealRadius > max_radius) || (!ros::ok()))
+      break;
+
+    // Adjust the position (spiral search)
+    ROS_INFO("Adjusting the position of the pick attempt slightly and retrying");
+    theta=theta+theta_incr;
+    y=cos(theta)*r;
+    z=sin(theta)*r;
+    adjusted_pose = search_start_pose;
+    adjusted_pose.pose.position.y += y;
+    adjusted_pose.pose.position.z += z;
+    r = r + radius_inc_set;
+    RealRadius = sqrt(pow(y,2)+pow(z,2));
+  }
 
   planning_scene_interface_.disallowCollisions(screw_tool_id, "tray_2_screw_holder");
-  ROS_WARN_STREAM("TODO: TURN OFF MOTOR");
-  ROS_INFO_STREAM("Moving back completely.");
+  ROS_INFO_STREAM("Moving back up completely.");
   screw_head_pose.pose.position.x = -.05;
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
   success = moveToCartPoseLIN(screw_head_pose, robot_name, true, screw_tool_link, 0.5);
@@ -1486,10 +1501,12 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
   }
   else if (goal->tool_name == "screw_tool")
   {
+    goToNamedPose("screw_pick_ready", goal->robot_name);
     std::string screw_tool_id = "screw_tool_m" + std::to_string(goal->screw_size);
     std::string screw_tool_link = goal->robot_name + "_screw_tool_m" + std::to_string(goal->screw_size) + "_tip_link";
     std::string fastening_tool_name = "m" + std::to_string(goal->screw_size) +  "_tool";
     pickScrew(goal->item_pose, screw_tool_id, goal->robot_name, screw_tool_link, fastening_tool_name);
+    goToNamedPose("screw_pick_ready", goal->robot_name);
   }
   else if (goal->tool_name == "suction")
   {;} // TODO: Here is space for code from AIST.
