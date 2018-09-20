@@ -10,7 +10,7 @@ import o2as_msgs.srv
 class PrecisionGripperAction:
     def __init__(self):
         name = rospy.get_name()
-        serial_port = rospy.get_param(name + "/serial_port", "/dev/ttyUSB0")
+        serial_port = rospy.get_param(name + "/serial_port", "/dev/for_docker/gripper")
         rospy.loginfo("Starting up on serial port: " + serial_port)
         self.dynamixel = xm430.USB2Dynamixel_Device( serial_port, baudrate = 57600 )
         self.p1 = xm430.Robotis_Servo2( self.dynamixel, 1, series = "XM" )  #inner gripper
