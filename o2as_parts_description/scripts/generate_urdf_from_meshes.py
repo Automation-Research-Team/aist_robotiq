@@ -7,6 +7,8 @@ import rospy
 import rospkg
 rp = rospkg.RosPack()
 
+print("D1")
+
 # Read in the files
 filenames = os.listdir(os.path.join(rp.get_path("o2as_parts_description"), "meshes"))
 filenames_strip1 = []
@@ -16,23 +18,31 @@ for name in filenames:
 for name in filenames_strip1: 
     filenames_no_ext.append(os.path.splitext(name)[0])        # This removes the .vhacd from ".vhacd.dae" files
 partnames = list(sorted(set(filenames_no_ext)))   # Removes duplicates and sorts (because sets do not allow duplicate entries)
+print("D1")
+out_dir = os.path.join(rp.get_path("o2as_parts_description"), "urdf/generated")
 
 # Read in the templates
 extra_joint_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "extra_frames.csv")
-macro_template_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "macro_template.urdf")
-macro_frames_only_template_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "macro_frames_only_template.urdf")
-spawn_template_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "spawn_template.urdf")
-out_dir = os.path.join(rp.get_path("o2as_parts_description"), "urdf/generated")
-
+macro_template_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "macro_template.urdf.xacro")
 f = open(macro_template_filename,'r')
 macro_template = f.read()
 f.close()
+
+macro_frames_only_template_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "macro_frames_only_template.urdf.xacro")
 f = open(macro_frames_only_template_filename,'r')
 macro_frames_only_template = f.read()
 f.close()
+
+non_macro_template_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "non_macro_template.urdf.xacro")
+f = open(non_macro_template_filename,'r')
+non_macro_template = f.read()
+f.close()
+
+spawn_template_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "spawn_template.urdf")
 f = open(spawn_template_filename,'r')
 spawn_template = f.read()
 f.close()
+print("Reading")
 extra_frames = []
 with open(extra_joint_filename, 'r') as f:
   reader = csv.reader(f)
@@ -47,9 +57,12 @@ with open(extra_joint_filename, 'r') as f:
 # --- This is ignored for now
 
 # Write the macros
+if not os.path.exists(out_dir):
+    os.makedirs(out_dir)
 for part_num, partname in enumerate(partnames):
-    macrofile = open(os.path.join(out_dir, partname+"_macro.urdf"),'w+')
-    macro_frames_only_file = open(os.path.join(out_dir, partname+"_frames_only_macro.urdf"),'w+')
+    print("Writing partname")
+    macrofile = open(os.path.join(out_dir, partname+"_macro.urdf.xacro"),'w+')
+    macro_frames_only_file = open(os.path.join(out_dir, partname+"_frames_only_macro.urdf.xacro"),'w+')
 
     mname_int = "assy_part_" + partname[0:2]                    # = "assy_part_01" for part 01.
     mname_ext = mname_int
@@ -92,10 +105,23 @@ for part_num, partname in enumerate(partnames):
         macro_frames_only_filecontent = macro_frames_only_filecontent.replace("<!-- #EXTRAFRAMES -->", extra_frames_urdf)
     macrofile.write(macrofile_content)
     macro_frames_only_file.write(macro_frames_only_filecontent)
-    rospy.loginfo("Wrote " + os.path.join(out_dir, partname+"_macro.urdf"))
-    rospy.loginfo("Wrote " + os.path.join(out_dir, partname+"_frames_only_macro.urdf"))
+    print("Wrote " + os.path.join(out_dir, partname+"_macro.urdf.xacro"))
+    print("Wrote " + os.path.join(out_dir, partname+"_frames_only_macro.urdf.xacro"))
+
+for part_num, partname in enumerate(partnames):
+    non_macrofile = open(os.path.join(out_dir, partname+"_non_macro.urdf.xacro"),'w+')
+    mname_ext = "assy_part_" + partname[0:2]
+    non_macrofile_content = non_macro_template.replace("MACRONAME_EXTERNAL", mname_ext)
+    non_macrofile_content = non_macrofile_content.replace("PARTNAME", partname)
+    non_macrofile.write(non_macrofile_content)
+    print("Wrote " + os.path.join(out_dir, partname+"_macro.urdf.xacro"))
 
 
-
-
-
+# Convert xacro files to urdf (necessary for the URDF-to-msg converter)
+import subprocess
+for part_num, partname in enumerate(partnames):
+    print("Convert xacro to urdf")
+    non_macrofilepath = os.path.join( out_dir, partname+"_non_macro.urdf.xacro")
+    out_urdf_filepath = os.path.join( os.path.join(out_dir, "collision_object_urdfs"), partname+"_non_macro.urdf")
+    cmd = 'xacro --inorder ' + non_macrofilepath + " -o " + out_urdf_filepath
+    subprocess.check_call(cmd, shell=True)

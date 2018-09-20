@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="o2as_base">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   
   <xacro:macro name="o2as_base" params="boxname parent *origin">
     <!-- This creates a box with the origin in the bottom corner, fixed to the world link. -->
@@ -21,6 +21,7 @@
         </material>
       </visual>
       <collision>
+      <origin xyz="${box_w/2} ${box_l/2} ${box_h/2}" rpy="0 0 0"/>
         <geometry>
           <box size="${box_w} ${box_l} ${box_h}"/> 
         </geometry>

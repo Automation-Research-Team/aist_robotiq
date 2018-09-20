@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="screw_feeder">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="screw_feeder">
 
   <xacro:macro name="screw_feeder" params="feedername parent *origin">
   <!-- This creates a screw feeder (roughly) with the origin in the back right corner. -->
@@ -78,7 +78,9 @@
   <joint name="${feedername}_outlet_joint" type="fixed">
     <parent link="${feedername}_link"/>
     <child link="${feedername}_outlet_link"/>
-    <origin rpy="0.0 0.0 0.0" xyz="${length-.01} ${width/2} ${height/2 + .02}"/>
+    <!-- <origin rpy="0.0 0 0.0" xyz="${length-.01} ${width/2} ${height/2 + .02}"/> -->
+    <!-- <origin rpy="0.0 ${pi/2} 0.0" xyz="${-height/2 - .02} ${width/2} ${length-.01}"/> -->
+    <origin rpy="0.0 ${pi/2} 0.0" xyz="${length-.01} ${width/2} ${height/2 + .02}"/>
   </joint>
   <link name="${feedername}_outlet_link"/>
   </xacro:macro>

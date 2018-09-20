@@ -29,8 +29,8 @@
 
   <!-- Scene items (trays, bins...) -->
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/taskboard_scene.xacro" /> -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" />
-  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/assembly_scene.xacro" /> -->
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" /> -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/assembly_scene.xacro" />
   
   <!-- Robot bases -->
   <!-- Putting these at height 0.0 makes them intersect with the ground, so they are elevated. -->
@@ -68,15 +68,15 @@
 
   <!-- Screw holder & screw tool visual -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/screw_tools.xacro" />
-
+  
   <!-- Feeders -->
-  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/screw_feeder.xacro" />
-  <xacro:screw_feeder feedername="m3_feeder" parent="a_bot_base_smfl">
-    <origin xyz=".3 .4 .05" rpy="0 0 ${pi/2}" />   
+  <xacro:include filename="$(find o2as_scene_description)/urdf/screw_feeder.xacro" />
+  <xacro:screw_feeder feedername="m3_feeder" parent="c_bot_base_smfl">
+    <origin xyz=".66 -0.25 .065" rpy="0 0 ${pi/2}" />   
   </xacro:screw_feeder>
   <xacro:screw_feeder feedername="m4_feeder" parent="c_bot_base_smfl">
-    <origin xyz=".45 .05 .05" rpy="0 0 0" />   
-  </xacro:screw_feeder> -->
+    <origin xyz=".54 -0.25 .065" rpy="0 0 ${pi/2}" />   
+  </xacro:screw_feeder>
 
   <!-- robot arms -->    
   <xacro:ur5_robot prefix="a_bot_" joint_limited="true"
@@ -101,7 +101,7 @@
     elbow_joint_lower_limit="0.0" elbow_joint_upper_limit="${pi}"
     wrist_1_lower_limit="${-pi}" wrist_1_upper_limit="${pi}"
     wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
-    wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
+    wrist_3_lower_limit="${-pi*5/4}" wrist_3_upper_limit="${pi*5/4}"/>
 
   <link name="o2as_ground" />
 
@@ -130,9 +130,10 @@
   </xacro:precision_gripper>
 
   <!-- spawn and attach dual robotiq 85 grippers -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_85_gripper_with_ft300.urdf.xacro" />
-  <!-- <xacro:robotiq_85_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link" /> -->
-  <xacro:robotiq_85_gripper_o2as prefix="c_bot_" parent = "c_bot_ee_link"/>
+  <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_b_bot_gripper.urdf.xacro" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_c_bot_gripper.urdf.xacro" />
+  <!-- <xacro:o2as_b_bot_gripper prefix="b_bot_" parent = "b_bot_ee_link" /> -->
+  <xacro:o2as_c_bot_gripper prefix="c_bot_" parent = "c_bot_ee_link"/>
 
   <!-- Add cameras -->
   <xacro:include filename="$(find o2as_realsense2_camera)/urdf/_d435.urdf.xacro" />
