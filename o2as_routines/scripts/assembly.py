@@ -107,13 +107,23 @@ class AssemblyClass(O2ASBaseRoutines):
 
 ######
 
-  def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, lift_up_after_place = True):
+  def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, approach_axis="z" ,lift_up_after_place = True):
     rospy.loginfo("Going above place target")
-    object_pose.pose.position.z = approach_height
+    if approach_axis=="z":
+      object_pose.pose.position.z = approach_height
+    elif approach_axis=="y":
+      object_pose.pose.position.y = approach_height
+    elif approach_axis=="x":
+      object_pose.pose.position.x = approach_height
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
 
     rospy.loginfo("Moving to place target")
-    object_pose.pose.position.z = place_height
+    if approach_axis=="z":
+      object_pose.pose.position.z = place_height
+    elif approach_axis=="y":
+      object_pose.pose.position.y = place_height
+    elif approach_axis=="x":
+      object_pose.pose.position.x = place_height
     self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True)
 
     #gripper open
@@ -130,9 +140,14 @@ class AssemblyClass(O2ASBaseRoutines):
     
     if lift_up_after_place:
       rospy.loginfo("Moving back up")
-      object_pose.pose.position.z = (approach_height)
+      if approach_axis=="z":
+        object_pose.pose.position.z = approach_height
+      elif approach_axis=="y":
+        object_pose.pose.position.y = approach_height
+      elif approach_axis=="x":
+        object_pose.pose.position.x = approach_height
       self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)  
-    
+
 
   def assembly_task(self):
     self.go_to_named_pose("home", "c_bot")
@@ -419,19 +434,110 @@ class AssemblyClass(O2ASBaseRoutines):
     # # pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(pi/2, 0,0))
     # self.do_screw_action("b_bot", pscrew, screw_height = 0.02, screw_size = 4)
 
+  def pick_retainer_pin(self, robot_name = "b_bot"):
+    rospy.loginfo("============ Picking up a retainer pin using b_bot ============")
+    # if robot_name=="b_bot":
+    #   self.go_to_named_pose("back", "c_bot")
+    # elif robot_name=="c_bot":
+    #   self.go_to_named_pose("back", "b_bot")
+
+    self.go_to_named_pose("home", robot_name)
+
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.header.frame_id = "tray_2_partition_2"
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.position.x = 0
+    pose0.pose.position.z = 0.008
+
+    # if robot_name=="b_bot":
+    #   self.go_to_pose_goal(robot_name, pose0,speed=.05, move_lin = True)
+    #   # pose0.pose.position.x = -.01
+    #   rospy.sleep(1.0)
+    # pose0.pose.position.z =0
+    self.send_gripper_command(gripper="b_bot",command = 0.04)
+    self.do_pick_action(robot_name, pose0, z_axis_rotation = 0.0, use_complex_planning = False)
+    
+    #self.go_to_named_pose("home", "b_bot")
+    self.groups["b_bot"].set_joint_value_target([1.75, -1.24, 1.28, -0.00, 0.23, -1.55])
+    self.groups["b_bot"].set_max_velocity_scaling_factor(.3)
+    self.groups["b_bot"].go(wait=True)
+    self.groups["b_bot"].stop()
+
+    intermediate_retainer_pin_tip = geometry_msgs.msg.PoseStamped()
+    intermediate_retainer_pin_tip.header.frame_id = "intermediate_assy_part_14_screw_head"
+    intermediate_retainer_pin_tip.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    
+    self.go_to_pose_goal(robot_name, intermediate_retainer_pin_tip,speed=.2, move_lin = True)
+    intermediate_retainer_pin_tip.pose.position.z = -0.4
+    self.go_to_pose_goal(robot_name, intermediate_retainer_pin_tip,speed=.2, move_lin = True)
+    return
+
+  def pick_and_place_retainer_pin_spacer(self, robot_name = "a_bot"):
+    rospy.loginfo("============ Picking up a retainer pin spacer using a_bot ============")
+
+    self.go_to_named_pose("home", robot_name)
+
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.header.frame_id = "tray_2_partition_3"
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.position.x = 0
+    pose0.pose.position.z = 0.02
+
+    self.pick("a_bot",pose0,-0.01,
+                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
+                                approach_height = 0.1)
+
+    self.go_to_named_pose("home", robot_name)
+
+    intermediate_retainer_pin_tip = geometry_msgs.msg.PoseStamped()
+    intermediate_retainer_pin_tip.header.frame_id = "intermediate_assy_part_14_screw_tip"
+    intermediate_retainer_pin_tip.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+
+    self.go_to_pose_goal("b_bot", intermediate_retainer_pin_tip,speed=.2, move_lin = True)
+
+    intermediate_retainer_pin_tip.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi, 0))
+    intermediate_retainer_pin_tip.pose.position.x += 0.01637
+    intermediate_retainer_pin_tip.pose.position.y += 0.0021364
+    intermediate_retainer_pin_tip.pose.position.z += 0.012837
+
+    #0.01637; 0.0021364; 0.012837
+    self.place("a_bot",intermediate_retainer_pin_tip,0.01637,
+                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
+                                approach_height = 0.03,approach_axis="x", lift_up_after_place = False)
+    self.horizontal_spiral_motion("a_bot", .004, intermediate_retainer_pin_tip)
+    rospy.loginfo("doing spiral motion")
+
+
+    # pin_held_up = geometry_msgs.msg.PoseStamped()
+    # pin_held_up.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, 0, pi/2))
+    # pin_held_up.pose.position.x = 0.07
+    # pin_held_up.pose.position.y = 0.20
+    # pin_held_up.pose.position.z = .47
+
+    # if robot_name=="a_bot":
+      # self.go_to_pose_goal(robot_name, pose0,speed=.05, move_lin = True)
+      # pose0.pose.position.x = -.01
+      # rospy.sleep(1.0)
+    # pose0.pose.position.z =0
+    # self.send_gripper_command(gripper="b_bot",command = 0.04)
+    # self.do_pick_action(robot_name, pose0, z_axis_rotation = 0.0, gripper_command = "complex_pick_from_inside")
+    return
 
 
 if __name__ == '__main__':
   try:
     assy = AssemblyClass()
     assy.set_up_item_parameters()
-    
+    assy.go_to_named_pose("home", "c_bot")
+    # assy.go_to_named_pose("home", "b_bot")
+    assy.go_to_named_pose("home", "a_bot")
     # assy.handover_demo()
     # assy.insertion_demo()
     # assy.belt_demo()
-    assy.place_plate_3_and_screw_demo()
+    # assy.place_plate_3_and_screw_demo()
     # assy.place_plate_2()
-
+    assy.pick_retainer_pin()
+    assy.pick_and_place_retainer_pin_spacer()
     print "============ Done!"
   except rospy.ROSInterruptException:
     pass
