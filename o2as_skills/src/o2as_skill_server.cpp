@@ -1243,8 +1243,9 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
     o2as_msgs::sendScriptToUR srv;
     srv.request.program_id = "spiral_motion";
     srv.request.robot_name = "b_bot";
-    srv.request.max_radius = .002;
+    srv.request.max_radius = .004;
     srv.request.radius_increment = .001;
+    srv.request.spiral_axis = "Y";
     sendScriptToURClient_.call(srv);
     if (srv.response.success == true)
     {

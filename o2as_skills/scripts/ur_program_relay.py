@@ -184,13 +184,15 @@ class URScriptRelay():
                 req.max_radius = .0065
             if not req.radius_increment:
                 req.radius_increment = .002
-
+            if not req.spiral_axis:
+                req.spiral_axis = "Z"
             
             program_back += "    textmsg(\"Performing spiral motion.\")\n"
             program_back += "    spiral_motion(" + str(req.max_radius) \
                                 + ", " + str(req.radius_increment) \
                                 + ", " + str(req.velocity) \
-                                + ", " + str(req.acceleration) + ")\n"
+                                + ", " + str(req.acceleration) \
+                                + ", \"" + req.spiral_axis + "\")\n"
             program_back += "    textmsg(\"Done.\")\n"
             program_back += "end\n"
 
