@@ -23,7 +23,7 @@ float64 acceleration            # move_l param (default: .5)
 float64 velocity                # move_l param (default: .05)
 
 # lin_move_rel
-geometry_msgs/PointStamped relative_translation  # for lin_translation
+geometry_msgs/Point relative_translation  # for lin_translation. In EE coordinates (Z+ is forward)
 ---
 # Response
 bool success
