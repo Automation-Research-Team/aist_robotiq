@@ -312,41 +312,50 @@ class O2ASBaseRoutines(object):
     rospy.loginfo(success)
     return success
 
-  def horizontal_spiral_motion(self, robot_name, max_radius, start_pos, radius_increment = .001, speed = 0.02):
-    group = self.groups[robot_name]
+  def horizontal_spiral_motion(self, robot_name, max_radius, start_pos, radius_increment = .001, speed = 0.02, spiral_axis="Z"):
     rospy.loginfo("Performing horizontal spiral motion " + str(speed))
-    rospy.loginfo("Setting velocity scaling to " + str(speed))
-    group.set_max_velocity_scaling_factor(speed)
+    req = o2as_msgs.srv.sendScriptToURRequest()
+    req.program_id = "spiral_motion"
+    req.robot_name = robot_name
+    req.velocity = speed
+    req.spiral_axis = spiral_axis
+    res = self.urscript_client.call(req)
+    wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(10.0))
+    return res.success
 
-    # Modified code from Robotiq spiral search
-    theta_incr = 30
-    radius_inc_set = radius_increment / (360 / theta_incr)
-    r=0.0003  #Start radius
-    theta=0
-    RealRadius=0
+    # group = self.groups[robot_name]
+    # rospy.loginfo("Performing horizontal spiral motion " + str(speed))
+    # rospy.loginfo("Setting velocity scaling to " + str(speed))
+    # group.set_max_velocity_scaling_factor(speed)
+    # # Modified code from Robotiq spiral search
+    # theta_incr = 30
+    # radius_inc_set = radius_increment / (360 / theta_incr)
+    # r=0.0003  #Start radius
+    # theta=0
+    # RealRadius=0
     
-    # ==== MISBEHAVING VERSION (see https://answers.ros.org/question/300978/movegroupcommander-get_current_pose-returns-incorrect-result-when-using-real-robot/ )
-    # start_pos_bugged = group.get_current_pose() 
-    # ==== WORKING VERSION:
-    gripper_pos = geometry_msgs.msg.PoseStamped()
-    gripper_pos.header.frame_id = "a_bot_gripper_tip_link"
-    gripper_pos.pose.orientation.w = 1.0
-    # start_pos = self.listener.transformPose("world", gripper_pos)
+    # # ==== MISBEHAVING VERSION (see https://answers.ros.org/question/300978/movegroupcommander-get_current_pose-returns-incorrect-result-when-using-real-robot/ )
+    # # start_pos_bugged = group.get_current_pose() 
+    # # ==== WORKING VERSION:
+    # gripper_pos = geometry_msgs.msg.PoseStamped()
+    # gripper_pos.header.frame_id = "a_bot_gripper_tip_link"
+    # gripper_pos.pose.orientation.w = 1.0
+    # # start_pos = self.listener.transformPose("world", gripper_pos)
 
-    next_pos = start_pos
-    while RealRadius <= max_radius and not rospy.is_shutdown():
-        #By default, the Spiral_Search function will maintain contact between both mating parts at all times
-        theta=theta+theta_incr
-        x=cos(radians(theta))*r
-        y=sin(radians(theta))*r
-        next_pos.pose.position.x = start_pos.pose.position.x + x
-        next_pos.pose.position.y = start_pos.pose.position.y + y
-        r=r + radius_inc_set
-        RealRadius = sqrt(pow(x,2)+pow(y,2))
-        self.go_to_pose_goal(robot_name, next_pos)
-        rospy.sleep(0.1)
-    # -------------
-    return True
+    # next_pos = start_pos
+    # while RealRadius <= max_radius and not rospy.is_shutdown():
+    #     #By default, the Spiral_Search function will maintain contact between both mating parts at all times
+    #     theta=theta+theta_incr
+    #     x=cos(radians(theta))*r
+    #     y=sin(radians(theta))*r
+    #     next_pos.pose.position.x = start_pos.pose.position.x + x
+    #     next_pos.pose.position.y = start_pos.pose.position.y + y
+    #     r=r + radius_inc_set
+    #     RealRadius = sqrt(pow(x,2)+pow(y,2))
+    #     self.go_to_pose_goal(robot_name, next_pos)
+    #     rospy.sleep(0.1)
+    # # -------------
+    # return True
 
   def go_to_named_pose(self, pose_name, robot_name, speed = 0.3):
     # pose_name should be "home", "back" etc.
