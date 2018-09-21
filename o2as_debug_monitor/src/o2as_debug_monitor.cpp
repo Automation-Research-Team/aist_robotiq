@@ -18,6 +18,11 @@ using CamInfoCallback =
 
 namespace o2as_debug_monitor
 {
+  const int font_face_ = cv::FONT_HERSHEY_SIMPLEX;
+  const double font_scale_ = 0.5;
+  const int font_thick_ = 0.8;
+  const int font_ltype_ = CV_AA;
+
   // Adopted from team-NAIST-Panasonic ARC repository
   // https://github.com/warehouse-picking-automation-challenges/team_naist_panasonic
   cv_bridge::CvImagePtr convert2OpenCV(
@@ -62,7 +67,13 @@ namespace o2as_debug_monitor
   }
 
   boost::function<void(const sensor_msgs::CameraInfoConstPtr&)>
-    getCallbackForCameraInfo(cv::Rect rect, cv::Mat& monitor_) {
+    getCallbackForCameraInfo(cv::Rect rect, XmlRpc::XmlRpcValue &params,
+      cv::Mat& monitor_)
+  {
+    // Vavlues captured by closure
+    int offset_x = params["offset"][0];
+    int offset_y = params["offset"][1];
+
     // This function returns callback function
     return [=](const sensor_msgs::CameraInfoConstPtr &msg) {
       // Show window at the first time
@@ -71,21 +82,19 @@ namespace o2as_debug_monitor
         cv::moveWindow("Monitor", 128, 128);
       }
 
-      ROS_INFO("width: %d", msg->width);
-//      // Convert sent message into cv::Mat
-//      cv::Mat img = convert2OpenCV(
-//        *msg, sensor_msgs::image_encodings::RGB8
-//      ) -> image;
-//
-//      // Resize the image and put it to the buffer
-//      cv::Size size = cv::Size(rect.width, rect.height);
-//      cv::Mat resized;
-//      cv::resize(img, resized, size, 0, 0, cv::INTER_CUBIC);
-//      resized.copyTo(monitor_(rect));
-//
-//      // Copy the image buffer in the window
-//        cv::imshow("Monitor", monitor_);
-//        cv::waitKey(3);
+      {
+        std::string text = "Width : " + std::to_string(msg->width);
+        cv::Point point(rect.x + offset_x, rect.y + offset_y);
+        cv::putText(monitor_, text, point, font_face_, 2 * font_scale_,
+                    cv::Scalar(255, 255, 255), font_thick_, font_ltype_);
+      }
+
+      {
+        std::string text = "Height: " + std::to_string(msg->height);
+        cv::Point point(rect.x + offset_x, rect.y + offset_y + 32);
+        cv::putText(monitor_, text, point, font_face_, 2 * font_scale_,
+                    cv::Scalar(255, 255, 255), font_thick_, font_ltype_);
+      }
     };
   }
 
@@ -128,7 +137,7 @@ namespace o2as_debug_monitor
       int d_cols;
       int d_rows;
 
-      cv::Rect getRect(XmlRpc::XmlRpcValue params)
+      cv::Rect getRect(XmlRpc::XmlRpcValue &params)
       {
         int col_min = params["col"][0];
         int col_max = params["col"][1];
@@ -188,7 +197,9 @@ namespace o2as_debug_monitor
           cv::Rect rect = getRect(params);
 
           // Create, set and keep callback function
-          caminfocbs_.push_back(getCallbackForCameraInfo(rect, monitor_));
+          caminfocbs_.push_back(
+            getCallbackForCameraInfo(rect, params, monitor_)
+          );
           n_sub_rs_.push_back(nh.subscribe(topic_name, 1, caminfocbs_.back()));
         }
       }
