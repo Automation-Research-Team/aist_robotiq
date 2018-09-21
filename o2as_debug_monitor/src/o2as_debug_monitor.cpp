@@ -11,7 +11,10 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/imgproc/imgproc.hpp>
 
-using ImageCallback = boost::function<void(const sensor_msgs::ImageConstPtr&)>;
+using ImageCallback =
+  boost::function<void(const sensor_msgs::ImageConstPtr&)>;
+using CamInfoCallback =
+  boost::function<void(const sensor_msgs::CameraInfoConstPtr&)>;
 
 namespace o2as_debug_monitor
 {
@@ -58,6 +61,34 @@ namespace o2as_debug_monitor
     };
   }
 
+  boost::function<void(const sensor_msgs::CameraInfoConstPtr&)>
+    getCallbackForCameraInfo(cv::Rect rect, cv::Mat& monitor_) {
+    // This function returns callback function
+    return [=](const sensor_msgs::CameraInfoConstPtr &msg) {
+      // Show window at the first time
+      if (!cvGetWindowHandle("Monitor")) {
+        cv::namedWindow("Monitor", cv::WINDOW_NORMAL);
+        cv::moveWindow("Monitor", 128, 128);
+      }
+
+      ROS_INFO("width: %d", msg->width);
+//      // Convert sent message into cv::Mat
+//      cv::Mat img = convert2OpenCV(
+//        *msg, sensor_msgs::image_encodings::RGB8
+//      ) -> image;
+//
+//      // Resize the image and put it to the buffer
+//      cv::Size size = cv::Size(rect.width, rect.height);
+//      cv::Mat resized;
+//      cv::resize(img, resized, size, 0, 0, cv::INTER_CUBIC);
+//      resized.copyTo(monitor_(rect));
+//
+//      // Copy the image buffer in the window
+//        cv::imshow("Monitor", monitor_);
+//        cv::waitKey(3);
+    };
+  }
+
   class Monitor
   {
     public:
@@ -75,11 +106,18 @@ namespace o2as_debug_monitor
         XmlRpc::XmlRpcValue image_topics;
         nh.getParam("o2as_debug_monitor/image_topics", image_topics);
         setImageCallbacks(nh, image_topics);
+
+        // Set callback functions for CameraInfo topics
+        XmlRpc::XmlRpcValue caminfo_topics;
+        nh.getParam("o2as_debug_monitor/caminfo_topics", caminfo_topics);
+        setCameraInfoCallbacks(nh, caminfo_topics);
       }
 
     private:
-      std::vector<image_transport::Subscriber> sub_rs_;
+      std::vector<image_transport::Subscriber> i_sub_rs_;
+      std::vector<ros::Subscriber> n_sub_rs_;
       std::vector<ImageCallback> imgcbs_;
+      std::vector<CamInfoCallback> caminfocbs_;
 
       cv::Mat monitor_;
 
@@ -113,16 +151,46 @@ namespace o2as_debug_monitor
           int col_max = params["col"][1];
           int row_min = params["row"][0];
           int row_max = params["row"][1];
+
           int x = col_min * d_cols;
           int y = row_min * d_rows;
           int w = (col_max - col_min + 1) * d_cols - 1;
           int h = (row_max - row_min + 1) * d_rows - 1;
+
+          ROS_INFO("%s", topic_name.c_str());
+          ROS_INFO("%d, %d, %d, %d", x, y, w, h);
+
           imgcbs_.push_back(
             getCallbackForImage(cv::Rect(x, y, w, h), monitor_)
           );
-          sub_rs_.push_back(it_.subscribe(topic_name, 1, imgcbs_.back()));
+          i_sub_rs_.push_back(it_.subscribe(topic_name, 1, imgcbs_.back()));
+        }
+      }
+
+      void setCameraInfoCallbacks(ros::NodeHandle &nh,
+                                  XmlRpc::XmlRpcValue caminfo_topics)
+      {
+        for (auto it = caminfo_topics.begin(); it != caminfo_topics.end(); it++)
+        {
+          auto params = caminfo_topics[it->first];
+          std::string topic_name = params["topic_name"];
+          int col_min = params["col"][0];
+          int col_max = params["col"][1];
+          int row_min = params["row"][0];
+          int row_max = params["row"][1];
+
+          int x = col_min * d_cols;
+          int y = row_min * d_rows;
+          int w = (col_max - col_min + 1) * d_cols - 1;
+          int h = (row_max - row_min + 1) * d_rows - 1;
+
           ROS_INFO("%s", topic_name.c_str());
           ROS_INFO("%d, %d, %d, %d", x, y, w, h);
+
+          caminfocbs_.push_back(
+            getCallbackForCameraInfo(cv::Rect(x, y, w, h), monitor_)
+          );
+          n_sub_rs_.push_back(nh.subscribe(topic_name, 1, caminfocbs_.back()));
         }
       }
   };
