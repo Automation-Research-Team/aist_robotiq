@@ -14,7 +14,6 @@ from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import PointCloud2
 import sensor_msgs.point_cloud2 as pc2
-from geometry_msgs.msg import PoseStamped
 
 Params= (
     dummy_param,
@@ -28,9 +27,10 @@ class MarkerDetectionNode(MarkerDetection):
         self.dynamic_reconfigure = Server(MarkerPoseEstimationConfig, self.dynamic_reconfigure_callback)
 
         # # generate marker
+        # image_dir = rospy.get_param("~image_dir")
         # for i in range(50):
-        #     marker_filename = os.path.join(self.input_dir, "marker_" + str(i) + ".png")
-        #     self.generate_marker(marker_filename, i, 700)
+        #     marker_filename = os.path.join(image_dir, "marker_" + str(i) + ".png")
+        #     self.generate_marker(marker_filename, i, 600)
 
         # connect to the camera
         self.bridge = CvBridge()

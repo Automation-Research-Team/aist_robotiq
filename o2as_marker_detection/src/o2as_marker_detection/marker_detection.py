@@ -1,5 +1,3 @@
-
-
 import cv2
 import cv2.aruco as aruco
 import math
@@ -8,11 +6,13 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import rospy
 
+#dir(aruco)
+
 class MarkerDetection(object):
     def __init__(self):
         # self.dictionary = aruco.getPredefinedDictionary(aruco.DICT_4X4_50)
-        self.dictionary = aruco.getPredefinedDictionary(aruco.DICT_5X5_50)
-        # self.dictionary = aruco.getPredefinedDictionary(aruco.DICT_7X7_50)
+        # self.dictionary = aruco.getPredefinedDictionary(aruco.DICT_5X5_50)
+        self.dictionary = aruco.getPredefinedDictionary(aruco.DICT_7X7_50)
 
     def generate_marker(self, filename, id, size=100):
         generator = aruco.drawMarker(self.dictionary, id, size)
@@ -21,7 +21,7 @@ class MarkerDetection(object):
         cv2.imshow('marker', img)
         cv2.waitKey(1)
 
-    def detect_marker(self, cloud, image, target_marker_id=0, output=None):
+    def detect_marker(self, cloud, image, target_marker_id=0):
         # read image
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 

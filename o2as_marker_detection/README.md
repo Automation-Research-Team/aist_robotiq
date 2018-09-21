@@ -7,7 +7,9 @@ This package is AR marker detection using opencv's aruco module.
 Run demo with.
 
     ```
-    roslaunch o2as_marker_detection marker_detection.launch
+    roslaunch o2as_marker_detection demo_phoxi.launch
+    or
+    roslaunch o2as_marker_detection demo_realsense.launch
     ```
 
 Get frame from the camera and detect marker,
