@@ -625,27 +625,279 @@ class AssemblyClass(O2ASBaseRoutines):
   def fasten_clamping_pulley(self):
     loginfo("in progress")
 
+  def put_on_belt(self):
+    ps_b_pick_approach = geometry_msgs.msg.PoseStamped()
+    ps_b_pick_approach.header.frame_id = "tray_1_partition_3"
+    ps_b_pick_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(pi/4, pi/2, 0))
+    ps_b_pick_approach.pose.position.x = -.06
+    ps_b_pick_approach.pose.position.y = -0.025
+    ps_b_pick_approach.pose.position.z = 0.02
+    ps_b_pick = copy.deepcopy(ps_b_pick_approach)
+    ps_b_pick.pose.position.z = -0.015
+    ps_b_above_belt_present = copy.deepcopy(ps_b_pick_approach)
+    ps_b_above_belt_present.header.frame_id = "assembled_assy_part_11_front_hole"
+    ps_b_above_belt_present.pose.position.x = 0.006
+    ps_b_above_belt_present.pose.position.y = 0.056
+    ps_b_above_belt_present.pose.position.z = 0.114
+    ps_b_above_belt_present.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0, 0, 0))
+    ps_b_belt_present = copy.deepcopy(ps_b_above_belt_present)
+    ps_b_belt_present.pose.position.z = 0.03
+
+    ps_a_belt_approach = copy.deepcopy(ps_b_above_belt_present)
+    ps_a_belt_approach.pose.position.x = 0.0012
+    ps_a_belt_approach.pose.position.y = 0.161
+    ps_a_belt_approach.pose.position.z = 0.081
+    ps_a_belt_approach.pose.orientation.x = -0.60423
+    ps_a_belt_approach.pose.orientation.y = 0.63256
+    ps_a_belt_approach.pose.orientation.z = 0.3505
+    ps_a_belt_approach.pose.orientation.w = 0.33455
+    ps_a_belt_grasp = copy.deepcopy(ps_a_belt_approach)
+    ps_a_belt_grasp.pose.position.x = 0.015
+    ps_a_belt_grasp.pose.position.y = 0.137
+    ps_a_belt_place = copy.deepcopy(ps_a_belt_grasp)
+    ps_a_belt_place.pose.position.x = 0.01482
+    ps_a_belt_place.pose.position.y = 0.13746
+    ps_a_belt_place.pose.position.z = 0.0082091
+    ps_a_belt_place.pose.orientation.x = 0.60687
+    ps_a_belt_place.pose.orientation.y = -0.58903
+    ps_a_belt_place.pose.orientation.z = -0.38475
+    ps_a_belt_place.pose.orientation.w = -0.36975
+    
+    # Possible extra hold poses
+    # #temporary a_bot
+    # 0.015942; 0.13972; -0.014877; 0.58922; -0.54298; -0.38705; -0.45627
+    # #approach to temporary a_bot
+    # 0.013052; 0.14083; 0.0017692; 0.58923; -0.54291; -0.38707; -0.45633
+
+    ps_b_belt_put_0 = copy.deepcopy(ps_b_above_belt_present)
+    ps_b_belt_put_0.pose.position.x = -0.023068
+    ps_b_belt_put_0.pose.position.y = 0.022218
+    ps_b_belt_put_0.pose.position.z = -0.0016302
+    ps_b_belt_put_0.pose.orientation.x = -0.0011895
+    ps_b_belt_put_0.pose.orientation.y = 0.0031101
+    ps_b_belt_put_0.pose.orientation.z = 0.00065682
+    ps_b_belt_put_0.pose.orientation.w = 0.99999
+   
+    ps_b_belt_put_1 = copy.deepcopy(ps_b_above_belt_present)
+    ps_b_belt_put_1.pose.position.x = -0.029182
+    ps_b_belt_put_1.pose.position.y = -0.010515
+    ps_b_belt_put_1.pose.position.z = 0.010613
+
+    ps_b_belt_put_2 = copy.deepcopy(ps_b_above_belt_present)
+    ps_b_belt_put_2.pose.position.x = 0.0067392
+    ps_b_belt_put_2.pose.position.y = -0.024667
+    ps_b_belt_put_2.pose.position.z = 0.029542
+    # ps_b_belt_put_2.pose.position.z = 0.012  # Manual tune through code
+    ps_b_belt_put_2.pose.orientation.x =-0.026838
+    ps_b_belt_put_2.pose.orientation.y = 0.20445
+    ps_b_belt_put_2.pose.orientation.z = 0.021962
+    ps_b_belt_put_2.pose.orientation.w = 0.97826
+
+    ps_b_belt_put_3 = copy.deepcopy(ps_b_above_belt_present)
+    ps_b_belt_put_3.pose.position.x = 0.010046
+    ps_b_belt_put_3.pose.position.y = -0.025405
+    ps_b_belt_put_3.pose.position.z = 0.01382
+    ps_b_belt_put_3.pose.orientation.x = -0.047127
+    ps_b_belt_put_3.pose.orientation.y = 0.27254
+    ps_b_belt_put_3.pose.orientation.z = 0.096443
+    ps_b_belt_put_3.pose.orientation.w = 0.95614
+
+    ps_b_belt_put_4 = copy.deepcopy(ps_b_above_belt_present)
+    ps_b_belt_put_4.pose.position.x = 0.0097681
+    ps_b_belt_put_4.pose.position.y = -0.032955
+    ps_b_belt_put_4.pose.position.z = -0.00017476
+    ps_b_belt_put_4.pose.orientation.x = 0.13849
+    ps_b_belt_put_4.pose.orientation.y = 0.28608
+    ps_b_belt_put_4.pose.orientation.z = 0.042087
+    ps_b_belt_put_4.pose.orientation.w = 0.94721
+
+    ps_b_belt_put_5 = copy.deepcopy(ps_b_above_belt_present)
+    ps_b_belt_put_5.pose.position.x = 0.0096936
+    ps_b_belt_put_5.pose.position.y = -0.028125
+    ps_b_belt_put_5.pose.position.z = -0.011783
+    ps_b_belt_put_5.pose.orientation.x = 0.25341
+    ps_b_belt_put_5.pose.orientation.y = 0.28907
+    ps_b_belt_put_5.pose.orientation.z = 0.0068096
+    ps_b_belt_put_5.pose.orientation.w = 0.92313
+    
+    ps_b_belt_put_6 = copy.deepcopy(ps_b_above_belt_present)
+    ps_b_belt_put_6.pose.position.x = 0.0096176
+    ps_b_belt_put_6.pose.position.y = -0.023353
+    ps_b_belt_put_6.pose.position.z = -0.020149
+    ps_b_belt_put_6.pose.orientation.x = 0.4333
+    ps_b_belt_put_6.pose.orientation.y = 0.28455
+    ps_b_belt_put_6.pose.orientation.z = -0.051186
+    ps_b_belt_put_6.pose.orientation.w = 0.85362
+
+    ps_b_belt_put_7 = copy.deepcopy(ps_b_above_belt_present)
+    ps_b_belt_put_7.pose.position.x = 0.0095138
+    ps_b_belt_put_7.pose.position.y = -0.018058
+    ps_b_belt_put_7.pose.position.z = -0.023723
+    ps_b_belt_put_7.pose.orientation.x = 0.47823
+    ps_b_belt_put_7.pose.orientation.y = 0.28154
+    ps_b_belt_put_7.pose.orientation.z = -0.066498
+    ps_b_belt_put_7.pose.orientation.w = 0.82922
+
+    ps_b_belt_put_8 = copy.deepcopy(ps_b_above_belt_present)
+    ps_b_belt_put_8.pose.position.x = 0.0095106
+    ps_b_belt_put_8.pose.position.y = -0.016251
+    ps_b_belt_put_8.pose.position.z = -0.026674
+    ps_b_belt_put_8.pose.orientation.x = 0.57396
+    ps_b_belt_put_8.pose.orientation.y = 0.27155
+    ps_b_belt_put_8.pose.orientation.z = -0.099617
+    ps_b_belt_put_8.pose.orientation.w = 0.76609
+
+    ps_b_belt_put_9 = copy.deepcopy(ps_b_above_belt_present)
+    ps_b_belt_put_9.pose.position.x = 0.011757
+    ps_b_belt_put_9.pose.position.y = -0.010226
+    ps_b_belt_put_9.pose.position.z = -0.021166
+    ps_b_belt_put_9.pose.orientation.x = 0.63966
+    ps_b_belt_put_9.pose.orientation.y = 0.16901
+    ps_b_belt_put_9.pose.orientation.z = 0.05053
+    ps_b_belt_put_9.pose.orientation.w = 0.74814
+
+    # ps_b_belt_put_10 = copy.deepcopy(ps_b_above_belt_present)
+    # ps_b_belt_put_10.pose.position.x = 0.0095106
+    # ps_b_belt_put_10.pose.position.y = -0.016251
+    # ps_b_belt_put_10.pose.position.z = -0.026674
+    # ps_b_belt_put_10.pose.orientation.x = 0.57396
+    # ps_b_belt_put_10.pose.orientation.y = 0.27155
+    # ps_b_belt_put_10.pose.orientation.z = -0.099617
+    # ps_b_belt_put_10.pose.orientation.w = 0.76609
+
+    ps_a_belt_put_0 = copy.deepcopy(ps_b_above_belt_present)
+    ps_a_belt_put_0.pose.position.x = -0.1284726
+    ps_a_belt_put_0.pose.position.y = 0.14147
+    ps_a_belt_put_0.pose.position.z = 0.10941
+    ps_a_belt_put_0.pose.orientation.x = 0.84672
+    ps_a_belt_put_0.pose.orientation.y = -0.41555
+    ps_a_belt_put_0.pose.orientation.z = -0.061494
+    ps_a_belt_put_0.pose.orientation.w = -0.3265
+
+    ps_a_belt_put_1 = copy.deepcopy(ps_b_above_belt_present)
+    ps_a_belt_put_1.pose.position.x = 0.00037505
+    ps_a_belt_put_1.pose.position.y = 0.051676
+    ps_a_belt_put_1.pose.position.z = 0.0011139
+    ps_a_belt_put_1.pose.orientation.x = 0.99502
+    ps_a_belt_put_1.pose.orientation.y = -0.089389
+    ps_a_belt_put_1.pose.orientation.z = -0.042746
+    ps_a_belt_put_1.pose.orientation.w = -0.010752
+
+    ps_a_belt_put_2 = copy.deepcopy(ps_b_above_belt_present)
+    ps_a_belt_put_2.pose.position.x = 0.00037505
+    ps_a_belt_put_2.pose.position.y = 0.051676
+    ps_a_belt_put_2.pose.position.z = 0.0011139
+    ps_a_belt_put_2.pose.orientation.x = 0.99502
+    ps_a_belt_put_2.pose.orientation.y = -0.089389
+    ps_a_belt_put_2.pose.orientation.z = -0.042746
+    ps_a_belt_put_2.pose.orientation.w = -0.010752
+
+    ps_a_belt_put_3 = copy.deepcopy(ps_b_above_belt_present)
+    ps_a_belt_put_3.pose.position.x = 0.029154
+    ps_a_belt_put_3.pose.position.y = 0.039011
+    ps_a_belt_put_3.pose.position.z = -0.024386
+    ps_a_belt_put_3.pose.orientation.x = 0.99248
+    ps_a_belt_put_3.pose.orientation.y = -0.11621
+    ps_a_belt_put_3.pose.orientation.z = -0.0092272
+    ps_a_belt_put_3.pose.orientation.w = -0.037367
+
+    # ==========
+    
+    self.send_gripper_command("b_bot", .02)
+    self.go_to_named_pose("home", "c_bot")
+    self.go_to_named_pose("home", "b_bot")
+    self.go_to_named_pose("home", "a_bot")
+        
+    self.move_lin("b_bot", ps_b_pick_approach, 1.0)
+    rospy.sleep(1)
+    self.move_lin("b_bot", ps_b_pick, 0.1)
+    rospy.sleep(1)
+    self.send_gripper_command("b_bot", "close")
+    self.move_lin("b_bot", ps_b_pick_approach, 1.0)
+    rospy.sleep(1)
+    
+    self.move_lin("b_bot", ps_b_above_belt_present, 1.0)
+    rospy.sleep(1)
+    self.move_lin("b_bot", ps_b_belt_present, 1.0)
+    rospy.sleep(1)
+    self.move_lin("a_bot", ps_a_belt_approach, 1.0)
+    rospy.sleep(1)
+    self.move_lin("a_bot", ps_a_belt_grasp, 1.0)
+    rospy.sleep(1)
+    self.send_gripper_command("precision_gripper_inner", "close")
+    self.move_lin("a_bot", ps_a_belt_place, .03)
+    rospy.sleep(1)
+    # self.send_gripper_command("precision_gripper_inner", "close")
+    rospy.loginfo("Press enter.")
+    raw_input()
+    self.move_lin("b_bot", ps_b_belt_put_0, .03)
+    rospy.sleep(.5)
+    self.move_lin("b_bot", ps_b_belt_put_1, .03)
+    rospy.sleep(.5)
+    self.move_lin("b_bot", ps_b_belt_put_2, .03)
+    rospy.sleep(.1)
+    self.move_lin("b_bot", ps_b_belt_put_3, .03)
+    rospy.sleep(.1)
+    self.move_lin("b_bot", ps_b_belt_put_4, .03)
+    rospy.sleep(.1)
+    self.move_lin("b_bot", ps_b_belt_put_5, .03)
+    rospy.sleep(.1)
+    self.move_lin("b_bot", ps_b_belt_put_6, .03)
+    rospy.sleep(.1)
+    self.move_lin("b_bot", ps_b_belt_put_7, .03)
+    rospy.sleep(.1)
+    self.move_lin("b_bot", ps_b_belt_put_8, .03)
+    rospy.sleep(.1)
+    # self.move_lin("b_bot", ps_b_belt_put_9, .03)
+    # rospy.sleep(.1)
+    rospy.loginfo("Press enter.")
+    raw_input()
+
+    self.move_lin("a_bot", ps_a_belt_approach, .1)
+    rospy.sleep(1)
+    self.move_lin("a_bot", ps_a_belt_put_0, .1)
+    rospy.sleep(1)
+    self.move_lin("a_bot", ps_a_belt_put_1, .03)
+    rospy.sleep(1)
+    self.move_lin("a_bot", ps_a_belt_put_2, .03)
+    rospy.sleep(1)
+    self.move_lin("a_bot", ps_a_belt_put_3, .03)
+    rospy.sleep(1)
+    self.send_gripper_command("b_bot", 0.015)
+
 
 if __name__ == '__main__':
   try:
     assy = AssemblyClass()
     assy.set_up_item_parameters()
-    assy.go_to_named_pose("home", "c_bot")
-    assy.go_to_named_pose("home", "b_bot")
-    assy.go_to_named_pose("home", "a_bot")
+    # assy.go_to_named_pose("home", "c_bot")
+    # assy.go_to_named_pose("home", "b_bot")
+    # assy.go_to_named_pose("home", "a_bot")
     # assy.handover_demo()
     # assy.insertion_demo()
     # assy.belt_demo()
-    # assy.place_plate_3_and_screw_demo()
-    assy.place_plate_3_and_screw()
+
+    ### Equip tool
+    # assy.go_to_named_pose("back", "c_bot")
+    # assy.do_change_tool_action("b_bot", screw_size=4, equip=True)
+
+    # assy.place_plate_3_and_screw()
     # assy.place_plate_2()
-    assy.pick_retainer_pin()
-    assy.adjust_centering()
-    assy.rotate_hand_facing_the_sky()
+
+    ###
+    # assy.pick_retainer_pin()
+    # assy.adjust_centering()
+    # assy.rotate_hand_facing_the_sky()
+
     # assy.pick_idle_pulley()
     # assy.place_idle_pulley()
-    assy.pick_retainer_pin_spacer()
-    assy.place_retainer_pin_spacer()
+    
+    # assy.pick_retainer_pin_spacer()
+    # assy.place_retainer_pin_spacer()
+    ####
+
+    ### ==== SUBTASK G
+    assy.put_on_belt()
     print "============ Done!"
   except rospy.ROSInterruptException:
     pass
