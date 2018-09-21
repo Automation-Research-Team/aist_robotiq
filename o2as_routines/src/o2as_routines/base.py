@@ -198,8 +198,8 @@ class O2ASBaseRoutines(object):
                                       0.01,        # eef_step
                                       0.0)         # jump_threshold
     rospy.loginfo("compute cartesian path succeeded with " + str(fraction*100) + "%")
-
     plan = group.execute(plan, wait=True)
+    # plan = group.retime_trajectory(self.robots.get_current_state(), plan, speed)
     group.stop()
     group.clear_pose_targets()
 

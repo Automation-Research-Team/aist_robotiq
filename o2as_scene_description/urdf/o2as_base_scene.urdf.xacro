@@ -171,7 +171,7 @@
     <!-- osx phoxi setting (maybe) -->
     <!-- <origin xyz="0.46 0 ${bots_z + .1 + .8}" rpy="${-160*pi/180} 0 ${pi/2}"/> -->
     <!-- aist phoxi setting  -->
-    <origin xyz="0.616968905765895 0.121035425329841 1.423091256751067" rpy="-2.626594398897875 0.2001733992896885 1.5970042364211503"/> 
+    <origin xyz="0.594404677631629 0.128504467275411 1.427249342095321" rpy="-2.6268341423102637 0.1979289843311739 1.6062811061489097"/> 
   </xacro:phoxi_m_camera>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->

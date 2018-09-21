@@ -11,17 +11,17 @@ import geometry_msgs.msg
 def phoxi_transformation_examples():
     # original matrix
     T_phoxi = np.array([
-        [-0.025681652912, 0.872561093468, -0.487829469046, 616.968905765895],
-        [0.979695563504, -0.075095371915, -0.185895906270, 171.035425329841],
-        [-0.198839270656, -0.482698480713, -0.852915658880, 1423.091256751067],
-        [0.000000000000, 0.000000000000, 0.000000000000, 1.000000000000 ]
+        [-0.034784670752, 0.873298269909, -0.485942546454, 0.594404677631629],
+        [0.979858695089, -0.065869488303, -0.188515644360, 0.128504467275411],
+        [-0.196639172950, -0.482712484078, -0.853417654714, 1.427249342095321],
+        [0.000000000000, 0.000000000000, 0.000000000000, 1.000000000000]
     ])
 
     # https://github.com/ros/geometry/blob/hydro-devel/tf/src/tf/transformations.py
     # Example code for getting rpy angles and translation from the 4x4 homogenous matrix via TF
     scale, shear, angles, trans, persp = tf.transformations.decompose_matrix(T_phoxi)
-    print(angles)
-    print(trans)
+    print("angles: {}".format(angles))
+    print("trans: {}".format(trans))
 
     # rpy = tf.transformations.euler_from_matrix(T_phoxi)
     # xyz = [T_phoxi[0,3], T_phoxi[1,3], T_phoxi[2,3]]
