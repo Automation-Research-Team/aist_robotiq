@@ -92,7 +92,7 @@ class URScriptRelay():
             program_back += "end\n"
 
             program = program_front + "\n" + program_back
-        if req.program_id == "linear_push":
+        elif req.program_id == "linear_push":
             program_front = self.insertion_template
             program_back = ""
 

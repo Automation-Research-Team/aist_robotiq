@@ -358,6 +358,7 @@ class O2ASBaseRoutines(object):
     # # -------------
     # return True
 
+
   def go_to_named_pose(self, pose_name, robot_name, speed = 0.3):
     # pose_name should be "home", "back" etc.
     self.groups[robot_name].set_named_target(pose_name)
@@ -454,11 +455,18 @@ class O2ASBaseRoutines(object):
       self.fastening_tool_client.wait_for_result()
     return self.fastening_tool_client.get_result()
 
-  def do_insertion(self, robot_name):
+  def do_insertion(self, robot_name, max_insertion_distance=0.01, 
+                        max_approach_distance = .1, max_force = 5,
+                        max_radius = .001, radius_increment = .0001):
     # Directly calls the UR service rather than the action of the skill_server
     req = o2as_msgs.srv.sendScriptToURRequest()
     req.robot_name = robot_name
     req.program_id = "insertion"
+    req.max_insertion_distance = max_insertion_distance
+    req.max_approach_distance = max_approach_distance
+    req.max_force = max_force
+    req.max_radius = max_radius
+    req.radius_increment = radius_increment
     res = self.urscript_client.call(req)
     return res.success
   
