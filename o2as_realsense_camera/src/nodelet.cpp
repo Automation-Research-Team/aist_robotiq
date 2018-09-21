@@ -16,6 +16,10 @@ private:
 
 void RealSenseCameraNodelet::onInit(void)
 {
+	// // set logger level to debug
+    // ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
+    // ros::console::notifyLoggerLevelsChanged();
+
 	ros::NodeHandle nh = getNodeHandle();
 	ROS_INFO_STREAM("realsense camera nodelet is loaded.");
 	pimpl.reset(new RealSenseCamera(nh, getPrivateNodeHandle()));

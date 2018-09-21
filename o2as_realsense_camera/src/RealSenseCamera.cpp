@@ -26,9 +26,6 @@ RealSenseCamera::RealSenseCamera(ros::NodeHandle nh, ros::NodeHandle private_nh)
         throw "failed to configure realsense camera device.";
     }
 
-    // Pubilsh static transform
-    publishStaticTransforms();
-
     // Activate
     active_ = false;
     if (activate() == false) {
@@ -126,7 +123,7 @@ bool RealSenseCamera::configure()
 // camera info
 //###################################################### 
 
-rs2_intrinsics RealSenseCamera::getColorCameraIntrinsics()
+rs2_intrinsics RealSenseCamera::getCameraIntrinsics(int tag)
 {
     rs2::pipeline_profile pipeline_profile = rs_pipe_.get_active_profile();
     rs2::stream_profile color_profile = pipeline_profile.get_stream(rs2_stream::RS2_STREAM_COLOR);
@@ -185,17 +182,19 @@ bool RealSenseCamera::activate()
     servers_.dump_frame = nh_.advertiseService("dump_frame", &RealSenseCamera::dumpFrameCallback, this);
 
     // activate publishers
-    publishers_.color_image = image_transport_.advertise("color", 1, true);
-    publishers_.depth_image = image_transport_.advertise("depth", 1, true);
+    publishers_.color_image = image_transport_.advertise("color/image_raw", 1, true);
+    publishers_.depth_image = image_transport_.advertise("depth/image_raw", 1, true);
     publishers_.point_cloud = nh_.advertise<PointCloud>("cloud", 1, true);
+    publishers_.color_camera_info = nh_.advertise<cinfo_t>("color/camera_info", 1, true);
+    publishers_.depth_camera_info = nh_.advertise<cinfo_t>("depth/camera_info", 1, true);
 
     // start image publishing timer
     publish_frame_timer_ = nh_.createTimer(ros::Rate(30), &RealSenseCamera::publishFrameCallback, this);
-    set_trigger_mode(trigger_mode_);
+    setTriggerMode(trigger_mode_);
     active_ = true;
     return true;
 }
-void RealSenseCamera::set_trigger_mode(bool mode)
+void RealSenseCamera::setTriggerMode(bool mode)
 {
     if (trigger_mode_ == false) {
         publish_frame_timer_.start();
@@ -298,12 +297,12 @@ std_msgs::Header RealSenseCamera::getHeader()
 }
 
 bool RealSenseCamera::getFrame(bool publish, 
-    sensor_msgs::Image* color_image_msg, 
-    sensor_msgs::Image* depth_image_msg, 
-    sensor_msgs::PointCloud2* point_cloud_msg)
+    image_t* color_image_msg, 
+    image_t* depth_image_msg, 
+    cloud_t* point_cloud_msg)
 {
     ROS_ASSERT(active_ == true);
-    ROS_DEBUG_STREAM("getFrame"
+    ROS_DEBUG_STREAM("getFrame. "
         << "publish: "      << publish       << ", "
         << "trigger_mode: " << trigger_mode_ << ", "
         << "send_color: "   << send_color_   << ", "
@@ -351,10 +350,12 @@ bool RealSenseCamera::getFrameCallback(
 }
 
 inline void RealSenseCamera::publishFrame(
-    sensor_msgs::Image* color_image_msg, 
-    sensor_msgs::Image* depth_image_msg, 
-    sensor_msgs::PointCloud2* point_cloud_msg) 
+    image_t* color_image_msg, 
+    image_t* depth_image_msg, 
+    cloud_t* point_cloud_msg) 
 {
+    publishCameraInfo();
+    publishStaticTransforms();
     if (color_image_msg) {
         publishers_.color_image.publish(*color_image_msg);
     }
@@ -368,9 +369,10 @@ inline void RealSenseCamera::publishFrame(
 
 void RealSenseCamera::publishFrameCallback(ros::TimerEvent const &) 
 {
-    sensor_msgs::Image color_image_msg;
-    sensor_msgs::Image depth_image_msg; 
-    sensor_msgs::PointCloud2 point_cloud_msg;
+    ROS_DEBUG("publish frame callback");
+    image_t color_image_msg;
+    image_t depth_image_msg; 
+    cloud_t point_cloud_msg;
     getFrame(true, &color_image_msg, &depth_image_msg, &point_cloud_msg);
 }
 
@@ -404,7 +406,7 @@ float* RealSenseCamera::getPointCloud2(cv::Mat& cv_depth_image)
     }
     return cloud;
 }
-bool RealSenseCamera::save_cloud_binary(const char* filename, int width, int height, float *cloud)
+bool RealSenseCamera::saveCloudBinary(const char* filename, int width, int height, float *cloud)
 {
     FILE *fout = fopen(filename, "wb");
     if (fout == NULL) {
@@ -440,11 +442,66 @@ bool RealSenseCamera::dumpFrameCallback(
         }
         if (!req.point_cloud_filename.empty()) {
             float* cloud = getPointCloud2(cv_depth_image);
-            save_cloud_binary((char*)req.point_cloud_filename.c_str(), cv_depth_image.cols, cv_depth_image.rows, cloud);
+            saveCloudBinary((char*)req.point_cloud_filename.c_str(), cv_depth_image.cols, cv_depth_image.rows, cloud);
             free(cloud);
         }
     }
     return true;
+}
+
+void toRosCameraInfo(rs2_intrinsics i, cinfo_t& cinfo)
+{
+    // Set height and width.
+    cinfo.height = i.width;
+    cinfo.width  = i.height;
+    cinfo.distortion_model = "plumb_bob";
+
+    // Set distortion and intrinsic parameters.
+    cinfo.D.resize(5);
+    std::fill(std::begin(cinfo.D), std::end(cinfo.D), 0.0);  // No distortion.
+
+    // set K
+    std::fill(std::begin(cinfo.K), std::end(cinfo.K), 0.0);
+    cinfo.K[0] = i.fx;
+    cinfo.K[2] = i.ppx;
+    cinfo.K[4] = i.fy;
+    cinfo.K[5] = i.ppy;
+    cinfo.K[8] = 1.0;
+
+    // Set cinfo.R to be an identity matrix.
+    std::fill(std::begin(cinfo.R), std::end(cinfo.R), 0.0);
+    cinfo.R[0] = cinfo.R[4] = cinfo.R[8] = 1.0;
+
+    // Set 3x4 camera matrix.
+    std::fill(std::begin(cinfo.P), std::end(cinfo.P), 0.0);
+    cinfo.P[0] = i.fx;
+    cinfo.P[2] = i.ppx;
+    cinfo.P[4] = i.fy;
+    cinfo.P[5] = i.ppy;
+    cinfo.P[8] = 1.0;
+
+    // No binning
+    cinfo.binning_x = cinfo.binning_y = 0;
+
+    // ROI is same as entire image.
+    cinfo.roi.x_offset = cinfo.roi.y_offset = 0;
+    cinfo.roi.width = cinfo.roi.height = 0;
+    cinfo.roi.do_rectify = false;
+}
+
+void RealSenseCamera::publishCameraInfo()
+{
+    cinfo_t	color_cinfo;
+    color_cinfo.header.stamp = ros::Time::now();
+    color_cinfo.header.frame_id = "camera_color_optical_frame";
+    toRosCameraInfo(getColorCameraIntrinsics(), color_cinfo);
+    publishers_.color_camera_info.publish(color_cinfo);
+
+    cinfo_t	depth_cinfo;
+    depth_cinfo.header.stamp = ros::Time::now();
+    depth_cinfo.header.frame_id = "camera_depth_optical_frame";
+    toRosCameraInfo(getColorCameraIntrinsics(), depth_cinfo);
+    publishers_.depth_camera_info.publish(depth_cinfo);
 }
 
 //###################################################### 

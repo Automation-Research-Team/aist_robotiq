@@ -13,6 +13,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/CameraInfo.h>
 #include <image_transport/image_transport.h>
 #include <tf2_ros/static_transform_broadcaster.h>
 
@@ -20,6 +21,9 @@ namespace o2as{
 
 using Point = pcl::PointXYZ;
 using PointCloud = pcl::PointCloud<Point>;
+using image_t = sensor_msgs::Image;
+using cloud_t = sensor_msgs::PointCloud2;
+using cinfo_t = sensor_msgs::CameraInfo;
 
 class RealSenseCamera
 {
@@ -50,7 +54,9 @@ protected:
     // camera info
     //###################################################### 
 
-    rs2_intrinsics getColorCameraIntrinsics();
+    rs2_intrinsics getCameraIntrinsics(int tag);
+    inline rs2_intrinsics getColorCameraIntrinsics() { return getCameraIntrinsics(rs2_stream::RS2_STREAM_COLOR); }
+    inline rs2_intrinsics getDepthCameraIntrinsics() { return getCameraIntrinsics(rs2_stream::RS2_STREAM_DEPTH); }
     bool prepareConversion();
 
     //###################################################### 
@@ -58,7 +64,7 @@ protected:
     //###################################################### 
 
     bool activate();
-    void set_trigger_mode(bool mode);
+    void setTriggerMode(bool mode);
     void deactivate();
 
     //###################################################### 
@@ -73,23 +79,24 @@ protected:
     PointCloud::Ptr getPointCloud(rs2::frame& depth_frame);
     std_msgs::Header getHeader();
     bool getFrame(bool publish = false, 
-        sensor_msgs::Image* color_image_msg = NULL, 
-        sensor_msgs::Image* depth_image_msg = NULL, 
-        sensor_msgs::PointCloud2* point_cloud_msg = NULL);
+        image_t* color_image_msg = NULL, 
+        image_t* depth_image_msg = NULL, 
+        cloud_t* point_cloud_msg = NULL);
     bool getFrameCallback(
         o2as_realsense_camera::GetFrame::Request & req, 
         o2as_realsense_camera::GetFrame::Response & res);
     
     /// Publish
     inline void publishFrame(
-        sensor_msgs::Image* color_image_msg = NULL, 
-        sensor_msgs::Image* depth_image_msg = NULL, 
-        sensor_msgs::PointCloud2* point_cloud_msg = NULL);
+        image_t* color_image_msg = NULL, 
+        image_t* depth_image_msg = NULL, 
+        cloud_t* point_cloud_msg = NULL);
     void publishFrameCallback(ros::TimerEvent const &);
-    
+    void publishCameraInfo();
+
     /// Dump
     float* getPointCloud2(cv::Mat& cv_depth_image);
-    bool save_cloud_binary(const char* filename, int width, int height, float *cloud);
+    bool saveCloudBinary(const char* filename, int width, int height, float *cloud);
     bool dumpFrameCallback(
         o2as_realsense_camera::DumpFrame::Request & req, 
         o2as_realsense_camera::DumpFrame::Response & res);
@@ -168,6 +175,9 @@ private:
         image_transport::Publisher depth_image;
         /// Publisher for publishing raw point clouds.
         ros::Publisher point_cloud;
+        /// Publisher for camera info.
+        ros::Publisher color_camera_info;
+        ros::Publisher depth_camera_info;
     } publishers_;
 
     struct Servers {
