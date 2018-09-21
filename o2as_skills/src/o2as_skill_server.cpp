@@ -1219,7 +1219,8 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
     //   screw_picked = ros::topic::waitForMessage("/m3_tool/screw_suctioned", ros::Duration(1.0));
     // else if (screw_tool_id == "screw_tool_m6")
     //   screw_picked = ros::topic::waitForMessage("/m6_tool/screw_suctioned", ros::Duration(1.0));
-    screw_picked = false;  // TODO: Replace this with the block above checking for pick success
+    ROS_WARN("Setting screw_picked to true");
+    screw_picked = true;  // TODO: Replace this with the block above checking for pick success
     if ((RealRadius > max_radius) || (!ros::ok()))
       break;
 
@@ -1238,7 +1239,6 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
   planning_scene_interface_.disallowCollisions(screw_tool_id, "tray_2_screw_holder");
   ROS_INFO_STREAM("Moving back up completely.");
   screw_head_pose.pose.position.x = -.05;
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
   success = moveToCartPoseLIN(screw_head_pose, robot_name, true, screw_tool_link, 0.5);
   
   // TODO: Check suction success
@@ -1803,6 +1803,7 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
     srv.request.robot_name = goal->robot_name;
     srv.request.max_radius = .002;
     srv.request.radius_increment = .0005;
+    srv.request.spiral_axis = "Y";
     sendScriptToURClient_.call(srv);
     if (srv.response.success == true)
     {

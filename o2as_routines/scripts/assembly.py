@@ -327,12 +327,7 @@ class AssemblyClass(O2ASBaseRoutines):
     rospy.loginfo("Getting result")
     self.pick_client.get_result()
 
-    p_screw_rest = geometry_msgs.msg.PoseStamped()
-    p_screw_rest.header.frame_id = "screw_tool_m6_helper_link" # The top corner of the big plate
-    p_screw_rest.pose.position.y = .15
-    p_screw_rest.pose.position.z = .25
-    p_screw_rest.pose.orientation.w = 1.0
-    self.move_lin("b_bot", p_screw_rest, 0.05)
+    self.go_to_named_pose("screw_pick_ready", "b_bot")
 
     ###### ===========
     
@@ -351,39 +346,44 @@ class AssemblyClass(O2ASBaseRoutines):
     ps_pickup.pose.position.z = -0.03    
     ps_high = copy.deepcopy(ps_approach)
     ps_high.pose.position.z = 0.13
-    ps_place = ps_pickup
+    ps_place = copy.deepcopy(ps_pickup)
     ps_place.header.frame_id = "assembled_assy_part_03_pulley_ridge_bottom"
     ps_place.pose.position.z += .001
-    ps_move_away = ps_place
-    ps_move_away.pose.position.y -= .06
+    ps_place.pose.position.x += .003 # MAGIC NUMBER!!
+    ps_move_away = copy.deepcopy(ps_place)
+    ps_move_away.pose.position.y += .06
     
     self.move_lin("c_bot", ps_approach, 1.0)
 
     self.move_lin("c_bot", ps_pickup, 1.0)
     self.send_gripper_command("c_bot", "close")
+    rospy.sleep(1)
     # raw_input() # Uncomment this to draw the contour as it is grasped
 
     self.move_lin("c_bot", ps_high, 1.0)
 
     # Deliver the item to its assembled position
-    ps_place.pose.position.z += .005
-    self.move_lin("c_bot", ps_place, .3)
-    ps_place.pose.position.z -= .005
-    self.move_lin("c_bot", ps_place, .02)
-    self.send_gripper_command("c_bot", 0.008)
+    self.move_lin("c_bot", ps_place, .2)
+    # self.send_gripper_command("c_bot", 0.008)
+    self.send_gripper_command("c_bot", 0.02)
 
     # Move out of the way
     self.move_lin("c_bot", ps_move_away, .3)
-    self.go_to_named_pose("back", "c_bot")
+    # self.go_to_named_pose("back", "c_bot")
     
     ###### ==========
     # Move b_bot to the hole and screw
-    self.go_to_named_pose("back", "b_bot")
+    self.go_to_named_pose("screw_plate_ready", "b_bot")
+
+    self.move_lin("c_bot", ps_place, .2)
+    # self.send_gripper_command("c_bot", 0.008)
+
     pscrew = geometry_msgs.msg.PoseStamped()
     pscrew.header.frame_id = "assembled_assy_part_03_bottom_screw_hole_1" # The top corner of the big plate
-    pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0, 0,0))
-    # pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(pi/2, 0,0))
-    self.do_screw_action("b_bot", pscrew, screw_height = 0.02, screw_size = 4)
+    pscrew.pose.position.y = .004
+    pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(-pi/4, 0,0))
+    self.do_screw_action("b_bot", pscrew, screw_height = 0.002, screw_size = 4)
+    self.go_to_named_pose("screw_plate_ready", "b_bot")
 
   def place_plate_2(self):
     # Requires the tool to be equipped on b_bot
@@ -881,7 +881,7 @@ if __name__ == '__main__':
     # assy.go_to_named_pose("back", "c_bot")
     # assy.do_change_tool_action("b_bot", screw_size=4, equip=True)
 
-    # assy.place_plate_3_and_screw()
+    assy.place_plate_3_and_screw()
     # assy.place_plate_2()
 
     ###
@@ -897,7 +897,7 @@ if __name__ == '__main__':
     ####
 
     ### ==== SUBTASK G
-    assy.put_on_belt()
+    # assy.put_on_belt()
     print "============ Done!"
   except rospy.ROSInterruptException:
     pass
