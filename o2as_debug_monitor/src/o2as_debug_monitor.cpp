@@ -128,7 +128,24 @@ namespace o2as_debug_monitor
       int d_cols;
       int d_rows;
 
-      void setGlobalParams(XmlRpc::XmlRpcValue params)
+      cv::Rect getRect(XmlRpc::XmlRpcValue params)
+      {
+        int col_min = params["col"][0];
+        int col_max = params["col"][1];
+        int row_min = params["row"][0];
+        int row_max = params["row"][1];
+
+        int x = col_min * d_cols;
+        int y = row_min * d_rows;
+        int w = (col_max - col_min + 1) * d_cols - 1;
+        int h = (row_max - row_min + 1) * d_rows - 1;
+
+        ROS_INFO("%d, %d, %d, %d", x, y, w, h);
+
+        return cv::Rect(x, y, w, h);
+      }
+
+      void setGlobalParams(XmlRpc::XmlRpcValue &params)
       {
         width = params["width"];
         height = params["height"];
@@ -147,22 +164,13 @@ namespace o2as_debug_monitor
         {
           auto params = image_topics[it->first];
           std::string topic_name = params["topic_name"];
-          int col_min = params["col"][0];
-          int col_max = params["col"][1];
-          int row_min = params["row"][0];
-          int row_max = params["row"][1];
-
-          int x = col_min * d_cols;
-          int y = row_min * d_rows;
-          int w = (col_max - col_min + 1) * d_cols - 1;
-          int h = (row_max - row_min + 1) * d_rows - 1;
-
           ROS_INFO("%s", topic_name.c_str());
-          ROS_INFO("%d, %d, %d, %d", x, y, w, h);
 
-          imgcbs_.push_back(
-            getCallbackForImage(cv::Rect(x, y, w, h), monitor_)
-          );
+          // Area in the debug monitor
+          cv::Rect rect = getRect(params);
+
+          // Create, set and keep callback function
+          imgcbs_.push_back(getCallbackForImage(rect, monitor_));
           i_sub_rs_.push_back(it_.subscribe(topic_name, 1, imgcbs_.back()));
         }
       }
@@ -174,22 +182,13 @@ namespace o2as_debug_monitor
         {
           auto params = caminfo_topics[it->first];
           std::string topic_name = params["topic_name"];
-          int col_min = params["col"][0];
-          int col_max = params["col"][1];
-          int row_min = params["row"][0];
-          int row_max = params["row"][1];
-
-          int x = col_min * d_cols;
-          int y = row_min * d_rows;
-          int w = (col_max - col_min + 1) * d_cols - 1;
-          int h = (row_max - row_min + 1) * d_rows - 1;
-
           ROS_INFO("%s", topic_name.c_str());
-          ROS_INFO("%d, %d, %d, %d", x, y, w, h);
 
-          caminfocbs_.push_back(
-            getCallbackForCameraInfo(cv::Rect(x, y, w, h), monitor_)
-          );
+          // Area in the debug monitor
+          cv::Rect rect = getRect(params);
+
+          // Create, set and keep callback function
+          caminfocbs_.push_back(getCallbackForCameraInfo(rect, monitor_));
           n_sub_rs_.push_back(nh.subscribe(topic_name, 1, caminfocbs_.back()));
         }
       }
