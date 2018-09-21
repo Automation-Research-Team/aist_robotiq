@@ -1784,7 +1784,7 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
   target_tip_link_pose.pose.position.x -= .05;
   moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link);
 
-  sendFasteningToolCommand("m" + std::to_string(goal->screw_size) + "_tool", "tighten", false, 30.0, 600);
+  sendFasteningToolCommand("m" + std::to_string(goal->screw_size) + "_tool", "tighten", false, 12.0, 600);
   // Disable collision for screw tool 
   updatePlanningScene();
   collision_detection::AllowedCollisionMatrix acm_original(planning_scene_.allowed_collision_matrix);
@@ -1814,7 +1814,9 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
       ROS_ERROR("Could not call the service client to do spiral motion.");
   }
 
-  bool finished_before_timeout = fastening_tool_client.waitForResult(ros::Duration(20.0));
+  // ROS_ERROR("Waiting for 20 seconds for screw spiral motion because the motors are not checked");
+  // ros::Duration(30.0).sleep();
+  bool finished_before_timeout = fastening_tool_client.waitForResult(ros::Duration(10.0));
   auto result = fastening_tool_client.getResult();
   ROS_INFO_STREAM("Screw tool motor command " << (finished_before_timeout ? "returned" : "did not return before timeout") <<". Result: " << result->control_result);
 

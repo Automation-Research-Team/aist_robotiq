@@ -578,7 +578,7 @@ class CalibrationClass(O2ASBaseRoutines):
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "assembled_assy_part_01_corner_2"
     if robot_name=="b_bot":
-      pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, 0, 0))
+      pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/4, 0, 0))
       pose0.pose.position.x -= .02
     elif robot_name=="c_bot":
       pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, 0, 0))

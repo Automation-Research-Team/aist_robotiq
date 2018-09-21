@@ -315,7 +315,7 @@ class AssemblyClass(O2ASBaseRoutines):
     goal.tool_name = "screw_tool"
     goal.screw_size = 4
     pscrew = geometry_msgs.msg.PoseStamped()
-    pscrew.header.frame_id = "tray_2_screw_m4_1" # The top corner of the big plate
+    pscrew.header.frame_id = "tray_2_screw_m4_7" # The top corner of the big plate
     pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(-pi/2, 0,0))
     goal.item_pose = pscrew
     rospy.loginfo("Sending pick action goal")
@@ -349,7 +349,7 @@ class AssemblyClass(O2ASBaseRoutines):
     ps_place = copy.deepcopy(ps_pickup)
     ps_place.header.frame_id = "assembled_assy_part_03_pulley_ridge_bottom"
     ps_place.pose.position.z += .001
-    ps_place.pose.position.x += .003 # MAGIC NUMBER!!
+    ps_place.pose.position.x += .001 # MAGIC NUMBER!!
     ps_move_away = copy.deepcopy(ps_place)
     ps_move_away.pose.position.y += .06
     
@@ -364,8 +364,8 @@ class AssemblyClass(O2ASBaseRoutines):
 
     # Deliver the item to its assembled position
     self.move_lin("c_bot", ps_place, .2)
-    # self.send_gripper_command("c_bot", 0.008)
-    self.send_gripper_command("c_bot", 0.02)
+    self.send_gripper_command("c_bot", 0.008)
+    # self.send_gripper_command("c_bot", 0.01)
 
     # Move out of the way
     self.move_lin("c_bot", ps_move_away, .3)
@@ -375,7 +375,7 @@ class AssemblyClass(O2ASBaseRoutines):
     # Move b_bot to the hole and screw
     self.go_to_named_pose("screw_plate_ready", "b_bot")
 
-    self.move_lin("c_bot", ps_place, .2)
+    self.move_lin("c_bot", ps_place, .1)
     # self.send_gripper_command("c_bot", 0.008)
 
     pscrew = geometry_msgs.msg.PoseStamped()
@@ -384,6 +384,10 @@ class AssemblyClass(O2ASBaseRoutines):
     pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(-pi/4, 0,0))
     self.do_screw_action("b_bot", pscrew, screw_height = 0.002, screw_size = 4)
     self.go_to_named_pose("screw_plate_ready", "b_bot")
+
+    self.move_lin("c_bot", ps_move_away, .3)
+    self.go_to_named_pose("home", "c_bot")
+    self.go_to_named_pose("screw_ready", "b_bot")
 
   def place_plate_2(self):
     # Requires the tool to be equipped on b_bot
@@ -882,7 +886,18 @@ if __name__ == '__main__':
     # assy.do_change_tool_action("b_bot", screw_size=4, equip=True)
 
     assy.place_plate_3_and_screw()
-    # assy.place_plate_2()
+    assy.place_plate_2()
+    
+    # assy.go_to_named_pose("screw_ready", "b_bot")
+    # assy.go_to_named_pose("back", "c_bot")
+    # assy.do_change_tool_action("b_bot", screw_size=4, equip=False)
+
+
+    # ### Equip then unequip with c_bot
+    # assy.go_to_named_pose("home", "c_bot")
+    # assy.do_change_tool_action("c_bot", screw_size=4, equip=True)    
+    # assy.go_to_named_pose("screw_ready", "c_bot")
+    # assy.do_change_tool_action("c_bot", screw_size=4, equip=False)
 
     ###
     # assy.pick_retainer_pin()
