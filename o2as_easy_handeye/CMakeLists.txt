@@ -5,13 +5,20 @@ project(o2as_easy_handeye)
 add_compile_options(-std=c++14)
 
 find_package(catkin REQUIRED COMPONENTS
+  cv_bridge
+  dynamic_reconfigure
   geometry_msgs
   image_proc
+  image_transport
   message_generation
   roscpp
   sensor_msgs
   std_msgs
   visp_bridge
+  aruco
+  aruco_ros
+  aruco_msgs
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -25,9 +32,10 @@ catkin_package(
 ###########
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
-add_executable(${PROJECT_NAME}_calibrator
+add_executable(calibrator
   src/calibrator.cpp
   src/calibrator.h
   src/calibrator_main.cpp
@@ -37,14 +45,30 @@ add_executable(${PROJECT_NAME}_calibrator
   src/names.h
 )
 
-target_link_libraries(${PROJECT_NAME}_calibrator
+target_link_libraries(calibrator
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
   gsl
 )
 
-add_dependencies(${PROJECT_NAME}_calibrator
+add_dependencies(calibrator
   ${PROJECT_NAME}_gencpp
+  ${catkin_EXPORTED_TARGETS}
+)
+
+add_executable(marker_detector
+  src/marker_detector_main.cpp
+)
+
+target_link_libraries(marker_detector
+  ${catkin_LIBRARIES}
+  ${roscpp_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)
+
+add_dependencies(marker_detector
+  ${PROJECT_NAME}_gencpp
+  ${PROJECT_NAME}_gencfg
   ${catkin_EXPORTED_TARGETS}
 )
 
@@ -61,7 +85,8 @@ catkin_install_python(
 
 install(
   TARGETS
-    ${PROJECT_NAME}_calibrator
+    calibrator
+    marker_detector
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
