@@ -71,13 +71,13 @@ class TaskboardClass(O2ASBaseRoutines):
                       "10 mm washer", "M3 set screw", "M3 bolt", 
                       "M4 bolt", "Pulley", "10 mm end cap"]
     self.item_pick_heights = [0.02, 0.02, 0.045,
-                              0.047, 0.02, 0.0, 
+                              0.047, 0.072, 0.0, 
                               0.02, 0.02, -0.002, 
                               -0.002, 0.02, 0.02,
                               0.02, 0.007, -0.002]
 
     self.item_place_heights = [0.04, 0.04, 0.046,
-                               0.046, 0.04, 0.04, 
+                               0.046, 0.074, 0.04, 
                                0.04, 0.04, 0.0, 
                                0.0, 0.04, 0.04, 
                                0.04, 0.006, 0.0]
@@ -569,28 +569,79 @@ if __name__ == '__main__':
       
       if i == 5: #unadjusted
         #pick up the tool
-        peg_tool_pose = geometry_msgs.msg.PoseStamped()
-        peg_tool_pose.header.frame_id = "Peg_tool"
-        peg_tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+        tool_pose = geometry_msgs.msg.PoseStamped()
+        tool_pose.header.frame_id = "peg_tool"
+        tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+        tool_grasped_height = 0.086
+
+        ## MAGIC NUMBERS!!
+        b_bot_dx_pick = -0.005
+        b_bot_dy_pick = 0.01
+        b_bot_dx_place = -0.002
+        b_bot_dy_place = 0.004
+
+        pick_pose_low = copy.deepcopy(taskboard.pick_poses[i-1])
+        pick_pose_low.pose.position.x += b_bot_dx_pick
+        pick_pose_low.pose.position.y += b_bot_dy_pick
+        pick_pose_low.pose.position.z = taskboard.item_pick_heights[i-1] + tool_grasped_height + .02
+        pick_pose_high = copy.deepcopy(pick_pose_low)
+        pick_pose_high.pose.position.z += .1
+
+        intermediate_pose = geometry_msgs.msg.PoseStamped()
+        intermediate_pose.pose.position.z = .25
+        intermediate_pose.pose.orientation = pick_pose_high.pose.orientation
+        intermediate_pose.header.frame_id = "taskboard_corner1"
+
+        place_pose_low = copy.deepcopy(taskboard.place_poses[i-1])
+        place_pose_low.pose.position.x += b_bot_dx_place
+        place_pose_low.pose.position.y += b_bot_dy_place
+        place_pose_low.pose.position.z = .07 + tool_grasped_height + .01
+        place_pose_high = copy.deepcopy(place_pose_low)
+        place_pose_high.pose.position.z += .1
         
-        taskboard.pick("b_bot",peg_tool_pose, taskboard.item_pick_heights[i-1],
+        taskboard.pick("b_bot",tool_pose, tool_grasped_height,
                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
                                approach_height = 0.1)
-        #push the object
-        taskboard.pick("b_bot", taskboard.pick_poses[i-1], grasp_height=0.013, speed_fast = 0.2, speed_slow = 0.01, gripper_command="none", approach_height = 0.05)
-        #place and fasten(unfinished)
-        taskboard.place("b_bot",taskboard.place_poses[i-1],place_height=0.013,
-                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="none",
-                                approach_height = 0.15, lift_up_after_place = False)
-        #fasten it and release the tool
-        taskboard.place_poses[i-1].pose.position.z += 0.1
-        taskboard.go_to_pose_goal("b_bot", taskboard.place_poses[i-1], speed=0.05)
-        #return the tool
-        taskboard.place("b_bot",peg_tool_pose,place_height=0.013,
-                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="open",
-                                approach_height = 0.15, lift_up_after_place = True)
+        print("press enter")
+        print("pick_pose low height: ")
+        print(pick_pose_low.pose.position.z)
+        print(taskboard.item_pick_heights[i-1])
+        raw_input()
+        # Push into the nut to pick it up
+        taskboard.go_to_pose_goal("b_bot", pick_pose_low, speed=0.05, move_lin=True)
+        taskboard.do_linear_push("b_bot", 10, wait = True)
+        # taskboard.horizontal_spiral_motion("b_bot", max_radius = .006, radius_increment = .01)
+        taskboard.do_nut_fasten_action("peg", wait = False)
+        taskboard.do_linear_push("b_bot", 40, wait = True)
+        rospy.sleep(2.0)
+        print("press enter")
+        raw_input()
+        taskboard.go_to_pose_goal("b_bot", pick_pose_high, speed=0.05, move_lin=True)
+
+        taskboard.go_to_pose_goal("b_bot", intermediate_pose, speed=0.05, move_lin=True)
+
+        #place and fasten
+        taskboard.go_to_pose_goal("b_bot", place_pose_low, speed=0.05, move_lin=True)        
+        print("press enter")
+        raw_input()
+        taskboard.do_linear_push("b_bot", 10, wait = True)
+        rospy.sleep(1.0)
+        taskboard.do_nut_fasten_action("peg", wait = False)
+        rospy.sleep(3.0)
+        taskboard.horizontal_spiral_motion("b_bot", max_radius = .003, radius_increment = .003)
         
-     
+        rospy.sleep(2.0)
+        taskboard.do_nut_fasten_action("peg", wait = False)
+        rospy.sleep(5.0)
+        print("press enter")
+        raw_input()
+        # Go back up
+        taskboard.go_to_pose_goal("b_bot", place_pose_high, speed=0.05, move_lin=True)
+        #return the tool
+        taskboard.place("b_bot",tool_pose,place_height=0.013 + tool_grasped_height,
+                                speed_fast = 0.2, speed_slow = 0.07, gripper_command="open",
+                                approach_height = 0.2, lift_up_after_place = True)
+        
 
       if i == 6:
         # Pick up the belt

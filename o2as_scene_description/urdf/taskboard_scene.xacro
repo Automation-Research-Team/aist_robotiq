@@ -32,12 +32,12 @@
   </joint>
   <link name="M10nut_tool"/>
 
-  <joint name="Peg_tool" type="fixed">
+  <joint name="peg_tool" type="fixed">
     <parent link="taskboard"/>
-    <child link="Peg_tool"/>
+    <child link="peg_tool"/>
     <origin rpy="0.0 0.0 0" xyz="-0.06 0.56 0"/>
   </joint>
-  <link name="Peg_tool"/>
+  <link name="peg_tool"/>
 
 
   
