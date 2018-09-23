@@ -269,19 +269,19 @@ class CalibrationClass(O2ASBaseRoutines):
     rospy.loginfo("============ Calibrating taskboard. ============")
     poses = []
 
-    pose1 = geometry_msgs.msg.PoseStamped()
-    pose1.header.frame_id = "taskboard_corner2"
-    pose1.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    pose1.pose.position.z = .00
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.header.frame_id = "taskboard_corner2"
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.position.z = .003
 
-    pose2 = copy.deepcopy(pose1)
-    pose2.header.frame_id = "taskboard_corner3"
-    pose3 = copy.deepcopy(pose1)
-    pose3.header.frame_id = "taskboard_part10"
+    for i in range(3):
+      poses.append(copy.deepcopy(pose0))
+
+    poses[1].header.frame_id = "taskboard_corner3"
+    # poses[1].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
+    poses[2].header.frame_id = "taskboard_part10"
     
-    poses = [pose1, pose2, pose3]
-    
-    self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
+    self.cycle_through_calibration_poses(poses, "a_bot", speed=0.08)
     return
 
   def taskboard_calibration_extended(self):
@@ -291,22 +291,21 @@ class CalibrationClass(O2ASBaseRoutines):
 
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    pose0.pose.position.z = 0.0
+    pose0.pose.position.z = 0.002
 
     # On top of the metal sheet
-    pose1 = copy.deepcopy(pose0)
-    pose1.header.frame_id = "taskboard_part7b"
-    pose1.pose.position.y = .0015
-    pose1.pose.position.z = .0253 + 0.0
+    pose0 = copy.deepcopy(pose0)
 
-    pose2 = copy.deepcopy(pose0)
-    pose2.header.frame_id = "taskboard_part8"
-    pose3 = copy.deepcopy(pose0)
-    pose3.header.frame_id = "taskboard_part9"
-    pose4 = copy.deepcopy(pose0)
-    pose4.header.frame_id = "taskboard_part14"
-    
-    poses = [pose1, pose2, pose3, pose4]
+    for i in range(5):
+      poses.append(copy.deepcopy(pose0))
+
+    poses[0].header.frame_id = "taskboard_part7_2"
+    poses[0].pose.position.y = .0015
+    poses[0].pose.position.z = .0253 + 0.0
+    poses[1].header.frame_id = "taskboard_part8"
+    poses[2].header.frame_id = "taskboard_part9"
+    poses[3].header.frame_id = "taskboard_part14"
+    poses[4].header.frame_id = "taskboard_part5"
     
     self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
     return
@@ -318,12 +317,12 @@ class CalibrationClass(O2ASBaseRoutines):
 
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    pose0.pose.position.z = .003
+    pose0.pose.position.z = .002
 
     pose1 = copy.deepcopy(pose0)
     pose1.header.frame_id = "mat_part15"
     pose2 = copy.deepcopy(pose0)
-    pose2.header.frame_id = "mat_part7b"
+    pose2.header.frame_id = "mat_part7_1"
     pose3 = copy.deepcopy(pose0)
     pose3.header.frame_id = "mat_part3"
     
@@ -332,7 +331,7 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
     return 
 
-  def gripper_frame_calibration_mat(self):
+  def gripper_frame_calibration(self):
     rospy.loginfo("============ Calibrating the a_bot gripper tip frame for a_bot. ============")
     rospy.loginfo("Each approach of the target position has its orientation turned by 90 degrees.")
     poses = []
@@ -343,7 +342,7 @@ class CalibrationClass(O2ASBaseRoutines):
     pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     pose0.pose.position.x = -.002
     pose0.pose.position.y = -.002
-    pose0.pose.position.z = .001
+    pose0.pose.position.z = .002
 
     q0 = tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0)
     q_turn_90 = tf_conversions.transformations.quaternion_from_euler(pi/2, 0, 0)
@@ -875,7 +874,7 @@ if __name__ == '__main__':
       elif r == '22':
         c.taskboard_calibration_mat()
       elif r == '23':
-        c.gripper_frame_calibration_mat()
+        c.gripper_frame_calibration()
       elif r == '3':
         rospy.loginfo("NOT YET IMPLEMENTED")
       elif r == '4':

@@ -19,10 +19,9 @@ with open(os.path.join(rp.get_path("o2as_scene_description"), "urdf/templates", 
     outfile = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf", 'o2as_mat.xacro'),'w+')
     outfile.write(template_front)
     for row in reader:
-        row[0]=int(row[0])
         row[1]=float(row[1])/1000.
         row[2]=float(row[2])/1000.
-        outfile.write("    <joint name=\"${matname}_part"+str(row[0])+"\" type=\"fixed\">\n")
+        outfile.write("    <joint name=\"${matname}_part"+row[0]+"\" type=\"fixed\">\n")
         outfile.write("      <parent link=\"${matname}\"/>\n")
         outfile.write("      <child link=\"${matname}_part"+str(row[0])+"\"/>\n")
         outfile.write("      <origin rpy=\"0.0 0.0 ${pi/2}\" xyz=\""+str(row[1])+" "+str(row[2])+" 0.0\"/>\n")

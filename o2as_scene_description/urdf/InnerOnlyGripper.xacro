@@ -27,12 +27,12 @@
       </geometry>
     </collision>
     
-    <visual>
+    <!-- <visual>
       <origin rpy="0 0 0" xyz="0.0 -0.01 0.062"/>
       <geometry>
         <box size="0.07 0.09 0.18"/> 
       </geometry>
-    </visual>
+    </visual> -->
 
   </link>
 
@@ -46,7 +46,7 @@
   <joint name="${prefix}${grippername}_tip_link_joint" type="fixed">
     <parent link="${parent}"/>
     <child link="${prefix}${grippername}_tip_link"/>
-    <origin rpy="0.0 ${-pi/2} 0.0" xyz="0.0 -0.015 .158"/>
+    <origin rpy="0.0 ${-pi/2} 0.0" xyz="-0.002 -0.017 .163"/>
   </joint>
   <link name="${prefix}${grippername}_tip_link"/>
   </xacro:macro>

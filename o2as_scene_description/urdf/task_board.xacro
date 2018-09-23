@@ -121,19 +121,19 @@
   <!-- ======== -->
 
   <!-- The nut and bolt on the metal sheet -->
-  <joint name="${boardname}_part7a" type="fixed">
+  <joint name="${boardname}_part7_1" type="fixed">
     <parent link="${boardname}_surface"/>
-    <child link="${boardname}_part7a"/>
+    <child link="${boardname}_part7_1"/>
     <origin rpy="0.0 0.0 ${pi/2}" xyz="0.335 0.056 0.05"/>
   </joint>
-  <link name="${boardname}_part7a"/>
+  <link name="${boardname}_part7_1"/>
 
-  <joint name="${boardname}_part7b" type="fixed">
+  <joint name="${boardname}_part7_2" type="fixed">
     <parent link="${boardname}_surface"/>
-    <child link="${boardname}_part7b"/>
+    <child link="${boardname}_part7_2"/>
     <origin rpy="0.0 0.0 ${pi/2}" xyz="0.338 0.056 0.05"/>
   </joint>
-  <link name="${boardname}_part7b">
+  <link name="${boardname}_part7_2">
     <visual>
       <origin xyz="0 0.0015 -.015" rpy="0 0 0"/>
       <geometry>

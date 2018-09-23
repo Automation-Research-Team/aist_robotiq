@@ -55,7 +55,6 @@
       </visual>
       <!-- Done with boundary drawing -->
       <collision>
-        <origin xyz="${mat_w/2} .01 ${mat_h}" rpy="0 0 0"/>
         <geometry>
           <box size="${mat_w} ${mat_l} ${mat_h}"/> 
         </geometry>
@@ -121,12 +120,19 @@
     </joint>
     <link name="${matname}_part6"/>
 
-    <joint name="${matname}_part7" type="fixed">
+    <joint name="${matname}_part7_1" type="fixed">
       <parent link="${matname}"/>
-      <child link="${matname}_part7"/>
+      <child link="${matname}_part7_1"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.0785 0.116 0.0"/>
+    </joint>
+    <link name="${matname}_part7_1"/>
+
+    <joint name="${matname}_part7_2" type="fixed">
+      <parent link="${matname}"/>
+      <child link="${matname}_part7_2"/>
       <origin rpy="0.0 0.0 ${pi/2}" xyz="0.011 0.011 0.0"/>
     </joint>
-    <link name="${matname}_part7"/>
+    <link name="${matname}_part7_2"/>
 
     <joint name="${matname}_part8" type="fixed">
       <parent link="${matname}"/>
