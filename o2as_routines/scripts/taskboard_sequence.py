@@ -653,26 +653,61 @@ if __name__ == '__main__':
   
       if i == 8:  #unadjusted
         #pick up the tool
-        nut_tool_pose = geometry_msgs.msg.PoseStamped()
-        nut_tool_pose.header.frame_id = "M10nut_tool"
-        nut_tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+        tool_pose = geometry_msgs.msg.PoseStamped()
+        tool_pose.header.frame_id = "M10nut_tool"
+        tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+        tool_grasped_height = 0.042
+
+        ## MAGIC NUMBERS!!
+        b_bot_dx_pick = 0.01
+        b_bot_dy_pick = 0.03
+        # b_bot_dx_place = 0.0
+        b_bot_dy_place = 0.005
+
+        pick_pose_low = copy.deepcopy(taskboard.pick_poses[i-1])
+        pick_pose_low.pose.position.x += b_bot_dx_pick
+        pick_pose_low.pose.position.y += b_bot_dy_pick
+        pick_pose_low.pose.position.z = taskboard.item_pick_heights[i-1] + tool_grasped_height + .01
+        pick_pose_high = copy.deepcopy(pick_pose_low)
+        pick_pose_high.pose.position.z += .15
+
+        place_pose_low = copy.deepcopy(taskboard.place_poses[i-1])
+        place_pose_low.pose.position.y += b_bot_dy_place
+        place_pose_low.pose.position.z = .02 + tool_grasped_height + .01
+        place_pose_high = copy.deepcopy(place_pose_low)
+        place_pose_high.pose.position.z += .1
         
-        taskboard.pick("b_bot",nut_tool_pose, 0.06,
+        taskboard.pick("b_bot",tool_pose, tool_grasped_height,
                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
                                approach_height = 0.1)
-        #push the object
-        taskboard.pick("b_bot", taskboard.pick_poses[i-1], grasp_height=0.013, speed_fast = 0.2, speed_slow = 0.01, gripper_command="none", approach_height = 0.05)
+        print("press enter")
+        raw_input()
+        # Push into the nut to pick it up
+        taskboard.go_to_pose_goal("b_bot", pick_pose_low, speed=0.05, move_lin=True)
+        taskboard.do_linear_push("b_bot", 10, wait = True)
+        taskboard.horizontal_spiral_motion("b_bot", max_radius = .006, radius_increment = .01)
+        taskboard.do_linear_push("b_bot", 40, wait = True)
+        rospy.sleep(2.0)
+        print("press enter")
+        raw_input()
+        taskboard.go_to_pose_goal("b_bot", pick_pose_high, speed=0.05, move_lin=True)
         #place and fasten
-        taskboard.place("b_bot",taskboard.place_poses[i-1],place_height=0.013,
-                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="none",
-                                approach_height = 0.15, lift_up_after_place = False)
-        #fasten it(unfinished) and release the tool
-        taskboard.place_poses[i-1].pose.position.z += 0.1
-        taskboard.go_to_pose_goal("b_bot", taskboard.place_poses[i-1], speed=0.05)
+        taskboard.go_to_pose_goal("b_bot", place_pose_low, speed=0.05, move_lin=True)        
+        print("press enter")
+        raw_input()
+        taskboard.do_nut_fasten_action("m10_nut", wait = False)
+        taskboard.do_linear_push("b_bot", 10, wait = True)
+        rospy.sleep(4.0)
+        taskboard.do_linear_push("b_bot", 40, wait = True)
+        rospy.sleep(8.0)
+        print("press enter")
+        raw_input()
+        # Go back up
+        taskboard.go_to_pose_goal("b_bot", place_pose_high, speed=0.05, move_lin=True)
         #return the tool
-        taskboard.place("b_bot",nut_tool_pose,place_height=0.013,
-                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="open",
-                                approach_height = 0.15, lift_up_after_place = True)
+        taskboard.place("b_bot",tool_pose,place_height=0.013 + tool_grasped_height,
+                                speed_fast = 0.2, speed_slow = 0.07, gripper_command="open",
+                                approach_height = 0.2, lift_up_after_place = True)
 
       if i in [9, 10]:
         taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1], approach_height = 0.03,
@@ -746,13 +781,14 @@ if __name__ == '__main__':
                                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside",
                                 approach_height = 0.10, lift_up_after_place = False)
       
-      # taskboard.go_to_named_pose("home", "a_bot")
-      # taskboard.go_to_named_pose("home", "b_bot")
-      # taskboard.go_to_named_pose("home", "c_bot")
-      taskboard.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
+      taskboard.go_to_named_pose("home", "a_bot")
+      taskboard.go_to_named_pose("home", "b_bot")
+      taskboard.go_to_named_pose("home", "c_bot")
+      # taskboard.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
       i = raw_input("Enter the number of the part to be performed: ")
       i =int(i)  
 
     print "============ Done!"
   except rospy.ROSInterruptException:
     pass
+

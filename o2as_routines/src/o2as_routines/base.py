@@ -142,6 +142,7 @@ class O2ASBaseRoutines(object):
     self.change_tool_client = actionlib.SimpleActionClient('/o2as_skills/changeTool', o2as_msgs.msg.changeToolAction)
 
     self.fastening_tool_client = actionlib.SimpleActionClient('/o2as_fastening_tools/fastener_gripper_control_action', o2as_msgs.msg.FastenerGripperControlAction)
+    self.nut_peg_tool_client = actionlib.SimpleActionClient('/nut_tools_action', o2as_msgs.msg.ToolsCommandAction)
 
     self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR)
     self.goToNamedPose_client = rospy.ServiceProxy('/o2as_skills/goToNamedPose', o2as_msgs.srv.goToNamedPose)
@@ -318,6 +319,8 @@ class O2ASBaseRoutines(object):
     req = o2as_msgs.srv.sendScriptToURRequest()
     req.program_id = "spiral_motion"
     req.robot_name = robot_name
+    req.max_radius = max_radius
+    req.radius_increment = radius_increment    
     req.velocity = speed
     req.spiral_axis = spiral_axis
     res = self.urscript_client.call(req)
@@ -456,9 +459,23 @@ class O2ASBaseRoutines(object):
       self.fastening_tool_client.wait_for_result()
     return self.fastening_tool_client.get_result()
 
+  def do_nut_fasten_action(self, item_name, wait = False):
+    goal = o2as_msgs.msg.ToolsCommandGoal()
+    # goal.stop = stop
+    goal.peg_fasten = (item_name == "peg")
+    # goal.big_nut_fasten = (item_name == "m10_nut")
+    goal.big_nut_fasten = True
+    goal.small_nut_fasten = (item_name == "m6_nut")
+    rospy.loginfo("Sending nut_tool action goal.")
+    self.nut_peg_tool_client.send_goal(goal)
+    if wait:
+      self.nut_peg_tool_client.wait_for_result(rospy.Duration.from_sec(30.0))
+    return self.nut_peg_tool_client.get_result()
+
   def do_insertion(self, robot_name, max_insertion_distance=0.01, 
                         max_approach_distance = .1, max_force = 5,
-                        max_radius = .001, radius_increment = .0001):
+                        max_radius = .001, radius_increment = .0001,
+                        wait = False):
     # Directly calls the UR service rather than the action of the skill_server
     req = o2as_msgs.srv.sendScriptToURRequest()
     req.robot_name = robot_name
@@ -469,14 +486,19 @@ class O2ASBaseRoutines(object):
     # req.max_radius = max_radius
     # req.radius_increment = radius_increment
     res = self.urscript_client.call(req)
+    if wait:
+      wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
     return res.success
   
-  def do_linear_push(self, robot_name):
+  def do_linear_push(self, robot_name, force, wait = False):
     # Directly calls the UR service rather than the action of the skill_server
     req = o2as_msgs.srv.sendScriptToURRequest()
     req.robot_name = robot_name
+    req.max_force = force
     req.program_id = "linear_push"
     res = self.urscript_client.call(req)
+    if wait:
+      wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
     return res.success
 
   def do_regrasp(self, giver_robot_name, receiver_robot_name, grasp_distance = .02):
