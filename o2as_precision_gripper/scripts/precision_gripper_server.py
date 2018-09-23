@@ -14,7 +14,7 @@ class PrecisionGripperAction:
         rospy.loginfo("Starting up on serial port: " + serial_port)
         self.dynamixel = xm430.USB2Dynamixel_Device( serial_port, baudrate = 57600 )
         self.p1 = xm430.Robotis_Servo2( self.dynamixel, 1, series = "XM" )  #inner gripper
-        self.p2 = xm430.Robotis_Servo2( self.dynamixel, 2, series = "XM" )  #outer gripper
+        # self.p2 = xm430.Robotis_Servo2( self.dynamixel, 2, series = "XM" )  #outer gripper
 
         #read the parameters
         
@@ -86,11 +86,9 @@ class PrecisionGripperAction:
         success = command_is_sent
         if success:
             if goal.stop:
-                self._feedback.motor_speed = -1 #an arbitary number higher than self.speed_limit
-            elif goal.open_outer_gripper_fully or goal.close_outer_gripper_fully:  
-                self._feedback.motor_speed = self.p2.read_current_velocity()
-            elif goal.open_inner_gripper_fully or goal.close_inner_gripper_fully:
-                self._feedback.motor_speed = self.p1.read_current_velocity()
+                self._feedback.motor_speed = -1
+            else:  
+                self._feedback.motor_speed = 1e12 #an arbitary number higher than self.speed_limit
             while self._feedback.motor_speed > self.speed_limit:
                 rospy.sleep(0.1)
                 # check that preempt has not been requested by the client
@@ -103,6 +101,8 @@ class PrecisionGripperAction:
                     self._feedback.motor_speed = self.p2.read_current_velocity()
                 elif goal.open_inner_gripper_fully or goal.close_inner_gripper_fully:
                     self._feedback.motor_speed = self.p1.read_current_velocity()
+                print("motor speed:")
+                print(self._feedback.motor_speed)
                 # publish the feedback
                 self._action_server.publish_feedback(self._feedback)
             if success:
@@ -254,7 +254,6 @@ class PrecisionGripperAction:
             self.p1.set_positive_direction("cw")
             self.p1.set_current(current)
             self.p1.set_goal_position(self.inner_open_motor_position)
-            rospy.logerr("1111111111111")
             rospy.sleep(0.1)
             return True
         except:

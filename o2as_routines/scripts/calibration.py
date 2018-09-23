@@ -51,6 +51,13 @@ class CalibrationClass(O2ASBaseRoutines):
   objects defined in the scene.
   """
 
+  def __init__(self):
+    super(CalibrationClass, self).__init__()
+    
+    self.a_bot_downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+    # Neutral downward in the taskboard frames
+    rospy.sleep(.5)   # Use this instead of waiting, so that simulation can be used
+
   def cycle_through_calibration_poses(self, poses, robot_name, speed=0.3, with_approach=False, move_lin=False, go_home=True, end_effector_link=""):
     home_pose = "home"
       
@@ -271,7 +278,7 @@ class CalibrationClass(O2ASBaseRoutines):
 
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "taskboard_corner2"
-    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.orientation = self.a_bot_downward_orientation
     pose0.pose.position.z = .003
 
     for i in range(3):
@@ -290,7 +297,7 @@ class CalibrationClass(O2ASBaseRoutines):
     poses = []
 
     pose0 = geometry_msgs.msg.PoseStamped()
-    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.orientation = self.a_bot_downward_orientation
     pose0.pose.position.z = 0.002
 
     # On top of the metal sheet
@@ -310,25 +317,49 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
     return
 
-  def taskboard_calibration_mat(self):
+  def taskboard_calibration_mat(self, extended = False):
     rospy.loginfo("============ Calibrating placement mat for the taskboard task. ============")
     rospy.loginfo("a_bot gripper tip should be 3 mm above the surface.")
+    self.go_to_named_pose("home", "a_bot", speed=0.1)
     poses = []
 
     pose0 = geometry_msgs.msg.PoseStamped()
-    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.orientation = self.a_bot_downward_orientation
     pose0.pose.position.z = .002
-
-    pose1 = copy.deepcopy(pose0)
-    pose1.header.frame_id = "mat_part15"
-    pose2 = copy.deepcopy(pose0)
-    pose2.header.frame_id = "mat_part7_1"
-    pose3 = copy.deepcopy(pose0)
-    pose3.header.frame_id = "mat_part3"
     
-    poses = [pose1, pose2, pose3]
-
-    self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
+    if not extended: 
+      for i in range(3):
+        poses.append(copy.deepcopy(pose0))
+      poses[0].header.frame_id = "mat_part15"
+      poses[1].header.frame_id = "mat_part7_1"
+      poses[2].header.frame_id = "mat_part3"
+      self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
+    else:
+      pose0.pose.position.z = .005
+      for i in range(16):
+        poses.append(copy.deepcopy(pose0))
+      poses[0].header.frame_id = "mat_part1"
+      poses[1].header.frame_id = "mat_part2"
+      poses[2].header.frame_id = "mat_part3"
+      poses[3].header.frame_id = "mat_part4"
+      poses[4].header.frame_id = "mat_part5"
+      poses[5].header.frame_id = "mat_part6"
+      poses[6].header.frame_id = "mat_part7_1"
+      poses[7].header.frame_id = "mat_part7_2"
+      poses[8].header.frame_id = "mat_part8"
+      poses[9].header.frame_id = "mat_part9"
+      poses[10].header.frame_id = "mat_part10"
+      poses[11].header.frame_id = "mat_part11"
+      poses[12].header.frame_id = "mat_part12"
+      poses[13].header.frame_id = "mat_part13"
+      poses[14].header.frame_id = "mat_part14"
+      poses[15].header.frame_id = "mat_part15"
+      # Go to above center of mat quickly
+      # above_mat = copy.deepcopy(pose0)
+      # above_mat.header.frame_id = "mat"
+      # above_
+      # self.go_to_pose_goal("a_bot", ,speed=.1, move_lin = True)
+      self.cycle_through_calibration_poses(poses, "a_bot", speed=0.05, go_home=False, move_lin=True)
     return 
 
   def gripper_frame_calibration(self):
@@ -339,12 +370,12 @@ class CalibrationClass(O2ASBaseRoutines):
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "taskboard_part14"  # Good for demonstration, but not for calculation
     # pose0.header.frame_id = "mat_part10"      # Good for touching down and noting the position
-    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.orientation = self.a_bot_downward_orientation
     pose0.pose.position.x = -.002
     pose0.pose.position.y = -.002
     pose0.pose.position.z = .002
 
-    q0 = tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0)
+    q0 = tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi)
     q_turn_90 = tf_conversions.transformations.quaternion_from_euler(pi/2, 0, 0)
     q1 = tf_conversions.transformations.quaternion_multiply(q0, q_turn_90)
     q2 = tf_conversions.transformations.quaternion_multiply(q1, q_turn_90)
@@ -822,7 +853,8 @@ if __name__ == '__main__':
       rospy.loginfo("2: Taskboard")
       rospy.loginfo("21: Taskboard extended fun tour")
       rospy.loginfo("22: Placement mat (for the taskboard task)")
-      rospy.loginfo("23: a_bot gripper frame (rotate around EEF axis on taskboard)")
+      rospy.loginfo("23: Placement mat extended (for the taskboard task)")
+      rospy.loginfo("24: a_bot gripper frame (rotate around EEF axis on taskboard)")
       rospy.loginfo("3: TODO: Kitting bins")
       rospy.loginfo("4: Parts tray tests (assembly/kitting)")
       rospy.loginfo("51: Assembly base plate (c_bot)")
@@ -874,6 +906,8 @@ if __name__ == '__main__':
       elif r == '22':
         c.taskboard_calibration_mat()
       elif r == '23':
+        c.taskboard_calibration_mat(extended=True)
+      elif r == '24':
         c.gripper_frame_calibration()
       elif r == '3':
         rospy.loginfo("NOT YET IMPLEMENTED")

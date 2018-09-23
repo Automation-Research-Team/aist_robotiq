@@ -277,7 +277,7 @@ class O2ASBaseRoutines(object):
     rospy.loginfo("compute cartesian path succeeded with " + str(fraction*100) + "%")
     plan = group.retime_trajectory(self.robots.get_current_state(), plan, speed)
 
-    if fraction < 0.95 and self.use_real_robot:
+    if fraction < 0.99 and self.use_real_robot:
       rospy.loginfo("MoveIt failed to plan linear motion. Attempting linear motion via URScript.")
       req = o2as_msgs.srv.sendScriptToURRequest()
       req.program_id = "lin_move"
@@ -313,7 +313,7 @@ class O2ASBaseRoutines(object):
     rospy.loginfo(success)
     return success
 
-  def horizontal_spiral_motion(self, robot_name, max_radius, start_pos, radius_increment = .001, speed = 0.02, spiral_axis="Z"):
+  def horizontal_spiral_motion(self, robot_name, max_radius, radius_increment = .001, speed = 0.02, spiral_axis="Z"):
     rospy.loginfo("Performing horizontal spiral motion " + str(speed))
     req = o2as_msgs.srv.sendScriptToURRequest()
     req.program_id = "spiral_motion"
@@ -323,6 +323,7 @@ class O2ASBaseRoutines(object):
     res = self.urscript_client.call(req)
     wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(10.0))
     return res.success
+    # =====
 
     # group = self.groups[robot_name]
     # rospy.loginfo("Performing horizontal spiral motion " + str(speed))
@@ -341,7 +342,7 @@ class O2ASBaseRoutines(object):
     # gripper_pos = geometry_msgs.msg.PoseStamped()
     # gripper_pos.header.frame_id = "a_bot_gripper_tip_link"
     # gripper_pos.pose.orientation.w = 1.0
-    # # start_pos = self.listener.transformPose("world", gripper_pos)
+    # start_pos = self.listener.transformPose("world", gripper_pos)
 
     # next_pos = start_pos
     # while RealRadius <= max_radius and not rospy.is_shutdown():
@@ -462,11 +463,11 @@ class O2ASBaseRoutines(object):
     req = o2as_msgs.srv.sendScriptToURRequest()
     req.robot_name = robot_name
     req.program_id = "insertion"
-    req.max_insertion_distance = max_insertion_distance
-    req.max_approach_distance = max_approach_distance
-    req.max_force = max_force
-    req.max_radius = max_radius
-    req.radius_increment = radius_increment
+    # req.max_insertion_distance = max_insertion_distance
+    # req.max_approach_distance = max_approach_distance
+    # req.max_force = max_force
+    # req.max_radius = max_radius
+    # req.radius_increment = radius_increment
     res = self.urscript_client.call(req)
     return res.success
   
