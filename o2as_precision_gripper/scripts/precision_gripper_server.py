@@ -276,9 +276,10 @@ class PrecisionGripperAction:
     def inner_gripper_open_slightly(self, open_range):
         try:
             self.p1.set_operating_mode("currentposition")
-            self.p1.set_current(8)
+            self.p1.set_current(12)
             current_position = self.p1.read_current_position()
-            current_position = current_position-open_range
+            current_position = current_position + open_range
+            print("Current position: " + str(current_position))
             self.p1.set_goal_position(current_position)
             rospy.sleep(0.1)
             return True
