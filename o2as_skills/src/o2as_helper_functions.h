@@ -57,7 +57,8 @@ geometry_msgs::PoseStamped transform_pose_now(geometry_msgs::PoseStamped& pose, 
 
     while (!success) {
       try {
-        ros::Time t = ros::Time::now();
+        // ros::Time t = ros::Time::now();
+        ros::Time t = ros::Time(0);
         pose.header.stamp = t;
         listener.waitForTransform(pose.header.frame_id, referenceFrame, t, ros::Duration(3.0));
         listener.lookupTransform(pose.header.frame_id, referenceFrame, t, transform);
@@ -66,7 +67,7 @@ geometry_msgs::PoseStamped transform_pose_now(geometry_msgs::PoseStamped& pose, 
         return result_pose;
       } catch (tf::ExtrapolationException e) {
         ROS_ERROR_STREAM("Something went wrong in transform_pose_now, trying to transform from " << pose.header.frame_id << " to " << referenceFrame);
-        // ROS_ERROR(e.what());
+        ROS_ERROR(e.what());
       }
       sleep(0.1);
     }
