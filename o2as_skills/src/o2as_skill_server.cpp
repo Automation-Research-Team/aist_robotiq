@@ -1614,7 +1614,7 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
     { 
       c_tilt = 10.0;  // degrees. Tilts during the handover to c (this makes the pose nicer for b_bot)
     } 
-    q.setRPY(0, -c_tilt/180.0*M_PI, 0);   // r p y of the handover position (for the receiver)    
+    q.setRPY(M_PI, -c_tilt/180.0*M_PI, 0);   // r p y of the handover position (for the receiver)    
   }
   else if ((picker_robot_name == "b_bot") || (picker_robot_name == "a_bot"))
   {
@@ -1637,6 +1637,7 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
   geometry_msgs::PoseStamped handover_pose_holder, handover_pose_picker;
   handover_pose_holder.header.frame_id = "handover_frame";
   handover_pose_picker.header.frame_id = "handover_frame";
+  handover_pose_picker.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, 0, 0);
   if(holder_robot_name == "a_bot")
   {
     handover_pose_holder.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, M_PI); // Facing the receiver, rotated
@@ -1680,6 +1681,7 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
     // Move back.
     ROS_INFO_STREAM("Moving receiver robot (" << picker_robot_name << ") back to approach pose.");
     handover_pose_picker.pose.position.x = -gripper_distance_after_grasp;
+    moveToCartPoseLIN(handover_pose_picker, picker_robot_name);
     ROS_INFO("regraspAction is set as succeeded");
     regraspActionServer_.setSucceeded();
   }

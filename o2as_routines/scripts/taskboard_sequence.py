@@ -533,36 +533,46 @@ if __name__ == '__main__':
       if i == 1: #unadjusted
         #taskboard.go_to_pose_goal("b_bot", taskboard.pick_poses[i-1], speed = 0.2)
 
-        # taskboard.pick("b_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
-        #                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
-        #                 approach_height = 0.07)
+        taskboard.pick("b_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
+                        speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
+                        approach_height = 0.07)
         taskboard.go_to_named_pose("back","c_bot")
+        taskboard.go_to_named_pose("home","b_bot")
         taskboard.go_to_named_pose("regrasp_ready","b_bot")
         taskboard.do_regrasp("b_bot", "c_bot", grasp_distance = .02)
         taskboard.go_to_named_pose("home","b_bot")
         taskboard.go_to_named_pose("home","c_bot")
 
-        # taskboard.send_gripper_command(gripper="precision_gripper_inner", command="open")
-        # taskboard.send_gripper_command(gripper="precision_gripper_outer", command="close")
-        # taskboard.send_gripper_command(gripper="b_bot", command=0.01)
-        # taskboard.go_to_named_pose("back", "b_bot")
+        bearing_c_place_pose = copy.deepcopy(taskboard.place_poses[i-1])
+        bearing_c_place_pose.pose.position.x = -.04
+        bearing_c_place_pose.pose.position.y = .15
+        bearing_c_place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
 
-        bearing_place_pose = copy.deepcopy(taskboard.place_poses[i-1])
-        bearing_place_pose.pose.position.x = -.04
-        bearing_place_pose.pose.position.y = .07
-
-        taskboard.place("c_bot", bearing_place_pose,taskboard.item_place_heights[i-1] + .03,
-                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="open",
-                                approach_height = 0.10, lift_up_after_place = True)
+        
+        bearing_c_place_pose.pose.position.z = taskboard.item_place_heights[i-1] + .01
+        taskboard.go_to_pose_goal("c_bot", bearing_c_place_pose, speed=0.2, move_lin=True)
+        taskboard.do_linear_push("c_bot", 5, wait = True)
+        taskboard.send_gripper_command(gripper="c_bot", command="open")
+        # taskboard.place("c_bot", bearing_c_place_pose,taskboard.item_place_heights[i-1] + .01,
+        #                         speed_fast = 0.2, speed_slow = 0.05, gripper_command="open",
+        #                         approach_height = 0.10, lift_up_after_place = True)
         taskboard.go_to_named_pose("home","c_bot")
 
         taskboard.send_gripper_command(gripper="precision_gripper_inner", command="close")
-
-        taskboard.place("a_bot", taskboard.place_poses[i-1],taskboard.item_place_heights[i-1]-0.02,
+        
+        bearing_c_place_pose.pose.position.z = 0.0
+        taskboard.place("a_bot", bearing_c_place_pose,taskboard.item_place_heights[i-1] - 0.02,
                                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="none",
                                 approach_height = 0.10, lift_up_after_place = False)
 
+        bearing_a_place_pose = copy.deepcopy(taskboard.place_poses[i-1])
+        bearing_a_place_pose.pose.position.z = taskboard.item_place_heights[i-1] - 0.02
+        taskboard.go_to_pose_goal("a_bot", bearing_a_place_pose, speed=0.2, move_lin=True)
         taskboard.horizontal_spiral_motion("a_bot", .006)
+
+        # TODO: Push with b_bot?
+
+      ################################################################################################
 
       if i == 2: #unadjusted
         taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
