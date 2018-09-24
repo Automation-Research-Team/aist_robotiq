@@ -88,7 +88,7 @@ class PrecisionGripperAction:
             if goal.stop:
                 self._feedback.motor_speed = -1
             else:  
-                self._feedback.motor_speed = 1e12 #an arbitary number higher than self.speed_limit
+                self._feedback.motor_speed = 100000 #an arbitrary number higher than self.speed_limit
             while self._feedback.motor_speed > self.speed_limit:
                 rospy.sleep(0.1)
                 # check that preempt has not been requested by the client
@@ -99,10 +99,10 @@ class PrecisionGripperAction:
                     break
                 if goal.open_outer_gripper_fully or goal.close_outer_gripper_fully:  
                     self._feedback.motor_speed = self.p2.read_current_velocity()
-                elif goal.open_inner_gripper_fully or goal.close_inner_gripper_fully:
+                elif goal.open_inner_gripper_fully or goal.close_inner_gripper_fully or goal.open_inner_gripper_slightly:
                     self._feedback.motor_speed = self.p1.read_current_velocity()
-                print("motor speed:")
-                print(self._feedback.motor_speed)
+                # print("motor speed:")
+                # print(self._feedback.motor_speed)
                 # publish the feedback
                 self._action_server.publish_feedback(self._feedback)
             if success:

@@ -615,7 +615,7 @@ class O2ASBaseRoutines(object):
         goal.this_action_grasps_an_object = this_action_grasps_an_object
         self.gripper_action_clients["a_bot"].send_goal(goal)
         rospy.loginfo("Closing inner gripper")
-        self.gripper_action_clients["a_bot"].wait_for_result()
+        self.gripper_action_clients["a_bot"].wait_for_result(rospy.Duration(4.0))
         result = self.gripper_action_clients["a_bot"].get_result()
         rospy.loginfo(result)
     except rospy.ROSInterruptException:
@@ -630,7 +630,7 @@ class O2ASBaseRoutines(object):
         goal.this_action_grasps_an_object = this_action_grasps_an_object
         self.gripper_action_clients["a_bot"].send_goal(goal)
         rospy.loginfo("Opening inner gripper")
-        self.gripper_action_clients["a_bot"].wait_for_result()
+        self.gripper_action_clients["a_bot"].wait_for_result(rospy.Duration(4.0))
         result = self.gripper_action_clients["a_bot"].get_result()
         rospy.loginfo(result)
     except rospy.ROSInterruptException:
@@ -646,7 +646,7 @@ class O2ASBaseRoutines(object):
       goal.this_action_grasps_an_object = this_action_grasps_an_object
       self.gripper_action_clients["a_bot"].send_goal(goal)
       rospy.loginfo("Opening inner gripper slightly")
-      self.gripper_action_clients["a_bot"].wait_for_result()
+      self.gripper_action_clients["a_bot"].wait_for_result(rospy.Duration(4.0))
       result = self.gripper_action_clients["a_bot"].get_result()
       rospy.loginfo(result)
     except rospy.ServiceException, e:
