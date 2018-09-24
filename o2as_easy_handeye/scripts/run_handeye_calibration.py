@@ -196,7 +196,7 @@ def run_calibration(camera_name, robot_name):
 
   # Collect samples over pre-defined poses
   for i, pose in enumerate(posess[camera_name][robot_name]):
-    mg.move(pose, 1)
+    mg.move(pose, 0.05)
     take_sample()
     rospy.sleep(3)  # Sleep for 1 seconds
     sample_list = get_sample_list()

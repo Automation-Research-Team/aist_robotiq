@@ -1,19 +1,20 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(o2as_easy_handeye)
+project(o2as_aruco_ros)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++14)
 
 find_package(catkin REQUIRED COMPONENTS
-  cv_bridge
-  geometry_msgs
-  image_proc
-  image_transport
   message_generation
-  roscpp
-  sensor_msgs
+  dynamic_reconfigure
+  geometry_msgs
+  image_transport
   std_msgs
-  visp_bridge
+  std_srvs
+  cv_bridge
+  aruco
+  aruco_ros
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -30,41 +31,28 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
 )
 
-add_executable(calibrator
-  src/calibrator.cpp
-  src/calibrator.h
-  src/calibrator_main.cpp
-  src/aistCalibration.cpp
-  src/vpMatrix.cpp
-  src/names.cpp
-  src/names.h
+add_executable(marker_detector
+  src/marker_detector_main.cpp
 )
 
-target_link_libraries(calibrator
+target_link_libraries(marker_detector
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
-  gsl
+  ${OpenCV_LIBRARIES}
 )
 
-add_dependencies(calibrator
+add_dependencies(marker_detector
   ${PROJECT_NAME}_gencpp
+  ${PROJECT_NAME}_gencfg
   ${catkin_EXPORTED_TARGETS}
 )
 
 #############
 ## Install ##
 #############
-catkin_install_python(
-  PROGRAMS
-    scripts/run_handeye_calibration.py
-    scripts/go_home.py
-    scripts/convert_phoxi_camera_info_gazebo.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
 install(
   TARGETS
-    calibrator
+    marker_detector
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
