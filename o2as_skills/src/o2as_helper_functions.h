@@ -65,7 +65,7 @@ geometry_msgs::PoseStamped transform_pose_now(geometry_msgs::PoseStamped& pose, 
         success = true;
         return result_pose;
       } catch (tf::ExtrapolationException e) {
-        ROS_ERROR("Something went wrong in transform_pose_now.");
+        ROS_ERROR_STREAM("Something went wrong in transform_pose_now, trying to transform from " << pose.header.frame_id << " to " << referenceFrame);
         // ROS_ERROR(e.what());
       }
       sleep(0.1);

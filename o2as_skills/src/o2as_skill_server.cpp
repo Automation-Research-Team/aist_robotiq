@@ -1649,21 +1649,25 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
   tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "workspace_center", "handover_frame"));
 
   goToNamedPose("back", picker_robot_name);
+  if (holder_robot_name == "b_bot")
+    goToNamedPose("regrasp_ready", holder_robot_name);
 
+  tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "workspace_center", "handover_frame"));
   // Move the Giver to the regrasp_pose
   ROS_INFO_STREAM("Moving giver robot (" << holder_robot_name << ") to handover pose.");
-  moveToCartPosePTP(handover_pose_holder, holder_robot_name);
+  moveToCartPoseLIN(handover_pose_holder, holder_robot_name);
   
   // Move the Receiver to an approach pose, then on to grasp
   ROS_INFO_STREAM("Moving receiver robot (" << picker_robot_name << ") to approach pose.");
   handover_pose_picker.pose.position.x = -gripper_distance_before_grasp;
-  moveToCartPosePTP(handover_pose_picker, picker_robot_name);
+  moveToCartPoseLIN(handover_pose_picker, picker_robot_name);
 
   ros::Duration(1).sleep();
+  tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "workspace_center", "handover_frame"));
   ROS_INFO_STREAM("Moving receiver robot (" << picker_robot_name << ") to grasp pose.");
   handover_pose_picker.pose.position.x = -grasp_distance;
   ROS_WARN_STREAM("Position x is: " << -grasp_distance);
-  moveToCartPosePTP(handover_pose_picker, picker_robot_name);
+  moveToCartPoseLIN(handover_pose_picker, picker_robot_name);
   
   // Close the Receiver's gripper
   

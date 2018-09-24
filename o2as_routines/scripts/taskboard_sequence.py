@@ -533,19 +533,36 @@ if __name__ == '__main__':
       if i == 1: #unadjusted
         #taskboard.go_to_pose_goal("b_bot", taskboard.pick_poses[i-1], speed = 0.2)
 
-        taskboard.pick("b_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
-                        speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
-                        approach_height = 0.1)
-        taskboard.do_regrasp("b_bot", "a_bot", grasp_distance = .03)
-        taskboard.send_gripper_command(gripper="precision_gripper_inner", command="open")
-        taskboard.send_gripper_command(gripper="precision_gripper_outer", command="close")
-        taskboard.send_gripper_command(gripper="b_bot", command=0.01)
-        taskboard.go_to_named_pose("back", "b_bot")
+        # taskboard.pick("b_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
+        #                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
+        #                 approach_height = 0.07)
+        taskboard.go_to_named_pose("back","c_bot")
+        taskboard.go_to_named_pose("regrasp_ready","b_bot")
+        taskboard.do_regrasp("b_bot", "c_bot", grasp_distance = .02)
+        taskboard.go_to_named_pose("home","b_bot")
+        taskboard.go_to_named_pose("home","c_bot")
 
-        taskboard.place("a_bot", taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],
-                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside",
+        # taskboard.send_gripper_command(gripper="precision_gripper_inner", command="open")
+        # taskboard.send_gripper_command(gripper="precision_gripper_outer", command="close")
+        # taskboard.send_gripper_command(gripper="b_bot", command=0.01)
+        # taskboard.go_to_named_pose("back", "b_bot")
+
+        bearing_place_pose = copy.deepcopy(taskboard.place_poses[i-1])
+        bearing_place_pose.pose.position.x = -.04
+        bearing_place_pose.pose.position.y = .07
+
+        taskboard.place("c_bot", bearing_place_pose,taskboard.item_place_heights[i-1] + .03,
+                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="open",
+                                approach_height = 0.10, lift_up_after_place = True)
+        taskboard.go_to_named_pose("home","c_bot")
+
+        taskboard.send_gripper_command(gripper="precision_gripper_inner", command="close")
+
+        taskboard.place("a_bot", taskboard.place_poses[i-1],taskboard.item_place_heights[i-1]-0.02,
+                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="none",
                                 approach_height = 0.10, lift_up_after_place = False)
-        taskboard.horizontal_spiral_motion("a_bot", .006, taskboard.place_poses[i-1])
+
+        taskboard.horizontal_spiral_motion("a_bot", .006)
 
       if i == 2: #unadjusted
         taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
