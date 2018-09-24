@@ -303,37 +303,59 @@ class TaskboardClass(O2ASBaseRoutines):
     self.go_to_named_pose("home", "b_bot")
     self.go_to_named_pose("home", "a_bot")
   
-    for i in range(0,15):
-      rospy.loginfo("=== Now targeting part number " + str(i+1) + ": " + self.item_names[i])
+    # Proposed order:
+    # - Set screw 11 first, because it is affected by any movement of the mat
+    # - Washers 9 and 10 early, because they are easy
+    # - Spacers 3, 4 early, because they are easy and tall
+    # - Pulley 14 early, because it is easy
+    # 
+    # - End cap 15 after washer 10
+    # - Small screws 12, 13 not too late, because they may fall over
+    # - Retainer pin 2 late, because we need space to pick it up and it is risky + expensive (few points, but takes time)
+    # - Big nut 8 late, because it may move the mat
+    # - Peg 5 late, because it may move the mat and cause collisions on the taskboard (but not too late because it may fall over on the mat)
+    # 
+    # - Belt 6, nut/bolt 7, bearing 1 anytime
+    # The hardest things should go last.
+    
+
+    taskboard_tasks = range(1,16)
+    # taskboard_tasks =  [11, 
+    # 10, 9, 3, 4, 1,
+    # 6, 14, 15, 12, 13,  
+    # 8, 2, 7, 5]
+
+    for i in taskboard_tasks:
+      rospy.loginfo("=== Now targeting part number " + str(i) + ": " + self.item_names[i-1] + ": " + self.item_names[i-1])
 
       # peg-in-hole with complex_pick_from_inside
-      if i in [2, 13]:
-        self.pick("a_bot",self.pick_poses[i],self.item_pick_heights[i],
+      if i in [3, 14]:
+        self.pick("a_bot",self.pick_poses[i-1],self.item_pick_heights[i-1],
                     speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside")
-        self.place("a_bot",self.place_poses[i],self.item_place_heights[i],
+        self.place("a_bot",self.place_poses[i-1],self.item_place_heights[i-1],
                     speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside")
       
       #peg-in-hole with complex_pick_from_outside
-      if i == 3:
-        self.pick("a_bot",self.pick_poses[i],self.item_pick_heights[i],
+      if i == 4:
+        self.pick("a_bot",self.pick_poses[i-1],self.item_pick_heights[i-1],
                     speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_outside")
-        self.place("a_bot",self.place_poses[i],self.item_place_heights[i],
+        self.place("a_bot",self.place_poses[i-1],self.item_place_heights[i-1],
                     speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_outside")
 
       #peg-in-hole with easy pick_only_inner(washers)
-      if i in [8, 9, 14]:
-        self.pick("a_bot",self.pick_poses[i],self.item_pick_heights[i],
+      if i in [9, 10, 15]:
+        self.pick("a_bot",self.pick_poses[i-1],self.item_pick_heights[i-1],
                     speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
-        self.place("a_bot",self.place_poses[i],self.item_place_heights[i],
+        self.place("a_bot",self.place_poses[i-1],self.item_place_heights[i-1],
                     speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
 
       # This requires a regrasp (bearing)
-      if i == 0:
+      if i == 1:
         rospy.logwarn("Now it's part1. It's a regrasp task")
         # self.go_to_pose_goal("b_bot", pick_poses[i] speed=speed_fast)
 
       # Requires a regrasp (pin)
-      if i == 1:
+      if i == 2:
         rospy.logwarn("This part is skipped because it requires a regrasp")
         pass
 
@@ -627,6 +649,7 @@ if __name__ == '__main__':
         taskboard.do_linear_push("b_bot", 10, wait = True)
         rospy.sleep(1.0)
         taskboard.do_nut_fasten_action("peg", wait = False)
+        # NOTE: Can c_bot + a_bot use its grippers to center the peg?
         rospy.sleep(3.0)
         taskboard.horizontal_spiral_motion("b_bot", max_radius = .003, radius_increment = .003)
         
@@ -702,7 +725,7 @@ if __name__ == '__main__':
       if i == 7:
         pass
   
-      if i == 8:  #unadjusted
+      if i == 8:  
         #pick up the tool
         tool_pose = geometry_msgs.msg.PoseStamped()
         tool_pose.header.frame_id = "M10nut_tool"
