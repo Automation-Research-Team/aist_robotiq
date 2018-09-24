@@ -316,16 +316,21 @@ class O2ASBaseRoutines(object):
 
   def horizontal_spiral_motion(self, robot_name, max_radius, radius_increment = .001, speed = 0.02, spiral_axis="Z"):
     rospy.loginfo("Performing horizontal spiral motion " + str(speed))
-    req = o2as_msgs.srv.sendScriptToURRequest()
-    req.program_id = "spiral_motion"
-    req.robot_name = robot_name
-    req.max_radius = max_radius
-    req.radius_increment = radius_increment    
-    req.velocity = speed
-    req.spiral_axis = spiral_axis
-    res = self.urscript_client.call(req)
-    wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(10.0))
-    return res.success
+    if (self.use_real_robot):
+      req = o2as_msgs.srv.sendScriptToURRequest()
+      req.program_id = "spiral_motion"
+      req.robot_name = robot_name
+      req.max_radius = max_radius
+      req.radius_increment = radius_increment    
+      req.velocity = speed
+      req.spiral_axis = spiral_axis
+      res = self.urscript_client.call(req)
+      wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(10.0))
+      return res.success
+    else:
+      rospy.loginfo("Skipping, because the real robot is not being used")
+      rospy.sleep(3)
+      return True
     # =====
 
     # group = self.groups[robot_name]
@@ -492,14 +497,19 @@ class O2ASBaseRoutines(object):
   
   def do_linear_push(self, robot_name, force, wait = False):
     # Directly calls the UR service rather than the action of the skill_server
-    req = o2as_msgs.srv.sendScriptToURRequest()
-    req.robot_name = robot_name
-    req.max_force = force
-    req.program_id = "linear_push"
-    res = self.urscript_client.call(req)
-    if wait:
-      wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
-    return res.success
+    if self.use_real_robot:
+      req = o2as_msgs.srv.sendScriptToURRequest()
+      req.robot_name = robot_name
+      req.max_force = force
+      req.program_id = "linear_push"
+      res = self.urscript_client.call(req)
+      if wait:
+        wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
+      return res.success
+    else:
+      rospy.loginfo("Skipping linear push, because the real robot is not being used")
+      rospy.sleep(3)
+      return True
 
   def do_regrasp(self, giver_robot_name, receiver_robot_name, grasp_distance = .02):
     """The item goes from giver to receiver."""
@@ -555,6 +565,15 @@ class O2ASBaseRoutines(object):
     else:
       rospy.logerr("Could not parse gripper command")
 
+    rospy.logwarn("Sending goal 5 times because the action server seems unreliable")
+    action_client.send_goal(goal)
+    rospy.sleep(.1)
+    action_client.send_goal(goal)
+    rospy.sleep(.1)
+    action_client.send_goal(goal)
+    rospy.sleep(.1)
+    action_client.send_goal(goal)
+    rospy.sleep(.1)
     action_client.send_goal(goal)
     rospy.loginfo("Sending command " + str(command) + " to gripper: " + gripper)
     action_client.wait_for_result(rospy.Duration(6.0))  # Default wait time: 6 s
