@@ -1,4 +1,0 @@
-<launch>
-    <include file="$(find o2as_fastener_gripper)/launch/fastener_gripper.launch"/>
-    <node name="fastener_gripper_controller_test" pkg="o2as_fastener_gripper" type="fastener_gripper_controller_test.py" output="screen"/>
-</launch>

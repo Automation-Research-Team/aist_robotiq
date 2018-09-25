@@ -1,0 +1,10 @@
+# Define the goal
+string fastening_tool_name     # 'name' in screw_control.yaml
+string screw_control           # "Insert" or "Remove"
+bool switch                    #  True : on, False : off
+---
+# Define the result
+bool control_result            # excute result
+---
+# Define a feedback message
+uint32 screw_status            # disital_input of ur_control 
