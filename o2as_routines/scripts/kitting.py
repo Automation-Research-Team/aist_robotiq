@@ -177,6 +177,7 @@ class KittingClass(O2ASBaseRoutines):
 
   def switch_suction(self, on=False):
     # Judge success or fail using pressure status.
+    
     return self._suction(1, on)
 
   def pick_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link="", approach_height=0.15):
@@ -290,8 +291,8 @@ class KittingClass(O2ASBaseRoutines):
 
           # Transform object_position to goal_pose in bin
           goal_pose = geometry_msgs.msg.PoseStamped()
-          goal_pose.header.frame_id = self.bin_id[item]
-          goal_pose.pose.position = self.listener.transformPoint(self.bin_id[item], object_position).point
+          goal_pose.header.frame_id = "world"
+          goal_pose.pose.position = self.listener.transformPoint(goal_pose.header.frame_id, object_position).point
           goal_pose.pose.orientation = copy.deepcopy(self.downward_orientation)
           rospy.logdebug("\nGrasp point in %s: (x, y, z) = (%f, %f, %f)", 
             goal_pose.header.frame_id, 
