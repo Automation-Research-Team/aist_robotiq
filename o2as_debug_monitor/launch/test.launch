@@ -32,5 +32,11 @@
         topic_name: /a_phoxi_m_camera/texture
         col: [0, 15]
         row: [10, 19]
+    caminfo_topics:
+      phoxi_caminfo:
+        topic_name: /a_phoxi_m_camera/camera_info
+        col: [16, 23]
+        row: [10, 19]
+        offset: [8, 32]
   </rosparam>
 </launch>
