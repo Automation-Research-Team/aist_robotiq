@@ -179,32 +179,42 @@ class KittingClass(O2ASBaseRoutines):
     # Judge success or fail using pressure status.
     return self._suction(1, on)
 
+  def pick_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link="", approach_height=0.15):
+    rospy.loginfo("Go to the target.")
+    res = self.move_lin(group_name, pose_goal_stamped, speed_slow, end_effector_link)
+    if not res:
+      rospy.logdebug("Couldn't go to the target.")
+      return False
+    res = self.switch_suction(True)
+    rospy.sleep(1)
+    if not res:
+      rospy.logdebug("Couldn't pick the target using suction.")
+      return False
+  
+  def pick_using_precision_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = "", approach_height=0.15):
+    # TODO: here is for Osaka Univ.
+    pass
+
   def pick(self, group_name, pose_goal_stamped, speed_fast = 1.0, speed_slow = 1.0, end_effector_link = "", approach_height = 0.15):
 
     rospy.loginfo("Go to above the target bin.")
     pose_goal_above = copy.deepcopy(pose_goal_stamped)
     pose_goal_above.pose.position.z = approach_height
     res = self.move_lin(group_name, pose_goal_above, speed_fast, end_effector_link)
-    # NOTE: all_close threshold may need to be flexible because kitting using vision often failed.
-    # if not res:
-    #   rospy.logdebug("Couldn't go to above the target bin.")
-    #   return False
+      if not res:
+        rospy.logdebug("Couldn't go to above the target bin.")
+        return False
 
-    # rospy.loginfo("Go to the target.")
-    # res = self.move_lin(group_name, pose_goal_stamped, speed_slow, end_effector_link)
-    # # if not res:
-    # #   rospy.logdebug("Couldn't go to the target.")
-    # #   return False
-    # res = self.switch_suction(True)
-    # rospy.sleep(1)
-    # # if not res:
-    # #   return False
+    if end_effector_link == "dual_suction_gripper_pad_link":
+      self.pick_using_dual_suction_gripper(group_name, pose_goal_stamped, speed_slow, end_effector_link, approach_height)
+    elif end_effector_link == "gripper":
+      self.pick_using_precision_gripper(group_name, pose_goal_stamped, speed_slow, end_effector_link, approach_height)
 
     rospy.loginfo("Go to above the target bin.")
     res = self.move_lin(group_name, pose_goal_above, speed_slow, end_effector_link)
-    # if not res:
-    #   rospy.logdebug("Couldn't go to above the target bin.")
-    #   return False
+    if not res:
+      rospy.logdebug("Couldn't go to above the target bin.")
+      return False
 
     return True
     
