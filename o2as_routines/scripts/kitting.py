@@ -180,7 +180,7 @@ class KittingClass(O2ASBaseRoutines):
     
     return self._suction(1, on)
 
-  def pick_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link="", approach_height=0.15):
+  def pick_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link=""):
     rospy.loginfo("Go to the target.")
     res = self.move_lin(group_name, pose_goal_stamped, speed_slow, end_effector_link)
     if not res:
@@ -192,7 +192,22 @@ class KittingClass(O2ASBaseRoutines):
       rospy.logdebug("Couldn't pick the target using suction.")
       return False
   
-  def pick_using_precision_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = "", approach_height=0.15):
+  def pick_using_precision_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = ""):
+    # TODO: here is for Osaka Univ.
+    pass
+
+  def place_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = "")
+    rospy.loginfo("Go to the target.")
+    res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link)
+    if not res:
+      rospy.logdebug("Couldn't go to the target.")
+      return False
+    res = self.switch_suction(False)
+    rospy.sleep(1)
+    if not res:
+      return False
+
+  def place_using_precision_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link ="")
     # TODO: here is for Osaka Univ.
     pass
 
@@ -224,20 +239,11 @@ class KittingClass(O2ASBaseRoutines):
     pose_goal_above = copy.deepcopy(pose_goal_stamped)
     pose_goal_above.pose.position.z = approach_height
     res = self.move_lin(group_name, pose_goal_above, speed_slow, end_effector_link)
-    # NOTE: all_close threshold may need to be flexible because kitting using vision often failed.
-    # if not res:
-    #   rospy.logdebug("Couldn't go to above the target bin.")
-    #   return False
+    if not res:
+      rospy.logdebug("Couldn't go to above the target bin.")
+      return False
 
-    # rospy.loginfo("Go to the target.")
-    # res = self.move_lin(group_name, pose_goal_stamped, speed_slow, end_effector_link)
-    # # if not res:
-    # #   rospy.logdebug("Couldn't go to the target.")
-    # #   return False
-    # res = self.switch_suction(False)
-    # rospy.sleep(1)
-    # # if not res:
-    # #   return False
+
 
     rospy.loginfo("Go to above the target tray partition.")
     res = self.move_lin(group_name, pose_goal_above, speed_fast, end_effector_link)

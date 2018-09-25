@@ -4,8 +4,8 @@
   <rosparam command="load" file="$(find o2as_routines)/config/kitting_part_bin_list.yaml" />
   <rosparam command="load" file="$(find o2as_routines)/config/kitting_tray_list.yaml" />
 
-  <!-- <include file="$(find o2as_aist_config)/launch/demo.launch" /> -->
-  <include file="$(find o2as_examples)/launch/connect_aist_robots.launch"/>
+  <include file="$(find o2as_aist_config)/launch/demo.launch" />
+  <!-- <include file="$(find o2as_examples)/launch/connect_aist_robots.launch"/> -->
 
   <arg name="id" default=""/>
   <node name="o2as_phoxi_camera" pkg="o2as_phoxi_camera" type="o2as_phoxi_camera" output="screen">
