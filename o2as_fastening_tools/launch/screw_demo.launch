@@ -1,0 +1,11 @@
+<launch>
+    <arg name="config_dir"         default="$(find o2as_fastening_tools)/config"/>
+    <arg name="screw_control"      default="screw_control"/>
+    
+    <node name="fastening_tool_action_client" pkg="o2as_fastening_tools" type="screw_controller_client.py" output="screen"/>
+
+    <node name="screw_controller" pkg="o2as_fastening_tools" type="screw_controller.py" output="screen">
+        <param name="config_dir"    type="string" value="$(arg config_dir)"/>
+        <param name="screw_control" type="string" value="$(arg screw_control)"/>
+    </node>
+</launch>

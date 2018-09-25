@@ -2,7 +2,7 @@
 # Set minimum required version of cmake, project name and compile options
 ################################################################################
 cmake_minimum_required(VERSION 2.8.3)
-project(o2as_fastener_gripper)
+project(o2as_fastening_tools)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
@@ -24,15 +24,18 @@ find_package(catkin REQUIRED COMPONENTS
 # Declare ROS messages, services and actions
 ################################################################################
 
+add_message_files(
+  FILES
+  PressureSensoState.msg
+)
+
 add_service_files(
   FILES
   DynamixelWriteCommand.srv
   DynamixelReadState.srv
-  Fasten.srv
-  Stop.srv
 )
 
-add_action_files(DIRECTORY action FILES FastenerGripperControl.action)
+add_action_files(DIRECTORY action FILES FastenerGripperControl.action ScrewControl.action)
 
 generate_messages(
   DEPENDENCIES actionlib_msgs std_msgs 
@@ -58,6 +61,6 @@ add_executable(dynamixel_controller src/dynamixel_controller.cpp)
 add_dependencies(dynamixel_controller ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(dynamixel_controller ${catkin_LIBRARIES})
 
-add_executable(ServiceClient_test src/ServiceClient_test.cpp)
-add_dependencies(ServiceClient_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(ServiceClient_test ${catkin_LIBRARIES})
+#add_executable(ServiceClient_test src/ServiceClient_test.cpp)
+#add_dependencies(ServiceClient_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(ServiceClient_test ${catkin_LIBRARIES})
