@@ -80,6 +80,34 @@
     <origin xyz="-0.05 ${tool_offset} 0.004" rpy="0.0 0.0 0.0" />
   </joint>
 
+  <link name="nut_tool_m6_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1.0"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <!-- <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://o2as_scene_description/meshes/nut_tool_m6_BC5-XL320-LG20-R_v2.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="white">
+        <color rgba=".9 .9 .9 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 ${bit_cushion_to_axis - .02} .0275"/>
+      <geometry>
+        <box size=".026 .04 .055"/>
+      </geometry>
+    </collision> -->
+  </link>
+  <joint name="nut_tool_m6_to_holder" type="fixed">
+    <parent link="screw_tool_holder" />
+    <child link="nut_tool_m6_link" />
+    <origin xyz="-0.05 ${tool_offset} 0.004" rpy="0.0 0.0 0.0" />
+  </joint>
+
   <link name="screw_tool_m4_link">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -158,6 +186,13 @@
   <joint name="screw_tool_m6_helper_joint" type="fixed">
     <parent link="screw_tool_m6_link" />
     <child link="screw_tool_m6_helper_link" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-pi/2}" />
+  </joint>
+
+  <link name="nut_tool_m6_helper_link"/>
+  <joint name="nut_tool_m6_helper_joint" type="fixed">
+    <parent link="nut_tool_m6_link" />
+    <child link="nut_tool_m6_helper_link" />
     <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-pi/2}" />
   </joint>
 

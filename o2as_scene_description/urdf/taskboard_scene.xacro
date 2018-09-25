@@ -39,6 +39,11 @@
   </joint>
   <link name="peg_tool"/>
 
-
+  <joint name="taskboard_set_screw_tool_joint" type="fixed">
+    <parent link="taskboard"/>
+    <child link="taskboard_set_screw_tool_link"/>
+    <origin rpy="0.0 ${pi/2} ${pi/2}" xyz="-0.08 0.3 0"/>
+  </joint>
+  <link name="taskboard_set_screw_tool_link"/>
   
 </robot>

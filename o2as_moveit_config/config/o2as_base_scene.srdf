@@ -225,12 +225,36 @@
         <joint name="a_bot_wrist_3_joint" value="1.57" />
     </group_state>
     <group_state name="place_part_2_ready" group="a_bot">
-        <joint name="a_bot_elbow_joint" value="1.07288" />
+        <joint name="a_bot_elbow_joint" value="0.99136" />
         <joint name="a_bot_shoulder_lift_joint" value="-0.8688" />
-        <joint name="a_bot_shoulder_pan_joint" value="0.99136" />
+        <joint name="a_bot_shoulder_pan_joint" value="1.07288" />
         <joint name="a_bot_wrist_1_joint" value="-0.076732" />
-        <joint name="a_bot_wrist_2_joint" value="-0.477950" />
+        <joint name="a_bot_wrist_2_joint" value="-0.47795" />
         <joint name="a_bot_wrist_3_joint" value="-1.61999" />
+    </group_state>
+    <group_state name="place_set_screw_ready" group="a_bot">
+        <joint name="a_bot_elbow_joint" value="1.267" />
+        <joint name="a_bot_shoulder_lift_joint" value="-1.3538" />
+        <joint name="a_bot_shoulder_pan_joint" value="1.9787" />
+        <joint name="a_bot_wrist_1_joint" value="0.1041" />
+        <joint name="a_bot_wrist_2_joint" value="1.7009" />
+        <joint name="a_bot_wrist_3_joint" value="-1.61999" />
+    </group_state>
+    <group_state name="set_screw_intermediate_pose" group="b_bot">
+        <joint name="b_bot_elbow_joint" value="2.3650" />
+        <joint name="b_bot_shoulder_lift_joint" value="-2.2455" />
+        <joint name="b_bot_shoulder_pan_joint" value="1.5646" />
+        <joint name="b_bot_wrist_1_joint" value="-1.6389" />
+        <joint name="b_bot_wrist_2_joint" value="-2.4119" />
+        <joint name="b_bot_wrist_3_joint" value="-1.5098" />
+    </group_state>
+    <group_state name="set_screw_insert_pose" group="b_bot">
+        <joint name="b_bot_elbow_joint" value="1.98332" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.55261" />
+        <joint name="b_bot_shoulder_pan_joint" value="1.66073" />
+        <joint name="b_bot_wrist_1_joint" value="-0.424471" />
+        <joint name="b_bot_wrist_2_joint" value="-3.05216" />
+        <joint name="b_bot_wrist_3_joint" value="-3.1474" />
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="c_bot_gripper" parent_link="c_bot_robotiq_85_tip_link" group="c_bot" />

@@ -14,26 +14,40 @@
     <xacro:property name="dx" value="-.03"/>
 
     <!-- Screw tool tips. X-axis points along the screw into the hole. -->
-    <joint name="${prefix}robotiq_85_m6_screw_tool_tip_joint" type="fixed">
+    <joint name="${prefix}robotiq_85_screw_tool_m6_tip_joint" type="fixed">
       <parent link="${prefix}robotiq_85_tip_link"/>
       <child link="${prefix}screw_tool_m6_tip_link"/>
       <origin rpy="0.0 ${pi/2} 0.0" xyz="${dx} 0.0 -0.12 "/>
     </joint>
     <link name="${prefix}screw_tool_m6_tip_link"/>
+
+    <joint name="${prefix}robotiq_85_nut_tool_m6_tip_joint" type="fixed">
+      <parent link="${prefix}robotiq_85_tip_link"/>
+      <child link="${prefix}nut_tool_m6_tip_link"/>
+      <origin rpy="0.0 ${pi/4} 0.0" xyz="${dx} 0.0 -0.12 "/>
+    </joint>
+    <link name="${prefix}nut_tool_m6_tip_link"/>
     
-    <joint name="${prefix}robotiq_85_m4_screw_tool_tip_joint" type="fixed">
+    <joint name="${prefix}robotiq_85_screw_tool_m4_tip_joint" type="fixed">
       <parent link="${prefix}robotiq_85_tip_link"/>
       <child link="${prefix}screw_tool_m4_tip_link"/>
       <origin rpy="0.0 ${pi/2} 0.0" xyz="${dx} 0.0 -0.146 "/>
     </joint>
     <link name="${prefix}screw_tool_m4_tip_link"/>
 
-    <joint name="${prefix}robotiq_85_m3_screw_tool_tip_joint" type="fixed">
+    <joint name="${prefix}robotiq_85_screw_tool_m3_tip_joint" type="fixed">
       <parent link="${prefix}robotiq_85_tip_link"/>
       <child link="${prefix}screw_tool_m3_tip_link"/>
       <origin rpy="0.0 ${pi/2} 0.0" xyz="${dx} 0.0 -0.112 "/>
     </joint>
     <link name="${prefix}screw_tool_m3_tip_link"/>
+
+    <joint name="${prefix}robotiq_85_set_screw_tool_tip_joint" type="fixed">
+      <parent link="${prefix}robotiq_85_tip_link"/>
+      <child link="${prefix}set_screw_tool_tip_link"/>
+      <origin rpy="0.0 ${pi/2} 0.0" xyz="${dx+.01} 0.0 -0.085 "/>
+    </joint>
+    <link name="${prefix}set_screw_tool_tip_link"/>
 
   </xacro:macro>
 </robot>

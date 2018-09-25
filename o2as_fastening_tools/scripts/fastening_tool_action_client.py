@@ -32,8 +32,8 @@ if __name__ == '__main__':
         controller = FasteningToolController()
 
         name_list = [
-            "m4_tool",
-            "m3_tool",
+            "screw_tool_m4",
+            "screw_tool_m3",
         ]
 
         for name in name_list:
