@@ -666,8 +666,8 @@ class CalibrationClass(O2ASBaseRoutines):
     rospy.loginfo("============ Moving robot finger tip to the screw on the tray============")
     if robot_name=="b_bot":
       self.go_to_named_pose("back", "c_bot")
-    elif robot_name=="c_bot":
-      self.go_to_named_pose("back", "b_bot")
+    elif robot_name=="a_bot":
+      self.go_to_named_pose("back", "c_bot")
 
     self.go_to_named_pose("home", robot_name)
 
@@ -681,7 +681,9 @@ class CalibrationClass(O2ASBaseRoutines):
     elif robot_name=="c_bot":
       pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, 0, 0))
       pose0.pose.position.x = -.01
-    
+    elif robot_name=="a_bot":
+      pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi, 0, 0))
+      pose0.pose.position.x = -.01
     for i in range(8):
       poses.append(copy.deepcopy(pose0))
 
@@ -696,6 +698,7 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, go_home=False, move_lin=True)
     return
 
+  
   def screw_pickup_test(self, robot_name = "b_bot"):
     rospy.loginfo("============ Picking up an m4 screw with the tool ============")
     rospy.loginfo("============ The screw tool m4 has to be carried by the robot! ============")
@@ -876,6 +879,7 @@ if __name__ == '__main__':
       rospy.loginfo("71: Go to screw feeder outlets with m4 tool for c_bot (tool has to be equipped)")
       rospy.loginfo("81: Go to tray partitions using b_bot")
       rospy.loginfo("82: Go to screws on the tray using b_bot")
+      rospy.loginfo("83: Go to screws on the tray using a_bot")
       rospy.loginfo("x: Exit ")
       rospy.loginfo(" ")
       r = raw_input()
@@ -953,6 +957,8 @@ if __name__ == '__main__':
         c.assembly_calibration_tray_non_screw(robot_name="b_bot")
       elif r == '82':
         c.screw_tool_test_tray_with_fingertip(robot_name="b_bot")
+      elif r == '83':
+        c.screw_tool_test_tray_with_fingertip(robot_name="a_bot")
       elif r == 'x':
         break
       else:
