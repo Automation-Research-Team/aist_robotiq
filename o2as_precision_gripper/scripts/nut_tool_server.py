@@ -5,20 +5,27 @@ import time
 import rospy
 import actionlib
 import o2as_msgs.msg
+
+
 class ToolsAction:
     def __init__(self):
         name = rospy.get_name()
         serial_port = rospy.get_param(name + "/serial_port", "/dev/ttyUSB0")
         rospy.loginfo("Starting up on serial port: " + serial_port)
+
+        self.peg_motor_id = rospy.get_param(name + "/peg_motor_id", 1)
+        self.m10_nut_motor_id = rospy.get_param(name + "/m10_nut_motor_id", 2)
+        self.m6_nut_motor_id = rospy.get_param(name + "/m6_nut_motor_id", 3)
+
         self.dynamixel = xm430.USB2Dynamixel_Device( serial_port, baudrate = 57600 )
-        self.p1 = xm430.Robotis_Servo2( self.dynamixel, 1, series = "XM" )  #Peg
-        # self.p2 = xm430.Robotis_Servo2( self.dynamixel, 2, series = "XM" )  #Big nut
-        # self.p3 = xm430.Robotis_Servo2( self.dynamixel, 3, series = "XM" )  #small nut
+        self.p1 = xm430.Robotis_Servo2( self.dynamixel, self.peg_motor_id, series = "XM" )  #Peg
+        # self.p2 = xm430.Robotis_Servo2( self.dynamixel, self.m10_nut_motor_id, series = "XM" )  #Big nut
+        # self.p3 = xm430.Robotis_Servo2( self.dynamixel, self.m6_nut_motor_id, series = "XM" )  #small nut
 
         self._feedback = o2as_msgs.msg.ToolsCommandFeedback()
         self._result = o2as_msgs.msg.ToolsCommandResult()
         #define the action
-        self._action_name = "tools_action"
+        self._action_name = "nut_tools_action"
         self._action_server = actionlib.SimpleActionServer(self._action_name, o2as_msgs.msg.ToolsCommandAction, execute_cb=self.action_callback, auto_start = False)
         self._action_server.start()
         rospy.loginfo('Action server '+ str(self._action_name)+" started.")
@@ -70,7 +77,7 @@ class ToolsAction:
                     self._feedback.motor_speed = self.p3.read_current_velocity()
              
             self._feedback.countTime = 0
-            while self._feedback.motor_speed > 10 and self._feedback.countTime < 50:
+            while self._feedback.motor_speed > 10 and self._feedback.countTime < 100:
                 rospy.sleep(0.1)
                 self._feedback.countTime += 1
                 # check that preempt has not been requested by the client
@@ -97,14 +104,16 @@ class ToolsAction:
                 self._action_server.set_succeeded(self._result)
         else:
             self._action_server.set_preempted()
-
+        self.peg_disable_torque()
+        self.big_nut_disable_torque()
+        self.small_nut_disable_torque()
   
     ######################################################
 
     def peg_fasten(self, current):
         try:
             self.p1.set_operating_mode("current")
-            self.p1.set_positive_direction("cw")
+            self.p1.set_positive_direction("ccw")
             self.p1.set_current(current)
             rospy.sleep(0.1)
             return True
@@ -115,7 +124,7 @@ class ToolsAction:
     def big_nut_fasten(self, current):
         try:
             self.p2.set_operating_mode("current")
-            self.p2.set_positive_direction("cw")
+            self.p2.set_positive_direction("ccw")
             self.p2.set_current(current)
             rospy.sleep(0.1)
             return True
@@ -126,7 +135,7 @@ class ToolsAction:
     def small_nut_fasten(self, current):
         try:
             self.p3.set_operating_mode("current")
-            self.p3.set_positive_direction("cw")
+            self.p3.set_positive_direction("ccw")
             self.p3.set_current(current)
             rospy.sleep(0.1)
             return True
