@@ -5,7 +5,6 @@
 * @version 0.1
 * @brief ROS version of the example named "simple" in the Aruco software package.
 */
-
 #include <iostream>
 #include <limits>
 #include <opencv2/core.hpp>
@@ -30,68 +29,8 @@
 namespace aruco_ros
 {
 /************************************************************************
-*  class ArucoSimple							*
+*  geometry functions							*
 ************************************************************************/
-template <class ITER> auto
-fit_plane(ITER begin, ITER end)
-{
-    using vector_t	= typename std::iterator_traits<ITER>::value_type;
-    using value_type	= typename vector_t::value_type;
-    constexpr int N	= vector_t::rows;
-    using matrix_t	= cv::Matx<value_type, N, N>;
-    using plane_t	= cv::Vec<value_type, N+1>;
-
-    const auto	outer = [](const auto& x)
-			{
-			    matrix_t	y;
-			    for (int i = 0; i < N; ++i)
-				for (int j = 0; j < N; ++j)
-				    y(i, j) = x(i) * x(j);
-			    return y;
-			};
-    
-  // Compute centroid.
-    const auto	siz = std::distance(begin, end);
-    auto	centroid = vector_t::zeros();
-    for (auto iter = begin; iter != end; ++iter)
-	centroid += *iter;
-    centroid *= value_type(1)/value_type(siz);
-
-  // Compute moment matrix.
-    auto	moments = matrix_t::zeros();
-    for (auto iter = begin; iter != end; ++iter)
-	moments += outer(*iter - centroid);
-
-    matrix_t	evectors;
-    vector_t	evalues;
-    cv::eigen(moments, evalues, evectors);
-    std::cerr << "  evalues = " << evalues << std::endl;
-
-    plane_t	plane;
-    plane(N) = 0;
-    for (int i = 0; i < N; ++i)
-    {
-	plane(i)  = evectors(N-1, i);
-	plane(N) -= plane(i) * centroid(i);
-    }
-    if (plane[N] < 0)
-	plane *= value_type(-1);
-
-    std::cerr << "plane = " << plane << std::endl << std::endl;
-    
-    return plane;
-}
-
-template <class T, int N> T
-distance(const cv::Vec<T, N+1>& plane, const cv::Vec<T, N>& point)
-{
-    T	d = 0;
-    for (int i = 0; i < N; ++i)
-	d += plane(i) * point(i);
-
-    return std::abs(d + plane(N));
-}
-
 template <class T> cv::Vec<T, 3>
 at(const sensor_msgs::PointCloud2& cloud_msg, int u, int v)
 {
@@ -130,6 +69,129 @@ at(const sensor_msgs::PointCloud2& cloud_msg, T u, T v)
     return {NaN, NaN, NaN};
 }
 
+template <class T, int N> T
+angle(const cv::Vec<T, N>& x, const cv::Vec<T, N>& y)
+{
+    return std::acos(x.dot(y)/(cv::norm(x)*cv::norm(y))) * 180.0/M_PI;
+}
+
+template <class T> cv::Matx<T, 3, 3>
+rodrigues(const cv::Matx<T, 3, 1>& r)
+{
+    using matrix_t = cv::Matx<T, 3, 3>;
+    
+    const auto	theta = r.norm();
+    r /= theta;
+    const auto	c = std::cos(theta), s = std::sin(theta);
+    matrix_t	R = matrix_t::zeros();
+    for (int i = 0; i < 3; ++i)
+    {
+	R(i, i) += c;
+	
+	for (int j = 0; j < 3; ++j)
+	    R(i, j) += (1 - c)*r(i)*r(j);
+    }
+    R(0, 1) -= s * r(2);
+    R(0, 2) += s * r(1);
+    R(1, 0) += s * r(2);
+    R(1, 2) -= s * r(0);
+    R(2, 0) -= s * r(1);
+    R(2, 1) += s * r(0);
+
+    return R;
+}
+    
+/************************************************************************
+*  struct Plane<T, N>							*
+************************************************************************/
+template <class T, size_t N>
+class Plane
+{
+  public:
+    using vector_type	= cv::Vec<T, N>;
+    using value_type	= T;
+
+  public:
+    Plane()					    :_n(), _d(0)	{}
+    Plane(const vector_type& norm, value_type dist) :_n(norm), _d(dist)	{}
+    template <class ITER>
+    Plane(ITER begin, ITER end)				{ fit(begin, end); }
+    
+    template <class ITER>
+    void		fit(ITER begin, ITER end)	;
+    
+    const vector_type&	normal()			const	{ return _n; }
+    value_type		distance()			const	{ return _d; }
+    value_type		distance(const vector_type& point) const
+			{
+			    return std::abs(_n.dot(point) + _d);
+			}
+    vector_type		cross_point(const vector_type& view_vector) const
+			{
+			    return (-_d/_n.dot(view_vector)) * view_vector;
+			}
+
+    friend std::ostream&
+			operator <<(std::ostream& out, const Plane& plane)
+			{
+			    out << plane._n << ": " << plane._d;
+			}
+
+  private:
+    vector_type	_n;	// normal
+    value_type	_d;	// distance from the origin
+};
+    
+template <class T, size_t N> template <class ITER> void
+Plane<T, N>::fit(ITER begin, ITER end)
+{
+    using matrix_type	= cv::Matx<T, N, N>;
+
+    const auto	ext   =	[](const auto& x)
+			{
+			    matrix_type	y;
+			    for (int i = 0; i < N; ++i)
+				for (int j = 0; j < N; ++j)
+				    y(i, j) = x(i) * x(j);
+			    return y;
+			};
+
+  // Check #points.
+    const auto	npoints  = std::distance(begin, end);
+    if (npoints < 3)
+	throw std::runtime_error("Plane<T, N>::fit(): three or more points required!");
+    
+  // Compute centroid.
+    auto	centroid = vector_type::zeros();
+    for (auto iter = begin; iter != end; ++iter)
+	centroid += *iter;
+    centroid *= value_type(1)/value_type(npoints);
+
+  // Compute moment matrix.
+    auto	moments = matrix_type::zeros();
+    for (auto iter = begin; iter != end; ++iter)
+	moments += ext(*iter - centroid);
+
+    matrix_type	evectors;
+    vector_type	evalues;
+    cv::eigen(moments, evalues, evectors);
+
+    _n = vector_type::all(0);
+    for (size_t j = 0; j < N; ++j)
+	_n(j) = evectors(N - 1, j);
+    _d = -_n.dot(centroid);
+    if (_d < 0)
+    {
+	_n *= value_type(-1);
+	_d *= -1;
+    }
+
+    std::cerr << "plane = " << *this << std::endl
+	      << "  err = " << std::sqrt(evalues(N-1)/value_type(npoints))
+	      << ", computed from " << npoints << " points." << std::endl
+	      << std::endl;
+}
+
 /************************************************************************
 *  class ArucoSimple							*
 ************************************************************************/
@@ -155,9 +217,11 @@ class ArucoSimple
     bool	get_transform(const std::string& refFrame,
 			      const std::string& childFrame,
 			      tf::StampedTransform& transform)	const	;
-    void
-		get_transform(const aruco::Marker& marker,
-			      const cloud_t& cloud_msg)		const	;
+    tf::Transform
+		get_marker_transform(const aruco::Marker& marker,
+				     const cloud_t& cloud_msg)	const	;
+    template <class T> cv::Vec<T, 3>
+		view_vector(T u, T v)				const	;
     
   private:
     ros::NodeHandle			_nh;
@@ -347,9 +411,9 @@ ArucoSimple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 	  // only publishing the selected marker
 	    if (marker.id == _marker_id)
 	    {
-		get_transform(marker, cloud_msg);
-		
-		tf::Transform		transform = arucoMarker2Tf(marker);
+		tf::Transform	transform = get_marker_transform(marker,
+								 cloud_msg);
+	      //tf::Transform	transform = arucoMarker2Tf(marker);
 
 		tf::StampedTransform	cameraToReference;
 		cameraToReference.setIdentity();
@@ -358,10 +422,10 @@ ArucoSimple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 				  cameraToReference);
 
 		transform = static_cast<tf::Transform>(cameraToReference) 
-		    * static_cast<tf::Transform>(_rightToLeft) 
-		    * transform;
+			  * static_cast<tf::Transform>(_rightToLeft) 
+			  * transform;
 
-		tf::StampedTransform
+		const tf::StampedTransform
 		    stampedTransform(transform, curr_stamp,
 				     _reference_frame, _marker_frame);
 		_tfBroadcaster.sendTransform(stampedTransform);
@@ -373,8 +437,7 @@ ArucoSimple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 		_pose_pub.publish(poseMsg);
 
 		geometry_msgs::TransformStamped	transformMsg;
-		tf::transformStampedTFToMsg(stampedTransform,
-					    transformMsg);
+		tf::transformStampedTFToMsg(stampedTransform, transformMsg);
 		_transform_pub.publish(transformMsg);
 
 		geometry_msgs::Vector3Stamped	positionMsg;
@@ -444,6 +507,10 @@ ArucoSimple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 	ROS_ERROR("cv_bridge exception: %s", e.what());
 	return;
     }
+    catch (const std::runtime_error& e)
+    {
+	ROS_ERROR("Failed to compute marker plane: %s", e.what());
+    }
 }
 
 bool
@@ -476,37 +543,27 @@ ArucoSimple::get_transform(const std::string& refFrame,
     return true;
 }
 
-void
-ArucoSimple::get_transform(const aruco::Marker& marker,
-			   const cloud_t& cloud_msg) const
+tf::Transform
+ArucoSimple::get_marker_transform(const aruco::Marker& marker,
+				  const cloud_t& cloud_msg) const
 {
-    using T		= float;
-    using point_t	= cv::Vec<T, 3>;
-    using iterator_t	= sensor_msgs::PointCloud2ConstIterator<T>;
+    using value_t	= float;
+    using iterator_t	= sensor_msgs::PointCloud2ConstIterator<value_t>;
     using rgbiterator_t	= sensor_msgs::PointCloud2Iterator<uint32_t>;
-
+    using point_t	= cv::Vec<value_t, 3>;
+    using plane_t	= Plane<value_t, 3>;
 
   // Compute initial marker plane.
     std::vector<point_t>	points;
     for (const auto& corner : marker)
     {
-	const auto	point = at<T>(cloud_msg, corner.x, corner.y);
+	const auto	point = at<value_t>(cloud_msg, corner.x, corner.y);
+
 	if (!std::isnan(point(2)))
-	{
-	    std::cerr << "at(" << corner.x << ", " << corner.y << "): " << point
-		      << std::endl;
 	    points.push_back(point);
-	}
     }
 
-    if (points.size() < 3)
-    {
-	std::cerr << "Failed to find initial plane." << std::endl;
-	return;
-    }
-
-    std::cerr << "=== Initial plane ===" << std::endl;
-    auto	plane = fit_plane(points.cbegin(), points.cend());
+    plane_t	plane(points.cbegin(), points.cend());
 
   // Compute 2D bounding box of marker.
     const int	u0 = std::floor(std::min({marker[0].x, marker[1].x,
@@ -518,7 +575,7 @@ ArucoSimple::get_transform(const aruco::Marker& marker,
     const int	v1 = std::ceil( std::max({marker[0].y, marker[1].y,
 					  marker[2].y, marker[3].y}));
 
-  // Select 3D points near to the initial plane within the bounding box.
+  // Select 3D points close to the initial plane within the bounding box.
     points.clear();
     for (auto v = v0; v <= v1; ++v)
     {
@@ -530,9 +587,9 @@ ArucoSimple::get_transform(const aruco::Marker& marker,
 	
 	for (auto u = u0; u <= u1; ++u)
 	{
-	    const auto	point = at<T>(cloud_msg, u, v);
+	    const auto	point = at<value_t>(cloud_msg, u, v);
 	    
-	    if (!std::isnan(point(2)) && distance(plane, point) < 0.001)
+	    if (!std::isnan(point(2)) && plane.distance(point) < 0.001)
 	    {
 		points.push_back(point);
 		*rgb = 0xff0000;
@@ -543,16 +600,64 @@ ArucoSimple::get_transform(const aruco::Marker& marker,
 	}
     }
 
-    if (points.size() < 3)
-    {
-	std::cerr << "Failed to find refined plane." << std::endl;
-	return;
-    }
+    plane.fit(points.cbegin(), points.cend());
 
-    std::cerr << "=== Refined plane ===" << std::endl;
-    plane = fit_plane(points.cbegin(), points.cend());
-    
+  // Compute 3D coordinates of marker corners.
+    point_t	corners[4];
+    for (int i = 0; i < 4; ++i)
+	corners[i] = plane.cross_point(view_vector(marker[i].x, marker[i].y));
+
+  // Compute p and q, i.e. marker's local x-axis and y-axis respectively.
+    const auto&	n = plane.normal();
+    const auto	c = (corners[2] + corners[3] - corners[0] - corners[1])
+		  + (corners[1] + corners[2] - corners[3] - corners[0])
+			.cross(n);
+    const auto	p = c / cv::norm(c);
+    const auto	q = n.cross(p);
+  /*
+    std::cerr << marker << std::endl;
+    std::cerr << p.cross(q) - n << ", l = "
+	      << c.dot(p)/4 << std::endl;
+  */
+  // Compute marker centroid.
+    const auto	centroid = 0.25*(corners[0] + corners[1] +
+				 corners[2] + corners[3]);
+
+#if 0
+    std::cerr << "--- compute from matrker ---\n"
+	      << rodrigues(marker.
+	      << tf::Transform(tf::Matrix3x3(-p(0), n(0), q(0),
+					     -p(1), n(1), q(1),
+					     -p(2), n(2), q(2)),
+			       tf::Vector3(centroid(0),
+					   centroid(1), centroid(2)))
+	      << std::endl;
+  */
+    for (int i = 0; i < 4; ++i)
+    {
+	int	j = (i + 1)%4;
+	int	k = (j + 1)%4;
+	std::cerr << "length(" << i << ", " << j << ") = "
+		  << cv::norm(corners[i] - corners[j]) << std::endl;
+	std::cerr << "angle(" << i << ", " << j << ", " << k << ") = "
+		  << angle(corners[i] - corners[j], corners[k] - corners[j])
+		  << std::endl;
+    }
     _cloud_pub.publish(cloud_msg);
+#endif	
+    return tf::Transform(tf::Matrix3x3(-p(0), n(0), q(0),
+				       -p(1), n(1), q(1),
+				       -p(2), n(2), q(2)),
+			 tf::Vector3(centroid(0), centroid(1), centroid(2)));
+}
+
+template <class T> cv::Vec<T, 3>
+ArucoSimple::view_vector(T u, T v) const
+{
+    const auto&	K = _camParam.CameraMatrix;
+    const auto	y = (v - K.at<T>(1, 2))/K.at<T>(1, 1);
+    
+    return {(u - K.at<T>(0, 2) - y*K.at<T>(0, 1))/K.at<T>(0, 0), y, T(1)};
 }
     
 }	// namespace aruco_ros
