@@ -8,29 +8,17 @@
 
 
   <!-- spawn and attach dual suction grippers -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro" />
   <xacro:dual_suction_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link">
     <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
-  </xacro:dual_suction_gripper_o2as>
+  </xacro:dual_suction_gripper_o2as> -->
 
   <xacro:property name="tray_width" value=".300" />
   <xacro:property name="tray_length" value=".210" />
 
-  <!-- add camera for pose matching on the table -->
-  <link name="workspace_cam_holder_link" />
-  <joint name="workspace_cam_holder_joint" type="fixed">
-    <parent link="workspace_center" />
-    <child  link="workspace_cam_holder_link" />
-    <origin xyz="0 0 0" rpy="0.0 -${pi/2} 0.0" />
-  </joint>
-  <xacro:sensor_d435 prefix="workspace_" parent="workspace_cam_holder_link">
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-  </xacro:sensor_d435>
-  <!-- TODO: Deal with this camera? -->
-
   <!-- add tray rack -->
   <xacro:o2as_box boxname="rack_trays" box_w="0.21" box_l="0.60" box_h=".015" parent="workspace_center">
-    <origin xyz="-.26 -0.3 0" rpy="0 0 0" />   
+    <origin xyz="-.33 -0.3 0" rpy="0 0 0" />   
   </xacro:o2as_box>
   <link name="rack_trays_center" />
   <joint name="rack_trays_joint" type="fixed">
@@ -40,14 +28,13 @@
   </joint>
 
   <!-- add trays -->
-  <xacro:property name="set3_x" value="${-tray_length-.05}" />
-  <xacro:property name="set3_y" value="0" />
-  <xacro:property name="set3_z" value="0.015" />
-  <xacro:kitting_tray1 trayname="set3_tray_1" parent="workspace_center">
-    <origin xyz="${set3_x} ${set3_y} ${set3_z}" rpy="0 0 0" />
+  <xacro:property name="tray_x" value="${-tray_length+.01}" />
+  <xacro:property name="tray_y" value="0" />
+  <xacro:kitting_tray1 trayname="tray_1" parent="rack_trays_center">
+    <origin xyz="${tray_x} ${tray_y} 0" rpy="0 0 0" />
   </xacro:kitting_tray1>
-  <xacro:kitting_tray2 trayname="set3_tray_2" parent="workspace_center">
-    <origin xyz="${set3_x} ${set3_y-tray_width} ${set3_z}" rpy="0 0 0" />
+  <xacro:kitting_tray2 trayname="tray_2" parent="rack_trays_center">
+    <origin xyz="+.01 0 0" rpy="0 0 ${pi}" />
   </xacro:kitting_tray2>
   
 </robot>

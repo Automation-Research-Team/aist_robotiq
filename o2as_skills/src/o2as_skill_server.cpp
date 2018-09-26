@@ -201,6 +201,39 @@ SkillServer::SkillServer() :
   screw_tool_m3.frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
   screw_tool_m3.frame_names[0] = "screw_tool_m3_tip";
 
+  //Suction tool
+  suction_tool.header.frame_id = "suction_tool_link";
+  suction_tool.id = "suction_tool";
+
+  suction_tool.primitives.resize(2);
+  suction_tool.primitive_poses.resize(2);
+  // The upper box
+  suction_tool.primitives[0].type = suction_tool.primitives[0].BOX;
+  suction_tool.primitives[0].dimensions.resize(3);
+  suction_tool.primitives[0].dimensions[0] = 0.03;
+  suction_tool.primitives[0].dimensions[1] = 0.06;
+  suction_tool.primitives[0].dimensions[2] = 0.04;
+  suction_tool.primitive_poses[0].position.x = 0;
+  suction_tool.primitive_poses[0].position.y = 0.02;
+  suction_tool.primitive_poses[0].position.z = 0.02;
+
+  // The cylinder representing the tip
+  suction_tool.primitives[1].type = suction_tool.primitives[1].CYLINDER;
+  suction_tool.primitives[1].dimensions.resize(2);
+  suction_tool.primitives[1].dimensions[0] = 0.1;    // Cylinder height
+  suction_tool.primitives[1].dimensions[1] = 0.004;   // Cylinder radius
+  suction_tool.primitive_poses[1].position.x = 0;
+  suction_tool.primitive_poses[1].position.y = 0.02;  // 21 mm distance from axis
+  suction_tool.primitive_poses[1].position.z = -0.05;
+  suction_tool.operation = suction_tool.ADD;
+
+  // The tool tip
+  suction_tool.frame_poses.resize(1);
+  suction_tool.frame_names.resize(1);
+  suction_tool.frame_poses[0].position.z = -.1;
+  suction_tool.frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
+  suction_tool.frame_names[0] = "suction_tool_tip";
+
 
   // Initialize robot statuses
   o2as_msgs::RobotStatus r1, r2, r3;
@@ -581,6 +614,12 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     ROS_INFO_STREAM("screw_tool_id: " << screw_tool_id);
     if (screw_tool_id == "nut_tool_m6")
       ps_approach.pose.position.z = .052;
+    if (screw_tool_id == "suction_tool")
+    {
+      ps_approach.pose.position.x = -.07;
+      ps_approach.pose.position.z = .03;
+    }
+
     ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
     // if (screw_tool_id == "nut_tool_m6")
     //   ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI/4, 0);
@@ -591,6 +630,8 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     ps_tool_holder.pose.position.x = 0.03;
     if (screw_tool_id == "nut_tool_m6")
       ps_tool_holder.pose.position.x = 0.02;
+    if (screw_tool_id == "suction_tool")
+      ps_tool_holder.pose.position.x = 0.01;
     if (unequip) ps_tool_holder.pose.position.x -= 0.001;  
 
     ps_high_up = ps_approach;
@@ -961,6 +1002,7 @@ bool SkillServer::spawnTool(std::string screw_tool_id)
   if (screw_tool_id == "screw_tool_m6") collision_objects[0] = screw_tool_m6;
   else if (screw_tool_id == "screw_tool_m4") collision_objects[0] = screw_tool_m4;
   else if (screw_tool_id == "screw_tool_m3") collision_objects[0] = screw_tool_m3;
+  else if (screw_tool_id == "suction_tool") collision_objects[0] = suction_tool;
 
   collision_objects[0].operation = collision_objects[0].ADD;
 
@@ -999,6 +1041,7 @@ bool SkillServer::attachDetachTool(std::string screw_tool_id, std::string robot_
   if (screw_tool_id == "screw_tool_m6") att_coll_object.object = screw_tool_m6;
   else if (screw_tool_id == "screw_tool_m4") att_coll_object.object = screw_tool_m4;
   else if (screw_tool_id == "screw_tool_m3") att_coll_object.object = screw_tool_m3;
+  else if (screw_tool_id == "suction_tool") att_coll_object.object = suction_tool;
   else { ROS_WARN_STREAM("No screw tool specified to " << attach_or_detach); }
 
   att_coll_object.link_name = robot_name + "_robotiq_85_tip_link";
@@ -1854,6 +1897,8 @@ void SkillServer::executeChangeTool(const o2as_msgs::changeToolGoalConstPtr& goa
   std::string screw_tool_id = "screw_tool_m" + std::to_string(goal->screw_size);
   if (goal->screw_size == 66)
     screw_tool_id = "nut_tool_m6";
+  if (goal->screw_size == 50)
+    screw_tool_id = "suction_tool";
   bool success = equipUnequipScrewTool(goal->robot_name, screw_tool_id, equip_or_unequip);
   
   if (success) { changeToolActionServer_.setSucceeded(); }
