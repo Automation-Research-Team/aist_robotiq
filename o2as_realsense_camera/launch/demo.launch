@@ -1,24 +1,29 @@
 <launch>
-    <!-- 
-    616205004841 : free @ osx used by shibata
-    612201001671 : b_bot_camera
-     -->
-    <arg name="serial_number" default=""/> <!-- specify serial number of your camera -->
-    <arg name="camera_name" default="camera"/>
+    <!-- cameras
+    616205004841 : osx
+    612201001671 : osx/b_bot_camera
+	605201001486 : osx
+	627201001218 : osx
+    -->
+    <arg name="camera_name" default="realsense"/>
+    <arg name="serial_number" default="616205004841"/> <!-- specify serial number of your camera -->
 
-	<group ns="$(arg camera_name)">
-        <!-- server -->
-        <include file="$(find o2as_realsense_camera)/launch/camera.launch">
-            <arg name="serial_number" value="$(arg serial_number)"/>
-        </include>
+    <include file="$(find o2as_realsense_camera)/launch/camera.launch">
+        <arg name="camera_name" value="$(arg camera_name)"/>
+        <arg name="serial_number" value="$(arg serial_number)"/>
+        <arg name="trigger_mode" value="true"/>
+        <arg name="send_color" value="true"/>
+        <arg name="send_depth" value="true"/>
+        <arg name="send_cloud" value="true"/>
+    </include>
 
-        <!-- client -->
-        <node name="camera_client" pkg="o2as_realsense_camera" type="demo.py" output="screen">
-            <param name="setting_filename" value="$(find o2as_realsense_camera)/image/relasense_$(arg serial_number).yaml"/>
-            <param name="pcloud_filename" value="$(find o2as_realsense_camera)/image/test.dat"/>
-            <param name="image_filename" value="$(find o2as_realsense_camera)/image/test.png"/>
-            <remap from="/connect" to="$(arg camera_name)/connect"/>
-            <remap from="/save_frame_for_cad_matching" to="$(arg camera_name)/save_frame_for_cad_matching"/>
-        </node>
-    </group>
+    <arg name="image_dir" value="$(find o2as_realsense_camera)/image"/>
+    <node name="demo" pkg="o2as_realsense_camera" type="demo.py" output="screen">
+        <param name="camera_name" type="string" value="$(arg camera_name)"/>
+        <param name="image_filename" type="string" value="$(arg image_dir)/$(arg camera_name)_$(arg serial_number)_texture.png"/>
+        <param name="cloud_filename" type="string" value="$(arg image_dir)/$(arg camera_name)_$(arg serial_number)_cloud.dat"/>
+    </node>
+
+    <node name="reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
+
 </launch>

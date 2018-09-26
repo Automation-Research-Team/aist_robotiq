@@ -1,24 +1,26 @@
 import rospy
-from util import *
 from o2as_realsense_camera.srv import *
 
-# service names
-CONNECT_SERVICE = "connect"
-SAVE_FRAME_FOR_CAD_MATCHING_SERVICE = "save_frame_for_cad_matching"
-SAVE_CAMERA_INFO_SERVICE = "save_camera_info"
-
+def ros_service_proxy(service_name, service_type):
+    proxy = None
+    try:
+        rospy.logwarn("wait for service " + service_name)
+        rospy.wait_for_service(service_name)
+        rospy.logdebug("service " + service_name + " is ready.")
+        proxy = rospy.ServiceProxy(service_name, service_type)
+    except rospy.ServiceException as e:
+        rospy.logerr("service error: %s", str(e)) 
+    return proxy
+    
 # the class send request to the camera server
 class RealSenseCameraClient(object):
-    def __init__(self, ns=""):
-        self._connect = ros_service_proxy(ns+CONNECT_SERVICE, Connect)
-        self._save_frame_for_cad_matching = ros_service_proxy(ns+SAVE_FRAME_FOR_CAD_MATCHING_SERVICE, SaveFrameForCadMatching)
-        self._save_camera_info = ros_service_proxy(ns+SAVE_CAMERA_INFO_SERVICE, SaveCameraInfo)
+    def __init__(self, server_node_name=""):
+        ns = "/"+server_node_name+"/"
+        self._get_frame = ros_service_proxy(ns+"get_frame", GetFrame)
+        self._dump_frame = ros_service_proxy(ns+"dump_frame", DumpFrame)
 
-    def connect(self):
-        return self._connect()
+    def get_frame(self, publish=False):
+        return self._get_frame(publish)
 
-    def save_frame_for_cad_matching(self, pcloud_filename, image_filename):
-        return self._save_frame_for_cad_matching(pcloud_filename, image_filename)
-
-    def save_camera_info(self, filename):
-        return self._save_camera_info(filename)
+    def dump_frame(self, color_image_filename, depth_image_filename, point_cloud_filename):
+        return self._dump_frame(color_image_filename, depth_image_filename, point_cloud_filename)
