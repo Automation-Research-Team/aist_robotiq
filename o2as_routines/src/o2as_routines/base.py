@@ -59,6 +59,8 @@ from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
 
+log_level = LOG_LEVEL = rospy.DEBUG
+
 import ur_modern_driver.msg
 
 
@@ -121,7 +123,7 @@ class O2ASBaseRoutines(object):
     self.use_real_robot = rospy.get_param("use_real_robot")
 
     moveit_commander.roscpp_initialize(sys.argv)
-    rospy.init_node('assembly_example', anonymous=False)
+    rospy.init_node('assembly_example', anonymous=False, log_level=LOG_LEVEL)
 
     self.robots = moveit_commander.RobotCommander()
     self.groups = {"a_bot":moveit_commander.MoveGroupCommander("a_bot"),
@@ -179,6 +181,9 @@ class O2ASBaseRoutines(object):
     group.set_end_effector_link(end_effector_link)
     
     group.set_pose_target(pose_goal_stamped)
+    if end_effector_link:
+      rospy.loginfo("Setting end effector link to " + end_effector_link)
+      group.set_end_effector_link(end_effector_link)
     rospy.loginfo("Setting velocity scaling to " + str(speed))
     group.set_max_velocity_scaling_factor(speed)
 
@@ -292,6 +297,7 @@ class O2ASBaseRoutines(object):
       return res.success
 
     plan = group.execute(plan, wait=True)
+    # plan = group.retime_trajectory(self.robots.get_current_state(), plan, speed)
     group.stop()
     group.clear_pose_targets()
 

@@ -88,7 +88,7 @@
     <arg name="serial_port" default="/dev/ttyUSB2" />
   </include> -->
 
-  <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch">
+  <include file="$(find o2as_aist_config)/launch/o2as_moveit_planning_execution.launch">
     <arg name="sim" value="false" />
     <arg name="debug" value="false" />
     <arg name="config" value="true" />
