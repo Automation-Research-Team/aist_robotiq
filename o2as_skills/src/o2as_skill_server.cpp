@@ -578,13 +578,20 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   {
     ps_approach.pose.position.x = -.06;
     ps_approach.pose.position.z = .017;
+    ROS_INFO_STREAM("screw_tool_id: " << screw_tool_id);
+    if (screw_tool_id == "nut_tool_m6")
+      ps_approach.pose.position.z = .052;
     ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
+    // if (screw_tool_id == "nut_tool_m6")
+    //   ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, M_PI/4, 0);
     ps_move_away = ps_approach;
 
     // The tool is deposited a bit in front of the original position. The robot pushes it to the final pose after placing it.
     ps_tool_holder = ps_approach;
-    if (equip)        ps_tool_holder.pose.position.x = 0.030;
-    else if (unequip) ps_tool_holder.pose.position.x = 0.029;  
+    ps_tool_holder.pose.position.x = 0.03;
+    if (screw_tool_id == "nut_tool_m6")
+      ps_tool_holder.pose.position.x = 0.02;
+    if (unequip) ps_tool_holder.pose.position.x -= 0.001;  
 
     ps_high_up = ps_approach;
     // ps_high_up.pose.position.z +=.5;
@@ -1213,12 +1220,7 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     // TODO: Wait for message from suction topic
-    // if (screw_tool_id == "screw_tool_m4")
-    //   screw_picked = ros::topic::waitForMessage("/m4_tool/screw_suctioned", ros::Duration(1.0));
-    // else if (screw_tool_id == "screw_tool_m3")
-    //   screw_picked = ros::topic::waitForMessage("/m3_tool/screw_suctioned", ros::Duration(1.0));
-    // else if (screw_tool_id == "screw_tool_m6")
-    //   screw_picked = ros::topic::waitForMessage("/m6_tool/screw_suctioned", ros::Duration(1.0));
+    //   screw_picked = ros::topic::waitForMessage("/" + screw_tool_id + "/screw_suctioned", ros::Duration(1.0));
     ROS_WARN("Setting screw_picked to true");
     screw_picked = true;  // TODO: Replace this with the block above checking for pick success
     if ((RealRadius > max_radius) || (!ros::ok()))
@@ -1505,7 +1507,7 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
     goToNamedPose("screw_pick_ready", goal->robot_name);
     std::string screw_tool_id = "screw_tool_m" + std::to_string(goal->screw_size);
     std::string screw_tool_link = goal->robot_name + "_screw_tool_m" + std::to_string(goal->screw_size) + "_tip_link";
-    std::string fastening_tool_name = "m" + std::to_string(goal->screw_size) +  "_tool";
+    std::string fastening_tool_name = "screw_tool_m" + std::to_string(goal->screw_size);
     pickScrew(goal->item_pose, screw_tool_id, goal->robot_name, screw_tool_link, fastening_tool_name);
     goToNamedPose("screw_pick_ready", goal->robot_name);
   }
@@ -1850,6 +1852,8 @@ void SkillServer::executeChangeTool(const o2as_msgs::changeToolGoalConstPtr& goa
   if (!goal->equip_the_tool) { equip_or_unequip = "unequip"; }
 
   std::string screw_tool_id = "screw_tool_m" + std::to_string(goal->screw_size);
+  if (goal->screw_size == 66)
+    screw_tool_id = "nut_tool_m6";
   bool success = equipUnequipScrewTool(goal->robot_name, screw_tool_id, equip_or_unequip);
   
   if (success) { changeToolActionServer_.setSucceeded(); }

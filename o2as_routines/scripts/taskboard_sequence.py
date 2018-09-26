@@ -73,29 +73,32 @@ class TaskboardClass(O2ASBaseRoutines):
     self.item_pick_heights = [0.02, 0.02, 0.045,
                               0.047, 0.072, 0.0, 
                               0.02, 0.02, -0.002, 
-                              -0.002, 0.02, 0.02,
-                              0.02, 0.007, -0.002]
+                              -0.002, 0.001, 0.02,
+                              0.02, 0.007, 0.005]
 
-    self.item_place_heights = [0.04, 0.04, 0.046,
+    self.item_place_heights = [0.02, 0.04, 0.046,
                                0.046, 0.074, 0.04, 
                                0.04, 0.04, 0.0, 
-                               0.0, 0.04, 0.04, 
+                               0.0, 0.0, 0.04, 
                                0.04, 0.006, 0.0]
     self.gripper_operation_to_use = ["outer", "inner_from_inside", "inner_from_outside", "complex_pick_from_inside", "complex_pick_from_outside"]
     self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+    self.downward_orientation_cylinder_axis_along_workspace_x = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
     # 
     self.pick_poses = []
     self.place_poses = []
-    for i in range(0,15):
+    for i in range(1,16):
       pick_pose = geometry_msgs.msg.PoseStamped()
       pick_pose.pose.orientation = self.downward_orientation
-      pick_pose.header.frame_id = "mat_part" + str(i+1)
+      if i == 11:
+        pick_pose.pose.orientation = self.downward_orientation_cylinder_axis_along_workspace_x
+      pick_pose.header.frame_id = "mat_part" + str(i)
       # pick_pose.pose.position.z = self.item_pick_heights[i]
       self.pick_poses.append(pick_pose)
 
       place_pose = geometry_msgs.msg.PoseStamped()
       place_pose.pose.orientation = self.downward_orientation
-      place_pose.header.frame_id = "taskboard_part" + str(i+1)
+      place_pose.header.frame_id = "taskboard_part" + str(i)
       # 
       # place_pose.pose.position.z = self.item_place_heights[i]
       self.place_poses.append(place_pose)
@@ -156,11 +159,12 @@ class TaskboardClass(O2ASBaseRoutines):
     object_pose.pose.position.z += approach_height
     rospy.loginfo("Height 1: " + str(object_pose.pose.position.z))
     if special_pick == True:
-      object_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/4.2, -pi/1.3))
+      object_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*45/180, pi/2))
     rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
     object_pose.pose.position.z -= approach_height
     rospy.loginfo("Height 2: " + str(object_pose.pose.position.z))
+    self.publish_marker(object_pose, "place_pose")
 
     if gripper_command=="complex_pick_from_inside":
       self.precision_gripper_inner_close() 
@@ -199,13 +203,13 @@ class TaskboardClass(O2ASBaseRoutines):
     else: 
       self.send_gripper_command(gripper=robotname, command="close")
 
-    if special_pick == True:
-      object_pose.pose.orientation = self.downward_orientation
+    # if special_pick == True:
+    #   object_pose.pose.orientation = self.downward_orientation
     rospy.sleep(.5)
     rospy.loginfo("Going back up")
     object_pose.pose.position.z += approach_height
     rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
-    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast)
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
     object_pose.pose.position.z -= approach_height
 
 ######
@@ -258,7 +262,7 @@ class TaskboardClass(O2ASBaseRoutines):
     r_pulley=0.034
     theta_offset = 90  # To adjust the starting angle
     theta_belt= 0 + theta_offset
-    theta_increase=15
+    theta_increase=20
 
     start_pose = geometry_msgs.msg.PoseStamped()
     start_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
@@ -274,7 +278,7 @@ class TaskboardClass(O2ASBaseRoutines):
     next_pose = geometry_msgs.msg.PoseStamped()
     next_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     next_pose.header.frame_id = "taskboard_part6_large_pulley"
-    while theta_belt <= 360+theta_offset and not rospy.is_shutdown():
+    while theta_belt <= 340+theta_offset and not rospy.is_shutdown():
         #By default, the Spiral_Search function will maintain contact between both mating parts at all times
          theta_belt=theta_belt+theta_increase
          x=cos(radians(theta_belt))*r_pulley
@@ -321,7 +325,7 @@ class TaskboardClass(O2ASBaseRoutines):
 
     taskboard_tasks = range(1,16)
     # taskboard_tasks =  [11, 
-    # 10, 9, 3, 4, 1,
+    # 10, 9, 3, 1, 4,
     # 6, 14, 15, 12, 13,  
     # 8, 2, 7, 5]
 
@@ -399,28 +403,26 @@ class TaskboardClass(O2ASBaseRoutines):
       pass
     return
 
-  def belt_pick(self, robotname):
-    belt_pick_pose = copy.deepcopy(self.pick_poses[5])
-    belt_pick_pose.pose.position.y += .055
-    self.pick("b_bot", belt_pick_pose, grasp_height=.002,
-                    speed_fast = 0.2, speed_slow = 0.02, gripper_command="close")
-
   def tilt_up_gripper(self, speed_fast=0.1, speed_slow=0.02):
-    tilt_pose = copy.deepcopy(self.pick_poses[5])
-    tilt_pose.pose.position.z += 0.4
-    before_tilt_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi, 0, pi/2))
+    self.go_to_named_pose("tilt_ready", "a_bot")
+    rospy.sleep(.2)
+    tilt_pose = geometry_msgs.msg.PoseStamped()
+    tilt_pose.header.frame_id = "a_bot_gripper_tip_link"
+    tilt_pose.pose.orientation.w = 1.0
+    tilt_pose = self.listener.transformPose("workspace_center", tilt_pose)
+    # tilt_pose.pose.position.x += 0.25
+    # tilt_pose.pose.position.z += 0.3
+    before_tilt_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, pi*45/180))
     tilt_pose.pose.orientation = before_tilt_orientation
     self.go_to_pose_goal('a_bot', tilt_pose, speed=speed_fast)
+
     #gripper slight open
     self.precision_gripper_inner_open_slightly()
 
     #tilt up
-    after_tilt_up = geometry_msgs.msg.PoseStamped()
-    after_tilt_up.header.frame_id = "world"
-    after_tilt_up.pose.position.x = .25833
-    after_tilt_up.pose.position.y = -0.044345
-    after_tilt_up.pose.position.z = 1.1004
-    after_tilt_up.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi, -pi/5, pi/2))
+    after_tilt_up = copy.deepcopy(tilt_pose)
+    after_tilt_up.pose.position.z += 0.1
+    after_tilt_up.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, -pi/5, pi*45/180))
     self.go_to_pose_goal('a_bot', after_tilt_up, speed=speed_fast)
 
     #return
@@ -489,19 +491,22 @@ if __name__ == '__main__':
     taskboard.groups["a_bot"].set_goal_tolerance(.0001) 
     taskboard.groups["a_bot"].set_planning_time(3) 
     taskboard.groups["a_bot"].set_num_planning_attempts(10)
-    taskboard.go_to_named_pose("home", "c_bot")
-    taskboard.go_to_named_pose("home", "b_bot")
-    taskboard.go_to_named_pose("home", "a_bot")
+    # taskboard.go_to_named_pose("home", "c_bot")
+    # taskboard.go_to_named_pose("home", "b_bot")
+    # taskboard.go_to_named_pose("home", "a_bot")
 
     # taskboard.full_taskboard_task()
 
     i = raw_input("Enter the number of the part to be performed: ")
-    i =int(i)
+    i = int(i)
     while(i):
-      if i == 111:
-        #taskboard.precision("a_bot", taskboard.pick_poses[3], taskboard.item_pick_heights[3]-0.012, taskboard.place_poses[3], taskboard.item_place_heights[3]-0.02)
-        taskboard.precision("a_bot", taskboard.pick_poses[3], taskboard.item_pick_heights[3]-0.026, taskboard.place_poses[3], taskboard.item_place_heights[3]-0.025)
+      # if i in range(1,16):
+      #   rospy.loginfo("=== Now performing part number " + str(i) + ": " + self.item_names[i-1])
       # Testing
+      if i == 555:
+        taskboard.go_to_named_pose("home","a_bot")
+        taskboard.go_to_named_pose("home","b_bot")
+        taskboard.go_to_named_pose("back","c_bot")
       if i == 50:
         taskboard.go_to_pose_goal("a_bot",  taskboard.pick_poses[0], "b_bot", taskboard.pick_poses[2])
       if i == 51:
@@ -531,28 +536,40 @@ if __name__ == '__main__':
       ################################################################################################
 
       if i == 1: #unadjusted
-        #taskboard.go_to_pose_goal("b_bot", taskboard.pick_poses[i-1], speed = 0.2)
+        ## MAGIC NUMBERS!!
+        b_bot_dx_pick = -0.01
+        b_bot_dy_pick = 0.005
+        bearing_pick_pose_b = copy.deepcopy(taskboard.pick_poses[i-1])
+        bearing_pick_pose_b.pose.position.x += b_bot_dx_pick
+        bearing_pick_pose_b.pose.position.y += b_bot_dy_pick
 
-        taskboard.pick("b_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
-                        speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
-                        approach_height = 0.07)
+        taskboard.go_to_named_pose("home","a_bot")
+        taskboard.go_to_named_pose("home","b_bot")
         taskboard.go_to_named_pose("back","c_bot")
+        taskboard.pick("b_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
+                        speed_fast = 0.2, speed_slow = 0.04, gripper_command="close",
+                        approach_height = 0.07)
         taskboard.go_to_named_pose("home","b_bot")
         taskboard.go_to_named_pose("regrasp_ready","b_bot")
-        taskboard.do_regrasp("b_bot", "c_bot", grasp_distance = .02)
+        taskboard.do_regrasp("b_bot", "c_bot", grasp_distance = -.02)
         taskboard.go_to_named_pose("home","b_bot")
         taskboard.go_to_named_pose("home","c_bot")
 
-        bearing_c_place_pose = copy.deepcopy(taskboard.place_poses[i-1])
-        bearing_c_place_pose.pose.position.x = -.04
-        bearing_c_place_pose.pose.position.y = .15
+        bearing_c_place_pose = copy.deepcopy(taskboard.place_poses[3])  # This is part 4 
+        # bearing_c_place_pose.pose.position.x = -.06
+        # bearing_c_place_pose.pose.position.y = .18
         bearing_c_place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
 
         
-        bearing_c_place_pose.pose.position.z = taskboard.item_place_heights[i-1] + .01
-        taskboard.go_to_pose_goal("c_bot", bearing_c_place_pose, speed=0.2, move_lin=True)
-        taskboard.do_linear_push("c_bot", 5, wait = True)
+        bearing_c_place_pose.pose.position.z = taskboard.item_place_heights[i-1]
+        taskboard.go_to_pose_goal("c_bot", bearing_c_place_pose, speed=0.08, move_lin=True)
+        taskboard.do_linear_push("c_bot", 10, wait = True)
         taskboard.send_gripper_command(gripper="c_bot", command="open")
+        rospy.sleep(1.0)
+        taskboard.send_gripper_command(gripper="c_bot", command="close", force=1.0, velocity = .013)
+        rospy.sleep(1.0)
+        taskboard.send_gripper_command(gripper="c_bot", command="open", velocity = .013)
+        rospy.sleep(2.0)
         # taskboard.place("c_bot", bearing_c_place_pose,taskboard.item_place_heights[i-1] + .01,
         #                         speed_fast = 0.2, speed_slow = 0.05, gripper_command="open",
         #                         approach_height = 0.10, lift_up_after_place = True)
@@ -561,41 +578,66 @@ if __name__ == '__main__':
         taskboard.send_gripper_command(gripper="precision_gripper_inner", command="close")
         
         bearing_c_place_pose.pose.position.z = 0.0
-        taskboard.place("a_bot", bearing_c_place_pose,taskboard.item_place_heights[i-1] - 0.02,
+        z_a_bot = 0.015
+        taskboard.place("a_bot", bearing_c_place_pose, z_a_bot,
                                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="none",
                                 approach_height = 0.10, lift_up_after_place = False)
-
         bearing_a_place_pose = copy.deepcopy(taskboard.place_poses[i-1])
-        bearing_a_place_pose.pose.position.z = taskboard.item_place_heights[i-1] - 0.02
-        taskboard.go_to_pose_goal("a_bot", bearing_a_place_pose, speed=0.2, move_lin=True)
-        taskboard.horizontal_spiral_motion("a_bot", .006)
+        bearing_a_place_pose.pose.position.z = z_a_bot
+        rospy.loginfo("Moving bearing to final pose")
+        taskboard.go_to_pose_goal("a_bot", bearing_a_place_pose, speed=0.15, move_lin=True)
+        taskboard.horizontal_spiral_motion("a_bot", .004)
+        bearing_a_place_pose.pose.position.z += .05
+        taskboard.go_to_pose_goal("a_bot", bearing_a_place_pose, speed=0.15, move_lin=True)
+        taskboard.go_to_named_pose("home","a_bot")
+        
+        # ### Push with b_bot
+        # ### Pushing with b_bot only does not work. The tool needs to be grasped beforehand.
+        # taskboard.go_to_pose_goal("b_bot", bearing_a_place_pose, speed=0.15, move_lin=True)
+        # taskboard.send_gripper_command(gripper="b_bot", command="close")
+        # taskboard.do_linear_push("b_bot", 20, wait = True)
+        # taskboard.go_to_pose_goal("b_bot", bearing_a_place_pose, speed=0.15, move_lin=True)
+        # taskboard.go_to_named_pose("home","b_bot")
+        rospy.loginfo("Done")
 
-        # TODO: Push with b_bot?
+        # TODO: Make sure the task succeeded by pushing with b_bot and plate 3
 
-      ################################################################################################
+      if i == 2: #unadjusted  
+        
+        inclined_pick_pose = copy.deepcopy(taskboard.pick_poses[i-1])
+        inclined_pick_pose.pose.position.y += .015
 
-      if i == 2: #unadjusted
-        taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
+        taskboard.pick("a_bot",inclined_pick_pose, 0.00,
                                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
                                 approach_height = 0.1, special_pick = True)
         taskboard.tilt_up_gripper(speed_fast=0.1, speed_slow=0.02)
+        taskboard.go_to_named_pose("place_part_2_ready", "a_bot")
+
+        place_pose = geometry_msgs.msg.PoseStamped()
+        place_pose.header.frame_id = "taskboard_part2"
+        place_pose.pose.position.x = -0.0357
+        place_pose.pose.position.z = 0.04 
+        place_pose.pose.orientation.z = 1.0
+        taskboard.go_to_pose_goal("a_bot", place_pose, speed=0.01, move_lin=True)
+        taskboard.horizontal_spiral_motion("a_bot", max_radius = .003, radius_increment = .002, spiral_axis="X")
+        taskboard.send_gripper_command(gripper="precision_gripper_inner", command="open")
 
         #Pick up by screw tool(screw tool control unfinished)
-        taskboard.pick("b_bot",taskboard.screw_tool_pose,grasp_height=0.01,
-                        speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
-                        approach_height = 0.1, special_pick = False)
+        # taskboard.pick("b_bot",taskboard.screw_tool_pose,grasp_height=0.01,
+        #                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
+        #                 approach_height = 0.1, special_pick = False)
         
-        taskboard.pick("b_bot",taskboard.pick_screw_pose,grasp_height=0.01,
-                        speed_fast = 0.2, speed_slow = 0.02, gripper_command="none",
-                        approach_height = 0.1, special_pick = False)
+        # taskboard.pick("b_bot",taskboard.pick_screw_pose,grasp_height=0.01,
+        #                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="none",
+        #                 approach_height = 0.1, special_pick = False)
         
-        #place
-        taskboard.place("b_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],
-                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="",
-                                approach_height = 0.15, lift_up_after_place = False)
-        taskboard.horizontal_spiral_motion("a_bot", .002, taskboard.place_poses[i-1])
+        # #place
+        # taskboard.place("b_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],
+        #                         speed_fast = 0.2, speed_slow = 0.02, gripper_command="",
+        #                         approach_height = 0.15, lift_up_after_place = False)
+        # taskboard.horizontal_spiral_motion("a_bot", .002, taskboard.place_poses[i-1])
 
-      if i == 3: #unadjusted
+      if i == 3: 
         taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
                                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
                                 approach_height = 0.07)
@@ -614,7 +656,7 @@ if __name__ == '__main__':
         taskboard.place("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],
                                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
                                 approach_height = 0.1, lift_up_after_place = False)
-        taskboard.horizontal_spiral_motion("a_bot", .002)
+        taskboard.horizontal_spiral_motion("a_bot", max_radius=.004, radius_increment=.002)
       
       if i == 5: #unadjusted
         #pick up the tool
@@ -693,38 +735,41 @@ if __name__ == '__main__':
                                 approach_height = 0.2, lift_up_after_place = True)
         
 
-      if i == 6:
+      if i == 6: # Belt
+        pick_tool_pose = geometry_msgs.msg.PoseStamped()
+        pick_tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+        pick_tool_pose.header.frame_id = "belt_placement_tool"
+        place_tool_pose = copy.deepcopy(pick_tool_pose)
+        place_tool_pose.pose.position.x = 0.058
+        place_tool_pose.pose.position.z = 0.04
+
         # Pick up the belt
+        # TODO: Replace these toggle_collisions command with the allow_collisions setting
         taskboard.toggle_collisions(collisions_on=False)
-        taskboard.belt_pick("b_bot")
+        belt_pick_pose = copy.deepcopy(taskboard.pick_poses[5])
+        belt_pick_pose.pose.position.y += .055
+        taskboard.pick("b_bot", belt_pick_pose, grasp_height=.002,
+                        speed_fast = 0.2, speed_slow = 0.04, gripper_command="close")
         taskboard.toggle_collisions(collisions_on=True)
         taskboard.go_to_named_pose("home", "b_bot")
         
         # Set the placement aid
-        pick_tool_pose = geometry_msgs.msg.PoseStamped()
-        pick_tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-        pick_tool_pose.header.frame_id = "belt_placement_tool"
+        taskboard.go_to_named_pose("home", "c_bot")
         taskboard.pick("c_bot", pick_tool_pose, grasp_height=0.013, speed_fast = 0.2, speed_slow = 0.1, gripper_command="close",
                                 approach_height = 0.05)
-        place_tool_pose = geometry_msgs.msg.PoseStamped()
-        place_tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-        place_tool_pose.header.frame_id = "belt_placement_tool"
-        place_tool_pose.pose.position.x = 0.058
-        place_tool_pose.pose.position.z = 0.04
         taskboard.toggle_collisions(collisions_on=False)
-        taskboard.place("c_bot", place_tool_pose, place_height=-0.005, speed_fast = 0.2, speed_slow = 0.03, gripper_command="open",
+        taskboard.place("c_bot", place_tool_pose, place_height=-0.005, speed_fast = 0.2, speed_slow = 0.05, gripper_command="open",
                                 approach_height = 0.03, lift_up_after_place = True)
         taskboard.toggle_collisions(collisions_on=True)
+        taskboard.go_to_named_pose("back", "c_bot")
 
         # Place the belt
-        taskboard.go_to_named_pose("back", "c_bot")
         belt_place_pose = geometry_msgs.msg.PoseStamped()
         belt_place_pose.header.frame_id = "taskboard_part6_large_pulley"
         belt_place_pose.pose.position.x = 0.0
         belt_place_pose.pose.position.y = .068
         belt_place_pose.pose.position.z = .06 + .1
-        belt_place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -170.0 * pi/180))
-        # 0.716; -0.09; -0.684; 0.1
+        belt_place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
         taskboard.go_to_pose_goal("b_bot", belt_place_pose, speed=0.3)
         belt_place_pose.pose.position.z = .06
         taskboard.go_to_pose_goal("b_bot", belt_place_pose, speed=0.3)
@@ -734,7 +779,7 @@ if __name__ == '__main__':
         belt_place_pose.pose.position.x = 0.0
         belt_place_pose.pose.position.y = .01
         belt_place_pose.pose.position.z = .0075
-        belt_place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -179.0 * pi/180))
+        belt_place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
         taskboard.go_to_pose_goal("b_bot", belt_place_pose, speed=0.1)
         
         taskboard.send_gripper_command(gripper="b_bot", command=.01)
@@ -748,6 +793,17 @@ if __name__ == '__main__':
         # Fiddle in the belt
         rospy.logwarn("Doing belt spiral motion")
         taskboard.belt_circle_motion("a_bot")
+        taskboard.go_to_named_pose("home", "a_bot", wait=True)
+
+        # Remove the placement aid
+        taskboard.go_to_named_pose("home", "c_bot")
+        taskboard.toggle_collisions(collisions_on=False)
+        taskboard.pick("c_bot", place_tool_pose, grasp_height=-0.005, speed_fast = 0.2, speed_slow = 0.1, gripper_command="close",
+                                approach_height = 0.05)
+        taskboard.place("c_bot", pick_tool_pose, place_height=0.013, speed_fast = 0.2, speed_slow = 0.03, gripper_command="open",
+                                approach_height = 0.03, lift_up_after_place = True)
+        taskboard.toggle_collisions(collisions_on=True)
+        taskboard.go_to_named_pose("back", "c_bot")
 
       if i == 7:
         pass
@@ -820,9 +876,193 @@ if __name__ == '__main__':
         if i == 9:
           taskboard.horizontal_spiral_motion("a_bot", .0025)
         if i == 10:
-          taskboard.horizontal_spiral_motion("a_bot", .003)
+          taskboard.horizontal_spiral_motion("a_bot", .006, radius_increment=0.0025)
+        taskboard.go_to_named_pose("home", "a_bot")
+
+
+      # Definitions for part 11
+      start_pose_b = geometry_msgs.msg.PoseStamped()
+      start_pose_b.header.frame_id = "workspace_center"
+      start_pose_b.pose.position.x = -0.21885
+      start_pose_b.pose.position.y = 0.33875
+      start_pose_b.pose.position.z = 0.062649
+      start_pose_b.pose.orientation.x = 0.14067
+      start_pose_b.pose.orientation.y = 0.99003
+      start_pose_b.pose.orientation.z = 0.00022566
+      start_pose_b.pose.orientation.w = 0.0078231
+
+      start_pose_b_lowered = copy.deepcopy(start_pose_b)
+      start_pose_b_lowered.pose.position.z -= .01
+      start_pose_b_lowered_and_back = copy.deepcopy(start_pose_b_lowered)
+      start_pose_b_lowered_and_back.pose.position.x += .05
+
+      intermediate_pose_b = copy.deepcopy(start_pose_b_lowered_and_back)
+      intermediate_pose_b.pose.position.z = 0.2
+      intermediate_pose_b.pose.position.y -= 0.05
+      intermediate_pose_b.pose.position.x += 0.05
+      intermediate_pose_b.pose.orientation.x = 0.0
+      intermediate_pose_b.pose.orientation.y = 1.0
+      intermediate_pose_b.pose.orientation.z = 0.0
+      intermediate_pose_b.pose.orientation.w = 0.0
+
+      ##### COPY PASTE THIS POSITION JUST BEFORE THE START OF THE TASK
+      set_screw_drop_pose_a = geometry_msgs.msg.PoseStamped()
+      set_screw_drop_pose_a.header.frame_id = "workspace_center"
+      set_screw_drop_pose_a.pose.position.x = -0.19521
+      set_screw_drop_pose_a.pose.position.y = 0.34463
+      set_screw_drop_pose_a.pose.position.z = 0.23743
+      set_screw_drop_pose_a.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, pi/2))
+      set_screw_drop_pose_approach_a = copy.deepcopy(set_screw_drop_pose_a)
+      set_screw_drop_pose_approach_a.pose.position.z += 0.03
+
+      push_pose_c = geometry_msgs.msg.PoseStamped()
+      push_pose_c.header.frame_id = "b_bot_set_screw_tool_tip_link"
+      push_pose_c.pose.position.x = 0.03
+      push_pose_c.pose.position.z = 0.005
+      push_pose_c.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi, 0))
+
+      approach_insert_pose_b = geometry_msgs.msg.PoseStamped()
+      approach_insert_pose_b.header.frame_id = "taskboard_part11"
+      approach_insert_pose_b.pose.position.z = .035
+      approach_insert_pose_b.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi*160/180, pi/2, 0))
+      
+      insert_pose_b = copy.deepcopy(approach_insert_pose_b)
+      insert_pose_b.pose.position.z = 0.002
+
+      pick_up_set_screw_tool_pose = geometry_msgs.msg.PoseStamped()
+      pick_up_set_screw_tool_pose.header.frame_id = "taskboard_set_screw_tool_link"
+      pick_up_set_screw_tool_pose.pose.position.x = -.005
+      pick_up_set_screw_tool_pose.pose.orientation.w = 1.0
+
+      ### To move into position
+      if i == 110:
+        taskboard.go_to_named_pose("set_screw_intermediate_pose", "b_bot")
+      if i == 111:
+        taskboard.go_to_pose_goal("b_bot", start_pose_b_lowered_and_back, speed=0.03, move_lin=True)
+      if i == 112:
+        taskboard.go_to_pose_goal("b_bot", start_pose_b_lowered, speed=0.02, move_lin=True)
+      if i == 113: 
+        taskboard.go_to_pose_goal("b_bot", start_pose_b, speed=0.02, move_lin=True)
+      if i == 1131: 
+        taskboard.horizontal_spiral_motion("b_bot", .001, radius_increment = .0005, spiral_axis = "Y", wait=False)
+      if i == 114: # Pick up tool
+        taskboard.send_gripper_command(gripper="b_bot", command="open")
+        taskboard.go_to_pose_goal("b_bot", pick_up_set_screw_tool_pose, speed=0.06, move_lin=True)
+        taskboard.send_gripper_command(gripper="b_bot", command="close")
+        print("Press enter to proceed.")
+        inp = raw_input()
+        pick_up_set_screw_tool_pose.pose.position.x -= .03
+        taskboard.go_to_pose_goal("b_bot", pick_up_set_screw_tool_pose, speed=0.04, move_lin=True)
+        pick_up_set_screw_tool_pose.pose.position.x += .03
+        taskboard.go_to_named_pose("set_screw_intermediate_pose", "b_bot")
+      if i == 115: # Place tool
+        pick_up_set_screw_tool_pose.pose.position.x -= .01
+        taskboard.go_to_pose_goal("b_bot", pick_up_set_screw_tool_pose, speed=0.04, move_lin=True)
+        pick_up_set_screw_tool_pose.pose.position.x += .01
+        taskboard.send_gripper_command(gripper="b_bot", command="open")
+        pick_up_set_screw_tool_pose.pose.position.x -= .06
+        taskboard.go_to_pose_goal("b_bot", pick_up_set_screw_tool_pose, speed=0.06, move_lin=True)
+        pick_up_set_screw_tool_pose.pose.position.x += .06
+        taskboard.go_to_named_pose("set_screw_intermediate_pose", "b_bot")
+
+      # Check a_bot positions
+      if i == 1161: 
+        taskboard.go_to_named_pose("place_set_screw_ready", "a_bot")
+      if i == 1162: 
+        taskboard.go_to_pose_goal("a_bot", set_screw_drop_pose_approach_a, speed=0.1, move_lin=True)
+      if i == 1163: 
+        taskboard.go_to_pose_goal("a_bot", set_screw_drop_pose_a, speed=0.02, move_lin=True)
+      if i == 1164: 
+        taskboard.go_to_named_pose("home", "a_bot")
+      if i == 1165: 
+        taskboard.go_to_named_pose("home", "a_bot")
+        taskboard.pick("a_bot",taskboard.pick_poses[11-1],taskboard.item_pick_heights[11-1],
+                                 speed_fast = 0.2, speed_slow = 0.04, gripper_command="easy_pick_outside_only_inner",
+                                 approach_height = 0.05)
+        taskboard.go_to_named_pose("place_set_screw_ready", "a_bot")
+
+      if i == 117:
+        taskboard.go_to_named_pose("set_screw_insert_pose", "b_bot")
+      if i == 118:
+        taskboard.go_to_pose_goal("b_bot", approach_insert_pose_b, speed=0.02, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
+      if i == 119:
+        rospy.loginfo("Height: " + str(insert_pose_b.pose.position.z))
+        taskboard.go_to_pose_goal("b_bot", insert_pose_b, speed=0.02, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
 
       if i == 11:      #unadjusted(set screw)
+        # taskboard.go_to_named_pose("back","c_bot")
+        # ### Pick up the screw with a_bot
+        # taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
+        #                          speed_fast = 0.2, speed_slow = 0.04, gripper_command="easy_pick_outside_only_inner",
+        #                          approach_height = 0.05)
+        # taskboard.go_to_named_pose("home","a_bot")
+        
+        # ### Drop it in the straw
+        # taskboard.go_to_named_pose("place_set_screw_ready","a_bot")
+        # taskboard.go_to_pose_goal("a_bot", set_screw_drop_pose_approach_a, speed=0.1, move_lin=True)
+        # taskboard.go_to_pose_goal("a_bot", set_screw_drop_pose_a, speed=0.02, move_lin=True)
+        # taskboard.send_gripper_command(gripper="precision_gripper_inner", command="open")
+        # taskboard.precision_gripper_inner_open_slightly()
+        # rospy.sleep(0.3)
+        # taskboard.precision_gripper_inner_open_slightly()
+        # rospy.sleep(0.3)
+        # taskboard.precision_gripper_inner_open_slightly()
+        # rospy.sleep(0.3)
+        # taskboard.precision_gripper_inner_open_slightly()
+        
+        # ### Move a home while b_bot does spiral motion
+        # taskboard.go_to_pose_goal("a_bot", set_screw_drop_pose_approach_a, speed=0.2, move_lin=True)
+        # taskboard.horizontal_spiral_motion("b_bot", .001, radius_increment = .0005, spiral_axis = "Y", wait=False)
+        # taskboard.go_to_named_pose("home","a_bot")
+        # rospy.sleep(3)
+        
+        # ### Go down, back, up
+        # taskboard.go_to_pose_goal("b_bot", start_pose_b_lowered, speed=0.02, move_lin=True)
+        # taskboard.go_to_pose_goal("b_bot", start_pose_b_lowered_and_back, speed=0.02, move_lin=True)
+        # taskboard.go_to_pose_goal("b_bot", intermediate_pose_b, speed=0.04, move_lin=True)
+        # taskboard.go_to_named_pose("set_screw_intermediate_pose", "b_bot")
+
+        # ### Push screw against something (c_bot closed gripper?)
+        # taskboard.go_to_named_pose("screw_ready", "c_bot")
+        # taskboard.send_gripper_command(gripper="c_bot", command="close", wait=False)
+        # taskboard.go_to_pose_goal("c_bot", push_pose_c, speed=0.2, move_lin=True)
+        # rospy.sleep(.2)
+        # taskboard.do_linear_push("c_bot", 10, wait = True)
+        # rospy.sleep(.2)
+        # taskboard.go_to_pose_goal("c_bot", push_pose_c, speed=0.2, move_lin=True)
+        # taskboard.go_to_named_pose("back", "c_bot")
+
+        ### Move to insertion point
+        taskboard.go_to_named_pose("set_screw_insert_pose", "b_bot")
+        taskboard.go_to_pose_goal("b_bot", approach_insert_pose_b, speed=0.04, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
+        print("Press enter to continue")
+        raw_input()
+        taskboard.set_motor("set_screw_tool", "tighten", duration = 20.0)
+
+        ### Turn on motor, do spiral motions while descending
+        taskboard.go_to_pose_goal("b_bot", insert_pose_b, speed=0.02, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
+        taskboard.horizontal_spiral_motion("b_bot", .003, spiral_axis="Y", radius_increment = .001)
+        insert_pose_b.pose.position.z -= .002
+        taskboard.go_to_pose_goal("b_bot", insert_pose_b, speed=0.02, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
+        taskboard.horizontal_spiral_motion("b_bot", .003, spiral_axis="Y", radius_increment = .001)
+        taskboard.go_to_pose_goal("b_bot", insert_pose_b, speed=0.01, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
+        rospy.sleep(5.0)
+        
+        ### Go up, drop the tool
+        taskboard.go_to_pose_goal("b_bot", approach_insert_pose_b, speed=0.02, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
+        taskboard.go_to_named_pose("set_screw_insert_pose", "b_bot")
+        taskboard.go_to_named_pose("set_screw_intermediate_pose", "b_bot")
+        
+        # Place tool
+        pick_up_set_screw_tool_pose.pose.position.x -= .01
+        taskboard.go_to_pose_goal("b_bot", pick_up_set_screw_tool_pose, speed=0.04, move_lin=True)
+        pick_up_set_screw_tool_pose.pose.position.x += .01
+        taskboard.send_gripper_command(gripper="b_bot", command="open")
+        pick_up_set_screw_tool_pose.pose.position.x -= .06
+        taskboard.go_to_pose_goal("b_bot", pick_up_set_screw_tool_pose, speed=0.06, move_lin=True)
+        pick_up_set_screw_tool_pose.pose.position.x += .06
+        taskboard.go_to_named_pose("set_screw_intermediate_pose", "b_bot")
+        
         pass
 
       if i == 12:      #unadjusted
@@ -865,26 +1105,93 @@ if __name__ == '__main__':
       if i == 14:
         taskboard.pick("a_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1], approach_height = 0.05,
                                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
+        taskboard.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
+
         taskboard.place("a_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1], approach_height = 0.05,
                                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
                                 lift_up_after_place = False)
-        taskboard.horizontal_spiral_motion("a_bot", .002)
+        taskboard.horizontal_spiral_motion("a_bot", .002, radius_increment = .0005)
+
+        taskboard.send_gripper_command(gripper="c_bot", command=0.02)
+        pose = copy.deepcopy(taskboard.place_poses[i-1])
+        pose.pose.position.z += .05
+        taskboard.go_to_pose_goal("a_bot", pose, speed=0.02, move_lin=True)
+        taskboard.go_to_named_pose("home", "a_bot")
+        
+        # TODO: Try pushing with the a_bot's open inner gripper (it would save time)
+        # Push down with the c_bot in case it is blocked
+        taskboard.go_to_named_pose("home", "c_bot")
+        # TODO: Turn the pose around by 180 degrees to speed up the motion
+        taskboard.place("c_bot",taskboard.place_poses[i-1],taskboard.item_place_heights[i-1] - .01, approach_height = 0.02,
+                        speed_fast = 0.2, speed_slow = 0.05, gripper_command="none",
+                        lift_up_after_place = True)
+        taskboard.go_to_named_pose("home", "c_bot")
         
 
       if i == 15:     #unadjusted
-       taskboard.do_pick_action("b_bot", taskboard.pick_poses[i-1], z_axis_rotation = 0.0, use_complex_planning = False)
-       taskboard.do_regrasp("b_bot", "a_bot", grasp_distance = .02)
+       taskboard.pick("b_bot",taskboard.pick_poses[i-1],taskboard.item_pick_heights[i-1],
+                        speed_fast = 0.3, speed_slow = 0.02, gripper_command="close",
+                        approach_height = 0.04)
+       
+       regraspPose = geometry_msgs.msg.PoseStamped()
+       regraspPose.header.frame_id = "workspace_center"
+       regraspPose.pose.position.x = 0.2
+       regraspPose.pose.position.y = .0
+       regraspPose.pose.position.z = 0.7
+       
+       #regrasp 
+       # TODO: Make this a joint angle named pose instead (the movement will be faster)
+       taskboard.b_bot_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, 0, -pi/2))
+       regraspPose.pose.orientation = taskboard.b_bot_orientation
+       taskboard.go_to_pose_goal("b_bot", regraspPose, speed=0.2)
+
+       regraspPose.pose.position.y -= 0.05
+       taskboard.a_bot_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, pi/2))
+       regraspPose.pose.orientation = taskboard.a_bot_orientation
+       taskboard.go_to_pose_goal("a_bot", regraspPose, speed=0.12)
+       regraspPose.pose.position.y += 0.05
+       
+       regraspPose.pose.position.y += 0.012
+       regraspPose.pose.position.x += 0.0025
+       taskboard.send_gripper_command(gripper="precision_gripper_inner", command="close")
+       taskboard.go_to_pose_goal("a_bot", regraspPose, speed=0.02, move_lin= True)
+       taskboard.horizontal_spiral_motion("a_bot", .002, radius_increment = .0005)
        taskboard.send_gripper_command(gripper="precision_gripper_inner", command="open")
-       taskboard.send_gripper_command(gripper="precision_gripper_outer", command="close")
-       taskboard.send_gripper_command(gripper="b_bot", command=0.01)
+       regraspPose.pose.position.y -= 0.012
+       regraspPose.pose.position.x -= 0.0025
+       
+      #  rospy.sleep(3)
+       taskboard.send_gripper_command(gripper="b_bot", command="open")
+       regraspPose.pose.position.y += 0.03
+       regraspPose.pose.orientation = taskboard.b_bot_orientation
+       taskboard.go_to_pose_goal("b_bot", regraspPose, speed=0.02, move_lin= True)
+       rospy.loginfo("Press enter to confirm that b_bot moved backwards")
+       raw_input()
        taskboard.go_to_named_pose("back", "b_bot")
+
        taskboard.place("a_bot", taskboard.place_poses[i-1],taskboard.item_place_heights[i-1],
-                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="complex_pick_from_inside",
-                                approach_height = 0.10, lift_up_after_place = False)
+                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
+                                approach_height = 0.05, lift_up_after_place = False)
+
+      #  taskboard.send_gripper_command(gripper="precision_gripper_inner", command="open")
+      #  taskboard.horizontal_spiral_motion("a_bot", .002, radius_increment = .0005)
+       taskboard.place_poses[i-1].pose.position.z += 0.03
+       taskboard.go_to_pose_goal("a_bot", taskboard.place_poses[i-1], speed=0.01, move_lin= True)
+       taskboard.go_to_named_pose("home", "a_bot")
+
+       #push by b
+       taskboard.send_gripper_command(gripper="b_bot", command="close")
+       taskboard.place_poses[i-1].pose.position.z += 0.015
+       taskboard.go_to_named_pose("home", "b_bot")
+       taskboard.go_to_pose_goal("b_bot", taskboard.place_poses[i-1], speed=0.2)
+       taskboard.do_linear_push("b_bot", 10, wait = True)
+       taskboard.go_to_named_pose("home", "b_bot")
+
+
       
-      taskboard.go_to_named_pose("home", "a_bot")
-      taskboard.go_to_named_pose("home", "b_bot")
-      taskboard.go_to_named_pose("home", "c_bot")
+      # taskboard.go_to_named_pose("home", "a_bot")
+      # taskboard.go_to_named_pose("home", "b_bot")
+      # taskboard.go_to_named_pose("home", "c_bot")
       # taskboard.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
       i = raw_input("Enter the number of the part to be performed: ")
       i =int(i)  

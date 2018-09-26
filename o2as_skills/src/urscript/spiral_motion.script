@@ -1,7 +1,7 @@
 def SpiralMotion():
     def spiral_motion(max_radius=5.0, radius_incr=0.3, speed=0.01, acceleration=0.6, spiral_axis="Z"):
-        if (max_radius < 0.002) or (max_radius > .01):
-            textmsg("ERROR: max_radius parameter in m must be between 0.002 m and 0.01 m")
+        if (max_radius < 0.0005) or (max_radius > .01):
+            textmsg("ERROR: max_radius parameter in m must be between 0.0005 m and 0.01 m")
         else:
             spiral_axis_x = (spiral_axis=="X")
             spiral_axis_y = (spiral_axis=="Y")

@@ -12,7 +12,7 @@ Panels:
         - /TF1
         - /TF1/Tree1
       Splitter Ratio: 0.5
-    Tree Height: 221
+    Tree Height: 211
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -83,6 +83,14 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
+          M10nut_tool:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          Peg_tool:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_bot_base:
             Alpha: 1
             Show Axes: false
@@ -145,294 +153,16 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          assembled_assy_part_01:
+          a_phoxi_m_camera:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          assembled_assy_part_01_screw_hole_panel1_1:
+          a_phoxi_m_camera_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          assembled_assy_part_01_screw_hole_panel1_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_01_screw_hole_panel2_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_01_screw_hole_panel2_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_01_under_outer_hole:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_02_back_hole:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_bottom_screw_hole_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_bottom_screw_hole_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_bottom_screw_hole_aligner_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_bottom_screw_hole_aligner_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_motor_screw_hole_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_motor_screw_hole_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_motor_screw_hole_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_motor_screw_hole_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_motor_screw_hole_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_motor_screw_hole_6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_03:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_03_bottom_screw_hole_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_03_bottom_screw_hole_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_03_bottom_screw_hole_aligner_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_03_bottom_screw_hole_aligner_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_03_front_hole:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_03_pulley_ridge_bottom:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_03_pulley_ridge_middle:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_03_pulley_ridge_top:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_04:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_04_inserted_02:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_04_inserted_13:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_04_tip:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_05:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_05_center:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_07:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_07_back_hole:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_07_back_tip:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_07_front_hole:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_07_inserted:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_07_screw_hole_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_07_screw_hole_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_07_screw_hole_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_07_screw_hole_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_08:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_08_back_tip:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_08_front_tip:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_08_inserted:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_09:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_09_inner_surface:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_09_screw_hole:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_10:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_10_center:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_11:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_11_back_hole:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_11_front_hole:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_11_screw_head_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_11_screw_head_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_12:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_12_center:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_13:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_13_center:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_13_screw_head:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_14:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_14_screw_head:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_14_screw_inserted:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_14_screw_tip:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_15:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_15_center:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_16:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_16_center:
+          a_phoxi_m_sensor:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -450,43 +180,6 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          b_bot_cam_holder_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_bot_camera_depth_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_bot_camera_depth_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_bot_camera_fisheye_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_bot_camera_fisheye_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_bot_camera_left_ir_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_bot_camera_left_ir_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_bot_camera_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          b_bot_camera_right_ir_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           b_bot_ee_link:
             Alpha: 1
             Show Axes: false
@@ -551,7 +244,15 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          b_bot_screw_tool_m5_tip_link:
+          b_bot_screw_tool_m3_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_bot_screw_tool_m4_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_bot_screw_tool_m6_tip_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -584,6 +285,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          belt_placement_tool:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           c_bot_base:
             Alpha: 1
             Show Axes: false
@@ -598,6 +303,47 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          c_bot_cam_holder_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_camera_depth_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_camera_depth_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_camera_fisheye_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_camera_fisheye_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_camera_left_ir_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_camera_left_ir_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_camera_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          c_bot_camera_right_ir_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_camera_right_ir_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           c_bot_ee_link:
             Alpha: 1
             Show Axes: false
@@ -662,7 +408,19 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          c_bot_screw_tool_m5_tip_link:
+          c_bot_robotiq_85_tip_rotation_helper_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_screw_tool_m3_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_screw_tool_m4_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_screw_tool_m6_tip_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -695,7 +453,21 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          camera_right_ir_optical_frame:
+          m3_feeder_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          m3_feeder_outlet_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          m4_feeder_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          m4_feeder_outlet_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -768,7 +540,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          mat_part7:
+          mat_part7_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part7_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -807,11 +583,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          screw_tool_m5_helper_link:
+          screw_tool_m6_helper_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          screw_tool_m5_link:
+          screw_tool_m6_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -894,11 +670,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          taskboard_part7a:
+          taskboard_part7_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          taskboard_part7b:
+          taskboard_part7_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -917,7 +693,12 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          workbox:
+          workbox1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          workbox2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -948,11 +729,11 @@ Visualization Manager:
         TextHeight: 0.0799999982
       Planning Request:
         Colliding Link Color: 255; 0; 0
-        Goal State Alpha: 0.0199999996
+        Goal State Alpha: 0.200000003
         Goal State Color: 250; 128; 0
         Interactive Marker Size: 0.150000006
         Joint Violation Color: 255; 0; 255
-        Planning Group: all_bots
+        Planning Group: a_bot
         Query Goal State: true
         Query Start State: false
         Show Workspace: false
@@ -975,6 +756,14 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
+          M10nut_tool:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          Peg_tool:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_bot_base:
             Alpha: 1
             Show Axes: false
@@ -1037,294 +826,16 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          assembled_assy_part_01:
+          a_phoxi_m_camera:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          assembled_assy_part_01_screw_hole_panel1_1:
+          a_phoxi_m_camera_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          assembled_assy_part_01_screw_hole_panel1_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_01_screw_hole_panel2_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_01_screw_hole_panel2_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_01_under_outer_hole:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_02_back_hole:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_bottom_screw_hole_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_bottom_screw_hole_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_bottom_screw_hole_aligner_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_bottom_screw_hole_aligner_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_motor_screw_hole_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_motor_screw_hole_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_motor_screw_hole_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_motor_screw_hole_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_motor_screw_hole_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_02_motor_screw_hole_6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_03:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_03_bottom_screw_hole_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_03_bottom_screw_hole_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_03_bottom_screw_hole_aligner_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_03_bottom_screw_hole_aligner_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_03_front_hole:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_03_pulley_ridge_bottom:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_03_pulley_ridge_middle:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_03_pulley_ridge_top:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_04:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_04_inserted_02:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_04_inserted_13:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_04_tip:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_05:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_05_center:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_07:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_07_back_hole:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_07_back_tip:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_07_front_hole:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_07_inserted:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_07_screw_hole_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_07_screw_hole_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_07_screw_hole_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_07_screw_hole_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_08:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_08_back_tip:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_08_front_tip:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_08_inserted:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_09:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_09_inner_surface:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_09_screw_hole:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_10:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_10_center:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_11:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_11_back_hole:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_11_front_hole:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_11_screw_head_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_11_screw_head_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_12:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_12_center:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_13:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_13_center:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_13_screw_head:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_14:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_14_screw_head:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_14_screw_inserted:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_14_screw_tip:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_15:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_15_center:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          assembled_assy_part_16:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          assembled_assy_part_16_center:
+          a_phoxi_m_sensor:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -1342,43 +853,6 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          b_bot_cam_holder_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_bot_camera_depth_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_bot_camera_depth_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_bot_camera_fisheye_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_bot_camera_fisheye_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_bot_camera_left_ir_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_bot_camera_left_ir_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_bot_camera_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          b_bot_camera_right_ir_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           b_bot_ee_link:
             Alpha: 1
             Show Axes: false
@@ -1443,7 +917,15 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          b_bot_screw_tool_m5_tip_link:
+          b_bot_screw_tool_m3_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_bot_screw_tool_m4_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_bot_screw_tool_m6_tip_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -1476,6 +958,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          belt_placement_tool:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           c_bot_base:
             Alpha: 1
             Show Axes: false
@@ -1490,6 +976,47 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          c_bot_cam_holder_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_camera_depth_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_camera_depth_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_camera_fisheye_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_camera_fisheye_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_camera_left_ir_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_camera_left_ir_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_camera_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          c_bot_camera_right_ir_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_camera_right_ir_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           c_bot_ee_link:
             Alpha: 1
             Show Axes: false
@@ -1554,7 +1081,19 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          c_bot_screw_tool_m5_tip_link:
+          c_bot_robotiq_85_tip_rotation_helper_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_screw_tool_m3_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_screw_tool_m4_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_bot_screw_tool_m6_tip_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -1587,7 +1126,21 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          camera_right_ir_optical_frame:
+          m3_feeder_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          m3_feeder_outlet_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          m4_feeder_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          m4_feeder_outlet_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -1660,7 +1213,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          mat_part7:
+          mat_part7_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          mat_part7_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -1699,11 +1256,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          screw_tool_m5_helper_link:
+          screw_tool_m6_helper_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          screw_tool_m5_link:
+          screw_tool_m6_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -1786,11 +1343,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          taskboard_part7a:
+          taskboard_part7_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          taskboard_part7b:
+          taskboard_part7_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -1809,7 +1366,12 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          workbox:
+          workbox1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          workbox2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -1831,6 +1393,10 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
+        M10nut_tool:
+          Value: true
+        Peg_tool:
+          Value: true
         a_bot_base:
           Value: true
         a_bot_base_link:
@@ -1849,6 +1415,8 @@ Visualization Manager:
           Value: true
         a_bot_tool0:
           Value: true
+        a_bot_tool0_controller:
+          Value: true
         a_bot_upper_arm_link:
           Value: true
         a_bot_wrist_1_link:
@@ -1857,167 +1425,17 @@ Visualization Manager:
           Value: true
         a_bot_wrist_3_link:
           Value: true
-        assembled_assy_part_01:
+        a_phoxi_m_camera:
           Value: true
-        assembled_assy_part_01_screw_hole_panel1_1:
+        a_phoxi_m_camera_link:
           Value: true
-        assembled_assy_part_01_screw_hole_panel1_2:
-          Value: true
-        assembled_assy_part_01_screw_hole_panel2_1:
-          Value: true
-        assembled_assy_part_01_screw_hole_panel2_2:
-          Value: true
-        assembled_assy_part_01_under_outer_hole:
-          Value: true
-        assembled_assy_part_02:
-          Value: true
-        assembled_assy_part_02_back_hole:
-          Value: true
-        assembled_assy_part_02_bottom_screw_hole_1:
-          Value: true
-        assembled_assy_part_02_bottom_screw_hole_2:
-          Value: true
-        assembled_assy_part_02_bottom_screw_hole_aligner_1:
-          Value: true
-        assembled_assy_part_02_bottom_screw_hole_aligner_2:
-          Value: true
-        assembled_assy_part_02_motor_screw_hole_1:
-          Value: true
-        assembled_assy_part_02_motor_screw_hole_2:
-          Value: true
-        assembled_assy_part_02_motor_screw_hole_3:
-          Value: true
-        assembled_assy_part_02_motor_screw_hole_4:
-          Value: true
-        assembled_assy_part_02_motor_screw_hole_5:
-          Value: true
-        assembled_assy_part_02_motor_screw_hole_6:
-          Value: true
-        assembled_assy_part_03:
-          Value: true
-        assembled_assy_part_03_bottom_screw_hole_1:
-          Value: true
-        assembled_assy_part_03_bottom_screw_hole_2:
-          Value: true
-        assembled_assy_part_03_bottom_screw_hole_aligner_1:
-          Value: true
-        assembled_assy_part_03_bottom_screw_hole_aligner_2:
-          Value: true
-        assembled_assy_part_03_front_hole:
-          Value: true
-        assembled_assy_part_03_pulley_ridge_bottom:
-          Value: true
-        assembled_assy_part_03_pulley_ridge_middle:
-          Value: true
-        assembled_assy_part_03_pulley_ridge_top:
-          Value: true
-        assembled_assy_part_04:
-          Value: true
-        assembled_assy_part_04_inserted_02:
-          Value: true
-        assembled_assy_part_04_inserted_13:
-          Value: true
-        assembled_assy_part_04_tip:
-          Value: true
-        assembled_assy_part_05:
-          Value: true
-        assembled_assy_part_05_center:
-          Value: true
-        assembled_assy_part_07:
-          Value: true
-        assembled_assy_part_07_back_hole:
-          Value: true
-        assembled_assy_part_07_back_tip:
-          Value: true
-        assembled_assy_part_07_front_hole:
-          Value: true
-        assembled_assy_part_07_inserted:
-          Value: true
-        assembled_assy_part_07_screw_hole_1:
-          Value: true
-        assembled_assy_part_07_screw_hole_2:
-          Value: true
-        assembled_assy_part_07_screw_hole_3:
-          Value: true
-        assembled_assy_part_07_screw_hole_4:
-          Value: true
-        assembled_assy_part_08:
-          Value: true
-        assembled_assy_part_08_back_tip:
-          Value: true
-        assembled_assy_part_08_front_tip:
-          Value: true
-        assembled_assy_part_08_inserted:
-          Value: true
-        assembled_assy_part_09:
-          Value: true
-        assembled_assy_part_09_inner_surface:
-          Value: true
-        assembled_assy_part_09_screw_hole:
-          Value: true
-        assembled_assy_part_10:
-          Value: true
-        assembled_assy_part_10_center:
-          Value: true
-        assembled_assy_part_11:
-          Value: true
-        assembled_assy_part_11_back_hole:
-          Value: true
-        assembled_assy_part_11_front_hole:
-          Value: true
-        assembled_assy_part_11_screw_head_1:
-          Value: true
-        assembled_assy_part_11_screw_head_2:
-          Value: true
-        assembled_assy_part_12:
-          Value: true
-        assembled_assy_part_12_center:
-          Value: true
-        assembled_assy_part_13:
-          Value: true
-        assembled_assy_part_13_center:
-          Value: true
-        assembled_assy_part_13_screw_head:
-          Value: true
-        assembled_assy_part_14:
-          Value: true
-        assembled_assy_part_14_screw_head:
-          Value: true
-        assembled_assy_part_14_screw_inserted:
-          Value: true
-        assembled_assy_part_14_screw_tip:
-          Value: true
-        assembled_assy_part_15:
-          Value: true
-        assembled_assy_part_15_center:
-          Value: true
-        assembled_assy_part_16:
-          Value: true
-        assembled_assy_part_16_center:
+        a_phoxi_m_sensor:
           Value: true
         b_bot_base:
           Value: true
         b_bot_base_link:
           Value: true
         b_bot_base_smfl:
-          Value: true
-        b_bot_cam_holder_link:
-          Value: true
-        b_bot_camera_depth_frame:
-          Value: true
-        b_bot_camera_depth_optical_frame:
-          Value: true
-        b_bot_camera_fisheye_frame:
-          Value: true
-        b_bot_camera_fisheye_optical_frame:
-          Value: true
-        b_bot_camera_left_ir_frame:
-          Value: true
-        b_bot_camera_left_ir_optical_frame:
-          Value: true
-        b_bot_camera_link:
-          Value: true
-        b_bot_camera_right_ir_frame:
           Value: true
         b_bot_ee_link:
           Value: true
@@ -2045,11 +1463,17 @@ Visualization Manager:
           Value: true
         b_bot_robotiq_85_tip_link:
           Value: true
+        b_bot_screw_tool_m3_tip_link:
+          Value: true
+        b_bot_screw_tool_m4_tip_link:
+          Value: true
         b_bot_screw_tool_m6_tip_link:
           Value: true
         b_bot_shoulder_link:
           Value: true
         b_bot_tool0:
+          Value: true
+        b_bot_tool0_controller:
           Value: true
         b_bot_upper_arm_link:
           Value: true
@@ -2059,11 +1483,33 @@ Visualization Manager:
           Value: true
         b_bot_wrist_3_link:
           Value: true
+        belt_placement_tool:
+          Value: true
         c_bot_base:
           Value: true
         c_bot_base_link:
           Value: true
         c_bot_base_smfl:
+          Value: true
+        c_bot_cam_holder_link:
+          Value: true
+        c_bot_camera_depth_frame:
+          Value: true
+        c_bot_camera_depth_optical_frame:
+          Value: true
+        c_bot_camera_fisheye_frame:
+          Value: true
+        c_bot_camera_fisheye_optical_frame:
+          Value: true
+        c_bot_camera_left_ir_frame:
+          Value: true
+        c_bot_camera_left_ir_optical_frame:
+          Value: true
+        c_bot_camera_link:
+          Value: true
+        c_bot_camera_right_ir_frame:
+          Value: true
+        c_bot_camera_right_ir_optical_frame:
           Value: true
         c_bot_ee_link:
           Value: true
@@ -2091,11 +1537,19 @@ Visualization Manager:
           Value: true
         c_bot_robotiq_85_tip_link:
           Value: true
+        c_bot_robotiq_85_tip_rotation_helper_link:
+          Value: true
+        c_bot_screw_tool_m3_tip_link:
+          Value: true
+        c_bot_screw_tool_m4_tip_link:
+          Value: true
         c_bot_screw_tool_m6_tip_link:
           Value: true
         c_bot_shoulder_link:
           Value: true
         c_bot_tool0:
+          Value: true
+        c_bot_tool0_controller:
           Value: true
         c_bot_upper_arm_link:
           Value: true
@@ -2105,7 +1559,13 @@ Visualization Manager:
           Value: true
         c_bot_wrist_3_link:
           Value: true
-        camera_right_ir_optical_frame:
+        m3_feeder_link:
+          Value: true
+        m3_feeder_outlet_link:
+          Value: true
+        m4_feeder_link:
+          Value: true
+        m4_feeder_outlet_link:
           Value: true
         mat:
           Value: true
@@ -2141,7 +1601,9 @@ Visualization Manager:
           Value: true
         mat_part6:
           Value: true
-        mat_part7:
+        mat_part7_1:
+          Value: true
+        mat_part7_2:
           Value: true
         mat_part8:
           Value: true
@@ -2199,9 +1661,9 @@ Visualization Manager:
           Value: true
         taskboard_part6_small_pulley:
           Value: true
-        taskboard_part7a:
+        taskboard_part7_1:
           Value: true
-        taskboard_part7b:
+        taskboard_part7_2:
           Value: true
         taskboard_part8:
           Value: true
@@ -2209,7 +1671,9 @@ Visualization Manager:
           Value: true
         taskboard_surface:
           Value: true
-        workbox:
+        workbox1:
+          Value: true
+        workbox2:
           Value: true
         workspace_center:
           Value: true
@@ -2225,7 +1689,8 @@ Visualization Manager:
           o2as_ground:
             a_bot_base_link:
               a_bot_base:
-                {}
+                a_bot_tool0_controller:
+                  {}
               a_bot_shoulder_link:
                 a_bot_upper_arm_link:
                   a_bot_forearm_link:
@@ -2241,28 +1706,19 @@ Visualization Manager:
                               {}
             a_bot_base_smfl:
               {}
+            a_phoxi_m_camera:
+              a_phoxi_m_sensor:
+                a_phoxi_m_camera_link:
+                  {}
             b_bot_base_link:
               b_bot_base:
-                {}
+                b_bot_tool0_controller:
+                  {}
               b_bot_shoulder_link:
                 b_bot_upper_arm_link:
                   b_bot_forearm_link:
                     b_bot_wrist_1_link:
                       b_bot_wrist_2_link:
-                        b_bot_cam_holder_link:
-                          b_bot_camera_link:
-                            b_bot_camera_depth_frame:
-                              b_bot_camera_depth_optical_frame:
-                                {}
-                              b_bot_camera_fisheye_frame:
-                                b_bot_camera_fisheye_optical_frame:
-                                  {}
-                              b_bot_camera_left_ir_frame:
-                                b_bot_camera_left_ir_optical_frame:
-                                  {}
-                              b_bot_camera_right_ir_frame:
-                                camera_right_ir_optical_frame:
-                                  {}
                         b_bot_wrist_3_link:
                           b_bot_ee_link:
                             b_bot_ft300_link:
@@ -2281,6 +1737,10 @@ Visualization Manager:
                                 b_bot_robotiq_85_right_finger_link:
                                   {}
                               b_bot_robotiq_85_tip_link:
+                                b_bot_screw_tool_m3_tip_link:
+                                  {}
+                                b_bot_screw_tool_m4_tip_link:
+                                  {}
                                 b_bot_screw_tool_m6_tip_link:
                                   {}
                           b_bot_tool0:
@@ -2289,12 +1749,27 @@ Visualization Manager:
               {}
             c_bot_base_link:
               c_bot_base:
-                {}
+                c_bot_tool0_controller:
+                  {}
               c_bot_shoulder_link:
                 c_bot_upper_arm_link:
                   c_bot_forearm_link:
                     c_bot_wrist_1_link:
                       c_bot_wrist_2_link:
+                        c_bot_cam_holder_link:
+                          c_bot_camera_link:
+                            c_bot_camera_depth_frame:
+                              c_bot_camera_depth_optical_frame:
+                                {}
+                              c_bot_camera_fisheye_frame:
+                                c_bot_camera_fisheye_optical_frame:
+                                  {}
+                              c_bot_camera_left_ir_frame:
+                                c_bot_camera_left_ir_optical_frame:
+                                  {}
+                              c_bot_camera_right_ir_frame:
+                                c_bot_camera_right_ir_optical_frame:
+                                  {}
                         c_bot_wrist_3_link:
                           c_bot_ee_link:
                             c_bot_ft300_link:
@@ -2313,11 +1788,22 @@ Visualization Manager:
                                 c_bot_robotiq_85_right_finger_link:
                                   {}
                               c_bot_robotiq_85_tip_link:
-                                c_bot_screw_tool_m6_tip_link:
-                                  {}
+                                c_bot_robotiq_85_tip_rotation_helper_link:
+                                  c_bot_screw_tool_m3_tip_link:
+                                    {}
+                                  c_bot_screw_tool_m4_tip_link:
+                                    {}
+                                  c_bot_screw_tool_m6_tip_link:
+                                    {}
                           c_bot_tool0:
                             {}
             c_bot_base_smfl:
+              m3_feeder_link:
+                m3_feeder_outlet_link:
+                  {}
+              m4_feeder_link:
+                m4_feeder_outlet_link:
+                  {}
               screw_tool_holder:
                 screw_tool_m3_link:
                   screw_tool_m3_helper_link:
@@ -2328,10 +1814,18 @@ Visualization Manager:
                 screw_tool_m6_link:
                   screw_tool_m6_helper_link:
                     {}
-            workbox:
+            workbox1:
+              {}
+            workbox2:
               {}
             workspace_center:
               taskboard:
+                M10nut_tool:
+                  {}
+                Peg_tool:
+                  {}
+                belt_placement_tool:
+                  {}
                 mat:
                   mat_corner1:
                     {}
@@ -2365,7 +1859,9 @@ Visualization Manager:
                     {}
                   mat_part6:
                     {}
-                  mat_part7:
+                  mat_part7_1:
+                    {}
+                  mat_part7_2:
                     {}
                   mat_part8:
                     {}
@@ -2406,9 +1902,9 @@ Visualization Manager:
                     {}
                   taskboard_part6_small_pulley:
                     {}
-                  taskboard_part7a:
+                  taskboard_part7_1:
                     {}
-                  taskboard_part7b:
+                  taskboard_part7_2:
                     {}
                   taskboard_part8:
                     {}
@@ -2421,7 +1917,7 @@ Visualization Manager:
       Marker Topic: visualization_marker
       Name: Marker
       Namespaces:
-        {}
+        markers: true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -2449,37 +1945,37 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.03986597
+      Distance: 0.796723366
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.00773345213
-        Y: -0.0451692827
-        Z: 1.16966021
+        X: 0.101962291
+        Y: 0.027113976
+        Z: 0.974879801
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.480398238
+      Pitch: 0.320398182
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 6.17857695
+      Yaw: 6.23039913
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1056
+  Height: 1028
   Hide Left Dock: false
   Hide Right Dock: true
   MotionPlanning:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd000000040000000000000280000003ccfc020000000cfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003a00000165000000c600fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000120020002d00200053006c00690064006500720000000000ffffffff0000000000000000fb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e006701000001a5000002610000016b00fffffffb0000002e004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d00200053006c00690064006500720000000000ffffffff0000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000003e00ffffff000000010000010f000003ccfc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003a000003cc0000009e00fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000074f0000003efc0100000002fb0000000800540069006d006500000000000000074f0000024400fffffffb0000000800540069006d00650100000000000004500000000000000000000004b9000003cc00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd000000040000000000000280000003b0fc020000000cfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003a0000015b000000c600fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000120020002d00200053006c00690064006500720000000000ffffffff0000000000000000fb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e0067010000019b0000024f0000016b00fffffffb0000002e004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d00200053006c00690064006500720000000000ffffffff0000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000003e00ffffff000000010000010f000003ccfc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003a000003cc0000009e00fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000074f0000003efc0100000002fb0000000800540069006d006500000000000000074f0000024400fffffffb0000000800540069006d00650100000000000004500000000000000000000004b9000003b000000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:

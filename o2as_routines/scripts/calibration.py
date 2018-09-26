@@ -291,9 +291,9 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, "a_bot", speed=0.08)
     return
 
-  def taskboard_calibration_extended(self):
+  def taskboard_calibration_extended(self, robot_name = "a_bot"):
     rospy.loginfo("============ Demonstrating the calibration of the taskboard. ============")
-    rospy.loginfo("This moves a_bot to the top of the parts pre-mounted in the taskboard.")
+    rospy.loginfo("This moves " + robot_name + " to the top of the parts pre-mounted in the taskboard.")
     poses = []
 
     pose0 = geometry_msgs.msg.PoseStamped()
@@ -303,24 +303,36 @@ class CalibrationClass(O2ASBaseRoutines):
     # On top of the metal sheet
     pose0 = copy.deepcopy(pose0)
 
-    for i in range(5):
-      poses.append(copy.deepcopy(pose0))
+    if robot_name == "a_bot":
+      for i in range(5):
+        poses.append(copy.deepcopy(pose0))
 
-    poses[0].header.frame_id = "taskboard_part7_2"
-    poses[0].pose.position.y = .0015
-    poses[0].pose.position.z = .0253 + 0.0
-    poses[1].header.frame_id = "taskboard_part8"
-    poses[2].header.frame_id = "taskboard_part9"
-    poses[3].header.frame_id = "taskboard_part14"
-    poses[4].header.frame_id = "taskboard_part5"
-    
-    self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
+      poses[0].header.frame_id = "taskboard_part7_2"
+      poses[0].pose.position.y = .0015
+      poses[0].pose.position.z = .0253 + 0.0
+      poses[1].header.frame_id = "taskboard_part8"
+      poses[2].header.frame_id = "taskboard_part9"
+      poses[3].header.frame_id = "taskboard_part14"
+      poses[4].header.frame_id = "taskboard_part5"
+
+      self.cycle_through_calibration_poses(poses, robot_name, speed=0.3)
+    elif robot_name == "c_bot":
+      for i in range(4):
+        poses.append(copy.deepcopy(pose0))
+
+      poses[0].header.frame_id = "taskboard_part8"
+      poses[1].header.frame_id = "taskboard_part9"
+      poses[2].header.frame_id = "taskboard_part14"
+      poses[3].header.frame_id = "taskboard_part5"
+
+      self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, move_lin = True)
     return
 
-  def taskboard_calibration_mat(self, extended = False):
+  def taskboard_calibration_mat(self, extended = False, robot_name = "a_bot"):
     rospy.loginfo("============ Calibrating placement mat for the taskboard task. ============")
     rospy.loginfo("a_bot gripper tip should be 3 mm above the surface.")
     self.go_to_named_pose("home", "a_bot", speed=0.1)
+    self.go_to_named_pose("home", "b_bot", speed=0.1)
     poses = []
 
     pose0 = geometry_msgs.msg.PoseStamped()
@@ -333,7 +345,7 @@ class CalibrationClass(O2ASBaseRoutines):
       poses[0].header.frame_id = "mat_part15"
       poses[1].header.frame_id = "mat_part7_1"
       poses[2].header.frame_id = "mat_part3"
-      self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
+      self.cycle_through_calibration_poses(poses, robot_name, speed=0.3)
     else:
       pose0.pose.position.z = .005
       for i in range(16):
@@ -358,8 +370,8 @@ class CalibrationClass(O2ASBaseRoutines):
       # above_mat = copy.deepcopy(pose0)
       # above_mat.header.frame_id = "mat"
       # above_
-      # self.go_to_pose_goal("a_bot", ,speed=.1, move_lin = True)
-      self.cycle_through_calibration_poses(poses, "a_bot", speed=0.05, go_home=False, move_lin=True)
+      # self.go_to_pose_goal(robot_name, ,speed=.1, move_lin = True)
+      self.cycle_through_calibration_poses(poses, robot_name, speed=0.05, go_home=False, move_lin=True)
     return 
 
   def gripper_frame_calibration(self):
@@ -855,8 +867,10 @@ if __name__ == '__main__':
       rospy.loginfo("15: Align c/b grippers part 3 (high up)")
       rospy.loginfo("2: Taskboard")
       rospy.loginfo("21: Taskboard extended fun tour")
+      rospy.loginfo("211: Taskboard extended with b_bot")
       rospy.loginfo("22: Placement mat (for the taskboard task)")
       rospy.loginfo("23: Placement mat extended (for the taskboard task)")
+      rospy.loginfo("231: Placement mat extended with b_bot")
       rospy.loginfo("24: a_bot gripper frame (rotate around EEF axis on taskboard)")
       rospy.loginfo("3: TODO: Kitting bins")
       rospy.loginfo("4: Parts tray tests (assembly/kitting)")
@@ -907,10 +921,14 @@ if __name__ == '__main__':
         c.taskboard_calibration()
       elif r == '21':
         c.taskboard_calibration_extended()
+      elif r == '211':
+        c.taskboard_calibration_extended("b_bot")
       elif r == '22':
         c.taskboard_calibration_mat()
       elif r == '23':
         c.taskboard_calibration_mat(extended=True)
+      elif r == '231':
+        c.taskboard_calibration_mat(extended=True, robot_name="b_bot")
       elif r == '24':
         c.gripper_frame_calibration()
       elif r == '3':
