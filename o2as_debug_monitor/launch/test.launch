@@ -38,5 +38,10 @@
         col: [16, 23]
         row: [10, 19]
         offset: [8, 32]
+    string_topics:
+      state:
+        topic_name: /o2as_state
+        col: [0, 31]
+        row: [19, 19]
   </rosparam>
 </launch>

@@ -15,6 +15,8 @@ using ImageCallback =
   boost::function<void(const sensor_msgs::ImageConstPtr&)>;
 using CamInfoCallback =
   boost::function<void(const sensor_msgs::CameraInfoConstPtr&)>;
+using StringCallback =
+  boost::function<void(const std_msgs::String::ConstPtr&)>;
 
 namespace o2as_debug_monitor
 {
@@ -70,7 +72,7 @@ namespace o2as_debug_monitor
     getCallbackForCameraInfo(cv::Rect rect, XmlRpc::XmlRpcValue &params,
       cv::Mat& monitor_)
   {
-    // Vavlues captured by closure
+    // Values captured by closure
     int offset_x = params["offset"][0];
     int offset_y = params["offset"][1];
 
@@ -98,6 +100,30 @@ namespace o2as_debug_monitor
     };
   }
 
+  boost::function<void(const std_msgs::String::ConstPtr& msg)>
+    getCallbackForString(cv::Rect rect, XmlRpc::XmlRpcValue &params,
+      cv::Mat& monitor_)
+  {
+    // Values captured by closure
+    int offset_x = params["offset"][0];
+    int offset_y = params["offset"][1];
+
+    // This function returns callback function
+    return [=](const std_msgs::String::ConstPtr& msg) {
+      // Show window at the first time
+      if (!cvGetWindowHandle("Monitor")) {
+        cv::namedWindow("Monitor", cv::WINDOW_NORMAL);
+        cv::moveWindow("Monitor", 128, 128);
+      }
+
+      // TODO: need to erase previous message from the image buffer?
+      std::string text = std::to_string(msg->data);
+      cv::Point point(rect.x + offset_x, rect.y + offset_y);
+      cv::putText(monitor_, text, point, font_face_, 2 * font_scale_,
+                  cv::Scalar(255, 255, 255), font_thick_, font_ltype_);
+    };
+  }
+
   class Monitor
   {
     public:
@@ -120,6 +146,11 @@ namespace o2as_debug_monitor
         XmlRpc::XmlRpcValue caminfo_topics;
         nh.getParam("o2as_debug_monitor/caminfo_topics", caminfo_topics);
         setCameraInfoCallbacks(nh, caminfo_topics);
+
+        // Set callback functions for String topics
+        XmlRpc::XmlRpcValue string_topics;
+        nh.getParam("o2as_debug_monitor/string_topics", string_topics);
+        setStringCallbacks(nh, string_topics);
       }
 
     private:
@@ -127,6 +158,7 @@ namespace o2as_debug_monitor
       std::vector<ros::Subscriber> n_sub_rs_;
       std::vector<ImageCallback> imgcbs_;
       std::vector<CamInfoCallback> caminfocbs_;
+      std::vector<StringCallback> stringcbs_;
 
       cv::Mat monitor_;
 
@@ -201,6 +233,26 @@ namespace o2as_debug_monitor
             getCallbackForCameraInfo(rect, params, monitor_)
           );
           n_sub_rs_.push_back(nh.subscribe(topic_name, 1, caminfocbs_.back()));
+        }
+      }
+
+      void setStringCallbacks(ros::NodeHandle &nh,
+                              XmlRpc::XmlRpcValue string_topics)
+      {
+        for (auto it = string_topics.begin(); it != string_topics.end(); it++)
+        {
+          auto params = string_topics[it->first];
+          std::string topic_name = params["topic_name"];
+          ROS_INFO("%s", topic_name.c_str());
+
+          // Area in the debug monitor
+          cv::Rect rect = getRect(params);
+
+          // Create, set and keep callback function
+          stringcbs_.push_back(
+            getCallbackForString(rect, params, monitor_)
+          );
+          n_sub_rs_.push_back(nh.subscribe(topic_name, 1, stringcbs_.back()));
         }
       }
   };
