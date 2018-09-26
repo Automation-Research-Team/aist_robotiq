@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<!-- This script launch nodelet manager and o2as_debug_monitor -->
+<launch>
+  <!-- Nodelet manager -->
+  <node pkg="nodelet" type="nodelet" name="standalone_nodelet" args="manager"
+        output="screen"/>
+
+  <!-- o2as_debug_monitor -->
+  <node pkg="nodelet" type="nodelet" name="o2as_debug_monitor"
+        args="load o2as_debug_monitor/O2asDebugMonitor standalone_nodelet"
+        output="screen">
+    <!--<remap from="/Plus/out" to="remapped_output"/>-->
+  </node>
+
+  <rosparam>
+  o2as_debug_monitor:
+    global:
+      width: 1920
+      height: 1200
+      n_cols: 32
+      n_rows: 20
+    image_topics:
+      realsense:
+        topic_name: /b_bot_camera/rgb/image_raw
+        col: [0, 15]
+        row: [0, 9]
+      realsense2:
+        topic_name: /b_bot_camera/rgb/image_raw
+        col: [16, 23]
+        row: [0, 4]
+      phoxi_texture:
+        topic_name: /a_phoxi_m_camera/texture
+        col: [0, 15]
+        row: [10, 19]
+    caminfo_topics:
+      phoxi_caminfo:
+        topic_name: /a_phoxi_m_camera/camera_info
+        col: [16, 23]
+        row: [10, 19]
+        offset: [8, 32]
+  </rosparam>
+</launch>
