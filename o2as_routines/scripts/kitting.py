@@ -192,11 +192,24 @@ class KittingClass(O2ASBaseRoutines):
       rospy.logdebug("Couldn't pick the target using suction.")
       return False
   
+  def view_bin(self, group_name, bin_id, speed_fast = 1.0, speed_slow = 1.0, end_effector_link = ""):
+    # TODO: adjust the x,z and end effector orientatio for optimal view of the bin to use with the  \search_grasp service
+    goal_pose = geometry_msgs.msg.PoseStamped()
+    goal_pose.header.frame_id = bin_id
+    goal_pose.pose.position.x = 0.1
+    goal_pose.pose.position.y = 0
+    goal_pose.pose.position.z = 0.05
+    goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+    res = self.move_lin(group_name, goal_pose, speed_slow, end_effector_link)
+    if not res:
+      rospy.logdebug("Couldn't go to the target.")
+      return False
+
   def pick_using_precision_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = ""):
     # TODO: here is for Osaka Univ.
     pass
 
-  def place_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = "")
+  def place_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = ""):
     rospy.loginfo("Go to the target.")
     res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link)
     if not res:
@@ -207,7 +220,7 @@ class KittingClass(O2ASBaseRoutines):
     if not res:
       return False
 
-  def place_using_precision_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link ="")
+  def place_using_precision_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link =""):
     # TODO: here is for Osaka Univ.
     pass
 
@@ -217,9 +230,9 @@ class KittingClass(O2ASBaseRoutines):
     pose_goal_above = copy.deepcopy(pose_goal_stamped)
     pose_goal_above.pose.position.z = approach_height
     res = self.move_lin(group_name, pose_goal_above, speed_fast, end_effector_link)
-      if not res:
-        rospy.logdebug("Couldn't go to above the target bin.")
-        return False
+    if not res:
+      rospy.logdebug("Couldn't go to above the target bin.")
+      return False
 
     if end_effector_link == "dual_suction_gripper_pad_link":
       self.pick_using_dual_suction_gripper(group_name, pose_goal_stamped, speed_slow, end_effector_link, approach_height)
@@ -351,14 +364,15 @@ class KittingClass(O2ASBaseRoutines):
   
   def kitting_task(self):
     # self.go_to_named_pose("home", "c_bot")
-    self.go_to_named_pose("home", "b_bot")
-    # self.go_to_named_pose("home", "a_bot")
+    # self.go_to_named_pose("home", "b_bot")
+    self.go_to_named_pose("home", "a_bot")
 
-    self.pick_and_place_demo()
+    #self.pick_and_place_demo()
+    self.view_bin("a_bot", "set2_bin1_3")
 
     # self.go_to_named_pose("home", "c_bot")
-    self.go_to_named_pose("home", "b_bot")
-    # self.go_to_named_pose("home", "a_bot")
+    # self.go_to_named_pose("home", "b_bot")
+    self.go_to_named_pose("home", "a_bot")
 
     # TODO
 
