@@ -93,6 +93,7 @@ protected:
         cloud_t* point_cloud_msg = NULL);
     void publishFrameCallback(ros::TimerEvent const &);
     void publishCameraInfo();
+    void publishInfoCallback(ros::TimerEvent const &);
 
     /// Dump
     float* getPointCloud2(cv::Mat& cv_depth_image);
@@ -154,6 +155,7 @@ private:
     bool send_cloud_;
     /// Timer to trigger frame publishing.
     ros::Timer publish_frame_timer_;
+    ros::Timer publish_info_timer_;
     /// Object for handling transportation of images.
     image_transport::ImageTransport image_transport_;
 

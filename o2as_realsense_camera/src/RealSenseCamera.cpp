@@ -190,6 +190,8 @@ bool RealSenseCamera::activate()
 
     // start image publishing timer
     publish_frame_timer_ = nh_.createTimer(ros::Rate(30), &RealSenseCamera::publishFrameCallback, this);
+    publish_info_timer_ = nh_.createTimer(ros::Rate(30), &RealSenseCamera::publishInfoCallback, this);
+    publish_info_timer_.start();
     setTriggerMode(trigger_mode_);
     active_ = true;
     return true;
@@ -354,8 +356,6 @@ inline void RealSenseCamera::publishFrame(
     image_t* depth_image_msg, 
     cloud_t* point_cloud_msg) 
 {
-    publishCameraInfo();
-    publishStaticTransforms();
     if (color_image_msg) {
         publishers_.color_image.publish(*color_image_msg);
     }
@@ -474,11 +474,11 @@ void toRosCameraInfo(rs2_intrinsics i, cinfo_t& cinfo)
 
     // Set 3x4 camera matrix.
     std::fill(std::begin(cinfo.P), std::end(cinfo.P), 0.0);
-    cinfo.P[0] = i.fx;
-    cinfo.P[2] = i.ppx;
-    cinfo.P[4] = i.fy;
-    cinfo.P[5] = i.ppy;
-    cinfo.P[8] = 1.0;
+    cinfo.P[0]  = i.fx;
+    cinfo.P[2]  = i.ppx;
+    cinfo.P[5]  = i.fy;
+    cinfo.P[6]  = i.ppy;
+    cinfo.P[10] = 1.0;
 
     // No binning
     cinfo.binning_x = cinfo.binning_y = 0;
@@ -502,6 +502,12 @@ void RealSenseCamera::publishCameraInfo()
     depth_cinfo.header.frame_id = "camera_depth_optical_frame";
     toRosCameraInfo(getColorCameraIntrinsics(), depth_cinfo);
     publishers_.depth_camera_info.publish(depth_cinfo);
+}
+
+void RealSenseCamera::publishInfoCallback(ros::TimerEvent const &) 
+{
+    publishCameraInfo();
+    publishStaticTransforms();
 }
 
 //###################################################### 
