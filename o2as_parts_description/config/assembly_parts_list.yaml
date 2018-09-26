@@ -99,3 +99,13 @@ parts_list:
     type: 99_holder
     cad: 99_holder.stl
     description: Holder
+  - id: 100
+    name: robotiq_calib_marker
+    type: 100-ROBOTIQ_CALIB_MARKER
+    cad: 100-ROBOTIQ_CALIB_MARKER.stl
+    description: Calilbration marker for ROBOTIQ gripper
+  - id: 101
+    name: suction_calib_marker
+    type: 101-SUCTION_CALIB_MARKER
+    cad: 101-SUCTION_CALIB_MARKER.stl
+    description: Calilbration marker for suction gripper
