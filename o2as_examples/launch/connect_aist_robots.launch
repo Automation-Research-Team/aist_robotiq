@@ -7,6 +7,9 @@
   <!-- Publish robot model -->
   <include file="$(find o2as_scene_description)/launch/o2as_base_scene_upload.launch" />
 
+  <!-- Required for the UR scripts to be sent -->
+  <param name="use_real_robot" type="bool" value="true" />
+
   <!-- robot_ip: IP-address of the robot's socket-messaging server -->
   <!-- <arg name="robot_ip_a" default="10.66.171.51"/> -->
   <arg name="robot_ip_b" default="10.66.171.51"/>
