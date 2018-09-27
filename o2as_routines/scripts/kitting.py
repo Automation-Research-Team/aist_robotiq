@@ -192,15 +192,19 @@ class KittingClass(O2ASBaseRoutines):
       rospy.logdebug("Couldn't pick the target using suction.")
       return False
   
-  def view_bin(self, group_name, bin_id, speed_fast = 1.0, speed_slow = 1.0, end_effector_link = ""):
+  def view_bin(self, group_name, bin_id, speed_fast = 1.0, speed_slow = 1.0, bin_eff_height = 0.3, bin_eff_xoff = 0, bin_eff_deg_angle = 20,end_effector_link = ""):
     # TODO: adjust the x,z and end effector orientatio for optimal view of the bin to use with the  \search_grasp service
     goal_pose = geometry_msgs.msg.PoseStamped()
     goal_pose.header.frame_id = bin_id
-    goal_pose.pose.position.x = 0.1
+    goal_pose.pose.position.x = bin_eff_xoff
     goal_pose.pose.position.y = 0
-    goal_pose.pose.position.z = 0.05
-    goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
-    res = self.move_lin(group_name, goal_pose, speed_slow, end_effector_link)
+    goal_pose.pose.position.z = bin_eff_height
+    #goal orientation for a_bot_camera_depth_frame 
+    #goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2 + 20*pi/180, 0))
+    #res = self.go_to_pose_goal(group_name, goal_pose, speed_slow, "a_bot_camera_depth_frame")
+    #goal orientation for gripper
+    goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 + 20*pi/180, 0))
+    res = self.move_lin(group_name, goal_pose, speed_slow, "")
     if not res:
       rospy.logdebug("Couldn't go to the target.")
       return False
@@ -368,11 +372,11 @@ class KittingClass(O2ASBaseRoutines):
     self.go_to_named_pose("home", "a_bot")
 
     #self.pick_and_place_demo()
-    self.view_bin("a_bot", "set2_bin1_3")
+    self.view_bin("a_bot", "set2_bin1_2")
 
     # self.go_to_named_pose("home", "c_bot")
     # self.go_to_named_pose("home", "b_bot")
-    self.go_to_named_pose("home", "a_bot")
+    # self.go_to_named_pose("home", "a_bot")
 
     # TODO
 
