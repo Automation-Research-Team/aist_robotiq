@@ -150,8 +150,8 @@ Plane<T, N>::fit(ITER begin, ITER end)
     const auto	ext   =	[](const auto& x)
 			{
 			    matrix_type	y;
-			    for (int i = 0; i < N; ++i)
-				for (int j = 0; j < N; ++j)
+			    for (size_t i = 0; i < N; ++i)
+				for (size_t j = 0; j < N; ++j)
 				    y(i, j) = x(i) * x(j);
 			    return y;
 			};
@@ -186,10 +186,9 @@ Plane<T, N>::fit(ITER begin, ITER end)
 	_d *= -1;
     }
 
-    std::cerr << "plane = " << *this << std::endl
-	      << "  err = " << std::sqrt(evalues(N-1)/value_type(npoints))
-	      << ", computed from " << npoints << " points." << std::endl
-	      << std::endl;
+    ROS_DEBUG_STREAM("plane = " << *this << ", err = "
+		     << std::sqrt(std::abs(evalues(N-1))/value_type(npoints))
+		     << ", computed from " << npoints << " points.");
 }
 
 /************************************************************************
@@ -275,7 +274,7 @@ ArucoSimple::ArucoSimple()
      _image_pub(_it.advertise("result", 1)),
      _cloud_sub(_nh.subscribe("/pointcloud", 1,
 			      &ArucoSimple::cloud_callback, this)),
-     _cloud_pub(_nh.advertise<cloud_t>("pointcloud",  1)),
+     _cloud_pub(_nh.advertise<cloud_t>("pointcloud", 1)),
      _debug_pub(_it.advertise("debug",  1)),
      _pose_pub(_nh.advertise<geometry_msgs::PoseStamped>("pose", 100)),
      _transform_pub(_nh.advertise<geometry_msgs::TransformStamped>(
@@ -323,10 +322,12 @@ ArucoSimple::ArucoSimple()
     if (_reference_frame.empty())
 	_reference_frame = _camera_frame;
 
-    ROS_INFO("Aruco node started with marker size of %f m and marker id to track: %d",
-	     _marker_size, _marker_id);
-    ROS_INFO("Aruco node will publish pose to TF with %s as parent and %s as child.",
-	     _reference_frame.c_str(), _marker_frame.c_str());
+    ROS_INFO_STREAM("Aruco node started with marker size of "
+		    << _marker_size << " m and marker id to track: "
+		    << _marker_id);
+    ROS_INFO_STREAM("Aruco node will publish pose to TF with "
+		    << _reference_frame << " as parent and "
+		    << _marker_frame << " as child.");
 
     _dyn_rec_server.setCallback(boost::bind(&ArucoSimple::reconf_callback,
 					    this, _1, _2));
@@ -353,7 +354,7 @@ ArucoSimple::reconf_callback(ArucoThresholdConfig& config, uint32_t level)
     _mDetector.setThresholdParams(config.param1, config.param2);
 
     if (config.normalizeImage)
-	ROS_WARN("normalizeImageIllumination is unimplemented!");
+	ROS_WARN_STREAM("normalizeImageIllumination is unimplemented!");
 }
 
 void
@@ -385,7 +386,7 @@ ArucoSimple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 	(_marker_pub.getNumSubscribers()    == 0) &&
 	(_pixel_pub.getNumSubscribers()	    == 0))
     {
-	ROS_DEBUG("No subscribers, not looking for aruco markers");
+	ROS_DEBUG_STREAM("No subscribers, not looking for aruco markers");
 	return;
     }
 
@@ -504,12 +505,16 @@ ArucoSimple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
     }
     catch (const cv_bridge::Exception& e)
     {
-	ROS_ERROR("cv_bridge exception: %s", e.what());
+	ROS_ERROR_STREAM("cv_bridge exception: " << e.what());
 	return;
     }
     catch (const std::runtime_error& e)
     {
-	ROS_ERROR("Failed to compute marker plane: %s", e.what());
+	ROS_WARN_STREAM("Failed to compute marker plane: " << e.what());
+    }
+    catch (...)
+    {
+	ROS_ERROR_STREAM("Unknown error");
     }
 }
 
@@ -577,30 +582,56 @@ ArucoSimple::get_marker_transform(const aruco::Marker& marker,
 
   // Select 3D points close to the initial plane within the bounding box.
     points.clear();
-    for (auto v = v0; v <= v1; ++v)
+    try
     {
-	iterator_t	xyz(cloud_msg, "x");
 	rgbiterator_t	rgb(const_cast<cloud_t&>(cloud_msg), "rgb");
-	const auto	idx = cloud_msg.width * v + u0;
-	xyz += idx;
-	rgb += idx;
 	
-	for (auto u = u0; u <= u1; ++u)
+	for (auto v = v0; v <= v1; ++v)
 	{
-	    const auto	point = at<value_t>(cloud_msg, u, v);
-	    
-	    if (!std::isnan(point(2)) && plane.distance(point) < 0.001)
+	    iterator_t		xyz(cloud_msg, "x");
+	    rgbiterator_t	rgb(const_cast<cloud_t&>(cloud_msg), "rgb");
+	    const auto	idx = cloud_msg.width * v + u0;
+	    xyz += idx;
+	    rgb += idx;
+	
+	    for (auto u = u0; u <= u1; ++u)
 	    {
-		points.push_back(point);
-		*rgb = 0xff0000;
+		const auto	point = at<value_t>(cloud_msg, u, v);
+	    
+		if (!std::isnan(point(2)) && plane.distance(point) < 0.001)
+		{
+		    points.push_back(point);
+		    *rgb = 0xff0000;
+		}
+		
+		++xyz;
+		++rgb;
 	    }
-
-	    ++xyz;
-	    ++rgb;
+	}
+    }
+    catch (const std::exception& err)
+    {
+	for (auto v = v0; v <= v1; ++v)
+	{
+	    iterator_t	xyz(cloud_msg, "x");
+	    const auto	idx = cloud_msg.width * v + u0;
+	    xyz += idx;
+	
+	    for (auto u = u0; u <= u1; ++u)
+	    {
+		const auto	point = at<value_t>(cloud_msg, u, v);
+	    
+		if (!std::isnan(point(2)) && plane.distance(point) < 0.001)
+		    points.push_back(point);
+		
+		++xyz;
+	    }
 	}
     }
 
     plane.fit(points.cbegin(), points.cend());
+
+    _cloud_pub.publish(cloud_msg);
 
   // Compute 3D coordinates of marker corners.
     point_t	corners[4];
@@ -614,37 +645,11 @@ ArucoSimple::get_marker_transform(const aruco::Marker& marker,
 			.cross(n);
     const auto	p = c / cv::norm(c);
     const auto	q = n.cross(p);
-  /*
-    std::cerr << marker << std::endl;
-    std::cerr << p.cross(q) - n << ", l = "
-	      << c.dot(p)/4 << std::endl;
-  */
+
   // Compute marker centroid.
     const auto	centroid = 0.25*(corners[0] + corners[1] +
 				 corners[2] + corners[3]);
 
-#if 0
-    std::cerr << "--- compute from matrker ---\n"
-	      << rodrigues(marker.
-	      << tf::Transform(tf::Matrix3x3(-p(0), n(0), q(0),
-					     -p(1), n(1), q(1),
-					     -p(2), n(2), q(2)),
-			       tf::Vector3(centroid(0),
-					   centroid(1), centroid(2)))
-	      << std::endl;
-  */
-    for (int i = 0; i < 4; ++i)
-    {
-	int	j = (i + 1)%4;
-	int	k = (j + 1)%4;
-	std::cerr << "length(" << i << ", " << j << ") = "
-		  << cv::norm(corners[i] - corners[j]) << std::endl;
-	std::cerr << "angle(" << i << ", " << j << ", " << k << ") = "
-		  << angle(corners[i] - corners[j], corners[k] - corners[j])
-		  << std::endl;
-    }
-    _cloud_pub.publish(cloud_msg);
-#endif	
     return tf::Transform(tf::Matrix3x3(-p(0), n(0), q(0),
 				       -p(1), n(1), q(1),
 				       -p(2), n(2), q(2)),
@@ -667,8 +672,20 @@ main(int argc, char** argv)
 {
     ros::init(argc, argv, "aruco_simple");
 
-    aruco_ros::ArucoSimple	node;
-    ros::spin();
-
+    try
+    {
+	aruco_ros::ArucoSimple	node;
+	ros::spin();
+    }
+    catch (const std::exception& err)
+    {
+	ROS_ERROR_STREAM(err.what());
+	return 1;
+    }
+    catch (...)
+    {
+	ROS_ERROR_STREAM("Unknown error.");
+    }
+    
     return 0;
 }
