@@ -70,7 +70,7 @@ class TaskboardClass(O2ASBaseRoutines):
                       "M6 Nut & Bolt", "M12 nut", "6 mm washer", 
                       "10 mm washer", "M3 set screw", "M3 bolt", 
                       "M4 bolt", "Pulley", "10 mm end cap"]
-    self.item_pick_heights = [0.02, 0.02, 0.045,
+    self.item_pick_heights = [0.02, 0.02, 0.042,
                               0.047, 0.072, 0.0, 
                               0.02, 0.02, -0.002, 
                               -0.002, 0.001, 0.02,
@@ -778,7 +778,7 @@ if __name__ == '__main__':
         belt_place_pose.header.frame_id = "taskboard_part6_large_pulley"
         belt_place_pose.pose.position.x = 0.0
         belt_place_pose.pose.position.y = .01
-        belt_place_pose.pose.position.z = .0075
+        belt_place_pose.pose.position.z = .0085
         belt_place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
         taskboard.go_to_pose_goal("b_bot", belt_place_pose, speed=0.1)
         
