@@ -304,7 +304,7 @@ class CalibrationClass(O2ASBaseRoutines):
     pose0 = copy.deepcopy(pose0)
 
     if robot_name == "a_bot":
-      for i in range(5):
+      for i in range(4):
         poses.append(copy.deepcopy(pose0))
 
       poses[0].header.frame_id = "taskboard_part7_2"
@@ -313,7 +313,6 @@ class CalibrationClass(O2ASBaseRoutines):
       poses[1].header.frame_id = "taskboard_part8"
       poses[2].header.frame_id = "taskboard_part9"
       poses[3].header.frame_id = "taskboard_part14"
-      poses[4].header.frame_id = "taskboard_part5"
 
       self.cycle_through_calibration_poses(poses, robot_name, speed=0.3)
     elif robot_name == "c_bot":
@@ -345,7 +344,7 @@ class CalibrationClass(O2ASBaseRoutines):
       poses[0].header.frame_id = "mat_part15"
       poses[1].header.frame_id = "mat_part7_1"
       poses[2].header.frame_id = "mat_part3"
-      self.cycle_through_calibration_poses(poses, robot_name, speed=0.3)
+      self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, move_lin = True)
     else:
       pose0.pose.position.z = .005
       for i in range(16):
