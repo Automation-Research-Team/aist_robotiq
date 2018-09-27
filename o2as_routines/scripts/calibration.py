@@ -642,7 +642,7 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, go_home=False)
     return
 
-  def screw_tool_test_assembly(self, robot_name = "b_bot"):
+  def screw_tool_test_assembly(self, robot_name = "b_bot", tool_name="_screw_tool_m4_tip_link"):
     rospy.loginfo("============ Moving the screw tool m4 to the four corners of the base plate ============")
     rospy.loginfo("============ The screw tool m4 has to be carried by the robot! ============")
     if robot_name=="b_bot":
@@ -668,8 +668,8 @@ class CalibrationClass(O2ASBaseRoutines):
     poses[1].header.frame_id = "assembled_assy_part_01_corner_3"
     poses[2].header.frame_id = "assembled_assy_part_01_corner_4"
     poses[3].header.frame_id = "assembled_assy_part_01_corner_1"
-    
-    self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, go_home=False, move_lin=True, end_effector_link=robot_name + "_screw_tool_m4_tip_link")
+    end_effector_link=robot_name+ tool_name
+    self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, go_home=False, move_lin=True, end_effector_link=end_effector_link)
     return
 
   def tray_screw_calibration(self, robot_name = "b_bot", end_effector_link="", task="assembly"):
@@ -950,6 +950,7 @@ if __name__ == '__main__':
       rospy.loginfo("62: Go to screw holder (with c_bot)")
       rospy.loginfo("63: Go to assembly base plate with m4 screw tool (b_bot; m4 tool has to be equipped)")
       rospy.loginfo("64: Go to assembly base plate with m4 screw tool (c_bot; m4 tool has to be equipped)")
+      rospy.loginfo("641: Go to assembly base plate with m6 nut tool (c_bot; m6 nut tool has to be equipped)")
       rospy.loginfo("65: Go to tray positions with m4 tool for b_bot (tool has to be equipped)")
       rospy.loginfo("66: Go to tray positions with m4 tool for c_bot (tool has to be equipped)")
       rospy.loginfo("67: Pick up screw from tray with b_bot (tool has to be equipped)")
@@ -1037,6 +1038,8 @@ if __name__ == '__main__':
         c.screw_tool_test_assembly(robot_name="b_bot")
       elif r == '64':
         c.screw_tool_test_assembly(robot_name="c_bot")
+      elif r == '641':
+        c.screw_tool_test_assembly(robot_name="c_bot",tool_name="_nut_tool_m6_tip_link")
       elif r == '65':
         c.tray_screw_calibration(robot_name="b_bot", end_effector_link="b_bot_screw_tool_m4_tip_link")
       elif r == '66':
