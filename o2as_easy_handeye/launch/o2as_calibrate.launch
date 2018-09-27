@@ -15,7 +15,8 @@
 
   <!-- Start ArUco -->
   <!-- <node name="aruco_tracker" pkg="aruco_ros" type="single"> -->
-  <node name="aruco_tracker" pkg="o2as_aruco_ros" type="marker_detector">
+  <node name="aruco_tracker" pkg="o2as_aruco_ros" type="marker_detector"
+	output="screen">
     <remap from="/camera_info"	to="/$(arg camera_name)/camera_info"
 	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/image"	to="/$(arg camera_name)/texture"
@@ -39,14 +40,7 @@
   </node>
 
   <!-- Start robot controller -->
-  <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch"
-	   if="$(eval arg('config') == 'sim')">
-    <arg name="sim" value="true"/>
-  </include>
   <include file="$(find o2as_examples)/launch/connect_real_robots.launch"
-	   if="$(eval arg('config') == 'real')">
-  </include>
-  <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch"
 	   if="$(eval arg('config') == 'real')">
   </include>
   <include file="$(find o2as_examples)/launch/connect_aist_robots.launch"
@@ -55,6 +49,12 @@
   <include file="$(find o2as_examples)/launch/connect_osaka_robots.launch"
 	   if="$(eval arg('config') == 'osaka')">
   </include>
+
+  <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch">
+    <arg name="sim" value="true"  if    ="$(eval arg('config') == 'sim')"/>
+    <arg name="sim" value="false" unless="$(eval arg('config') == 'sim')"/>
+  </include>
+  <include file="$(find o2as_skills)/launch/o2as_skill_server.launch"/>
 
   <!-- Start easy_handeye calibrator -->
   <include file="$(find o2as_easy_handeye)/launch/calibrate.launch">

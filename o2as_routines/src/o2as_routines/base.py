@@ -275,7 +275,7 @@ class O2ASBaseRoutines(object):
     wpose2 = group.get_current_pose().pose
     # rospy.loginfo("Wpose2:")
     # rospy.loginfo(wpose2)
-    waypoints.append(wpose2)
+    # waypoints.append(wpose2)
     pose_goal_world = self.listener.transformPose("world", pose_goal_stamped).pose
     waypoints.append(pose_goal_world)
     (plan, fraction) = group.compute_cartesian_path(
