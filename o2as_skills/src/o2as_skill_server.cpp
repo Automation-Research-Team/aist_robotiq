@@ -648,13 +648,20 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     ps_approach.pose.position.x = -.04;
     ps_approach.pose.position.y = -.002;  // ATTENTION: MAGIC NUMBER!
     ps_approach.pose.position.z = .07;
+    if (screw_tool_id == "nut_tool_m6")
+      ps_approach.pose.position.z = .09;
     ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, M_PI/2, 0);
 
     ps_tool_holder = ps_approach;
     ps_tool_holder.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, M_PI/4, 0);
-    if (equip)        ps_tool_holder.pose.position.x = 0.025;
-    else if (unequip) ps_tool_holder.pose.position.x = 0.024;  
+    ps_tool_holder.pose.position.x = 0.025;
     ps_tool_holder.pose.position.z = .003;
+    if (screw_tool_id == "nut_tool_m6") {
+      ps_tool_holder.pose.position.x = 0.01;
+      ps_tool_holder.pose.position.z = .015;
+    }
+    if (unequip) ps_tool_holder.pose.position.x -= 0.001;  
+    
     
     ps_move_away = ps_tool_holder;
     ps_move_away.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, M_PI/2, 0);
