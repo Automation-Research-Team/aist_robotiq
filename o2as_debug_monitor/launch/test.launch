@@ -31,17 +31,25 @@
       phoxi_texture:
         topic_name: /a_phoxi_m_camera/texture
         col: [0, 15]
-        row: [10, 19]
+        row: [10, 17]
     caminfo_topics:
       phoxi_caminfo:
         topic_name: /a_phoxi_m_camera/camera_info
         col: [16, 23]
-        row: [10, 19]
+        row: [10, 17]
         offset: [8, 32]
     string_topics:
       state:
         topic_name: /o2as_state
         col: [0, 31]
-        row: [19, 19]
+        row: [18, 19]
+        offset: [8, 32]
+        n_history: 4
   </rosparam>
+
+    <!-- ROS node for test, publishes test messages -->
+  <node pkg="o2as_debug_monitor" type="test_debug_monitor.py"
+        name="test_debug_monitor" output="screen">
+    <!--<remap from="/Plus/out" to="remapped_output"/>-->
+  </node>
 </launch>

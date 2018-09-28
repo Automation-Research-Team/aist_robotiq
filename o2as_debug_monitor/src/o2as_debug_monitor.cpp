@@ -1,6 +1,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <iostream>
+#include <deque>
+#include <chrono>
 #include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
 #include <ros/ros.h>
@@ -20,112 +22,150 @@ using CamInfoCallback =
 using StringCallback =
   boost::function<void(const std_msgs::String::ConstPtr&)>;
 
+const int font_face_ = cv::FONT_HERSHEY_DUPLEX;
+const double font_scale_ = 0.5;
+const int font_thick_ = 1;
+const int font_ltype_ = 4; //CV_AA;
+
+void check_window()
+{
+  if (!cvGetWindowHandle("Monitor")) {
+    cv::namedWindow("Monitor", cv::WINDOW_NORMAL);
+    cv::moveWindow("Monitor", 128, 128);
+  }
+}
+
+void clear_buffer_rect(cv::Rect rect, const cv::Mat& monitor_)
+{
+  cv::rectangle(monitor_,
+                cv::Point(rect.x, rect.y),
+                cv::Point(rect.x + rect.width, rect.y + rect.height),
+                cv::Scalar(0, 0, 0), CV_FILLED);
+}
+
+void putText(const cv::Mat& monitor_, int x, int y, const std::string& text)
+{
+  cv::Point point(x, y);
+  cv::putText(monitor_, text, point, font_face_, 2 * font_scale_,
+              cv::Scalar(255, 255, 255), font_thick_, font_ltype_);
+}
+
+long now() {
+  return std::chrono::duration_cast<std::chrono::milliseconds>(
+    std::chrono::system_clock::now().time_since_epoch()
+  ).count();
+}
+
+// Adopted from team-NAIST-Panasonic ARC repository
+// https://github.com/warehouse-picking-automation-challenges/team_naist_panasonic
+cv_bridge::CvImagePtr convert2OpenCV(
+  const sensor_msgs::Image &img, const std::string type
+  )
+{
+  cv_bridge::CvImagePtr cv_ptr;
+  try {
+    cv_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::BGR8);
+  }
+  catch (cv_bridge::Exception &e) {
+    ROS_ERROR("Image converter, cv_bridge exception: %s", e.what());
+  }
+  return cv_ptr;
+}
+
+//  boost::function<void(const sensor_msgs::ImageConstPtr&)>
+ImageCallback getCallbackForImage(cv::Rect rect, cv::Mat& monitor_)
+{
+  // This function returns callback function
+  return [=](const sensor_msgs::ImageConstPtr &msg) {
+    // Show window at the first time
+    if (!cvGetWindowHandle("Monitor")) {
+      cv::namedWindow("Monitor", cv::WINDOW_NORMAL);
+      cv::moveWindow("Monitor", 128, 128);
+    }
+
+    // Convert sent message into cv::Mat
+    cv::Mat img = convert2OpenCV(
+      *msg, sensor_msgs::image_encodings::RGB8
+    ) -> image;
+
+    // Resize the image and put it to the buffer
+    cv::Size size = cv::Size(rect.width, rect.height);
+    cv::Mat resized;
+    cv::resize(img, resized, size, 0, 0, cv::INTER_CUBIC);
+    resized.copyTo(monitor_(rect));
+
+    // Copy the image buffer in the window
+      cv::imshow("Monitor", monitor_);
+      cv::waitKey(3);
+  };
+}
+
+//boost::function<void(const sensor_msgs::CameraInfoConstPtr&)>
+CamInfoCallback getCallbackForCameraInfo(
+  cv::Rect rect, XmlRpc::XmlRpcValue &params, cv::Mat& monitor_
+  )
+{
+  // Values captured by closure
+  int offset_x = params["offset"][0];
+  int offset_y = params["offset"][1];
+
+  // This function returns callback function
+  return [=](const sensor_msgs::CameraInfoConstPtr &msg)
+  {
+    // Show window at the first time
+    check_window();
+
+    clear_buffer_rect(rect, monitor_);
+
+    std::string text1 = "Width : " + std::to_string(msg->width);
+    putText(monitor_, rect.x + offset_x, rect.y + offset_y, text1);
+    std::string text2 = "Height: " + std::to_string(msg->height);
+      putText(monitor_, rect.x + offset_x, rect.y + offset_y + 32, text2);
+  };
+}
+
+//boost::function<void(const std_msgs::String::ConstPtr& msg)>
+StringCallback getCallbackForString(cv::Rect rect, XmlRpc::XmlRpcValue &params,
+                                    cv::Mat& monitor_, long start_time)
+{
+  // Values captured by closure
+  int offset_x = params["offset"][0];
+  int offset_y = params["offset"][1];
+  int n_history = params["n_history"];
+  printf("%d", n_history);
+  std::deque<std::string> messages;
+  for (int i = 0; i < n_history; i++)
+  {
+    messages.push_back("");
+  }
+  std::vector<int> ivec;
+
+  // This function returns callback function
+  return [=](const std_msgs::String::ConstPtr& msg) mutable {
+    check_window();
+    clear_buffer_rect(rect, monitor_);
+
+    long elapsed_time = now() - start_time;
+    char buf[255];
+    sprintf(buf, "%.1lfs: ", (float)elapsed_time / 1000);
+    std::string text = buf + std::string(msg->data.c_str());
+    messages.push_back(text);
+    messages.pop_front();
+
+    for (int i = 0; i < n_history; i++)
+    {
+      putText(monitor_, rect.x + offset_x, rect.y + offset_y + 32 * i,
+              messages[i]);
+    }
+    
+    // Copy the image buffer in the window
+    cv::imshow("Monitor", monitor_);
+    cv::waitKey(3);
+  };
+}
+
 namespace o2as_debug_monitor
 {
-  const int font_face_ = cv::FONT_HERSHEY_SIMPLEX;
-  const double font_scale_ = 0.5;
-  const int font_thick_ = 0.8;
-  const int font_ltype_ = CV_AA;
-
-  // Adopted from team-NAIST-Panasonic ARC repository
-  // https://github.com/warehouse-picking-automation-challenges/team_naist_panasonic
-  cv_bridge::CvImagePtr convert2OpenCV(
-    const sensor_msgs::Image &img, const std::string type
-    )
-  {
-    cv_bridge::CvImagePtr cv_ptr;
-    try {
-      cv_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::BGR8);
-    }
-    catch (cv_bridge::Exception &e) {
-      ROS_ERROR("Image converter, cv_bridge exception: %s", e.what());
-    }
-    return cv_ptr;
-  }
-
-  boost::function<void(const sensor_msgs::ImageConstPtr&)>
-    getCallbackForImage(cv::Rect rect, cv::Mat& monitor_) {
-    // This function returns callback function
-    return [=](const sensor_msgs::ImageConstPtr &msg) {
-      // Show window at the first time
-      if (!cvGetWindowHandle("Monitor")) {
-        cv::namedWindow("Monitor", cv::WINDOW_NORMAL);
-        cv::moveWindow("Monitor", 128, 128);
-      }
-
-      // Convert sent message into cv::Mat
-      cv::Mat img = convert2OpenCV(
-        *msg, sensor_msgs::image_encodings::RGB8
-      ) -> image;
-
-      // Resize the image and put it to the buffer
-      cv::Size size = cv::Size(rect.width, rect.height);
-      cv::Mat resized;
-      cv::resize(img, resized, size, 0, 0, cv::INTER_CUBIC);
-      resized.copyTo(monitor_(rect));
-
-      // Copy the image buffer in the window
-        cv::imshow("Monitor", monitor_);
-        cv::waitKey(3);
-    };
-  }
-
-  boost::function<void(const sensor_msgs::CameraInfoConstPtr&)>
-    getCallbackForCameraInfo(cv::Rect rect, XmlRpc::XmlRpcValue &params,
-      cv::Mat& monitor_)
-  {
-    // Values captured by closure
-    int offset_x = params["offset"][0];
-    int offset_y = params["offset"][1];
-
-    // This function returns callback function
-    return [=](const sensor_msgs::CameraInfoConstPtr &msg) {
-      // Show window at the first time
-      if (!cvGetWindowHandle("Monitor")) {
-        cv::namedWindow("Monitor", cv::WINDOW_NORMAL);
-        cv::moveWindow("Monitor", 128, 128);
-      }
-
-      {
-        std::string text = "Width : " + std::to_string(msg->width);
-        cv::Point point(rect.x + offset_x, rect.y + offset_y);
-        cv::putText(monitor_, text, point, font_face_, 2 * font_scale_,
-                    cv::Scalar(255, 255, 255), font_thick_, font_ltype_);
-      }
-
-      {
-        std::string text = "Height: " + std::to_string(msg->height);
-        cv::Point point(rect.x + offset_x, rect.y + offset_y + 32);
-        cv::putText(monitor_, text, point, font_face_, 2 * font_scale_,
-                    cv::Scalar(255, 255, 255), font_thick_, font_ltype_);
-      }
-    };
-  }
-
-  boost::function<void(const std_msgs::String::ConstPtr& msg)>
-    getCallbackForString(cv::Rect rect, XmlRpc::XmlRpcValue &params,
-      cv::Mat& monitor_)
-  {
-    // Values captured by closure
-    int offset_x = params["offset"][0];
-    int offset_y = params["offset"][1];
-
-    // This function returns callback function
-    return [=](const std_msgs::String::ConstPtr& msg) {
-      // Show window at the first time
-      if (!cvGetWindowHandle("Monitor")) {
-        cv::namedWindow("Monitor", cv::WINDOW_NORMAL);
-        cv::moveWindow("Monitor", 128, 128);
-      }
-
-      // TODO: need to erase previous message from the image buffer?
-      std::string text = msg->data.c_str();
-      cv::Point point(rect.x + offset_x, rect.y + offset_y);
-      cv::putText(monitor_, text, point, font_face_, 2 * font_scale_,
-                  cv::Scalar(255, 255, 255), font_thick_, font_ltype_);
-    };
-  }
-
   class Monitor
   {
     public:
@@ -138,6 +178,9 @@ namespace o2as_debug_monitor
 
         // Initialize shared objects in this class
         monitor_ = cv::Mat(height, width, CV_8UC3, cv::Scalar(0, 0, 0));
+
+        // Start time
+        start_time = now();
 
         // Set callback functions for image topics
         XmlRpc::XmlRpcValue image_topics;
@@ -170,6 +213,7 @@ namespace o2as_debug_monitor
       int n_rows;
       int d_cols;
       int d_rows;
+      long start_time;
 
       cv::Rect getRect(XmlRpc::XmlRpcValue &params)
       {
@@ -252,7 +296,7 @@ namespace o2as_debug_monitor
 
           // Create, set and keep callback function
           stringcbs_.push_back(
-            getCallbackForString(rect, params, monitor_)
+            getCallbackForString(rect, params, monitor_, start_time)
           );
           n_sub_rs_.push_back(nh.subscribe(topic_name, 1, stringcbs_.back()));
         }
