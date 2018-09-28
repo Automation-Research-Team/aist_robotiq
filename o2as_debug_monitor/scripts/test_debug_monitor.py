@@ -2,6 +2,7 @@
 from time import sleep, time
 import rospy
 from std_msgs.msg import String, Int32
+from o2as_debug_monitor.msg import PressureSensoState
 
 if __name__ == "__main__":
   # Initialize the ROS node
@@ -10,6 +11,8 @@ if __name__ == "__main__":
   # Initialize publishers
   pub1 = rospy.Publisher("/o2as_state/kitting_set_id", Int32, queue_size=1)
   pub2 = rospy.Publisher("/o2as_state", String, queue_size=1)
+  pub3 = rospy.Publisher("/o2as_fastening_tools/screw_suctioned",
+                         PressureSensoState, queue_size=18) # see issue 133
 
   # Wait until debug monitor launch
   sleep(2);
