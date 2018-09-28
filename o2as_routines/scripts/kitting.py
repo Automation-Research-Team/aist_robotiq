@@ -18,6 +18,8 @@ from o2as_graspability_estimation.srv import *
 
 from o2as_routines.base import O2ASBaseRoutines
 
+from PIL import Image, ImageDraw
+
 LOG_LEVEL = log_level = rospy.DEBUG
 # LOG_LEVEL = log_level = rospy.INFO
 
@@ -192,7 +194,7 @@ class KittingClass(O2ASBaseRoutines):
       rospy.logdebug("Couldn't pick the target using suction.")
       return False
   
-  def view_bin(self, group_name, bin_id, speed_fast = 1.0, speed_slow = 1.0, bin_eff_height = 0.3, bin_eff_xoff = 0, bin_eff_deg_angle = 20,end_effector_link = ""):
+  def view_bin(self, group_name, bin_id, speed_fast = 1.0, speed_slow = 1.0, bin_eff_height = 0.2, bin_eff_xoff = 0, bin_eff_deg_angle = 20,end_effector_link = ""):
     # TODO: adjust the x,z and end effector orientatio for optimal view of the bin to use with the  \search_grasp service
     goal_pose = geometry_msgs.msg.PoseStamped()
     goal_pose.header.frame_id = bin_id
@@ -206,8 +208,113 @@ class KittingClass(O2ASBaseRoutines):
     goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 + 20*pi/180, 0))
     res = self.move_lin(group_name, goal_pose, speed_slow, "")
     if not res:
-      rospy.logdebug("Couldn't go to the target.")
-      return False
+      rospy.loginfo("Couldn't go to the target.")
+    #TODO Problem with gazebo controller while controlling the robot with movelin
+    #  return False
+
+    #TODO not sure if the sleep is necessary is move_lin wait for the motion to be finished?
+    rospy.sleep(1)
+
+
+    print("test pass") 
+    #self.go_to_named_pose("home", "a_bot")
+    #rospy.loginfo("Test set2_bin1_5")
+    #joint_goal = self.groups[group_name].get_current_joint_values()
+    #joint_goal[0] = 0.1355740113565158
+    #joint_goal[1] = -1.7406231536659567
+    #joint_goal[2] = 2.020421953459774
+    #joint_goal[3] = -1.4944480238779398
+    #joint_goal[4] = -1.5458841821325437
+    #joint_goal[5] = -1.4311145388770798
+
+    #TO FIX it seems that the command is not responding after move_lin is called
+    #self.groups[group_name].go(joint_goal, wait=True)
+
+    #10.5 11.0
+    #TODO modifiy the bin to get the inner corner of each bins in kiting_bin_macro line 49..
+    point_top1 = geometry_msgs.msg.PointStamped()
+    #point_top1.header.frame_id = "set2_bin1_3"
+    point_top1.header.frame_id = bin_id
+    point_top1.point = geometry_msgs.msg.Point(0.050, 0.055, 0)
+
+
+    point_top2 = geometry_msgs.msg.PointStamped()
+    #point_top2.header.frame_id = "set2_bin1_3"
+    point_top2.header.frame_id = bin_id
+    point_top2.point = geometry_msgs.msg.Point(-0.050, 0.055, 0)
+
+    point_top3 = geometry_msgs.msg.PointStamped()
+    #point_top3.header.frame_id = "set2_bin1_3"
+    point_top3.header.frame_id = bin_id
+    point_top3.point = geometry_msgs.msg.Point(-0.050, -0.055, 0)
+
+    point_top4 = geometry_msgs.msg.PointStamped()
+    #point_top4.header.frame_id = "set2_bin1_3"
+    point_top4.header.frame_id = bin_id
+    point_top4.point = geometry_msgs.msg.Point(0.050, -0.055, 0)
+
+#    t = tf.TransformerROS(True, rospy.Duration(10.0)) 
+    #TODO change the fisheye from to the depth frame in casse of offset. but fisheye should e ok since the two images are aligned (depth and rgb) after the real sense node
+    point_top1_cam = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", point_top1).point
+    point_top2_cam = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", point_top2).point
+    point_top3_cam = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", point_top3).point
+    point_top4_cam = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", point_top4).point
+
+    print("point_top1_cam")
+    print(point_top1_cam)
+    print("point_top2_cam")
+    print(point_top2_cam)
+    print("point_top3_cam")
+    print(point_top3_cam)
+    print("point_top4_cam")
+    print(point_top4_cam)
+
+    point_test_center_cam = geometry_msgs.msg.Point()
+    point_test_center_cam = geometry_msgs.msg.Point(0, 0, 0.4)
+    print(point_test_center_cam)
+
+#TODO project the 4 points in the depth plane (which projection matrix to use from the camera)
+    #projection matrix
+    #554.3827128226441, 0.0, 320.5, 0.0, 554.3827128226441, 240.5, 0.0, 0.0, 1.0    
+    #
+    #P: [554.3827128226441, 0.0, 320.5, -38.80678989758509, 0.0, 554.3827128226441, 240.5, 0.0, 0.0, 0.0, 1.0, 0.0]
+    #TODO take the parameters from the /camera_info topic instead
+    cameraMatK = np.array([[554.3827128226441, 0.0, 320.5],
+                           [0.0, 554.3827128226441, 240.5],
+                           [0.0, 0.0, 1.0]])
+
+    point_top1_cam_np = np.array([point_top1_cam.x, point_top1_cam.y, 1])   
+    point_top2_cam_np = np.array([point_top2_cam.x, point_top2_cam.y, 1])   
+    point_top3_cam_np = np.array([point_top3_cam.x, point_top3_cam.y, 1])   
+    point_top4_cam_np = np.array([point_top4_cam.x, point_top4_cam.y, 1])   
+    point_test_center_cam_np = np.array([point_test_center_cam.x, point_test_center_cam.y, point_test_center_cam.z])   
+      
+    point_top1_img_np = cameraMatK.dot(point_top1_cam_np)
+    point_top2_img_np = cameraMatK.dot(point_top2_cam_np)
+    point_top3_img_np = cameraMatK.dot(point_top3_cam_np)
+    point_top4_img_np = cameraMatK.dot(point_top4_cam_np)
+    point_test_center_img_np = cameraMatK.dot(point_test_center_cam_np) 
+
+    print(point_top1_img_np)
+    print(point_top2_img_np)
+    print(point_top3_img_np)
+    print(point_top4_img_np)
+    print(point_test_center_img_np)
+
+    #bitwise for mask the range image
+    polygon = [(point_top1_img_np[0],point_top1_img_np[1]),
+               (point_top2_img_np[0],point_top2_img_np[1]),
+               (point_top3_img_np[0],point_top3_img_np[1]),
+               (point_top4_img_np[0],point_top4_img_np[1])]
+
+    img = Image.new('L', (640,480), 0)
+    ImageDraw.Draw(img).polygon(polygon, outline = 1, fill = 128)
+    mask = np.array(img)
+    img.save('polygon.png','PNG')
+
+#    point_top1_cam = t.transformPoint("a_bot_camera_depth_frame", point_top1)
+#    point_top1_cam = t.transformPoint(point_top4.header.frame_id, point_top1)
+
 
   def pick_using_precision_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = ""):
     # TODO: here is for Osaka Univ.
@@ -369,7 +476,7 @@ class KittingClass(O2ASBaseRoutines):
   def kitting_task(self):
     # self.go_to_named_pose("home", "c_bot")
     # self.go_to_named_pose("home", "b_bot")
-    self.go_to_named_pose("home", "a_bot")
+    #self.go_to_named_pose("home", "a_bot")
 
     #self.pick_and_place_demo()
     self.view_bin("a_bot", "set2_bin1_2")
