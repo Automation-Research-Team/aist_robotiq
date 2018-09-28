@@ -20,7 +20,7 @@ from o2as_routines.base import O2ASBaseRoutines
 
 # Poses taken during handeye calibration
 # TODO: These poses are specific for `d_bot` camera, need to modify for Phoxi
-poses = {
+keyposes = {
   'a_phoxi_m_camera': {
     'a_bot': [
       [0.245, 0.3, 0.30, radians(  0), radians(  0), radians(90)],
@@ -90,12 +90,19 @@ def get_service_proxy(service_name, camera_name, robot_name):
   return rospy.ServiceProxy(service_name_full, service_type)
 
 
-class MoveGroupCommander(object):
+######################################################################
+#  class CalibrationCommander                                        #
+######################################################################
+class CalibrationCommander(object):
   """Wrapper of MoveGroupCommander specific for this script"""
-  def __init__(self, camera_name, robot_name):
-    self.trigger_frame       = get_service_proxy("trigger_frame",
+  def __init__(self, camera_name, robot_name, needs_trigger, needs_calib):
+    self.needs_trigger = needs_trigger
+    self.needs_calib   = needs_calib
+
+    if needs_trigger:
+      self.trigger_frame     = get_service_proxy("trigger_frame",
                                                  camera_name, robot_name)
-    self.get_frame           = get_service_proxy("get_frame",
+      self.get_frame         = get_service_proxy("get_frame",
                                                  camera_name, robot_name)
     self.take_sample         = get_service_proxy("take_sample",
                                                  camera_name, robot_name)
@@ -128,15 +135,15 @@ class MoveGroupCommander(object):
     # Logging
     print("============ Reference frame: %s" % group.get_planning_frame())
     print("============ End effector: %s"    % group.get_end_effector_link())
+
     
-  def visit_subposes(self, keypose, speed, sleep_time):
+  def move_to_subposes(self, keypose, speed, sleep_time):
     pose = keypose
     for i in range(3):
-      print("\n--- SubLoop [{}/5]: Try! ---".format(i+1))
+      print("\n--- Subpose [{}/5]: Try! ---".format(i+1))
       self.move(pose, speed)
-      print("--- Subloop [{}/5]: Completed. ---".format(i+1))
-      self.trigger_frame()
-      self.get_frame(0, True)
+      print("--- Subpose [{}/5]: Completed. ---".format(i+1))
+      self.get_image_data()
       rospy.sleep(sleep_time)
       pose[3] -= radians(30)
 
@@ -144,11 +151,10 @@ class MoveGroupCommander(object):
     pose[4] += radians(15)
 
     for i in range(2):
-      print("\n--- Subloop [{}/5]: Try! ---".format(i+4))
+      print("\n--- Subpose [{}/5]: Try! ---".format(i+4))
       self.move(pose, speed)
-      print("--- Subloop [{}/5]: Completed. ---".format(i+4))
-      self.trigger_frame()
-      self.get_frame(0, True)
+      print("--- Subpose [{}/5]: Completed. ---".format(i+4))
+      self.get_image_data()
       rospy.sleep(sleep_time)
       pose[4] -= radians(30)
 
@@ -169,89 +175,79 @@ class MoveGroupCommander(object):
     self.baseRoutines.go_to_pose_goal(self.robot_name, poseStamped, speed,
                                       move_lin=False)
 
-  def take_sample(self):
-    self.trigger_frame()
-    self.get_frame(0, True)
-    self.take_sample()
+  def get_image_data(self):
+    if self.needs_trigger:
+      self.trigger_frame()
+      self.get_frame(0, True)
+    if self.needs_calib:
+      self.take_sample()
+      sample_list = self.get_sample_list()
+      n1 = len(sample_list.samples.hand_world_samples.transforms)
+      n2 = len(sample_list.samples.camera_marker_samples.transforms)
+      print("  took {} hand_world samples and {} camera_marker " +
+            "samples").format(n1, n2)
 
   def go_home(self):
     self.baseRoutines.go_to_named_pose("home", self.robot_name)
 
     
-def run_calibration(camera_name, robot_name, speed):
+######################################################################
+#  global functions                                                  #
+######################################################################
+def run(camera_name, robot_name, speed, sleep_time,
+        needs_trigger, needs_calib):
   """Run handeye calibration for the specified robot (e.g., "b_bot")"""
   # Initialize move group and service proxies
-  mg = MoveGroupCommander(camera_name, robot_name)
+  commander = CalibrationCommander(camera_name, robot_name,
+                                   needs_trigger, needs_calib)
 
-  print("=== Calibration started for {} ===".format(robot_name))
+  print("=== Calibration started for {} + {} ===".format(camera_name,
+                                                         robot_name))
 
   # Clear samples in the buffer if exist
-  n_samples = len(get_sample_list().samples.hand_world_samples.transforms)
-  if 0 < n_samples:
-    for _ in range(n_samples):
-      remove_sample(0)
+  if needs_calib:
+    n_samples = len(commander.get_sample_list().samples.hand_world_samples.transforms)
+    if 0 < n_samples:
+      for _ in range(n_samples):
+        commander.remove_sample(0)
 
   # Reset pose
-  mg.go_home()
+  commander.go_home()
 
   # Collect samples over pre-defined poses
-  pose_list = poses[camera_name][robot_name]
-  for i, pose in enumerate(pose_list):
-    print("\n*** Loop [{}/{}]: Try! ***".format(i+1, len(pose_list)))
-    mg.move(pose, speed)
-    print("*** Loop [{}/{}]: Completed. ***".format(i+1, len(pose_list)))
-    mg.take_sample()
-    rospy.sleep(3)  # Sleep for 1 seconds
-    sample_list = mg.get_sample_list()
-    n1 = len(sample_list.samples.hand_world_samples.transforms)
-    n2 = len(sample_list.samples.camera_marker_samples.transforms)
-    print("  took {} hand_world samples and {} camera_marker " +
-          "samples").format(n1, n2)
+  keypose_list = keyposes[camera_name][robot_name]
+  for i, keypose in enumerate(keypose_list):
+    print("\n*** Keypose [{}/{}]: Try! ***".format(i+1, len(keypose_list)))
+    commander.move_to_subposes(keypose, speed, sleep_time)
+    print("*** Keypose [{}/{}]: Completed. ***".format(i+1, len(keypose_list)))
 
-  # Compute and save calibration
-  mg.compute_calibration()
-  mg.save_calibration()
+  if needs_calib:
+    # Compute and save calibration
+    commander.compute_calibration()
+    commander.save_calibration()
 
   # Reset pose
-  mg.go_home()
+  commander.go_home()
 
-  print("=== Calibration completed for {} ===".format(robot_name))
-
-  
-def visit_calibration_points(camera_name, robot_name, speed, sleep_time):
-  """Run handeye calibration for the specified robot (e.g., "b_bot")"""
-  # Initialize move group and service proxies
-  mg = MoveGroupCommander(camera_name, robot_name)
-
-  print("=== Visiting started for {} ===".format(robot_name))
-
-  # Reset pose
-  mg.go_home()
-
-  # Move to each calibration point
-  pose_list = poses[camera_name][robot_name]
-  for i, pose in enumerate(pose_list):
-    print("\n*** Loop [{}/{}]: Try! ***".format(i+1, len(pose_list)))
-    mg.visit_subposes(pose, speed, sleep_time)
-    print("*** Loop [{}/{}]: Completed. ***".format(i+1, len(pose_list)))
-
-  # Reset pose
-  mg.go_home()
-  print("=== Visiting completed for {} ===".format(robot_name))
+  print("=== Calibration completed for {} + {} ===".format(camera_name,
+                                                           robot_name))
 
   
 def main():
   try:
-    camera_name = sys.argv[1]
-    robot_name  = sys.argv[2]
+    camera_name   = sys.argv[1]
+    robot_name    = sys.argv[2]
+    needs_trigger = (True if (sys.argv[3] == "true") else False)
+      
     assert(camera_name in {"a_phoxi_m_camera", "c_bot_camera"})
     assert(robot_name  in {"a_bot", "b_bot", "c_bot"})
-    speed = 0.1;
+    speed      = 0.1
+    sleep_time = 1
 
     if (os.path.basename(sys.argv[0]) == "run_handeye_calibration.py"):
-      run_calibration(camera_name, robot_name, speed)
+      run(camera_name, robot_name, speed, sleep_time, needs_trigger, False)
     else:
-      visit_calibration_points(camera_name, robot_name, speed, 1)
+      run(camera_name, robot_name, speed, sleep_time, needs_trigger, True)
 
   except rospy.ROSInterruptException:
     return
