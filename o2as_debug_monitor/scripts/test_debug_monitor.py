@@ -1,18 +1,29 @@
 #! /usr/bin/env python
 from time import sleep, time
 import rospy
-from std_msgs.msg import String
+from std_msgs.msg import String, Int32
 
 if __name__ == "__main__":
   # Initialize the ROS node
   rospy.init_node("test_debug_monitor")
 
-  # Initialize a publisher
-  pub = rospy.Publisher("/o2as_state", String, queue_size=1)
+  # Initialize publishers
+  pub1 = rospy.Publisher("/o2as_state/kitting_set_id", Int32, queue_size=1)
+  pub2 = rospy.Publisher("/o2as_state", String, queue_size=1)
 
-  # Loop
-  while True:
-    sleep(1)
-    msg = String()
-    msg.data = str(time())
-    pub.publish(msg)
+  # Wait until debug monitor launch
+  sleep(2);
+
+  # Loop over set lists
+  for i in range(1, 4):
+    # Start round
+    msg = Int32()
+    msg.data = i
+    pub1.publish(msg)
+
+    # Loop over subtasks
+    for j in range(10):
+      sleep(1)
+      msg = String()
+      msg.data = str(time())
+      pub2.publish(msg)

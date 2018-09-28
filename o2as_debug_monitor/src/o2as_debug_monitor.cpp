@@ -6,6 +6,7 @@
 #include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
 #include <ros/ros.h>
+#include <std_msgs/Int32.h>
 #include <std_msgs/Float64.h>
 #include <std_msgs/String.h>
 #include <cv_bridge/cv_bridge.h>
@@ -21,6 +22,9 @@ using CamInfoCallback =
   boost::function<void(const sensor_msgs::CameraInfoConstPtr&)>;
 using StringCallback =
   boost::function<void(const std_msgs::String::ConstPtr&)>;
+using KittingSetIdCallback =
+  boost::function<void(const std_msgs::Int32::ConstPtr&)>;
+using RosParam = XmlRpc::XmlRpcValue;
 
 const int font_face_ = cv::FONT_HERSHEY_DUPLEX;
 const double font_scale_ = 0.5;
@@ -164,6 +168,56 @@ StringCallback getCallbackForString(cv::Rect rect, XmlRpc::XmlRpcValue &params,
   };
 }
 
+KittingSetIdCallback getCallbackForKittingSetId(
+  cv::Rect rect, XmlRpc::XmlRpcValue &params, cv::Mat& monitor_, 
+  ros::NodeHandle &nh
+)
+{
+  // Values captured by closure
+  int offset_x = params["offset"][0];
+  int offset_y = params["offset"][1];
+
+  // This function returns callback function
+  return [=](const std_msgs::Int32::ConstPtr& msg) {
+    check_window();
+    clear_buffer_rect(rect, monitor_);
+
+    RosParam parts_set;
+    nh.getParam("/set_" + std::to_string(msg->data), parts_set);
+
+    int i = 0;
+    char buf[255];
+    sprintf(buf, "Set %d", msg->data);
+    putText(monitor_, rect.x + offset_x, rect.y + offset_y + 32 * i, buf);
+    i += 2;
+
+    for (auto it = parts_set.begin(); it != parts_set.end(); it++)
+    {
+      // auto a = parts_set[i];
+      putText(monitor_, rect.x + offset_x, rect.y + offset_y + 32 * i,
+              it->first);
+      i++;
+    }
+
+    // long elapsed_time = now() - start_time;
+    // char buf[255];
+    // sprintf(buf, "%.1lfs: ", (float)elapsed_time / 1000);
+    // std::string text = buf + std::string(msg->data.c_str());
+    // messages.push_back(text);
+    // messages.pop_front();
+
+    // for (int i = 0; i < n_history; i++)
+    // {
+    //   putText(monitor_, rect.x + offset_x, rect.y + offset_y + 32 * i,
+    //           messages[i]);
+    // }
+    
+    // // Copy the image buffer in the window
+    // cv::imshow("Monitor", monitor_);
+    // cv::waitKey(3);
+  };
+}
+
 namespace o2as_debug_monitor
 {
   class Monitor
@@ -196,6 +250,12 @@ namespace o2as_debug_monitor
         XmlRpc::XmlRpcValue string_topics;
         nh.getParam("o2as_debug_monitor/string_topics", string_topics);
         setStringCallbacks(nh, string_topics);
+
+        // Set callback function for kitting set id topics
+        XmlRpc::XmlRpcValue kitting_set_id_topics;
+        nh.getParam("o2as_debug_monitor/kitting_set_id_topics",
+                    kitting_set_id_topics);
+        setKittingSetIdCallbacks(nh, kitting_set_id_topics);
       }
 
     private:
@@ -204,6 +264,7 @@ namespace o2as_debug_monitor
       std::vector<ImageCallback> imgcbs_;
       std::vector<CamInfoCallback> caminfocbs_;
       std::vector<StringCallback> stringcbs_;
+      std::vector<KittingSetIdCallback> setidcbs_;
 
       cv::Mat monitor_;
 
@@ -300,6 +361,28 @@ namespace o2as_debug_monitor
           );
           n_sub_rs_.push_back(nh.subscribe(topic_name, 1, stringcbs_.back()));
         }
+      }
+
+      void setKittingSetIdCallbacks(ros::NodeHandle &nh,
+                                    XmlRpc::XmlRpcValue kitting_set_id_topics)
+      {
+        auto topics = kitting_set_id_topics;
+        for (auto it = topics.begin(); it != topics.end(); it++)
+        {
+          auto params = topics[it->first];
+          std::string topic_name = params["topic_name"];
+          ROS_INFO("%s", topic_name.c_str());
+
+          // Area in the debug monitor
+          cv::Rect rect = getRect(params);
+
+          // Create, set and keep callback function
+          setidcbs_.push_back(
+            getCallbackForKittingSetId(rect, params, monitor_, nh)
+          );
+          n_sub_rs_.push_back(nh.subscribe(topic_name, 1, setidcbs_.back()));
+        }
+
       }
   };
 

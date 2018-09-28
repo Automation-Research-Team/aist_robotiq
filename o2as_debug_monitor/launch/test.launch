@@ -41,11 +41,20 @@
     string_topics:
       state:
         topic_name: /o2as_state
-        col: [0, 31]
+        col: [0, 23]
         row: [18, 19]
         offset: [8, 32]
         n_history: 4
+    kitting_set_id_topics:
+      kitting_item_set:
+        topic_name: /o2as_state/kitting_set_id
+        col: [24, 31]
+        row: [0, 19]
+        offset: [8, 32]
   </rosparam>
+
+  <!-- This is for testing purpopse. -->
+  <rosparam command="load" file="$(find o2as_routines)/config/kitting_item_list.yaml"/>
 
     <!-- ROS node for test, publishes test messages -->
   <node pkg="o2as_debug_monitor" type="test_debug_monitor.py"
