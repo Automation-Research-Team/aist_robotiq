@@ -1,9 +1,11 @@
+#include <string.h>
 #include <stdio.h>
 #include <iostream>
 #include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
+#include <std_msgs/String.h>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -117,7 +119,7 @@ namespace o2as_debug_monitor
       }
 
       // TODO: need to erase previous message from the image buffer?
-      std::string text = std::to_string(msg->data);
+      std::string text = msg->data.c_str();
       cv::Point point(rect.x + offset_x, rect.y + offset_y);
       cv::putText(monitor_, text, point, font_face_, 2 * font_scale_,
                   cv::Scalar(255, 255, 255), font_thick_, font_ltype_);
