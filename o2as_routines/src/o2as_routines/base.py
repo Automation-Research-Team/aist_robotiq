@@ -297,7 +297,7 @@ class O2ASBaseRoutines(object):
     group.clear_pose_targets()
 
     current_pose = group.get_current_pose().pose
-    return all_close(pose_goal_stamped.pose, current_pose, 0.01), plan_success
+    return plan_success
 
   def move_front_bots(self, pose_goal_a_bot, pose_goal_b_bot, speed = 0.05):
     rospy.logwarn("CAUTION: Moving front bots together, but MoveIt does not do continuous collision checking.")
@@ -375,6 +375,113 @@ class O2ASBaseRoutines(object):
     self.groups[robot_name].stop()
     self.groups[robot_name].clear_pose_targets()
     return True
+
+  ######
+
+  def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False):
+    #self.publish_marker(object_pose, "pick_pose")
+    #initial gripper_setup
+    rospy.loginfo("Going above object to pick")
+    rospy.loginfo("Height 0: " + str(object_pose.pose.position.z))
+    rospy.loginfo("Approach height 0: " + str(approach_height))
+    object_pose.pose.position.z += approach_height
+    rospy.loginfo("Height 1: " + str(object_pose.pose.position.z))
+    if special_pick == True:
+      object_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*45/180, pi/2))
+    rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
+    object_pose.pose.position.z -= approach_height
+    rospy.loginfo("Height 2: " + str(object_pose.pose.position.z))
+    self.publish_marker(object_pose, "place_pose")
+
+    if gripper_command=="complex_pick_from_inside":
+      self.precision_gripper_inner_close() 
+    elif gripper_command=="complex_pick_from_outside":
+      self.precision_gripper_inner_open()
+    elif gripper_command=="easy_pick_only_inner":
+      self.precision_gripper_inner_close()
+    elif gripper_command=="easy_pick_outside_only_inner":
+      self.precision_gripper_inner_open()
+    elif gripper_command=="none":
+      pass
+    else: 
+      self.send_gripper_command(gripper=robotname, command="open")
+
+    rospy.loginfo("Moving down to object")
+    rospy.loginfo(grasp_height)
+    object_pose.pose.position.z += grasp_height
+    rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
+    object_pose.pose.position.z -= grasp_height
+
+    # W = raw_input("waiting for the gripper")
+    #gripper close
+    if gripper_command=="complex_pick_from_inside":
+      self.precision_gripper_inner_open(this_action_grasps_an_object = True)
+      self.precision_gripper_outer_close()
+    elif gripper_command=="complex_pick_from_outside":
+      self.precision_gripper_inner_close(this_action_grasps_an_object = True)
+      self.precision_gripper_outer_close()
+    elif gripper_command=="easy_pick_only_inner":
+      self.precision_gripper_inner_open(this_action_grasps_an_object = True)
+    elif gripper_command=="easy_pick_outside_only_inner":
+      self.precision_gripper_inner_close()
+    elif gripper_command=="none":
+      pass
+    else: 
+      self.send_gripper_command(gripper=robotname, command="close")
+
+    # if special_pick == True:
+    #   object_pose.pose.orientation = self.downward_orientation
+    rospy.sleep(.5)
+    rospy.loginfo("Going back up")
+    object_pose.pose.position.z += approach_height
+    rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
+    object_pose.pose.position.z -= approach_height
+
+  ######
+
+  def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, lift_up_after_place = True):
+    #self.publish_marker(object_pose, "place_pose")
+    rospy.loginfo("Going above place target")
+    object_pose.pose.position.z += approach_height
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
+    object_pose.pose.position.z -= approach_height
+
+    rospy.loginfo("Moving to place target")
+    object_pose.pose.position.z += place_height
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
+    object_pose.pose.position.z -= place_height
+
+    # print "============ Stopping at the placement height. Press `Enter` to keep moving moving the robot ..."
+    # raw_input()
+
+    #gripper open
+    if gripper_command=="complex_pick_from_inside":
+      self.precision_gripper_outer_open()
+      self.precision_gripper_inner_close()
+    elif gripper_command=="complex_pick_from_outside":
+      self.precision_gripper_outer_open()
+      self.precision_gripper_inner_open()
+    elif gripper_command=="easy_pick_only_inner":
+      self.precision_gripper_inner_close()
+    elif gripper_command=="easy_pick_outside_only_inner":
+      self.precision_gripper_inner_open()
+    elif gripper_command=="none":
+      pass
+    else: 
+      self.send_gripper_command(gripper=robotname, command="open")
+
+    
+    if lift_up_after_place:
+      rospy.loginfo("Moving back up")
+      object_pose.pose.position.z += approach_height
+      self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)  
+      object_pose.pose.position.z -= approach_height
+    return
+
+  ######
 
   def do_pick_action(self, robot_name, pose_stamped, screw_size = 0.0, z_axis_rotation = 0.0, use_complex_planning = False, tool_name = ""):
     # Call the pick action
