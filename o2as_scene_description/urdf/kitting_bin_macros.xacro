@@ -45,6 +45,13 @@
     <xacro:kitting_bin_internal binname="${binname}" parent="${parent}" filename="bin1_EA661CA-11" z_origin_offset="${z_origin_offset}">
       <xacro:insert_block name="origin"/>
     </xacro:kitting_bin_internal>
+
+    <joint name="${binname}_top_left_corner_joint" type="fixed">
+      <parent link="${binname}"/>
+      <child link="${binname}_top_left_corner_link"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.1 0.1 -0.146 "/>
+    </joint>
+    <link name="${binname}_top_left_corner_link"/>
   </xacro:macro>
 
   <xacro:macro name="kitting_bin_2" params="binname parent z_origin_offset *origin">

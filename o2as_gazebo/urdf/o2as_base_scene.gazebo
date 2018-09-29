@@ -44,8 +44,8 @@
     </sensor>
   </gazebo>
 
-  <gazebo reference="d_bot_camera_link">
-    <sensor type="depth" name="d_bot_camera">
+  <gazebo reference="a_bot_camera_link">
+    <sensor type="depth" name="a_bot_camera">
       <always_on>true</always_on>
       <visualize>true</visualize>             
       <camera>
@@ -62,12 +62,12 @@
           <far>100</far>
         </clip>
       </camera>
-      <plugin name="d_bot_cam_controller" filename="libgazebo_ros_openni_kinect.so">
+      <plugin name="a_bot_cam_controller" filename="libgazebo_ros_openni_kinect.so">
         <baseline>0.2</baseline>
         <alwaysOn>true</alwaysOn>
         <updateRate>10.0</updateRate>
-        <cameraName>d_bot_camera</cameraName>
-        <frameName>d_bot_camera_link</frameName>
+        <cameraName>a_bot_camera</cameraName>
+        <frameName>a_bot_camera_link</frameName>
         <imageTopicName>rgb/image_raw</imageTopicName>
         <depthImageTopicName>depth/image_raw</depthImageTopicName>
         <pointCloudTopicName>depth/points</pointCloudTopicName>
