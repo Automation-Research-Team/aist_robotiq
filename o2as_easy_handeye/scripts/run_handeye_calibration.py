@@ -110,9 +110,11 @@ def get_service_proxy(service_name, camera_name, robot_name):
 ######################################################################
 #  class CalibrationCommander                                        #
 ######################################################################
-class CalibrationCommander(object):
+class HandEyeCalibrationRoutines(O2ASBaseRoutines):
   """Wrapper of MoveGroupCommander specific for this script"""
   def __init__(self, camera_name, robot_name, needs_trigger, needs_calib):
+    super(HandEyeCalibrationRoutines, self).__init__()
+    
     self.needs_trigger = needs_trigger
     self.needs_calib   = needs_calib
 
@@ -135,9 +137,8 @@ class CalibrationCommander(object):
                                                  camera_name, robot_name)
 
     ## Initialize `moveit_commander`
-    self.baseRoutines = O2ASBaseRoutines()
     self.robot_name   = robot_name
-    group = self.baseRoutines.groups[robot_name]
+    group = self.groups[robot_name]
 
     # Set `_ee_link` as end effector wrt `_base_link` of the robot
     #group.set_pose_reference_frame(robot_name + "_base_link")
@@ -194,9 +195,9 @@ class CalibrationCommander(object):
       = geometry_msgs.msg.Quaternion(
         *tf_conversions.transformations.quaternion_from_euler(
           pose[3], pose[4], pose[5]))
-    [all_close, move_success] \
-      = self.baseRoutines.go_to_pose_goal(self.robot_name, poseStamped, speed,
-                                          move_lin=False)
+    [all_close, move_success] = self.go_to_pose_goal(self.robot_name,
+                                                     poseStamped, speed,
+                                                     move_lin=False)
     return move_success
 
   def get_image_data(self):
@@ -212,68 +213,62 @@ class CalibrationCommander(object):
             "samples").format(n1, n2)
 
   def go_home(self):
-    self.baseRoutines.go_to_named_pose("home", self.robot_name)
+    self.go_to_named_pose("home", self.robot_name)
+
+  def run(self, keyposes, speed, sleep_time):
+    """Run handeye calibration for the specified robot (e.g., "b_bot")"""
+    # Clear samples in the buffer if exist
+    if self.needs_calib:
+      n_samples = len(self.get_sample_list().samples.hand_world_samples.transforms)
+      if 0 < n_samples:
+        for _ in range(n_samples):
+          self.remove_sample(0)
+
+    # Reset pose
+    self.go_home()
+
+    #self.flush_buffer()
+  
+    # Collect samples over pre-defined poses
+    for i, keypose in enumerate(keyposes):
+      print("\n*** Keypose [{}/{}]: Try! ***".format(i+1, len(keyposes)))
+      self.move_to_subposes(keypose, speed, sleep_time)
+      print("*** Keypose [{}/{}]: Completed. ***".format(i+1, len(keyposes)))
+
+    if self.needs_calib:
+      # Compute and save calibration
+      self.compute_calibration()
+      self.save_calibration()
+
+    # Reset pose
+    self.go_home()
 
     
 ######################################################################
 #  global functions                                                  #
 ######################################################################
-def run(camera_name, robot_name, speed, sleep_time,
-        needs_trigger, needs_calib):
-  """Run handeye calibration for the specified robot (e.g., "b_bot")"""
-  # Initialize move group and service proxies
-  commander = CalibrationCommander(camera_name, robot_name,
-                                   needs_trigger, needs_calib)
-
-  print("=== Calibration started for {} + {} ===".format(camera_name,
-                                                         robot_name))
-
-  # Clear samples in the buffer if exist
-  if needs_calib:
-    n_samples = len(commander.get_sample_list().samples.hand_world_samples.transforms)
-    if 0 < n_samples:
-      for _ in range(n_samples):
-        commander.remove_sample(0)
-
-  # Reset pose
-  commander.go_home()
-
-  commander.flush_buffer()
-  
-  # Collect samples over pre-defined poses
-  keypose_list = keyposes[camera_name][robot_name]
-  for i, keypose in enumerate(keypose_list):
-    print("\n*** Keypose [{}/{}]: Try! ***".format(i+1, len(keypose_list)))
-    commander.move_to_subposes(keypose, speed, sleep_time)
-    print("*** Keypose [{}/{}]: Completed. ***".format(i+1, len(keypose_list)))
-
-  if needs_calib:
-    # Compute and save calibration
-    commander.compute_calibration()
-    commander.save_calibration()
-
-  # Reset pose
-  commander.go_home()
-
-  print("=== Calibration completed for {} + {} ===".format(camera_name,
-                                                           robot_name))
-
   
 def main():
   try:
     camera_name   = sys.argv[1]
     robot_name    = sys.argv[2]
     needs_trigger = (True if (sys.argv[3] == "trigger") else False)
-      
+    needs_calib   = (True if (os.path.basename(sys.argv[0]) == "run_handeye_calibration.py") else False)
+    
     assert(camera_name in {"a_phoxi_m_camera", "c_bot_camera"})
     assert(robot_name  in {"a_bot", "b_bot", "c_bot"})
+
+    routines = HandEyeCalibrationRoutines(camera_name, robot_name,
+                                          needs_trigger, needs_calib)
+
+    print("=== Calibration started for {} + {} ===".format(camera_name,
+                                                           robot_name))
     speed      = 0.1
     sleep_time = 1
-
-    if (os.path.basename(sys.argv[0]) == "run_handeye_calibration.py"):
-      run(camera_name, robot_name, speed, sleep_time, needs_trigger, True)
-    else:
-      run(camera_name, robot_name, speed, sleep_time, needs_trigger, False)
+    routines.run(keyposes[camera_name][robot_name], speed, sleep_time)
+    print("=== Calibration completed for {} + {} ===".format(camera_name,
+                                                             robot_name))
+    
 
   except rospy.ROSInterruptException:
     return

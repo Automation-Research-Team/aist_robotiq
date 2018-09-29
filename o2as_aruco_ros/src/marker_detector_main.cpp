@@ -360,33 +360,19 @@ ArucoSimple::reconf_callback(ArucoThresholdConfig& config, uint32_t level)
 void
 ArucoSimple::image_callback(const image_p& image_msg)
 {
-    std::cerr << "image_callback(): image arrived... ";
     if (image_msg->header.stamp == _cloud_msg.header.stamp)
-    {
-	std::cerr << "Try to detect marker." << std::endl;
 	detect_marker(*image_msg, _cloud_msg);
-    }
     else
-    {
-	std::cerr << "Save to buffer." << std::endl;
 	_image_msg = *image_msg;
-    }
 }
     
 void
 ArucoSimple::cloud_callback(const cloud_p& cloud_msg)
 {
-    std::cerr << "cloud_callback(): clouf arrived... ";
     if (cloud_msg->header.stamp == _image_msg.header.stamp)
-    {
-	std::cerr << "Try to detect marker." << std::endl;
 	detect_marker(_image_msg, *cloud_msg);
-    }
     else
-    {
-	std::cerr << "Save to buffer." << std::endl;
 	_cloud_msg = *cloud_msg;
-    }
 }
 
 void
@@ -485,7 +471,6 @@ ArucoSimple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 		visMarker.color.a  = 1.0;
 		visMarker.lifetime = ros::Duration(3.0);
 		_marker_pub.publish(visMarker);
-		std::cerr << "detect_marker(): marker published." << std::endl;
 	    }
 
 	  // but drawing all the detected markers
