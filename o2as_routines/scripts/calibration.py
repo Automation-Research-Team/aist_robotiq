@@ -55,6 +55,9 @@ class CalibrationClass(O2ASBaseRoutines):
     super(CalibrationClass, self).__init__()
     
     self.a_bot_downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+    self.bin_names = ["set1_bin2_1", "set1_bin2_2", "set1_bin2_3", "set1_bin2_4", "set1_bin3_1", "set2_bin1_1", 
+                      "set2_bin1_2", "set2_bin1_3", "set2_bin1_4", "set2_bin1_5"]
+
     # Neutral downward in the taskboard frames
     rospy.sleep(.5)   # Use this instead of waiting, so that simulation can be used
 
@@ -905,10 +908,14 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
     return 
 
+  
+
   def bin_calibration(self, robot_name="b_bot", end_effector_link=""):
-    rospy.loginfo("============ Calibrating bin. ============")
-    rospy.loginfo(robot_name + " end effector should be 8 cm above center of bin.")
-    if robot_name=="b_bot":
+    rospy.loginfo("============ Calibrating bins. ============")
+    rospy.loginfo(robot_name + " end effector should be 10 cm above center of bin.")
+    if robot_name=="a_bot":
+      self.go_to_named_pose("back", "b_bot")
+    elif robot_name=="b_bot":
       self.go_to_named_pose("back", "c_bot")
     elif robot_name=="c_bot":
       self.go_to_named_pose("back", "b_bot")
@@ -923,24 +930,57 @@ class CalibrationClass(O2ASBaseRoutines):
     poses = []
 
     pose0 = geometry_msgs.msg.PoseStamped()
-    pose0.header.frame_id = "set1_bin2_1"
+    # pose0.header.frame_id = "set1_bin2_1"
     pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     if end_effector_link and robot_name == "b_bot":
       pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
-    pose0.pose.position.z = 0.08
+    pose0.pose.position.z = 0.1
 
-    for i in range(10):
+    for bin in self.bin_names:
+      pose0.header.frame_id = bin
       poses.append(copy.deepcopy(pose0))
 
-    poses[1].header.frame_id = "set1_bin2_2"
-    poses[2].header.frame_id = "set1_bin2_3"
-    poses[3].header.frame_id = "set1_bin2_4"
-    poses[4].header.frame_id = "set1_bin3_1"
-    poses[5].header.frame_id = "set2_bin1_1"
-    poses[6].header.frame_id = "set2_bin1_2"
-    poses[7].header.frame_id = "set2_bin1_3"
-    poses[8].header.frame_id = "set2_bin1_4"
-    poses[9].header.frame_id = "set2_bin1_5"
+    self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
+    return 
+
+  def bin_corner_calibration(self, robot_name="b_bot", end_effector_link=""):
+    rospy.loginfo("============ Calibrating bin. ============")
+    rospy.loginfo(robot_name + " end effector should be 3 cm above each corner of each bin.")
+    if robot_name=="a_bot":
+      self.go_to_named_pose("back", "b_bot")
+    elif robot_name=="b_bot":
+      self.go_to_named_pose("back", "c_bot")
+    elif robot_name=="c_bot":
+      self.go_to_named_pose("back", "b_bot")
+    
+    if end_effector_link=="":
+      self.go_to_named_pose("home", robot_name)
+    elif "screw" in end_effector_link:
+      self.go_to_named_pose("screw_ready", robot_name)
+    elif "suction" in end_effector_link:
+      self.go_to_named_pose("screw_ready", robot_name)
+
+    poses = []
+
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    if end_effector_link and robot_name == "b_bot":
+      pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+    pose0.pose.position.z = 0.03
+
+    for bin in self.bin_names:
+      new_pose = copy.deepcopy(pose0)
+      new_pose.header.frame_id = bin + "_top_back_left_corner"
+      poses.append(new_pose)
+      new_pose = copy.deepcopy(pose0)
+      new_pose.header.frame_id = bin + "_top_back_right_corner"
+      poses.append(new_pose)
+      new_pose = copy.deepcopy(pose0)
+      new_pose.header.frame_id = bin + "_top_front_right_corner"
+      poses.append(new_pose)
+      new_pose = copy.deepcopy(pose0)
+      new_pose.header.frame_id = bin + "_top_front_left_corner"
+      poses.append(new_pose)
 
     self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
     return 
@@ -982,6 +1022,9 @@ if __name__ == '__main__':
       rospy.loginfo("321: Bins with a_bot")
       rospy.loginfo("322: Bins with b_bot")
       rospy.loginfo("323: Bins with suction_tool (b_bot)")
+      rospy.loginfo("331: Bin corners with a_bot")
+      rospy.loginfo("332: Bin corners with b_bot")
+      rospy.loginfo("333: Bin corners with suction_tool (b_bot)")
       rospy.loginfo("4: Parts tray tests (assembly/kitting)")
       rospy.loginfo("51: Assembly base plate (c_bot)")
       rospy.loginfo("52: Assembly base plate (b_bot)")
@@ -1071,6 +1114,12 @@ if __name__ == '__main__':
         c.bin_calibration(robot_name="b_bot")
       elif r == '323':
         c.bin_calibration(robot_name="b_bot", end_effector_link="b_bot_suction_tool_tip_link")
+      elif r == '331':
+        c.bin_corner_calibration(robot_name="a_bot")
+      elif r == '332':
+        c.bin_corner_calibration(robot_name="b_bot")
+      elif r == '333':
+        c.bin_corner_calibration(robot_name="b_bot", end_effector_link="b_bot_suction_tool_tip_link")
       elif r == '4':
         c.parts_tray_tests()
       elif r == '51':
