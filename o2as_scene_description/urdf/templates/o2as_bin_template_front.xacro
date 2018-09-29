@@ -13,6 +13,6 @@
   <joint name="rack_bins_joint" type="fixed">
     <parent link="workspace_center" />
     <child link="rack_bins_center"/>
-    <origin xyz=".21 0 0.015" rpy="0 0 0"/>
+    <origin xyz=".26 0 0.015" rpy="0 0 0"/>
   </joint>
 
