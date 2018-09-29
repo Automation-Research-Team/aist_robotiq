@@ -8,19 +8,21 @@ this launch file.
 -->
 
 <launch>
-    <arg name="robot_name" default="b_bot" />
+  <arg name="robot_name" default="b_bot" />
 
-    <!-- start easy_handeye publisher -->
-    <include file="$(find easy_handeye)/launch/publish.launch" >
-        <arg name="eye_on_hand" value="false" />
-        <arg name="namespace_prefix" default="o2as_easy_handeye_b_bot" />
+  <!-- start easy_handeye publisher -->
+  <include file="$(find easy_handeye)/launch/publish.launch" >
+    <arg name="eye_on_hand" value="false" />
+    <arg name="namespace_prefix"
+	 default="o2as_easy_handeye_$(arg robot_name)" />
 
-        <!--it is possible to override the link names saved in the yaml file
-            in case of name clashes, for example-->
-        <!-- Assume eye_on_hand is false -->
-        <arg name="robot_base_frame" value="$(arg robot_name)_base_link" />
-        <arg name="tracking_base_frame" default="camera_link_from_$(arg robot_name)_estimated" />
+    <!--it is possible to override the link names saved in the yaml file
+        in case of name clashes, for example-->
+    <!-- Assume eye_on_hand is false -->
+    <arg name="robot_base_frame" value="$(arg robot_name)_base_link" />
+    <arg name="tracking_base_frame"
+	 default="camera_link_from_$(arg robot_name)_estimated" />
 
-        <arg name="inverse" default="false" />
+    <arg name="inverse" default="false" />
     </include>
 </launch>

@@ -163,9 +163,8 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     for i in range(3):
       print("\n--- Subpose [{}/5]: Try! ---".format(i+1))
       if self.move(pose, speed):
-        print("--- Subpose [{}/5]: Completed. ---".format(i+1))
-        self.get_image_data()
         rospy.sleep(sleep_time)
+        print("--- Subpose [{}/5]: Completed. ---".format(i+1))
       else:
         print("--- Subpose [{}/5]: Failed. ---".format(i+1))
       pose[3] -= radians(30)
@@ -175,10 +174,11 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
 
     for i in range(2):
       print("\n--- Subpose [{}/5]: Try! ---".format(i+4))
-      self.move(pose, speed)
-      print("--- Subpose [{}/5]: Completed. ---".format(i+4))
-      self.get_image_data()
-      rospy.sleep(sleep_time)
+      if self.move(pose, speed):
+        rospy.sleep(sleep_time)
+        print("--- Subpose [{}/5]: Completed. ---".format(i+4))
+      else:
+        print("--- Subpose [{}/5]: Failed. ---".format(i+4))
       pose[4] -= radians(30)
 
     
@@ -198,19 +198,19 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     [all_close, move_success] = self.go_to_pose_goal(self.robot_name,
                                                      poseStamped, speed,
                                                      move_lin=False)
-    return move_success
+    if move_success:
+      if self.needs_trigger:
+        self.trigger_frame()
+        self.get_frame(0, True)
+      if self.needs_calib:
+        self.take_sample()
+        sample_list = self.get_sample_list()
+        n1 = len(sample_list.samples.hand_world_samples.transforms)
+        n2 = len(sample_list.samples.camera_marker_samples.transforms)
+        print("  took {} hand-world samples and {} camera-marker samples").format(n1, n2)
 
-  def get_image_data(self):
-    if self.needs_trigger:
-      self.trigger_frame()
-      self.get_frame(0, True)
-    if self.needs_calib:
-      self.take_sample()
-      sample_list = self.get_sample_list()
-      n1 = len(sample_list.samples.hand_world_samples.transforms)
-      n2 = len(sample_list.samples.camera_marker_samples.transforms)
-      print("  took {} hand_world samples and {} camera_marker " +
-            "samples").format(n1, n2)
+    return move_success
+        
 
   def go_home(self):
     self.go_to_named_pose("home", self.robot_name)
