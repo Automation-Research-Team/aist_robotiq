@@ -18,6 +18,12 @@ from o2as_graspability_estimation.srv import *
 
 from o2as_routines.base import O2ASBaseRoutines
 
+import rospkg
+rp = rospkg.RosPack()
+import csv
+import os
+
+
 from PIL import Image, ImageDraw
 
 LOG_LEVEL = log_level = rospy.DEBUG
@@ -25,153 +31,49 @@ LOG_LEVEL = log_level = rospy.DEBUG
 
 CroppedArea = namedtuple("CroppedArea", ["min_row", "max_row", "min_col", "max_col"])
 
-# Temporary variable for integration of graspability estimation in AIST
-bin_id_for_graspability_estimation = {
-  "part_7": 1,
-  "part_13": 2,
-  "part_11": 3,
-  "part_8": 4,
-  "part_4": 5,
-  "part_14": 6,
-  "part_17": 7,
-  "part_5": 8,
-  "part_12": 9,
-  "part_9": 10
-}
-
-part_poses_demo = {
-  "part_4":
-  {
-    "position": geometry_msgs.msg.Point(0, 0, 0.07),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
-    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
-    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
-  },
-  "part_5":
-  {
-    "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
-    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
-    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
-  },
-  "part_6":
-  {
-    "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
-    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
-    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
-  },
-  "part_7":
-  {
-    "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
-    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
-    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
-  },
-  "part_8":
-  {
-    "position": geometry_msgs.msg.Point(0, 0, 0.024),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
-    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
-    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
-  },
-  "part_9":
-  {
-    "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
-    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
-    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
-  },
-  "part_10":
-  {
-    "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
-    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
-    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
-  },
-  "part_11":
-  {
-    "position": geometry_msgs.msg.Point(0, 0, 0.037),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
-    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
-    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
-  },
-  "part_12":
-  {
-    "position": geometry_msgs.msg.Point(0, 0, 0.009),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
-    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
-    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
-    
-  },
-  "part_13":
-  {
-    "position": geometry_msgs.msg.Point(0, 0, 0.024),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
-    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
-    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
-  },
-  "part_14":
-  {
-    "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
-    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
-    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
-  },
-  "part_15":
-  {
-    "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
-    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
-    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
-  },
-  "part_16":
-  {
-    "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
-    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
-    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
-  },
-  "part_17":
-  {
-    "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
-    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
-    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
-  },
-  "part_18":
-  {
-    "position": geometry_msgs.msg.Point(0, 0, 0.02),
-    "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
-    "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
-    "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
-  }
-}
-
 class KittingClass(O2ASBaseRoutines):
   """
   This contains the routine used to run the kitting task. See base.py for shared convenience functions.
   """
   def __init__(self):
-
     super(KittingClass, self).__init__()
     
     # params
-    self.bin_id = rospy.get_param('part_bin_list')
-    self.gripper_id = rospy.get_param('gripper_id')
-    self.tray_id = rospy.get_param('tray_id')
+    # self.bin_id = rospy.get_param('part_bin_list')
+    # self.gripper_id = rospy.get_param('gripper_id')
+    # self.tray_id = rospy.get_param('tray_id')
     
     # services
     self._suction = rospy.ServiceProxy("o2as_usb_relay/set_power", SetPower)
     self._search_grasp = rospy.ServiceProxy("search_grasp", SearchGrasp)
 
-    self.set_up_item_parameters()
+    self.initial_setup()
     rospy.sleep(.5)
+    rospy.loginfo("Kitting task ready!")
 
-  def set_up_item_parameters(self):
-    self.item_names = []
-    self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    # 
+  def initial_setup(self):
+    self.orders = self.read_order_file()
+    rospy.loginfo("Received order list:")
+    rospy.loginfo(self.orders)
+    self.suction_orientation_from_behind = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    self.suction_orientation_from_45 = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/4))
+    self.suction_orientation_from_side = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+
+  
+  def read_order_file(self):
+    kitting_list = []
+    kitting_list.append([])
+    kitting_list.append([])
+    kitting_list.append([])
+    
+    with open(os.path.join(rp.get_path("o2as_routines"), "config", "kitting_order_file.csv"), 'r') as f:
+      reader = csv.reader(f)
+      header = next(reader)
+      # [0, 1, 2, 3, 4] = ["Set", "No.", "ID", "Name", "Note"]
+      for data in reader:
+        kitting_list[int(data[0])-1].append(int(data[2]))
+
+    return kitting_list
 
   ################ ----- Routines  
   ################ 
@@ -216,6 +118,7 @@ class KittingClass(O2ASBaseRoutines):
     rospy.sleep(1)
 
 
+
     print("test pass") 
     #self.go_to_named_pose("home", "a_bot")
     #rospy.loginfo("Test set2_bin1_5")
@@ -230,7 +133,6 @@ class KittingClass(O2ASBaseRoutines):
     #TO FIX it seems that the command is not responding after move_lin is called
     #self.groups[group_name].go(joint_goal, wait=True)
 
-    #10.5 11.0
     #TODO modifiy the bin to get the inner corner of each bins in kiting_bin_macro line 49..
     point_top1 = geometry_msgs.msg.PointStamped()
     #point_top1.header.frame_id = "set2_bin1_3"
@@ -279,9 +181,19 @@ class KittingClass(O2ASBaseRoutines):
     #
     #P: [554.3827128226441, 0.0, 320.5, -38.80678989758509, 0.0, 554.3827128226441, 240.5, 0.0, 0.0, 0.0, 1.0, 0.0]
     #TODO take the parameters from the /camera_info topic instead
-    cameraMatK = np.array([[554.3827128226441, 0.0, 320.5],
-                           [0.0, 554.3827128226441, 240.5],
+
+
+#for gazebo
+#    cameraMatK = np.array([[554.3827128226441, 0.0, 320.5],
+#                           [0.0, 554.3827128226441, 240.5],
+#                           [0.0, 0.0, 1.0]])
+
+#for ID Realsense on robot ID61*41   width 640 height 360
+    cameraMatK = np.array([[461.605774, 0.0, 318.471497],
+                           [0.0, 461.605804, 180.336258],
                            [0.0, 0.0, 1.0]])
+
+
 
     point_top1_cam_np = np.array([point_top1_cam.x, point_top1_cam.y, 1])   
     point_top2_cam_np = np.array([point_top2_cam.x, point_top2_cam.y, 1])   
@@ -293,7 +205,7 @@ class KittingClass(O2ASBaseRoutines):
     point_top2_img_np = cameraMatK.dot(point_top2_cam_np)
     point_top3_img_np = cameraMatK.dot(point_top3_cam_np)
     point_top4_img_np = cameraMatK.dot(point_top4_cam_np)
-    point_test_center_img_np = cameraMatK.dot(point_test_center_cam_np) 
+    point_test_center_img_np = cameraMatK.dot(point_test_center_cam_np)
 
     print(point_top1_img_np)
     print(point_top2_img_np)
@@ -307,7 +219,7 @@ class KittingClass(O2ASBaseRoutines):
                (point_top3_img_np[0],point_top3_img_np[1]),
                (point_top4_img_np[0],point_top4_img_np[1])]
 
-    img = Image.new('L', (640,480), 0)
+    img = Image.new('L', (640,360), 0)
     ImageDraw.Draw(img).polygon(polygon, outline = 1, fill = 128)
     mask = np.array(img)
     img.save('polygon.png','PNG')
@@ -315,6 +227,53 @@ class KittingClass(O2ASBaseRoutines):
 #    point_top1_cam = t.transformPoint("a_bot_camera_depth_frame", point_top1)
 #    point_top1_cam = t.transformPoint(point_top4.header.frame_id, point_top1)
 
+
+
+  def pick_screw_from_feeder(self, screw_size):
+    """
+    Picks a screw from one of the feeders. The screw tool already has to be equipped!
+    """
+    # Use this command to equip the screw tool: do_change_tool_action(self, "c_bot", equip=True, screw_size = 4)
+    
+    if not screw_size==3 and not screw_size==4:
+      rospy.logerror("Screw size needs to be 3 or 4!")
+      return False
+    
+    # Turn to the right to face the feeders
+    self.go_to_named_pose("feeder_pick_ready", "c_bot")
+
+    pose_feeder = geometry_msgs.msg.PoseStamped()
+    pose_feeder.header.frame_id = "m" + str(screw_size) + "_feeder_outlet_link"
+    pose_feeder.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    pose_feeder.pose.position.x = -.02
+
+    return self.do_pick_action("c_bot", pose_feeder, screw_size = 4, use_complex_planning = True, tool_name = "screw_tool")
+
+  def place_screw_in_tray(self, screw_size, hole_number):
+    """
+    Places a screw in a tray. A screw needs to be carried by the screw tool!
+    """
+    # Use this command to equip the screw tool: do_change_tool_action(self, "c_bot", equip=True, screw_size = 4)
+    
+    if not screw_size==3 and not screw_size==4:
+      rospy.logerror("Screw size needs to be 3 or 4!")
+      return False
+    
+    # Turn to the right to face the feeders
+    self.go_to_named_pose("feeder_pick_ready", "c_bot")
+    
+    pose_tray = geometry_msgs.msg.PoseStamped()
+    pose_tray.header.frame_id = "tray_2_screw_m" + str(screw_size) + "_" + str(hole_number)
+    pose_tray.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, 0, 0))
+    pose_tray.pose.position.x = -.01
+
+    success = self.do_place_action("c_bot", pose_tray, tool_name = "screw_tool")
+    if not success:
+      return False
+    
+    self.go_to_named_pose("feeder_pick_ready", "c_bot")
+    return True
+    
 
   def pick_using_precision_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = ""):
     # TODO: here is for Osaka Univ.
@@ -336,7 +295,6 @@ class KittingClass(O2ASBaseRoutines):
     pass
 
   def pick(self, group_name, pose_goal_stamped, speed_fast = 1.0, speed_slow = 1.0, end_effector_link = "", approach_height = 0.15):
-
     rospy.loginfo("Go to above the target bin.")
     pose_goal_above = copy.deepcopy(pose_goal_stamped)
     pose_goal_above.pose.position.z = approach_height
@@ -376,7 +334,7 @@ class KittingClass(O2ASBaseRoutines):
     #   return False
 
     rospy.loginfo("Go back to home.")
-    res = self.go_to_named_pose("home", group_name, speed_fast)
+    res = self.move_lin("home", group_name, speed_fast)
     # if not res:
     #   rospy.logdebug("Couldn't go back to home.")
     #   return False
@@ -388,6 +346,128 @@ class KittingClass(O2ASBaseRoutines):
   ################ 
 
   def pick_and_place_demo(self):
+    # Temporary variable for integration of graspability estimation in AIST
+    bin_id_for_graspability_estimation = {
+      "part_7": 1,
+      "part_13": 2,
+      "part_11": 3,
+      "part_8": 4,
+      "part_4": 5,
+      "part_14": 6,
+      "part_17": 7,
+      "part_5": 8,
+      "part_12": 9,
+      "part_9": 10
+    }
+
+    part_poses_demo = {
+      "part_4":
+      {
+        "position": geometry_msgs.msg.Point(0, 0, 0.07),
+        "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+        "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+        "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+      },
+      "part_5":
+      {
+        "position": geometry_msgs.msg.Point(0, 0, 0.02),
+        "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+        "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+        "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+      },
+      "part_6":
+      {
+        "position": geometry_msgs.msg.Point(0, 0, 0.02),
+        "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+        "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+        "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+      },
+      "part_7":
+      {
+        "position": geometry_msgs.msg.Point(0, 0, 0.02),
+        "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+        "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+        "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+      },
+      "part_8":
+      {
+        "position": geometry_msgs.msg.Point(0, 0, 0.024),
+        "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+        "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+        "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+      },
+      "part_9":
+      {
+        "position": geometry_msgs.msg.Point(0, 0, 0.02),
+        "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+        "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+        "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+      },
+      "part_10":
+      {
+        "position": geometry_msgs.msg.Point(0, 0, 0.02),
+        "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+        "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+        "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+      },
+      "part_11":
+      {
+        "position": geometry_msgs.msg.Point(0, 0, 0.037),
+        "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+        "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+        "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+      },
+      "part_12":
+      {
+        "position": geometry_msgs.msg.Point(0, 0, 0.009),
+        "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+        "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+        "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+        
+      },
+      "part_13":
+      {
+        "position": geometry_msgs.msg.Point(0, 0, 0.024),
+        "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+        "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+        "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+      },
+      "part_14":
+      {
+        "position": geometry_msgs.msg.Point(0, 0, 0.02),
+        "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+        "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+        "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+      },
+      "part_15":
+      {
+        "position": geometry_msgs.msg.Point(0, 0, 0.02),
+        "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+        "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+        "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+      },
+      "part_16":
+      {
+        "position": geometry_msgs.msg.Point(0, 0, 0.02),
+        "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+        "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+        "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+      },
+      "part_17":
+      {
+        "position": geometry_msgs.msg.Point(0, 0, 0.02),
+        "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+        "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+        "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+      },
+      "part_18":
+      {
+        "position": geometry_msgs.msg.Point(0, 0, 0.02),
+        "orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0)),
+        "goal_position": geometry_msgs.msg.Point(0, 0, 0.05),
+        "goal_orientation": geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
+      }
+    }
 
     speed_fast = 1.0
     speed_slow = 1.0
@@ -395,7 +475,7 @@ class KittingClass(O2ASBaseRoutines):
     for set_num in range(1,4):
       item_list = rospy.get_param("/set_"+str(set_num))
       rospy.loginfo(item_list)
-      rospy.loginfo("kitintg set_"+str(set_num) +" started!")
+      rospy.loginfo("kitting set_"+str(set_num) +" started!")
 
       for item in item_list:
         req_search_grasp = SearchGraspRequest()
@@ -440,8 +520,8 @@ class KittingClass(O2ASBaseRoutines):
             world_pose.pose.position.y, 
             world_pose.pose.position.z)
           
-          res = self.pick("b_bot", goal_pose, speed_fast, speed_slow, "b_bot_dual_suction_gripper_pad_link", 0.1)
-          robot_pose = self.groups["b_bot"].get_current_pose("b_bot_dual_suction_gripper_pad_link")
+          res = self.pick("b_bot", goal_pose, speed_fast, speed_slow, "b_bot_suction_tool_tip_link", 0.1)
+          robot_pose = self.groups["b_bot"].get_current_pose("b_bot_suction_tool_tip_link")
           rospy.logdebug("\nrobot ee position in %s: (x, y, z) = (%s, %s, %s)", 
             robot_pose.header.frame_id, 
             robot_pose.pose.position.x, 
@@ -458,7 +538,7 @@ class KittingClass(O2ASBaseRoutines):
           # place_pose.header.frame_id = self.tray_id[item]
           # place_pose.pose.position = copy.deepcopy(part_poses_demo[item]["goal_position"])
           # place_pose.pose.orientation = copy.deepcopy(part_poses_demo[item]["goal_orientation"])
-          # res = self.place("b_bot", place_pose, speed_fast, speed_slow, "b_bot_dual_suction_gripper_pad_link")
+          # res = self.place("b_bot", place_pose, speed_fast, speed_slow, "b_bot_suction_tool_tip_link")
           # if not res:
           #   rospy.logerr("Failed to place target object.")
           #   return
@@ -474,28 +554,31 @@ class KittingClass(O2ASBaseRoutines):
       raw_input()
   
   def kitting_task(self):
-    # self.go_to_named_pose("home", "c_bot")
-    # self.go_to_named_pose("home", "b_bot")
-    #self.go_to_named_pose("home", "a_bot")
 
-    #self.pick_and_place_demo()
-    self.view_bin("a_bot", "set2_bin1_2")
+    # Strategy:
+    # - Read in order files
+    # - Start with suction tool equipped
+    # - Pick all the screws in the current set and put them in the feeders, so they will be ready to be picked
+    # - Go through all items that require suction, so the tool is equipped only once does not have to be re-equipped
+    # - Go through items that are picked by the a_bot or b_bot grippers
+    # - Pick and place the screws
+    # - Try to pick and return any excess screws
+    pass
 
-    # self.go_to_named_pose("home", "c_bot")
-    # self.go_to_named_pose("home", "b_bot")
-    # self.go_to_named_pose("home", "a_bot")
-
-    # TODO
 
 
 if __name__ == '__main__':
-
   try:
     kit = KittingClass()
-    kit.set_up_item_parameters()
     
-    kit.kitting_task()
-    # kit.check_point_test()
+    kit.view_bin("a_bot", "set2_bin1_2")
+
+    kit.pick_and_place_demo()
+
+    # rospy.loginfo("Press enter to start the task!")
+    # raw_input()
+    # kit.kitting_task()
+    
     print "============ Done!"
   except rospy.ROSInterruptException:
     pass
