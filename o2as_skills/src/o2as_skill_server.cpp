@@ -1299,6 +1299,92 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
   return true;
 }
 
+bool SkillServer::placeScrew(geometry_msgs::PoseStamped screw_head_pose, std::string screw_tool_id, std::string robot_name, std::string screw_tool_link, std::string fastening_tool_name)
+{
+  // Strategy: 
+  // - Move 1 cm above the screw head pose
+  // - Go down real slow for 2 cm while turning the motor in the direction that would tighten the screw
+  // - Do a little circle motion with radius 1-2 mm
+  // - Move up again slowly
+  // - If the suction reports success, return true
+  // - If not, display warning and return false?
+  
+  tf::Transform t;
+  tf::Quaternion q(screw_head_pose.pose.orientation.x, screw_head_pose.pose.orientation.y, screw_head_pose.pose.orientation.z, screw_head_pose.pose.orientation.w);
+  t.setOrigin(tf::Vector3(screw_head_pose.pose.position.x, screw_head_pose.pose.position.y, screw_head_pose.pose.position.z));
+  t.setRotation(q);
+  tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), screw_head_pose.header.frame_id, "screw_pick_frame"));
+  ROS_INFO_STREAM("Received placeScrew command.");
+
+  ROS_INFO_STREAM("Moving close to tray screw hole.");
+  screw_head_pose.pose.position.x = -.01;
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  bool success = moveToCartPoseLIN(screw_head_pose, robot_name, true, screw_tool_link, 0.3);
+  if (!success)
+  {
+    ROS_INFO_STREAM("Linear motion plan to target pick pose failed. Returning false.");
+    return false;
+  }
+
+  planning_scene_interface_.allowCollisions(screw_tool_id, "tray_2_screw_holder");
+
+  auto adjusted_pose = screw_head_pose;
+  auto search_start_pose = screw_head_pose;
+  bool screw_picked = false;
+  
+  // Try to pick the screw, but go around in a spiral while trying to pick it
+  sendFasteningToolCommand(fastening_tool_name, "tighten", false, 10.0);
+
+  ROS_INFO_STREAM("Moving into tray screw hole.");
+  adjusted_pose.pose.position.x = .01;
+  moveToCartPoseLIN(adjusted_pose, robot_name, true, screw_tool_link, 0.02);
+
+  if (use_real_robot_)
+  {
+    o2as_msgs::sendScriptToUR srv;
+    srv.request.program_id = "spiral_motion";
+    srv.request.robot_name = goal->robot_name;
+    srv.request.max_radius = .002;
+    srv.request.radius_increment = .0005;
+    srv.request.spiral_axis = "Y";
+    sendScriptToURClient_.call(srv);
+    if (srv.response.success == true)
+    {
+      ROS_DEBUG("Successfully called the service client to do spiral motion.");
+      // waitForURProgram("/" + goal->robot_name +"_controller");
+    }
+    else
+      ROS_ERROR("Could not call the service client to do spiral motion.");
+  }
+  else
+  {
+    ROS_INFO("Waiting for 5 s to simulate the spiral motion that would run on the real robot.");
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  }
+
+  ROS_INFO_STREAM("Moving back a bit slowly.");
+  adjusted_pose.pose.position.x = -.01;
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  moveToCartPoseLIN(adjusted_pose, robot_name, true, screw_tool_link, 0.02);
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  // TODO: Wait for message from suction topic
+  //   screw_picked = ros::topic::waitForMessage("/" + screw_tool_id + "/screw_suctioned", ros::Duration(1.0));
+  ROS_WARN("Setting screw_placed to true");
+
+  ROS_WARN_STREAM("TODO: TURN OFF SUCTION");
+
+  planning_scene_interface_.disallowCollisions(screw_tool_id, "tray_2_screw_holder");
+  ROS_INFO_STREAM("Moving back up completely.");
+  screw_head_pose.pose.position.x = -.05;
+  success = moveToCartPoseLIN(screw_head_pose, robot_name, true, screw_tool_link, 0.5);
+  
+  // TODO: Check suction success
+
+  ROS_INFO_STREAM("Finished picking up screw. We don't know if we got it, so we are returning true for now. TODO.");
+  return true;
+}
+
 bool SkillServer::publishMarker(geometry_msgs::PoseStamped marker_pose, std::string marker_type)
 {
     visualization_msgs::Marker marker;
@@ -1608,6 +1694,15 @@ void SkillServer::executePlace(const o2as_msgs::placeGoalConstPtr& goal)
   if (goal->tool_name == "suction")
   {
     ; // TODO: Set the ee_link_name correctly and pass a flag to placeFromAbove
+  }
+
+  if (goal->tool_name == "screw_tool")
+  {
+    // This is for placing a screw in the tray
+    std::string screw_tool_id = "screw_tool_m" + std::to_string(goal->screw_size);
+    std::string screw_tool_link = goal->robot_name + "_screw_tool_m" + std::to_string(goal->screw_size) + "_tip_link";
+    std::string fastening_tool_name = "screw_tool_m" + std::to_string(goal->screw_size);
+    return placeScrew(goal->item_pose, screw_tool_id, goal->robot_name, screw_tool_link, fastening_tool_name);
   }
 
   placeFromAbove(goal->item_pose, ee_link_name, goal->robot_name);
