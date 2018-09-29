@@ -216,6 +216,7 @@ class KittingClass(O2ASBaseRoutines):
     rospy.sleep(1)
 
 
+
     print("test pass") 
     #self.go_to_named_pose("home", "a_bot")
     #rospy.loginfo("Test set2_bin1_5")
@@ -230,7 +231,6 @@ class KittingClass(O2ASBaseRoutines):
     #TO FIX it seems that the command is not responding after move_lin is called
     #self.groups[group_name].go(joint_goal, wait=True)
 
-    #10.5 11.0
     #TODO modifiy the bin to get the inner corner of each bins in kiting_bin_macro line 49..
     point_top1 = geometry_msgs.msg.PointStamped()
     #point_top1.header.frame_id = "set2_bin1_3"
@@ -279,9 +279,19 @@ class KittingClass(O2ASBaseRoutines):
     #
     #P: [554.3827128226441, 0.0, 320.5, -38.80678989758509, 0.0, 554.3827128226441, 240.5, 0.0, 0.0, 0.0, 1.0, 0.0]
     #TODO take the parameters from the /camera_info topic instead
-    cameraMatK = np.array([[554.3827128226441, 0.0, 320.5],
-                           [0.0, 554.3827128226441, 240.5],
+
+
+#for gazebo
+#    cameraMatK = np.array([[554.3827128226441, 0.0, 320.5],
+#                           [0.0, 554.3827128226441, 240.5],
+#                           [0.0, 0.0, 1.0]])
+
+#for ID Realsense on robot ID61*41   width 640 height 360
+    cameraMatK = np.array([[461.605774, 0.0, 318.471497],
+                           [0.0, 461.605804, 180.336258],
                            [0.0, 0.0, 1.0]])
+
+
 
     point_top1_cam_np = np.array([point_top1_cam.x, point_top1_cam.y, 1])   
     point_top2_cam_np = np.array([point_top2_cam.x, point_top2_cam.y, 1])   
@@ -307,7 +317,7 @@ class KittingClass(O2ASBaseRoutines):
                (point_top3_img_np[0],point_top3_img_np[1]),
                (point_top4_img_np[0],point_top4_img_np[1])]
 
-    img = Image.new('L', (640,480), 0)
+    img = Image.new('L', (640,360), 0)
     ImageDraw.Draw(img).polygon(polygon, outline = 1, fill = 128)
     mask = np.array(img)
     img.save('polygon.png','PNG')
