@@ -360,19 +360,33 @@ ArucoSimple::reconf_callback(ArucoThresholdConfig& config, uint32_t level)
 void
 ArucoSimple::image_callback(const image_p& image_msg)
 {
+    std::cerr << "image_callback(): image arrived... ";
     if (image_msg->header.stamp == _cloud_msg.header.stamp)
+    {
+	std::cerr << "Try to detect marker." << std::endl;
 	detect_marker(*image_msg, _cloud_msg);
+    }
     else
+    {
+	std::cerr << "Save to buffer." << std::endl;
 	_image_msg = *image_msg;
+    }
 }
     
 void
 ArucoSimple::cloud_callback(const cloud_p& cloud_msg)
 {
+    std::cerr << "cloud_callback(): clouf arrived... ";
     if (cloud_msg->header.stamp == _image_msg.header.stamp)
+    {
+	std::cerr << "Try to detect marker." << std::endl;
 	detect_marker(_image_msg, *cloud_msg);
+    }
     else
+    {
+	std::cerr << "Save to buffer." << std::endl;
 	_cloud_msg = *cloud_msg;
+    }
 }
 
 void
@@ -395,8 +409,8 @@ ArucoSimple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 
     try
     {
-      //const auto	curr_stamp = ros::Time::now();
-	const auto	curr_stamp = image_msg.header.stamp;
+	const auto	curr_stamp = ros::Time::now();
+      //const auto	curr_stamp = image_msg.header.stamp;
 	auto		inImage = cv_bridge::toCvCopy(
 					image_msg,
 					sensor_msgs::image_encodings::RGB8)
@@ -412,6 +426,7 @@ ArucoSimple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 	  // only publishing the selected marker
 	    if (marker.id == _marker_id)
 	    {
+	      // marker -> camera transform
 		tf::Transform	transform = get_marker_transform(marker,
 								 cloud_msg);
 	      //tf::Transform	transform = arucoMarker2Tf(marker);
@@ -422,6 +437,7 @@ ArucoSimple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 		    get_transform(_reference_frame, _camera_frame,
 				  cameraToReference);
 
+	      // marker -> reference transform
 		transform = static_cast<tf::Transform>(cameraToReference) 
 			  * static_cast<tf::Transform>(_rightToLeft) 
 			  * transform;
@@ -469,15 +485,16 @@ ArucoSimple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 		visMarker.color.a  = 1.0;
 		visMarker.lifetime = ros::Duration(3.0);
 		_marker_pub.publish(visMarker);
+		std::cerr << "detect_marker(): marker published." << std::endl;
 	    }
 
 	  // but drawing all the detected markers
 	    marker.draw(inImage, cv::Scalar(0,0,255), 2);
 	}
 
-      //draw a 3d cube in each marker if there is 3d info
 	if (_marker_size != -1)
 	{
+	  //draw a 3d cube in each marker if there is 3d info
 	    for (auto& marker : markers)
 		aruco::CvDrawingUtils::draw3dAxis(inImage, marker, _camParam);
 	}
