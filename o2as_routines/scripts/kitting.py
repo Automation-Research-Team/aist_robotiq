@@ -58,7 +58,7 @@ class KittingClass(O2ASBaseRoutines):
     self.suction_orientation_from_behind = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     self.suction_orientation_from_45 = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/4))
     self.suction_orientation_from_side = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
-
+    self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
   
   def read_order_file(self):
     kitting_list = []
@@ -96,47 +96,46 @@ class KittingClass(O2ASBaseRoutines):
       rospy.logdebug("Couldn't pick the target using suction.")
       return False
 
-  def naive_pick(self, group_name, bin_id, speed_fast = 1.0, speed_slow = 1.0, approach_height = 0.05,bin_eff_height = 0.07, bin_eff_xoff = 0, bin_eff_deg_angle = 0,end_effector_link = ""):
+  def naive_pick(self, group_name, bin_id, speed_fast = 1.0, speed_slow = 1.0, approach_height = 0.05, bin_eff_height = 0.07, bin_eff_xoff = 0, bin_eff_yoff = 0, bin_eff_deg_angle = 0,end_effector_link = ""):
 
     #Place gripper above bin
     goal_pose_above = geometry_msgs.msg.PoseStamped()
     goal_pose_above.header.frame_id = bin_id
     goal_pose_above.pose.position.x = bin_eff_xoff
-    goal_pose_above.pose.position.y = 0
+    goal_pose_above.pose.position.y = bin_eff_yoff
     goal_pose_above.pose.position.z = bin_eff_height
     goal_pose_above.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 , 0))
-    res, move_group_res = self.move_lin(group_name, goal_pose_above, speed_slow, "")
-    print("res")
-    print(res)
-    print(move_group_res)
-    if not move_group_res:
+    res = self.move_lin(group_name, goal_pose_above, speed_slow, "")
+    if not res:
       rospy.loginfo("Couldn't go to the target.")
     #TODO Problem with gazebo controller while controlling the robot with movelin
       return False
 
     #Open the gripper 
-    self.send_gripper_command(gripper= "precision_gripper_inner", command="open")
+    self.send_gripper_command(gripper= "precision_gripper_inner", command="close")
     #self.precision_gripper_inner_open()
+    rospy.sleep(1)
 
     #Descend
     rospy.loginfo("Descend on target.")
     goal_pose_descend = copy.deepcopy(goal_pose_above)
-    goal_pose_descend.pose.position.z = goal_pose_descend.pose.position.z-approach_height
-    res, move_group_res  = self.move_lin(group_name, goal_pose_descend, speed_fast, end_effector_link)
-    if not move_group_res:
+    goal_pose_descend.pose.position.z = goal_pose_descend.pose.position.z - approach_height
+    res  = self.move_lin(group_name, goal_pose_descend, speed_fast, end_effector_link)
+    if not res:
       rospy.loginfo("Couldn't go to above the target bin.")
       return False
 
     #Close the gripper 
-    self.send_gripper_command(gripper= "precision_gripper_inner", command="close")
+    self.send_gripper_command(gripper= "precision_gripper_inner", command="open")
     #self.precision_gripper_inner_close()
+    rospy.sleep(1)
 
     #Ascend
     rospy.loginfo("Ascend with target.")
     goal_pose_ascend = copy.deepcopy(goal_pose_descend)
-    goal_pose_ascend.pose.position.z = goal_pose_ascend.pose.position.z+approach_height
-    res, move_group_res  = self.move_lin(group_name, goal_pose_ascend, speed_fast, end_effector_link)
-    if not move_group_res:
+    goal_pose_ascend.pose.position.z = goal_pose_ascend.pose.position.z + approach_height
+    res  = self.move_lin(group_name, goal_pose_ascend, speed_fast, end_effector_link)
+    if not res:
       rospy.loginfo("Couldn't go to above the target bin.")
       return False
 
@@ -334,7 +333,7 @@ class KittingClass(O2ASBaseRoutines):
     # TODO: here is for Osaka Univ.
     pass
 
-  def pick(self, group_name, pose_goal_stamped, speed_fast = 1.0, speed_slow = 1.0, end_effector_link = "", approach_height = 0.15):
+  def pick_kitting(self, group_name, pose_goal_stamped, speed_fast = 1.0, speed_slow = 1.0, end_effector_link = "", approach_height = 0.15):
     rospy.loginfo("Go to above the target bin.")
     pose_goal_above = copy.deepcopy(pose_goal_stamped)
     pose_goal_above.pose.position.z = approach_height
@@ -356,7 +355,7 @@ class KittingClass(O2ASBaseRoutines):
 
     return True
     
-  def place(self, group_name, pose_goal_stamped, speed_fast = 1.0, speed_slow = 1.0, end_effector_link = "", approach_height = 0.15):
+  def place_kitting(self, group_name, pose_goal_stamped, speed_fast = 1.0, speed_slow = 1.0, end_effector_link = "", approach_height = 0.15):
     rospy.loginfo("Go to above the target tray partition.")
     pose_goal_above = copy.deepcopy(pose_goal_stamped)
     pose_goal_above.pose.position.z = approach_height
@@ -560,7 +559,7 @@ class KittingClass(O2ASBaseRoutines):
             world_pose.pose.position.y, 
             world_pose.pose.position.z)
           
-          res = self.pick("b_bot", goal_pose, speed_fast, speed_slow, "b_bot_suction_tool_tip_link", 0.1)
+          res = self.pick_kitting("b_bot", goal_pose, speed_fast, speed_slow, "b_bot_suction_tool_tip_link", 0.1)
           robot_pose = self.groups["b_bot"].get_current_pose("b_bot_suction_tool_tip_link")
           rospy.logdebug("\nrobot ee position in %s: (x, y, z) = (%s, %s, %s)", 
             robot_pose.header.frame_id, 
@@ -578,7 +577,7 @@ class KittingClass(O2ASBaseRoutines):
           # place_pose.header.frame_id = self.tray_id[item]
           # place_pose.pose.position = copy.deepcopy(part_poses_demo[item]["goal_position"])
           # place_pose.pose.orientation = copy.deepcopy(part_poses_demo[item]["goal_orientation"])
-          # res = self.place("b_bot", place_pose, speed_fast, speed_slow, "b_bot_suction_tool_tip_link")
+          # res = self.place_kitting("b_bot", place_pose, speed_fast, speed_slow, "b_bot_suction_tool_tip_link")
           # if not res:
           #   rospy.logerr("Failed to place target object.")
           #   return
@@ -603,8 +602,10 @@ class KittingClass(O2ASBaseRoutines):
     # - Go through items that are picked by the a_bot or b_bot grippers
     # - Pick and place the screws
     # - Try to pick and return any excess screws
-    #self.pick_and_place_demo()
-    self.naive_pick("a_bot", "set2_bin1_3")
+
+    # - Between sets, say "Done with set X. Press enter to start the next set."
+    # Ideally, we can fit all the trays into the scene.
+    return
 
 
 
@@ -612,10 +613,38 @@ if __name__ == '__main__':
   try:
     kit = KittingClass()
     
-    kit.view_bin("a_bot", "set2_bin1_2")
+    ##### EXAMPLE 1
+    # kit.go_to_named_pose("home", "a_bot")
+    # kit.naive_pick("a_bot", "set2_bin1_4", bin_eff_height=.04)
+    # kit.go_to_named_pose("home", "a_bot")
+    # place_pose = geometry_msgs.msg.PoseStamped()
+    # place_pose.header.frame_id = "tray_2_partition_4"
+    # place_pose.pose.orientation = kit.downward_orientation
+    # kit.place("a_bot", place_pose, place_height=0.02, speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
 
-    kit.pick_and_place_demo()
+    ##### EXAMPLE 2
+    # kit.go_to_named_pose("home", "a_bot")
+    pick_pose = geometry_msgs.msg.PoseStamped()
+    pick_pose.header.frame_id = "set2_bin1_5"
+    pick_pose.pose.orientation = kit.downward_orientation
+    pick_pose.pose.position.y = .03
+    kit.pick("a_bot", pick_pose, -0.01, speed_fast = 0.2, speed_slow = 0.02, 
+                   gripper_command="easy_pick_outside_only_inner", approach_height = 0.05)
+    # kit.go_to_named_pose("home", "a_bot")
+    # place_pose = geometry_msgs.msg.PoseStamped()
+    # place_pose.header.frame_id = "tray_2_partition_4"
+    # place_pose.pose.orientation = kit.downward_orientation
+    # kit.place("a_bot", place_pose, place_height=0.02, speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
+    
 
+    ##### EXAMPLE 3 (How to look into a bin)
+    # kit.view_bin("a_bot", "set2_bin1_4")
+
+    ##### OLD CODE
+    # kit.pick_and_place_demo()
+
+
+    ##### WHAT THE REAL TASK SHOULD BE LIKE
     # rospy.loginfo("Press enter to start the task!")
     # raw_input()
     # kit.kitting_task()
