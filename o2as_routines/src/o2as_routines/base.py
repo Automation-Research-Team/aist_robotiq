@@ -59,7 +59,7 @@ from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
 
-log_level = LOG_LEVEL = rospy.DEBUG
+log_level = LOG_LEVEL = rospy.INFO
 
 import ur_modern_driver.msg
 
@@ -268,14 +268,15 @@ class O2ASBaseRoutines(object):
 
     # FIXME: At the start of the program, get_current_pose() did not return the correct value. Should be a bug report.
     waypoints = []
-    wpose1 = group.get_current_pose().pose
-    # rospy.loginfo("Wpose1:")
-    # rospy.loginfo(wpose1)
-    rospy.sleep(.05)
-    wpose2 = group.get_current_pose().pose
-    # rospy.loginfo("Wpose2:")
-    # rospy.loginfo(wpose2)
-    waypoints.append(wpose2)
+    ### The current pose is not added anymore, because it causes a bug in Gazebo, and it is not necessary.
+    # wpose1 = group.get_current_pose().pose
+    # # rospy.loginfo("Wpose1:")
+    # # rospy.loginfo(wpose1)
+    # rospy.sleep(.05)
+    # wpose2 = group.get_current_pose().pose
+    # # rospy.loginfo("Wpose2:")
+    # # rospy.loginfo(wpose2)
+    # waypoints.append(wpose2)
     pose_goal_world = self.listener.transformPose("world", pose_goal_stamped).pose
     waypoints.append(pose_goal_world)
     (plan, fraction) = group.compute_cartesian_path(

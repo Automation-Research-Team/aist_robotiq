@@ -905,6 +905,46 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
     return 
 
+  def bin_calibration(self, robot_name="b_bot", end_effector_link=""):
+    rospy.loginfo("============ Calibrating bin. ============")
+    rospy.loginfo(robot_name + " end effector should be 8 cm above center of bin.")
+    if robot_name=="b_bot":
+      self.go_to_named_pose("back", "c_bot")
+    elif robot_name=="c_bot":
+      self.go_to_named_pose("back", "b_bot")
+    
+    if end_effector_link=="":
+      self.go_to_named_pose("home", robot_name)
+    elif "screw" in end_effector_link:
+      self.go_to_named_pose("screw_ready", robot_name)
+    elif "suction" in end_effector_link:
+      self.go_to_named_pose("screw_ready", robot_name)
+
+    poses = []
+
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.header.frame_id = "set1_bin2_1"
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    if end_effector_link and robot_name == "b_bot":
+      pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+    pose0.pose.position.z = 0.08
+
+    for i in range(10):
+      poses.append(copy.deepcopy(pose0))
+
+    poses[1].header.frame_id = "set1_bin2_2"
+    poses[2].header.frame_id = "set1_bin2_3"
+    poses[3].header.frame_id = "set1_bin2_4"
+    poses[4].header.frame_id = "set1_bin3_1"
+    poses[5].header.frame_id = "set2_bin1_1"
+    poses[6].header.frame_id = "set2_bin1_2"
+    poses[7].header.frame_id = "set2_bin1_3"
+    poses[8].header.frame_id = "set2_bin1_4"
+    poses[9].header.frame_id = "set2_bin1_5"
+
+    self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
+    return 
+
 if __name__ == '__main__':
   try:
     c = CalibrationClass()
@@ -913,6 +953,8 @@ if __name__ == '__main__':
       rospy.loginfo("============ Calibration procedures ============ ")
       rospy.loginfo("Enter a number to check calibrations for the following things: ")
       rospy.loginfo("1: The robots (central position with nothing on the table)")
+      rospy.loginfo("100: Go home with all robots")
+      rospy.loginfo("101: Go back with all robots")
       rospy.loginfo("111: The robots (Using the assembly base plate)")
       rospy.loginfo("112: The robots (Using the corner between b/c)")
       rospy.loginfo("113: The robots (Using the corner between a/b)")
@@ -939,6 +981,7 @@ if __name__ == '__main__':
       rospy.loginfo("317: Screws in tray with screw_tool_m4 (c_bot)")
       rospy.loginfo("321: Bins with a_bot")
       rospy.loginfo("322: Bins with b_bot")
+      rospy.loginfo("323: Bins with suction_tool (b_bot)")
       rospy.loginfo("4: Parts tray tests (assembly/kitting)")
       rospy.loginfo("51: Assembly base plate (c_bot)")
       rospy.loginfo("52: Assembly base plate (b_bot)")
@@ -966,6 +1009,14 @@ if __name__ == '__main__':
       r = raw_input()
       if r == '1':
         c.check_robot_calibration()
+      if r == '100':
+        c.go_to_named_pose("home", "a_bot")
+        c.go_to_named_pose("home", "b_bot")
+        c.go_to_named_pose("home", "c_bot")
+      if r == '101':
+        c.go_to_named_pose("back", "a_bot")
+        c.go_to_named_pose("back", "b_bot")
+        c.go_to_named_pose("back", "c_bot")
       if r == '111':
         c.check_robot_calibration(position="assembly_corner_4")
       if r == '112':
@@ -1014,6 +1065,12 @@ if __name__ == '__main__':
         c.tray_screw_calibration(robot_name="b_bot", end_effector_link="b_bot_suction_tool_tip_link", task="kitting")
       elif r == '317':
         c.tray_screw_calibration(robot_name="c_bot", end_effector_link="c_bot_screw_tool_m4_tip_link", task="kitting")
+      elif r == '321':
+        c.bin_calibration(robot_name="a_bot")
+      elif r == '322':
+        c.bin_calibration(robot_name="b_bot")
+      elif r == '323':
+        c.bin_calibration(robot_name="b_bot", end_effector_link="b_bot_suction_tool_tip_link")
       elif r == '4':
         c.parts_tray_tests()
       elif r == '51':
