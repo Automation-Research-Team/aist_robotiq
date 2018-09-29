@@ -8,6 +8,9 @@
        doc="Size of the ArUco marker used, in meters"/>
   <arg name="config"		default="sim"/>
 
+  <param name="use_real_robot"	value="false"
+	 if="$(eval arg('config') == 'sim')"/>
+  
   <!-- Set AR marker ID -->
   <arg name="marker_id" value="17"  if="$(eval arg('robot_name') == 'a_bot')"/>
   <arg name="marker_id" value="26"  if="$(eval arg('robot_name') == 'b_bot')"/>
