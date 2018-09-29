@@ -46,12 +46,63 @@
       <xacro:insert_block name="origin"/>
     </xacro:kitting_bin_internal>
 
-    <joint name="${binname}_top_left_corner_joint" type="fixed">
+    <joint name="${binname}_bottom_front_right_corner_joint" type="fixed">
       <parent link="${binname}"/>
-      <child link="${binname}_top_left_corner_link"/>
-      <origin rpy="0.0 0.0 0.0" xyz="0.1 0.1 -0.146 "/>
+      <child link="${binname}_bottom_front_right_corner"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.04 0.055 0.0 "/>
     </joint>
-    <link name="${binname}_top_left_corner_link"/>
+    <link name="${binname}_bottom_front_right_corner"/>
+
+    <joint name="${binname}_bottom_back_right_corner_joint" type="fixed">
+      <parent link="${binname}"/>
+      <child link="${binname}_bottom_back_right_corner"/>
+      <origin rpy="0.0 0.0 0.0" xyz="-0.055 0.055 0.0 "/>
+    </joint>
+    <link name="${binname}_bottom_back_right_corner"/>
+
+    <joint name="${binname}_bottom_back_left_corner_joint" type="fixed">
+      <parent link="${binname}"/>
+      <child link="${binname}_bottom_back_left_corner"/>
+      <origin rpy="0.0 0.0 0.0" xyz="-0.055 -0.055 0.0 "/>
+    </joint>
+    <link name="${binname}_bottom_back_left_corner"/>
+
+    <joint name="${binname}_bottom_front_left_corner_joint" type="fixed">
+      <parent link="${binname}"/>
+      <child link="${binname}_bottom_front_left_corner"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.04 -0.055 0.0 "/>
+    </joint>
+    <link name="${binname}_bottom_front_left_corner"/>
+
+    <joint name="${binname}_top_front_right_corner_joint" type="fixed">
+      <parent link="${binname}"/>
+      <child link="${binname}_top_front_right_corner"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.04 0.055 0.04 "/>
+    </joint>
+    <link name="${binname}_top_front_right_corner"/>
+
+    <joint name="${binname}_top_back_right_corner_joint" type="fixed">
+      <parent link="${binname}"/>
+      <child link="${binname}_top_back_right_corner"/>
+      <origin rpy="0.0 0.0 0.0" xyz="-0.055 0.055 0.04 "/>
+    </joint>
+    <link name="${binname}_top_back_right_corner"/>
+
+    <joint name="${binname}_top_back_left_corner_joint" type="fixed">
+      <parent link="${binname}"/>
+      <child link="${binname}_top_back_left_corner"/>
+      <origin rpy="0.0 0.0 0.0" xyz="-0.055 -0.055 0.04 "/>
+    </joint>
+    <link name="${binname}_top_back_left_corner"/>
+
+    <joint name="${binname}_top_front_left_corner_joint" type="fixed">
+      <parent link="${binname}"/>
+      <child link="${binname}_top_front_left_corner"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.04 -0.055 0.04 "/>
+    </joint>
+    <link name="${binname}_top_front_left_corner"/>
+
+
   </xacro:macro>
 
   <xacro:macro name="kitting_bin_2" params="binname parent z_origin_offset *origin">
