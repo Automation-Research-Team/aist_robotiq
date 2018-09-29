@@ -23,36 +23,50 @@ from o2as_routines.base import O2ASBaseRoutines
 keyposes = {
   'a_phoxi_m_camera': {
     'a_bot': [
-      [0.245, 0.3, 0.30, radians(  0), radians(  0), radians(90)],
-      [0.245, 0.3, 0.30, radians(  0), radians( 30), radians(90)],
-      [0.245, 0.3, 0.30, radians( 30), radians( 30), radians(90)],
-      [0.245, 0.3, 0.30, radians( 30), radians(  0), radians(90)],
-      [0.245, 0.3, 0.30, radians(-30), radians(  0), radians(90)],
-      [0.245, 0.3, 0.30, radians(-30), radians( 30), radians(90)],
+#      [0.15, -0.30, 0.25, radians( 30), radians( 25), radians(0)],
+      [0.15, -0.10, 0.20, radians(-90), radians( 25), radians(0)],
+      [0.15,  0.00, 0.20, radians(-60), radians( 25), radians(0)],
+      [0.15,  0.10, 0.20, radians(-60), radians( 25), radians(0)],
+
+      [0.20,  0.10, 0.30, radians(-60), radians( 25), radians(0)],
+      [0.20,  0.00, 0.30, radians(-60), radians( 25), radians(0)],
+      [0.20, -0.10, 0.30, radians(-60), radians( 25), radians(0)],
     ],
 
     'b_bot': [
-      [-0.32, 0.30, 0.15, radians( 30), radians( 25), radians(180)],
-      [-0.32, 0.45, 0.15, radians( 30), radians( 25), radians(180)],
-      [-0.35, 0.60, 0.15, radians(  0), radians( 25), radians(180)],
+      [0.32,  0.20, 0.15, radians( 30), radians( 25), radians(0)],
+      [0.32,  0.05, 0.15, radians( 30), radians( 25), radians(0)],
+      [0.35, -0.10, 0.15, radians(  0), radians( 25), radians(0)],
 
-      [-0.35, 0.50, 0.25, radians(  0), radians( 25), radians(180)],
-      [-0.32, 0.40, 0.25, radians( 30), radians( 25), radians(180)],
-      [-0.32, 0.30, 0.25, radians( 30), radians( 25), radians(180)],
+      [0.35,  0.00, 0.25, radians(  0), radians( 25), radians(0)],
+      [0.32,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
+      [0.32,  0.20, 0.25, radians( 30), radians( 25), radians(0)],
 
-      [-0.20, 0.30, 0.30, radians( 30), radians( 25), radians(180)],
-      [-0.20, 0.40, 0.30, radians( 30), radians( 25), radians(180)],
-      [-0.20, 0.50, 0.30, radians(  0), radians( 25), radians(180)],
+      [0.20,  0.20, 0.30, radians( 30), radians( 25), radians(0)],
+      [0.20,  0.10, 0.30, radians( 30), radians( 25), radians(0)],
+      [0.20,  0.00, 0.30, radians(  0), radians( 25), radians(0)],
 
-      [-0.15, 0.60, 0.15, radians(  0), radians( 25), radians(180)],
-      [-0.15, 0.45, 0.15, radians( 30), radians( 25), radians(180)],
-      [-0.15, 0.30, 0.15, radians( 30), radians( 25), radians(180)],
+      [0.15, -0.10, 0.15, radians(  0), radians( 25), radians(0)],
+      [0.15,  0.05, 0.15, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.20, 0.15, radians( 30), radians( 25), radians(0)],
     ],
 
     'c_bot': [
-      [-0.110,  0.433,  0.386, -0.900,  0.000,  0.000],
-      [-0.110,  0.415,  0.351, -0.570,  0.000,  0.000],
-      [-0.143,  0.424,  0.365, -0.699,  0.559, -0.428]
+      [0.05, -0.05, 0.15, radians(  0), radians( 25), radians(0)],
+      [0.05,  0.05, 0.15, radians( 30), radians( 25), radians(0)],
+      [0.05,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
+
+      [0.15,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.05, 0.15, radians( 30), radians( 25), radians(0)],
+      [0.15, -0.05, 0.15, radians(  0), radians( 25), radians(0)],
+
+      [0.15, -0.05, 0.25, radians(  0), radians( 25), radians(0)],
+      [0.15,  0.05, 0.25, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.15, 0.25, radians( 30), radians( 25), radians(0)],
+
+      [0.10,  0.15, 0.25, radians( 30), radians( 25), radians(0)],
+      [0.10,  0.05, 0.25, radians( 30), radians( 25), radians(0)],
+      [0.10, -0.05, 0.25, radians(  0), radians( 25), radians(0)],
     ]
   }
 }
@@ -63,7 +77,10 @@ def get_service_proxy(service_name, camera_name, robot_name):
   cs = "/{}/".format(camera_name)
   ns = "/o2as_easy_handeye_{}_eye_on_base/".format(robot_name)
 
-  if service_name is "trigger_frame":
+  if service_name is "flush_buffer":
+    service_type      = Trigger
+    service_name_full = cs + "flush_buffer"
+  elif service_name is "trigger_frame":
     service_type      = Trigger
     service_name_full = cs + "trigger_frame"
   elif service_name is "get_frame":
@@ -100,6 +117,8 @@ class CalibrationCommander(object):
     self.needs_calib   = needs_calib
 
     if needs_trigger:
+      self.flush_buffer      = get_service_proxy("flush_buffer",
+                                                 camera_name, robot_name)
       self.trigger_frame     = get_service_proxy("trigger_frame",
                                                  camera_name, robot_name)
       self.get_frame         = get_service_proxy("get_frame",
@@ -121,9 +140,10 @@ class CalibrationCommander(object):
     group = self.baseRoutines.groups[robot_name]
 
     # Set `_ee_link` as end effector wrt `_base_link` of the robot
-    group.set_pose_reference_frame(robot_name + "_base_link")
-    # group.set_end_effector_link(robot_name    + "_ee_link")
-    group.set_end_effector_link(robot_name    + "_ar_marker")
+    #group.set_pose_reference_frame(robot_name + "_base_link")
+    group.set_pose_reference_frame("workspace_center")
+    group.set_end_effector_link(robot_name    + "_ee_link")
+    #group.set_end_effector_link(robot_name + "_ar_marker")
 
     # Trajectory publisher
     display_trajectory_publisher = rospy.Publisher(
@@ -137,17 +157,19 @@ class CalibrationCommander(object):
     print("============ End effector: %s"    % group.get_end_effector_link())
 
     
-  def move_to_subposes(self, keypose, speed, sleep_time):
-    pose = keypose
+  def move_to_subposes(self, pose, speed, sleep_time):
+    roll = pose[3]
     for i in range(3):
       print("\n--- Subpose [{}/5]: Try! ---".format(i+1))
-      self.move(pose, speed)
-      print("--- Subpose [{}/5]: Completed. ---".format(i+1))
-      self.get_image_data()
-      rospy.sleep(sleep_time)
+      if self.move(pose, speed):
+        print("--- Subpose [{}/5]: Completed. ---".format(i+1))
+        self.get_image_data()
+        rospy.sleep(sleep_time)
+      else:
+        print("--- Subpose [{}/5]: Failed. ---".format(i+1))
       pose[3] -= radians(30)
 
-    pose[3]  = radians(0)
+    pose[3]  = roll - radians(30)
     pose[4] += radians(15)
 
     for i in range(2):
@@ -164,7 +186,7 @@ class CalibrationCommander(object):
     # TODO: check type of `pose`
     print("move to {}".format(pose))
     poseStamped                 = geometry_msgs.msg.PoseStamped()
-    poseStamped.header.frame_id = self.robot_name + "_base_link"
+    poseStamped.header.frame_id = "workspace_center"
     poseStamped.pose.position.x = pose[0]
     poseStamped.pose.position.y = pose[1]
     poseStamped.pose.position.z = pose[2]
@@ -172,8 +194,10 @@ class CalibrationCommander(object):
       = geometry_msgs.msg.Quaternion(
         *tf_conversions.transformations.quaternion_from_euler(
           pose[3], pose[4], pose[5]))
-    self.baseRoutines.go_to_pose_goal(self.robot_name, poseStamped, speed,
-                                      move_lin=False)
+    [all_close, move_success] \
+      = self.baseRoutines.go_to_pose_goal(self.robot_name, poseStamped, speed,
+                                          move_lin=False)
+    return move_success
 
   def get_image_data(self):
     if self.needs_trigger:
@@ -214,6 +238,8 @@ def run(camera_name, robot_name, speed, sleep_time,
   # Reset pose
   commander.go_home()
 
+  commander.flush_buffer()
+  
   # Collect samples over pre-defined poses
   keypose_list = keyposes[camera_name][robot_name]
   for i, keypose in enumerate(keypose_list):
@@ -237,7 +263,7 @@ def main():
   try:
     camera_name   = sys.argv[1]
     robot_name    = sys.argv[2]
-    needs_trigger = (True if (sys.argv[3] == "true") else False)
+    needs_trigger = (True if (sys.argv[3] == "trigger") else False)
       
     assert(camera_name in {"a_phoxi_m_camera", "c_bot_camera"})
     assert(robot_name  in {"a_bot", "b_bot", "c_bot"})
@@ -245,9 +271,9 @@ def main():
     sleep_time = 1
 
     if (os.path.basename(sys.argv[0]) == "run_handeye_calibration.py"):
-      run(camera_name, robot_name, speed, sleep_time, needs_trigger, False)
-    else:
       run(camera_name, robot_name, speed, sleep_time, needs_trigger, True)
+    else:
+      run(camera_name, robot_name, speed, sleep_time, needs_trigger, False)
 
   except rospy.ROSInterruptException:
     return

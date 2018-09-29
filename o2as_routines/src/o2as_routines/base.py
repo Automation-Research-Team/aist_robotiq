@@ -191,7 +191,7 @@ class O2ASBaseRoutines(object):
       group.set_goal_tolerance(.000001)
       group.set_planning_time(10)
 
-    plan = group.go(wait=True)
+    move_success = group.go(wait=True)
     group.stop()
     # It is always good to clear your targets after planning with poses.
     # Note: there is no equivalent function for clear_joint_value_targets()
@@ -203,7 +203,7 @@ class O2ASBaseRoutines(object):
       group.set_planning_time(3) 
 
     current_pose = group.get_current_pose().pose
-    return all_close(pose_goal_stamped.pose, current_pose, 0.01)
+    return all_close(pose_goal_stamped.pose, current_pose, 0.01), move_success
 
   def transformTargetPoseFromTipLinkToEE(self, ps, robot_name, end_effector_link):
     rospy.loginfo("Received pose to transform to EE link:")
