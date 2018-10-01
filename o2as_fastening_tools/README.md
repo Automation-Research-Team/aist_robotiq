@@ -1,10 +1,19 @@
 # Introduction
 This package controls our fastening tools which are driven by an XL320 motor. 
+It also controls the suction and ejection mechanisms.
 
 ## Available ROS services
+There are two action services.
 
 ```
 o2as_fastening_tools/fastener_gripper_control_action
+o2as_fastening_tools/screw_control_action
+```
+
+There is also a topic published for every tool.
+
+```
+screw_tool_m4/screw_suctioned
 ```
 
 Please read 'How to use' for details. 
@@ -40,6 +49,8 @@ Enter the names of each motor ID and gripper in this file: config/gripper.yaml
 # How to use
 ## About action service
 
+### fastener_gripper_control_action
+
 The action topic is "o2as_fastening_tools/fastening_gripper_control_action" and the action is defined in o2as_msgs.
 
 load gripper info file. (fastening_tools.yaml)
@@ -73,13 +84,53 @@ The "duration" can be in seconds.
 The "duration" is float32 type. (ex. "duration" = 1.0 : one second) 
 In this mode, there is no feedback.
 
+### suction_control
+
+The action topic is "o2as_fastening_tools/suction_control" and the action is defined in o2as_msgs.
+
+load ur_control info file. (suction_control.yaml)
+
+This action is used when you want to execute suction on/off.
+If this action is insert screw or trying to break vacuum, if it does not get the result after 5 seconds, it will return 'False' and exit.
+
+To use the action service, use "fastening_tool_name" and "suction_control" and "switch".
+The return value is the boolean type.
+The feedback value is current the digital_input of ur_controller states of boolean type.
+
+- "fastening_tool_name" : 
+The gripper name is set with suction_control.yaml in the config folder.
+In this file, the name of screw fastening tool and other info are listed.
+For details, I think that you can understand by looking at suction_control.yaml
+
+- "turn_suction_on" :
+This value is used to turn the suction on and off via the digital output pin of ur_control.
+
+- "eject_screw" :
+This value is used to turn the ejection on and off via the digital output pin of ur_control. If this is not set to True, the screw might stay attached to the tool for a few seconds after suction is turned off. Both turn_suction_on and eject_screw should be set to False after a screw was ejected.
+
+This action service uses the service 'b_bot_controller/ur_driver/set_io' of the sub module ur_modern_driver.
+Please be careful if you use 'b_bot_controller/ur_driver/set_io' as an alias.
+
+## About Publish screw_suctioned
+
+This topic in suction_controller.py.
+This topic publishes suction success for each screw tool as a std_msgs/Bool message, on a topic such as 
+
+```
+screw_tool_m4/screw_suctioned
+```
+
+This topic uses the publish 'ur_driver/io_states' of the sub module ur_modern_driver.
+Please be careful if you use 'ur_driver/io_states' as an alias.
+
+
 ## About the actual launch file
 
 As in fastening_tools.launch, set parameter.
 
-'max_access' is the number of U2D2 connections.
+'num_controllers' is the number of U2D2 connections.
 
-'access_no' is set as many set by 'max_access'. 
+'serial_port' is set as many set by 'num_controllers'. 
 The value uses the connection name of U2D2.
 
 'conf_dir' sets the path of the config folder.
@@ -87,7 +138,8 @@ The value uses the connection name of U2D2.
 'fastening_tools' sets the yaml name with gripper information.
 
 
-## Example of use 
+## Example of use
+### fastener_gripper_control 
 
 Appoint gripper name and rotary speed in 'fastener_gripper_action_client.py'.
 
@@ -102,5 +154,10 @@ I think that the following operation is possible.
 - 2. Stop rotation of the motor with fingers, generate load.
 - 3. When the load is detected (rotation speed = 0), the torque of XL-320 is turned off and the rotation stop
 - 4. To next motor id .
+
+
+### screw_control
+
+Please run 'suction_demo.launch'.
 
 
