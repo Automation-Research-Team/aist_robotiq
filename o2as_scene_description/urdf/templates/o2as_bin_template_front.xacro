@@ -4,15 +4,3 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_bin_macros.xacro" />
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro"/>
 
-  <!-- add rack -->
-  <xacro:o2as_box boxname="rack_bins" box_w="0.42" box_l="0.680" box_h=".015" parent="workspace_center">
-    <origin xyz="0 -.32 0" rpy="0 0 0" />   
-  </xacro:o2as_box>
- 
-  <link name="rack_bins_center" />
-  <joint name="rack_bins_joint" type="fixed">
-    <parent link="workspace_center" />
-    <child link="rack_bins_center"/>
-    <origin xyz=".26 0 0.015" rpy="0 0 0"/>
-  </joint>
-

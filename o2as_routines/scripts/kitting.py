@@ -109,7 +109,7 @@ class KittingClass(O2ASBaseRoutines):
     kitting_list.append([])
     kitting_list.append([])
     
-    with open(os.path.join(rp.get_path("o2as_routines"), "config", "kitting_order_file.csv"), 'r') as f:
+    with open(os.path.join(rp.get_path("o2as_scene_description"), "config", "kitting_order_file.csv"), 'r') as f:
       reader = csv.reader(f)
       header = next(reader)
       # [0, 1, 2, 3, 4] = ["Set", "No.", "ID", "Name", "Note"]
