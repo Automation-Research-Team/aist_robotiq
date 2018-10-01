@@ -4,7 +4,7 @@ import rospy
 import actionlib
 import actionlib_tutorials.msg
 from o2as_fastening_tools.srv import *
-from o2as_fastening_tools.msg import *
+from o2as_msgs.msg import *
 from ur_msgs.msg import *
 from ur_msgs.srv import *
 from util import *
@@ -20,10 +20,10 @@ class ScrewController(object):
         config_dir = rospy.get_param("~config_dir")
         config_file = rospy.get_param("~screw_controls")
         
-        rospy.Subscriber("ur_driver/io_states", IOStates, self.callback, queue_size=1)
+        rospy.Subscriber("b_bot_controller/ur_driver/io_states", IOStates, self.callback, queue_size=1)
         self.pub = rospy.Publisher('o2as_fastening_tools/screw_suctioned', PressureSensoState, queue_size=18)
         
-        self.set_io = rospy.ServiceProxy('ur_driver/set_io', SetIO)
+        self.set_io = rospy.ServiceProxy('b_bot_controller/ur_driver/set_io', SetIO)
 
         # get data for .yaml
         conf_screw_filename = config_dir + "/" + config_file + ".yaml"
