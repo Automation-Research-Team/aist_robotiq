@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
         for name in name_list:
             res = controller.suction(name, True, False)
-            rospy.sleep(3)
+            rospy.sleep(10)
             res = controller.suction(name, False, False)
 
             if not res.success :

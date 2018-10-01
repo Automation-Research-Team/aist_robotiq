@@ -20,7 +20,6 @@ class SuctionController(object):
         config_file = rospy.get_param("~suction_control")
         
         rospy.Subscriber("b_bot_controller/ur_driver/io_states", IOStates, self.io_state_callback, queue_size=1)
-        self.pub = rospy.Publisher('o2as_fastening_tools/screw_suctioned', PressureSensorState, queue_size=18)
         
         self.set_io = rospy.ServiceProxy('b_bot_controller/ur_driver/set_io', SetIO)
 
@@ -35,10 +34,12 @@ class SuctionController(object):
         self.in_state = dict()
         self.out_state = dict()
         self.tool_suction_publisher = dict()
+        self.in_port_name = dict()
 
         # get data for .yaml
         self.suction_tool_list = conf_file_content['suction_control']
         for tool_data in self.suction_tool_list:
+            self.in_port_name.update({tool_data['digital_in_port']: tool_data['name']})
             self.digital_in_port.update({tool_data['name']: tool_data['digital_in_port']})
             self.digital_out_port_vac.update({tool_data['name']: tool_data['digital_out_port_vac']})
             self.digital_out_port_blow.update({tool_data['name']: tool_data['digital_out_port_blow']})
@@ -52,19 +53,13 @@ class SuctionController(object):
     def io_state_callback(self, data):
         for read_in_status in data.digital_in_states:
             self.in_state.update({read_in_status.pin: read_in_status.state})
+            if read_in_status.pin in self.in_port_name:
+                bool_msg = Bool()
+                bool_msg.data = read_in_status.state
+                self.tool_suction_publisher[self.in_port_name[read_in_status.pin]].publish(bool_msg)
 
         for read_out_status in data.digital_out_states:
             self.out_state.update({read_out_status.pin: read_out_status.state})
-
-        for tool_data in self.suction_tool_list:
-            bool_msg = Bool
-            bool_msg.data = self.in_state[ self.digital_in_port[tool_data['name']] ]
-            print(tool_data['name'])
-            print(bool_msg)
-            print("----")
-            print(bool_msg.data)
-            print("====")
-            self.tool_suction_publisher[tool_data['name']].publish(bool_msg)
 
     def set_out_pin_switch(self, port, state):
         success_flag = True
