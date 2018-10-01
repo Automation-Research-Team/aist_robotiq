@@ -84,7 +84,8 @@
   </include>
 
   <include file="$(find o2as_precision_gripper)/launch/precision_gripper.launch">
-    <arg name="serial_port" default="/dev/ttyUSB2" />
+    <arg name="serial_port" default="/dev/for_docker/gripper" />
+    <!-- <arg name="serial_port" default="/dev/ttyUSB0" /> -->
   </include>
 
   <include file="$(find o2as_fastening_tools)/launch/fastening_tools.launch">

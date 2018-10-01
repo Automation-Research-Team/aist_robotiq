@@ -3,23 +3,38 @@
 <!-- The gripper center would be about 44 mm from the top, so the tip might be 111 mm further down -->
 <!-- The tip\axis seems to be 11.5 mm from the "front" side. The front side looks into the gripper -->
 
-<robot name="screw_tools">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <link name="screw_tool_holder">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <mass value="1.0"/>
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
+    <!-- The horizontal plate -->
     <visual>
-      <origin rpy="0 0 0" xyz="0 -.05 0"/>
+      <origin rpy="0 0 0" xyz="-0.15 .0033 0.002"/>
       <geometry>
-        <box size=".3 .1 .004"/> 
+        <box size=".3 .066 .004"/> 
       </geometry>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 -.05 0"/>
+      <origin rpy="0 0 0" xyz="-0.15 .0033 0.002"/>
       <geometry>
-        <box size=".3 .1 .004"/> 
+        <box size=".3 .066 .004"/> 
+      </geometry>
+    </collision>
+
+    <!-- The vertical plate -->
+    <visual>
+      <origin rpy="0 0 0" xyz="-0.15 -.011 0.0179"/>
+      <geometry>
+        <box size=".3 .004 .035"/> 
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="-0.15 -.011 0.0179"/>
+      <geometry>
+        <box size=".3 .004 .035"/> 
       </geometry>
     </collision>
   </link>
@@ -27,12 +42,17 @@
   <joint name="screw_holder_to_base" type="fixed">
     <parent link="c_bot_base_smfl" />
     <child link="screw_tool_holder" />
-    <origin xyz="0.45 0.7 0.06" rpy="0.0 0.0 0.0" />
+    <origin xyz="${0.65-0.045 +.005} ${0.65+.004} 0.06" rpy="0.0 0.0 0.0" />
+    <!-- +.005 is a MAGIC NUMBER added on Sep 17 to put the tool roughly between c_bot and b_bot's physical position. -->
   </joint>
 
   <!-- ++++++++++++++++++++++++++++ -->
+  
+  <xacro:property name="bit_cushion_to_axis" value="0.0285"/>
+  <xacro:property name="tool_offset" value="${-.005 + bit_cushion_to_axis}" />  
+  <!-- The collision boxes of the tools only include the top part (not what is hanging underneath the holder) -->
 
- <link name="screw_tool_m6_link">
+  <link name="screw_tool_m6_link">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <mass value="1.0"/>
@@ -47,17 +67,45 @@
         <color rgba=".9 .9 .9 1"/>
       </material>
     </visual>
-    <!-- <collision>
-      <origin rpy="0 0 -.225" xyz="0 0 0"/>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 ${bit_cushion_to_axis - .02} .0275"/>
       <geometry>
-        <box size=".02 .04 .155"/>
+        <box size=".026 .04 .055"/>
       </geometry>
-    </collision> -->
+    </collision>
   </link>
   <joint name="screw_tool_m6_to_holder" type="fixed">
     <parent link="screw_tool_holder" />
     <child link="screw_tool_m6_link" />
-    <origin xyz="0.1 0.0 0.0" rpy="0.0 0.0 0.0" />
+    <origin xyz="-0.05 ${tool_offset} 0.004" rpy="0.0 0.0 0.0" />
+  </joint>
+
+  <link name="nut_tool_m6_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1.0"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <!-- <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://o2as_scene_description/meshes/nut_tool_m6_BC5-XL320-LG20-R_v2.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="white">
+        <color rgba=".9 .9 .9 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 ${bit_cushion_to_axis - .02} .0275"/>
+      <geometry>
+        <box size=".026 .04 .055"/>
+      </geometry>
+    </collision> -->
+  </link>
+  <joint name="nut_tool_m6_to_holder" type="fixed">
+    <parent link="screw_tool_holder" />
+    <child link="nut_tool_m6_link" />
+    <origin xyz="-0.05 ${tool_offset} 0.004" rpy="0.0 0.0 0.0" />
   </joint>
 
   <link name="screw_tool_m4_link">
@@ -75,17 +123,17 @@
         <color rgba=".9 .9 .9 1"/>
       </material>
     </visual>
-    <!-- <collision>
-      <origin rpy="0 0 -.225" xyz="0 0 0"/>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 ${bit_cushion_to_axis - .02} .0275"/>
       <geometry>
-        <box size=".02 .04 .155"/> 
+        <box size=".026 .04 .055"/>
       </geometry>
-    </collision> -->
+    </collision>
   </link>
   <joint name="screw_tool_m4_to_holder" type="fixed">
     <parent link="screw_tool_holder" />
     <child link="screw_tool_m4_link" />
-    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+    <origin xyz="-0.15 ${tool_offset} 0.004" rpy="0.0 0.0 0.0" />
   </joint>
   
 
@@ -105,20 +153,20 @@
         <color rgba=".9 .9 .9 1"/>
       </material>
     </visual>
-    <!-- <collision>
-      <origin rpy="0 0 -.225" xyz="0 0 0"/>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 ${bit_cushion_to_axis - .02} .0275"/>
       <geometry>
-        <box size=".02 .04 .155"/> 
+        <box size=".026 .04 .055"/>
       </geometry>
-    </collision> -->
+    </collision>
   </link>
   <joint name="screw_tool_m3_to_holder" type="fixed">
     <parent link="screw_tool_holder" />
     <child link="screw_tool_m3_link" />
-    <origin xyz="-0.1 0.0 0.0" rpy="0.0 0.0 0.0" />
+    <origin xyz="-0.25 ${tool_offset} 0.004" rpy="0.0 0.0 0.0" />
   </joint>
 
-  <!-- Extra links to position the gripper more simply -->
+  <!-- Extra links to position the gripper more easily -->
 
   <link name="screw_tool_m3_helper_link"/>
   <joint name="screw_tool_m3_helper_joint" type="fixed">
@@ -138,6 +186,13 @@
   <joint name="screw_tool_m6_helper_joint" type="fixed">
     <parent link="screw_tool_m6_link" />
     <child link="screw_tool_m6_helper_link" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-pi/2}" />
+  </joint>
+
+  <link name="nut_tool_m6_helper_link"/>
+  <joint name="nut_tool_m6_helper_joint" type="fixed">
+    <parent link="nut_tool_m6_link" />
+    <child link="nut_tool_m6_helper_link" />
     <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-pi/2}" />
   </joint>
 

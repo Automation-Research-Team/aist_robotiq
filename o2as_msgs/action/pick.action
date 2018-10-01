@@ -3,7 +3,9 @@ string gripper_command              # "inner_only", "complex_pick_from_inside", 
 bool retreat_after_pick             # If true, arm moves away from the table after grasping
 
 string item_id                      # item ID in the planning scene
-geometry_msgs/PoseStamped item_pose # This overrides the item_id
+geometry_msgs/PoseStamped item_pose # Overrides the item_id. 
+                                    # If screw is being picked with the tool, this is set at the 
+                                    # very tip of the head, with x pointing into the head.
 
 float64 z_axis_rotation             # If this is set, the orientation of the item_pose is ignored and set facing downward, rotated by this.
 
@@ -11,7 +13,6 @@ string robot_name                   # "a_bot", "b_bot", "c_bot"
 string tool_name                    # "outer_gripper", "inner_gripper", "suction", "screw_tool" or empty
 
 uint8 screw_size                    # M3, M4, M6 (without the M)
-geometry_msgs/PoseStamped screw_head_pose # This is set at the very tip of the head, with x pointing into the head
 ---
 # success
 bool success

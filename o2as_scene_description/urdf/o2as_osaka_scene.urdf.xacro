@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro"
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
        name="o2as_base_scene" >
 
   <!-- This is the main file defining our robot arrangement and physical environment. -->
@@ -26,8 +26,8 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur3.urdf.xacro" />
 
   <!-- Scene items (trays, bins...) -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/taskboard_scene.xacro" />
-  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" /> -->
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/taskboard_scene.xacro" /> -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene_osaka.xacro" />
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/assembly_scene.xacro" /> -->
   
   <!-- Robot bases -->
@@ -121,10 +121,15 @@
   </joint>
 
   <!-- spawn and attach grippers -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/precision_gripper.xacro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/precision_gripper.xacro" />
   <xacro:precision_gripper prefix="a_bot_"  grippername = "gripper" parent = "a_bot_tool0">
     <origin xyz="0.0 0 0.04" rpy="0 ${pi/2} 0"/>
-  </xacro:precision_gripper>
+  </xacro:precision_gripper> -->
+
+  <xacro:include filename="$(find o2as_scene_description)/urdf/InnerOnlyGripper.xacro" />
+  <xacro:InnerOnlyGripper prefix="a_bot_"  grippername = "gripper" parent = "a_bot_tool0">
+    <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
+  </xacro:InnerOnlyGripper>
   
   <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_85_gripper_with_ft300.urdf.xacro" />
   <xacro:robotiq_85_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link" />

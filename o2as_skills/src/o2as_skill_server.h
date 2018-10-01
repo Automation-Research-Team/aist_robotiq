@@ -48,6 +48,7 @@
 #include "o2as_msgs/insertAction.h"
 #include "o2as_msgs/screwAction.h"
 #include "o2as_msgs/changeToolAction.h"
+#include "o2as_msgs/FastenerGripperControlAction.h"
 
 #include <actionlib/client/simple_action_client.h>
 #include <robotiq_msgs/CModelCommandAction.h>
@@ -59,6 +60,7 @@ public:
   SkillServer();
 
   //Helpers (convenience functions)
+  bool moveToJointPose(std::vector<double> joint_positions, std::string robot_name, bool wait = true, double velocity_scaling_factor = 1.0, bool use_UR_script = false);
   bool moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true, std::string end_effector_link = "", double velocity_scaling_factor = 0.1);
   bool moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait = true, std::string end_effector_link = "", double velocity_scaling_factor = 0.1);
   bool goToNamedPose(std::string pose_name, std::string robot_name);
@@ -81,13 +83,14 @@ public:
   bool goFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, double velocity_scaling_factor);
   bool placeFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name = "");
   bool pickFromAbove(geometry_msgs::PoseStamped target_tip_link_pose, std::string end_effector_link_name, std::string robot_name, std::string gripper_name = "");
-  bool pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::string screw_tool_id, std::string robot_name);
+  bool pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::string screw_tool_id, std::string robot_name, std::string screw_tool_link, std::string fastening_tool_name);
   bool publishMarker(geometry_msgs::PoseStamped marker_pose, std::string marker_type = "");
   bool publishPoseMarker(geometry_msgs::PoseStamped marker_pose);
 
   bool openGripper(std::string robot_name, std::string gripper_name = "");
   bool closeGripper(std::string robot_name, std::string gripper_name = "");
   bool sendGripperCommand(std::string robot_name, double opening_width, std::string gripper_name = "");
+  bool sendFasteningToolCommand(std::string fastening_tool_name, std::string direction = "tighten", bool wait = false, double duration = 20.0, int speed = 500);
 
   // Callback declarations
   bool goToNamedPoseCallback(o2as_msgs::goToNamedPose::Request &req,
@@ -109,6 +112,7 @@ public:
 
 // private:
   ros::NodeHandle n_;
+  bool use_real_robot_;
 
   ros::Publisher pubMarker_;
   int marker_id_count = 0;
@@ -135,6 +139,7 @@ public:
   // Action clients
   // actionlib::SimpleActionClient<control_msgs::GripperCommandAction> a_bot_gripper_client_;
   actionlib::SimpleActionClient<robotiq_msgs::CModelCommandAction> b_bot_gripper_client_, c_bot_gripper_client_;
+  actionlib::SimpleActionClient<o2as_msgs::FastenerGripperControlAction> fastening_tool_client;
 
   double PLANNING_TIME = 5.0, LIN_PLANNING_TIME = 15.0;
   

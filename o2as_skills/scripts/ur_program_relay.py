@@ -92,7 +92,7 @@ class URScriptRelay():
             program_back += "end\n"
 
             program = program_front + "\n" + program_back
-        if req.program_id == "linear_push":
+        elif req.program_id == "linear_push":
             program_front = self.insertion_template
             program_back = ""
 
@@ -122,36 +122,45 @@ class URScriptRelay():
 
             program = program_front + "\n" + program_back
         elif req.program_id == "lin_move":
-            rospy.logwarn("LIN MOVE IS NOT IMPLEMENTED CORRECTLY YET") 
+            rospy.loginfo("lin move uses the ee_link of the robot, not the EE of the move group.") 
             if not req.acceleration:
                 req.acceleration = 0.5
             if not req.velocity:
                 req.velocity = .03
+            rospy.loginfo("original pose:")
+            rospy.loginfo(req.target_pose)
             robot_pose = self.listener.transformPose(req.robot_name + "_base", req.target_pose)
             xyz = [robot_pose.pose.position.x, robot_pose.pose.position.y, robot_pose.pose.position.z]
+            
             q = [robot_pose.pose.orientation.x, robot_pose.pose.orientation.y, 
                  robot_pose.pose.orientation.z, robot_pose.pose.orientation.w]
             rpy = tf.transformations.euler_from_quaternion(q)
+            # rpy needs to be in axis-angle representation
+            # http://www.zacobria.com/universal-robots-knowledge-base-tech-support-forum-hints-tips/python-code-example-of-converting-rpyeuler-angles-to-rotation-vectorangle-axis-for-universal-robots/
+            rospy.loginfo("q in robot base:")
+            rospy.loginfo(q)
 
-            # This works, but it uses the ee_link TCP of the robot.
+            # This seems to work, but it uses the ee_link TCP of the robot.
             program = ""
             program += "def move_to_pose_lin():\n"
             program += "    textmsg(\"Move_l to a pose.\")\n"
+            program += "    rv = rpy2rotvec([" + str(rpy[0]) + "," + str(rpy[1]) + "," + str(rpy[2]) + "])\n"
             program += "    target_pos=p[" + str(xyz[0]) + "," + str(xyz[1]) + "," + str(xyz[2]) + "," \
-                                      + str(rpy[0]) + "," + str(rpy[1]) + "," + str(rpy[2]) + "]\n"
+                                      "rv[0], rv[1], rv[2]]\n"
             program += "    movel(pose_trans(p[0.0,0.0,0.0,0.0,0.0,0.0], target_pos), " + \
                             "a = " + str(req.acceleration) + ", v = " + str(req.velocity) + ")\n"
+            # program += "    movel(target_pos, " + \
+            #                 "a = " + str(req.acceleration) + ", v = " + str(req.velocity) + ")\n"
             program += "    textmsg(\"Done.\")\n"
             program += "end\n"
             rospy.loginfo(program)
-            rospy.logwarn("Not sending this.")
-            return True
         elif req.program_id == "lin_move_rel":
             if not req.acceleration:
                 req.acceleration = 0.5
             if not req.velocity:
                 req.velocity = .03
-            xyz = [req.relative_translation.point.x, req.relative_translation.point.y, req.relative_translation.point.z]
+            # rospy.logwarn("The frame_id of the Point is ignored!")
+            xyz = [req.relative_translation.x, req.relative_translation.y, req.relative_translation.z]
 
             program = ""
             program += "def move_lin_rel():\n"
@@ -167,6 +176,8 @@ class URScriptRelay():
         elif req.program_id == "spiral_motion":
             program_front = self.spiral_motion_template
             program_back = ""
+            if (req.radius_increment < 0.0001) or (req.radius_increment > 0.005):
+                rospy.logerror("radius_incr needs to be between 0.0001 and 0.005 but is " + str(req.radius_increment))
             if not req.acceleration:
                 req.acceleration = 0.1
             if not req.velocity:
@@ -175,13 +186,15 @@ class URScriptRelay():
                 req.max_radius = .0065
             if not req.radius_increment:
                 req.radius_increment = .002
-
+            if not req.spiral_axis:
+                req.spiral_axis = "Z"
             
             program_back += "    textmsg(\"Performing spiral motion.\")\n"
             program_back += "    spiral_motion(" + str(req.max_radius) \
                                 + ", " + str(req.radius_increment) \
                                 + ", " + str(req.velocity) \
-                                + ", " + str(req.acceleration) + ")\n"
+                                + ", " + str(req.acceleration) \
+                                + ", \"" + req.spiral_axis + "\")\n"
             program_back += "    textmsg(\"Done.\")\n"
             program_back += "end\n"
 
@@ -193,6 +206,25 @@ class URScriptRelay():
             while program_line:
                 program += program_line
                 program_line = program_file.read(1024)
+        elif req.program_id == "movej":
+            if not len(req.joint_positions) == 6:
+                rospy.logwarn("Joint pose vector not of the correct length")
+                return False
+            if not req.acceleration:
+                req.acceleration = 0.1
+            if not req.velocity:
+                req.velocity = .03
+
+            program = ""
+            program += "def move_to_joint_pose():\n"
+            program += "    textmsg(\"Move_j to a pose.\")\n"
+            program += "    target_pos=[" + str(joint_positions[0]) + "," + str(joint_positions[1]) + "," + str(joint_positions[2]) + "," \
+                                      + str(joint_positions[3]) + "," + str(joint_positions[4]) + "," + str(joint_pose[5]) + "]\n"
+            program += "    movej(target_pos, " + \
+                            "a = " + str(req.acceleration) + ", v = " + str(req.velocity) + ")\n"
+            program += "    textmsg(\"Done.\")\n"
+            program += "end\n"
+            rospy.loginfo(program)
         else:
             rospy.logerr("The program could not be recognized: " + req.program_id)
             return False
@@ -202,8 +234,8 @@ class URScriptRelay():
         program_msg.data = program
 
         rospy.loginfo("Sending UR robot command.")
-        rospy.loginfo("Program is:")
-        rospy.loginfo(program)
+        # rospy.logdebug("Program is:")
+        # rospy.logdebug(program)
         self.publishers[req.robot_name].publish(program_msg)
         return True
 
