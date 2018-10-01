@@ -1,5 +1,5 @@
 suction_control:
-  - name: screw_tool_m5        # Name of screw fastening tool
+  - name: screw_tool_m6        # Name of screw fastening tool
     digital_in_port: 0         # The pin to which the pressure sensor is connected
     digital_out_port_vac: 0    # The pin to which the 'vac' of vacuum pump unit is connected
     digital_out_port_blow: 1   # The pin to which the 'blow' of vacuum pump unit is connected
