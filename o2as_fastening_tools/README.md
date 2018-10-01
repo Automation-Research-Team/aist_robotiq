@@ -107,8 +107,8 @@ The valid strings for "screw_control" is "Insert" or "Remove".
 This value is used to turn digital output pin of ur_control on and off.
 True is on. False is off.
 
-This action service uses the service 'ur_driver/set_io' of the sub module ur_modern_driver.
-Please be careful if you use 'ur_driver/set_io' as an alias.
+This action service uses the service 'b_bot_controller/ur_driver/set_io' of the sub module ur_modern_driver.
+Please be careful if you use 'b_bot_controller/ur_driver/set_io' as an alias.
 
 ## About Publish screw_suctioned
 
