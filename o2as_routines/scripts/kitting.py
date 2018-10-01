@@ -22,6 +22,7 @@ import rospkg
 rp = rospkg.RosPack()
 import csv
 import os
+import random
 
 
 from PIL import Image, ImageDraw
@@ -55,6 +56,48 @@ class KittingClass(O2ASBaseRoutines):
     self.orders = self.read_order_file()
     rospy.loginfo("Received order list:")
     rospy.loginfo(self.orders)
+
+    self.grip_strategy = {
+        4 : "suction", 
+        5 : "suction", 
+        6 : "robotiq_gripper", 
+        7 : "robotiq_gripper",  # Used to be suction
+        8 : "suction", 
+        9 : "precision_gripper_from_inside", 
+        10: "precision_gripper_from_inside", 
+        11: "suction",  # Can be one of the grippers
+        12: "suction",  # Can be precision_gripper_from_outside in inclined bin
+        13: "suction",  # Should be precision_gripper_from_inside
+        14: "precision_gripper_from_inside", 
+        15: "precision_gripper_from_inside", 
+        16: "precision_gripper_from_inside", 
+        17: "precision_gripper_from_outside", 
+        18: "precision_gripper_from_outside"}
+    self.screw_ids = [17,18]
+    self.suction_ids = []
+    for key, value in self.grip_strategy.items():
+      if value == "suction":
+        self.suction_ids.append(key)
+
+    rospy.loginfo(suction_ids)
+
+    self.part_position_in_tray = {
+      4 : "tray_1_partition_4",
+      5 : "tray_2_partition_6",
+      6 : "tray_1_partition_3",
+      7 : "tray_1_partition_2",
+      8 : "tray_2_partition_1",
+      9 : "tray_2_partition_4",
+      10: "tray_2_partition_7",
+      11: "tray_1_partition_1",
+      12: "tray_2_partition_3",
+      13: "tray_1_partition_5",
+      14: "tray_2_partition_2",
+      15: "tray_2_partition_5",
+      16: "tray_2_partition_8" }
+
+    # TODO: Get the part_bin_position from parameters
+
     self.suction_orientation_from_behind = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     self.suction_orientation_from_45 = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/4))
     self.suction_orientation_from_side = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
@@ -380,6 +423,11 @@ class KittingClass(O2ASBaseRoutines):
 
     return True
 
+  def set_orientation_for_suction_tool(self, target_pose):
+    """Takes a pose and assigns a suitable orientation for the suction"""
+    # This needs to transform the pose to the world and check if it is too close to b_bot.
+    pass
+
   ################ ----- Demos  
   ################ 
   ################ 
@@ -593,7 +641,6 @@ class KittingClass(O2ASBaseRoutines):
       raw_input()
   
   def kitting_task(self):
-
     # Strategy:
     # - Read in order files
     # - Start with suction tool equipped
@@ -602,11 +649,53 @@ class KittingClass(O2ASBaseRoutines):
     # - Go through items that are picked by the a_bot or b_bot grippers
     # - Pick and place the screws
     # - Try to pick and return any excess screws
-
     # - Between sets, say "Done with set X. Press enter to start the next set."
     # Ideally, we can fit all the trays into the scene.
-    return
 
+    # TODO: Set the suction tool orientation depending on distance to b_bot
+
+    ## Simplest possible strategy
+    for order in self.orders:
+      rospy.loginfo("===== Fulfilling order: ")
+      rospy.loginfo(order)
+      for part_id in order:
+        rospy.loginfo("===== Picking part: " + str(part_id))
+        pick_pose = geometry_msgs.msg.PoseStamped()
+        pick_pose.header.frame_id = self.part_bin_location[part_id]
+        pick_pose.pose.orientation = self.downward_orientation
+        if self.grip_strategy[part_id] == "suction":
+          self.do_change_tool_action("b_bot", equip=True, 50)   # 50 = suction tool
+          # Set orientation
+          # self.pick()
+          self.do_change_tool_action("b_bot", equip=False, 50)   # 50 = suction tool
+          
+        # TODO: Get height from camera
+        grasp_height = .01
+        if self.grip_strategy[part_id] == "precision_gripper_from_inside":
+          robot_name = "a_bot"
+          gripper_command="easy_pick_inside_only_inner"
+        elif self.grip_strategy[part_id] == "precision_gripper_from_outside":
+          robot_name = "a_bot"
+          gripper_command="easy_pick_outside_only_inner"
+        elif self.grip_strategy[part_id] == "robotiq_gripper":
+          robot_name = "b_bot"
+          gripper_command="close"
+        
+        grasped = False
+        while not grasped:
+          grasped = self.pick(robot_name, pick_pose, grasp_height, speed_fast = 0.3, speed_slow = 0.02, 
+                      gripper_command, approach_height = 0.05)
+          pick_pose.pose.position.x = random.uniform(-.03, .03)
+          pick_pose.pose.position.y = random.uniform(-.03, .03)
+        # TODO: Do suction pickup
+
+        if part_id in self.screw_ids:
+          # TODO: Do screw drop into feeder, pickup, and place
+          pass
+      rospy.loginfo("Finished order. Replace trays and press enter to proceed.")
+      raw_input()
+
+    return
 
 
 if __name__ == '__main__':
