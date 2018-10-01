@@ -123,7 +123,7 @@ class SuctionController(object):
                 success_flag = False
             if not self.set_out_pin_switch(vac_port, 1):
                 success_flag = False
-        elif goal.drop_screw:
+        elif goal.eject_screw:
             if not self.set_out_pin_switch(vac_port, 0):
                 success_flag = False
             if not self.set_out_pin_switch(blow_port, 1):
