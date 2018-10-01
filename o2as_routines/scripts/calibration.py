@@ -993,6 +993,7 @@ if __name__ == '__main__':
       rospy.loginfo("============ Calibration procedures ============ ")
       rospy.loginfo("Enter a number to check calibrations for the following things: ")
       rospy.loginfo("1: The robots (central position with nothing on the table)")
+      rospy.loginfo("1000: Move with different jerk values")
       rospy.loginfo("100: Go home with all robots")
       rospy.loginfo("101: Go back with all robots")
       rospy.loginfo("111: The robots (Using the assembly base plate)")
@@ -1052,6 +1053,18 @@ if __name__ == '__main__':
       r = raw_input()
       if r == '1':
         c.check_robot_calibration()
+      if r == '1000':
+        ps = geometry_msgs.msg.PoseStamped()
+        ps.header.frame_id = "workspace_center"
+        ps.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+        ps.pose.position.z = .2
+        c.go_to_named_pose("home", "b_bot")
+        c.move_lin("b_bot", ps, speed=.2, acceleration=.04)
+        c.go_to_named_pose("home", "b_bot")
+        c.move_lin("b_bot", ps, speed=.2, acceleration=.08)
+        c.go_to_named_pose("home", "b_bot")
+        c.move_lin("b_bot", ps, speed=.2, acceleration=.15)
+        c.go_to_named_pose("home", "b_bot")
       if r == '100':
         c.go_to_named_pose("home", "a_bot")
         c.go_to_named_pose("home", "b_bot")

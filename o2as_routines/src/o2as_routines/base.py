@@ -163,10 +163,10 @@ class O2ASBaseRoutines(object):
     self.publishMarker_client.call(req)
     return True
 
-  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, high_precision = False, 
+  def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, high_precision = False, 
                       end_effector_link = "", move_lin = True):
     if move_lin:
-      return self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link)
+      return self.move_lin(group_name, pose_goal_stamped, speed, acceleration, end_effector_link)
     self.publish_marker(pose_goal_stamped, "pose")
     group = self.groups[group_name]
     
@@ -243,10 +243,9 @@ class O2ASBaseRoutines(object):
 
     return ps_new
 
-  def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, end_effector_link = ""):
+  def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, end_effector_link = ""):
     self.publish_marker(pose_goal_stamped, "pose")
 
-    group = self.groups[group_name]
     if not end_effector_link:
       if group_name == "c_bot":
         end_effector_link = "c_bot_robotiq_85_tip_link"
@@ -254,6 +253,20 @@ class O2ASBaseRoutines(object):
         end_effector_link = "b_bot_robotiq_85_tip_link"
       elif group_name == "a_bot":
         end_effector_link = "a_bot_gripper_tip_link"
+
+    if self.use_real_robot:
+      rospy.loginfo("Real robot is being used. Send linear motion to robot controller directly via URScript.")
+      req = o2as_msgs.srv.sendScriptToURRequest()
+      req.program_id = "lin_move"
+      req.robot_name = group_name
+      req.target_pose = self.transformTargetPoseFromTipLinkToEE(pose_goal_stamped, group_name, end_effector_link)
+      req.velocity = speed
+      req.acceleration = acceleration
+      res = self.urscript_client.call(req)
+      wait_for_UR_program("/" + group_name +"_controller", rospy.Duration.from_sec(30.0))
+      return res.success
+
+    group = self.groups[group_name]
       
     group.set_end_effector_link(end_effector_link)
     group.set_pose_target(pose_goal_stamped)
@@ -280,17 +293,6 @@ class O2ASBaseRoutines(object):
                                       0.0)         # jump_threshold
     rospy.loginfo("compute cartesian path succeeded with " + str(fraction*100) + "%")
     plan = group.retime_trajectory(self.robots.get_current_state(), plan, speed)
-
-    if fraction < 0.99 and self.use_real_robot:
-      rospy.loginfo("MoveIt failed to plan linear motion. Attempting linear motion via URScript.")
-      req = o2as_msgs.srv.sendScriptToURRequest()
-      req.program_id = "lin_move"
-      req.robot_name = group_name
-      req.target_pose = self.transformTargetPoseFromTipLinkToEE(pose_goal_stamped, group_name, end_effector_link)
-      req.velocity = speed
-      res = self.urscript_client.call(req)
-      wait_for_UR_program("/" + group_name +"_controller", rospy.Duration.from_sec(30.0))
-      return res.success
 
     plan_success = group.execute(plan, wait=True)
     group.stop()

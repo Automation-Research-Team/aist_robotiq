@@ -337,8 +337,43 @@ bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string
 }
 
 // This works only for a single robot.
-bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait, std::string end_effector_link, double velocity_scaling_factor)
+// Acceleration is only used for the real robot.
+bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait, std::string end_effector_link, double velocity_scaling_factor, double acceleration)
 {
+  if (use_real_robot_)
+  {
+    if (end_effector_link == "")
+    {
+      if (robot_name == "c_bot")
+        end_effector_link = "c_bot_robotiq_85_tip_link";
+      else if (robot_name == "b_bot")
+        end_effector_link = "b_bot_robotiq_85_tip_link";
+      else if (robot_name == "a_bot")
+        end_effector_link = "a_bot_gripper_tip_link";
+    }
+    ROS_WARN("Real robot is being used. Sending linear motion to robot controller directly via URScript.");
+    o2as_msgs::sendScriptToUR UR_srv;
+    UR_srv.request.program_id = "lin_move";
+    UR_srv.request.robot_name = robot_name;  
+    UR_srv.request.target_pose = transformTargetPoseFromTipLinkToEE(pose, robot_name, end_effector_link, tflistener_);
+    publishMarker(transformTargetPoseFromTipLinkToEE(pose, robot_name, end_effector_link, tflistener_), "pose");
+    UR_srv.request.velocity = velocity_scaling_factor;
+    UR_srv.request.acceleration = acceleration;
+    sendScriptToURClient_.call(UR_srv);
+    if (UR_srv.response.success == true)
+    {
+      ROS_INFO("Successfully called the URScript client to do linear motion to approach pose.");
+      waitForURProgram("/" + robot_name +"_controller");
+      return true;
+    }
+    else
+    {
+      ROS_ERROR("Could not go to approach pose. Aborting tool pickup.");
+      planning_scene_interface_.applyPlanningScene(planning_scene_);
+      return false;
+    }
+  }
+
   moveit::planning_interface::MoveGroupInterface::Plan myplan;
   moveit::planning_interface::MoveItErrorCode 
     success_plan = moveit_msgs::MoveItErrorCodes::FAILURE, 
@@ -413,30 +448,6 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   }
   else
   {
-    if (use_real_robot_)
-    {
-      ROS_WARN("MoveIt failed to do linear plan. Trying move_l with the UR.");
-      ros::Duration(2).sleep();
-      o2as_msgs::sendScriptToUR UR_srv;
-      UR_srv.request.program_id = "lin_move";
-      UR_srv.request.robot_name = robot_name;  
-      UR_srv.request.target_pose = transformTargetPoseFromTipLinkToEE(pose, robot_name, end_effector_link, tflistener_);
-      publishMarker(transformTargetPoseFromTipLinkToEE(pose, robot_name, end_effector_link, tflistener_), "pose");
-      UR_srv.request.velocity = .05;
-      sendScriptToURClient_.call(UR_srv);
-      if (UR_srv.response.success == true)
-      {
-        ROS_INFO("Successfully called the URScript client to do linear motion to approach pose.");
-        waitForURProgram("/" + robot_name +"_controller");
-        return true;
-      }
-      else
-      {
-        ROS_ERROR("Could not go to approach pose. Aborting tool pickup.");
-        planning_scene_interface_.applyPlanningScene(planning_scene_);
-        return false;
-      }
-    }
     ROS_ERROR_STREAM("Cartesian motion plan failed.");
     group_pointer->setMaxVelocityScalingFactor(1.0); // Reset the velocity
     group_pointer->setPlanningTime(1.0);
