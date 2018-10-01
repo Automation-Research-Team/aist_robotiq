@@ -11,20 +11,6 @@ import actionlib
 import actionlib_tutorials.msg
 
 class FasteningToolController:
-    def fasten(self, name):
-        client = actionlib.SimpleActionClient('o2as_fastening_tools/fastener_gripper_control_action', FastenerGripperControlAction)
-        client.wait_for_server()
-        goal = FastenerGripperControlGoal()
-
-        goal.fastening_tool_name = name
-        goal.speed = 100
-        goal.direction = "tighten"
-
-        client.send_goal_and_wait(goal,rospy.Duration(10),rospy.Duration(10))
-        client.wait_for_result()
-        
-        return client.get_result()
-
     def screw(self, name, mode, state):
         client = actionlib.SimpleActionClient('o2as_fastening_tools/screw_control_action', ScrewControlAction)
         client.wait_for_server()
@@ -41,12 +27,12 @@ class FasteningToolController:
 
 if __name__ == '__main__':
     try:
-        rospy.init_node('fastening_tool_controller_test')
+        rospy.init_node('fastening_screw_test')
 
         controller = FasteningToolController()
 
         name_list = [
-            "m5_tool",
+            "screw_tool_m5",
         ]
 
         for name in name_list:

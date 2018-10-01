@@ -7,7 +7,7 @@ import os.path
 import yaml
 from std_msgs.msg import String
 from o2as_fastening_tools.srv import *
-from o2as_fastening_tools.msg import *
+from o2as_msgs.msg import *
 from util import *
 
 class FasteningToolController(object):
@@ -26,6 +26,7 @@ class FasteningToolController(object):
         self.fastening_tools = dict()
         data_list = fastening_tools['fastening_tools']
         for data in data_list:
+            rospy.loginfo("Loaded " + data['name'] + " on motor id " + str(data['motor_id']))
             self.fastening_tools.update({data['name'] : data['motor_id']})
         
         self.dynamixel_command_write = rospy.ServiceProxy('o2as_fastening_tools/dynamixel_write_command', DynamixelWriteCommand)
@@ -63,15 +64,14 @@ class FasteningToolController(object):
         t_duration = 1
         motor_id = self.fastening_tools[goal.fastening_tool_name]
         self._result.control_result = True
+        if not goal.speed:
+            goal.speed = 1023
         self._feedback.motor_speed = goal.speed
 
         rospy.wait_for_service('o2as_fastening_tools/dynamixel_write_command')
         rospy.wait_for_service('o2as_fastening_tools/dynamixel_read_state')
 
         if goal.direction == "loosen" :
-            t_duration = goal.duration
-            if t_duration == 0.0 :
-                t_duration = 1
             goal.speed = 1024 + goal.speed
             if goal.speed > 2047 :
                 goal.speed = 2047
@@ -90,21 +90,20 @@ class FasteningToolController(object):
             self._result.control_result = False
             self._as.set_succeeded(self._result)
             return
-
-        rospy.sleep(t_duration)
-
-        # process for loosen
-        if goal.direction == "loosen" :
-            if not self.set_moving_speed(motor_id, 0) :
-                self.set_torque_enable(motor_id, 0)
-                self._result.control_result = True
-                self._as.set_succeeded(self._result)
-            else :
-                self.set_torque_enable(motor_id, 0)
-                self._result.control_result = False
-                self._as.set_succeeded(self._result)
+        
+        if goal.direction == "loosen" and not goal.duration:
+            rospy.logwarn("Loosen command was sent, but without a duration. Setting to 2 seconds.")
+            goal.duration = 2
             return
 
+        if goal.duration:
+            rospy.sleep(goal.duration)
+            self.set_torque_enable(motor_id, 0)
+            self._result.control_result = self.set_moving_speed(motor_id, 0) 
+            self._result.control_result = True
+            self._as.set_succeeded(self._result)
+            return
+            
         # process for tighten
         while self._feedback.motor_speed > 0:
             if self._as.is_preempt_requested():

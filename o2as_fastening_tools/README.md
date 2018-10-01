@@ -49,7 +49,8 @@ Enter the names of each motor ID and gripper in this file: config/gripper.yaml
 ## About action service
 ### fastener_gripper_control_action
 
-This action in fastening_tool_action_server.py.
+The action topic is "o2as_fastening_tools/fastening_gripper_control_action" and the action is defined in o2as_msgs.
+
 load gripper info file. (fastening_tools.yaml)
 
 To use the action service, use "fastening_tool_name" and "speed" or "duration" and "direction".
@@ -57,7 +58,7 @@ The return value is the boolean type.
 The feedback value is current the rotation speed of uint32 type.
 
 - "fastening_tool_name" : 
-The gripper name is set with fatening_tools.yaml in the config folder.
+The gripper name is set with gripper.yaml in the config folder.
 In this file, the motor are listed.
 If you want to add a new motor, please add it to this file.
 The gripper name can be any string.
@@ -83,11 +84,12 @@ In this mode, there is no feedback.
 
 ### screw_control_action
 
-This action in screw_controller.py.
-This action is used when you want to execute suction on/off.
-If this action is insert screw or trying to break vacuum, if it does not get the result after 5 seconds, it will return 'False' and exit.
+The action topic is "o2as_fastening_tools/screw_control_action" and the action is defined in o2as_msgs.
 
 load ur_control info file. (screw_control.yaml)
+
+This action is used when you want to execute suction on/off.
+If this action is insert screw or trying to break vacuum, if it does not get the result after 5 seconds, it will return 'False' and exit.
 
 To use the action service, use "fastening_tool_name" and "screw_control" and "switch".
 The return value is the boolean type.
@@ -124,9 +126,9 @@ Please be careful if you use 'ur_driver/io_states' as an alias.
 
 As in fastening_tools.launch, set parameter.
 
-'max_access' is the number of U2D2 connections.
+'num_controllers' is the number of U2D2 connections.
 
-'access_no' is set as many set by 'max_access'. 
+'serial_port' is set as many set by 'num_controllers'. 
 The value uses the connection name of U2D2.
 
 'conf_dir' sets the path of the config folder.
@@ -134,8 +136,8 @@ The value uses the connection name of U2D2.
 'fastening_tools' sets the yaml name with gripper information.
 
 
-## Example of use 
-### astener_gripper_control
+## Example of use
+### fastener_gripper_control 
 
 Appoint gripper name and rotary speed in 'fastener_gripper_action_client.py'.
 
@@ -155,4 +157,5 @@ I think that the following operation is possible.
 ### screw_control
 
 Please run 'screw_demo.launch'.
+
 
