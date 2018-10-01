@@ -5,7 +5,7 @@ import sys
 import rospy
 from std_msgs.msg import String
 from o2as_fastening_tools.srv import *
-from o2as_fastening_tools.msg import *
+from o2as_msgs.msg import *
 
 import actionlib
 import actionlib_tutorials.msg
@@ -32,8 +32,8 @@ if __name__ == '__main__':
         controller = FasteningToolController()
 
         name_list = [
-            "m4_tool",
-            "m3_tool",
+            "screw_tool_m4",
+            "screw_tool_m3",
         ]
 
         for name in name_list:
@@ -44,4 +44,3 @@ if __name__ == '__main__':
 
     except rospy.ROSInterruptException:
         print("program interrupted before completion", file=sys.stderr)
-

@@ -18,7 +18,7 @@ class ScrewController(object):
         self.comm_result = False
         self.pin_state = False
         config_dir = rospy.get_param("~config_dir")
-        config_file = rospy.get_param("~screw_control")
+        config_file = rospy.get_param("~screw_controls")
         
         rospy.Subscriber("ur_driver/io_states", IOStates, self.callback, queue_size=1)
         self.pub = rospy.Publisher('o2as_fastening_tools/screw_suctioned', PressureSensoState, queue_size=18)
@@ -37,7 +37,7 @@ class ScrewController(object):
         self.out_state = dict()
 
         # get data for .yaml
-        data_list = screw_list['screw_control']
+        data_list = screw_list['screw_controls']
         for data in data_list:
             self.digital_in_port.update({data['name'] : data['digital_in_port']})
             self.digital_out_port_vac.update({data['name'] : data['digital_out_port_vac']})
