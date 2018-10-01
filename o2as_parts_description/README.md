@@ -24,7 +24,16 @@ To view all the parts in Rviz, simply include "display_all_parts.srdf" in the sc
 
 ## Generating the URDF files
 
-The node `generate_urdf_from_meshes.py` takes the files in `/meshes` and the file `/urdf/templates/extra_frames.csv`, and generates the macro files in the `/urdf` directory. Files are overwritten, so be careful.
+Before running the assembly task, the meshes need to be put into the `/meshes` directory of this package, with the first two letters being the part number. Afterwards, execute these commands:
+
+    ```bash
+    rosrun o2as_parts_description generate_urdf_from_meshes.py
+    rosrun o2as_parts_description generate_assembled_piece.py
+    ```
+
+The two nodes take the files in `/meshes` and  `/urdf/templates` as input, and generate the URDF files in the `/urdf/generated` directory. Files are overwritten, so be careful.
+
+To change the assembly and the named frames, change the csv files in `/urdf/templates/`.
 
 ## Rules for item coordinate systems
 

@@ -38,14 +38,14 @@ with open(frames_filename, 'r') as f:
                 row_stripped.append(el.strip())       # Removes whitespaces
             extra_frames.append(row_stripped)
 
-template_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "assembly_template.urdf")
+template_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "assembly_template.urdf.xacro")
 f = open(template_filename,'r')
 template_front = f.read()
 f.close()
 
 # Write the file containing connections between the frames in the instructions
 out_dir = os.path.join(rp.get_path("o2as_parts_description"), "urdf/generated")
-outfile = open(os.path.join(out_dir, "full_assembly.urdf"),'w+')
+outfile = open(os.path.join(out_dir, "full_assembly.urdf.xacro"),'w+')
 content = template_front
 
 content +=  "    <xacro:assy_part_01 prefix=\"${prefix}\" parent=\"${parent}\" spawn_attached=\"true\"> \n"
@@ -133,8 +133,8 @@ outfile.write(content)
 # Write the same assembly, but without the collision and visual bodies
 content = content.replace("xacro:assy_part_", "xacro:assy_part_frames_only_")
 content = content.replace("name=\"full_assembly\"", "name=\"full_assembly_frames_only\"")
-content = content.replace("assembly_parts_macros.urdf", "assembly_parts_frame_macros.urdf")
+content = content.replace("assembly_parts_macros.urdf.xacro", "assembly_parts_frame_macros.urdf.xacro")
 
 out_dir2 = os.path.join(rp.get_path("o2as_parts_description"), "urdf/generated")
-outfile2 = open(os.path.join(out_dir2, "full_assembly_frames_only.urdf"),'w+')
+outfile2 = open(os.path.join(out_dir2, "full_assembly_frames_only.urdf.xacro"),'w+')
 outfile2.write(content)

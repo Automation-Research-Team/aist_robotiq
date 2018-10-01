@@ -18,7 +18,8 @@ add_message_files(DIRECTORY msg)
 add_service_files(DIRECTORY srv)
 
 # Generate actions in the 'action' folder
-add_action_files( DIRECTORY action )
+add_action_files( 
+  DIRECTORY action )
 
 # # Generate added messages and services with any dependencies listed here
 
