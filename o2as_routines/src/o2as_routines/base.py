@@ -485,7 +485,7 @@ class O2ASBaseRoutines(object):
 
   ######
 
-  def do_pick_action(self, robot_name, pose_stamped, screw_size = 0.0, z_axis_rotation = 0.0, use_complex_planning = False, tool_name = ""):
+  def do_pick_action(self, robot_name, pose_stamped, screw_size = 0, z_axis_rotation = 0.0, use_complex_planning = False, tool_name = ""):
     # Call the pick action
     goal = o2as_msgs.msg.pickGoal()
     goal.robot_name = robot_name
@@ -503,12 +503,13 @@ class O2ASBaseRoutines(object):
     rospy.loginfo("Getting result")
     return self.pick_client.get_result()
 
-  def do_place_action(self, robot_name, pose_stamped, tool_name = ""):
+  def do_place_action(self, robot_name, pose_stamped, tool_name = "", screw_size=0):
     # Call the pick action
     goal = o2as_msgs.msg.placeGoal()
     goal.robot_name = robot_name
     goal.item_pose = pose_stamped
     goal.tool_name = tool_name
+    goal.screw_size = screw_size
     rospy.loginfo("Sending place action goal")
     rospy.loginfo(goal)
 

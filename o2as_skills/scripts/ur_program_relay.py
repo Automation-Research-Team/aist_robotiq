@@ -122,13 +122,13 @@ class URScriptRelay():
 
             program = program_front + "\n" + program_back
         elif req.program_id == "lin_move":
-            rospy.loginfo("lin move uses the ee_link of the robot, not the EE of the move group.") 
+            rospy.logdebug("UR script lin move uses the ee_link of the robot, not the EE of the move group.") 
             if not req.acceleration:
                 req.acceleration = 0.5
             if not req.velocity:
                 req.velocity = .03
-            rospy.loginfo("original pose:")
-            rospy.loginfo(req.target_pose)
+            rospy.logdebug("original pose:")
+            rospy.logdebug(req.target_pose)
             robot_pose = self.listener.transformPose(req.robot_name + "_base", req.target_pose)
             xyz = [robot_pose.pose.position.x, robot_pose.pose.position.y, robot_pose.pose.position.z]
             
@@ -137,8 +137,8 @@ class URScriptRelay():
             rpy = tf.transformations.euler_from_quaternion(q)
             # rpy needs to be in axis-angle representation
             # http://www.zacobria.com/universal-robots-knowledge-base-tech-support-forum-hints-tips/python-code-example-of-converting-rpyeuler-angles-to-rotation-vectorangle-axis-for-universal-robots/
-            rospy.loginfo("q in robot base:")
-            rospy.loginfo(q)
+            rospy.logdebug("q in robot base:")
+            rospy.logdebug(q)
 
             # This seems to work, but it uses the ee_link TCP of the robot.
             program = ""
@@ -153,7 +153,7 @@ class URScriptRelay():
             #                 "a = " + str(req.acceleration) + ", v = " + str(req.velocity) + ")\n"
             program += "    textmsg(\"Done.\")\n"
             program += "end\n"
-            rospy.loginfo(program)
+            rospy.logdebug(program)
         elif req.program_id == "lin_move_rel":
             if not req.acceleration:
                 req.acceleration = 0.5
@@ -186,6 +186,8 @@ class URScriptRelay():
                 req.max_radius = .0065
             if not req.radius_increment:
                 req.radius_increment = .002
+            if not req.theta_increment:
+                req.theta_increment = 30
             if not req.spiral_axis:
                 req.spiral_axis = "Z"
             
@@ -194,7 +196,8 @@ class URScriptRelay():
                                 + ", " + str(req.radius_increment) \
                                 + ", " + str(req.velocity) \
                                 + ", " + str(req.acceleration) \
-                                + ", \"" + req.spiral_axis + "\")\n"
+                                + ", \"" + req.spiral_axis + "\"" \
+                                + ", " + str(req.theta_increment) + ")\n"
             program_back += "    textmsg(\"Done.\")\n"
             program_back += "end\n"
 
