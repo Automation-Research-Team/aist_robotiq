@@ -75,7 +75,7 @@
     <origin xyz=".66 -0.25 .065" rpy="0 0 ${pi/2}" />   
   </xacro:screw_feeder>
   <xacro:screw_feeder feedername="m4_feeder" parent="c_bot_base_smfl">
-    <origin xyz=".54 -0.25 .065" rpy="0 0 ${pi/2}" />   
+    <origin xyz=".52 -0.25 .065" rpy="0 0 ${pi/2}" />   
   </xacro:screw_feeder>
 
   <!-- robot arms -->    

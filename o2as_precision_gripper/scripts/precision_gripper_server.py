@@ -18,9 +18,9 @@ class PrecisionGripperAction:
         # self.p2 = xm430.Robotis_Servo2( self.dynamixel, 2, series = "XM" )  #outer gripper
 
         self.inner_gripper_motor_pos = -1
-        self.outer_gripper_motor_pos = -1
+        # self.outer_gripper_motor_pos = -1
         self.inner_gripper_read_current_position()
-        self.outer_gripper_read_current_position()
+        # self.outer_gripper_read_current_position()
         self.inner_motor_pos_pub = rospy.Publisher('o2as_precision_gripper/inner_gripper_motor_pos', std_msgs.msg.Int32, queue_size=1)
         self.inner_motor_closed_pub = rospy.Publisher('o2as_precision_gripper/inner_gripper_fully_closed', std_msgs.msg.Bool, queue_size=1)
         self.inner_motor_opened_pub = rospy.Publisher('o2as_precision_gripper/inner_gripper_fully_opened', std_msgs.msg.Bool, queue_size=1)
@@ -56,13 +56,13 @@ class PrecisionGripperAction:
         rospy.loginfo('Executing'+ str(self._action_name)+"."+"request sent:")
         rospy.loginfo(goal)
         self.inner_gripper_read_current_position()
-        self.outer_gripper_read_current_position()
+        # self.outer_gripper_read_current_position()
         # start executing the action
         command_is_sent = False
         if goal.stop:
             rospy.loginfo("Turning off torque.")
             command_is_sent1 = self.inner_gripper_disable_torque()
-            command_is_sent2 = self.outer_gripper_disable_torque()
+            command_is_sent2 = True     # command_is_sent2 = self.outer_gripper_disable_torque()
             if command_is_sent1 and command_is_sent2 is True:
                 command_is_sent = True
             else:
@@ -120,7 +120,7 @@ class PrecisionGripperAction:
         else:
             self._action_server.set_preempted()
         self.inner_gripper_read_current_position()
-        self.outer_gripper_read_current_position()
+        # self.outer_gripper_read_current_position()
 
     def publish_status(self, timer_event):
         """Publishes the last known motor status"""

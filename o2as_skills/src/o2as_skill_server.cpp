@@ -11,7 +11,8 @@ SkillServer::SkillServer() :
                   a_bot_group_("a_bot"), b_bot_group_("b_bot"), c_bot_group_("c_bot"),
                   b_bot_gripper_client_("/b_bot_gripper/gripper_action_controller", true),
                   c_bot_gripper_client_("/c_bot_gripper/gripper_action_controller", true),
-                  fastening_tool_client("/o2as_fastening_tools/fastener_gripper_control_action", true)
+                  fastening_tool_client("/o2as_fastening_tools/fastener_gripper_control_action", true),
+                  suction_client("/o2as_fastening_tools/suction_control", true)
 { 
   // Topics to publish
   pubMarker_ = n_.advertise<visualization_msgs::Marker>("visualization_marker", 10);
@@ -1011,6 +1012,49 @@ bool SkillServer::sendFasteningToolCommand(std::string fastening_tool_name, std:
   return result->control_result;
 }
 
+bool SkillServer::setSuction(std::string fastening_tool_name, bool turn_suction_on)
+{
+  // Send a goal to the action
+  o2as_msgs::SuctionControlGoal goal;
+  o2as_msgs::SuctionControlResultConstPtr result;
+
+  goal.fastening_tool_name = fastening_tool_name;
+  goal.turn_suction_on = turn_suction_on;
+  suction_client.sendGoal(goal);
+  ros::Duration(0.1).sleep();
+  bool finished_before_timeout = suction_client.waitForResult(ros::Duration(2.0));
+  result = suction_client.getResult();
+  ROS_DEBUG_STREAM("Suction action " << (finished_before_timeout ? "returned" : "did not return before timeout") <<", with result: " << result->success);
+  return result->success;
+}
+
+bool SkillServer::ejectScrew(std::string fastening_tool_name)
+{
+  // Sends a stream of air to eject the screw, then stops it.
+  o2as_msgs::SuctionControlGoal goal;
+  o2as_msgs::SuctionControlResultConstPtr result;
+
+  goal.fastening_tool_name = fastening_tool_name;
+  goal.eject_screw = true;
+  suction_client.sendGoal(goal);
+  ros::Duration(0.1).sleep();
+  bool finished_before_timeout = suction_client.waitForResult(ros::Duration(2.0));
+  if (!finished_before_timeout)
+  {
+    ROS_ERROR("Suction controller does not respond.");
+    return false;
+  }
+  result = suction_client.getResult();
+  ROS_DEBUG_STREAM("Suction action " << (finished_before_timeout ? "returned" : "did not return before timeout") <<", with result: " << result->success);
+
+  // Stop the ejecting air right away.
+  ros::Duration(1.0).sleep();
+  goal.eject_screw = false;
+  suction_client.sendGoal(goal);
+  return true;
+}
+
+
 // Add the screw tool as a Collision Object to the scene, so that it can be attached to the robot
 bool SkillServer::spawnTool(std::string screw_tool_id)
 {
@@ -1222,10 +1266,9 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
   // Strategy: 
   // - Move 1 cm above the screw head pose
   // - Go down real slow for 2 cm while turning the motor in the direction that would loosen the screw
-  // - Do a little circle motion with radius 1-2 mm
   // - Move up again slowly
   // - If the suction reports success, return true
-  // - If not, display warning and return false?
+  // - If not, try the same a few more times in nearby locations (spiral-search-like)
   
   tf::Transform t;
   tf::Quaternion q(screw_head_pose.pose.orientation.x, screw_head_pose.pose.orientation.y, screw_head_pose.pose.orientation.z, screw_head_pose.pose.orientation.w);
@@ -1234,11 +1277,6 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
   tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), screw_head_pose.header.frame_id, "screw_pick_frame"));
   ROS_INFO_STREAM("Received pickScrew command.");
   
-  // ROS_INFO_STREAM("Moving far above screw.");
-  // screw_head_pose.pose.position.x = -.05;
-  // std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  // moveToCartPoseLIN(screw_head_pose, robot_name, true, screw_tool_link, 1.0);
-
   ROS_INFO_STREAM("Moving close to screw.");
   screw_head_pose.pose.position.x = -.01;
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -1250,11 +1288,11 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
   }
 
   planning_scene_interface_.allowCollisions(screw_tool_id, "tray_2_screw_holder");
-  ROS_WARN_STREAM("TODO: TURN ON SUCTION");
 
   auto adjusted_pose = screw_head_pose;
   auto search_start_pose = screw_head_pose;
   bool screw_picked = false;
+  boost::shared_ptr<std_msgs::Bool const> bool_msg_pointer;
   
   double max_radius = .0025;
   double theta_incr = M_PI/3;
@@ -1266,6 +1304,7 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
   double y, z;
   
   // Try to pick the screw, but go around in a spiral while trying to pick it
+  setSuction(screw_tool_id, true);
   while (!screw_picked)
   {
     sendFasteningToolCommand(fastening_tool_name, "loosen", false, 2.0);
@@ -1280,10 +1319,11 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
     moveToCartPoseLIN(adjusted_pose, robot_name, true, screw_tool_link, 0.1);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    // TODO: Wait for message from suction topic
-    //   screw_picked = ros::topic::waitForMessage("/" + screw_tool_id + "/screw_suctioned", ros::Duration(1.0));
-    ROS_WARN("Setting screw_picked to true");
-    screw_picked = true;  // TODO: Replace this with the block above checking for pick success
+    bool_msg_pointer = ros::topic::waitForMessage<std_msgs::Bool>("/" + screw_tool_id + "/screw_suctioned", ros::Duration(1.0));
+    if(bool_msg_pointer != NULL){
+      screw_picked = bool_msg_pointer->data;
+    }
+
     if ((RealRadius > max_radius) || (!ros::ok()))
       break;
 
@@ -1302,23 +1342,24 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
   planning_scene_interface_.disallowCollisions(screw_tool_id, "tray_2_screw_holder");
   ROS_INFO_STREAM("Moving back up completely.");
   screw_head_pose.pose.position.x = -.05;
-  success = moveToCartPoseLIN(screw_head_pose, robot_name, true, screw_tool_link, 0.5);
+  moveToCartPoseLIN(screw_head_pose, robot_name, true, screw_tool_link, 0.5);
   
-  // TODO: Check suction success
-
-  ROS_INFO_STREAM("Finished picking up screw. We don't know if we got it, so we are returning true for now. TODO.");
-  return true;
+  ROS_INFO_STREAM((screw_picked ? "Finished picking up screw successfully." : "Failed to pick screw."));
+  return screw_picked;
 }
 
-bool SkillServer::placeScrew(geometry_msgs::PoseStamped screw_head_pose, std::string screw_tool_id, std::string robot_name, std::string screw_tool_link, std::string fastening_tool_name)
+bool SkillServer::placeScrew(
+  geometry_msgs::PoseStamped screw_head_pose, std::string screw_tool_id,
+  std::string robot_name, std::string screw_tool_link,
+  std::string fastening_tool_name
+)
 {
   // Strategy: 
   // - Move 1 cm above the screw head pose
   // - Go down real slow for 2 cm while turning the motor in the direction that would tighten the screw
   // - Do a little circle motion with radius 1-2 mm
   // - Move up again slowly
-  // - If the suction reports success, return true
-  // - If not, display warning and return false?
+  // - Assume it worked.
   
   tf::Transform t;
   tf::Quaternion q(screw_head_pose.pose.orientation.x, screw_head_pose.pose.orientation.y, screw_head_pose.pose.orientation.z, screw_head_pose.pose.orientation.w);
@@ -1343,7 +1384,7 @@ bool SkillServer::placeScrew(geometry_msgs::PoseStamped screw_head_pose, std::st
   auto search_start_pose = screw_head_pose;
   bool screw_picked = false;
   
-  // Try to pick the screw, but go around in a spiral while trying to pick it
+  // Try to place the screw, but go around in a spiral while trying to place it
   sendFasteningToolCommand(fastening_tool_name, "tighten", false, 10.0);
 
   ROS_INFO_STREAM("Moving into tray screw hole.");
@@ -1354,7 +1395,7 @@ bool SkillServer::placeScrew(geometry_msgs::PoseStamped screw_head_pose, std::st
   {
     o2as_msgs::sendScriptToUR srv;
     srv.request.program_id = "spiral_motion";
-    srv.request.robot_name = goal->robot_name;
+    srv.request.robot_name = robot_name;
     srv.request.max_radius = .002;
     srv.request.radius_increment = .0005;
     srv.request.spiral_axis = "Y";
