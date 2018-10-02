@@ -160,6 +160,14 @@
         <joint name="c_bot_wrist_2_joint" value="-1.57" />
         <joint name="c_bot_wrist_3_joint" value="-3.1415" />
     </group_state>
+    <group_state name="screw_pick_ready" group="c_bot">
+        <joint name="c_bot_elbow_joint" value="1.4" />
+        <joint name="c_bot_shoulder_lift_joint" value="-2.1" />
+        <joint name="c_bot_shoulder_pan_joint" value="0" />
+        <joint name="c_bot_wrist_1_joint" value="-1.6141" />
+        <joint name="c_bot_wrist_2_joint" value="-1.57" />
+        <joint name="c_bot_wrist_3_joint" value="-3.1415" />
+    </group_state>
     <group_state name="tool_pick_ready" group="c_bot">
         <joint name="c_bot_elbow_joint" value="1.4" />
         <joint name="c_bot_shoulder_lift_joint" value="-2.1" />
@@ -255,6 +263,22 @@
         <joint name="b_bot_wrist_1_joint" value="-0.424471" />
         <joint name="b_bot_wrist_2_joint" value="-3.05216" />
         <joint name="b_bot_wrist_3_joint" value="-3.1474" />
+    </group_state>
+    <group_state name="screw_place_ready_near_b_bot" group="c_bot">
+        <joint name="c_bot_elbow_joint" value="1.4" />
+        <joint name="c_bot_shoulder_lift_joint" value="-2.1" />
+        <joint name="c_bot_shoulder_pan_joint" value="1.6315" />
+        <joint name="c_bot_wrist_1_joint" value="-1.6141" />
+        <joint name="c_bot_wrist_2_joint" value="-1.57" />
+        <joint name="c_bot_wrist_3_joint" value="-3.1415" />
+    </group_state>
+    <group_state name="check_precision_gripper_success" group="a_bot">
+        <joint name="a_bot_elbow_joint" value="1.8643" />
+        <joint name="a_bot_shoulder_lift_joint" value="-1.42301" />
+        <joint name="a_bot_shoulder_pan_joint" value="0.5977" />
+        <joint name="a_bot_wrist_1_joint" value="-2.8298" />
+        <joint name="a_bot_wrist_2_joint" value="-1.91703" />
+        <joint name="a_bot_wrist_3_joint" value="-1.55731" />
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="c_bot_gripper" parent_link="c_bot_robotiq_85_tip_link" group="c_bot" />
