@@ -19,6 +19,7 @@
       height: 1200
       n_cols: 32
       n_rows: 20
+
     image_topics:
       realsense:
         topic_name: /b_bot_camera/rgb/image_raw
@@ -32,19 +33,34 @@
         topic_name: /a_phoxi_m_camera/texture
         col: [0, 15]
         row: [10, 17]
+
     caminfo_topics:
       phoxi_caminfo:
         topic_name: /a_phoxi_m_camera/camera_info
         col: [16, 23]
         row: [10, 17]
         offset: [8, 32]
+
     string_topics:
-      state:
-        topic_name: /o2as_state
-        col: [0, 23]
-        row: [18, 19]
+      task:
+        topic_name: /o2as_state/task
+        col: [0, 15]
+        row: [16, 16]
+        offset: [8, 36]
+        n_history: 1
+      subtask:
+        topic_name: /o2as_state/subtask
+        col: [0, 15]
+        row: [17, 19]
         offset: [8, 32]
-        n_history: 4
+        n_history: 5
+      operation:
+        topic_name: /o2as_state/operation
+        col: [16, 31]
+        row: [16, 19]
+        offset: [8, 32]
+        n_history: 7
+
     kitting_set_id_topics:
       kitting_item_set:
         topic_name: /o2as_state/kitting_set_id

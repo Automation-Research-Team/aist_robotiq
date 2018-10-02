@@ -45,6 +45,10 @@ void clear_buffer_rect(cv::Rect rect, const cv::Mat& monitor_)
                 cv::Point(rect.x, rect.y),
                 cv::Point(rect.x + rect.width, rect.y + rect.height),
                 cv::Scalar(0, 0, 0), CV_FILLED);
+  cv::rectangle(monitor_,
+                cv::Point(rect.x, rect.y),
+                cv::Point(rect.x + rect.width, rect.y + rect.height),
+                cv::Scalar(255, 255, 255), 1);
 }
 
 void putText(const cv::Mat& monitor_, int x, int y, const std::string& text)
