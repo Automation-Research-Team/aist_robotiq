@@ -8,7 +8,7 @@
   </node>
 
   <arg name="camera_name" default="camera"/>
-  <arg name="serial_number" default="616205004841"/> <!-- specify serial number of your camera -->
+  <arg name="serial_number" default="627201001218"/> <!-- specify serial number of your camera -->
   <arg name="color_width" default="640"/>
   <arg name="color_height" default="360"/>
   <arg name="depth_width" default="640"/>

@@ -6,7 +6,7 @@
 	627201001218 : osx
     -->
     <arg name="camera_name" default="realsense"/>
-    <arg name="serial_number" default="616205004841"/> <!-- specify serial number of your camera -->
+    <arg name="serial_number" default="627201001218"/> <!-- specify serial number of your camera -->
 
     <include file="$(find o2as_realsense_camera)/launch/camera.launch">
         <arg name="camera_name" value="$(arg camera_name)"/>

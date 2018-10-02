@@ -95,6 +95,13 @@
     <arg name="serial_port_1" default="/dev/for_docker/screw" />
   </include>
 
+  <!-- a_bot camera -->
+  <include file="$(find o2as_realsense_camera)/launch/camera.launch">
+    <arg name="camera_name" default="c_bot_camera"/>
+    <arg name="camera_frame" default="c_bot_camera"/>
+    <arg name="serial_number" value="627201001218"/> 
+  </include>
+
   <!-- <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch">
     <arg name="sim" value="false" />
     <arg name="debug" value="false" />
