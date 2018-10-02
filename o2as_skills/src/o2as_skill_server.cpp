@@ -987,6 +987,8 @@ bool SkillServer::sendGripperCommand(std::string robot_name, double opening_widt
 
 bool SkillServer::sendFasteningToolCommand(std::string fastening_tool_name, std::string direction, bool wait, double duration, int speed)
 {
+  if (!use_real_robot_)
+    return true;
   // Send a goal to the action
   o2as_msgs::FastenerGripperControlGoal goal;
   o2as_msgs::FastenerGripperControlResultConstPtr result;
@@ -1014,6 +1016,8 @@ bool SkillServer::sendFasteningToolCommand(std::string fastening_tool_name, std:
 
 bool SkillServer::setSuction(std::string fastening_tool_name, bool turn_suction_on)
 {
+  if (!use_real_robot_)
+    return true;
   // Send a goal to the action
   o2as_msgs::SuctionControlGoal goal;
   o2as_msgs::SuctionControlResultConstPtr result;
@@ -1030,6 +1034,8 @@ bool SkillServer::setSuction(std::string fastening_tool_name, bool turn_suction_
 
 bool SkillServer::ejectScrew(std::string fastening_tool_name)
 {
+  if (!use_real_robot_)
+    return true;
   // Sends a stream of air to eject the screw, then stops it.
   o2as_msgs::SuctionControlGoal goal;
   o2as_msgs::SuctionControlResultConstPtr result;
@@ -1738,25 +1744,30 @@ void SkillServer::executePlace(const o2as_msgs::placeGoalConstPtr& goal)
 {
   ROS_INFO("placeAction was called");
   // TODO: Calculate the target pose with the item height currently held
-
   std::string ee_link_name;
-  if (goal->robot_name == "a_bot"){ee_link_name = goal->robot_name + "_gripper_tip_link"; }
-  else {ee_link_name = goal->robot_name + "_robotiq_85_tip_link";}
-  
   if (goal->tool_name == "suction")
   {
     ; // TODO: Set the ee_link_name correctly and pass a flag to placeFromAbove
   }
-
-  if (goal->tool_name == "screw_tool")
+  else if (goal->tool_name == "screw_tool")
   {
     // This is for placing a screw in the tray
     std::string screw_tool_id = "screw_tool_m" + std::to_string(goal->screw_size);
     std::string screw_tool_link = goal->robot_name + "_screw_tool_m" + std::to_string(goal->screw_size) + "_tip_link";
     std::string fastening_tool_name = "screw_tool_m" + std::to_string(goal->screw_size);
-    return placeScrew(goal->item_pose, screw_tool_id, goal->robot_name, screw_tool_link, fastening_tool_name);
+    bool success = placeScrew(goal->item_pose, screw_tool_id, goal->robot_name, screw_tool_link, fastening_tool_name);
+    if (success)
+      placeActionServer_.setSucceeded();
+    else
+      placeActionServer_.setAborted();
+    return;
   }
-
+  else
+  {
+    if (goal->robot_name == "a_bot"){ee_link_name = goal->robot_name + "_gripper_tip_link"; }
+    else {ee_link_name = goal->robot_name + "_robotiq_85_tip_link";}
+  }
+  
   placeFromAbove(goal->item_pose, ee_link_name, goal->robot_name);
   ROS_INFO("placeAction is set as succeeded");
   placeActionServer_.setSucceeded();

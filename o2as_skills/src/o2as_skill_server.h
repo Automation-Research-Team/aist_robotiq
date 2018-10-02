@@ -49,6 +49,7 @@
 #include "o2as_msgs/screwAction.h"
 #include "o2as_msgs/changeToolAction.h"
 #include "o2as_msgs/FastenerGripperControlAction.h"
+#include "o2as_msgs/SuctionControlAction.h"
 
 #include <actionlib/client/simple_action_client.h>
 #include <robotiq_msgs/CModelCommandAction.h>
