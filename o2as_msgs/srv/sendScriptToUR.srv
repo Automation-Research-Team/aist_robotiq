@@ -8,7 +8,8 @@ string program_id       # "insertion", "lin_move", "lin_move_rel", "spiral_motio
 float64 max_force               # The force that spiral_search applies, in N
 string force_direction          # The direction vector of the force (usually X+ or Z-)
 float64 max_radius              # In m. Default: .0065
-float64 radius_increment        # How fast the spiral increases in size. In m. Default: .002
+float64 radius_increment        # How fast the spiral increases in size per rotation. In m. Default: .002
+float64 theta_increment         # The angle increment (in degrees!) each rotation is sliced into.
 geometry_msgs/Vector3 stiffness # For insertion and spiral_search. In N/m. The coordinate system is the ee link.
 float64 forward_speed           # The speed at which "insertion" moves forward. Slower probably improves precision.
 float64 max_approach_distance   # For the linear search approach
