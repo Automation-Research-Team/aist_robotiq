@@ -44,6 +44,13 @@
       <origin xyz="0.187 0 0" rpy="0 0 0"/>
     </joint>
 
+    <joint name="${prefix}robotiq_85_suction_tool_tip_joint" type="fixed">
+      <parent link="${prefix}dual_suction_gripper_pad_link"/>
+      <child link="${prefix}suction_tool_tip_link"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0 "/>
+    </joint>
+    <link name="${prefix}suction_tool_tip_link"/>
+
     <!-- A link representing the tip of the coander gripper
 	 and a joint attaching it to the gripper -->
     <link name="${prefix}dual_suction_gripper_coanda_link"/>

@@ -70,7 +70,7 @@ class TaskboardClass(O2ASBaseRoutines):
                       "M6 Nut & Bolt", "M12 nut", "6 mm washer", 
                       "10 mm washer", "M3 set screw", "M3 bolt", 
                       "M4 bolt", "Pulley", "10 mm end cap"]
-    self.item_pick_heights = [0.02, 0.02, 0.045,
+    self.item_pick_heights = [0.02, 0.02, 0.042,
                               0.047, 0.072, 0.0, 
                               0.02, 0.02, -0.002, 
                               -0.002, 0.001, 0.02,
@@ -150,108 +150,7 @@ class TaskboardClass(O2ASBaseRoutines):
   ################ ----- Routines  
   ################ 
   ################ 
-  def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False):
-    #self.publish_marker(object_pose, "pick_pose")
-    #initial gripper_setup
-    rospy.loginfo("Going above object to pick")
-    rospy.loginfo("Height 0: " + str(object_pose.pose.position.z))
-    rospy.loginfo("Approach height 0: " + str(approach_height))
-    object_pose.pose.position.z += approach_height
-    rospy.loginfo("Height 1: " + str(object_pose.pose.position.z))
-    if special_pick == True:
-      object_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*45/180, pi/2))
-    rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
-    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
-    object_pose.pose.position.z -= approach_height
-    rospy.loginfo("Height 2: " + str(object_pose.pose.position.z))
-    self.publish_marker(object_pose, "place_pose")
-
-    if gripper_command=="complex_pick_from_inside":
-      self.precision_gripper_inner_close() 
-    elif gripper_command=="complex_pick_from_outside":
-      self.precision_gripper_inner_open()
-    elif gripper_command=="easy_pick_only_inner":
-      self.precision_gripper_inner_close()
-    elif gripper_command=="easy_pick_outside_only_inner":
-      self.precision_gripper_inner_open()
-    elif gripper_command=="none":
-      pass
-    else: 
-      self.send_gripper_command(gripper=robotname, command="open")
-
-    rospy.loginfo("Moving down to object")
-    rospy.loginfo(grasp_height)
-    object_pose.pose.position.z += grasp_height
-    rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
-    self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
-    object_pose.pose.position.z -= grasp_height
-
-    # W = raw_input("waiting for the gripper")
-    #gripper close
-    if gripper_command=="complex_pick_from_inside":
-      self.precision_gripper_inner_open(this_action_grasps_an_object = True)
-      self.precision_gripper_outer_close()
-    elif gripper_command=="complex_pick_from_outside":
-      self.precision_gripper_inner_close(this_action_grasps_an_object = True)
-      self.precision_gripper_outer_close()
-    elif gripper_command=="easy_pick_only_inner":
-      self.precision_gripper_inner_open(this_action_grasps_an_object = True)
-    elif gripper_command=="easy_pick_outside_only_inner":
-      self.precision_gripper_inner_close()
-    elif gripper_command=="none":
-      pass
-    else: 
-      self.send_gripper_command(gripper=robotname, command="close")
-
-    # if special_pick == True:
-    #   object_pose.pose.orientation = self.downward_orientation
-    rospy.sleep(.5)
-    rospy.loginfo("Going back up")
-    object_pose.pose.position.z += approach_height
-    rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
-    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
-    object_pose.pose.position.z -= approach_height
-
-######
-
-  def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, lift_up_after_place = True):
-    #self.publish_marker(object_pose, "place_pose")
-    rospy.loginfo("Going above place target")
-    object_pose.pose.position.z += approach_height
-    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
-    object_pose.pose.position.z -= approach_height
-
-    rospy.loginfo("Moving to place target")
-    object_pose.pose.position.z += place_height
-    self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
-    object_pose.pose.position.z -= place_height
-
-    # print "============ Stopping at the placement height. Press `Enter` to keep moving moving the robot ..."
-    # raw_input()
-
-    #gripper open
-    if gripper_command=="complex_pick_from_inside":
-      self.precision_gripper_outer_open()
-      self.precision_gripper_inner_close()
-    elif gripper_command=="complex_pick_from_outside":
-      self.precision_gripper_outer_open()
-      self.precision_gripper_inner_open()
-    elif gripper_command=="easy_pick_only_inner":
-      self.precision_gripper_inner_close()
-    elif gripper_command=="easy_pick_outside_only_inner":
-      self.precision_gripper_inner_open()
-    elif gripper_command=="none":
-      pass
-    else: 
-      self.send_gripper_command(gripper=robotname, command="open")
-
-    
-    if lift_up_after_place:
-      rospy.loginfo("Moving back up")
-      object_pose.pose.position.z += approach_height
-      self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)  
-      object_pose.pose.position.z -= approach_height
-    
+      
   def belt_circle_motion(self, robot_name, speed = 0.02):
     self.toggle_collisions(collisions_on=False)
     group = self.groups[robot_name]
@@ -778,7 +677,7 @@ if __name__ == '__main__':
         belt_place_pose.header.frame_id = "taskboard_part6_large_pulley"
         belt_place_pose.pose.position.x = 0.0
         belt_place_pose.pose.position.y = .01
-        belt_place_pose.pose.position.z = .0075
+        belt_place_pose.pose.position.z = .0085
         belt_place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
         taskboard.go_to_pose_goal("b_bot", belt_place_pose, speed=0.1)
         

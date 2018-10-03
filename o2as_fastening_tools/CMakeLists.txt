@@ -30,8 +30,6 @@ add_service_files(
   DynamixelReadState.srv
 )
 
-# add_action_files(DIRECTORY action FILES FastenerGripperControl.action)
-
 generate_messages(
   DEPENDENCIES actionlib_msgs std_msgs 
 )
@@ -56,6 +54,3 @@ add_executable(dynamixel_controller src/dynamixel_controller.cpp)
 add_dependencies(dynamixel_controller ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(dynamixel_controller ${catkin_LIBRARIES})
 
-#add_executable(ServiceClient_test src/ServiceClient_test.cpp)
-#add_dependencies(ServiceClient_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(ServiceClient_test ${catkin_LIBRARIES})

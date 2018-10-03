@@ -1,5 +1,5 @@
 fastening_tools:
-  - name: screw_tool_m5
+  - name: screw_tool_m6
     motor_id: 1
   - name: screw_tool_m4
     motor_id: 3

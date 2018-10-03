@@ -146,7 +146,7 @@ def read_order_list(directory, set_origin):
     part_set = set()
     kitting_list = dict()
 
-    with open(os.path.join(rp.get_path("o2as_scene_description"), "urdf/templates", "ExampleOfSetListFile2.csv"), 'r') as f:
+    with open(os.path.join(rp.get_path("o2as_scene_description"), "config", "kitting_order_file.csv"), 'r') as f:
         reader = csv.reader(f)
         header = next(reader)
         # [0, 1, 2, 3] = ["Set", "No.", "ID", "Name", "Note"]
