@@ -18,7 +18,7 @@
 
   <!-- Start ArUco -->
   <!-- <node name="aruco_tracker" pkg="aruco_ros" type="single"> -->
-  <node name="aruco_tracker" pkg="o2as_aruco_ros" type="marker_detector"
+  <node name="aruco_tracker" pkg="o2as_aruco_ros" type="o2as_aruco_simple"
 	output="screen">
     <remap from="/camera_info"	to="/$(arg camera_name)/camera_info"
 	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
@@ -30,7 +30,7 @@
 	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/image"	to="/$(arg camera_name)/rgb/image_raw"
 	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
-    <remap from="/cloud"	to="/$(arg camera_name)/depth/points"
+    <remap from="/pointcloud"	to="/$(arg camera_name)/depth/points"
 	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
 
     <!-- Other parameters -->
