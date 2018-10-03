@@ -28,34 +28,48 @@ class BlobDetection(object):
         rospy.Subscriber(self.image_topic, Image, self.image_callback)
         rospy.Subscriber(self.cloud_topic, PointCloud2, self.cloud_callback)
 
+        #Variable
         self.bridge = CvBridge()
+        current_image = Image()
+        current_cloud = PointCloud2()
+
 
     # Callback
     def image_callback(self, msg_in):
       img = self.bridge.imgmsg_to_cv2(msg_in, desired_encoding="passthrough")
       img = np.asarray(img)[:, :, ::-1]
+
+      # Detect the blob in the image
       blob_point = self.detect_blob(img)
       msg_out = geometry_msgs.msg.Point()
       msg_out = blob_point
       self.pub_img_pos.publish(msg_out)
+
+      # Convert the blob position image in the 3D camera system
+      msg_out = self.compute_3D_pos1(self.current_cloud, int(blob_point.x), int(blob_point.y))
+
+      # Publish the results   
+      self.pub_cloud_pos.publish(msg_out)
+
       # Slow down this node and reduce data transfer for image
       rospy.sleep(0.01)
 
     def cloud_callback(self, msg_in):
-      data_out = pc2.read_points(msg_in, field_names = None, skip_nans=False, uvs=[[320, 180]]) 
-      msg_out = geometry_msgs.msg.Point()
+      self.current_cloud = msg_in
+
+    def compute_3D_pos1(self, in_cloud, u,v):
+      # TODO the projection require int but the precision of the blob detected are in float so there is a loss of accuracy 
+    
+      data_out = pc2.read_points(in_cloud, field_names = None, skip_nans=False, uvs=[[u, v]]) 
       int_data = next(data_out)
-      msg_out.x = int_data[0]  
-      msg_out.y = int_data[1]
-      msg_out.z = int_data[2] 
 
-      rospy.loginfo(int_data)
-      print(int_data)
-      self.pub_cloud_pos.publish(msg_out)
+      res_out = geometry_msgs.msg.Point()
+      res_out.x = int_data[0]  
+      res_out.y = int_data[1]
+      res_out.z = int_data[2] 
 
+      return res_out
 
-      # Slow down this node and reduce data transfer for image
-      rospy.sleep(0.01)
 
     def detect_blob(self, img):
         """Compute the ratio of red area in the image.
@@ -122,6 +136,7 @@ class BlobDetection(object):
         if(len(keypoints)):
             blob.x = keypoints[0].pt[0]
             blob.y = keypoints[0].pt[1]
+
         else:
             blob.x = -666
             blob.y = -666
