@@ -192,7 +192,7 @@ Plane<T, N>::fit(ITER begin, ITER end)
 }
 
 /************************************************************************
-*  class Simple							*
+*  class Simple								*
 ************************************************************************/
 class Simple
 {
@@ -606,7 +606,7 @@ Simple::publish_marker_info(const aruco::Marker& marker,
 {
   // marker -> camera transform
     tf::Transform	transform = get_marker_transform(marker, cloud_msg);
-  //tf::Transform	transform = arucoMarker2Tf(marker);
+  //tf::Transform	transform = aruco_ros::arucoMarker2Tf(marker);
 
     tf::StampedTransform	cameraToReference;
     cameraToReference.setIdentity();
