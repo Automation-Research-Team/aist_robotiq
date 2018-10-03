@@ -34,9 +34,9 @@ keyposes = {
     ],
 
     'b_bot': [
-      [0.32,  0.15, 0.10, radians( 30), radians( 25), radians(0)],
-      [0.32,  0.00, 0.10, radians( 30), radians( 25), radians(0)],
-      [0.35, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
+      [0.32,  0.20, 0.15, radians( 30), radians( 25), radians(0)],
+      [0.32,  0.05, 0.15, radians( 30), radians( 25), radians(0)],
+      [0.35, -0.10, 0.15, radians(  0), radians( 25), radians(0)],
 
       [0.35,  0.00, 0.25, radians(  0), radians( 25), radians(0)],
       [0.32,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
