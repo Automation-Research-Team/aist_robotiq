@@ -6,6 +6,7 @@ import rospy
 from std_msgs.msg import Float64
 import geometry_msgs.msg
 from sensor_msgs.msg import Image
+from sensor_msgs.msg import PointCloud2
 from cv_bridge import CvBridge
 import cv2
 
@@ -86,15 +87,18 @@ if __name__ == "__main__":
   # TODO: read values from config file
   node_name = "o2as_blob_detection"
   image_topic = "/camera/color/image_raw"
-  blob_position_topic = node_name+"/blob_position"
+  cloud_topic = "/camera/cloud"
+  blob_pos_img_topic = node_name+"/blob_pos_img"
+  blob_pos_cloud_topic = node_name+"/blob_pos_cloud"
 
   # Initialization
   rospy.init_node(node_name)
-  pub = rospy.Publisher(blob_position_topic, geometry_msgs.msg.Point, queue_size=10)
+  pub = rospy.Publisher(blob_pos_img_topic, geometry_msgs.msg.Point, queue_size=10)
+  pub = rospy.Publisher(blob_pos_cloud_topic, geometry_msgs.msg.Point, queue_size=10)
   bridge = CvBridge()
 
   # Callback
-  def callback(msg_in):
+  def image_callback(msg_in):
     img = bridge.imgmsg_to_cv2(msg_in, desired_encoding="passthrough")
     img = np.asarray(img)[:, :, ::-1]
     blob_point = detect_blob(img)
@@ -105,7 +109,13 @@ if __name__ == "__main__":
     # Slow down this node and reduce data transfer for image
     rospy.sleep(0.01)
 
+  def cloud_callback(msg_in):
+
+    # Slow down this node and reduce data transfer for image
+    rospy.sleep(0.01)
+
   # Subscriber
-  rospy.Subscriber(image_topic, Image, callback)
+  rospy.Subscriber(image_topic, Image, image_callback)
+  rospy.Subscriber(cloud_topic, PointCloud2, cloud_callback)
 
   rospy.spin()
