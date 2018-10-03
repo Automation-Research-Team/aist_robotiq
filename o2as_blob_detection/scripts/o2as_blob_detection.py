@@ -17,6 +17,8 @@ from geometry_msgs.msg import Polygon, Point32
 
 import copy
 
+import actionlib
+import o2as_msgs.msg
 
 class BlobDetection(object):
     def __init__(self):
@@ -39,7 +41,24 @@ class BlobDetection(object):
         rospy.Subscriber(self.image_topic, Image, self.image_callback)
         rospy.Subscriber(self.cloud_topic, PointCloud2, self.cloud_callback)
 
+        #define the action
+        self._action_name = "blob_detection_action"
+        self._action_server = actionlib.SimpleActionServer(self._action_name, o2as_msgs.msg.blobDetectionAction, execute_cb=self.action_callback, auto_start = False)
+        self._action_server.start()
+        rospy.loginfo('Action server '+ str(self._action_name)+" started.")
+        self.action_result = o2as_msgs.msg.blobDetectionResult()
 
+    # Action Callback
+    def action_callback(self, goal):
+      rospy.loginfo('Executing'+ str(self._action_name)+"."+"request sent:")
+      rospy.loginfo(goal)
+      rospy.loginfo('Executing'+ str(self._action_name)+"."+"request sent:")
+
+      print(goal.maskCorner)
+      print("goal.mask")
+
+      self.action_result.success = True
+      self._action_server.set_succeeded(self.action_result)
 
     # Callback
     def image_callback(self, msg_in):
