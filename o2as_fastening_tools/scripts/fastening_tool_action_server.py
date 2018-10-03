@@ -99,7 +99,7 @@ class FasteningToolController(object):
         if goal.duration:
             rospy.sleep(goal.duration)
             self.set_torque_enable(motor_id, 0)
-            self._result.control_result = self.set_moving_speed(motor_id, 0) 
+            self._result.control_result = self.set_moving_speed(motor_id, 0)  # Stops the motor
             self._result.control_result = True
             self._as.set_succeeded(self._result)
             return
