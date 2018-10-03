@@ -26,7 +26,7 @@
 #include <aruco_ros/ArucoThresholdConfig.h>
 #include <aruco_ros/aruco_ros_utils.h>
 
-namespace aruco_ros
+namespace o2as_aruco_ros
 {
 /************************************************************************
 *  geometry functions							*
@@ -192,9 +192,9 @@ Plane<T, N>::fit(ITER begin, ITER end)
 }
 
 /************************************************************************
-*  class ArucoSimple							*
+*  class Simple							*
 ************************************************************************/
-class ArucoSimple
+class Simple
 {
   private:
     using	image_t	= sensor_msgs::Image;
@@ -203,16 +203,18 @@ class ArucoSimple
     using	cloud_p	= sensor_msgs::PointCloud2ConstPtr;
     
   public:
-    ArucoSimple();
+    Simple();
 
   private:
     void	cam_info_callback(const sensor_msgs::CameraInfo& msg)	;
-    void	reconf_callback(ArucoThresholdConfig& config,
+    void	reconf_callback(aruco_ros::ArucoThresholdConfig& config,
 				uint32_t level)				;
     void	image_callback(const image_p& image_msg)		;
     void	cloud_callback(const cloud_p& cloud_msg)		;
     void	detect_marker(const image_t& image_msg,
 			      const cloud_t& cloud_msg)			;
+    void	detect_markers(const image_t& image_msg,
+			       const cloud_t& cloud_msg)		;
     bool	get_transform(const std::string& refFrame,
 			      const std::string& childFrame,
 			      tf::StampedTransform& transform)	const	;
@@ -221,6 +223,11 @@ class ArucoSimple
 				     const cloud_t& cloud_msg)	const	;
     template <class T> cv::Vec<T, 3>
 		view_vector(T u, T v)				const	;
+    void	publish_marker_info(const aruco::Marker& marker,
+				    const cloud_t& cloud_msg,
+				    const ros::Time& stamp)		;
+    void	publish_misc_info(const cv::Mat& image,
+				  const ros::Time& stamp)		;
     
   private:
     ros::NodeHandle			_nh;
@@ -249,31 +256,33 @@ class ArucoSimple
     const ros::Subscriber		_cloud_sub;
     const ros::Publisher		_cloud_pub;
     cloud_t				_cloud_msg;
-    
+
     const ros::Publisher		_pose_pub;
     const ros::Publisher		_transform_pub; 
     const ros::Publisher		_position_pub;
     const ros::Publisher		_marker_pub;
     const ros::Publisher		_pixel_pub;
 
-    dynamic_reconfigure::Server<ArucoThresholdConfig>
+    dynamic_reconfigure::Server<aruco_ros::ArucoThresholdConfig>
 					_dyn_rec_server;
 
     aruco::MarkerDetector		_mDetector;
     double				_marker_size;
     int					_marker_id;
+
+    float				_planarityTolerance;
 };
     
-ArucoSimple::ArucoSimple()
+Simple::Simple()
     :_nh("~"),
      _cam_info_sub(_nh.subscribe("/camera_info", 1,
-				 &ArucoSimple::cam_info_callback, this)),
+				 &Simple::cam_info_callback, this)),
      _it(_nh),
-     _image_sub(_it.subscribe("/image", 1,
-			      &ArucoSimple::image_callback, this)),
+     _image_sub(_it.subscribe("/image", 1
+			      , &Simple::image_callback, this)),
      _image_pub(_it.advertise("result", 1)),
      _cloud_sub(_nh.subscribe("/pointcloud", 1,
-			      &ArucoSimple::cloud_callback, this)),
+			      &Simple::cloud_callback, this)),
      _cloud_pub(_nh.advertise<cloud_t>("pointcloud", 1)),
      _debug_pub(_it.advertise("debug",  1)),
      _pose_pub(_nh.advertise<geometry_msgs::PoseStamped>("pose", 100)),
@@ -282,7 +291,9 @@ ArucoSimple::ArucoSimple()
      _position_pub(_nh.advertise<geometry_msgs::Vector3Stamped>(
 		       "position", 100)),
      _marker_pub(_nh.advertise<visualization_msgs::Marker>("marker", 10)),
-     _pixel_pub(_nh.advertise<geometry_msgs::PointStamped>("pixel", 10))
+     _pixel_pub(_nh.advertise<geometry_msgs::PointStamped>("pixel", 10)),
+     _marker_id(0),
+     _planarityTolerance(0.001)
 {
     using	aruco::MarkerDetector;
 	
@@ -329,15 +340,16 @@ ArucoSimple::ArucoSimple()
 		    << _reference_frame << " as parent and "
 		    << _marker_frame << " as child.");
 
-    _dyn_rec_server.setCallback(boost::bind(&ArucoSimple::reconf_callback,
+    _dyn_rec_server.setCallback(boost::bind(&Simple::reconf_callback,
 					    this, _1, _2));
 }
 
 void
-ArucoSimple::cam_info_callback(const sensor_msgs::CameraInfo& msg)
+Simple::cam_info_callback(const sensor_msgs::CameraInfo& msg)
 {
   // wait for one camerainfo, then shut down that subscriber
-    _camParam = rosCameraInfo2ArucoCamParams(msg, _useRectifiedImages);
+    _camParam = aruco_ros::rosCameraInfo2ArucoCamParams(msg,
+							_useRectifiedImages);
 
   // handle cartesian offset between stereo pairs
   // see the sensor_msgs/CamaraInfo documentation for details
@@ -349,7 +361,8 @@ ArucoSimple::cam_info_callback(const sensor_msgs::CameraInfo& msg)
 }
 
 void
-ArucoSimple::reconf_callback(ArucoThresholdConfig& config, uint32_t level)
+Simple::reconf_callback(aruco_ros::ArucoThresholdConfig& config,
+			uint32_t level)
 {
     _mDetector.setThresholdParams(config.param1, config.param2);
 
@@ -358,7 +371,7 @@ ArucoSimple::reconf_callback(ArucoThresholdConfig& config, uint32_t level)
 }
 
 void
-ArucoSimple::image_callback(const image_p& image_msg)
+Simple::image_callback(const image_p& image_msg)
 {
     if (image_msg->header.stamp == _cloud_msg.header.stamp)
 	detect_marker(*image_msg, _cloud_msg);
@@ -367,7 +380,7 @@ ArucoSimple::image_callback(const image_p& image_msg)
 }
     
 void
-ArucoSimple::cloud_callback(const cloud_p& cloud_msg)
+Simple::cloud_callback(const cloud_p& cloud_msg)
 {
     if (cloud_msg->header.stamp == _image_msg.header.stamp)
 	detect_marker(_image_msg, *cloud_msg);
@@ -376,7 +389,7 @@ ArucoSimple::cloud_callback(const cloud_p& cloud_msg)
 }
 
 void
-ArucoSimple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
+Simple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 {
     if ((_image_pub.getNumSubscribers()	    == 0) &&
 	(_debug_pub.getNumSubscribers()	    == 0) &&
@@ -410,100 +423,18 @@ ArucoSimple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 	for (const auto& marker : markers)
 	{
 	  // only publishing the selected marker
-	    if (marker.id == _marker_id)
-	    {
-	      // marker -> camera transform
-		tf::Transform	transform = get_marker_transform(marker,
-								 cloud_msg);
-	      //tf::Transform	transform = arucoMarker2Tf(marker);
-
-		tf::StampedTransform	cameraToReference;
-		cameraToReference.setIdentity();
-		if (_reference_frame != _camera_frame)
-		    get_transform(_reference_frame, _camera_frame,
-				  cameraToReference);
-
-	      // marker -> reference transform
-		transform = static_cast<tf::Transform>(cameraToReference) 
-			  * static_cast<tf::Transform>(_rightToLeft) 
-			  * transform;
-
-		const tf::StampedTransform
-		    stampedTransform(transform, curr_stamp,
-				     _reference_frame, _marker_frame);
-		_tfBroadcaster.sendTransform(stampedTransform);
-
-		geometry_msgs::PoseStamped	poseMsg;
-		tf::poseTFToMsg(transform, poseMsg.pose);
-		poseMsg.header.frame_id = _reference_frame;
-		poseMsg.header.stamp    = curr_stamp;
-		_pose_pub.publish(poseMsg);
-
-		geometry_msgs::TransformStamped	transformMsg;
-		tf::transformStampedTFToMsg(stampedTransform, transformMsg);
-		_transform_pub.publish(transformMsg);
-
-		geometry_msgs::Vector3Stamped	positionMsg;
-		positionMsg.header = transformMsg.header;
-		positionMsg.vector = transformMsg.transform.translation;
-		_position_pub.publish(positionMsg);
-
-		geometry_msgs::PointStamped	pixelMsg;
-		pixelMsg.header  = transformMsg.header;
-		pixelMsg.point.x = marker.getCenter().x;
-		pixelMsg.point.y = marker.getCenter().y;
-		pixelMsg.point.z = 0;
-		_pixel_pub.publish(pixelMsg);
-
-	      //Publish rviz marker representing the ArUco marker patch
-		visualization_msgs::Marker	visMarker;
-		visMarker.header   = transformMsg.header;
-		visMarker.id       = 1;
-		visMarker.type     = visualization_msgs::Marker::CUBE;
-		visMarker.action   = visualization_msgs::Marker::ADD;
-		visMarker.pose     = poseMsg.pose;
-		visMarker.scale.x  = _marker_size;
-		visMarker.scale.y  = 0.001;
-		visMarker.scale.z  = _marker_size;
-		visMarker.color.r  = 1.0;
-		visMarker.color.g  = 0;
-		visMarker.color.b  = 0;
-		visMarker.color.a  = 1.0;
-		visMarker.lifetime = ros::Duration(3.0);
-		_marker_pub.publish(visMarker);
-	    }
+	    if (_marker_id == 0 || marker.id == _marker_id)
+		publish_marker_info(marker, cloud_msg, curr_stamp);
 
 	  // but drawing all the detected markers
 	    marker.draw(inImage, cv::Scalar(0,0,255), 2);
 	}
 
 	if (_marker_size != -1)
-	{
-	  //draw a 3d cube in each marker if there is 3d info
 	    for (auto& marker : markers)
 		aruco::CvDrawingUtils::draw3dAxis(inImage, marker, _camParam);
-	}
-
-	if (_image_pub.getNumSubscribers() > 0)
-	{
-	  //show input with augmented information
-	    cv_bridge::CvImage	out_msg;
-	    out_msg.header.stamp = curr_stamp;
-	    out_msg.encoding     = sensor_msgs::image_encodings::RGB8;
-	    out_msg.image	 = inImage;
-	    _image_pub.publish(out_msg.toImageMsg());
-	}
-
-	if (_debug_pub.getNumSubscribers() > 0)
-	{
-	  //show also the internal image
-	  //resulting from the threshold operation
-	    cv_bridge::CvImage	debug_msg;
-	    debug_msg.header.stamp = curr_stamp;
-	    debug_msg.encoding     = sensor_msgs::image_encodings::MONO8;
-	    debug_msg.image	   = _mDetector.getThresholdedImage();
-	    _debug_pub.publish(debug_msg.toImageMsg());
-	}
+	
+	publish_misc_info(inImage, curr_stamp);
     }
     catch (const cv_bridge::Exception& e)
     {
@@ -521,9 +452,9 @@ ArucoSimple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 }
 
 bool
-ArucoSimple::get_transform(const std::string& refFrame,
-			   const std::string& childFrame,
-			   tf::StampedTransform& transform) const
+Simple::get_transform(const std::string& refFrame,
+		      const std::string& childFrame,
+		      tf::StampedTransform& transform) const
 {
     std::string	errMsg;
     if (!_tfListener.waitForTransform(refFrame, childFrame,
@@ -551,8 +482,8 @@ ArucoSimple::get_transform(const std::string& refFrame,
 }
 
 tf::Transform
-ArucoSimple::get_marker_transform(const aruco::Marker& marker,
-				  const cloud_t& cloud_msg) const
+Simple::get_marker_transform(const aruco::Marker& marker,
+			     const cloud_t& cloud_msg) const
 {
     using value_t	= float;
     using iterator_t	= sensor_msgs::PointCloud2ConstIterator<value_t>;
@@ -600,7 +531,8 @@ ArucoSimple::get_marker_transform(const aruco::Marker& marker,
 	    {
 		const auto	point = at<value_t>(cloud_msg, u, v);
 	    
-		if (!std::isnan(point(2)) && plane.distance(point) < 0.001)
+		if (!std::isnan(point(2)) && plane.distance(point) <
+		    _planarityTolerance)
 		{
 		    points.push_back(point);
 		    *rgb = 0xff0000;
@@ -623,7 +555,8 @@ ArucoSimple::get_marker_transform(const aruco::Marker& marker,
 	    {
 		const auto	point = at<value_t>(cloud_msg, u, v);
 	    
-		if (!std::isnan(point(2)) && plane.distance(point) < 0.001)
+		if (!std::isnan(point(2)) && plane.distance(point) <
+		    _planarityTolerance)
 		    points.push_back(point);
 		
 		++xyz;
@@ -659,24 +592,112 @@ ArucoSimple::get_marker_transform(const aruco::Marker& marker,
 }
 
 template <class T> cv::Vec<T, 3>
-ArucoSimple::view_vector(T u, T v) const
+Simple::view_vector(T u, T v) const
 {
     const auto&	K = _camParam.CameraMatrix;
     const auto	y = (v - K.at<T>(1, 2))/K.at<T>(1, 1);
     
     return {(u - K.at<T>(0, 2) - y*K.at<T>(0, 1))/K.at<T>(0, 0), y, T(1)};
 }
+
+void
+Simple::publish_marker_info(const aruco::Marker& marker,
+			    const cloud_t& cloud_msg, const ros::Time& stamp)
+{
+  // marker -> camera transform
+    tf::Transform	transform = get_marker_transform(marker, cloud_msg);
+  //tf::Transform	transform = arucoMarker2Tf(marker);
+
+    tf::StampedTransform	cameraToReference;
+    cameraToReference.setIdentity();
+    if (_reference_frame != _camera_frame)
+	get_transform(_reference_frame, _camera_frame, cameraToReference);
+
+  // marker -> reference transform
+    transform = static_cast<tf::Transform>(cameraToReference) 
+	      * static_cast<tf::Transform>(_rightToLeft) 
+	      * transform;
+
+    const tf::StampedTransform	stampedTransform(transform, stamp,
+						 _reference_frame,
+						 _marker_frame);
+    _tfBroadcaster.sendTransform(stampedTransform);
+
+    geometry_msgs::PoseStamped	poseMsg;
+    tf::poseTFToMsg(transform, poseMsg.pose);
+    poseMsg.header.frame_id = _reference_frame;
+    poseMsg.header.stamp    = stamp;
+    _pose_pub.publish(poseMsg);
+
+    geometry_msgs::TransformStamped	transformMsg;
+    tf::transformStampedTFToMsg(stampedTransform, transformMsg);
+    _transform_pub.publish(transformMsg);
+
+    geometry_msgs::Vector3Stamped	positionMsg;
+    positionMsg.header = transformMsg.header;
+    positionMsg.vector = transformMsg.transform.translation;
+    _position_pub.publish(positionMsg);
+
+    geometry_msgs::PointStamped	pixelMsg;
+    pixelMsg.header  = transformMsg.header;
+    pixelMsg.point.x = marker.getCenter().x;
+    pixelMsg.point.y = marker.getCenter().y;
+    pixelMsg.point.z = 0;
+    _pixel_pub.publish(pixelMsg);
+
+  //Publish rviz marker representing the ArUco marker patch
+    visualization_msgs::Marker	visMarker;
+    visMarker.header   = transformMsg.header;
+    visMarker.id       = 1;
+    visMarker.type     = visualization_msgs::Marker::CUBE;
+    visMarker.action   = visualization_msgs::Marker::ADD;
+    visMarker.pose     = poseMsg.pose;
+    visMarker.scale.x  = _marker_size;
+    visMarker.scale.y  = 0.001;
+    visMarker.scale.z  = _marker_size;
+    visMarker.color.r  = 1.0;
+    visMarker.color.g  = 0;
+    visMarker.color.b  = 0;
+    visMarker.color.a  = 1.0;
+    visMarker.lifetime = ros::Duration(3.0);
+    _marker_pub.publish(visMarker);
+}
+
+void
+Simple::publish_misc_info(const cv::Mat& image, const ros::Time& stamp)
+{
+    if (_image_pub.getNumSubscribers() > 0)
+    {
+      //show input with augmented information
+	cv_bridge::CvImage	out_msg;
+	out_msg.header.stamp = stamp;
+	out_msg.encoding     = sensor_msgs::image_encodings::RGB8;
+	out_msg.image	     = image;
+	_image_pub.publish(out_msg.toImageMsg());
+    }
+
+    if (_debug_pub.getNumSubscribers() > 0)
+    {
+      //show also the internal image
+      //resulting from the threshold operation
+	cv_bridge::CvImage	debug_msg;
+	debug_msg.header.stamp = stamp;
+	debug_msg.encoding     = sensor_msgs::image_encodings::MONO8;
+	debug_msg.image	       = _mDetector.getThresholdedImage();
+	_debug_pub.publish(debug_msg.toImageMsg());
+    }
+}
     
-}	// namespace aruco_ros
+}	// namespace o2as_aruco_ros
 
 int
 main(int argc, char** argv)
 {
-    ros::init(argc, argv, "aruco_simple");
+    ros::init(argc, argv, "o2as_aruco_simple");
 
     try
     {
-	aruco_ros::ArucoSimple	node;
+	o2as_aruco_ros::Simple	node;
 	ros::spin();
     }
     catch (const std::exception& err)

@@ -164,7 +164,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
       print("\n--- Subpose [{}/5]: Try! ---".format(i+1))
       if self.move(pose, speed):
         rospy.sleep(sleep_time)
-        print("--- Subpose [{}/5]: Completed. ---".format(i+1))
+        print("--- Subpose [{}/5]: Succeeded. ---".format(i+1))
       else:
         print("--- Subpose [{}/5]: Failed. ---".format(i+1))
       pose[3] -= radians(30)
@@ -176,7 +176,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
       print("\n--- Subpose [{}/5]: Try! ---".format(i+4))
       if self.move(pose, speed):
         rospy.sleep(sleep_time)
-        print("--- Subpose [{}/5]: Completed. ---".format(i+4))
+        print("--- Subpose [{}/5]: Succeeded. ---".format(i+4))
       else:
         print("--- Subpose [{}/5]: Failed. ---".format(i+4))
       pose[4] -= radians(30)
