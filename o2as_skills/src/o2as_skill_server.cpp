@@ -1059,7 +1059,7 @@ bool SkillServer::ejectScrew(std::string fastening_tool_name)
   ROS_DEBUG_STREAM("Suction action " << (finished_before_timeout ? "returned" : "did not return before timeout") <<", with result: " << result->success);
 
   // Stop the ejecting air right away.
-  ros::Duration(1.0).sleep();
+  ros::Duration(2.0).sleep();
   goal.eject_screw = false;
   suction_client.sendGoal(goal);
   return true;

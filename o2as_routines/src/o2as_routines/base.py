@@ -59,8 +59,6 @@ from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
 
-log_level = LOG_LEVEL = rospy.INFO
-
 import ur_modern_driver.msg
 
 
@@ -123,9 +121,10 @@ class O2ASBaseRoutines(object):
     self.use_real_robot = rospy.get_param("use_real_robot")
 
     moveit_commander.roscpp_initialize(sys.argv)
-    rospy.init_node('assembly_example', anonymous=False, log_level=LOG_LEVEL)
+    rospy.init_node('assembly_example', anonymous=False)
 
     self.robots = moveit_commander.RobotCommander()
+    self.planning_scene_interface = moveit_commander.PlanningSceneInterface()
     self.groups = {"a_bot":moveit_commander.MoveGroupCommander("a_bot"),
               "b_bot":moveit_commander.MoveGroupCommander("b_bot"),
               "c_bot":moveit_commander.MoveGroupCommander("c_bot"),

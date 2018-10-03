@@ -96,7 +96,21 @@ class KittingClass(O2ASBaseRoutines):
       15: "tray_2_partition_5",
       16: "tray_2_partition_8" }
 
-    # TODO: Get the part_bin_position from parameters
+    # This can be copied from kitting_part_bin_list_auto.yaml
+    self.bin_is_inclined = {
+      "set1_bin2_3": False,
+      "set2_bin1_2": False,
+      "set1_bin2_4": False,
+      "set2_bin1_3": False,
+      "set2_bin1_4": False,
+      "set2_bin1_1": False,
+      "set1_bin2_1": False,
+      "set1_bin3_1": False,
+      "set1_bin2_2": False,
+      "set2_bin1_5": True
+    }
+
+    # TODO: Get the part_bin_position from parameters to set the orientation accordingly.
 
     self.suction_orientation_from_behind = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     self.suction_orientation_from_45 = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/4))
@@ -188,21 +202,22 @@ class KittingClass(O2ASBaseRoutines):
     # TODO: adjust the x,z and end effector orientatio for optimal view of the bin to use with the  \search_grasp service
     goal_pose = geometry_msgs.msg.PoseStamped()
     goal_pose.header.frame_id = bin_id
-    goal_pose.pose.position.x = bin_eff_xoff
-    goal_pose.pose.position.y = 0
-    goal_pose.pose.position.z = bin_eff_height
+    goal_pose.pose.position.x = bin_eff_xoff - .1
+    goal_pose.pose.position.y = -.05
+    goal_pose.pose.position.z = bin_eff_height - .12
     #goal orientation for a_bot_camera_depth_frame 
     #goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2 + 20*pi/180, 0))
     #res = self.go_to_pose_goal(group_name, goal_pose, speed_slow, "a_bot_camera_depth_frame")
     #goal orientation for gripper
-    goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 + 20*pi/180, 0))
+    # goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 + 20*pi/180, 0))
+    goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
     res = self.move_lin(group_name, goal_pose, speed_slow, "")
     if not res:
       rospy.loginfo("Couldn't go to the target.")
     #TODO Problem with gazebo controller while controlling the robot with movelin
-    #  return False
+      return False
  
-    #TODO Esure that the the motion is finished before generating the mask.
+    #TODO Ensure that the the motion is finished before generating the mask.
 
     #TODO not sure if the sleep is necessary is move_lin wait for the motion to be finished?
     rospy.sleep(1)
@@ -327,11 +342,11 @@ class KittingClass(O2ASBaseRoutines):
     pose_feeder = geometry_msgs.msg.PoseStamped()
     pose_feeder.header.frame_id = "m" + str(screw_size) + "_feeder_outlet_link"
     pose_feeder.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
-    pose_feeder.pose.position.x = -.02
+    pose_feeder.pose.position.x = 0.0
 
     return self.do_pick_action("c_bot", pose_feeder, screw_size = 4, use_complex_planning = True, tool_name = "screw_tool")
 
-  def place_screw_in_tray(self, screw_size, hole_number):
+  def place_screw_in_tray(self, screw_size, set_number, hole_number):
     """
     Places a screw in a tray. A screw needs to be carried by the screw tool!
     """
@@ -345,7 +360,7 @@ class KittingClass(O2ASBaseRoutines):
     self.go_to_named_pose("feeder_pick_ready", "c_bot")
     
     pose_tray = geometry_msgs.msg.PoseStamped()
-    pose_tray.header.frame_id = "tray_2_screw_m" + str(screw_size) + "_" + str(hole_number)
+    pose_tray.header.frame_id = "set_" + str(tray_number) + "tray_2_screw_m" + str(screw_size) + "_" + str(hole_number)
     pose_tray.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, 0, 0))
     pose_tray.pose.position.x = -.01
 
@@ -702,7 +717,7 @@ if __name__ == '__main__':
   try:
     kit = KittingClass()
     
-    ##### EXAMPLE 1
+    ##### EXAMPLE 1 (Pick up a part in the simplest way)
     # kit.go_to_named_pose("home", "a_bot")
     # kit.naive_pick("a_bot", "set2_bin1_4", bin_eff_height=.04)
     # kit.go_to_named_pose("home", "a_bot")
@@ -711,7 +726,7 @@ if __name__ == '__main__':
     # place_pose.pose.orientation = kit.downward_orientation
     # kit.place("a_bot", place_pose, place_height=0.02, speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
 
-    ##### EXAMPLE 2
+    ##### EXAMPLE 2 (Pick up a part more properly)
     # kit.go_to_named_pose("home", "a_bot")
     pick_pose = geometry_msgs.msg.PoseStamped()
     pick_pose.header.frame_id = "set2_bin1_5"
@@ -725,9 +740,31 @@ if __name__ == '__main__':
     # place_pose.pose.orientation = kit.downward_orientation
     # kit.place("a_bot", place_pose, place_height=0.02, speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
     
-
     ##### EXAMPLE 3 (How to look into a bin)
     # kit.view_bin("a_bot", "set2_bin1_4")
+
+    ##### EXAMPLE 4 (Look into all bins)
+    # kit.go_to_named_pose("home", "a_bot")
+    # kit.view_bin("a_bot", "set2_bin1_1")
+    # rospy.sleep(1)
+    # kit.view_bin("a_bot", "set2_bin1_2")
+    # rospy.sleep(1)
+    # kit.view_bin("a_bot", "set2_bin1_3")
+    # rospy.sleep(1)
+    # kit.view_bin("a_bot", "set2_bin1_4")
+    # rospy.sleep(1)
+    # kit.view_bin("a_bot", "set2_bin1_5")
+    # rospy.sleep(1)
+    # kit.view_bin("a_bot", "set1_bin2_1")
+    # rospy.sleep(1)
+    # kit.view_bin("a_bot", "set1_bin2_2")
+    # rospy.sleep(1)
+    # kit.view_bin("a_bot", "set1_bin2_3")
+    # rospy.sleep(1)
+    # kit.view_bin("a_bot", "set1_bin2_4")
+    # rospy.sleep(1)
+    # kit.view_bin("a_bot", "set1_bin3_1")
+    # rospy.sleep(1)
 
     ##### OLD CODE
     # kit.pick_and_place_demo()
