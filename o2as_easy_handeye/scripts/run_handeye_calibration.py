@@ -34,9 +34,9 @@ keyposes = {
     ],
 
     'b_bot': [
-      [0.32,  0.20, 0.15, radians( 30), radians( 25), radians(0)],
-      [0.32,  0.05, 0.15, radians( 30), radians( 25), radians(0)],
-      [0.35, -0.10, 0.15, radians(  0), radians( 25), radians(0)],
+      [0.32,  0.15, 0.10, radians( 30), radians( 25), radians(0)],
+      [0.32,  0.00, 0.10, radians( 30), radians( 25), radians(0)],
+      [0.35, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
 
       [0.35,  0.00, 0.25, radians(  0), radians( 25), radians(0)],
       [0.32,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
@@ -86,6 +86,12 @@ def get_service_proxy(service_name, camera_name, robot_name):
   elif service_name is "get_frame":
     service_type      = GetFrame
     service_name_full = cs + "get_frame"
+  elif service_name is "start_acquisition":
+    service_type      = Trigger
+    service_name_full = cs + "start_acquisition"
+  elif service_name is "stop_acquisition":
+    service_type      = Trigger
+    service_name_full = cs + "stop_acquisition"
   elif service_name is "take_sample":
     service_type      = TakeSample
     service_name_full = ns + "take_sample"
@@ -124,6 +130,10 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
       self.trigger_frame     = get_service_proxy("trigger_frame",
                                                  camera_name, robot_name)
       self.get_frame         = get_service_proxy("get_frame",
+                                                 camera_name, robot_name)
+      self.start_acquisition = get_service_proxy("start_acquisition",
+                                                 camera_name, robot_name)
+      self.stop_acquisition  = get_service_proxy("stop_acquisition",
                                                  camera_name, robot_name)
     self.take_sample         = get_service_proxy("take_sample",
                                                  camera_name, robot_name)
@@ -200,14 +210,23 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
                                                      move_lin=False)
     if move_success:
       if self.needs_trigger:
-        self.trigger_frame()
-        self.get_frame(0, True)
+        self.start_acquisition()
+        rospy.sleep(1)
+        # self.trigger_frame()
+        # self.get_frame(0, True)
+
       if self.needs_calib:
-        self.take_sample()
-        sample_list = self.get_sample_list()
-        n1 = len(sample_list.samples.hand_world_samples.transforms)
-        n2 = len(sample_list.samples.camera_marker_samples.transforms)
-        print("  took {} hand-world samples and {} camera-marker samples").format(n1, n2)
+        try:
+          self.take_sample()
+          sample_list = self.get_sample_list()
+          n1 = len(sample_list.samples.hand_world_samples.transforms)
+          n2 = len(sample_list.samples.camera_marker_samples.transforms)
+          print("  took {} hand-world samples and {} camera-marker samples").format(n1, n2)
+        except rospy.ServiceException as e:
+          print "Service call failed: %s"%e
+
+      if self.needs_trigger:
+        self.stop_acquisition()
 
     return move_success
         
@@ -218,6 +237,9 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
   def run(self, keyposes, speed, sleep_time):
     """Run handeye calibration for the specified robot (e.g., "b_bot")"""
     # Clear samples in the buffer if exist
+    if self.needs_trigger:
+      self.stop_acquisition()
+    
     if self.needs_calib:
       n_samples = len(self.get_sample_list().samples.hand_world_samples.transforms)
       if 0 < n_samples:
