@@ -11,9 +11,20 @@ from cv_bridge import CvBridge
 import cv2
 import sensor_msgs.point_cloud2 as pc2
 
+from PIL import Image as PIL_Image
+from PIL import ImageDraw as PIL_ImageDraw
+from geometry_msgs.msg import Polygon, Point32 
+
+import copy
+
 
 class BlobDetection(object):
     def __init__(self):
+        #Variable
+        self.bridge = CvBridge()
+        current_image = Image()
+        current_cloud = PointCloud2()
+
         # Config parameters
         # TODO: read values from config file
         self.image_topic = "/camera/color/image_raw"
@@ -28,34 +39,65 @@ class BlobDetection(object):
         rospy.Subscriber(self.image_topic, Image, self.image_callback)
         rospy.Subscriber(self.cloud_topic, PointCloud2, self.cloud_callback)
 
-        #Variable
-        self.bridge = CvBridge()
-        current_image = Image()
-        current_cloud = PointCloud2()
 
 
     # Callback
     def image_callback(self, msg_in):
-      img = self.bridge.imgmsg_to_cv2(msg_in, desired_encoding="passthrough")
-      img = np.asarray(img)[:, :, ::-1]
+      # Convert the image to be used wit OpenCV library
+      img_cv = self.bridge.imgmsg_to_cv2(msg_in, desired_encoding="passthrough")
+      img = np.asarray(img_cv)[:, :, ::-1]
+
+      # Apply the mask
+      mask_u = 200
+      mask_v = 100
+      #test_polygon = [ (mask_u,mask_v),
+      #                 (msg_in.width-mask_u,mask_v),
+      #                 (msg_in.width-mask_u,msg_in.height-mask_v),
+      #                 (mask_u,msg_in.height-mask_v)]
+
+      test_polygon = Polygon()
+      test_polygon.points = [Point32(mask_u,mask_v,0),
+                             Point32(msg_in.width-mask_u,mask_v,0),
+                             Point32(msg_in.width-mask_u,msg_in.height-mask_v,0),
+                             Point32(mask_u,msg_in.height-mask_v,0)]
+
+      #test_polygon = geometry_msgs.msg.Point()
+      #test_polygon [0] = geometry_msgs_msg.Point(mask_u,mask_v,0) 
+      #test_polygon [1] = geometry_msgs_msg.Point(msg_in.width-mask_u,mask_v)
+      #test_polygon [2] = geometry_msgs_msg.Point(msg_in.width-mask_u,msg_in.height-mask_v)
+      #test_polygon [3] = geometry_msgs_msg.Point(mask_u,msg_in.height-mask_v)
+
+      masked_img= self.mask_image(img, test_polygon)
 
       # Detect the blob in the image
-      blob_point = self.detect_blob(img)
-      msg_out = geometry_msgs.msg.Point()
-      msg_out = blob_point
-      self.pub_img_pos.publish(msg_out)
+      res_b, blob_array = self.detect_blob(masked_img)
+      print(blob_array)
+   
+      if(res_b):
+          msg_out = geometry_msgs.msg.Point()
+          msg_out = blob_array[0]
+          self.pub_img_pos.publish(msg_out)
 
-      # Convert the blob position image in the 3D camera system
-      msg_out = self.compute_3D_pos1(self.current_cloud, int(blob_point.x), int(blob_point.y))
+          # Convert the blob position image in the 3D camera system
+          msg_out = self.compute_3D_pos1(self.current_cloud, int(blob_array[0].x), int(blob_array[0].y))
 
-      # Publish the results   
-      self.pub_cloud_pos.publish(msg_out)
+          # Publish the results   
+          self.pub_cloud_pos.publish(msg_out)
 
-      # Slow down this node and reduce data transfer for image
-      rospy.sleep(0.01)
+          # Slow down this node and reduce data transfer for image
+          #rospy.sleep(0.01)
+      else:
+          pass
+
+          # Convert the blob position image in the 3D camera system
+          # Publish the results   
+
+          # Slow down this node and reduce data transfer for image
+          #rospy.sleep(0.01)
+
 
     def cloud_callback(self, msg_in):
-      self.current_cloud = msg_in
+      self.current_cloud = copy.deepcopy(msg_in)
 
     def compute_3D_pos1(self, in_cloud, u,v):
       # TODO the projection require int but the precision of the blob detected are in float so there is a loss of accuracy 
@@ -70,6 +112,31 @@ class BlobDetection(object):
 
       return res_out
 
+    def mask_image(self, in_img_cv, in_polygon):
+
+        polygon = [ (in_polygon.points[0].x,in_polygon.points[0].y),
+                    (in_polygon.points[1].x,in_polygon.points[1].y),
+                    (in_polygon.points[2].x,in_polygon.points[2].y),
+                    (in_polygon.points[3].x,in_polygon.points[3].y)] 
+ 
+        #print(in_img_cv.shape)
+        # Create the mask from the polygon
+        mask_img = PIL_Image.new('L', (in_img_cv.shape[1],in_img_cv.shape[0]), 0)
+        # Draw the mask with the polygon coordinate
+        PIL_ImageDraw.Draw(mask_img).polygon(polygon, outline = 1, fill = 255)
+        mask_image_np = np.array(mask_img)
+
+        #DEBUG Ssave the mask in a file
+        #namefile = "mask.png"
+        #mask_img.save(namefile,'PNG')
+
+        # Apply the mask to the image
+        #img_cv = cv2.imread(img_to_mask)
+        #mask_cv = cv2.imread(mask_img,0)
+        img_cv = in_img_cv
+        out_img = cv2.bitwise_and(img_cv,img_cv, mask = mask_image_np)
+        #cv2.imwrite('masked_image.png',out_img)
+        return out_img
 
     def detect_blob(self, img):
         """Compute the ratio of red area in the image.
@@ -132,16 +199,20 @@ class BlobDetection(object):
         # Show blobs
         cv2.imwrite("blob_detection_results.png", im_with_keypoints)
     
-        blob = geometry_msgs.msg.Point()
+        blob_array = []
+     
         if(len(keypoints)):
-            blob.x = keypoints[0].pt[0]
-            blob.y = keypoints[0].pt[1]
+            for i in range(len(keypoints)):
+                blob= geometry_msgs.msg.Point()
+                blob.x = keypoints[i].pt[0]
+                blob.y = keypoints[i].pt[1]
+                blob_array.append(blob)
+            return True, blob_array
 
-        else:
-            blob.x = -666
-            blob.y = -666
-    
-        return blob
+        else:  
+
+            return False, blob_array
+ 
 
 if __name__ == "__main__":
 
