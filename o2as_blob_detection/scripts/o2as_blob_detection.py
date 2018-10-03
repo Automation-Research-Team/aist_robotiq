@@ -9,7 +9,7 @@ from sensor_msgs.msg import Image
 from sensor_msgs.msg import PointCloud2
 from cv_bridge import CvBridge
 import cv2
-
+import sensor_msgs.point_cloud2 as pc2
 
 def detect_blob(img):
     """Compute the ratio of red area in the image.
@@ -93,8 +93,8 @@ if __name__ == "__main__":
 
   # Initialization
   rospy.init_node(node_name)
-  pub = rospy.Publisher(blob_pos_img_topic, geometry_msgs.msg.Point, queue_size=10)
-  pub = rospy.Publisher(blob_pos_cloud_topic, geometry_msgs.msg.Point, queue_size=10)
+  pub_img_pos = rospy.Publisher(blob_pos_img_topic, geometry_msgs.msg.Point, queue_size=10)
+  pub_cloud_pos = rospy.Publisher(blob_pos_cloud_topic, geometry_msgs.msg.Point, queue_size=10)
   bridge = CvBridge()
 
   # Callback
@@ -104,12 +104,22 @@ if __name__ == "__main__":
     blob_point = detect_blob(img)
     msg_out = geometry_msgs.msg.Point()
     msg_out = blob_point
-    pub.publish(msg_out)
-
+    pub_img_pos.publish(msg_out)
     # Slow down this node and reduce data transfer for image
     rospy.sleep(0.01)
 
   def cloud_callback(msg_in):
+    data_out = pc2.read_points(msg_in, field_names = None, skip_nans=False, uvs=[[320, 180]]) 
+    msg_out = geometry_msgs.msg.Point()
+    int_data = next(data_out)
+    msg_out.x = int_data[0]  
+    msg_out.y = int_data[1]
+    msg_out.z = int_data[2] 
+
+    rospy.loginfo(int_data)
+    print(int_data)
+    pub_cloud_pos.publish(msg_out)
+
 
     # Slow down this node and reduce data transfer for image
     rospy.sleep(0.01)
