@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<launch>
+  <node name="o2as_blob_detection" pkg="o2as_blob_detection" type="o2as_blob_detection.py"/>
+</launch>

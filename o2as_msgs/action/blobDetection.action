@@ -1,0 +1,12 @@
+# Request
+geometry_msgs/Polygon maskCorner
+
+
+---
+# Results
+geometry_msgs/PoseArray posesDetected
+bool success
+
+---
+# Feedback
+bool f
