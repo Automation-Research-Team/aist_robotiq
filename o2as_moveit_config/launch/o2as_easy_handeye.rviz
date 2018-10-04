@@ -81,6 +81,11 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
+          a_bot_ar_marker:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           a_bot_base:
             Alpha: 1
             Show Axes: false
@@ -95,6 +100,47 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          a_bot_cam_holder_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_depth_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_depth_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_fisheye_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_fisheye_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_left_ir_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_left_ir_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_bot_camera_right_ir_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_right_ir_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_bot_ee_link:
             Alpha: 1
             Show Axes: false
@@ -371,6 +417,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          c_bot_nut_tool_m6_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           c_bot_robotiq_85_base_link:
             Alpha: 1
             Show Axes: false
@@ -495,15 +545,6 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          rack_bins:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          rack_bins_center:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           rack_trays:
             Alpha: 1
             Show Axes: false
@@ -550,51 +591,797 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          set1_bin2_1_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_1_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_1_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_1_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_1_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_1_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_1_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_1_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set1_bin2_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set1_bin2_2_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_2_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_2_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_2_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_2_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_2_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_2_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_2_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set1_bin2_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set1_bin2_3_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_3_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_3_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_3_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_3_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_3_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_3_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_3_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set1_bin2_4:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set1_bin2_4_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_4_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_4_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_4_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_4_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_4_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_4_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_4_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set1_bin3_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set1_bin3_1_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin3_1_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin3_1_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin3_1_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin3_1_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin3_1_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin3_1_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin3_1_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set2_bin1_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set2_bin1_1_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_1_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_1_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_1_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_1_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_1_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_1_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_1_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set2_bin1_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set2_bin1_2_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_2_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_2_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_2_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_2_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_2_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_2_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_2_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set2_bin1_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set2_bin1_3_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_3_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_3_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_3_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_3_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_3_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_3_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_3_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set2_bin1_4:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set2_bin1_4_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_4_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_4_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_4_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_4_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_4_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_4_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_4_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set2_bin1_5:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set2_bin1_5_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_5_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_5_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_5_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_5_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_5_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_5_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_5_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_1_tray_1_divider1_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_1_tray_1_divider1_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_1_tray_1_partition_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_1_partition_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_1_partition_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_1_partition_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_1_partition_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_1_tray_2_divider2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_1_tray_2_partition_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_partition_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_partition_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_partition_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_partition_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_partition_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_partition_7:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_partition_8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_holder:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_1_tray_2_screw_m3_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m3_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m3_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m3_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m3_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m3_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_7:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_9:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_2_tray_1_divider1_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_2_tray_1_divider1_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_2_tray_1_partition_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_1_partition_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_1_partition_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_1_partition_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_1_partition_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_2_tray_2_divider2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_2_tray_2_partition_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_partition_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_partition_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_partition_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_partition_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_partition_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_partition_7:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_partition_8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_holder:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_2_tray_2_screw_m3_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m3_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m3_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m3_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m3_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m3_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_7:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_9:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_3_tray_1_divider1_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_3_tray_1_divider1_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_3_tray_1_partition_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_1_partition_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_1_partition_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_1_partition_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_1_partition_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_3_tray_2_divider2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_3_tray_2_partition_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_partition_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_partition_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_partition_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_partition_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_partition_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_partition_7:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_partition_8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_holder:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_3_tray_2_screw_m3_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m3_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m3_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m3_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m3_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m3_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_7:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_9:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           suction_tool_helper_link:
             Alpha: 1
             Show Axes: false
@@ -604,148 +1391,6 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          tray_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_1_divider1_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_1_divider1_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_1_partition_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_2_divider2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_2_partition_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_7:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_8:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_holder:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_2_screw_m3_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_7:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_8:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_9:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           workbox1:
             Alpha: 1
             Show Axes: false
@@ -809,6 +1454,11 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
+          a_bot_ar_marker:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           a_bot_base:
             Alpha: 1
             Show Axes: false
@@ -823,6 +1473,47 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          a_bot_cam_holder_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_depth_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_depth_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_fisheye_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_fisheye_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_left_ir_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_left_ir_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_bot_camera_right_ir_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_right_ir_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_bot_ee_link:
             Alpha: 1
             Show Axes: false
@@ -1099,6 +1790,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          c_bot_nut_tool_m6_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           c_bot_robotiq_85_base_link:
             Alpha: 1
             Show Axes: false
@@ -1223,15 +1918,6 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          rack_bins:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          rack_bins_center:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           rack_trays:
             Alpha: 1
             Show Axes: false
@@ -1278,51 +1964,797 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          set1_bin2_1_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_1_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_1_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_1_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_1_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_1_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_1_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_1_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set1_bin2_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set1_bin2_2_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_2_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_2_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_2_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_2_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_2_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_2_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_2_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set1_bin2_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set1_bin2_3_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_3_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_3_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_3_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_3_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_3_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_3_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_3_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set1_bin2_4:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set1_bin2_4_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_4_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_4_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_4_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_4_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_4_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_4_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin2_4_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set1_bin3_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set1_bin3_1_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin3_1_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin3_1_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin3_1_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin3_1_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin3_1_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin3_1_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set1_bin3_1_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set2_bin1_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set2_bin1_1_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_1_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_1_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_1_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_1_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_1_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_1_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_1_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set2_bin1_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set2_bin1_2_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_2_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_2_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_2_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_2_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_2_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_2_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_2_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set2_bin1_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set2_bin1_3_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_3_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_3_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_3_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_3_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_3_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_3_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_3_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set2_bin1_4:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set2_bin1_4_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_4_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_4_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_4_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_4_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_4_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_4_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_4_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           set2_bin1_5:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          set2_bin1_5_bottom_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_5_bottom_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_5_bottom_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_5_bottom_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_5_top_back_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_5_top_back_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_5_top_front_left_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set2_bin1_5_top_front_right_corner:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_1_tray_1_divider1_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_1_tray_1_divider1_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_1_tray_1_partition_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_1_partition_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_1_partition_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_1_partition_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_1_partition_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_1_tray_2_divider2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_1_tray_2_partition_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_partition_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_partition_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_partition_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_partition_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_partition_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_partition_7:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_partition_8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_holder:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_1_tray_2_screw_m3_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m3_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m3_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m3_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m3_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m3_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_7:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_1_tray_2_screw_m4_9:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_2_tray_1_divider1_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_2_tray_1_divider1_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_2_tray_1_partition_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_1_partition_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_1_partition_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_1_partition_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_1_partition_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_2_tray_2_divider2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_2_tray_2_partition_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_partition_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_partition_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_partition_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_partition_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_partition_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_partition_7:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_partition_8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_holder:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_2_tray_2_screw_m3_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m3_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m3_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m3_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m3_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m3_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_7:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_2_tray_2_screw_m4_9:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_3_tray_1_divider1_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_3_tray_1_divider1_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_3_tray_1_partition_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_1_partition_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_1_partition_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_1_partition_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_1_partition_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_3_tray_2_divider2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_3_tray_2_partition_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_partition_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_partition_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_partition_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_partition_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_partition_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_partition_7:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_partition_8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_holder:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          set_3_tray_2_screw_m3_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m3_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m3_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m3_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m3_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m3_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_6:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_7:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_8:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          set_3_tray_2_screw_m4_9:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           suction_tool_helper_link:
             Alpha: 1
             Show Axes: false
@@ -1332,148 +2764,6 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          tray_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_1_divider1_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_1_divider1_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_1_partition_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_2_divider2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_2_partition_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_7:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_8:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_holder:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_2_screw_m3_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_7:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_8:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_9:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           workbox1:
             Alpha: 1
             Show Axes: false
@@ -1501,14 +2791,36 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        a_bot_ar_marker:
+          Value: true
         a_bot_base:
           Value: false
         a_bot_base_link:
-          Value: false
+          Value: true
         a_bot_base_smfl:
           Value: false
-        a_bot_ee_link:
+        a_bot_cam_holder_link:
           Value: false
+        a_bot_camera_depth_frame:
+          Value: false
+        a_bot_camera_depth_optical_frame:
+          Value: false
+        a_bot_camera_fisheye_frame:
+          Value: false
+        a_bot_camera_fisheye_optical_frame:
+          Value: false
+        a_bot_camera_left_ir_frame:
+          Value: false
+        a_bot_camera_left_ir_optical_frame:
+          Value: false
+        a_bot_camera_link:
+          Value: false
+        a_bot_camera_right_ir_frame:
+          Value: false
+        a_bot_camera_right_ir_optical_frame:
+          Value: false
+        a_bot_ee_link:
+          Value: true
         a_bot_forearm_link:
           Value: false
         a_bot_gripper:
@@ -1530,7 +2842,7 @@ Visualization Manager:
         a_phoxi_m_camera:
           Value: false
         a_phoxi_m_camera_link:
-          Value: false
+          Value: true
         a_phoxi_m_sensor:
           Value: false
         b_bot_ar_marker:
@@ -1552,7 +2864,7 @@ Visualization Manager:
         b_bot_nut_tool_m6_tip_link:
           Value: false
         b_bot_robotiq_85_base_link:
-          Value: true
+          Value: false
         b_bot_robotiq_85_left_finger_link:
           Value: false
         b_bot_robotiq_85_left_finger_tip_link:
@@ -1594,11 +2906,11 @@ Visualization Manager:
         b_bot_wrist_3_link:
           Value: false
         c_bot_ar_marker:
-          Value: false
+          Value: true
         c_bot_base:
           Value: false
         c_bot_base_link:
-          Value: false
+          Value: true
         c_bot_base_smfl:
           Value: false
         c_bot_cam_holder_link:
@@ -1622,10 +2934,12 @@ Visualization Manager:
         c_bot_camera_right_ir_optical_frame:
           Value: false
         c_bot_ee_link:
-          Value: false
+          Value: true
         c_bot_forearm_link:
           Value: false
         c_bot_ft300_link:
+          Value: false
+        c_bot_nut_tool_m6_tip_link:
           Value: false
         c_bot_robotiq_85_base_link:
           Value: false
@@ -1683,10 +2997,6 @@ Visualization Manager:
           Value: false
         o2as_ground:
           Value: false
-        rack_bins:
-          Value: false
-        rack_bins_center:
-          Value: false
         rack_trays:
           Value: false
         rack_trays_center:
@@ -1707,102 +3017,398 @@ Visualization Manager:
           Value: false
         set1_bin2_1:
           Value: false
+        set1_bin2_1_bottom_back_left_corner:
+          Value: false
+        set1_bin2_1_bottom_back_right_corner:
+          Value: false
+        set1_bin2_1_bottom_front_left_corner:
+          Value: false
+        set1_bin2_1_bottom_front_right_corner:
+          Value: false
+        set1_bin2_1_top_back_left_corner:
+          Value: false
+        set1_bin2_1_top_back_right_corner:
+          Value: false
+        set1_bin2_1_top_front_left_corner:
+          Value: false
+        set1_bin2_1_top_front_right_corner:
+          Value: false
         set1_bin2_2:
+          Value: false
+        set1_bin2_2_bottom_back_left_corner:
+          Value: false
+        set1_bin2_2_bottom_back_right_corner:
+          Value: false
+        set1_bin2_2_bottom_front_left_corner:
+          Value: false
+        set1_bin2_2_bottom_front_right_corner:
+          Value: false
+        set1_bin2_2_top_back_left_corner:
+          Value: false
+        set1_bin2_2_top_back_right_corner:
+          Value: false
+        set1_bin2_2_top_front_left_corner:
+          Value: false
+        set1_bin2_2_top_front_right_corner:
           Value: false
         set1_bin2_3:
           Value: false
+        set1_bin2_3_bottom_back_left_corner:
+          Value: false
+        set1_bin2_3_bottom_back_right_corner:
+          Value: false
+        set1_bin2_3_bottom_front_left_corner:
+          Value: false
+        set1_bin2_3_bottom_front_right_corner:
+          Value: false
+        set1_bin2_3_top_back_left_corner:
+          Value: false
+        set1_bin2_3_top_back_right_corner:
+          Value: false
+        set1_bin2_3_top_front_left_corner:
+          Value: false
+        set1_bin2_3_top_front_right_corner:
+          Value: false
         set1_bin2_4:
+          Value: false
+        set1_bin2_4_bottom_back_left_corner:
+          Value: false
+        set1_bin2_4_bottom_back_right_corner:
+          Value: false
+        set1_bin2_4_bottom_front_left_corner:
+          Value: false
+        set1_bin2_4_bottom_front_right_corner:
+          Value: false
+        set1_bin2_4_top_back_left_corner:
+          Value: false
+        set1_bin2_4_top_back_right_corner:
+          Value: false
+        set1_bin2_4_top_front_left_corner:
+          Value: false
+        set1_bin2_4_top_front_right_corner:
           Value: false
         set1_bin3_1:
           Value: false
+        set1_bin3_1_bottom_back_left_corner:
+          Value: false
+        set1_bin3_1_bottom_back_right_corner:
+          Value: false
+        set1_bin3_1_bottom_front_left_corner:
+          Value: false
+        set1_bin3_1_bottom_front_right_corner:
+          Value: false
+        set1_bin3_1_top_back_left_corner:
+          Value: false
+        set1_bin3_1_top_back_right_corner:
+          Value: false
+        set1_bin3_1_top_front_left_corner:
+          Value: false
+        set1_bin3_1_top_front_right_corner:
+          Value: false
         set2_bin1_1:
+          Value: false
+        set2_bin1_1_bottom_back_left_corner:
+          Value: false
+        set2_bin1_1_bottom_back_right_corner:
+          Value: false
+        set2_bin1_1_bottom_front_left_corner:
+          Value: false
+        set2_bin1_1_bottom_front_right_corner:
+          Value: false
+        set2_bin1_1_top_back_left_corner:
+          Value: false
+        set2_bin1_1_top_back_right_corner:
+          Value: false
+        set2_bin1_1_top_front_left_corner:
+          Value: false
+        set2_bin1_1_top_front_right_corner:
           Value: false
         set2_bin1_2:
           Value: false
+        set2_bin1_2_bottom_back_left_corner:
+          Value: false
+        set2_bin1_2_bottom_back_right_corner:
+          Value: false
+        set2_bin1_2_bottom_front_left_corner:
+          Value: false
+        set2_bin1_2_bottom_front_right_corner:
+          Value: false
+        set2_bin1_2_top_back_left_corner:
+          Value: false
+        set2_bin1_2_top_back_right_corner:
+          Value: false
+        set2_bin1_2_top_front_left_corner:
+          Value: false
+        set2_bin1_2_top_front_right_corner:
+          Value: false
         set2_bin1_3:
+          Value: false
+        set2_bin1_3_bottom_back_left_corner:
+          Value: false
+        set2_bin1_3_bottom_back_right_corner:
+          Value: false
+        set2_bin1_3_bottom_front_left_corner:
+          Value: false
+        set2_bin1_3_bottom_front_right_corner:
+          Value: false
+        set2_bin1_3_top_back_left_corner:
+          Value: false
+        set2_bin1_3_top_back_right_corner:
+          Value: false
+        set2_bin1_3_top_front_left_corner:
+          Value: false
+        set2_bin1_3_top_front_right_corner:
           Value: false
         set2_bin1_4:
           Value: false
+        set2_bin1_4_bottom_back_left_corner:
+          Value: false
+        set2_bin1_4_bottom_back_right_corner:
+          Value: false
+        set2_bin1_4_bottom_front_left_corner:
+          Value: false
+        set2_bin1_4_bottom_front_right_corner:
+          Value: false
+        set2_bin1_4_top_back_left_corner:
+          Value: false
+        set2_bin1_4_top_back_right_corner:
+          Value: false
+        set2_bin1_4_top_front_left_corner:
+          Value: false
+        set2_bin1_4_top_front_right_corner:
+          Value: false
         set2_bin1_5:
+          Value: false
+        set2_bin1_5_bottom_back_left_corner:
+          Value: false
+        set2_bin1_5_bottom_back_right_corner:
+          Value: false
+        set2_bin1_5_bottom_front_left_corner:
+          Value: false
+        set2_bin1_5_bottom_front_right_corner:
+          Value: false
+        set2_bin1_5_top_back_left_corner:
+          Value: false
+        set2_bin1_5_top_back_right_corner:
+          Value: false
+        set2_bin1_5_top_front_left_corner:
+          Value: false
+        set2_bin1_5_top_front_right_corner:
+          Value: false
+        set_1_tray_1:
+          Value: false
+        set_1_tray_1_divider1_1:
+          Value: false
+        set_1_tray_1_divider1_2:
+          Value: false
+        set_1_tray_1_partition_1:
+          Value: false
+        set_1_tray_1_partition_2:
+          Value: false
+        set_1_tray_1_partition_3:
+          Value: false
+        set_1_tray_1_partition_4:
+          Value: false
+        set_1_tray_1_partition_5:
+          Value: false
+        set_1_tray_2:
+          Value: false
+        set_1_tray_2_divider2:
+          Value: false
+        set_1_tray_2_partition_1:
+          Value: false
+        set_1_tray_2_partition_2:
+          Value: false
+        set_1_tray_2_partition_3:
+          Value: false
+        set_1_tray_2_partition_4:
+          Value: false
+        set_1_tray_2_partition_5:
+          Value: false
+        set_1_tray_2_partition_6:
+          Value: false
+        set_1_tray_2_partition_7:
+          Value: false
+        set_1_tray_2_partition_8:
+          Value: false
+        set_1_tray_2_screw_holder:
+          Value: false
+        set_1_tray_2_screw_m3_1:
+          Value: false
+        set_1_tray_2_screw_m3_2:
+          Value: false
+        set_1_tray_2_screw_m3_3:
+          Value: false
+        set_1_tray_2_screw_m3_4:
+          Value: false
+        set_1_tray_2_screw_m3_5:
+          Value: false
+        set_1_tray_2_screw_m3_6:
+          Value: false
+        set_1_tray_2_screw_m4_1:
+          Value: false
+        set_1_tray_2_screw_m4_2:
+          Value: false
+        set_1_tray_2_screw_m4_3:
+          Value: false
+        set_1_tray_2_screw_m4_4:
+          Value: false
+        set_1_tray_2_screw_m4_5:
+          Value: false
+        set_1_tray_2_screw_m4_6:
+          Value: false
+        set_1_tray_2_screw_m4_7:
+          Value: false
+        set_1_tray_2_screw_m4_8:
+          Value: false
+        set_1_tray_2_screw_m4_9:
+          Value: false
+        set_2_tray_1:
+          Value: false
+        set_2_tray_1_divider1_1:
+          Value: false
+        set_2_tray_1_divider1_2:
+          Value: false
+        set_2_tray_1_partition_1:
+          Value: false
+        set_2_tray_1_partition_2:
+          Value: false
+        set_2_tray_1_partition_3:
+          Value: false
+        set_2_tray_1_partition_4:
+          Value: false
+        set_2_tray_1_partition_5:
+          Value: false
+        set_2_tray_2:
+          Value: false
+        set_2_tray_2_divider2:
+          Value: false
+        set_2_tray_2_partition_1:
+          Value: false
+        set_2_tray_2_partition_2:
+          Value: false
+        set_2_tray_2_partition_3:
+          Value: false
+        set_2_tray_2_partition_4:
+          Value: false
+        set_2_tray_2_partition_5:
+          Value: false
+        set_2_tray_2_partition_6:
+          Value: false
+        set_2_tray_2_partition_7:
+          Value: false
+        set_2_tray_2_partition_8:
+          Value: false
+        set_2_tray_2_screw_holder:
+          Value: false
+        set_2_tray_2_screw_m3_1:
+          Value: false
+        set_2_tray_2_screw_m3_2:
+          Value: false
+        set_2_tray_2_screw_m3_3:
+          Value: false
+        set_2_tray_2_screw_m3_4:
+          Value: false
+        set_2_tray_2_screw_m3_5:
+          Value: false
+        set_2_tray_2_screw_m3_6:
+          Value: false
+        set_2_tray_2_screw_m4_1:
+          Value: false
+        set_2_tray_2_screw_m4_2:
+          Value: false
+        set_2_tray_2_screw_m4_3:
+          Value: false
+        set_2_tray_2_screw_m4_4:
+          Value: false
+        set_2_tray_2_screw_m4_5:
+          Value: false
+        set_2_tray_2_screw_m4_6:
+          Value: false
+        set_2_tray_2_screw_m4_7:
+          Value: false
+        set_2_tray_2_screw_m4_8:
+          Value: false
+        set_2_tray_2_screw_m4_9:
+          Value: false
+        set_3_tray_1:
+          Value: false
+        set_3_tray_1_divider1_1:
+          Value: false
+        set_3_tray_1_divider1_2:
+          Value: false
+        set_3_tray_1_partition_1:
+          Value: false
+        set_3_tray_1_partition_2:
+          Value: false
+        set_3_tray_1_partition_3:
+          Value: false
+        set_3_tray_1_partition_4:
+          Value: false
+        set_3_tray_1_partition_5:
+          Value: false
+        set_3_tray_2:
+          Value: false
+        set_3_tray_2_divider2:
+          Value: false
+        set_3_tray_2_partition_1:
+          Value: false
+        set_3_tray_2_partition_2:
+          Value: false
+        set_3_tray_2_partition_3:
+          Value: false
+        set_3_tray_2_partition_4:
+          Value: false
+        set_3_tray_2_partition_5:
+          Value: false
+        set_3_tray_2_partition_6:
+          Value: false
+        set_3_tray_2_partition_7:
+          Value: false
+        set_3_tray_2_partition_8:
+          Value: false
+        set_3_tray_2_screw_holder:
+          Value: false
+        set_3_tray_2_screw_m3_1:
+          Value: false
+        set_3_tray_2_screw_m3_2:
+          Value: false
+        set_3_tray_2_screw_m3_3:
+          Value: false
+        set_3_tray_2_screw_m3_4:
+          Value: false
+        set_3_tray_2_screw_m3_5:
+          Value: false
+        set_3_tray_2_screw_m3_6:
+          Value: false
+        set_3_tray_2_screw_m4_1:
+          Value: false
+        set_3_tray_2_screw_m4_2:
+          Value: false
+        set_3_tray_2_screw_m4_3:
+          Value: false
+        set_3_tray_2_screw_m4_4:
+          Value: false
+        set_3_tray_2_screw_m4_5:
+          Value: false
+        set_3_tray_2_screw_m4_6:
+          Value: false
+        set_3_tray_2_screw_m4_7:
+          Value: false
+        set_3_tray_2_screw_m4_8:
+          Value: false
+        set_3_tray_2_screw_m4_9:
           Value: false
         suction_tool_helper_link:
           Value: false
         suction_tool_link:
-          Value: false
-        tray_1:
-          Value: false
-        tray_1_divider1_1:
-          Value: false
-        tray_1_divider1_2:
-          Value: false
-        tray_1_partition_1:
-          Value: false
-        tray_1_partition_2:
-          Value: false
-        tray_1_partition_3:
-          Value: false
-        tray_1_partition_4:
-          Value: false
-        tray_1_partition_5:
-          Value: false
-        tray_2:
-          Value: false
-        tray_2_divider2:
-          Value: false
-        tray_2_partition_1:
-          Value: false
-        tray_2_partition_2:
-          Value: false
-        tray_2_partition_3:
-          Value: false
-        tray_2_partition_4:
-          Value: false
-        tray_2_partition_5:
-          Value: false
-        tray_2_partition_6:
-          Value: false
-        tray_2_partition_7:
-          Value: false
-        tray_2_partition_8:
-          Value: false
-        tray_2_screw_holder:
-          Value: false
-        tray_2_screw_m3_1:
-          Value: false
-        tray_2_screw_m3_2:
-          Value: false
-        tray_2_screw_m3_3:
-          Value: false
-        tray_2_screw_m3_4:
-          Value: false
-        tray_2_screw_m3_5:
-          Value: false
-        tray_2_screw_m3_6:
-          Value: false
-        tray_2_screw_m4_1:
-          Value: false
-        tray_2_screw_m4_2:
-          Value: false
-        tray_2_screw_m4_3:
-          Value: false
-        tray_2_screw_m4_4:
-          Value: false
-        tray_2_screw_m4_5:
-          Value: false
-        tray_2_screw_m4_6:
-          Value: false
-        tray_2_screw_m4_7:
-          Value: false
-        tray_2_screw_m4_8:
-          Value: false
-        tray_2_screw_m4_9:
           Value: false
         workbox1:
           Value: false
         workbox2:
           Value: false
         workspace_center:
-          Value: false
+          Value: true
         world:
           Value: false
       Marker Scale: 0.5
@@ -1821,9 +3427,24 @@ Visualization Manager:
                   a_bot_forearm_link:
                     a_bot_wrist_1_link:
                       a_bot_wrist_2_link:
+                        a_bot_cam_holder_link:
+                          a_bot_camera_link:
+                            a_bot_camera_depth_frame:
+                              a_bot_camera_depth_optical_frame:
+                                {}
+                              a_bot_camera_fisheye_frame:
+                                a_bot_camera_fisheye_optical_frame:
+                                  {}
+                              a_bot_camera_left_ir_frame:
+                                a_bot_camera_left_ir_optical_frame:
+                                  {}
+                              a_bot_camera_right_ir_frame:
+                                a_bot_camera_right_ir_optical_frame:
+                                  {}
                         a_bot_wrist_3_link:
                           a_bot_ee_link:
-                            {}
+                            a_bot_ar_marker:
+                              {}
                           a_bot_tool0:
                             a_bot_gripper:
                               {}
@@ -1837,7 +3458,36 @@ Visualization Manager:
                   {}
             b_bot_base_link:
               b_bot_base:
-                {}
+                set_2_tray_1:
+                  set_2_tray_1_divider1_1:
+                    {}
+                  set_2_tray_1_divider1_2:
+                    {}
+                  set_2_tray_1_partition_1:
+                    {}
+                  set_2_tray_1_partition_2:
+                    {}
+                  set_2_tray_1_partition_3:
+                    {}
+                  set_2_tray_1_partition_4:
+                    {}
+                  set_2_tray_1_partition_5:
+                    {}
+                set_3_tray_1:
+                  set_3_tray_1_divider1_1:
+                    {}
+                  set_3_tray_1_divider1_2:
+                    {}
+                  set_3_tray_1_partition_1:
+                    {}
+                  set_3_tray_1_partition_2:
+                    {}
+                  set_3_tray_1_partition_3:
+                    {}
+                  set_3_tray_1_partition_4:
+                    {}
+                  set_3_tray_1_partition_5:
+                    {}
               b_bot_shoulder_link:
                 b_bot_upper_arm_link:
                   b_bot_forearm_link:
@@ -1925,6 +3575,8 @@ Visualization Manager:
                                 c_bot_ar_marker:
                                   {}
                                 c_bot_robotiq_85_tip_rotation_helper_link:
+                                  c_bot_nut_tool_m6_tip_link:
+                                    {}
                                   c_bot_screw_tool_m3_tip_link:
                                     {}
                                   c_bot_screw_tool_m4_tip_link:
@@ -1961,99 +3613,347 @@ Visualization Manager:
             workbox2:
               {}
             workspace_center:
-              rack_bins:
-                {}
-              rack_bins_center:
-                {}
               rack_trays:
                 {}
               rack_trays_center:
-                tray_1:
-                  tray_1_divider1_1:
+                set_1_tray_1:
+                  set_1_tray_1_divider1_1:
                     {}
-                  tray_1_divider1_2:
+                  set_1_tray_1_divider1_2:
                     {}
-                  tray_1_partition_1:
+                  set_1_tray_1_partition_1:
                     {}
-                  tray_1_partition_2:
+                  set_1_tray_1_partition_2:
                     {}
-                  tray_1_partition_3:
+                  set_1_tray_1_partition_3:
                     {}
-                  tray_1_partition_4:
+                  set_1_tray_1_partition_4:
                     {}
-                  tray_1_partition_5:
+                  set_1_tray_1_partition_5:
                     {}
-                tray_2:
-                  tray_2_divider2:
+                set_1_tray_2:
+                  set_1_tray_2_divider2:
                     {}
-                  tray_2_partition_1:
+                  set_1_tray_2_partition_1:
                     {}
-                  tray_2_partition_2:
+                  set_1_tray_2_partition_2:
                     {}
-                  tray_2_partition_3:
+                  set_1_tray_2_partition_3:
                     {}
-                  tray_2_partition_4:
+                  set_1_tray_2_partition_4:
                     {}
-                  tray_2_partition_5:
+                  set_1_tray_2_partition_5:
                     {}
-                  tray_2_partition_6:
+                  set_1_tray_2_partition_6:
                     {}
-                  tray_2_partition_7:
+                  set_1_tray_2_partition_7:
                     {}
-                  tray_2_partition_8:
+                  set_1_tray_2_partition_8:
                     {}
-                  tray_2_screw_holder:
+                  set_1_tray_2_screw_holder:
                     {}
-                  tray_2_screw_m3_1:
+                  set_1_tray_2_screw_m3_1:
                     {}
-                  tray_2_screw_m3_2:
+                  set_1_tray_2_screw_m3_2:
                     {}
-                  tray_2_screw_m3_3:
+                  set_1_tray_2_screw_m3_3:
                     {}
-                  tray_2_screw_m3_4:
+                  set_1_tray_2_screw_m3_4:
                     {}
-                  tray_2_screw_m3_5:
+                  set_1_tray_2_screw_m3_5:
                     {}
-                  tray_2_screw_m3_6:
+                  set_1_tray_2_screw_m3_6:
                     {}
-                  tray_2_screw_m4_1:
+                  set_1_tray_2_screw_m4_1:
                     {}
-                  tray_2_screw_m4_2:
+                  set_1_tray_2_screw_m4_2:
                     {}
-                  tray_2_screw_m4_3:
+                  set_1_tray_2_screw_m4_3:
                     {}
-                  tray_2_screw_m4_4:
+                  set_1_tray_2_screw_m4_4:
                     {}
-                  tray_2_screw_m4_5:
+                  set_1_tray_2_screw_m4_5:
                     {}
-                  tray_2_screw_m4_6:
+                  set_1_tray_2_screw_m4_6:
                     {}
-                  tray_2_screw_m4_7:
+                  set_1_tray_2_screw_m4_7:
                     {}
-                  tray_2_screw_m4_8:
+                  set_1_tray_2_screw_m4_8:
                     {}
-                  tray_2_screw_m4_9:
+                  set_1_tray_2_screw_m4_9:
+                    {}
+                set_2_tray_2:
+                  set_2_tray_2_divider2:
+                    {}
+                  set_2_tray_2_partition_1:
+                    {}
+                  set_2_tray_2_partition_2:
+                    {}
+                  set_2_tray_2_partition_3:
+                    {}
+                  set_2_tray_2_partition_4:
+                    {}
+                  set_2_tray_2_partition_5:
+                    {}
+                  set_2_tray_2_partition_6:
+                    {}
+                  set_2_tray_2_partition_7:
+                    {}
+                  set_2_tray_2_partition_8:
+                    {}
+                  set_2_tray_2_screw_holder:
+                    {}
+                  set_2_tray_2_screw_m3_1:
+                    {}
+                  set_2_tray_2_screw_m3_2:
+                    {}
+                  set_2_tray_2_screw_m3_3:
+                    {}
+                  set_2_tray_2_screw_m3_4:
+                    {}
+                  set_2_tray_2_screw_m3_5:
+                    {}
+                  set_2_tray_2_screw_m3_6:
+                    {}
+                  set_2_tray_2_screw_m4_1:
+                    {}
+                  set_2_tray_2_screw_m4_2:
+                    {}
+                  set_2_tray_2_screw_m4_3:
+                    {}
+                  set_2_tray_2_screw_m4_4:
+                    {}
+                  set_2_tray_2_screw_m4_5:
+                    {}
+                  set_2_tray_2_screw_m4_6:
+                    {}
+                  set_2_tray_2_screw_m4_7:
+                    {}
+                  set_2_tray_2_screw_m4_8:
+                    {}
+                  set_2_tray_2_screw_m4_9:
+                    {}
+                set_3_tray_2:
+                  set_3_tray_2_divider2:
+                    {}
+                  set_3_tray_2_partition_1:
+                    {}
+                  set_3_tray_2_partition_2:
+                    {}
+                  set_3_tray_2_partition_3:
+                    {}
+                  set_3_tray_2_partition_4:
+                    {}
+                  set_3_tray_2_partition_5:
+                    {}
+                  set_3_tray_2_partition_6:
+                    {}
+                  set_3_tray_2_partition_7:
+                    {}
+                  set_3_tray_2_partition_8:
+                    {}
+                  set_3_tray_2_screw_holder:
+                    {}
+                  set_3_tray_2_screw_m3_1:
+                    {}
+                  set_3_tray_2_screw_m3_2:
+                    {}
+                  set_3_tray_2_screw_m3_3:
+                    {}
+                  set_3_tray_2_screw_m3_4:
+                    {}
+                  set_3_tray_2_screw_m3_5:
+                    {}
+                  set_3_tray_2_screw_m3_6:
+                    {}
+                  set_3_tray_2_screw_m4_1:
+                    {}
+                  set_3_tray_2_screw_m4_2:
+                    {}
+                  set_3_tray_2_screw_m4_3:
+                    {}
+                  set_3_tray_2_screw_m4_4:
+                    {}
+                  set_3_tray_2_screw_m4_5:
+                    {}
+                  set_3_tray_2_screw_m4_6:
+                    {}
+                  set_3_tray_2_screw_m4_7:
+                    {}
+                  set_3_tray_2_screw_m4_8:
+                    {}
+                  set_3_tray_2_screw_m4_9:
                     {}
               set1_bin2_1:
-                {}
+                set1_bin2_1_bottom_back_left_corner:
+                  {}
+                set1_bin2_1_bottom_back_right_corner:
+                  {}
+                set1_bin2_1_bottom_front_left_corner:
+                  {}
+                set1_bin2_1_bottom_front_right_corner:
+                  {}
+                set1_bin2_1_top_back_left_corner:
+                  {}
+                set1_bin2_1_top_back_right_corner:
+                  {}
+                set1_bin2_1_top_front_left_corner:
+                  {}
+                set1_bin2_1_top_front_right_corner:
+                  {}
               set1_bin2_2:
-                {}
+                set1_bin2_2_bottom_back_left_corner:
+                  {}
+                set1_bin2_2_bottom_back_right_corner:
+                  {}
+                set1_bin2_2_bottom_front_left_corner:
+                  {}
+                set1_bin2_2_bottom_front_right_corner:
+                  {}
+                set1_bin2_2_top_back_left_corner:
+                  {}
+                set1_bin2_2_top_back_right_corner:
+                  {}
+                set1_bin2_2_top_front_left_corner:
+                  {}
+                set1_bin2_2_top_front_right_corner:
+                  {}
               set1_bin2_3:
-                {}
+                set1_bin2_3_bottom_back_left_corner:
+                  {}
+                set1_bin2_3_bottom_back_right_corner:
+                  {}
+                set1_bin2_3_bottom_front_left_corner:
+                  {}
+                set1_bin2_3_bottom_front_right_corner:
+                  {}
+                set1_bin2_3_top_back_left_corner:
+                  {}
+                set1_bin2_3_top_back_right_corner:
+                  {}
+                set1_bin2_3_top_front_left_corner:
+                  {}
+                set1_bin2_3_top_front_right_corner:
+                  {}
               set1_bin2_4:
-                {}
+                set1_bin2_4_bottom_back_left_corner:
+                  {}
+                set1_bin2_4_bottom_back_right_corner:
+                  {}
+                set1_bin2_4_bottom_front_left_corner:
+                  {}
+                set1_bin2_4_bottom_front_right_corner:
+                  {}
+                set1_bin2_4_top_back_left_corner:
+                  {}
+                set1_bin2_4_top_back_right_corner:
+                  {}
+                set1_bin2_4_top_front_left_corner:
+                  {}
+                set1_bin2_4_top_front_right_corner:
+                  {}
               set1_bin3_1:
-                {}
+                set1_bin3_1_bottom_back_left_corner:
+                  {}
+                set1_bin3_1_bottom_back_right_corner:
+                  {}
+                set1_bin3_1_bottom_front_left_corner:
+                  {}
+                set1_bin3_1_bottom_front_right_corner:
+                  {}
+                set1_bin3_1_top_back_left_corner:
+                  {}
+                set1_bin3_1_top_back_right_corner:
+                  {}
+                set1_bin3_1_top_front_left_corner:
+                  {}
+                set1_bin3_1_top_front_right_corner:
+                  {}
               set2_bin1_1:
-                {}
+                set2_bin1_1_bottom_back_left_corner:
+                  {}
+                set2_bin1_1_bottom_back_right_corner:
+                  {}
+                set2_bin1_1_bottom_front_left_corner:
+                  {}
+                set2_bin1_1_bottom_front_right_corner:
+                  {}
+                set2_bin1_1_top_back_left_corner:
+                  {}
+                set2_bin1_1_top_back_right_corner:
+                  {}
+                set2_bin1_1_top_front_left_corner:
+                  {}
+                set2_bin1_1_top_front_right_corner:
+                  {}
               set2_bin1_2:
-                {}
+                set2_bin1_2_bottom_back_left_corner:
+                  {}
+                set2_bin1_2_bottom_back_right_corner:
+                  {}
+                set2_bin1_2_bottom_front_left_corner:
+                  {}
+                set2_bin1_2_bottom_front_right_corner:
+                  {}
+                set2_bin1_2_top_back_left_corner:
+                  {}
+                set2_bin1_2_top_back_right_corner:
+                  {}
+                set2_bin1_2_top_front_left_corner:
+                  {}
+                set2_bin1_2_top_front_right_corner:
+                  {}
               set2_bin1_3:
-                {}
+                set2_bin1_3_bottom_back_left_corner:
+                  {}
+                set2_bin1_3_bottom_back_right_corner:
+                  {}
+                set2_bin1_3_bottom_front_left_corner:
+                  {}
+                set2_bin1_3_bottom_front_right_corner:
+                  {}
+                set2_bin1_3_top_back_left_corner:
+                  {}
+                set2_bin1_3_top_back_right_corner:
+                  {}
+                set2_bin1_3_top_front_left_corner:
+                  {}
+                set2_bin1_3_top_front_right_corner:
+                  {}
               set2_bin1_4:
-                {}
+                set2_bin1_4_bottom_back_left_corner:
+                  {}
+                set2_bin1_4_bottom_back_right_corner:
+                  {}
+                set2_bin1_4_bottom_front_left_corner:
+                  {}
+                set2_bin1_4_bottom_front_right_corner:
+                  {}
+                set2_bin1_4_top_back_left_corner:
+                  {}
+                set2_bin1_4_top_back_right_corner:
+                  {}
+                set2_bin1_4_top_front_left_corner:
+                  {}
+                set2_bin1_4_top_front_right_corner:
+                  {}
               set2_bin1_5:
-                {}
+                set2_bin1_5_bottom_back_left_corner:
+                  {}
+                set2_bin1_5_bottom_back_right_corner:
+                  {}
+                set2_bin1_5_bottom_front_left_corner:
+                  {}
+                set2_bin1_5_bottom_front_right_corner:
+                  {}
+                set2_bin1_5_top_back_left_corner:
+                  {}
+                set2_bin1_5_top_back_right_corner:
+                  {}
+                set2_bin1_5_top_front_left_corner:
+                  {}
+                set2_bin1_5_top_front_right_corner:
+                  {}
       Update Interval: 0
       Value: true
     - Class: rviz/Image
@@ -2138,10 +4038,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.384796619
+      Pitch: 0.524796605
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.258577675
+      Yaw: 0.00857782364
     Saved: ~
 Window Geometry:
   Displays:
