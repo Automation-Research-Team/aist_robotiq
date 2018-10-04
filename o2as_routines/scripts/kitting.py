@@ -170,8 +170,9 @@ class KittingClass(O2ASBaseRoutines):
 
     ### Sort by grasp strategy
     self.screw_items = []
-    self.m3_screws = []
-    self.m4_screws = []
+    self.screws = dict()
+    self.screws["m3"] = []
+    self.screws["m4"] = []
     self.suction_items = []
     self.robotiq_gripper_items = []
     self.precision_gripper_items = []
@@ -180,9 +181,9 @@ class KittingClass(O2ASBaseRoutines):
         rospy.loginfo("Appended item nr." + str(order_item.number_in_set) + " from set " + str(order_item.set_number) + " (part ID:" + str(order_item.part_id) + ") to list of screw items")
         self.screw_items.append(order_item)
         if order_item.part_id == 17:
-          self.m4_screws.append(order_item)
+          self.screws["m4"].append(order_item)
         elif order_item.part_id == 18:
-          self.m3_screws.append(order_item)
+          self.screws["m3"].append(order_item)
       elif order_item.ee_to_use == "suction":
         rospy.loginfo("Appended item nr." + str(order_item.number_in_set) + " from set " + str(order_item.set_number) + " (part ID:" + str(order_item.part_id) + ") to list of suction items")
         self.suction_items.append(order_item)
@@ -958,17 +959,19 @@ class KittingClass(O2ASBaseRoutines):
     start_time = rospy.Time.now()
     time_limit = rospy.Duration(1140) # 19 minutes
     self.fulfilled_items = 0
-    self.m4_screws_done = (len(self.m4_screws) == 0)
-    self.m3_screws_done = (len(self.m3_screws) == 0)
-    self.m4_screws_placed = {1:0, 2:0, 3:0}
-    self.m3_screws_placed = {1:0, 2:0, 3:0}
+    self.screws_done = dict()
+    self.screws_placed = dict()
+    self.screws_done["m4"] = (len(self.screws["m4"]) == 0)
+    self.screws_done["m3"] = (len(self.screws["m3"]) == 0)
+    self.screws_placed["m4"] = {1:0, 2:0, 3:0}
+    self.screws_placed["m3"] = {1:0, 2:0, 3:0}
 
     # ==== 1. First, do an initial attempt on picking all items, ordered by the tool that they are picked with (screws, suction, precision_gripper, robotiq)
 
     # self.go_to_named_pose("home", "a_bot")
     # for item in self.screw_items:
     #   if rospy.is_shutdown():
-    #           break
+    #     break
     #   self.pick_screw_from_bin_and_put_into_feeder(item)
     #   self.go_to_named_pose("home", "a_bot")
     # self.go_to_named_pose("back", "a_bot")
@@ -976,7 +979,7 @@ class KittingClass(O2ASBaseRoutines):
 
     # for item in self.suction_items:
     #   if rospy.is_shutdown():
-    #           break
+    #     break
     #   self.go_to_named_pose("suction_pick_ready", "b_bot")
     #   self.attempt_item(item, 10)
     # self.do_change_tool_action("b_bot", equip=False, screw_size=50)   # 50 = suction tool
@@ -984,14 +987,14 @@ class KittingClass(O2ASBaseRoutines):
 
     # for item in self.precision_gripper_items:
     #   if rospy.is_shutdown():
-    #           break
+    #     break
     #   self.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
     #   self.attempt_item(item)
     # self.go_to_named_pose("back", "a_bot")
 
     # for item in self.robotiq_gripper_items:
     #   if rospy.is_shutdown():
-    #           break
+    #     break
     #   self.attempt_item(item)
     # self.go_to_named_pose("back", "b_bot")
 
@@ -1002,53 +1005,34 @@ class KittingClass(O2ASBaseRoutines):
 
       # Pick the screws when they should be ready
       if (rospy.Time.now() - screw_delivery_time) > rospy.Duration(5):
-        if not self.m4_screws_done:
-          rospy.loginfo("Starting to pick m4 screws")
-          self.go_to_named_pose("home", "c_bot")
-          self.do_change_tool_action("c_bot", equip=True, screw_size=4)
-          for item in self.m4_screws:
-            if rospy.is_shutdown():
-              break
-            if self.pick_screw_from_feeder(4, attempts=2):
-              self.place_screw_in_tray(4, item.set_number, self.m4_screws_placed[item.set_number]+1)
-              self.m4_screws_placed[item.set_number] += 1
-              self.fulfilled_items += 1
-              item.fulfilled = True
-            else:
-              rospy.loginfo("Failed to pick an m4 screw from the feeder")
-              break
-          # TODO: Return excess screws
-          self.go_to_named_pose("screw_ready", "c_bot")
-          self.do_change_tool_action("c_bot", equip=False, screw_size=4)
-          self.go_to_named_pose("back", "c_bot")
-
-        if not self.m3_screws_done:
-          rospy.loginfo("Starting to pick m3 screws")
-          self.go_to_named_pose("home", "c_bot")
-          self.do_change_tool_action("c_bot", equip=True, screw_size=3)
-          for item in self.m3_screws:
-            if rospy.is_shutdown():
-              break
-            if self.pick_screw_from_feeder(3, attempts=2):
-              self.place_screw_in_tray(3, item.set_number, self.m4_screws_placed[item.set_number]+1)
-              self.m3_screws_placed[item.set_number] += 1
-              self.fulfilled_items += 1
-              item.fulfilled = True
-            else:
-              rospy.loginfo("Failed to pick an m3 screw from the feeder")
-              break
-          # TODO: Return excess screws
-          self.go_to_named_pose("screw_ready", "c_bot")
-          self.do_change_tool_action("c_bot", equip=False, screw_size=3)
-          self.go_to_named_pose("back", "c_bot")
+        for screw_size in [4,3]:
+          if not self.screws_done["m"+str(screw_size)]:
+            rospy.loginfo("Picking m" + str(screw_size) + " screws from feeder")
+            self.go_to_named_pose("home", "c_bot")
+            self.do_change_tool_action("c_bot", equip=True, screw_size=screw_size)
+            for item in self.screws["m"+str(screw_size)]:
+              if rospy.is_shutdown():
+                break
+              if self.pick_screw_from_feeder(screw_size, attempts=2):
+                self.place_screw_in_tray(screw_size, item.set_number, self.screws_placed["m"+str(screw_size)][item.set_number]+1)
+                self.screws_placed["m"+str(screw_size)][item.set_number] += 1
+                self.fulfilled_items += 1
+                item.fulfilled = True
+              else:
+                rospy.loginfo("Failed to pick an m" + str(screw_size) + " screw from the feeder")
+                break
+            # TODO: Return excess screws
+            self.go_to_named_pose("screw_ready", "c_bot")
+            self.do_change_tool_action("c_bot", equip=False, screw_size=screw_size)
+            self.go_to_named_pose("back", "c_bot")
       
       # Check all items, find which groups are done, then reattempt those that are unfinished
       all_done = True      
       suction_done = True
       precision_gripper_done = True
       robotiq_gripper_done = True
-      self.m4_screws_done = True
-      self.m3_screws_done = True
+      self.screws_done["m4"] = True
+      self.screws_done["m3"] = True
       for item in self.ordered_items:
         if not item.fulfilled:
           rospy.loginfo("Found an undelivered item in the order: item nr. " + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + ")")
@@ -1060,9 +1044,9 @@ class KittingClass(O2ASBaseRoutines):
           elif item.ee_to_use == "suction":
             suction_done = False
           if item.part_id == 17:
-            self.m4_screws_done = False
+            self.screws_done["m4"] = False
           elif item.part_id == 18:
-            self.m3_screws_done = False
+            self.screws_done["m3"] = False
 
       # if not precision_gripper_done:
       #   rospy.loginfo("Reattempting the remaining precision gripper items")
