@@ -11,6 +11,7 @@ from o2as_msgs.msg import *
 from util import *
 
 class FasteningToolController(object):
+    max_retry = 5
     _feedback = FastenerGripperControlFeedback()
     _result = FastenerGripperControlResult()
 
@@ -37,24 +38,32 @@ class FasteningToolController(object):
         self._as.start()
 
     def set_torque_enable(self, motor_id, value):
-        try:
-            res = self.dynamixel_command_write(motor_id, "Torque_Enable", value)
-            if not res.comm_result:
-                rospy.logerr('Can not set torque_enable to XL-320. (ID=%i)' %motor_id)
-            return res.comm_result
-        except rospy.ServiceException as exc:
-            rospy.logwarn('An exception occurred in the Torque_Enable set, but processing continues.')
-            return True
+        for i in range(1, self.max_retry + 1):
+            try:
+                res = self.dynamixel_command_write(motor_id, "Torque_Enable", value)
+            except rospy.ServiceException as exc:
+                rospy.logwarn('An exception occurred in the Torque_Enable set, but processing continues.')
+            else:
+                if not res.comm_result:
+                    rospy.logerr('Can not set torque_enable to XL-320. (ID=%i)' %motor_id)
+                return res.comm_result
+
+        rospy.logwarn('Maxmum number of retries has been reached.')
+        return True
 
     def set_moving_speed(self, motor_id, value):
-        try:
-            res = self.dynamixel_command_write(motor_id, "Moving_Speed", value)
-            if not res.comm_result:
-                rospy.logerr('Can not set speed to XL-320. (ID=%i)' %motor_id)
-            return res.comm_result
-        except rospy.ServiceException as exc:
-            rospy.logwarn('An exception occurred in the Moving_Speed set, but processing continues.')
-            return True
+        for i in range(1, self.max_retry + 1):
+            try:
+                res = self.dynamixel_command_write(motor_id, "Moving_Speed", value)
+            except rospy.ServiceException as exc:
+                rospy.logwarn('An exception occurred in the Moving_Speed set. Processing retry.')
+            else:
+                if not res.comm_result:
+                    rospy.logerr('Can not set speed to XL-320. (ID=%i)' %motor_id)
+                return res.comm_result
+
+        rospy.logwarn('Maxmum number of retries has been reached.')
+        return True
 
     def get_present_speed(self, motor_id):
         res = self.dynamixel_read_state(motor_id, "Present_Speed")
@@ -90,8 +99,10 @@ class FasteningToolController(object):
             return
 
         if not self.set_moving_speed(motor_id, goal.speed) :
+            self.set_moving_speed(motor_id, 0)
+            self.set_torque_enable(motor_id, 0)
             self._result.control_result = False
-            self._as.set_succeeded(self._result)
+            self._as.set_aborted(self._result)
             return
         
         if goal.direction == "loosen" and not goal.duration:
