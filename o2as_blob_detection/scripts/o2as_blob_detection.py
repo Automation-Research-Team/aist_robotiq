@@ -19,6 +19,7 @@ import copy
 
 import actionlib
 import o2as_msgs.msg
+from geometry_msgs.msg import PoseArray, Pose 
 
 class BlobDetection(object):
     def __init__(self):
@@ -26,6 +27,7 @@ class BlobDetection(object):
         self.bridge = CvBridge()
         current_image = Image()
         current_cloud = PointCloud2()
+        self.current_detected_poses = PoseArray() 
 
         # Config parameters
         # TODO: read values from config file
@@ -35,7 +37,7 @@ class BlobDetection(object):
         self.blob_pos_cloud_topic = rospy.get_name()+"/blob_pos_cloud"
 
         self.pub_img_pos = rospy.Publisher(self.blob_pos_img_topic, geometry_msgs.msg.Point, queue_size=10)
-        self.pub_cloud_pos = rospy.Publisher(self.blob_pos_cloud_topic, geometry_msgs.msg.Point, queue_size=10)
+        self.pub_cloud_pos = rospy.Publisher(self.blob_pos_cloud_topic, geometry_msgs.msg.PoseArray, queue_size=10)
 
         # Subscriber
         rospy.Subscriber(self.image_topic, Image, self.image_callback)
@@ -58,6 +60,7 @@ class BlobDetection(object):
       print("goal.mask")
 
       self.action_result.success = True
+      self.action_result.posesDetected = self.current_detected_poses
       self._action_server.set_succeeded(self.action_result)
 
     # Callback
@@ -90,7 +93,6 @@ class BlobDetection(object):
 
       # Detect the blob in the image
       res_b, blob_array = self.detect_blob(masked_img)
-      print(blob_array)
    
       if(res_b):
           msg_out = geometry_msgs.msg.Point()
@@ -98,11 +100,18 @@ class BlobDetection(object):
           self.pub_img_pos.publish(msg_out)
 
           # Convert the blob position image in the 3D camera system
-          msg_out = self.compute_3D_pos1(self.current_cloud, int(blob_array[0].x), int(blob_array[0].y))
-
+          #TODO synchronize the time stamp between image and cloud
+          self.current_detected_poses.header = self.current_cloud.header
+          tmp_pose_array = []
+          for i in range(0,len(blob_array)):
+            tmp_pose = geometry_msgs.msg.Pose() 
+            res_point3D = self.compute_3D_pos1(self.current_cloud, int(blob_array[i].x), int(blob_array[i].y))
+            tmp_pose.position = res_point3D.point
+            tmp_pose_array.append(tmp_pose)
+          self.current_detected_poses.poses = tmp_pose_array
           # Publish the results   
-          self.pub_cloud_pos.publish(msg_out)
-
+          self.pub_cloud_pos.publish(self.current_detected_poses)
+ 
           # Slow down this node and reduce data transfer for image
           #rospy.sleep(0.01)
       else:
@@ -114,8 +123,8 @@ class BlobDetection(object):
           # Slow down this node and reduce data transfer for image
           #rospy.sleep(0.01)
 
-
     def cloud_callback(self, msg_in):
+
       self.current_cloud = copy.deepcopy(msg_in)
 
     def compute_3D_pos1(self, in_cloud, u,v):
@@ -124,10 +133,11 @@ class BlobDetection(object):
       data_out = pc2.read_points(in_cloud, field_names = None, skip_nans=False, uvs=[[u, v]]) 
       int_data = next(data_out)
 
-      res_out = geometry_msgs.msg.Point()
-      res_out.x = int_data[0]  
-      res_out.y = int_data[1]
-      res_out.z = int_data[2] 
+      res_out = geometry_msgs.msg.PointStamped()
+      res_out.header = in_cloud.header
+      res_out.point.x = int_data[0]  
+      res_out.point.y = int_data[1]
+      res_out.point.z = int_data[2] 
 
       return res_out
 
@@ -217,7 +227,7 @@ class BlobDetection(object):
     
         # Show blobs
         cv2.imwrite("blob_detection_results.png", im_with_keypoints)
-    
+
         blob_array = []
      
         if(len(keypoints)):
