@@ -22,13 +22,13 @@
 
     image_topics:
       realsense:
-        topic_name: /b_bot_camera/rgb/image_raw
-        col: [0, 15]
-        row: [0, 9]
+        topic_name: /c_bot_camera/color/image_raw
+        col: [0, 12]
+        row: [0, 7]
       realsense2:
-        topic_name: /b_bot_camera/rgb/image_raw
-        col: [16, 23]
-        row: [0, 4]
+        topic_name: /c_bot_camera/depth/image_raw
+        col: [0, 12]
+        row: [8, 15]
       phoxi_texture:
         topic_name: /a_phoxi_m_camera/texture
         col: [0, 15]

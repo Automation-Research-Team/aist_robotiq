@@ -81,8 +81,21 @@ cv_bridge::CvImagePtr convert2OpenCV(
 }
 
 //  boost::function<void(const sensor_msgs::ImageConstPtr&)>
-ImageCallback getCallbackForImage(cv::Rect rect, cv::Mat& monitor_)
+ImageCallback getCallbackForImage(
+  cv::Rect rect, XmlRpc::XmlRpcValue &params, cv::Mat& monitor_
+)
 {
+  // Values captured by closure
+  double vmin = 0;
+  double vmax = 255;
+
+  if (params.hasMember("vrange") == true) {
+    int tmp1 = params["vrange"][0];
+    int tmp2 = params["vrange"][1];
+    vmin = tmp1;
+    vmax = tmp2;
+  }
+
   // This function returns callback function
   return [=](const sensor_msgs::ImageConstPtr &msg) {
     // Show window at the first time
@@ -100,6 +113,22 @@ ImageCallback getCallbackForImage(cv::Rect rect, cv::Mat& monitor_)
     cv::Size size = cv::Size(rect.width, rect.height);
     cv::Mat resized;
     cv::resize(img, resized, size, 0, 0, cv::INTER_CUBIC);
+
+    for (int i = 0; i < resized.rows ; i++)
+    {
+      for(int j = 0; j < resized.cols; j++)
+      {
+        for (int idx = 0; idx < 3; idx++)
+        {
+          double tmp = resized.at<cv::Vec3b>(i,j)[idx];
+          tmp = (tmp - vmin) / (vmax - vmin) * 255;
+          if (tmp > 255) { tmp = 255; }
+          if (tmp < 0) { tmp = 0; }
+          resized.at<cv::Vec3b>(i,j)[idx] = (uint8_t)tmp;
+        }
+      }
+    }
+
     resized.copyTo(monitor_(rect));
 
     // Copy the image buffer in the window
@@ -322,7 +351,7 @@ namespace o2as_debug_monitor
           cv::Rect rect = getRect(params);
 
           // Create, set and keep callback function
-          imgcbs_.push_back(getCallbackForImage(rect, monitor_));
+          imgcbs_.push_back(getCallbackForImage(rect, params, monitor_));
           i_sub_rs_.push_back(it_.subscribe(topic_name, 1, imgcbs_.back()));
         }
       }
