@@ -56,19 +56,35 @@ class BlobDetection(object):
       rospy.loginfo(goal)
       rospy.loginfo('Executing'+ str(self._action_name)+"."+"request sent:")
 
-      print(goal.maskCorner)
-      print("goal.mask")
+      self.detect_poses(goal.maskCorner)
 
       self.action_result.success = True
       self.action_result.posesDetected = self.current_detected_poses
       self._action_server.set_succeeded(self.action_result)
 
+
     # Callback
     def image_callback(self, msg_in):
       # Convert the image to be used wit OpenCV library
-      img_cv = self.bridge.imgmsg_to_cv2(msg_in, desired_encoding="passthrough")
-      img = np.asarray(img_cv)[:, :, ::-1]
+      self.current_image = copy.deepcopy(msg_in)
 
+      mask_u = 200
+      mask_v = 100
+
+      test_polygon = Polygon()
+      test_polygon.points = [Point32(mask_u,mask_v,0),
+                             Point32(640-mask_u,mask_v,0),
+                             Point32(640-mask_u,360,0),
+                             Point32(mask_u,360,0)]
+
+
+#      self.detect_poses(test_polygon)
+    
+    def detect_poses(self, in_polygon):
+
+
+      img_cv = self.bridge.imgmsg_to_cv2(self.current_image , desired_encoding="passthrough")
+      img = np.asarray(img_cv)[:, :, ::-1]
       # Apply the mask
       mask_u = 200
       mask_v = 100
@@ -77,19 +93,13 @@ class BlobDetection(object):
       #                 (msg_in.width-mask_u,msg_in.height-mask_v),
       #                 (mask_u,msg_in.height-mask_v)]
 
-      test_polygon = Polygon()
-      test_polygon.points = [Point32(mask_u,mask_v,0),
-                             Point32(msg_in.width-mask_u,mask_v,0),
-                             Point32(msg_in.width-mask_u,msg_in.height-mask_v,0),
-                             Point32(mask_u,msg_in.height-mask_v,0)]
-
       #test_polygon = geometry_msgs.msg.Point()
       #test_polygon [0] = geometry_msgs_msg.Point(mask_u,mask_v,0) 
       #test_polygon [1] = geometry_msgs_msg.Point(msg_in.width-mask_u,mask_v)
       #test_polygon [2] = geometry_msgs_msg.Point(msg_in.width-mask_u,msg_in.height-mask_v)
       #test_polygon [3] = geometry_msgs_msg.Point(mask_u,msg_in.height-mask_v)
 
-      masked_img= self.mask_image(img, test_polygon)
+      masked_img= self.mask_image(img, in_polygon)
 
       # Detect the blob in the image
       res_b, blob_array = self.detect_blob(masked_img)
