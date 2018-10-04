@@ -87,7 +87,8 @@ class BlobDetection(object):
     def detect_poses(self, in_polygon):
 
 
-      img_cv = self.bridge.imgmsg_to_cv2(self.current_image , desired_encoding="passthrough")
+      img_cv=cv2.imread('/root/catkin_ws/mask_extract/set2_bin1_4_img2.png')
+      #img_cv = self.bridge.imgmsg_to_cv2(self.current_image , desired_encoding="passthrough")
       cv2.imwrite('/root/catkin_ws/original_image.png',img_cv)
       img = np.asarray(img_cv)[:, :, ::-1]
       # Apply the mask

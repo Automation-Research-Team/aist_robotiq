@@ -24,6 +24,8 @@ import csv
 import os
 import random
 
+
+import math
 from geometry_msgs.msg import Polygon, Point32
 from PIL import Image, ImageDraw
 
@@ -192,14 +194,16 @@ class KittingClass(O2ASBaseRoutines):
     # TODO: adjust the x,z and end effector orientatio for optimal view of the bin to use with the  \search_grasp service
     goal_pose = geometry_msgs.msg.PoseStamped()
     goal_pose.header.frame_id = bin_id
-    goal_pose.pose.position.x = bin_eff_xoff
-    goal_pose.pose.position.y = 0
-    goal_pose.pose.position.z = bin_eff_height
+    goal_pose.pose.position.x = bin_eff_xoff - .1
+    goal_pose.pose.position.y = -.05
+    goal_pose.pose.position.z = bin_eff_height - .12
+
     #goal orientation for a_bot_camera_depth_frame 
     #goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2 + 20*pi/180, 0))
     #res = self.go_to_pose_goal(group_name, goal_pose, speed_slow, "a_bot_camera_depth_frame")
     #goal orientation for gripper
-    goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 + 20*pi/180, 0))
+#    goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 + 20*pi/180, 0))
+    goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
     res = self.move_lin(group_name, goal_pose, speed_slow, end_effector_link="")
     if not res:
       rospy.loginfo("Couldn't go to the target.")
@@ -229,10 +233,10 @@ class KittingClass(O2ASBaseRoutines):
     point_top4.point = geometry_msgs.msg.Point(-mask_margin, mask_margin, 0.0)
 
     #TODO change the fisheye from to the depth frame in casse of offset. but fisheye should e ok since the two images are aligned (depth and rgb) after the real sense node
-    point_top1_cam = self.listener.transformPoint("a_bot_camera_depth_optical_frame", point_top1).point
-    point_top2_cam = self.listener.transformPoint("a_bot_camera_depth_optical_frame", point_top2).point
-    point_top3_cam = self.listener.transformPoint("a_bot_camera_depth_optical_frame", point_top3).point
-    point_top4_cam = self.listener.transformPoint("a_bot_camera_depth_optical_frame", point_top4).point
+    point_top1_cam = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", point_top1).point
+    point_top2_cam = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", point_top2).point
+    point_top3_cam = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", point_top3).point
+    point_top4_cam = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", point_top4).point
 
 
     #print("point_top1_cam")
@@ -256,14 +260,14 @@ class KittingClass(O2ASBaseRoutines):
 
 
 #for gazebo
-    cameraMatK = np.array([[554.3827128226441, 0.0, 320.5],
-                           [0.0, 554.3827128226441, 240.5],
-                           [0.0, 0.0, 1.0]])
+#    cameraMatK = np.array([[554.3827128226441, 0.0, 320.5],
+#                           [0.0, 554.3827128226441, 240.5],
+#                           [0.0, 0.0, 1.0]])
 
 #for ID Realsense on robot ID61*41   width 640 height 360
-#    cameraMatK = np.array([[461.605774, 0.0, 318.471497],
-#                           [0.0, 461.605804, 180.336258],
-#                           [0.0, 0.0, 1.0]])
+    cameraMatK = np.array([[461.605774, 0.0, 318.471497],
+                           [0.0, 461.605804, 180.336258],
+                           [0.0, 0.0, 1.0]])
 
 
     point_top1_cam_np = np.array([point_top1_cam.x, point_top1_cam.y, point_top1_cam.z])   
@@ -310,17 +314,46 @@ class KittingClass(O2ASBaseRoutines):
         distanceToBinCenter = []
         for i in range(len(poseArrayRes.poses)): 
             pointCam = geometry_msgs.msg.PointStamped()
+
+            #simulation only
+            poseArrayRes.header.frame_id = "a_bot_camera_fisheye_optical_frame"
             pointCam.header = poseArrayRes.header
-            pointCam.point = poseArrayRes.poses[i].point
-            pointBin = t.transformPoint(bin_id, pointCam)
-            distanceToBinCenter.append(math.sqrt(pointBin.point.x*pointBin.point.x + pointBin.point.y*pointBin.point.y))
+            print("pointCam.header")
+            print(pointCam.header)
+            pointCam.point = poseArrayRes.poses[i].position
+            pointBin = self.listener.transformPoint(bin_id, pointCam).point
+            distanceToBinCenter.append(math.sqrt(pointBin.x*pointBin.x + pointBin.y*pointBin.y))
         minPoseIndex = np.argmin(distanceToBinCenter)
          
         rospy.loginfo("pose closest to the bin center in the xy plane")
         rospy.loginfo(poseArrayRes.poses[minPoseIndex])
+
+        #Place gripper above bin
+        pointPartCam = geometry_msgs.msg.PointStamped()
+        pointPartCam.header = poseArrayRes.header
+        pointPartCam.point = poseArrayRes.poses[i].position
+        pointPartBin = self.listener.transformPoint(bin_id, pointPartCam)
+
+        rospy.loginfo("Pose in bin")
+        rospy.loginfo(pointPartBin)
+
+        goal_part = geometry_msgs.msg.PoseStamped()
+        goal_part.header.frame_id = pointPartBin.header.frame_id
+        goal_part.pose.position.x = pointPartBin.point.x
+        goal_part.pose.position.y = pointPartBin.point.y
+        goal_part.pose.position.z = 0.01
+        goal_part.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 , 0))
+        res = self.move_lin(group_name, goal_part, speed_slow, "")
+        if not res:
+          rospy.loginfo("Couldn't go to the target.")
+        #TODO Problem with gazebo controller while controlling the robot with movelin
+          return False
+
     else:
         rospy.loginfo("no pose detected")
     #TODO if nothing is detected move the camera a bit to try to detect somethin
+
+
 
     #mask_img = Image.new('L', (640,480), 0)
     #ImageDraw.Draw(mask_img).polygon(mask_polygon, outline = 1, fill = 255)
