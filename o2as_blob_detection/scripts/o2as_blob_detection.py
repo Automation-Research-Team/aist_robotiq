@@ -31,8 +31,8 @@ class BlobDetection(object):
 
         # Config parameters
         # TODO: read values from config file
-        self.image_topic = "/camera/color/image_raw"
-        self.cloud_topic = "/camera/cloud"
+        self.image_topic = rospy.get_name()+ "/camera/color/image_raw"
+        self.cloud_topic = rospy.get_name()+ "/camera/cloud"
         self.blob_pos_img_topic = rospy.get_name()+"/blob_pos_img"
         self.blob_pos_cloud_topic = rospy.get_name()+"/blob_pos_cloud"
 
@@ -56,11 +56,15 @@ class BlobDetection(object):
       rospy.loginfo(goal)
       rospy.loginfo('Executing'+ str(self._action_name)+"."+"request sent:")
 
-      self.detect_poses(goal.maskCorner)
+      res = self.detect_poses(goal.maskCorner)
 
-      self.action_result.success = True
-      self.action_result.posesDetected = self.current_detected_poses
-      self._action_server.set_succeeded(self.action_result)
+      self.action_result.success = res
+      if(res):
+          self.action_result.posesDetected = self.current_detected_poses
+          self._action_server.set_succeeded(self.action_result)
+      else:
+          self.action_result.posesDetected = PoseArray()
+          self._action_server.set_succeeded(self.action_result)
 
 
     # Callback
@@ -121,11 +125,12 @@ class BlobDetection(object):
           self.current_detected_poses.poses = tmp_pose_array
           # Publish the results   
           self.pub_cloud_pos.publish(self.current_detected_poses)
- 
+
+          return True
           # Slow down this node and reduce data transfer for image
           #rospy.sleep(0.01)
       else:
-          pass
+          return False  
 
           # Convert the blob position image in the 3D camera system
           # Publish the results   
