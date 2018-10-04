@@ -209,23 +209,24 @@ class KittingClass(O2ASBaseRoutines):
     #TODO Esure that the the motion is finished before generating the mask.
 
     #TODO not sure if the sleep is necessary is move_lin wait for the motion to be finished?
-    rospy.sleep(1)
+    rospy.sleep(2)
 
+    mask_margin = 0.0
     point_top1 = geometry_msgs.msg.PointStamped()
     point_top1.header.frame_id = str(bin_id)+"_bottom_front_right_corner"
-    point_top1.point = geometry_msgs.msg.Point(0.0, 0.0, 0.0)
+    point_top1.point = geometry_msgs.msg.Point(-mask_margin, -mask_margin, 0.0)
 
     point_top2 = geometry_msgs.msg.PointStamped()
     point_top2.header.frame_id = str(bin_id)+"_bottom_back_right_corner"
-    point_top2.point = geometry_msgs.msg.Point(0.0, 0.0, 0.0)
+    point_top2.point = geometry_msgs.msg.Point(mask_margin, -mask_margin, 0.0)
 
     point_top3 = geometry_msgs.msg.PointStamped()
     point_top3.header.frame_id = str(bin_id)+"_bottom_back_left_corner"
-    point_top3.point = geometry_msgs.msg.Point(0.0, 0.0, 0.0)
+    point_top3.point = geometry_msgs.msg.Point(mask_margin, mask_margin, 0.0)
 
     point_top4 = geometry_msgs.msg.PointStamped()
     point_top4.header.frame_id = str(bin_id)+"_bottom_front_left_corner"
-    point_top4.point = geometry_msgs.msg.Point(0.0, 0.0, 0.0)
+    point_top4.point = geometry_msgs.msg.Point(-mask_margin, mask_margin, 0.0)
 
     #TODO change the fisheye from to the depth frame in casse of offset. but fisheye should e ok since the two images are aligned (depth and rgb) after the real sense node
     point_top1_cam = self.listener.transformPoint("a_bot_camera_depth_optical_frame", point_top1).point
@@ -255,14 +256,14 @@ class KittingClass(O2ASBaseRoutines):
 
 
 #for gazebo
-#    cameraMatK = np.array([[554.3827128226441, 0.0, 320.5],
-#                           [0.0, 554.3827128226441, 240.5],
-#                           [0.0, 0.0, 1.0]])
+    cameraMatK = np.array([[554.3827128226441, 0.0, 320.5],
+                           [0.0, 554.3827128226441, 240.5],
+                           [0.0, 0.0, 1.0]])
 
 #for ID Realsense on robot ID61*41   width 640 height 360
-    cameraMatK = np.array([[461.605774, 0.0, 318.471497],
-                           [0.0, 461.605804, 180.336258],
-                           [0.0, 0.0, 1.0]])
+#    cameraMatK = np.array([[461.605774, 0.0, 318.471497],
+#                           [0.0, 461.605804, 180.336258],
+#                           [0.0, 0.0, 1.0]])
 
 
     point_top1_cam_np = np.array([point_top1_cam.x, point_top1_cam.y, point_top1_cam.z])   
@@ -301,7 +302,26 @@ class KittingClass(O2ASBaseRoutines):
     poseArrayRes = geometry_msgs.msg.PoseArray()    
     poseArrayRes = result.posesDetected 
 
-   
+    #TODO Sort pose in the midle of the bin
+    #min x min y in the bin frame
+
+    if(result.success): 
+
+        distanceToBinCenter = []
+        for i in range(len(poseArrayRes.poses)): 
+            pointCam = geometry_msgs.msg.PointStamped()
+            pointCam.header = poseArrayRes.header
+            pointCam.point = poseArrayRes.poses[i].point
+            pointBin = t.transformPoint(bin_id, pointCam)
+            distanceToBinCenter.append(math.sqrt(pointBin.point.x*pointBin.point.x + pointBin.point.y*pointBin.point.y))
+        minPoseIndex = np.argmin(distanceToBinCenter)
+         
+        rospy.loginfo("pose closest to the bin center in the xy plane")
+        rospy.loginfo(poseArrayRes.poses[minPoseIndex])
+    else:
+        rospy.loginfo("no pose detected")
+    #TODO if nothing is detected move the camera a bit to try to detect somethin
+
     #mask_img = Image.new('L', (640,480), 0)
     #ImageDraw.Draw(mask_img).polygon(mask_polygon, outline = 1, fill = 255)
     #mask_image_np = np.array(mask_img)
@@ -745,7 +765,7 @@ if __name__ == '__main__':
     
 
     ##### EXAMPLE 3 (How to look into a bin)
-    kit.go_to_named_pose("home", "a_bot")
+    #kit.go_to_named_pose("home", "a_bot")
     kit.view_bin("a_bot", "set2_bin1_4")
 
     ##### OLD CODE
