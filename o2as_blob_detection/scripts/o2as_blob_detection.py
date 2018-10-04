@@ -25,8 +25,8 @@ class BlobDetection(object):
     def __init__(self):
         #Variable
         self.bridge = CvBridge()
-        current_image = Image()
-        current_cloud = PointCloud2()
+        self.current_image = Image()
+        self.current_cloud = PointCloud2()
         self.current_detected_poses = PoseArray() 
 
         # Config parameters
@@ -88,7 +88,7 @@ class BlobDetection(object):
 
 
       img_cv = self.bridge.imgmsg_to_cv2(self.current_image , desired_encoding="passthrough")
-      #cv2.imwrite('/root/catkin_ws/original_image.png',img_cv)
+      cv2.imwrite('/root/catkin_ws/original_image.png',img_cv)
       img = np.asarray(img_cv)[:, :, ::-1]
       # Apply the mask
       mask_u = 200
@@ -180,7 +180,7 @@ class BlobDetection(object):
         #mask_cv = cv2.imread(mask_img,0)
         img_cv = in_img_cv
         out_img = cv2.bitwise_and(img_cv,img_cv, mask = mask_image_np)
-        #cv2.imwrite('/root/catkin_ws/masked_image.png',out_img)
+        cv2.imwrite('/root/catkin_ws/masked_image.png',out_img)
         return out_img
 
     def detect_blob(self, img):
@@ -242,7 +242,7 @@ class BlobDetection(object):
         im_with_keypoints = cv2.drawKeypoints(im_rgb, keypoints, np.array([]), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     
         # Show blobs
-        #cv2.imwrite("/root/catkin_ws/blob_detection_results.png", im_with_keypoints)
+        cv2.imwrite("/root/catkin_ws/blob_detection_results.png", im_with_keypoints)
 
         blob_array = []
      
