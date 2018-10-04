@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<launch>
+
+  <!-- args -->
+  <arg name="robot_name" default="b_bot"/>  <!-- "a_bot", "b_bot", or "c_bot" -->
+  <arg name="camera_name" default="b_bot_camera"/>  <!-- "a_bot_camera", "b_bot_camera", or "c_bot_camera" -->
+
+	<!-- Start camera -->
+	<arg name="camera_serial_number" default="616205004841"/>
+	<include file="$(find o2as_realsense_camera)/launch/camera.launch">
+		<arg name="serial_number" value="$(arg camera_serial_number)"/>
+		<arg name="camera_name" default="$(arg camera_name)"/>
+        <arg name="trigger_mode" value="true"/>
+        <arg name="send_color" value="true"/>
+        <arg name="send_depth" value="false"/>
+        <arg name="send_cloud" value="true"/>
+	</include>
+
+	<!-- Start calibration -->
+	<include file="$(find o2as_calibration)/launch/online_calibration.launch">
+    <arg name="robot_name" value="$(arg robot_name)"/>
+    <arg name="camera_name" value="$(arg camera_name)"/>
+    <arg name="eye_on_hand" value="true"/>
+  </include>
+
+</launch>
