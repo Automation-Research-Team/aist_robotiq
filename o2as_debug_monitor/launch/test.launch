@@ -29,6 +29,7 @@
         topic_name: /c_bot_camera/depth/image_raw
         col: [0, 12]
         row: [8, 15]
+        vrange: [0, 64]
       phoxi_texture:
         topic_name: /a_phoxi_m_camera/texture
         col: [0, 15]
@@ -61,11 +62,34 @@
         offset: [8, 32]
         n_history: 7
 
+    suction_success_topics:
+      suction_success_m3:
+        topic_name: /screw_tool_m3/screw_suctioned
+        str: m3_suction
+        col: [24, 31]
+        row: [13, 15]
+        offset: [8, 32]
+        index: 0
+      suction_success_m4:
+        topic_name: /screw_tool_m4/screw_suctioned
+        str: m4_suction
+        col: [24, 31]
+        row: [13, 15]
+        offset: [8, 32]
+        index: 1
+      suction_success_m6:
+        topic_name: /screw_tool_m6/screw_suctioned
+        str: m6_suction
+        col: [24, 31]
+        row: [13, 15]
+        offset: [8, 32]
+        index: 2
+
     kitting_set_id_topics:
       kitting_item_set:
         topic_name: /o2as_state/kitting_set_id
         col: [24, 31]
-        row: [0, 19]
+        row: [0, 12]
         offset: [8, 32]
   </rosparam>
 

@@ -9,6 +9,7 @@
 #include <std_msgs/Int32.h>
 #include <std_msgs/Float64.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -24,6 +25,8 @@ using StringCallback =
   boost::function<void(const std_msgs::String::ConstPtr&)>;
 using KittingSetIdCallback =
   boost::function<void(const std_msgs::Int32::ConstPtr&)>;
+using SuctionSuccessCallback =
+  boost::function<void(const std_msgs::Bool::ConstPtr&)>;
 using RosParam = XmlRpc::XmlRpcValue;
 
 const int font_face_ = cv::FONT_HERSHEY_DUPLEX;
@@ -251,6 +254,50 @@ KittingSetIdCallback getCallbackForKittingSetId(
   };
 }
 
+void updateSuctionSuccess(cv::Rect rect, cv::Mat& monitor_,
+  std::vector<std::string> &suction_success_str, int offset_x, int offset_y)
+{
+  check_window();
+  clear_buffer_rect(rect, monitor_);
+
+  int i = 0;
+  for (auto it = suction_success_str.begin(); it != suction_success_str.end(); it++)
+  {
+    putText(monitor_, rect.x + offset_x, rect.y + offset_y + 32 * i, *it);
+    i++;
+  }
+
+  // Copy the image buffer in the window
+  cv::imshow("Monitor", monitor_);
+  cv::waitKey(3);
+}
+
+SuctionSuccessCallback getCallbackForSuctionSuccess(
+  cv::Rect rect, XmlRpc::XmlRpcValue &params, cv::Mat& monitor_,
+  std::vector<std::string>& suction_success_str
+)
+{
+  // Values captured by closure
+  int offset_x = params["offset"][0];
+  int offset_y = params["offset"][1];
+  int index = params["index"];
+  std::string str = params["str"];
+
+  suction_success_str.push_back(std::string("---"));
+
+  // This function returns callback function
+  return [=, &suction_success_str](const std_msgs::Bool::ConstPtr& msg) mutable {
+    check_window();
+    char buf[255];
+    sprintf(buf, "%s: %s", str.c_str(), msg->data ? "True" : "False");
+    suction_success_str[index] = std::string(buf);
+    if (index == 0) {
+      updateSuctionSuccess(rect, monitor_, suction_success_str, offset_x,
+                           offset_y);
+    }
+  };
+}
+
 namespace o2as_debug_monitor
 {
   class Monitor
@@ -289,6 +336,12 @@ namespace o2as_debug_monitor
         nh.getParam("o2as_debug_monitor/kitting_set_id_topics",
                     kitting_set_id_topics);
         setKittingSetIdCallbacks(nh, kitting_set_id_topics);
+
+        // Set callback function for suction success topics
+        XmlRpc::XmlRpcValue suction_success_topics;
+        nh.getParam("o2as_debug_monitor/suction_success_topics",
+                    suction_success_topics);
+        setSuctionSuccessCallbacks(nh, suction_success_topics);
       }
 
     private:
@@ -298,8 +351,11 @@ namespace o2as_debug_monitor
       std::vector<CamInfoCallback> caminfocbs_;
       std::vector<StringCallback> stringcbs_;
       std::vector<KittingSetIdCallback> setidcbs_;
+      std::vector<SuctionSuccessCallback> sscbs_;
 
       cv::Mat monitor_;
+
+      std::vector<std::string> suction_success_str;
 
       int width;
       int height;
@@ -415,7 +471,27 @@ namespace o2as_debug_monitor
           );
           n_sub_rs_.push_back(nh.subscribe(topic_name, 1, setidcbs_.back()));
         }
+      }
 
+      void setSuctionSuccessCallbacks(ros::NodeHandle &nh,
+                                      XmlRpc::XmlRpcValue topics)
+      {
+        for (auto it = topics.begin(); it != topics.end(); it++)
+        {
+          auto params = topics[it->first];
+          std::string topic_name = params["topic_name"];
+          ROS_INFO("%s", topic_name.c_str());
+
+          // Area in the debug monitor
+          cv::Rect rect = getRect(params);
+
+          // Create, set and keep callback function
+          sscbs_.push_back(
+            getCallbackForSuctionSuccess(rect, params, monitor_,
+                                         suction_success_str)
+          );
+          n_sub_rs_.push_back(nh.subscribe(topic_name, 1, sscbs_.back()));
+        }
       }
   };
 
