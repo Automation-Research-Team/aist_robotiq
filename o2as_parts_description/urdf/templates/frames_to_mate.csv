@@ -26,9 +26,3 @@ assy_part_12_center, assy_part_13_center,   0, 0, 0,   0.00475+0.009,0,0, Spacer
 assy_part_13_center, assy_part_14_inserted,   0, 0, 0,   0,0,0, Pulley + Screw
 assy_part_03_pulley_ridge_middle, assy_part_16_center,   0, 0, 0,   -(0.005+.001),0,0, Panel2 + Washer
 assy_part_16_center, assy_part_15_center,   0, 0, pi,   .001+.0025,0,0, Washer + Nut
-
-
-
-
-
-#assy_part_, assy_part_,   0, 0, 0,   0,0,0, -
