@@ -1347,9 +1347,10 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     bool_msg_pointer = ros::topic::waitForMessage<std_msgs::Bool>("/" + screw_tool_id + "/screw_suctioned", ros::Duration(1.0));
-    if(bool_msg_pointer != NULL){
+    if (bool_msg_pointer != NULL){
       screw_picked = bool_msg_pointer->data;
     }
+    else if (!use_real_robot_) screw_picked = true;
 
     if ((RealRadius > max_radius) || (!ros::ok()))
       break;
@@ -1725,8 +1726,14 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
     std::string screw_tool_id = "screw_tool_m" + std::to_string(goal->screw_size);
     std::string screw_tool_link = goal->robot_name + "_screw_tool_m" + std::to_string(goal->screw_size) + "_tip_link";
     std::string fastening_tool_name = "screw_tool_m" + std::to_string(goal->screw_size);
-    pickScrew(goal->item_pose, screw_tool_id, goal->robot_name, screw_tool_link, fastening_tool_name);
+    bool screw_picked = pickScrew(goal->item_pose, screw_tool_id, goal->robot_name, screw_tool_link, fastening_tool_name);
     goToNamedPose("screw_pick_ready", goal->robot_name);
+    if (!screw_picked)
+    {
+      ROS_INFO("pickAction has failed to pick the screw");
+      pickActionServer_.setAborted();
+      return;
+    }
   }
   else if (goal->tool_name == "suction")
   {;} // TODO: Here is space for code from AIST.
