@@ -177,7 +177,7 @@ class URScriptRelay():
             program_front = self.spiral_motion_template
             program_back = ""
             if (req.radius_increment < 0.0001) or (req.radius_increment > 0.005):
-                rospy.logerror("radius_incr needs to be between 0.0001 and 0.005 but is " + str(req.radius_increment))
+                rospy.logerr("radius_incr needs to be between 0.0001 and 0.005 but is " + str(req.radius_increment))
             if not req.acceleration:
                 req.acceleration = 0.1
             if not req.velocity:
