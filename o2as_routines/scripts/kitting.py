@@ -24,7 +24,7 @@ import csv
 import os
 import random
 
-
+from geometry_msgs.msg import Polygon, Point32
 from PIL import Image, ImageDraw
 
 LOG_LEVEL = log_level = rospy.DEBUG
@@ -47,6 +47,10 @@ class KittingClass(O2ASBaseRoutines):
     # services
     self._suction = rospy.ServiceProxy("o2as_usb_relay/set_power", SetPower)
     self._search_grasp = rospy.ServiceProxy("search_grasp", SearchGrasp)
+
+    # action
+    self.blob_detection_client = actionlib.SimpleActionClient('blob_detection_action', o2as_msgs.msg.blobDetectionAction)
+    self.blob_detection_client.wait_for_server()  
 
     self.initial_setup()
     rospy.sleep(.5)
@@ -79,7 +83,7 @@ class KittingClass(O2ASBaseRoutines):
       if value == "suction":
         self.suction_ids.append(key)
 
-    rospy.loginfo(suction_ids)
+    rospy.loginfo(self.suction_ids)
 
     self.part_position_in_tray = {
       4 : "tray_1_partition_4",
@@ -196,7 +200,7 @@ class KittingClass(O2ASBaseRoutines):
     #res = self.go_to_pose_goal(group_name, goal_pose, speed_slow, "a_bot_camera_depth_frame")
     #goal orientation for gripper
     goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 + 20*pi/180, 0))
-    res = self.move_lin(group_name, goal_pose, speed_slow, "")
+    res = self.move_lin(group_name, goal_pose, speed_slow, end_effector_link="")
     if not res:
       rospy.loginfo("Couldn't go to the target.")
     #TODO Problem with gazebo controller while controlling the robot with movelin
@@ -251,15 +255,14 @@ class KittingClass(O2ASBaseRoutines):
 
 
 #for gazebo
-    cameraMatK = np.array([[554.3827128226441, 0.0, 320.5],
-                           [0.0, 554.3827128226441, 240.5],
-                           [0.0, 0.0, 1.0]])
-
-#for ID Realsense on robot ID61*41   width 640 height 360
-#    cameraMatK = np.array([[461.605774, 0.0, 318.471497],
-#                           [0.0, 461.605804, 180.336258],
+#    cameraMatK = np.array([[554.3827128226441, 0.0, 320.5],
+#                           [0.0, 554.3827128226441, 240.5],
 #                           [0.0, 0.0, 1.0]])
 
+#for ID Realsense on robot ID61*41   width 640 height 360
+    cameraMatK = np.array([[461.605774, 0.0, 318.471497],
+                           [0.0, 461.605804, 180.336258],
+                           [0.0, 0.0, 1.0]])
 
 
     point_top1_cam_np = np.array([point_top1_cam.x, point_top1_cam.y, point_top1_cam.z])   
@@ -281,16 +284,29 @@ class KittingClass(O2ASBaseRoutines):
     #print(point_top4_img_np)
     #print(point_test_center_img_np)
 
-    polygon = [(point_top1_img_np[0]/point_top1_img_np[2],point_top1_img_np[1]/point_top1_img_np[2]),
-               (point_top2_img_np[0]/point_top2_img_np[2],point_top2_img_np[1]/point_top2_img_np[2]),
-               (point_top3_img_np[0]/point_top3_img_np[2],point_top3_img_np[1]/point_top3_img_np[2]),
-               (point_top4_img_np[0]/point_top4_img_np[2],point_top4_img_np[1]/point_top4_img_np[2])]
+    mask_polygon = Polygon()
+    mask_polygon.points = [Point32(point_top1_img_np[0]/point_top1_img_np[2],point_top1_img_np[1]/point_top1_img_np[2],0),
+                    Point32(point_top2_img_np[0]/point_top2_img_np[2],point_top2_img_np[1]/point_top2_img_np[2],0),
+                    Point32(point_top3_img_np[0]/point_top3_img_np[2],point_top3_img_np[1]/point_top3_img_np[2],0),
+                    Point32(point_top4_img_np[0]/point_top4_img_np[2],point_top4_img_np[1]/point_top4_img_np[2],0)]
 
-    mask_img = Image.new('L', (640,480), 0)
-    ImageDraw.Draw(mask_img).polygon(polygon, outline = 1, fill = 255)
-    mask_image_np = np.array(mask_img)
-    namefile = "mask_"+str(bin_id)+".png"
-    mask_img.save(namefile,'PNG')
+    goal = o2as_msgs.msg.blobDetectionGoal()
+    goal.maskCorner = mask_polygon
+    self.blob_detection_client.send_goal(goal)
+    self.blob_detection_client.wait_for_result()
+    result = self.blob_detection_client.get_result()
+    rospy.loginfo(result)
+
+    #TODO select which poses to choose in the array
+    poseArrayRes = geometry_msgs.msg.PoseArray()    
+    poseArrayRes = result.posesDetected 
+
+   
+    #mask_img = Image.new('L', (640,480), 0)
+    #ImageDraw.Draw(mask_img).polygon(mask_polygon, outline = 1, fill = 255)
+    #mask_image_np = np.array(mask_img)
+    #namefile = "mask_"+str(bin_id)+".png"
+    #mask_img.save(namefile,'PNG')
 
 
     #used to do the bitwise comparison between the mask and the original image
@@ -664,10 +680,12 @@ class KittingClass(O2ASBaseRoutines):
         pick_pose.header.frame_id = self.part_bin_location[part_id]
         pick_pose.pose.orientation = self.downward_orientation
         if self.grip_strategy[part_id] == "suction":
-          self.do_change_tool_action("b_bot", equip=True, 50)   # 50 = suction tool
+          self.do_change_tool_action("b_bot", equip=True, screw_size=50)   
+          # 50 = suction tool
           # Set orientation
           # self.pick()
-          self.do_change_tool_action("b_bot", equip=False, 50)   # 50 = suction tool
+	  self.do_change_tool_action("b_bot", equip=False, screw_size=50)   
+          # 50 = suction tool
           
         # TODO: Get height from camera
         grasp_height = .01
@@ -683,8 +701,8 @@ class KittingClass(O2ASBaseRoutines):
         
         grasped = False
         while not grasped:
-          grasped = self.pick(robot_name, pick_pose, grasp_height, speed_fast = 0.3, speed_slow = 0.02, 
-                      gripper_command, approach_height = 0.05)
+#          grasped = self.pick(robot_name, pick_pose, grasp_height, speed_fast = 0.3, speed_slow = 0.02, 
+#                      gripper_command, approach_height = 0.05)
           pick_pose.pose.position.x = random.uniform(-.03, .03)
           pick_pose.pose.position.y = random.uniform(-.03, .03)
         # TODO: Do suction pickup
@@ -713,12 +731,12 @@ if __name__ == '__main__':
 
     ##### EXAMPLE 2
     # kit.go_to_named_pose("home", "a_bot")
-    pick_pose = geometry_msgs.msg.PoseStamped()
-    pick_pose.header.frame_id = "set2_bin1_5"
-    pick_pose.pose.orientation = kit.downward_orientation
-    pick_pose.pose.position.y = .03
-    kit.pick("a_bot", pick_pose, -0.01, speed_fast = 0.2, speed_slow = 0.02, 
-                   gripper_command="easy_pick_outside_only_inner", approach_height = 0.05)
+    #pick_pose = geometry_msgs.msg.PoseStamped()
+    #pick_pose.header.frame_id = "set2_bin1_5"
+    #pick_pose.pose.orientation = kit.downward_orientation
+    #pick_pose.pose.position.y = .03
+    #kit.pick("a_bot", pick_pose, -0.01, speed_fast = 0.2, speed_slow = 0.02, 
+    #               gripper_command="easy_pick_outside_only_inner", approach_height = 0.05)
     # kit.go_to_named_pose("home", "a_bot")
     # place_pose = geometry_msgs.msg.PoseStamped()
     # place_pose.header.frame_id = "tray_2_partition_4"
@@ -727,7 +745,8 @@ if __name__ == '__main__':
     
 
     ##### EXAMPLE 3 (How to look into a bin)
-    # kit.view_bin("a_bot", "set2_bin1_4")
+    kit.go_to_named_pose("home", "a_bot")
+    kit.view_bin("a_bot", "set2_bin1_4")
 
     ##### OLD CODE
     # kit.pick_and_place_demo()
