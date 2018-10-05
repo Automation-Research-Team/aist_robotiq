@@ -29,7 +29,7 @@
 
   <!-- Scene items (trays, bins...) -->
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/taskboard_scene.xacro" /> -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xa -->cro" />
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/assembly_scene.xacro" /> -->
   
   <!-- Robot bases -->
@@ -198,12 +198,18 @@
 			marker_id="26">
     <origin xyz="0.0 0.0 0.0185" rpy="0 0 0"/>
   </xacro:o2as_ar_marker>
+  <xacro:o2as_ar_marker prefix="workspace_"
+			parent="workspace_center"
+			marker_id="256">
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+  </xacro:o2as_ar_marker>
 
   <!-- Add PhoXi 3D scanners -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />
   <xacro:phoxi_m_camera prefix="a_" parent="o2as_ground">
     <!-- <origin xyz="0.56 0 ${bots_z + .1 + .8}" rpy="${-160*pi/180} 0 ${pi/2}"/> -->
-    <origin xyz="0.46 0 ${bots_z + .1 + .8}" rpy="${-160*pi/180} 0 ${pi/2}"/>
+    <origin xyz="0.56824 -0.0047217 1.3994"
+	    rpy="${-154.926*pi/180} ${-0.221*pi/180} ${89.704*pi/180}"/>
   </xacro:phoxi_m_camera>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->

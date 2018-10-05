@@ -7,7 +7,6 @@ Panels:
         - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
         - /TF1
-        - /TF1/Frames1
         - /PointCloud21
       Splitter Ratio: 0.5
     Tree Height: 230
@@ -29,7 +28,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: Image
+    SyncSource: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -2840,11 +2839,11 @@ Visualization Manager:
         a_bot_wrist_3_link:
           Value: false
         a_phoxi_m_camera:
-          Value: false
-        a_phoxi_m_camera_link:
           Value: true
-        a_phoxi_m_sensor:
+        a_phoxi_m_camera_link:
           Value: false
+        a_phoxi_m_sensor:
+          Value: true
         b_bot_ar_marker:
           Value: true
         b_bot_base:

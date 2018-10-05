@@ -1,21 +1,27 @@
 <?xml version="1.0" ?>
 <launch>
-  <arg name="robot_name"/>  <!-- "a_bot", "b_bot", or "c_bot" -->
-  <arg name="move_group"	value  ="$(arg robot_name)"/>
+  <arg name="robot_name"	default="b_bost"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
-  <arg name="namespace_prefix"	value  ="o2as_easy_handeye_$(arg robot_name)"/>
   <arg name="marker_size"	default="0.07"
        doc="Size of the ArUco marker used, in meters"/>
-  <arg name="marker_id"		default="26"/>
   <arg name="config"		default="sim"/>
+
+  <arg name="eye_on_hand"	value="false"
+       if="$(eval arg('camera_name') == 'a_phoxi_m_camera')" />
+  <arg name="eye_on_hand"	value="true"
+       if="$(eval arg('camera_name') == 'a_bot_camera')" />
+  
+  <arg name="move_group"	value  ="$(arg robot_name)"/>
+  <arg name="namespace_prefix"	value  ="o2as_easy_handeye_$(arg robot_name)"/>
 
   <param name="use_real_robot"	value="false"
 	 if="$(eval arg('config') == 'sim')"/>
   
   <!-- Set AR marker ID -->
-  <!-- <arg name="marker_id" value="17"  if="$(eval arg('robot_name') == 'a_bot')"/> -->
-  <!-- <arg name="marker_id" value="26"  if="$(eval arg('robot_name') == 'b_bot')"/> -->
-  <!-- <arg name="marker_id" value="256" if="$(eval arg('robot_name') == 'c_bot')"/> -->
+  <arg name="marker_id"		value="26"
+       unless="$(eval arg('camera_name') == 'a_bot_camera')"/>
+  <arg name="marker_id"		value="256"
+       if="$(eval arg('robot_name') == 'a_bot_camera')"/>
 
   <!-- Start ArUco -->
   <!-- <node name="aruco_tracker" pkg="aruco_ros" type="single"> -->
@@ -63,8 +69,7 @@
   <!-- Start easy_handeye calibrator -->
   <include file="$(find o2as_easy_handeye)/launch/calibrate.launch">
     <arg name="namespace_prefix"	value="$(arg namespace_prefix)"/>
-    <arg name="eye_on_hand"		value="false"/>
-
+    <arg name="eye_on_hand"		value="$(arg eye_on_hand)"/>
     <arg name="tracking_base_frame"	value="camera_link"/>
     <arg name="tracking_marker_frame"	value="camera_marker"/>
     <arg name="robot_base_frame"	value="$(arg robot_name)_base_link"/>
