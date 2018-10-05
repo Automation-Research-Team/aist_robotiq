@@ -30,21 +30,21 @@ class PartsInfo(object):
         return repr((self.parts_name, self.bin_type, self.bin_name))
 
 bin_type = {
-    4 : "bin_2",
-    5 : "bin_2",
-    6 : "bin_3",
-    7 : "bin_2",
-    8 : "bin_2",
-    9 : "bin_1",
-    10: "bin_1",
-    11: "bin_2",
-    12: "bin_1",
-    13: "bin_2",
-    14: "bin_1",
-    15: "bin_1",
-    16: "bin_1",
-    17: "bin_1",
-    18: "bin_1"
+    4 : "bin2",
+    5 : "bin2",
+    6 : "bin3",
+    7 : "bin2",
+    8 : "bin2",
+    9 : "bin1",
+    10: "bin1",
+    11: "bin2",
+    12: "bin1",
+    13: "bin2",
+    14: "bin1",
+    15: "bin1",
+    16: "bin1",
+    17: "bin1",
+    18: "bin1"
 }
 
 def write_part_bin_list(parts_bin_dict):
@@ -59,7 +59,7 @@ def convert_parts_info_to_dict(bin_layout):
     parts_info_dict["part_bin_list"] = dict()
 
     for b in bin_layout:
-        parts_info_dict["part_bin_list"][int(b.parts_name.strip("parts_"))] = b.bin_name
+        parts_info_dict["part_bin_list"][int(b.parts_name.strip("part_"))] = b.bin_name
 
     return parts_info_dict
 
@@ -102,7 +102,7 @@ def make_parts_info_list(part_set):
     parts_info_list = list()
 
     for part in part_set:
-        parts_info_list.append(PartsInfo("parts_"+str(part), bin_type[part]))
+        parts_info_list.append(PartsInfo("part_"+str(part), bin_type[part]))
 
     return parts_info_list
 
