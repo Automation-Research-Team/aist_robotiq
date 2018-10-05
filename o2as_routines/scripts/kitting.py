@@ -211,24 +211,35 @@ class KittingClass(O2ASBaseRoutines):
       goal_pose_incline.header.frame_id = bin_id
       goal_pose_incline.pose.position.x = 0
       goal_pose_incline.pose.position.y = 0.035
-      goal_pose_incline.pose.position.z = 0.2
+      goal_pose_incline.pose.position.z = 0.25
       goal_pose_incline.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
       res = self.move_lin(group_name, goal_pose_incline, speed_slow, "")
+      rospy.sleep(2.0)
 
       #Check posture of the screw
       rospy.loginfo("Begin check motion")
+      goal_pose_ = geometry_msgs.msg.PoseStamped()
+      goal_pose_.header.frame_id = "a_bot_gripper_tip_link"
+      goal_pose_.pose.position.x = 0
+      goal_pose_.pose.position.y = 0
+      goal_pose_.pose.position.z = 0
+      goal_pose_.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/4 , 0, 0))
+      res = self.move_lin(group_name, goal_pose_, speed_slow, "")
+      rospy.sleep(2.0)
+     
       goal_pose_incline = geometry_msgs.msg.PoseStamped()
       goal_pose_incline.header.frame_id = "a_bot_gripper_tip_link"
-      goal_pose_incline.pose.position.x = -0.18
+      goal_pose_incline.pose.position.x = 0
       goal_pose_incline.pose.position.y = 0
       goal_pose_incline.pose.position.z = 0
-      goal_pose_incline.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, -0.52*pi, 0))
+      goal_pose_incline.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0 , -0.52*pi,0))
       #goal_pose_incline.header.frame_id = bin_id
       #goal_pose_incline.pose.position.x = posx
       #goal_pose_incline.pose.position.y = posy
       #goal_pose_incline.pose.position.z = posz
       #goal_pose_incline.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi/2 , -pi/2))
       res = self.move_lin(group_name, goal_pose_incline, speed_slow, "")
+      rospy.sleep(2.0)
 
       rospy.loginfo("Ending check motion")
       if not res:
@@ -824,7 +835,7 @@ if __name__ == '__main__':
     kit.go_to_named_pose("home", "a_bot")
     kit.go_to_named_pose("home", "b_bot")
 
-    kit.pick_screw_precision_gripper("a_bot", "set2_bin1_4", screw_size= 4)
+    kit.pick_screw_precision_gripper("a_bot", "set2_bin1_3", screw_size= 4)
 
     ##### OLD CODE
     # kit.pick_and_place_demo()
