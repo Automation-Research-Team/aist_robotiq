@@ -451,7 +451,7 @@ class KittingClass(O2ASBaseRoutines):
             pointCam = geometry_msgs.msg.PointStamped()
 
             #simulation only
-            poseArrayRes.header.frame_id = "a_bot_camera_fisheye_optical_frame"
+            #poseArrayRes.header.frame_id = "a_bot_camera_fisheye_optical_frame"
             pointCam.header = poseArrayRes.header
             print("pointCam.header")
             print(pointCam.header)
