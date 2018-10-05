@@ -730,7 +730,7 @@ class O2ASBaseRoutines(object):
     except rospy.ROSInterruptException:
         rospy.loginfo("program interrupted before completion", file=sys.stderr)
   
-  def precision_gripper_inner_open_slightly(self, this_action_grasps_an_object = False, open_range):
+  def precision_gripper_inner_open_slightly(self, this_action_grasps_an_object = False, open_range = 30):
     try:
       action_client = self.gripper_action_clients["a_bot"]
       goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
@@ -745,5 +745,5 @@ class O2ASBaseRoutines(object):
       result = self.gripper_action_clients["a_bot"].get_result()
       rospy.loginfo(result)
     except rospy.ServiceException, e:
-        print "Service call failed: %s"%e
+        rospy.logerror("Service call failed: %s", e)
 

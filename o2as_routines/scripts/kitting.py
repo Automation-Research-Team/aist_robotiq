@@ -45,7 +45,7 @@ class KittingClass(O2ASBaseRoutines):
     # self.tray_id = rospy.get_param('tray_id')
     
     #subscribe to gripper position
-    self._inner_gripper_pos_sub = rospy.Subscriber("o2as_precision_gripper/inner_gripper_motor_pos", std_msgs.msg.Int32, update_motorPosition)
+    self._inner_gripper_pos_sub = rospy.Subscriber("o2as_precision_gripper/inner_gripper_motor_pos", std_msgs.msg.Int32, self.update_motorPosition)
     self._motorPos = -1
 
     # services
@@ -56,7 +56,7 @@ class KittingClass(O2ASBaseRoutines):
     rospy.sleep(.5)
     rospy.loginfo("Kitting task ready!")
 
-  def update_motorPosition(self, data)
+  def update_motorPosition(self, data):
     self._motorPos = data
 
   def initial_setup(self):
@@ -86,7 +86,7 @@ class KittingClass(O2ASBaseRoutines):
       if value == "suction":
         self.suction_ids.append(key)
 
-    rospy.loginfo(suction_ids)
+    rospy.loginfo(self.suction_ids)
 
     self.part_position_in_tray = {
       4 : "tray_1_partition_4",
@@ -200,55 +200,75 @@ class KittingClass(O2ASBaseRoutines):
     posy = 0
     posz = 0.08
 
-    while (!success_pick)
-    {
+    while (not success_pick):
       #Random pick
-      self.naive_pick("b_bot", bin_id, speed_fast, speed_slow, approach_height, bin_eff_height, bin_eff_xoff, bin_eff_yoff, bin_eff_deg_angle, end_effector_link)
+      self.naive_pick(group_name, bin_id, speed_fast, speed_slow, approach_height, posz, posx, posy, bin_eff_deg_angle, end_effector_link)
 
-      #Check posture of the screw
+
+      #Go to the center to start the screw checking
+      rospy.loginfo("Go to the center to start the screw checking")
       goal_pose_incline = geometry_msgs.msg.PoseStamped()
       goal_pose_incline.header.frame_id = bin_id
-      goal_pose_incline.pose.position.x = posx
-      goal_pose_incline.pose.position.y = posy
-      goal_pose_incline.pose.position.z = posz
-      goal_pose_incline.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, -pi/4 , 0))
+      goal_pose_incline.pose.position.x = 0
+      goal_pose_incline.pose.position.y = 0.035
+      goal_pose_incline.pose.position.z = 0.2
+      goal_pose_incline.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
       res = self.move_lin(group_name, goal_pose_incline, speed_slow, "")
+
+      #Check posture of the screw
+      rospy.loginfo("Begin check motion")
+      goal_pose_incline = geometry_msgs.msg.PoseStamped()
+      goal_pose_incline.header.frame_id = "a_bot_gripper_tip_link"
+      goal_pose_incline.pose.position.x = -0.18
+      goal_pose_incline.pose.position.y = 0
+      goal_pose_incline.pose.position.z = 0
+      goal_pose_incline.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, -0.52*pi, 0))
+      #goal_pose_incline.header.frame_id = bin_id
+      #goal_pose_incline.pose.position.x = posx
+      #goal_pose_incline.pose.position.y = posy
+      #goal_pose_incline.pose.position.z = posz
+      #goal_pose_incline.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi/2 , -pi/2))
+      res = self.move_lin(group_name, goal_pose_incline, speed_slow, "")
+
+      rospy.loginfo("Ending check motion")
       if not res:
         rospy.loginfo("Couldn't go to the target.")
       #TODO Problem with gazebo controller while controlling the robot with movelin
         return False
 
       #Open just a bit the gripper
-      if(screw_size == 4)
+      if(screw_size == 4):
         open_range = 80
       elif(screw_size == 3):
         open_range = 60
       else:
         rospy.logerror("Screw size is wrong")
         open_range = 0
-
-      self.precision_gripper_inner_open_slightly(open_range)
+      rospy.loginfo("begin inner open slightly")
+      #self.precision_gripper_inner_open_slightly(open_range)
+      rospy.loginfo("ending inner open slightly")
       rospy.sleep(1.0)
       #Close the gripper fully
       self.send_gripper_command(gripper= "precision_gripper_inner", command="open")
       rospy.sleep(0.1)
       #Check the motor position 
-      if(abs(self._motorPos - close_pos) > 25 )
-        success_pick = True
-      else:
-        bin_eff_xoff =  posx - 0.01
+      #Simulation only
+      rospy.loginfo("successs check commented only for the smulation")
+      #if(abs(self._motorPos - close_pos) > 25 ):
+      success_pick = True
+      #else:
+      #  bin_eff_xoff =  posx - 0.01
         #bin_eff_yoff = bin_eff_yoff - 0.01
         #Ask for another candidate pose to the graspability program
       
-      rospy.loginfo("Try to pick another screw")
-    }
+      ##rospy.loginfo("Try to pick another screw")
 
     goal_pose_pick = geometry_msgs.msg.PoseStamped()
-    goal_pose_pick.header.frame_id = "tray_2"
+    goal_pose_pick.header.frame_id = "rack_trays_center"
     goal_pose_pick.pose.position.x = 0
     goal_pose_pick.pose.position.y = 0
-    goal_pose_pick.pose.position.z = 0.20
-    goal_pose_pick.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, 0, 0))
+    goal_pose_pick.pose.position.z = 0.30
+    goal_pose_pick.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0.75*pi))
     res = self.move_lin(group_name, goal_pose_pick, speed_slow, "")
     if not res:
       rospy.loginfo("Couldn't go to the pick position for the screw tool.")
@@ -736,10 +756,10 @@ class KittingClass(O2ASBaseRoutines):
         pick_pose.header.frame_id = self.part_bin_location[part_id]
         pick_pose.pose.orientation = self.downward_orientation
         if self.grip_strategy[part_id] == "suction":
-          self.do_change_tool_action("b_bot", equip=True, 50)   # 50 = suction tool
+          self.do_change_tool_action("b_bot", equip=True, screw_size = 50)   # 50 = suction tool
           # Set orientation
           # self.pick()
-          self.do_change_tool_action("b_bot", equip=False, 50)   # 50 = suction tool
+          self.do_change_tool_action("b_bot", equip=False, screw_size = 50)   # 50 = suction tool
           
         # TODO: Get height from camera
         grasp_height = .01
@@ -755,8 +775,8 @@ class KittingClass(O2ASBaseRoutines):
         
         grasped = False
         while not grasped:
-          grasped = self.pick(robot_name, pick_pose, grasp_height, speed_fast = 0.3, speed_slow = 0.02, 
-                      gripper_command, approach_height = 0.05)
+          grasped = self.pick(robot_name, pick_pose, grasp_height, 0.3, 0.02, 
+                      gripper_command, 0.05)
           pick_pose.pose.position.x = random.uniform(-.03, .03)
           pick_pose.pose.position.y = random.uniform(-.03, .03)
         # TODO: Do suction pickup
@@ -785,12 +805,12 @@ if __name__ == '__main__':
 
     ##### EXAMPLE 2
     # kit.go_to_named_pose("home", "a_bot")
-    pick_pose = geometry_msgs.msg.PoseStamped()
-    pick_pose.header.frame_id = "set2_bin1_5"
-    pick_pose.pose.orientation = kit.downward_orientation
-    pick_pose.pose.position.y = .03
-    kit.pick("a_bot", pick_pose, -0.01, speed_fast = 0.2, speed_slow = 0.02, 
-                   gripper_command="easy_pick_outside_only_inner", approach_height = 0.05)
+    #pick_pose = geometry_msgs.msg.PoseStamped()
+    #pick_pose.header.frame_id = "set2_bin1_5"
+    #pick_pose.pose.orientation = kit.downward_orientation
+    #pick_pose.pose.position.y = .03
+    #kit.pick("a_bot", pick_pose, -0.01, speed_fast = 0.2, speed_slow = 0.02, 
+    #               gripper_command="easy_pick_outside_only_inner", approach_height = 0.05)
     # kit.go_to_named_pose("home", "a_bot")
     # place_pose = geometry_msgs.msg.PoseStamped()
     # place_pose.header.frame_id = "tray_2_partition_4"
@@ -800,6 +820,11 @@ if __name__ == '__main__':
 
     ##### EXAMPLE 3 (How to look into a bin)
     # kit.view_bin("a_bot", "set2_bin1_4")
+
+    kit.go_to_named_pose("home", "a_bot")
+    kit.go_to_named_pose("home", "b_bot")
+
+    kit.pick_screw_precision_gripper("a_bot", "set2_bin1_4", screw_size= 4)
 
     ##### OLD CODE
     # kit.pick_and_place_demo()
