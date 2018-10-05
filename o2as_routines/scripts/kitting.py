@@ -44,6 +44,10 @@ class KittingClass(O2ASBaseRoutines):
     # self.gripper_id = rospy.get_param('gripper_id')
     # self.tray_id = rospy.get_param('tray_id')
     
+    #subscribe to gripper position
+    self._inner_gripper_pos_sub = rospy.Subscriber("o2as_precision_gripper/inner_gripper_motor_pos", std_msgs.msg.Int32, update_motorPosition)
+    self._motorPos = -1
+
     # services
     self._suction = rospy.ServiceProxy("o2as_usb_relay/set_power", SetPower)
     self._search_grasp = rospy.ServiceProxy("search_grasp", SearchGrasp)
@@ -51,6 +55,9 @@ class KittingClass(O2ASBaseRoutines):
     self.initial_setup()
     rospy.sleep(.5)
     rospy.loginfo("Kitting task ready!")
+
+  def update_motorPosition(self, data)
+    self._motorPos = data
 
   def initial_setup(self):
     self.orders = self.read_order_file()
@@ -182,8 +189,73 @@ class KittingClass(O2ASBaseRoutines):
       rospy.loginfo("Couldn't go to above the target bin.")
       return False
 
+  def pick_screw_precision_gripper(self, group_name, bin_id, screw_size, speed_fast = 1.0, speed_slow = 1.0, approach_height = 0.05, bin_eff_height = 0.07, bin_eff_deg_angle = 0,end_effector_link = ""):
+    success_pick = False
+    #Close the gripper and save the motor position
+    self.send_gripper_command(gripper= "precision_gripper_inner", command="open")
+    rospy.sleep(0.1)
+    close_pos = self._motorPos
 
-  
+    posx = 0
+    posy = 0
+    posz = 0.08
+
+    while (!success_pick)
+    {
+      #Random pick
+      self.naive_pick("b_bot", bin_id, speed_fast, speed_slow, approach_height, bin_eff_height, bin_eff_xoff, bin_eff_yoff, bin_eff_deg_angle, end_effector_link)
+
+      #Check posture of the screw
+      goal_pose_incline = geometry_msgs.msg.PoseStamped()
+      goal_pose_incline.header.frame_id = bin_id
+      goal_pose_incline.pose.position.x = posx
+      goal_pose_incline.pose.position.y = posy
+      goal_pose_incline.pose.position.z = posz
+      goal_pose_incline.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, -pi/4 , 0))
+      res = self.move_lin(group_name, goal_pose_incline, speed_slow, "")
+      if not res:
+        rospy.loginfo("Couldn't go to the target.")
+      #TODO Problem with gazebo controller while controlling the robot with movelin
+        return False
+
+      #Open just a bit the gripper
+      if(screw_size == 4)
+        open_range = 80
+      elif(screw_size == 3):
+        open_range = 60
+      else:
+        rospy.logerror("Screw size is wrong")
+        open_range = 0
+
+      self.precision_gripper_inner_open_slightly(open_range)
+      rospy.sleep(1.0)
+      #Close the gripper fully
+      self.send_gripper_command(gripper= "precision_gripper_inner", command="open")
+      rospy.sleep(0.1)
+      #Check the motor position 
+      if(abs(self._motorPos - close_pos) > 25 )
+        success_pick = True
+      else:
+        bin_eff_xoff =  posx - 0.01
+        #bin_eff_yoff = bin_eff_yoff - 0.01
+        #Ask for another candidate pose to the graspability program
+      
+      rospy.loginfo("Try to pick another screw")
+    }
+
+    goal_pose_pick = geometry_msgs.msg.PoseStamped()
+    goal_pose_pick.header.frame_id = "tray_2"
+    goal_pose_pick.pose.position.x = 0
+    goal_pose_pick.pose.position.y = 0
+    goal_pose_pick.pose.position.z = 0.20
+    goal_pose_pick.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, 0, 0))
+    res = self.move_lin(group_name, goal_pose_pick, speed_slow, "")
+    if not res:
+      rospy.loginfo("Couldn't go to the pick position for the screw tool.")
+      return False
+    
+    
+
   def view_bin(self, group_name, bin_id, speed_fast = 1.0, speed_slow = 1.0, bin_eff_height = 0.2, bin_eff_xoff = 0, bin_eff_deg_angle = 20,end_effector_link = ""):
     # TODO: adjust the x,z and end effector orientatio for optimal view of the bin to use with the  \search_grasp service
     goal_pose = geometry_msgs.msg.PoseStamped()
