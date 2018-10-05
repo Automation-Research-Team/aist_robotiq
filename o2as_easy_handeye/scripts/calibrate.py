@@ -6,7 +6,7 @@ from o2as_easy_handeye.handeye_server import HandeyeServer
 
 
 def main():
-    rospy.init_node('easy_handeye')
+    rospy.init_node('o2as_easy_handeye')
     while rospy.get_time() == 0.0:
         pass
 

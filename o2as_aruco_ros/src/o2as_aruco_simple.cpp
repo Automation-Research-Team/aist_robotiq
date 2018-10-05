@@ -159,7 +159,7 @@ Plane<T, N>::fit(ITER begin, ITER end)
   // Check #points.
     const auto	npoints  = std::distance(begin, end);
     if (npoints < 3)
-	throw std::runtime_error("Plane<T, N>::fit(): three or more points required!");
+	throw std::runtime_error("Failed to fit a plane: three or more points required!");
     
   // Compute centroid.
     auto	centroid = vector_type::zeros();
@@ -418,7 +418,10 @@ Simple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
       //detection results will go into "markers"
 	std::vector<aruco::Marker>	markers;
 	_mDetector.detect(inImage, markers, _camParam, _marker_size, false);
-	    
+
+	if (markers.size() == 0)
+	    throw std::runtime_error("No markers detected!");
+	
       //for each marker, draw info and its boundaries in the image
 	for (const auto& marker : markers)
 	{
@@ -443,7 +446,7 @@ Simple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
     }
     catch (const std::runtime_error& e)
     {
-	ROS_WARN_STREAM("Failed to compute marker plane: " << e.what());
+	ROS_WARN_STREAM(e.what());
     }
     catch (...)
     {
