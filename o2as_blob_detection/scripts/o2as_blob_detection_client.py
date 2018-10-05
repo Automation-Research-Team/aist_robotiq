@@ -26,12 +26,14 @@ if __name__ == '__main__':
         #                 (msg_in.width-mask_u,mask_v),
         #                 (msg_in.width-mask_u,msg_in.height-mask_v),
         #                 (mask_u,msg_in.height-mask_v)]
+        mask_u = 200
+        mask_v = 100
   
         test_polygon = Polygon()
-        test_polygon.points = [Point32(50,50,0),
-                               Point32(50,-50,0),
-                               Point32(-50,-50,0),
-                               Point32(-50,50,0)]
+        test_polygon.points = [Point32(mask_u,mask_v,0),
+                               Point32(640-mask_u,mask_v,0),
+                               Point32(640-mask_u,360,0),
+                               Point32(mask_u,360,0)]  
           
         goal.maskCorner = test_polygon
         client.send_goal(goal)
