@@ -2,7 +2,6 @@
 <launch>
   <arg name="robot_name"	default="b_bot" />
   <arg name="camera_name"	default="a_phoxi_m_camera" />
-  <arg name="inverse"		default="false" />
     
   <arg name="eye_on_hand"	value="false"
        if="$(eval arg('camera_name') == 'a_phoxi_m_camera')" />
@@ -49,7 +48,6 @@
 	   value="camera_link_from_$(arg robot_name)_estimated" />
     <param name="camera_body_frame"
 	   value="camera_body_from_$(arg robot_name)_estimated" />
-    <param name="inverse"		value="$(arg inverse)" />
 
     <node  name="$(anon handeye_publisher)"
 	   pkg="o2as_easy_handeye" type="publish.py" output="screen"/>
