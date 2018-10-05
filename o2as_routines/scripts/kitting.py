@@ -936,6 +936,21 @@ class KittingClass(O2ASBaseRoutines):
     
     return False
 
+  def get_item_pose(self, part_id, gripper, update_image):
+    bin_id = rospy.get_param("/roi_id/"+str(self.part_bin_list(part_id)))
+    req_search_grasp = SearchGraspRequest()
+    req_search_grasp.part_id = int(str(part_id).strip("part_"))
+    req_search_grasp.bin_id = bin_id
+    req_search_grasp.gripper = gripper
+    req_search_grasp.update_image = update_image
+    try:
+      resp_search_grasp = self._search_grasp(req_search_grasp)
+      update_image = False
+    except rospy.ServiceException as e:
+      rospy.logerr(e.message)
+      continue
+
+
   def attempt_item(self, item, max_attempts = 5):
     """This function attempts to pick an item.
        It increases the item.attempts counter each time it does, 

@@ -48,10 +48,10 @@ class Sets:
 def write_roi_id_to_yaml(set_list):
     roi_id_dict = dict()
     roi_id_dict["roi_id"] = dict()
-    i = 0
+    i = 1
     for s in set_list:
         for b in s.bins:
-            roi_id_dict["roi_id"][i] = b.bin_name
+            roi_id_dict["roi_id"][b.bin_name] = i
             # print("%d, %s"%(i, b.bin_name))
             i+=1
     with open(os.path.join(rp.get_path("o2as_graspability_estimation"), "config", "roi_id.yaml"), 'w') as f:
@@ -209,8 +209,8 @@ def main():
     directory=os.getcwd()
 
     set_list,bin_definition=read_csv_and_calc_bins_positions(directory)
-    outfile = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf", 'kitting_bins.xacro'),'w+')
-    write_file(outfile,directory,set_list,bin_definition)
+    # outfile = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf", 'kitting_bins.xacro'),'w+')
+    # write_file(outfile,directory,set_list,bin_definition)
 
     write_roi_id_to_yaml(set_list)
     
