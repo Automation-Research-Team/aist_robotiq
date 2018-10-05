@@ -9,8 +9,6 @@ rospy.init_node('o2as_handeye_calibration_publisher')
 while rospy.get_time() == 0.0:
     pass
 
-inverse = rospy.get_param('inverse')
-
 calib = HandeyeCalibration()
 calib.from_file()
 
@@ -34,16 +32,8 @@ trns        = result_tf.translation.x, result_tf.translation.y, \
               result_tf.translation.z
 rot         = result_tf.rotation.x, result_tf.rotation.y, \
               result_tf.rotation.z, result_tf.rotation.w
-
-transformer = TransformerROS()
-cal_mat     = transformer.fromTranslationRotation(trns, rot)
 orig        = calib.transformation.header.frame_id  # tool or base link
 dest        = calib.transformation.child_frame_id   # tracking_base_frame
-if inverse:
-    cal_mat    = tfs.inverse_matrix(cal_mat)
-    orig, dest = dest, orig
-trns = tfs.translation_from_matrix(cal_mat)
-rot  = tfs.quaternion_from_matrix(cal_mat)
 
 camera_base_frame    = rospy.get_param('camera_base_frame')
 camera_optical_frame = rospy.get_param('camera_optical_frame')
