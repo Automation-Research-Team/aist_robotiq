@@ -4,6 +4,8 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_bin_macros.xacro" />
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro"/>
 
+
+
  <!-- space for bin -->
 
  <!-- bin1_definition -->

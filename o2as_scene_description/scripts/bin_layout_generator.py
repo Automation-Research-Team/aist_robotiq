@@ -44,6 +44,19 @@ class Sets:
     def add_bin(self, bin):
         self.bins.append(bin)
 
+# write roi id for graspability based vision
+def write_roi_id_to_yaml(set_list):
+    roi_id_dict = dict()
+    roi_id_dict["roi_id"] = dict()
+    i = 0
+    for s in set_list:
+        for b in s.bins:
+            roi_id_dict["roi_id"][i] = b.bin_name
+            # print("%d, %s"%(i, b.bin_name))
+            i+=1
+    with open(os.path.join(rp.get_path("o2as_graspability_estimation"), "config", "roi_id.yaml"), 'w') as f:
+        yaml.dump(roi_id_dict, f)
+
 # write to outfile
 def write_head(outfile,directory):
     f = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf/templates", 'o2as_bin_template_front.xacro'),'r')
@@ -142,6 +155,7 @@ def read_bin_layout(directory,set_origin):
                 set_number = set_number+1
         return set_list
 
+
 def read_bins_origin(directory):
     with open(os.path.join(rp.get_path("o2as_scene_description"), "urdf/templates", 'bins_origin.csv'), 'r') as f:
         reader = csv.reader(f)
@@ -197,6 +211,8 @@ def main():
     set_list,bin_definition=read_csv_and_calc_bins_positions(directory)
     outfile = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf", 'kitting_bins.xacro'),'w+')
     write_file(outfile,directory,set_list,bin_definition)
+
+    # write_roi_id_to_yaml(set_list)
     
 if __name__ == "__main__":
     main()
