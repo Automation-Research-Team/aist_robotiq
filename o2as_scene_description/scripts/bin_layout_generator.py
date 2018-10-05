@@ -212,7 +212,15 @@ def main():
     outfile = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf", 'kitting_bins.xacro'),'w+')
     write_file(outfile,directory,set_list,bin_definition)
 
+<<<<<<< HEAD
     write_roi_id_to_yaml(set_list)
+=======
+    # Make ros parameter files
+    # pairs = make_pair_part_bin(set_list)
+    # write_pair_part_bin(os.path.join(rp.get_path("o2as_routines"), "config", 'kitting_part_bin_list.yaml'), pairs)
+    # write_kitting_parts_list(os.path.join(rp.get_path("o2as_routines"), "config", 'kitting_item_list.yaml'), kitting_list)
+    
+>>>>>>> 30aa04127472a73d1441ddd5613a4b278c9d15ae
     
 if __name__ == "__main__":
     main()

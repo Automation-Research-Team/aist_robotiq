@@ -25,14 +25,14 @@ class BlobDetection(object):
     def __init__(self):
         #Variable
         self.bridge = CvBridge()
-        current_image = Image()
-        current_cloud = PointCloud2()
+        self.current_image = Image()
+        self.current_cloud = PointCloud2()
         self.current_detected_poses = PoseArray() 
 
         # Config parameters
         # TODO: read values from config file
-        self.image_topic = "/camera/color/image_raw"
-        self.cloud_topic = "/camera/cloud"
+        self.image_topic = rospy.get_name()+ "/camera/color/image_raw"
+        self.cloud_topic = rospy.get_name()+ "/camera/cloud"
         self.blob_pos_img_topic = rospy.get_name()+"/blob_pos_img"
         self.blob_pos_cloud_topic = rospy.get_name()+"/blob_pos_cloud"
 
@@ -56,19 +56,41 @@ class BlobDetection(object):
       rospy.loginfo(goal)
       rospy.loginfo('Executing'+ str(self._action_name)+"."+"request sent:")
 
-      print(goal.maskCorner)
-      print("goal.mask")
+      res = self.detect_poses(goal.maskCorner)
 
-      self.action_result.success = True
-      self.action_result.posesDetected = self.current_detected_poses
-      self._action_server.set_succeeded(self.action_result)
+      self.action_result.success = res
+      if(res):
+          self.action_result.posesDetected = self.current_detected_poses
+          self._action_server.set_succeeded(self.action_result)
+      else:
+          self.action_result.posesDetected = PoseArray()
+          self._action_server.set_succeeded(self.action_result)
+
 
     # Callback
     def image_callback(self, msg_in):
       # Convert the image to be used wit OpenCV library
-      img_cv = self.bridge.imgmsg_to_cv2(msg_in, desired_encoding="passthrough")
-      img = np.asarray(img_cv)[:, :, ::-1]
+      self.current_image = copy.deepcopy(msg_in)
 
+      mask_u = 200
+      mask_v = 100
+
+      test_polygon = Polygon()
+      test_polygon.points = [Point32(mask_u,mask_v,0),
+                             Point32(640-mask_u,mask_v,0),
+                             Point32(640-mask_u,360,0),
+                             Point32(mask_u,360,0)]
+
+
+#      self.detect_poses(test_polygon)
+    
+    def detect_poses(self, in_polygon):
+
+
+      #img_cv=cv2.imread('/root/catkin_ws/mask_extract/set2_bin1_4_img2.png')
+      img_cv = self.bridge.imgmsg_to_cv2(self.current_image , desired_encoding="passthrough")
+      cv2.imwrite('/root/catkin_ws/original_image.png',img_cv)
+      img = np.asarray(img_cv)[:, :, ::-1]
       # Apply the mask
       mask_u = 200
       mask_v = 100
@@ -77,19 +99,13 @@ class BlobDetection(object):
       #                 (msg_in.width-mask_u,msg_in.height-mask_v),
       #                 (mask_u,msg_in.height-mask_v)]
 
-      test_polygon = Polygon()
-      test_polygon.points = [Point32(mask_u,mask_v,0),
-                             Point32(msg_in.width-mask_u,mask_v,0),
-                             Point32(msg_in.width-mask_u,msg_in.height-mask_v,0),
-                             Point32(mask_u,msg_in.height-mask_v,0)]
-
       #test_polygon = geometry_msgs.msg.Point()
       #test_polygon [0] = geometry_msgs_msg.Point(mask_u,mask_v,0) 
       #test_polygon [1] = geometry_msgs_msg.Point(msg_in.width-mask_u,mask_v)
       #test_polygon [2] = geometry_msgs_msg.Point(msg_in.width-mask_u,msg_in.height-mask_v)
       #test_polygon [3] = geometry_msgs_msg.Point(mask_u,msg_in.height-mask_v)
 
-      masked_img= self.mask_image(img, test_polygon)
+      masked_img= self.mask_image(img, in_polygon)
 
       # Detect the blob in the image
       res_b, blob_array = self.detect_blob(masked_img)
@@ -111,11 +127,12 @@ class BlobDetection(object):
           self.current_detected_poses.poses = tmp_pose_array
           # Publish the results   
           self.pub_cloud_pos.publish(self.current_detected_poses)
- 
+
+          return True
           # Slow down this node and reduce data transfer for image
           #rospy.sleep(0.01)
       else:
-          pass
+          return False  
 
           # Convert the blob position image in the 3D camera system
           # Publish the results   
@@ -164,7 +181,7 @@ class BlobDetection(object):
         #mask_cv = cv2.imread(mask_img,0)
         img_cv = in_img_cv
         out_img = cv2.bitwise_and(img_cv,img_cv, mask = mask_image_np)
-        #cv2.imwrite('masked_image.png',out_img)
+        cv2.imwrite('/root/catkin_ws/masked_image.png',out_img)
         return out_img
 
     def detect_blob(self, img):
@@ -226,7 +243,7 @@ class BlobDetection(object):
         im_with_keypoints = cv2.drawKeypoints(im_rgb, keypoints, np.array([]), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     
         # Show blobs
-        cv2.imwrite("blob_detection_results.png", im_with_keypoints)
+        cv2.imwrite("/root/catkin_ws/blob_detection_results.png", im_with_keypoints)
 
         blob_array = []
      

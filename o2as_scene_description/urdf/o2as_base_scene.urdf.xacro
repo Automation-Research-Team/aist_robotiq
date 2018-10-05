@@ -68,15 +68,6 @@
 
   <!-- Screw holder & screw tool visual -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/screw_tools.xacro" />
-  
-  <!-- Feeders -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/screw_feeder.xacro" />
-  <xacro:screw_feeder feedername="m3_feeder" parent="c_bot_base_smfl">
-    <origin xyz=".66 -0.25 .065" rpy="0 0 ${pi/2}" />   
-  </xacro:screw_feeder>
-  <xacro:screw_feeder feedername="m4_feeder" parent="c_bot_base_smfl">
-    <origin xyz=".52 -0.25 .065" rpy="0 0 ${pi/2}" />   
-  </xacro:screw_feeder>
 
   <!-- robot arms -->    
   <xacro:ur5_robot prefix="a_bot_" joint_limited="false"
