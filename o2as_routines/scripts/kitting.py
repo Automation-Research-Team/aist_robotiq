@@ -13,7 +13,7 @@ from collections import namedtuple
 from o2as_msgs.srv import *
 import actionlib
 import o2as_msgs.msg
-from o2as_usb_relay.srv import *
+# from o2as_usb_relay.srv import *
 from o2as_graspability_estimation.srv import *
 from std_msgs.msg import Bool
 
@@ -65,7 +65,10 @@ class KittingClass(O2ASBaseRoutines):
     # self.tray_id = rospy.get_param('tray_id')
     
     # services
-    self._suction = rospy.ServiceProxy("o2as_usb_relay/set_power", SetPower)
+    # self._suction = rospy.ServiceProxy("o2as_usb_relay/set_power", SetPower)
+    self._suction = actionlib.SimpleActionClient('o2as_fastening_tools/suction_control', SuctionControlAction)
+    self._suction_state = rospy.Subscriber("suction_tool/screw_suctioned", Bool, self._suction_state_callback)
+    self._suction.wait_for_server()
     self._search_grasp = rospy.ServiceProxy("search_grasp", SearchGrasp)
 
     # action
@@ -263,24 +266,37 @@ class KittingClass(O2ASBaseRoutines):
     else:
       return super(KittingClass, self).pick(robot_name, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height, special_pick)
     
+  def _suction_state_callback(self, data):
+    return data
 
-  def switch_suction(self, on=False):
+  def switch_suction(self, turn_suction_on=False):
     # Judge success or fail using pressure status.
     if not self.use_real_robot:
       return True
-    return self._suction(1, on)
+    
+    goal = SuctionControlGoal()
+    goal.name = "suction_tool"
+    goal.turn_suction_on = turn_suction_on
+    goal.eject_screw = False
+    self._suction.send_goal(goal)
+    self._suction.wait_for_result()
+    return self._suction.get_result():
 
   def pick_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link="b_bot_suction_tool_tip_link"):
-    rospy.loginfo("Go to the target.")
+    rospy.loginfo("Try picking up by suction.")
+    res = self.switch_suction(True)
+    if not res:
+      return False
+    
     res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
     if not res:
-      rospy.logdebug("Couldn't go to the target.")
       return False
-    res = self.switch_suction(True)
-    rospy.sleep(1)
-    if not res:
-      rospy.logdebug("Couldn't pick the target using suction.")
-      return False
+
+    start_time = rospy.get_rostime()
+    while ((rospy.get_rostime().secs - start_time.secs) <= 10.0):
+      if self._suction_state():
+        return True
+    return False
 
   def naive_pick(self, group_name, bin_id, speed_fast = 1.0, speed_slow = 1.0, approach_height = 0.05, bin_eff_height = 0.07, bin_eff_xoff = 0, bin_eff_yoff = 0, bin_eff_deg_angle = 0,end_effector_link = ""):
 
@@ -587,15 +603,20 @@ class KittingClass(O2ASBaseRoutines):
     pass
 
   def place_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = "b_bot_suction_tool_tip_link"):
-    rospy.loginfo("Go to the target.")
+    rospy.loginfo("Try place by suction.")
+    res = self.switch_suction(False)
+    if not res:
+      return False
+    
     res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
     if not res:
-      rospy.logdebug("Couldn't go to the target.")
       return False
-    res = self.switch_suction(False)
-    rospy.sleep(1)
-    if not res:
-      return False
+
+    start_time = rospy.get_rostime()
+    while ((rospy.get_rostime().secs - start_time.secs) <= 10.0):
+      if not self._suction_state():
+        return True
+    return False
 
   def place_using_precision_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link =""):
     # TODO: here is for Osaka Univ.
@@ -1156,6 +1177,18 @@ class KittingClass(O2ASBaseRoutines):
       rospy.loginfo("STOPPED THE TASK")
     return
 
+  def pick_suction_test(self):
+    for item in self.suction_items:
+      object_pose = geometry_msgs.msg.PoseStamped()
+      object_pose.header.frame_id = self.part_bin_list[item]
+      object_pose.pose.position = self.dropoff_heights[item]
+      object_pose.pose.orientation = self.downward_orientation
+      ret = self.pick("b_bot", object_pose, object_pose.pose.position.z, 0.05, 0.05, "suction", approach_height = 0.05, special_pick = False)
+      if not ret:
+        continue
+
+      object_pose.header.frame_id = self.part_position_in_tray[item]
+      self.place("b_bot", object_pose, object_pose.pose.position.z, 0.05, 0.05, "suction", approach_height = 0.05, special_pick = False)
 
 if __name__ == '__main__':
   try:
@@ -1164,6 +1197,7 @@ if __name__ == '__main__':
     while i:
       rospy.loginfo("Enter 1 to equip suction tool .")
       rospy.loginfo("Enter 2 to move the robots home to starting positions.")
+      rospy.loginfo("Enter 3 to pick and place b_bot using suction tool.")
       rospy.loginfo("Enter START to start the task.")
       rospy.loginfo("Enter x to exit.")
       i = raw_input()
@@ -1171,6 +1205,8 @@ if __name__ == '__main__':
         kit.do_change_tool_action("b_bot", equip=True, screw_size=50)   # 50 = suction tool
       if i == '2':
         kit.prepare_robots()
+      elif i == '3':
+        kit.pick_suction_test()
       elif i == 'START' or i == 'start' or i == '5000':
         kit.kitting_task()
       elif i == "x":
