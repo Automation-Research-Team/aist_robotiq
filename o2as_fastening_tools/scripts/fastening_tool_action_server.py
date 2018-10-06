@@ -11,6 +11,7 @@ from o2as_msgs.msg import *
 from util import *
 
 class FasteningToolController(object):
+    max_retry = 5
     _feedback = FastenerGripperControlFeedback()
     _result = FastenerGripperControlResult()
 
@@ -37,20 +38,32 @@ class FasteningToolController(object):
         self._as.start()
 
     def set_torque_enable(self, motor_id, value):
-        res = self.dynamixel_command_write(motor_id, "Torque_Enable", value)
-        if res.comm_result:
-            return True
-        else:
-            rospy.logerr('Can not set torque_enable to XL-320. (ID=%i)' %motor_id)
-            return False
+        for i in range(1, self.max_retry + 1):
+            try:
+                res = self.dynamixel_command_write(motor_id, "Torque_Enable", value)
+            except rospy.ServiceException as exc:
+                rospy.logwarn('An exception occurred in the Torque_Enable set, but processing continues.')
+            else:
+                if not res.comm_result:
+                    rospy.logerr('Can not set torque_enable to XL-320. (ID=%i)' %motor_id)
+                return res.comm_result
+
+        rospy.logwarn('Maxmum number of retries has been reached.')
+        return True
 
     def set_moving_speed(self, motor_id, value):
-        res = self.dynamixel_command_write(motor_id, "Moving_Speed", value)
-        if res.comm_result:
-            return True
-        else:
-            rospy.logerr('Can not set speed to XL-320. (ID=%i)' %motor_id)
-            return False
+        for i in range(1, self.max_retry + 1):
+            try:
+                res = self.dynamixel_command_write(motor_id, "Moving_Speed", value)
+            except rospy.ServiceException as exc:
+                rospy.logwarn('An exception occurred in the Moving_Speed set. Processing retry.')
+            else:
+                if not res.comm_result:
+                    rospy.logerr('Can not set speed to XL-320. (ID=%i)' %motor_id)
+                return res.comm_result
+
+        rospy.logwarn('Maxmum number of retries has been reached.')
+        return True
 
     def get_present_speed(self, motor_id):
         res = self.dynamixel_read_state(motor_id, "Present_Speed")
@@ -86,9 +99,10 @@ class FasteningToolController(object):
             return
 
         if not self.set_moving_speed(motor_id, goal.speed) :
-            print('')
+            self.set_moving_speed(motor_id, 0)
+            self.set_torque_enable(motor_id, 0)
             self._result.control_result = False
-            self._as.set_succeeded(self._result)
+            self._as.set_aborted(self._result)
             return
         
         if goal.direction == "loosen" and not goal.duration:
@@ -96,31 +110,45 @@ class FasteningToolController(object):
             goal.duration = 2
             return
 
+        # Turn the motor for the specified number of seconds.
         if goal.duration:
-            rospy.sleep(goal.duration)
-            self.set_torque_enable(motor_id, 0)
-            self._result.control_result = self.set_moving_speed(motor_id, 0) 
-            self._result.control_result = True
-            self._as.set_succeeded(self._result)
-            return
+            target_duration = goal.duration
+            start_time = rospy.get_rostime()
+            while ((rospy.get_rostime().secs - start_time.secs) <= target_duration):
+                if self._as.is_preempt_requested():
+                    self._as.set_preempted()
+                    break
             
+            if self.set_moving_speed(motor_id, 0):
+                self.set_torque_enable(motor_id, 0)
+                self._result.control_result = True
+                self._as.set_succeeded(self._result)
+            else:
+                self.set_torque_enable(motor_id, 0)
+                self._result.control_result = False
+                self._as.set_aborted(self._result)
+            return
+        
         # process for tighten
-        while self._feedback.motor_speed > 0:
+        # Rotate until the motor is loaded and stops.
+        success_flag = True
+        rospy.sleep(1)   # As speed may be read immediately after setting speed, the value may be near 0.
+        while self._feedback.motor_speed > 10:
             if self._as.is_preempt_requested():
                 self._as.set_preempted()
-                self._result.control_result = False
+                success_flag = False
                 break
 
+            # Even though the motor is spinning, it can occasionally acquire the value near 0, so read twice to prevent it.
             first_speed = self.get_present_speed(motor_id)
 
+            # Acquire value in the correct range
             while first_speed > 1023 :
                 first_speed = self.get_present_speed(motor_id)
 
             if first_speed == -1 :
-                self.set_torque_enable(motor_id, 0)
-                self._result.control_result = False
-                self._as.set_succeeded(self._result)
-                return 
+                success_flag = False
+                break
             
             current_speed = first_speed
 
@@ -131,35 +159,25 @@ class FasteningToolController(object):
                 second_speed = self.get_present_speed(motor_id)
 
             if second_speed == -1 :
-                self.set_torque_enable(motor_id, 0)
-                self._result.control_result = False
-                self._as.set_succeeded(self._result)
-                return 
+                success_flag = False
+                break
 
-            if first_speed <= 0 and second_speed <=0:
+            if first_speed <= 10 and second_speed <= 10:
                 current_speed = 0
-            elif second_speed > 0 :
+            elif second_speed > 10 :
                 current_speed = second_speed
 
             self._feedback.motor_speed = current_speed
             self._as.publish_feedback(self._feedback)
-
-        if not self.set_moving_speed(motor_id, 0) :
+        
+        if self.set_moving_speed(motor_id, 0) and success_flag:
             self.set_torque_enable(motor_id, 0)
-            self._result.control_result = False
+            self._result.control_result  = True
             self._as.set_succeeded(self._result)
-            return
-
-        if not self.set_torque_enable(motor_id, 0) :
-            self._result.control_result = False
-            self._as.set_succeeded(self._result)
-            return
-            
-        if self._result.control_result :
-            self._feedback.motor_speed = 0
-            self._as.publish_feedback(self._feedback)
-            
-            self._as.set_succeeded(self._result)
+        else:
+            self.set_torque_enable(motor_id, 0)
+            self._result.control_result  = False
+            self._as.set_aborted(self._result)
 
         
 if __name__ == '__main__':
