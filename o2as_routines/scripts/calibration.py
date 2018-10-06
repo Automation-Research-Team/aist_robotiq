@@ -45,6 +45,10 @@ from math import pi
 
 from o2as_routines.base import O2ASBaseRoutines
 
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
+import cv2
+
 class CalibrationClass(O2ASBaseRoutines):
   """
   These routines check the robots' calibration by moving them to
@@ -57,6 +61,10 @@ class CalibrationClass(O2ASBaseRoutines):
     self.a_bot_downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
     self.bin_names = ["bin2_1", "bin2_2", "bin2_3", "bin2_4", "bin3_1", "bin1_1", 
                       "bin1_2", "bin1_3", "bin1_4", "bin1_5"]
+
+    self.bridge = CvBridge()
+    self._img = Image()
+    self.img_sub = rospy.Subscriber("/a_bot_camera/color/image_raw", Image, self.image_callback)
 
     # Neutral downward in the taskboard frames
     rospy.sleep(.5)   # Use this instead of waiting, so that simulation can be used
@@ -1095,6 +1103,19 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
     return 
 
+  def check_inner_pick_calibration(self):
+    #Go to check pose
+    self.go_to_named_pose("check_precision_gripper_success", "a-bot")
+    rospy.sleep(0.2)
+
+    cv2.imwrite('/root/catkin_ws/src/o2as_bg_ratio/images/empty_close_gripper.png', self._img)
+
+    return
+
+  def image_callback(self, msg_in):
+    self._img = self.bridge.imgmsg_to_cv2(msg_in, desired_encoding="passthrough")
+
+
 if __name__ == '__main__':
   try:
     c = CalibrationClass()
@@ -1137,6 +1158,7 @@ if __name__ == '__main__':
       rospy.loginfo("331: Bin corners with a_bot")
       rospy.loginfo("332: Bin corners with b_bot")
       rospy.loginfo("333: Bin corners with suction_tool (b_bot)")
+      rospy.loginfo("341: Go to check pick pose and save image to file")
       rospy.loginfo("4: Parts tray tests (assembly/kitting)")
       rospy.loginfo("51: Assembly base plate (c_bot)")
       rospy.loginfo("52: Assembly base plate (b_bot)")
@@ -1267,6 +1289,8 @@ if __name__ == '__main__':
         c.bin_corner_calibration(robot_name="b_bot")
       elif r == '333':
         c.bin_corner_calibration(robot_name="b_bot", end_effector_link="b_bot_suction_tool_tip_link")
+      elif r == '341':
+        c.check_inner_pick_calibration()
       elif r == '4':
         c.parts_tray_tests()
       elif r == '51':
