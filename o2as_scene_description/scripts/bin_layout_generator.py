@@ -44,17 +44,17 @@ class Sets:
     def add_bin(self, bin):
         self.bins.append(bin)
 
-# write roi id for graspability based vision
-def write_roi_id_to_yaml(set_list):
+# write bin id for graspability based vision
+def write_fge_bin_id_to_yaml(set_list):
     roi_id_dict = dict()
     roi_id_dict["roi_id"] = dict()
     i = 1
     for s in set_list:
         for b in s.bins:
-            roi_id_dict["roi_id"][b.bin_name] = i
+            bin_id_dict["fge_bin_id"][b.bin_name] = i
             # print("%d, %s"%(i, b.bin_name))
             i+=1
-    with open(os.path.join(rp.get_path("o2as_graspability_estimation"), "config", "roi_id.yaml"), 'w') as f:
+    with open(os.path.join(rp.get_path("o2as_graspability_estimation"), "config", "fge_bin_id.yaml"), 'w') as f:
         yaml.dump(roi_id_dict, f)
 
 # write to outfile
