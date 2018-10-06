@@ -49,22 +49,6 @@ add_dependencies(o2as_single
   ${catkin_EXPORTED_TARGETS}
 )
 
-add_executable(marker_publish
-  src/marker_publish.cpp
-)
-
-target_link_libraries(marker_publish
-  ${catkin_LIBRARIES}
-  ${roscpp_LIBRARIES}
-  ${OpenCV_LIBRARIES}
-)
-
-add_dependencies(marker_publish
-  ${PROJECT_NAME}_gencpp
-  ${PROJECT_NAME}_gencfg
-  ${catkin_EXPORTED_TARGETS}
-)
-
 #############
 ## Install ##
 #############
