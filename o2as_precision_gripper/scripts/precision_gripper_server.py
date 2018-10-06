@@ -85,7 +85,11 @@ class PrecisionGripperAction:
                 command_is_sent = self.inner_gripper_close_fully(self.inner_force)
         elif goal.open_inner_gripper_slightly:
             rospy.loginfo("inner gripper open slightly")
-            command_is_sent = self.inner_gripper_open_slightly(self.inner_slight_open)
+            if goal.slight_opening_width:
+                steps = goal.slight_opening_width
+            else:
+                steps = self.inner_slight_open
+            command_is_sent = self.inner_gripper_open_slightly(steps)
 
         else:
             rospy.logerr('No command sent to the gripper, service request was empty.')
@@ -240,7 +244,7 @@ class PrecisionGripperAction:
             self.p1.set_operating_mode("currentposition")
             self.p1.set_current(12)
             current_position = self.p1.read_current_position()
-            current_position = current_position + open_range
+            current_position = current_position - open_range
             print("Current position: " + str(current_position))
             self.p1.set_goal_position(current_position)
             rospy.sleep(0.1)
