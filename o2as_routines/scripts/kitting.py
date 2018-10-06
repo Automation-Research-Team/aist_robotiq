@@ -903,12 +903,15 @@ class KittingClass(O2ASBaseRoutines):
       # TODO: Get the position from vision
       pick_pose = self.get_random_pose_in_bin(item)
       if item.ee_to_use == "precision_gripper_from_inside":
-        #view the position inside the bin
-        res_view_bin=self.view_bin(robot_name, item.bin_name)    
-        if(res_view_bin):
+        res_view_bin = self.view_bin(robot_name, item.bin_name)    
+        if res_view_bin:
           pick_pose = res_view_bin
-      # pick_pose = self.get_item_pose(item)
-      if item.ee_to_use == "suction":      # Orientation needs to be adjusted for suction tool
+      
+      if item.ee_to_use == "suction":      
+        # TODO: Fix the vision in this function
+        # pick_pose = self.get_item_pose(item)
+
+        # Orientation needs to be adjusted for suction tool
         pick_point_on_table = self.listener.transformPose("workspace_center", pick_pose).pose.position
         if pick_point_on_table.y > .1:
           pick_pose.pose.orientation = self.suction_orientation_from_behind
@@ -926,6 +929,10 @@ class KittingClass(O2ASBaseRoutines):
       else:
         gripper_command = ""
 
+
+      # TODO: self.adjust_pose_to_bin(pick_pose, item)
+      # Add sanity check for the poses, adjust orientations for the gripper near the border etc.
+      
       item_picked = self.pick(robot_name, pick_pose, 0.0, speed_fast = 0.3, speed_slow = 0.02, 
                         gripper_command=gripper_command, approach_height = 0.1)
       # TODO: Check grasp success via grasp width for robotiq gripper and vision for precision gripper
@@ -948,22 +955,27 @@ class KittingClass(O2ASBaseRoutines):
             place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
         elif item.set_number == 2:
           if item.target_frame[11] == '1':  # tray 1
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))  # Facing right
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0)) 
           elif item.target_frame[11] == '2':  # tray 2
             place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/4+pi))
         elif item.set_number == 3:
           if item.target_frame[11] == '1':  # tray 1
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi*30/180))  # Facing towards camera
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi*30/180)) 
           elif item.target_frame[11] == '2':  # tray 2
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, +pi)) # Facing towards camera
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, +pi))
         if not place_pose.pose.orientation.w and not place_pose.pose.orientation.x and not place_pose.pose.orientation.y:
           rospy.logerr("SOMETHING WENT WRONG, ORIENTATION IS NOT ASSIGNED")
       else:   # Precision_gripper, robotiq_gripper
         place_pose.pose.orientation = self.downward_orientation
+      if item.part_id == 6:
+        place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
       
       if item.ee_to_use == "suction":
         # Approach the place pose with controlled acceleration value
-        rospy.loginfo("Approaching place pose with controlled acceleration")
+        rospy.loginfo("Approaching place pose")
+        if item.set_number in [2,3] and item.target_frame[11] == '1':  # Tray 1
+          self.go_to_named_pose("suction_pick_ready", "b_bot", speed=.1)
+          self.go_to_named_pose("suction_place_intermediate_pose_for_sets_2_and_3", "b_bot", speed=.1)
         self.force_moveit_linear_motion = True
         place_pose.pose.position.z += .1
         self.move_lin(robot_name, place_pose, speed = 0.1, acceleration = 0.08, end_effector_link = "b_bot_suction_tool_tip_link")
