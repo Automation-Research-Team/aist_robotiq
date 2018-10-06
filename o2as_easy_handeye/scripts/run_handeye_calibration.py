@@ -229,7 +229,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
           sample_list = self.get_sample_list()
           n = len(sample_list.samples.hand_world_samples.transforms)
           print("  took {} (hand-world, camera-marker) samples").format(n)
-          
+
           try:
             bridge = CvBridge()
             cv2_img = btidge.imgmsg_to_cv2(imgmsg, "bgr8")
