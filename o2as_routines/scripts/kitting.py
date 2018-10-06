@@ -189,7 +189,7 @@ class KittingClass(O2ASBaseRoutines):
       rospy.loginfo("Couldn't go to above the target bin.")
       return False
 
-  def pick_screw_precision_gripper(self, group_name, bin_id, screw_size, speed_fast = 1.0, speed_slow = 1.0, approach_height = 0.05, bin_eff_height = 0.07, bin_eff_deg_angle = 0,end_effector_link = ""):
+  def pick_screw_precision_gripper(self, group_name, bin_id, screw_size, speed_fast = 1.0, speed_slow = .1, approach_height = 0.05, bin_eff_height = 0.07, bin_eff_deg_angle = 0,end_effector_link = ""):
     success_pick = False
     #Close the gripper and save the motor position
     self.send_gripper_command(gripper= "precision_gripper_inner", command="open")
@@ -205,46 +205,41 @@ class KittingClass(O2ASBaseRoutines):
       self.naive_pick(group_name, bin_id, speed_fast, speed_slow, approach_height, posz, posx, posy, bin_eff_deg_angle, end_effector_link)
 
 
-      #Go to the center to start the screw checking
-      rospy.loginfo("Go to the center to start the screw checking")
+      #Go to the bin center to start the screw checking
+      rospy.loginfo("Go to the bin center to start the screw checking")
       goal_pose_incline = geometry_msgs.msg.PoseStamped()
       goal_pose_incline.header.frame_id = bin_id
       goal_pose_incline.pose.position.x = 0
       goal_pose_incline.pose.position.y = 0.035
-      goal_pose_incline.pose.position.z = 0.25
+      goal_pose_incline.pose.position.z = 0.30
       goal_pose_incline.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
       res = self.move_lin(group_name, goal_pose_incline, speed_slow, "")
-      rospy.sleep(2.0)
 
       #Check posture of the screw
       rospy.loginfo("Begin check motion")
-      goal_pose_ = geometry_msgs.msg.PoseStamped()
-      goal_pose_.header.frame_id = "a_bot_gripper_tip_link"
-      goal_pose_.pose.position.x = 0
-      goal_pose_.pose.position.y = 0
-      goal_pose_.pose.position.z = 0
-      goal_pose_.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/4 , 0, 0))
-      res = self.move_lin(group_name, goal_pose_, speed_slow, "")
-      rospy.sleep(2.0)
-     
-      goal_pose_incline = geometry_msgs.msg.PoseStamped()
-      goal_pose_incline.header.frame_id = "a_bot_gripper_tip_link"
-      goal_pose_incline.pose.position.x = 0
-      goal_pose_incline.pose.position.y = 0
-      goal_pose_incline.pose.position.z = 0
-      goal_pose_incline.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0 , -0.52*pi,0))
-      #goal_pose_incline.header.frame_id = bin_id
-      #goal_pose_incline.pose.position.x = posx
-      #goal_pose_incline.pose.position.y = posy
-      #goal_pose_incline.pose.position.z = posz
-      #goal_pose_incline.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi/2 , -pi/2))
-      res = self.move_lin(group_name, goal_pose_incline, speed_slow, "")
-      rospy.sleep(2.0)
+      # goal_pose_ = geometry_msgs.msg.PoseStamped()
+      # goal_pose_.header.frame_id = "a_bot_gripper_tip_link"
+      # goal_pose_.pose.position.x = 0
+      # goal_pose_.pose.position.y = 0
+      # goal_pose_.pose.position.z = 0
+      # goal_pose_.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/4 , 0, 0))
+      # res = self.move_lin(group_name, goal_pose_, speed_slow, "")
+      # goal_pose_.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0 , -0.3*pi,0))
+      # res = self.move_lin(group_name, goal_pose_, speed_slow, "")
+
+      over_bin_3_joint_pose = [0.5639523868982476, -1.2023834734104668, 2.084380077110544, -4.115980903386012, -1.350262946004677, 1.5910085738144437]
+      self.groups["a_bot"].set_joint_value_target(over_bin_3_joint_pose)
+      self.groups["a_bot"].set_max_velocity_scaling_factor(.1)
+      self.groups["a_bot"].go(wait=True)
+
+      over_bin_3_inclined_joint_pose = [0.5646427393623301, -1.202333924982511, 2.040723585395901, -4.197616886811121, -1.3550737620026068, 1.6180429123653095]
+      self.groups["a_bot"].set_joint_value_target(over_bin_3_inclined_joint_pose)
+      self.groups["a_bot"].set_max_velocity_scaling_factor(.1)
+      self.groups["a_bot"].go(wait=True)
 
       rospy.loginfo("Ending check motion")
       if not res:
         rospy.loginfo("Couldn't go to the target.")
-      #TODO Problem with gazebo controller while controlling the robot with movelin
         return False
 
       #Open just a bit the gripper
@@ -261,18 +256,13 @@ class KittingClass(O2ASBaseRoutines):
       rospy.sleep(1.0)
       #Close the gripper fully
       self.send_gripper_command(gripper= "precision_gripper_inner", command="close")
-      rospy.sleep(0.1)
+      rospy.sleep(1.0)
       #Check the motor position 
-      #Simulation only
-      rospy.loginfo("successs check commented only for the smulation")
-      #if(abs(self._motorPos - close_pos) > 25 ):
-      success_pick = True
-      #else:
-      #  bin_eff_xoff =  posx - 0.01
-        #bin_eff_yoff = bin_eff_yoff - 0.01
-        #Ask for another candidate pose to the graspability program
-      
-      ##rospy.loginfo("Try to pick another screw")
+      if(abs(self._motorPos - close_pos) > 25 ):
+        success_pick = True
+      if not self.use_real_robot:
+        rospy.loginfo("Assume success for the smulation")
+        success_pick = True
 
     goal_pose_pick = geometry_msgs.msg.PoseStamped()
     goal_pose_pick.header.frame_id = "rack_trays_center"
@@ -285,6 +275,13 @@ class KittingClass(O2ASBaseRoutines):
       rospy.loginfo("Couldn't go to the pick position for the screw tool.")
       return False
     
+    above_handover_joint_pose = [1.2747349651123001, -1.8980970364707597, 2.3533797825176928, -3.596697424122053, -0.48908058573007357, 1.5708446443316382]
+    handover_joint_pose = [1.6313695241102988, -1.2487396560808532, 2.2917947101014815, -4.184833174775171, -0.8459805085976276, 1.570752157190914]
+    self.groups["a_bot"].set_joint_value_target(handover_joint_pose)
+    self.groups["a_bot"].set_max_velocity_scaling_factor(.1)
+    self.groups["a_bot"].go(wait=True)
+    self.precision_gripper_inner_open_slightly(open_range)
+    return True
     
 
   def view_bin(self, group_name, bin_id, speed_fast = 1.0, speed_slow = 1.0, bin_eff_height = 0.2, bin_eff_xoff = 0, bin_eff_deg_angle = 20,end_effector_link = ""):
