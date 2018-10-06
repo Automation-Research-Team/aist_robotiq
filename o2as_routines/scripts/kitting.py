@@ -947,7 +947,7 @@ class KittingClass(O2ASBaseRoutines):
     pose = geometry_msgs.PoseStamped()
     pose.header.frame_id = "/a_phoxi_m_sensor"
     pose.pose.position = resp.pos3D[0]
-    pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(resp.rot3D[0].x, resp.rot3D[0].y, resp.rot3D[0].z))
+    # pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(resp.rot3D[0].x, resp.rot3D[0].y, resp.rot3D[0].z))
 
     return pose
 
