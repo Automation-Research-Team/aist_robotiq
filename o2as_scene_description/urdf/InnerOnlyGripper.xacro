@@ -49,5 +49,13 @@
     <origin rpy="0.0 ${-pi/2} 0.0" xyz="-0.002 -0.014 .163"/>
   </joint>
   <link name="${prefix}${grippername}_tip_link"/>
+  
+  <joint name="${prefix}${grippername}_screw_pickup_joint" type="fixed">
+    <parent link="${prefix}${grippername}_tip_link"/>
+    <child link="${prefix}${grippername}_screw_pickup"/>
+    <origin rpy="0.0 ${pi/2} 0.0" xyz="-.032 0 -0.003"/>
+  </joint>
+  <link name="${prefix}${grippername}_screw_pickup"/>
+
   </xacro:macro>
 </robot>
