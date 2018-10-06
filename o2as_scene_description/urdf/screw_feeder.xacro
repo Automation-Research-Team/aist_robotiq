@@ -78,10 +78,15 @@
   <joint name="${feedername}_outlet_joint" type="fixed">
     <parent link="${feedername}_link"/>
     <child link="${feedername}_outlet_link"/>
-    <!-- <origin rpy="0.0 0 0.0" xyz="${length-.01} ${width/2} ${height/2 + .02}"/> -->
-    <!-- <origin rpy="0.0 ${pi/2} 0.0" xyz="${-height/2 - .02} ${width/2} ${length-.01}"/> -->
     <origin rpy="0.0 ${pi/2} 0.0" xyz="${length-.01} ${width/2} ${height/2}"/>
   </joint>
   <link name="${feedername}_outlet_link"/>
+
+  <joint name="${feedername}_inlet_joint" type="fixed">
+    <parent link="${feedername}_link"/>
+    <child link="${feedername}_inlet_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="${length/3} ${width/3} ${height}"/>
+  </joint>
+  <link name="${feedername}_inlet_link"/>
   </xacro:macro>
 </robot>

@@ -4,10 +4,6 @@
 -->
 <launch>
 
-  <!-- Publish robot model -->
-  <include file="$(find o2as_scene_description)/launch/o2as_base_scene_upload.launch" />
-  <param name="use_real_robot" type="bool" value="true" />
-
   <!-- Required for the UR scripts to be sent -->
   <param name="use_real_robot" type="bool" value="true" />
 
@@ -26,7 +22,11 @@
   <!-- The max_velocity parameter is only used for debugging in the ur_driver. It's not related to actual velocity limits -->
   <arg name="max_velocity" default="10.0"/> <!-- [rad/s] -->
 
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+  <!-- The three lines below are commented out because it is annoying to restart the robot. They are incompatible with Gazebo. -->
+  <!-- Publish robot model -->
+  <!-- <include file="$(find o2as_scene_description)/launch/o2as_base_scene_upload.launch" /> -->
+  <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" /> -->
 
   <!-- Drivers for the robots -->
   <node name="a_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen" ns="a_bot_controller">

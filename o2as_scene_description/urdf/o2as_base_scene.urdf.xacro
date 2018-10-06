@@ -68,15 +68,6 @@
 
   <!-- Screw holder & screw tool visual -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/screw_tools.xacro" />
-  
-  <!-- Feeders -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/screw_feeder.xacro" />
-  <xacro:screw_feeder feedername="m3_feeder" parent="c_bot_base_smfl">
-    <origin xyz=".66 -0.25 .065" rpy="0 0 ${pi/2}" />   
-  </xacro:screw_feeder>
-  <xacro:screw_feeder feedername="m4_feeder" parent="c_bot_base_smfl">
-    <origin xyz=".52 -0.25 .065" rpy="0 0 ${pi/2}" />   
-  </xacro:screw_feeder>
 
   <!-- robot arms -->    
   <xacro:ur5_robot prefix="a_bot_" joint_limited="false"
@@ -209,8 +200,8 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />
   <xacro:phoxi_m_camera prefix="a_" parent="o2as_ground">
     <!-- <origin xyz="0.56 0 ${bots_z + .1 + .8}" rpy="${-160*pi/180} 0 ${pi/2}"/> -->
-    <origin xyz="0.65526 -0.018791 1.4169"
-	    rpy="${-149.595*pi/180} ${0.473*pi/180} ${91.976*pi/180}"/>
+    <!-- <origin xyz="0.46 0 ${bots_z + .1 + .8}" rpy="${-160*pi/180} 0 ${pi/2}"/> -->
+    <origin xyz="0.65526 -0.018791 1.4169" rpy="${-149.595*pi/180} ${0.473*pi/180} ${91.976*pi/180}" />
   </xacro:phoxi_m_camera>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
