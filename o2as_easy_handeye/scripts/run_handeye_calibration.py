@@ -24,13 +24,13 @@ keyposes = {
   'a_phoxi_m_camera': {
     'a_bot': [
 #      [0.15, -0.30, 0.25, radians( 30), radians( 25), radians(0)],
-      [0.15, -0.10, 0.10, radians(-90), radians( 25), radians(0)],
-      [0.15,  0.00, 0.10, radians(-60), radians( 25), radians(0)],
-      [0.15,  0.10, 0.10, radians(-60), radians( 25), radians(0)],
+      [0.38, -0.10, 0.10, radians(-90), radians( 25), radians(0)],
+      [0.38,  0.00, 0.10, radians(-60), radians( 25), radians(0)],
+      [0.38,  0.10, 0.10, radians(-60), radians( 25), radians(0)],
 
-      [0.20,  0.10, 0.20, radians(-60), radians( 25), radians(0)],
-      [0.20,  0.00, 0.20, radians(-60), radians( 25), radians(0)],
-      [0.20, -0.10, 0.20, radians(-60), radians( 25), radians(0)],
+      [0.30,  0.10, 0.20, radians(-60), radians( 25), radians(0)],
+      [0.30,  0.00, 0.20, radians(-60), radians( 25), radians(0)],
+      [0.30, -0.10, 0.20, radians(-60), radians( 25), radians(0)],
     ],
 
     'b_bot': [
@@ -68,6 +68,12 @@ keyposes = {
       [0.10,  0.05, 0.25, radians( 30), radians( 25), radians(0)],
       [0.10, -0.05, 0.25, radians(  0), radians( 25), radians(0)],
     ]
+  },
+  'a_bot_camera': {
+    'a_bot': [
+#      [0.15, -0.30, 0.25, radians( 30), radians( 25), radians(0)],
+      [0.0, -0.30, 0.20, radians(0), radians(90), radians(-90)],
+    ]
   }
 }
 
@@ -75,7 +81,10 @@ keyposes = {
 def get_service_proxy(service_name, camera_name, robot_name):
   """Return ROS service proxy"""
   cs = "/{}/".format(camera_name)
-  ns = "/o2as_easy_handeye_{}_eye_on_base/".format(robot_name)
+  if camera_name == "a_bot_camera":
+    ns = "/o2as_easy_handeye_{}_eye_on_hand/".format(robot_name)
+  else:
+    ns = "/o2as_easy_handeye_{}_eye_on_base/".format(robot_name)
 
   if service_name is "flush_buffer":
     service_type      = Trigger
@@ -147,13 +156,13 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
                                                  camera_name, robot_name)
 
     ## Initialize `moveit_commander`
-    self.robot_name   = robot_name
+    self.robot_name = robot_name
     group = self.groups[robot_name]
 
     # Set `_ee_link` as end effector wrt `_base_link` of the robot
     #group.set_pose_reference_frame(robot_name + "_base_link")
     group.set_pose_reference_frame("workspace_center")
-    group.set_end_effector_link(robot_name    + "_ee_link")
+    group.set_end_effector_link(robot_name + "_ee_link")
     #group.set_end_effector_link(robot_name + "_ar_marker")
 
     # Trajectory publisher
@@ -234,6 +243,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
   def go_home(self):
     self.go_to_named_pose("home", self.robot_name)
 
+
   def run(self, keyposes, speed, sleep_time):
     """Run handeye calibration for the specified robot (e.g., "b_bot")"""
     # Clear samples in the buffer if exist
@@ -277,7 +287,7 @@ def main():
     needs_trigger = (True if (sys.argv[3] == "trigger") else False)
     needs_calib   = (True if (os.path.basename(sys.argv[0]) == "run_handeye_calibration.py") else False)
     
-    assert(camera_name in {"a_phoxi_m_camera", "c_bot_camera"})
+    assert(camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
     assert(robot_name  in {"a_bot", "b_bot", "c_bot"})
 
     routines = HandEyeCalibrationRoutines(camera_name, robot_name,
@@ -285,13 +295,12 @@ def main():
 
     print("=== Calibration started for {} + {} ===".format(camera_name,
                                                            robot_name))
-    speed      = 0.1
+    speed      = 1
     sleep_time = 1
     routines.run(keyposes[camera_name][robot_name], speed, sleep_time)
     print("=== Calibration completed for {} + {} ===".format(camera_name,
                                                              robot_name))
     
-
   except rospy.ROSInterruptException:
     return
 

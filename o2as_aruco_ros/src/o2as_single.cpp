@@ -7,7 +7,6 @@
 */
 #include <iostream>
 #include <limits>
-#include <opencv2/core.hpp>
 
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
@@ -25,6 +24,9 @@
 
 #include <aruco_ros/ArucoThresholdConfig.h>
 #include <aruco_ros/aruco_ros_utils.h>
+
+#include "Plane.h"
+#include "BinDescription.h"
 
 namespace o2as_aruco_ros
 {
@@ -69,128 +71,6 @@ at(const sensor_msgs::PointCloud2& cloud_msg, T u, T v)
     return {NaN, NaN, NaN};
 }
 
-template <class T, int N> T
-angle(const cv::Vec<T, N>& x, const cv::Vec<T, N>& y)
-{
-    return std::acos(x.dot(y)/(cv::norm(x)*cv::norm(y))) * 180.0/M_PI;
-}
-
-template <class T> cv::Matx<T, 3, 3>
-rodrigues(const cv::Matx<T, 3, 1>& r)
-{
-    using matrix_t = cv::Matx<T, 3, 3>;
-    
-    const auto	theta = r.norm();
-    r /= theta;
-    const auto	c = std::cos(theta), s = std::sin(theta);
-    matrix_t	R = matrix_t::zeros();
-    for (int i = 0; i < 3; ++i)
-    {
-	R(i, i) += c;
-	
-	for (int j = 0; j < 3; ++j)
-	    R(i, j) += (1 - c)*r(i)*r(j);
-    }
-    R(0, 1) -= s * r(2);
-    R(0, 2) += s * r(1);
-    R(1, 0) += s * r(2);
-    R(1, 2) -= s * r(0);
-    R(2, 0) -= s * r(1);
-    R(2, 1) += s * r(0);
-
-    return R;
-}
-    
-/************************************************************************
-*  struct Plane<T, N>							*
-************************************************************************/
-template <class T, size_t N>
-class Plane
-{
-  public:
-    using vector_type	= cv::Vec<T, N>;
-    using value_type	= T;
-
-  public:
-    Plane()					    :_n(), _d(0)	{}
-    Plane(const vector_type& norm, value_type dist) :_n(norm), _d(dist)	{}
-    template <class ITER>
-    Plane(ITER begin, ITER end)				{ fit(begin, end); }
-    
-    template <class ITER>
-    void		fit(ITER begin, ITER end)	;
-    
-    const vector_type&	normal()			const	{ return _n; }
-    value_type		distance()			const	{ return _d; }
-    value_type		distance(const vector_type& point) const
-			{
-			    return std::abs(_n.dot(point) + _d);
-			}
-    vector_type		cross_point(const vector_type& view_vector) const
-			{
-			    return (-_d/_n.dot(view_vector)) * view_vector;
-			}
-
-    friend std::ostream&
-			operator <<(std::ostream& out, const Plane& plane)
-			{
-			    out << plane._n << ": " << plane._d;
-			}
-
-  private:
-    vector_type	_n;	// normal
-    value_type	_d;	// distance from the origin
-};
-    
-template <class T, size_t N> template <class ITER> void
-Plane<T, N>::fit(ITER begin, ITER end)
-{
-    using matrix_type	= cv::Matx<T, N, N>;
-
-    const auto	ext   =	[](const auto& x)
-			{
-			    matrix_type	y;
-			    for (size_t i = 0; i < N; ++i)
-				for (size_t j = 0; j < N; ++j)
-				    y(i, j) = x(i) * x(j);
-			    return y;
-			};
-
-  // Check #points.
-    const auto	npoints  = std::distance(begin, end);
-    if (npoints < 3)
-	throw std::runtime_error("Failed to fit a plane: three or more points required!");
-    
-  // Compute centroid.
-    auto	centroid = vector_type::zeros();
-    for (auto iter = begin; iter != end; ++iter)
-	centroid += *iter;
-    centroid *= value_type(1)/value_type(npoints);
-
-  // Compute moment matrix.
-    auto	moments = matrix_type::zeros();
-    for (auto iter = begin; iter != end; ++iter)
-	moments += ext(*iter - centroid);
-
-    matrix_type	evectors;
-    vector_type	evalues;
-    cv::eigen(moments, evalues, evectors);
-
-    _n = vector_type::all(0);
-    for (size_t j = 0; j < N; ++j)
-	_n(j) = evectors(N - 1, j);
-    _d = -_n.dot(centroid);
-    if (_d < 0)
-    {
-	_n *= value_type(-1);
-	_d *= -1;
-    }
-
-    ROS_DEBUG_STREAM("plane = " << *this << ", err = "
-		     << std::sqrt(std::abs(evalues(N-1))/value_type(npoints))
-		     << ", computed from " << npoints << " points.");
-}
-
 /************************************************************************
 *  class Simple								*
 ************************************************************************/
@@ -201,10 +81,12 @@ class Simple
     using	image_p	= sensor_msgs::ImageConstPtr;
     using	cloud_t = sensor_msgs::PointCloud2;
     using	cloud_p	= sensor_msgs::PointCloud2ConstPtr;
-    
+
   public:
     Simple();
 
+    std::ostream&	print_bins(std::ostream& out)		const	;
+    
   private:
     void	cam_info_callback(const sensor_msgs::CameraInfo& msg)	;
     void	reconf_callback(aruco_ros::ArucoThresholdConfig& config,
@@ -226,8 +108,8 @@ class Simple
     void	publish_marker_info(const aruco::Marker& marker,
 				    const cloud_t& cloud_msg,
 				    const ros::Time& stamp)		;
-    void	publish_misc_info(const cv::Mat& image,
-				  const ros::Time& stamp)		;
+    void	publish_image_info(const cv::Mat& image,
+				   const ros::Time& stamp)		;
     
   private:
     ros::NodeHandle			_nh;
@@ -270,6 +152,8 @@ class Simple
     double				_marker_size;
     int					_marker_id;
 
+    std::vector<o2as::BinDescription>	_bins;
+    
     float				_planarityTolerance;
 };
     
@@ -344,6 +228,20 @@ Simple::Simple()
 					    this, _1, _2));
 }
 
+std::ostream&
+Simple::print_bins(std::ostream& out) const
+{
+    out << "<?xml version=\"1.0\"?>\n"
+	<< "<robot xmlns:xacro=\"http://www.ros.org/wiki/xacro\" name=\"kitting_scene\">\n"
+	<< "  <xacro:include filename=\"$(find o2as_scene_description)/urdf/kitting_bin_macros.xacro\"/>"
+	<< std::endl;
+
+    for (const auto& bin : _bins)
+	out << bin << std::endl;
+    
+    return out << "</robot>" << std::endl;
+}
+    
 void
 Simple::cam_info_callback(const sensor_msgs::CameraInfo& msg)
 {
@@ -408,45 +306,55 @@ Simple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 
     try
     {
-	const auto	curr_stamp = ros::Time::now();
-      //const auto	curr_stamp = image_msg.header.stamp;
 	auto		inImage = cv_bridge::toCvCopy(
 					image_msg,
 					sensor_msgs::image_encodings::RGB8)
-				->image;
+			        ->image;
+	const auto	curr_stamp = ros::Time::now();
+      //const auto	curr_stamp = image_msg.header.stamp;
 
-      //detection results will go into "markers"
-	std::vector<aruco::Marker>	markers;
-	_mDetector.detect(inImage, markers, _camParam, _marker_size, false);
-
-	if (markers.size() == 0)
-	    throw std::runtime_error("No markers detected!");
-	
-      //for each marker, draw info and its boundaries in the image
-	for (const auto& marker : markers)
+	try
 	{
-	  // only publishing the selected marker
-	    if (_marker_id == 0 || marker.id == _marker_id)
-		publish_marker_info(marker, cloud_msg, curr_stamp);
+	  //detection results will go into "markers"
+	    std::vector<aruco::Marker>	markers;
+	    _mDetector.detect(inImage,
+			      markers, _camParam, _marker_size, false);
 
-	  // but drawing all the detected markers
-	    marker.draw(inImage, cv::Scalar(0,0,255), 2);
-	}
-
-	if (_marker_size != -1)
-	    for (auto& marker : markers)
-		aruco::CvDrawingUtils::draw3dAxis(inImage, marker, _camParam);
+	    if (markers.size() == 0)
+		throw std::runtime_error("No markers detected!");
 	
-	publish_misc_info(inImage, curr_stamp);
+	  //for each marker, draw info and its boundaries in the image
+	    _bins.clear();
+	    for (const auto& marker : markers)
+	    {
+	      // only publishing the selected marker
+		if (_marker_id == 0)
+		    _bins.emplace_back(marker.id,
+				       get_marker_transform(marker,
+							    cloud_msg));
+		else if (marker.id == _marker_id)
+		    publish_marker_info(marker, cloud_msg, curr_stamp);
+
+	      // but drawing all the detected markers
+		marker.draw(inImage, cv::Scalar(0,0,255), 2);
+	    }
+
+	    if (_marker_size != -1)
+		for (auto& marker : markers)
+		    aruco::CvDrawingUtils::draw3dAxis(inImage,
+						      marker, _camParam);
+	}
+	catch (const std::runtime_error& e)
+	{
+	    ROS_WARN_STREAM(e.what());
+	}
+	
+	publish_image_info(inImage, curr_stamp);
     }
     catch (const cv_bridge::Exception& e)
     {
 	ROS_ERROR_STREAM("cv_bridge exception: " << e.what());
 	return;
-    }
-    catch (const std::runtime_error& e)
-    {
-	ROS_WARN_STREAM(e.what());
     }
     catch (...)
     {
@@ -492,7 +400,7 @@ Simple::get_marker_transform(const aruco::Marker& marker,
     using iterator_t	= sensor_msgs::PointCloud2ConstIterator<value_t>;
     using rgbiterator_t	= sensor_msgs::PointCloud2Iterator<uint32_t>;
     using point_t	= cv::Vec<value_t, 3>;
-    using plane_t	= Plane<value_t, 3>;
+    using plane_t	= o2as::Plane<value_t, 3>;
 
   // Compute initial marker plane.
     std::vector<point_t>	points;
@@ -526,7 +434,7 @@ Simple::get_marker_transform(const aruco::Marker& marker,
 	{
 	    iterator_t		xyz(cloud_msg, "x");
 	    rgbiterator_t	rgb(const_cast<cloud_t&>(cloud_msg), "rgb");
-	    const auto	idx = cloud_msg.width * v + u0;
+	    const auto		idx = cloud_msg.width * v + u0;
 	    xyz += idx;
 	    rgb += idx;
 	
@@ -588,10 +496,21 @@ Simple::get_marker_transform(const aruco::Marker& marker,
     const auto	centroid = 0.25*(corners[0] + corners[1] +
 				 corners[2] + corners[3]);
 
-    return tf::Transform(tf::Matrix3x3(-p(0), n(0), q(0),
-				       -p(1), n(1), q(1),
-				       -p(2), n(2), q(2)),
-			 tf::Vector3(centroid(0), centroid(1), centroid(2)));
+  // Compute marker -> reference transfrom.
+    const tf::Transform		transform(tf::Matrix3x3(-p(0), n(0), q(0),
+							-p(1), n(1), q(1),
+							-p(2), n(2), q(2)),
+					  tf::Vector3(centroid(0),
+						      centroid(1),
+						      centroid(2)));
+    tf::StampedTransform	cameraToReference;
+    cameraToReference.setIdentity();
+    if (_reference_frame != _camera_frame)
+	get_transform(_reference_frame, _camera_frame, cameraToReference);
+
+    return static_cast<tf::Transform>(cameraToReference) 
+	 * static_cast<tf::Transform>(_rightToLeft) 
+	 * transform;
 }
 
 template <class T> cv::Vec<T, 3>
@@ -607,27 +526,13 @@ void
 Simple::publish_marker_info(const aruco::Marker& marker,
 			    const cloud_t& cloud_msg, const ros::Time& stamp)
 {
-  // marker -> camera transform
-    tf::Transform	transform = get_marker_transform(marker, cloud_msg);
-  //tf::Transform	transform = aruco_ros::arucoMarker2Tf(marker);
-
-    tf::StampedTransform	cameraToReference;
-    cameraToReference.setIdentity();
-    if (_reference_frame != _camera_frame)
-	get_transform(_reference_frame, _camera_frame, cameraToReference);
-
-  // marker -> reference transform
-    transform = static_cast<tf::Transform>(cameraToReference) 
-	      * static_cast<tf::Transform>(_rightToLeft) 
-	      * transform;
-
-    const tf::StampedTransform	stampedTransform(transform, stamp,
-						 _reference_frame,
-						 _marker_frame);
+    const tf::StampedTransform	stampedTransform(
+				    get_marker_transform(marker, cloud_msg),
+				    stamp, _reference_frame, _marker_frame);
     _tfBroadcaster.sendTransform(stampedTransform);
 
     geometry_msgs::PoseStamped	poseMsg;
-    tf::poseTFToMsg(transform, poseMsg.pose);
+    tf::poseTFToMsg(stampedTransform, poseMsg.pose);
     poseMsg.header.frame_id = _reference_frame;
     poseMsg.header.stamp    = stamp;
     _pose_pub.publish(poseMsg);
@@ -667,7 +572,7 @@ Simple::publish_marker_info(const aruco::Marker& marker,
 }
 
 void
-Simple::publish_misc_info(const cv::Mat& image, const ros::Time& stamp)
+Simple::publish_image_info(const cv::Mat& image, const ros::Time& stamp)
 {
     if (_image_pub.getNumSubscribers() > 0)
     {
@@ -690,18 +595,20 @@ Simple::publish_misc_info(const cv::Mat& image, const ros::Time& stamp)
 	_debug_pub.publish(debug_msg.toImageMsg());
     }
 }
-    
+
 }	// namespace o2as_aruco_ros
 
 int
 main(int argc, char** argv)
 {
-    ros::init(argc, argv, "o2as_aruco_simple");
+    ros::init(argc, argv, "o2as_single");
 
     try
     {
 	o2as_aruco_ros::Simple	node;
 	ros::spin();
+
+	node.print_bins(std::cout);
     }
     catch (const std::exception& err)
     {
