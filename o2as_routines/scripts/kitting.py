@@ -83,6 +83,7 @@ class KittingClass(O2ASBaseRoutines):
     self._search_grasp = rospy.ServiceProxy("search_grasp", SearchGrasp)
     # action
     self.blob_detection_client = actionlib.SimpleActionClient('blob_detection_action', o2as_msgs.msg.blobDetectionAction)
+    self.inner_pick_detection_client = actionlib.SimpleActionClient('inner_pick_detection_action', o2as_msgs.msg.innerPickDetectionAction)
     # self.blob_detection_client.wait_for_server()  
 
     self.initial_setup()
@@ -699,6 +700,24 @@ class KittingClass(O2ASBaseRoutines):
     #    point_top1_cam = t.transformPoint("a_bot_camera_depth_frame", point_top1)
     #    point_top1_cam = t.transformPoint(point_top4.header.frame_id, point_top1)
 
+  def check_pick(self, group_name, part_id):
+    #Go to check position
+    self.go_to_named_pose("check_precision_gripper_success", group_name)
+    rospy.sleep(0.2)
+
+    #check pick
+    goal = o2as_msgs.msg.innerPickDetectionGoal()
+    #goal.part_id = part_id
+    self.inner_pick_detection_client.send_goal(goal)
+    self.inner_pick_detection_client.wait_for_result()
+    result = self.inner_pick_detection_client.get_result()
+    rospy.loginfo(result)
+
+    #Move back the robot to home
+    self.go_to_named_pose("home", group_name)
+
+    return result
+
   def pick_screw_from_feeder(self, screw_size, attempts = 1):
     """
     Picks a screw from one of the feeders. The screw tool already has to be equipped!
@@ -974,6 +993,8 @@ class KittingClass(O2ASBaseRoutines):
       item_picked = self.pick(robot_name, pick_pose, 0.0, speed_fast = 0.3, speed_slow = 0.02, 
                         gripper_command=gripper_command, approach_height = 0.1)
       # TODO: Check grasp success via grasp width for robotiq gripper and vision for precision gripper
+      if gripper_command == "precision_gripper_from_inside":
+        item_picked = self.check_pick("a_bot", item.part_id)
       # Suction is checked inside the pick function
       if not self.use_real_robot:
         item_picked = True
