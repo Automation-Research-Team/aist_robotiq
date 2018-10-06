@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import numpy as np
 from numpy.linalg import norm
 import rospy
@@ -15,6 +17,7 @@ class InnerPickDetection(object):
          #Variable
         self._current_image = Image()
 
+        self.bridge = CvBridge()
         # Config parameters
         # TODO: read values from config file
         self._x = 270
@@ -22,7 +25,7 @@ class InnerPickDetection(object):
         self._w = 64
         self._h = 32
 
-        self._image_topic = "/a_bot_camera/color/image_raw"
+        self._image_topic = "/c_bot_camera/color/image_raw"
 
         # Subscriber
         rospy.Subscriber(self._image_topic, Image, self.image_callback)
@@ -34,9 +37,9 @@ class InnerPickDetection(object):
         rospy.loginfo('Action server '+ str(self._action_name)+" started.")
         self.action_result = o2as_msgs.msg.innerPickDetectionResult()
 
-        img_empty = cv2.imread('/root/catkin_ws/o2as_bg_ratio/images/image2.png')
-        img_empty = np.asarray(img_empty)[:, :, ::-1]
-        self._empty_bg_ratio = self.compute_red_ratio(img_empty, self._x, self._y, self._w, self._h)
+        self.img_empty = cv2.imread('/root/catkin_ws/src/o2as_bg_ratio/images/image2.png')
+        self.img_empty = np.asarray(self.img_empty)[:, :, ::-1]
+        self._empty_bg_ratio = self.compute_red_ratio(self.img_empty, self._x, self._y, self._w, self._h)
         #rospy.get_param("/empty_bg_ratio", '0.7')
     
     # Action Callback
@@ -54,7 +57,7 @@ class InnerPickDetection(object):
 
     # Image Callback
     def image_callback(self, msg_in):
-        self._current_image = CvBridge.imgmsg_to_cv2(msg_in, desired_encoding="passthrough")
+        self._current_image = self.bridge.imgmsg_to_cv2(msg_in, desired_encoding="passthrough")
         self._current_image = np.asarray(self._current_image)[:, :, ::-1]
 
     #Compute ratio
