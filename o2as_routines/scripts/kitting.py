@@ -622,7 +622,7 @@ class KittingClass(O2ASBaseRoutines):
     rospy.loginfo(result)
 
     #TODO select which poses to choose in the array
-    poseArrayRes = geometry_msgs.msg.PoseArray()    
+    poseArrayRes = geometry_msgs.msg.PoseArray()
     poseArrayRes = result.posesDetected 
 
     #TODO Sort pose in the midle of the bin
@@ -928,7 +928,7 @@ class KittingClass(O2ASBaseRoutines):
     safe_pose.pose.position.x = clamp(pick_pose.pose.position.x, -bin_length/2, bin_length/2)
     safe_pose.pose.position.y = clamp(pick_pose.pose.position.y, -bin_width/2, bin_width/2)
 
-    if safe_pose.pose.position.x ~= pick_pose.pose.position.x or safe_pose.pose.position.y ~= pick_pose.pose.position.y:
+    if safe_pose.pose.position.x != pick_pose.pose.position.x or safe_pose.pose.position.y != pick_pose.pose.position.y:
       rospy.loginfo("Pose was adjusted in make_pose_safe_for_bin. Before: " + 
                     str(pick_pose.pose.position.x) + ", " + 
                     str(pick_pose.pose.position.y) + ". After: " + 
@@ -1029,7 +1029,9 @@ class KittingClass(O2ASBaseRoutines):
       if item.part_id == 6:
         place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
       
-      if item.ee_to_use == "suction":
+      if "precision_gripper" in item.ee_to_use:
+        self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=.1)
+      elif item.ee_to_use == "suction":
         # Approach the place pose with controlled acceleration value
         rospy.loginfo("Approaching place pose")
         if item.set_number in [2,3] and item.target_frame[11] == '1':  # Tray 1
