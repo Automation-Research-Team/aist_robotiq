@@ -312,10 +312,14 @@ class KittingClass(O2ASBaseRoutines):
     res = self.suck(True)
     if not res:
       return False
-    
     res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
     if not res:
       return False
+    start_time = rospy.get_rostime()
+    while ((rospy.get_rostime().secs - start_time.secs) <= 10.0):
+      if self._suctioned:
+        return True
+    return False
   
   def place_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = "b_bot_suction_tool_tip_link"):
     rospy.loginfo("Go to the target.")
@@ -327,10 +331,9 @@ class KittingClass(O2ASBaseRoutines):
     rospy.sleep(1)
     if not res:
       return False
-
     start_time = rospy.get_rostime()
     while ((rospy.get_rostime().secs - start_time.secs) <= 10.0):
-      if self._suctioned:
+      if not self._suctioned:
         return True
     return False
 
