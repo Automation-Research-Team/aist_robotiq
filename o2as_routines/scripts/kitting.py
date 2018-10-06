@@ -74,7 +74,7 @@ class KittingClass(O2ASBaseRoutines):
 
     # action
     self.blob_detection_client = actionlib.SimpleActionClient('blob_detection_action', o2as_msgs.msg.blobDetectionAction)
-    self.blob_detection_client.wait_for_server()  
+    # self.blob_detection_client.wait_for_server()  
 
     self.initial_setup()
     rospy.sleep(.5)
@@ -360,16 +360,6 @@ class KittingClass(O2ASBaseRoutines):
 
       #Check posture of the screw
       rospy.loginfo("Begin check motion")
-      # goal_pose_ = geometry_msgs.msg.PoseStamped()
-      # goal_pose_.header.frame_id = "a_bot_gripper_tip_link"
-      # goal_pose_.pose.position.x = 0
-      # goal_pose_.pose.position.y = 0
-      # goal_pose_.pose.position.z = 0
-      # goal_pose_.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/4 , 0, 0))
-      # res = self.move_lin(group_name, goal_pose_, speed_slow, "")
-      # goal_pose_.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0 , -0.3*pi,0))
-      # res = self.move_lin(group_name, goal_pose_, speed_slow, "")
-
       over_bin_3_joint_pose = [0.5639523868982476, -1.2023834734104668, 2.084380077110544, -4.115980903386012, -1.350262946004677, 1.5910085738144437]
       self.groups["a_bot"].set_joint_value_target(over_bin_3_joint_pose)
       self.groups["a_bot"].set_max_velocity_scaling_factor(.1)
@@ -420,12 +410,60 @@ class KittingClass(O2ASBaseRoutines):
     
     above_handover_joint_pose = [1.2747349651123001, -1.8980970364707597, 2.3533797825176928, -3.596697424122053, -0.48908058573007357, 1.5708446443316382]
     handover_joint_pose = [1.6313695241102988, -1.2487396560808532, 2.2917947101014815, -4.184833174775171, -0.8459805085976276, 1.570752157190914]
+    self.groups["a_bot"].set_joint_value_target(above_handover_joint_pose)
+    self.groups["a_bot"].set_max_velocity_scaling_factor(.1)
+    self.groups["a_bot"].go(wait=True)
     self.groups["a_bot"].set_joint_value_target(handover_joint_pose)
     self.groups["a_bot"].set_max_velocity_scaling_factor(.1)
     self.groups["a_bot"].go(wait=True)
     self.precision_gripper_inner_open_slightly(open_range)
     return True
     
+  def pick_screw_from_precision_gripper(self, screw_size, attempts = 1):
+    """
+    Picks a screw from the precision gripper.
+    """
+    if not screw_size==3 and not screw_size==4:
+      rospy.logerr("Screw size needs to be 3 or 4!")
+      return False
+    
+    # Turn to the right to face the feeders
+    self.go_to_named_pose("screw_ready", "c_bot")
+    self.go_to_named_pose("screw_handover", "a_bot")
+
+    pick_pose = geometry_msgs.msg.PoseStamped()
+    pick_pose.header.frame_id = "a_bot_gripper_screw_pickup"
+    pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    pick_pose.pose.position.x = 0.032
+
+    prep_pose = copy.deepcopy(pick_pose)
+    prep_pose.pose.position.x = 0.0
+    prep_pose.pose.position.y = -0.032
+    print("press enter")
+    raw_input()
+    self.move_lin("c_bot", prep_pose, .2, end_effector_link="c_bot_screw_tool_m"+str(screw_size)+"_tip_link")
+
+    attempt = 0
+    screw_picked = False
+    while attempt < attempts:
+      print("press enter")
+      raw_input()
+      self.do_pick_action("c_bot", pick_pose, screw_size = 4, use_complex_planning = True, tool_name = "screw_tool")
+      bool_msg = Bool()
+      try:
+        bool_msg = rospy.wait_for_message("/screw_tool_m" + str(screw_size) + "/screw_suctioned", Bool, 1.0)
+      except:
+        pass
+      screw_picked = bool_msg.data
+      if screw_picked:
+        rospy.loginfo("Successfully picked the screw")
+        return True
+      if not self.use_real_robot:
+        rospy.loginfo("Pretending the screw is picked, because this is simulation.")
+        return True
+      attempt += 1
+
+    return False
 
   def view_bin(self, group_name, bin_id, speed_fast = 1.0, speed_slow = 1.0, bin_eff_height = 0.2, bin_eff_xoff = 0, bin_eff_deg_angle = 20,end_effector_link = ""):
     # TODO: adjust the x,z and end effector orientatio for optimal view of the bin to use with the  \search_grasp service
@@ -1304,10 +1342,10 @@ if __name__ == '__main__':
     # kit.view_bin("a_bot", "set1_bin3_1")
     # rospy.sleep(1)
 
-    kit.go_to_named_pose("home", "a_bot")
-    kit.go_to_named_pose("home", "b_bot")
-
-    kit.pick_screw_precision_gripper("a_bot", "set2_bin1_3", screw_size= 4)
+    # kit.go_to_named_pose("home", "a_bot")
+    # kit.go_to_named_pose("home", "b_bot")
+    # kit.pick_screw_precision_gripper("a_bot", "set2_bin1_3", screw_size= 4)
+    kit.pick_screw_from_precision_gripper(screw_size=4)
 
     ##### OLD CODE
     # kit.pick_and_place_demo()
