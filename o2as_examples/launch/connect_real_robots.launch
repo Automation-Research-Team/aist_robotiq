@@ -97,8 +97,8 @@
 
   <!-- a_bot camera -->
   <include file="$(find o2as_realsense_camera)/launch/camera.launch">
-    <arg name="camera_name" default="c_bot_camera"/>
-    <arg name="camera_frame" default="c_bot_camera"/>
+    <arg name="camera_name" default="a_bot_camera"/>
+    <arg name="camera_frame" default="a_bot_camera"/>
     <arg name="serial_number" value="627201001218"/> 
   </include>
 

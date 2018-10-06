@@ -36,6 +36,7 @@ if __name__ == '__main__':
                                Point32(mask_u,360,0)]  
           
         goal.maskCorner = test_polygon
+        goal.param_part_id = "test"
         client.send_goal(goal)
         client.wait_for_result()
         result = client.get_result()

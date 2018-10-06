@@ -1,0 +1,12 @@
+# Request
+uint8 part_id
+
+
+---
+# Results
+bool picked
+bool success
+
+---
+# Feedback
+bool f

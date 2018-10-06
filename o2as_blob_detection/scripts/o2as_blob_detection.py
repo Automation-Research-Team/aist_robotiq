@@ -52,11 +52,11 @@ class BlobDetection(object):
 
     # Action Callback
     def action_callback(self, goal):
-      rospy.loginfo('Executing'+ str(self._action_name)+"."+"request sent:")
+      rospy.loginfo('Executing'+" "+str(self._action_name)+"."+"request sent:")
       rospy.loginfo(goal)
-      rospy.loginfo('Executing'+ str(self._action_name)+"."+"request sent:")
+      rospy.loginfo('Executing'+" "+str(self._action_name)+"."+"request sent:")
 
-      res = self.detect_poses(goal.maskCorner)
+      res = self.detect_poses(goal.maskCorner, goal.param_part_id)
 
       self.action_result.success = res
       if(res):
@@ -84,7 +84,7 @@ class BlobDetection(object):
 
 #      self.detect_poses(test_polygon)
     
-    def detect_poses(self, in_polygon):
+    def detect_poses(self, in_polygon, param_part_id = "default"):
 
 
       #img_cv=cv2.imread('/root/catkin_ws/mask_extract/set2_bin1_4_img2.png')
@@ -108,7 +108,7 @@ class BlobDetection(object):
       masked_img= self.mask_image(img, in_polygon)
 
       # Detect the blob in the image
-      res_b, blob_array = self.detect_blob(masked_img)
+      res_b, blob_array = self.detect_blob(masked_img, param_part_id)
    
       if(res_b):
           msg_out = geometry_msgs.msg.Point()
@@ -184,7 +184,7 @@ class BlobDetection(object):
         cv2.imwrite('/root/catkin_ws/masked_image.png',out_img)
         return out_img
 
-    def detect_blob(self, img):
+    def detect_blob(self, img, param_part_id = "default"):
         """Compute the ratio of red area in the image.
       
         The returned value should be used to check if the precision gripper pick a
@@ -204,30 +204,61 @@ class BlobDetection(object):
     
         params = cv2.SimpleBlobDetector_Params()
     
-        # Segmentation Thresholds
-        params.minThreshold = 100
-        params.maxThreshold = 400
+
+        rospy.loginfo( rospy.get_name() + " parameter chosen: " + param_part_id)
+        if(param_part_id == "test"):
+            rospy.loginfo( "in: " + param_part_id)
+            # Segmentation Thresholds
+            params.minThreshold = 100
+            params.maxThreshold = 400
     
-        # Filter by color
-        params.filterByColor = True
-        params.blobColor = 0
+            # Filter by color
+            params.filterByColor = True
+            params.blobColor = 0
     
-        # Filter by size of the blob.
-        params.filterByArea = True
-        params.minArea = 20
-        params.maxArea = 150
+            # Filter by size of the blob.
+            params.filterByArea = True
+            params.minArea = 20
+            params.maxArea = 150
     
-        # Filter by Circularity
-        params.filterByCircularity = True
-        params.minCircularity = 0.7
+            # Filter by Circularity
+            params.filterByCircularity = True
+            params.minCircularity = 0.7
     
-        # Filter by Convexity
-        params.filterByConvexity = False
-        params.minConvexity = 0.87
+            # Filter by Convexity
+            params.filterByConvexity = False
+            params.minConvexity = 0.87
     
-        # Filter by Inertia
-        params.filterByInertia = False
-        params.minInertiaRatio = 0.01
+            # Filter by Inertia
+            params.filterByInertia = False
+            params.minInertiaRatio = 0.01
+
+        elif(param_part_id == "part_"):
+            # Segmentation Thresholds
+            params.minThreshold = 100
+            params.maxThreshold = 400
+    
+            # Filter by color
+            params.filterByColor = True
+            params.blobColor = 0
+    
+            # Filter by size of the blob.
+            params.filterByArea = True
+            params.minArea = 20
+            params.maxArea = 150
+    
+            # Filter by Circularity
+            params.filterByCircularity = True
+            params.minCircularity = 0.7
+    
+            # Filter by Convexity
+            params.filterByConvexity = False
+            params.minConvexity = 0.87
+    
+            # Filter by Inertia
+            params.filterByInertia = False
+            params.minInertiaRatio = 0.01
+
     
        # Create a detector with the parameters
         ver = (cv2.__version__).split('.')
