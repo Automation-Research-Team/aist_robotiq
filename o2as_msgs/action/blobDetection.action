@@ -1,5 +1,6 @@
 # Request
 geometry_msgs/Polygon maskCorner
+string param_part_id
 
 
 ---
