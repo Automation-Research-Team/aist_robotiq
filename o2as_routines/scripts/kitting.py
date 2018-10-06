@@ -124,16 +124,17 @@ class KittingClass(O2ASBaseRoutines):
 
 
     self.part_bin_list = {
-      "part_11": "set1_bin2_3", 
-      "part_12": "set2_bin1_2", 
-      "part_13": "set1_bin2_4",
-      "part_16": "set2_bin1_3", 
-      "part_17": "set2_bin1_4", 
-      "part_18": "set2_bin1_1", 
-      "part_4": "set1_bin2_1",
-      "part_6": "set1_bin3_1", 
-      "part_8": "set1_bin2_2", 
-      "part_9": "set2_bin1_5" }
+      "part_11": "bin2_3", 
+      "part_12": "bin1_2", 
+      "part_13": "bin2_4",
+      "part_16": "bin1_3", 
+      "part_17": "bin1_4", 
+      "part_18": "bin1_1", 
+      "part_4": "bin2_1",
+      "part_6": "bin3_1", 
+      "part_8": "bin2_2", 
+      "part_9": "bin1_5" }
+    # self.part_bin_list = rospy.get_param("kitting_parts_bin_list")
 
 
     self.part_position_in_tray = {
@@ -952,6 +953,7 @@ class KittingClass(O2ASBaseRoutines):
     pose_in_camera.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(resp.rot3D[0].x, resp.rot3D[0].y, resp.rot3D[0].z))
     pose_in_bin.pose = tf_listener.transformPose(item.bin_name, pose_in_camera)
     pose_in_bin.pose.orientation = self.downward_orientation
+    # TODO We should talk about how to use rotiqz which the two_finger approaches.
 
     return pose_in_bin
 
@@ -977,9 +979,9 @@ class KittingClass(O2ASBaseRoutines):
       
       # Attempt to pick the item
       # TODO: Get the position from vision
-      # pick_pose = geometry_msgs.msg.PoseStamped()
-      # pick_pose.header.frame_id = item.bin_name
-      pick_pose = self.get_item_pose(item)
+      pick_pose = geometry_msgs.msg.PoseStamped()
+      pick_pose.header.frame_id = item.bin_name
+      # pick_pose = self.get_item_pose(item)
       if item.ee_to_use == "suction":      # Orientation needs to be adjusted for suction tool
         pick_point_on_table = self.listener.transformPose("workspace_center", pick_pose).pose.position
         if pick_point_on_table.y > -.1:
@@ -1086,6 +1088,7 @@ class KittingClass(O2ASBaseRoutines):
     # self.go_to_named_pose("back", "a_bot")
     screw_delivery_time = rospy.Time.now()
 
+    self.do_change_tool_action("b_bot", equip=True, screw_size=50)   # 50 = suction tool
     for item in self.suction_items:
       if rospy.is_shutdown():
         break
