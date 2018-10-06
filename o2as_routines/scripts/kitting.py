@@ -269,7 +269,7 @@ class KittingClass(O2ASBaseRoutines):
   def _suction_state_callback(self, data):
     self._suctioned = data.data
 
-  def switch_suction(self, turn_suction_on=False):
+  def suck(self, turn_suction_on=False, naive=False):
     # Judge success or fail using pressure status.
     if not self.use_real_robot:
       return True
@@ -284,13 +284,13 @@ class KittingClass(O2ASBaseRoutines):
 
   def pick_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link="b_bot_suction_tool_tip_link"):
     rospy.loginfo("Try picking up by suction.")
-    res = self.switch_suction(True)
+    res = self.suck(True)
     if not res:
       return False
     
-    # res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
-    # if not res:
-    #   return False
+    res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
+    if not res:
+      return False
 
     start_time = rospy.get_rostime()
     while ((rospy.get_rostime().secs - start_time.secs) <= 10.0):
@@ -604,13 +604,13 @@ class KittingClass(O2ASBaseRoutines):
 
   def place_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = "b_bot_suction_tool_tip_link"):
     rospy.loginfo("Try place by suction.")
-    res = self.switch_suction(False)
+    res = self.suck(False)
     if not res:
       return False
     
-    # res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
-    # if not res:
-      # return False
+    res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
+    if not res:
+      return False
 
     start_time = rospy.get_rostime()
     while ((rospy.get_rostime().secs - start_time.secs) <= 10.0):
@@ -936,20 +936,20 @@ class KittingClass(O2ASBaseRoutines):
     
     return False
 
-  def get_item_pose(self, part_id, gripper, update_image):
-    bin_id = rospy.get_param("/roi_id/"+str(self.part_bin_list(part_id)))
-    req_search_grasp = SearchGraspRequest()
-    req_search_grasp.part_id = int(str(part_id).strip("part_"))
-    req_search_grasp.bin_id = bin_id
-    req_search_grasp.gripper = gripper
-    req_search_grasp.update_image = update_image
-    try:
-      resp_search_grasp = self._search_grasp(req_search_grasp)
-      update_image = False
-    except rospy.ServiceException as e:
-      rospy.logerr(e.message)
-      continue
+  def get_item_pose(self, item, gripper, is_update=True):
+    req = SearchGraspRequest()
+    req.part_id = int(str(item).strip("part_"))
+    req.bin_name = self.part_bin_list[item]
+    req.gripper = gripper
+    req.is_updated = is_updated
+    resp = self._search_grasp(req_search_grasp)
 
+    pose = geometry_msgs.PoseStamped()
+    pose.header.frame_id = "/a_phoxi_m_sensor"
+    pose.pose.position = resp.pos3D[0]
+    pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(resp.rot3D[0].x, resp.rot3D[0].y, resp.rot3D[0].z))
+
+    return pose
 
   def attempt_item(self, item, max_attempts = 5):
     """This function attempts to pick an item.
@@ -973,8 +973,9 @@ class KittingClass(O2ASBaseRoutines):
       
       # Attempt to pick the item
       # TODO: Get the position from vision
-      pick_pose = geometry_msgs.msg.PoseStamped()
-      pick_pose.header.frame_id = item.bin_name
+      # pick_pose = geometry_msgs.msg.PoseStamped()
+      # pick_pose.header.frame_id = item.bin_name
+      pick_pose = self.get_item_pose()
       if item.ee_to_use == "suction":      # Orientation needs to be adjusted for suction tool
         pick_point_on_table = self.listener.transformPose("workspace_center", pick_pose).pose.position
         if pick_point_on_table.y > -.1:
@@ -1193,18 +1194,31 @@ class KittingClass(O2ASBaseRoutines):
     return
 
   def pick_suction_test(self):
-    ret = self.pick_using_dual_suction_gripper("b_bot", geometry_msgs.msg.PoseStamped(), 0.05)
-    if ret:
-      rospy.loginfo("succeeded")
-    else:
+    res = self.suck(True)
+    if not res:
       rospy.loginfo("failed")
+      return
+    
+    start_time = rospy.get_rostime()
+    suctioned = False
+    while ((rospy.get_rostime().secs - start_time.secs) <= 10.0):
+      if self._suctioned:
+        rospy.loginfo("succeeded")
+        return
+    rospy.loginfo("failed")
   
   def place_suction_test(self):
-    ret = self.place_using_dual_suction_gripper("b_bot", geometry_msgs.msg.PoseStamped(), 0.05)
-    if ret:
-      rospy.loginfo("succeeded")
-    else:
+    res = self.suck(False)
+    if not res:
       rospy.loginfo("failed")
+      return
+
+    start_time = rospy.get_rostime()
+    while ((rospy.get_rostime().secs - start_time.secs) <= 10.0):
+      if not self._suctioned:
+        rospy.loginfo("succeeded")
+        return
+    rospy.loginfo("failed")
 
 if __name__ == '__main__':
   try:
