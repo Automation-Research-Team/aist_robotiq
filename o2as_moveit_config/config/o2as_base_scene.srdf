@@ -296,6 +296,14 @@
         <joint name="b_bot_wrist_2_joint" value="-0.0347" />
         <joint name="b_bot_wrist_3_joint" value="-3.1415" />
     </group_state>
+    <group_state name="screw_handover" group="a_bot">
+        <joint name="a_bot_elbow_joint" value="2.2176" />
+        <joint name="a_bot_shoulder_lift_joint" value="-1.2053" />
+        <joint name="a_bot_shoulder_pan_joint" value="2.0694" />
+        <joint name="a_bot_wrist_1_joint" value="-4.1541" />
+        <joint name="a_bot_wrist_2_joint" value="-1.9116" />
+        <joint name="a_bot_wrist_3_joint" value="1.5707" />
+    </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="c_bot_gripper" parent_link="c_bot_robotiq_85_tip_link" group="c_bot" />
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
@@ -343,16 +351,6 @@
     <disable_collisions link1="a_bot_base_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="a_bot_base_link" link2="set1_bin2_1" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_link" link2="set1_bin2_2" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_link" link2="set1_bin2_3" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_link" link2="set1_bin2_4" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_link" link2="set1_bin3_1" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_link" link2="set2_bin1_1" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_link" link2="set2_bin1_2" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_link" link2="set2_bin1_3" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_link" link2="set2_bin1_4" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_link" link2="set2_bin1_5" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_link" link2="set_1_tray_1" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_link" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -390,16 +388,6 @@
     <disable_collisions link1="a_bot_base_smfl" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="a_bot_base_smfl" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="a_bot_base_smfl" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="a_bot_base_smfl" link2="set1_bin2_1" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_smfl" link2="set1_bin2_2" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_smfl" link2="set1_bin2_3" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_smfl" link2="set1_bin2_4" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_smfl" link2="set1_bin3_1" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_smfl" link2="set2_bin1_1" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_smfl" link2="set2_bin1_2" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_smfl" link2="set2_bin1_3" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_smfl" link2="set2_bin1_4" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_smfl" link2="set2_bin1_5" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_smfl" link2="set_1_tray_1" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_smfl" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="a_bot_base_smfl" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -555,16 +543,6 @@
     <disable_collisions link1="a_bot_shoulder_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="set_1_tray_1" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -597,13 +575,6 @@
     <disable_collisions link1="a_bot_upper_arm_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="a_bot_upper_arm_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="a_bot_upper_arm_link" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="a_bot_upper_arm_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="a_bot_upper_arm_link" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="a_bot_upper_arm_link" link2="set1_bin3_1" reason="Default" />
-    <disable_collisions link1="a_bot_upper_arm_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="a_bot_upper_arm_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="a_bot_upper_arm_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="a_bot_upper_arm_link" link2="set2_bin1_5" reason="Default" />
     <disable_collisions link1="a_bot_upper_arm_link" link2="set_1_tray_1" reason="Never" />
     <disable_collisions link1="a_bot_upper_arm_link" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="a_bot_upper_arm_link" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -713,16 +684,6 @@
     <disable_collisions link1="a_phoxi_m_camera" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="set1_bin2_1" reason="Adjacent" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="set1_bin2_2" reason="Adjacent" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="set1_bin2_3" reason="Adjacent" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="set1_bin2_4" reason="Adjacent" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="set1_bin3_1" reason="Adjacent" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="set2_bin1_1" reason="Adjacent" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="set2_bin1_2" reason="Adjacent" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="set2_bin1_3" reason="Adjacent" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="set2_bin1_4" reason="Adjacent" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="set2_bin1_5" reason="Adjacent" />
     <disable_collisions link1="a_phoxi_m_camera" link2="set_1_tray_1" reason="Adjacent" />
     <disable_collisions link1="a_phoxi_m_camera" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -770,16 +731,6 @@
     <disable_collisions link1="b_bot_base_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="b_bot_base_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="b_bot_base_link" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="set1_bin2_1" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_link" link2="set1_bin2_2" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_link" link2="set1_bin2_3" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_link" link2="set1_bin2_4" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_link" link2="set1_bin3_1" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_link" link2="set2_bin1_1" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_link" link2="set2_bin1_2" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_link" link2="set2_bin1_3" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_link" link2="set2_bin1_4" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_link" link2="set2_bin1_5" reason="Adjacent" />
     <disable_collisions link1="b_bot_base_link" link2="set_1_tray_1" reason="Adjacent" />
     <disable_collisions link1="b_bot_base_link" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="b_bot_base_link" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -812,16 +763,6 @@
     <disable_collisions link1="b_bot_base_smfl" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="b_bot_base_smfl" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="b_bot_base_smfl" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="b_bot_base_smfl" link2="set1_bin2_1" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_smfl" link2="set1_bin2_2" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_smfl" link2="set1_bin2_3" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_smfl" link2="set1_bin2_4" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_smfl" link2="set1_bin3_1" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_smfl" link2="set2_bin1_1" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_smfl" link2="set2_bin1_2" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_smfl" link2="set2_bin1_3" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_smfl" link2="set2_bin1_4" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_smfl" link2="set2_bin1_5" reason="Adjacent" />
     <disable_collisions link1="b_bot_base_smfl" link2="set_1_tray_1" reason="Adjacent" />
     <disable_collisions link1="b_bot_base_smfl" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="b_bot_base_smfl" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -868,8 +809,6 @@
     <disable_collisions link1="b_bot_ee_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="b_bot_ee_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="b_bot_ee_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="set_1_tray_1_divider1_2" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="set_1_tray_2_divider2" reason="Never" />
@@ -882,7 +821,6 @@
     <disable_collisions link1="b_bot_forearm_link" link2="b_bot_wrist_1_link" reason="Adjacent" />
     <disable_collisions link1="b_bot_forearm_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_forearm_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_forearm_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="b_bot_ft300_link" link2="b_bot_robotiq_85_base_link" reason="Default" />
     <disable_collisions link1="b_bot_ft300_link" link2="b_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_ft300_link" link2="b_bot_robotiq_85_left_finger_tip_link" reason="Never" />
@@ -933,7 +871,6 @@
     <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="m4_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="screw_tool_m3_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="set2_bin1_1" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="b_bot_robotiq_85_left_inner_knuckle_link" reason="Adjacent" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="b_bot_robotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="b_bot_robotiq_85_right_finger_link" reason="Never" />
@@ -954,7 +891,6 @@
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="c_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="m4_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="screw_tool_m3_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="b_bot_robotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="b_bot_robotiq_85_right_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="b_bot_robotiq_85_right_finger_tip_link" reason="Never" />
@@ -991,8 +927,6 @@
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="m4_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="screw_tool_m3_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="set2_bin1_4" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="set_2_tray_1_divider1_2" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="set_3_tray_1_divider1_2" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="b_bot_robotiq_85_right_finger_tip_link" reason="Default" />
@@ -1015,8 +949,6 @@
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="c_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="set_3_tray_1_divider1_2" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="b_bot_robotiq_85_right_inner_knuckle_link" reason="Adjacent" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="b_bot_robotiq_85_right_knuckle_link" reason="Never" />
@@ -1037,8 +969,6 @@
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="m4_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="screw_tool_m3_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="b_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="b_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="b_bot_wrist_2_link" reason="Never" />
@@ -1069,8 +999,6 @@
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="b_bot_upper_arm_link" reason="Adjacent" />
     <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_base_link" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_base_smfl" reason="Never" />
@@ -1089,16 +1017,6 @@
     <disable_collisions link1="b_bot_shoulder_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="set_1_tray_1" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -1126,12 +1044,6 @@
     <disable_collisions link1="b_bot_upper_arm_link" link2="m4_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_upper_arm_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="b_bot_upper_arm_link" link2="screw_tool_m4_link" reason="Never" />
-    <disable_collisions link1="b_bot_upper_arm_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="b_bot_upper_arm_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="b_bot_upper_arm_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="b_bot_upper_arm_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="b_bot_upper_arm_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="b_bot_upper_arm_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="b_bot_upper_arm_link" link2="set_1_tray_2" reason="Never" />
     <disable_collisions link1="b_bot_upper_arm_link" link2="set_1_tray_2_divider2" reason="Never" />
     <disable_collisions link1="b_bot_upper_arm_link" link2="set_1_tray_2_screw_holder" reason="Never" />
@@ -1147,7 +1059,6 @@
     <disable_collisions link1="b_bot_wrist_3_link" link2="c_bot_ee_link" reason="Never" />
     <disable_collisions link1="b_bot_wrist_3_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_wrist_3_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_wrist_3_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="c_bot_base_smfl" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_link" link2="c_bot_shoulder_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_link" link2="m3_feeder_link" reason="Never" />
@@ -1157,16 +1068,6 @@
     <disable_collisions link1="c_bot_base_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="c_bot_base_link" link2="set1_bin2_1" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_link" link2="set1_bin2_2" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_link" link2="set1_bin2_3" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_link" link2="set1_bin2_4" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_link" link2="set1_bin3_1" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_link" link2="set2_bin1_1" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_link" link2="set2_bin1_2" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_link" link2="set2_bin1_3" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_link" link2="set2_bin1_4" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_link" link2="set2_bin1_5" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_link" link2="set_1_tray_1" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_link" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -1196,16 +1097,6 @@
     <disable_collisions link1="c_bot_base_smfl" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="c_bot_base_smfl" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="c_bot_base_smfl" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="c_bot_base_smfl" link2="set1_bin2_1" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_smfl" link2="set1_bin2_2" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_smfl" link2="set1_bin2_3" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_smfl" link2="set1_bin2_4" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_smfl" link2="set1_bin3_1" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_smfl" link2="set2_bin1_1" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_smfl" link2="set2_bin1_2" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_smfl" link2="set2_bin1_3" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_smfl" link2="set2_bin1_4" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_smfl" link2="set2_bin1_5" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_smfl" link2="set_1_tray_1" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_smfl" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_base_smfl" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -1241,11 +1132,6 @@
     <disable_collisions link1="c_bot_camera_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_camera_link" link2="c_bot_wrist_2_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_camera_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_camera_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_camera_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_camera_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_camera_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_camera_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_camera_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_camera_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_camera_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1266,16 +1152,6 @@
     <disable_collisions link1="c_bot_ee_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_ee_link" link2="c_bot_wrist_3_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_ee_link" link2="screw_tool_m3_link" reason="Never" />
-    <disable_collisions link1="c_bot_ee_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="c_bot_ee_link" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="c_bot_ee_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="c_bot_ee_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="c_bot_ee_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="c_bot_ee_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_ee_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_ee_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_ee_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_ee_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_ee_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_ee_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_ee_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1290,16 +1166,6 @@
     <disable_collisions link1="c_bot_forearm_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_forearm_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="c_bot_forearm_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="c_bot_forearm_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="c_bot_forearm_link" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="c_bot_forearm_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="c_bot_forearm_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="c_bot_forearm_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="c_bot_forearm_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_forearm_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_forearm_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_forearm_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_forearm_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_forearm_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_forearm_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_forearm_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1318,16 +1184,6 @@
     <disable_collisions link1="c_bot_ft300_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_ft300_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_ft300_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_ft300_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="c_bot_ft300_link" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="c_bot_ft300_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="c_bot_ft300_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="c_bot_ft300_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="c_bot_ft300_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_ft300_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_ft300_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_ft300_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_ft300_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_ft300_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_ft300_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_ft300_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1345,14 +1201,6 @@
     <disable_collisions link1="c_bot_robotiq_85_base_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_base_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_base_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_base_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_base_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_base_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_base_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_base_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_base_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_base_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_base_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_base_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_base_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_base_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1369,13 +1217,6 @@
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1391,12 +1232,6 @@
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1411,12 +1246,6 @@
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1430,15 +1259,6 @@
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1451,14 +1271,6 @@
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1470,11 +1282,6 @@
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1485,12 +1292,6 @@
     <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1500,15 +1301,6 @@
     <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1525,16 +1317,6 @@
     <disable_collisions link1="c_bot_shoulder_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="set_1_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -1558,16 +1340,6 @@
     <disable_collisions link1="c_bot_shoulder_link" link2="workbox2" reason="Never" />
     <disable_collisions link1="c_bot_upper_arm_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="c_bot_upper_arm_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="c_bot_upper_arm_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="c_bot_upper_arm_link" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="c_bot_upper_arm_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="c_bot_upper_arm_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="c_bot_upper_arm_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="c_bot_upper_arm_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_upper_arm_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_upper_arm_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_upper_arm_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_upper_arm_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_upper_arm_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_upper_arm_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_upper_arm_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1582,16 +1354,6 @@
     <disable_collisions link1="c_bot_upper_arm_link" link2="set_3_tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="c_bot_wrist_1_link" link2="c_bot_wrist_2_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_wrist_1_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_wrist_1_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_wrist_1_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_wrist_1_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1600,16 +1362,6 @@
     <disable_collisions link1="c_bot_wrist_1_link" link2="set_3_tray_1_divider1_2" reason="Never" />
     <disable_collisions link1="c_bot_wrist_2_link" link2="c_bot_wrist_3_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_wrist_2_link" link2="m3_feeder_link" reason="Default" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_wrist_2_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_wrist_2_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_wrist_2_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1617,16 +1369,6 @@
     <disable_collisions link1="c_bot_wrist_2_link" link2="set_3_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_wrist_2_link" link2="set_3_tray_1_divider1_2" reason="Never" />
     <disable_collisions link1="c_bot_wrist_3_link" link2="m3_feeder_link" reason="Default" />
-    <disable_collisions link1="c_bot_wrist_3_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_3_link" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_3_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_3_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_3_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_3_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_3_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_3_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_3_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_3_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="c_bot_wrist_3_link" link2="set_2_tray_1" reason="Never" />
     <disable_collisions link1="c_bot_wrist_3_link" link2="set_2_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_wrist_3_link" link2="set_2_tray_1_divider1_2" reason="Never" />
@@ -1639,16 +1381,6 @@
     <disable_collisions link1="m3_feeder_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="m3_feeder_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="m3_feeder_link" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="m3_feeder_link" link2="set_1_tray_1" reason="Never" />
     <disable_collisions link1="m3_feeder_link" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="m3_feeder_link" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -1675,16 +1407,6 @@
     <disable_collisions link1="m4_feeder_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="m4_feeder_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="m4_feeder_link" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="m4_feeder_link" link2="set_1_tray_1" reason="Never" />
     <disable_collisions link1="m4_feeder_link" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="m4_feeder_link" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -1710,16 +1432,6 @@
     <disable_collisions link1="rack_trays" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="rack_trays" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="rack_trays" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="rack_trays" link2="set1_bin2_1" reason="Adjacent" />
-    <disable_collisions link1="rack_trays" link2="set1_bin2_2" reason="Adjacent" />
-    <disable_collisions link1="rack_trays" link2="set1_bin2_3" reason="Adjacent" />
-    <disable_collisions link1="rack_trays" link2="set1_bin2_4" reason="Adjacent" />
-    <disable_collisions link1="rack_trays" link2="set1_bin3_1" reason="Adjacent" />
-    <disable_collisions link1="rack_trays" link2="set2_bin1_1" reason="Adjacent" />
-    <disable_collisions link1="rack_trays" link2="set2_bin1_2" reason="Adjacent" />
-    <disable_collisions link1="rack_trays" link2="set2_bin1_3" reason="Adjacent" />
-    <disable_collisions link1="rack_trays" link2="set2_bin1_4" reason="Adjacent" />
-    <disable_collisions link1="rack_trays" link2="set2_bin1_5" reason="Adjacent" />
     <disable_collisions link1="rack_trays" link2="set_1_tray_1" reason="Adjacent" />
     <disable_collisions link1="rack_trays" link2="set_1_tray_1_divider1_1" reason="Default" />
     <disable_collisions link1="rack_trays" link2="set_1_tray_1_divider1_2" reason="Default" />
@@ -1744,16 +1456,6 @@
     <disable_collisions link1="screw_tool_holder" link2="screw_tool_m3_link" reason="Adjacent" />
     <disable_collisions link1="screw_tool_holder" link2="screw_tool_m4_link" reason="Adjacent" />
     <disable_collisions link1="screw_tool_holder" link2="screw_tool_m6_link" reason="Adjacent" />
-    <disable_collisions link1="screw_tool_holder" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="screw_tool_holder" link2="set_1_tray_1" reason="Never" />
     <disable_collisions link1="screw_tool_holder" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="screw_tool_holder" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -1777,16 +1479,6 @@
     <disable_collisions link1="screw_tool_holder" link2="workbox2" reason="Never" />
     <disable_collisions link1="screw_tool_m3_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="screw_tool_m3_link" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="screw_tool_m3_link" link2="set_1_tray_1" reason="Never" />
     <disable_collisions link1="screw_tool_m3_link" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="screw_tool_m3_link" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -1809,16 +1501,6 @@
     <disable_collisions link1="screw_tool_m3_link" link2="workbox1" reason="Never" />
     <disable_collisions link1="screw_tool_m3_link" link2="workbox2" reason="Never" />
     <disable_collisions link1="screw_tool_m4_link" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="screw_tool_m4_link" link2="set_1_tray_1" reason="Never" />
     <disable_collisions link1="screw_tool_m4_link" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="screw_tool_m4_link" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -1840,16 +1522,6 @@
     <disable_collisions link1="screw_tool_m4_link" link2="suction_tool_link" reason="Never" />
     <disable_collisions link1="screw_tool_m4_link" link2="workbox1" reason="Never" />
     <disable_collisions link1="screw_tool_m4_link" link2="workbox2" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="set1_bin2_1" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="set1_bin2_2" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="set1_bin2_3" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="set1_bin2_4" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="set1_bin3_1" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="set2_bin1_1" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="set2_bin1_2" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="set2_bin1_3" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="set2_bin1_4" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="set2_bin1_5" reason="Never" />
     <disable_collisions link1="screw_tool_m6_link" link2="set_1_tray_1" reason="Never" />
     <disable_collisions link1="screw_tool_m6_link" link2="set_1_tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="screw_tool_m6_link" link2="set_1_tray_1_divider1_2" reason="Never" />
@@ -1871,261 +1543,6 @@
     <disable_collisions link1="screw_tool_m6_link" link2="suction_tool_link" reason="Default" />
     <disable_collisions link1="screw_tool_m6_link" link2="workbox1" reason="Never" />
     <disable_collisions link1="screw_tool_m6_link" link2="workbox2" reason="Never" />
-    <disable_collisions link1="set1_bin2_1" link2="set1_bin2_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_1" link2="set1_bin2_3" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_1" link2="set1_bin2_4" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_1" link2="set1_bin3_1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_1" link2="set2_bin1_1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_1" link2="set2_bin1_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_1" link2="set2_bin1_3" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_1" link2="set2_bin1_4" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_1" link2="set2_bin1_5" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_1" link2="set_1_tray_1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_1" link2="set_1_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_1" link2="set_1_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set1_bin2_1" link2="set_1_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_1" link2="set_1_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set1_bin2_1" link2="set_1_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set1_bin2_1" link2="set_2_tray_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_1" link2="set_2_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_1" link2="set_2_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set1_bin2_1" link2="set_2_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_1" link2="set_2_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set1_bin2_1" link2="set_2_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set1_bin2_1" link2="set_3_tray_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_1" link2="set_3_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_1" link2="set_3_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set1_bin2_1" link2="set_3_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_1" link2="set_3_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set1_bin2_1" link2="set_3_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set1_bin2_1" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="set1_bin2_1" link2="workbox1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_1" link2="workbox2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_2" link2="set1_bin2_3" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_2" link2="set1_bin2_4" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_2" link2="set1_bin3_1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_2" link2="set2_bin1_1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_2" link2="set2_bin1_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_2" link2="set2_bin1_3" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_2" link2="set2_bin1_4" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_2" link2="set2_bin1_5" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_2" link2="set_1_tray_1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_2" link2="set_1_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_2" link2="set_1_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set1_bin2_2" link2="set_1_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_2" link2="set_1_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set1_bin2_2" link2="set_1_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set1_bin2_2" link2="set_2_tray_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_2" link2="set_2_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_2" link2="set_2_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set1_bin2_2" link2="set_2_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_2" link2="set_2_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set1_bin2_2" link2="set_2_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set1_bin2_2" link2="set_3_tray_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_2" link2="set_3_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_2" link2="set_3_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set1_bin2_2" link2="set_3_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_2" link2="set_3_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set1_bin2_2" link2="set_3_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set1_bin2_2" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="set1_bin2_2" link2="workbox1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_2" link2="workbox2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_3" link2="set1_bin2_4" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_3" link2="set1_bin3_1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_3" link2="set2_bin1_1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_3" link2="set2_bin1_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_3" link2="set2_bin1_3" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_3" link2="set2_bin1_4" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_3" link2="set2_bin1_5" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_3" link2="set_1_tray_1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_3" link2="set_1_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_3" link2="set_1_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set1_bin2_3" link2="set_1_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_3" link2="set_1_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set1_bin2_3" link2="set_1_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set1_bin2_3" link2="set_2_tray_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_3" link2="set_2_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_3" link2="set_2_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set1_bin2_3" link2="set_2_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_3" link2="set_2_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set1_bin2_3" link2="set_2_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set1_bin2_3" link2="set_3_tray_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_3" link2="set_3_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_3" link2="set_3_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set1_bin2_3" link2="set_3_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_3" link2="set_3_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set1_bin2_3" link2="set_3_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set1_bin2_3" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="set1_bin2_3" link2="workbox1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_3" link2="workbox2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_4" link2="set1_bin3_1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_4" link2="set2_bin1_1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_4" link2="set2_bin1_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_4" link2="set2_bin1_3" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_4" link2="set2_bin1_4" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_4" link2="set2_bin1_5" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_4" link2="set_1_tray_1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_4" link2="set_1_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_4" link2="set_1_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set1_bin2_4" link2="set_1_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_4" link2="set_1_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set1_bin2_4" link2="set_1_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set1_bin2_4" link2="set_2_tray_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_4" link2="set_2_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_4" link2="set_2_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set1_bin2_4" link2="set_2_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_4" link2="set_2_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set1_bin2_4" link2="set_2_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set1_bin2_4" link2="set_3_tray_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_4" link2="set_3_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set1_bin2_4" link2="set_3_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set1_bin2_4" link2="set_3_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_4" link2="set_3_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set1_bin2_4" link2="set_3_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set1_bin2_4" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="set1_bin2_4" link2="workbox1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin2_4" link2="workbox2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin3_1" link2="set2_bin1_1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin3_1" link2="set2_bin1_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin3_1" link2="set2_bin1_3" reason="Adjacent" />
-    <disable_collisions link1="set1_bin3_1" link2="set2_bin1_4" reason="Adjacent" />
-    <disable_collisions link1="set1_bin3_1" link2="set2_bin1_5" reason="Adjacent" />
-    <disable_collisions link1="set1_bin3_1" link2="set_1_tray_1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin3_1" link2="set_1_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set1_bin3_1" link2="set_1_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set1_bin3_1" link2="set_1_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin3_1" link2="set_1_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set1_bin3_1" link2="set_1_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set1_bin3_1" link2="set_2_tray_1" reason="Never" />
-    <disable_collisions link1="set1_bin3_1" link2="set_2_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set1_bin3_1" link2="set_2_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set1_bin3_1" link2="set_2_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin3_1" link2="set_2_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set1_bin3_1" link2="set_2_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set1_bin3_1" link2="set_3_tray_1" reason="Never" />
-    <disable_collisions link1="set1_bin3_1" link2="set_3_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set1_bin3_1" link2="set_3_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set1_bin3_1" link2="set_3_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set1_bin3_1" link2="set_3_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set1_bin3_1" link2="set_3_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set1_bin3_1" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="set1_bin3_1" link2="workbox1" reason="Adjacent" />
-    <disable_collisions link1="set1_bin3_1" link2="workbox2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_1" link2="set2_bin1_2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_1" link2="set2_bin1_3" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_1" link2="set2_bin1_4" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_1" link2="set2_bin1_5" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_1" link2="set_1_tray_1" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_1" link2="set_1_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_1" link2="set_1_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set2_bin1_1" link2="set_1_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_1" link2="set_1_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set2_bin1_1" link2="set_1_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set2_bin1_1" link2="set_2_tray_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_1" link2="set_2_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_1" link2="set_2_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set2_bin1_1" link2="set_2_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_1" link2="set_2_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set2_bin1_1" link2="set_2_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set2_bin1_1" link2="set_3_tray_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_1" link2="set_3_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_1" link2="set_3_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set2_bin1_1" link2="set_3_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_1" link2="set_3_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set2_bin1_1" link2="set_3_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set2_bin1_1" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="set2_bin1_1" link2="workbox1" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_1" link2="workbox2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_2" link2="set2_bin1_3" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_2" link2="set2_bin1_4" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_2" link2="set2_bin1_5" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_2" link2="set_1_tray_1" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_2" link2="set_1_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_2" link2="set_1_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set2_bin1_2" link2="set_1_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_2" link2="set_1_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set2_bin1_2" link2="set_1_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set2_bin1_2" link2="set_2_tray_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_2" link2="set_2_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_2" link2="set_2_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set2_bin1_2" link2="set_2_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_2" link2="set_2_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set2_bin1_2" link2="set_2_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set2_bin1_2" link2="set_3_tray_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_2" link2="set_3_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_2" link2="set_3_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set2_bin1_2" link2="set_3_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_2" link2="set_3_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set2_bin1_2" link2="set_3_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set2_bin1_2" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="set2_bin1_2" link2="workbox1" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_2" link2="workbox2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_3" link2="set2_bin1_4" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_3" link2="set2_bin1_5" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_3" link2="set_1_tray_1" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_3" link2="set_1_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_3" link2="set_1_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set2_bin1_3" link2="set_1_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_3" link2="set_1_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set2_bin1_3" link2="set_1_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set2_bin1_3" link2="set_2_tray_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_3" link2="set_2_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_3" link2="set_2_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set2_bin1_3" link2="set_2_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_3" link2="set_2_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set2_bin1_3" link2="set_2_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set2_bin1_3" link2="set_3_tray_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_3" link2="set_3_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_3" link2="set_3_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set2_bin1_3" link2="set_3_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_3" link2="set_3_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set2_bin1_3" link2="set_3_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set2_bin1_3" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="set2_bin1_3" link2="workbox1" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_3" link2="workbox2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_4" link2="set2_bin1_5" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_4" link2="set_1_tray_1" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_4" link2="set_1_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_4" link2="set_1_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set2_bin1_4" link2="set_1_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_4" link2="set_1_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set2_bin1_4" link2="set_1_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set2_bin1_4" link2="set_2_tray_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_4" link2="set_2_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_4" link2="set_2_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set2_bin1_4" link2="set_2_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_4" link2="set_2_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set2_bin1_4" link2="set_2_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set2_bin1_4" link2="set_3_tray_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_4" link2="set_3_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_4" link2="set_3_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set2_bin1_4" link2="set_3_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_4" link2="set_3_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set2_bin1_4" link2="set_3_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set2_bin1_4" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="set2_bin1_4" link2="workbox1" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_4" link2="workbox2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_5" link2="set_1_tray_1" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_5" link2="set_1_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_5" link2="set_1_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set2_bin1_5" link2="set_1_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_5" link2="set_1_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set2_bin1_5" link2="set_1_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set2_bin1_5" link2="set_2_tray_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_5" link2="set_2_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_5" link2="set_2_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set2_bin1_5" link2="set_2_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_5" link2="set_2_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set2_bin1_5" link2="set_2_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set2_bin1_5" link2="set_3_tray_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_5" link2="set_3_tray_1_divider1_1" reason="Never" />
-    <disable_collisions link1="set2_bin1_5" link2="set_3_tray_1_divider1_2" reason="Never" />
-    <disable_collisions link1="set2_bin1_5" link2="set_3_tray_2" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_5" link2="set_3_tray_2_divider2" reason="Never" />
-    <disable_collisions link1="set2_bin1_5" link2="set_3_tray_2_screw_holder" reason="Never" />
-    <disable_collisions link1="set2_bin1_5" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="set2_bin1_5" link2="workbox1" reason="Adjacent" />
-    <disable_collisions link1="set2_bin1_5" link2="workbox2" reason="Adjacent" />
     <disable_collisions link1="set_1_tray_1" link2="set_1_tray_1_divider1_1" reason="Adjacent" />
     <disable_collisions link1="set_1_tray_1" link2="set_1_tray_1_divider1_2" reason="Adjacent" />
     <disable_collisions link1="set_1_tray_1" link2="set_1_tray_2" reason="Adjacent" />

@@ -66,12 +66,16 @@ class KittingClass(O2ASBaseRoutines):
     # self.gripper_id = rospy.get_param('gripper_id')
     # self.tray_id = rospy.get_param('tray_id')
     
+    #subscribe to gripper position
+    self._inner_gripper_pos_sub = rospy.Subscriber("o2as_precision_gripper/inner_gripper_motor_pos", std_msgs.msg.Int32, self.update_motorPosition)
+    self._motorPos = -1
+
     # services
     # self._suction = rospy.ServiceProxy("o2as_usb_relay/set_power", SetPower)
     self._suction = actionlib.SimpleActionClient('o2as_fastening_tools/suction_control', SuctionControlAction)
     self._suctioned = False
     self._suction_state = rospy.Subscriber("suction_tool/screw_suctioned", Bool, self._suction_state_callback)
-    self._suction.wait_for_server()
+    # self._suction.wait_for_server()
     self._search_grasp = rospy.ServiceProxy("search_grasp", SearchGrasp)
     # action
     self.blob_detection_client = actionlib.SimpleActionClient('blob_detection_action', o2as_msgs.msg.blobDetectionAction)
@@ -80,7 +84,10 @@ class KittingClass(O2ASBaseRoutines):
     self.initial_setup()
     rospy.sleep(.5)
     rospy.loginfo("Kitting class started up!")
-  
+
+  def update_motorPosition(self, msg):
+    self._motorPos = msg.data
+
   def initial_setup(self):
     ### First, set up internal parameters
     ### Then, read order file and create the list to iterate through
@@ -119,8 +126,19 @@ class KittingClass(O2ASBaseRoutines):
         "part_17": 0.005, 
         "part_18": 0.005}
 
-    self.robotiq_gripper_ids = [6]
-
+    # TODO: Remove this hard-coded assignment
+    self.bin_id_for_graspability_estimation = {
+      "part_7": 1,
+      "part_13": 2,
+      "part_11": 3,
+      "part_8": 4,
+      "part_4": 5,
+      "part_14": 10,
+      "part_17": 7,
+      "part_5": 8,
+      "part_12": 9,
+      "part_9": 6,
+    }
 
 
     self.part_bin_list = {
@@ -134,7 +152,10 @@ class KittingClass(O2ASBaseRoutines):
       "part_6": "bin3_1", 
       "part_8": "bin2_2", 
       "part_9": "bin1_5" }
+<<<<<<< HEAD
     # self.part_bin_list = rospy.get_param("kitting_parts_bin_list")
+=======
+>>>>>>> 7fc3fa356665fc13fd11cbbb3d53de1c649437f9
 
 
     self.part_position_in_tray = {
@@ -156,16 +177,16 @@ class KittingClass(O2ASBaseRoutines):
 
     # This can be copied from kitting_part_bin_list_auto.yaml
     self.bin_is_inclined = {
-      "set1_bin2_3": False,
-      "set2_bin1_2": False,
-      "set1_bin2_4": False,
-      "set2_bin1_3": False,
-      "set2_bin1_4": False,
-      "set2_bin1_1": False,
-      "set1_bin2_1": False,
-      "set1_bin3_1": False,
-      "set1_bin2_2": False,
-      "set2_bin1_5": False
+      "bin2_3": False,
+      "bin1_2": False,
+      "bin2_4": False,
+      "bin1_3": False,
+      "bin1_4": False,
+      "bin1_1": False,
+      "bin2_1": False,
+      "bin3_1": False,
+      "bin2_2": False,
+      "bin1_5": False
     }
 
     #TODO: Count up delivered screws per set, so that the dropoff location changes
@@ -249,7 +270,12 @@ class KittingClass(O2ASBaseRoutines):
       object_pose.pose.position.z += approach_height
       self.move_lin(robot_name, object_pose, speed_slow, end_effector_link="b_bot_suction_tool_tip_link")
       object_pose.pose.position.z -= approach_height
-      # TODO: 
+      bool_msg = Bool()
+      try:
+        bool_msg = rospy.wait_for_message("/screw_tool_m" + str(screw_size) + "/screw_suctioned", Bool, 1.0)
+      except:
+        pass
+      screw_picked = bool_msg.data
       return picked
     else:
       return super(KittingClass, self).pick(robot_name, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height, special_pick)
@@ -294,6 +320,17 @@ class KittingClass(O2ASBaseRoutines):
     res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
     if not res:
       return False
+  
+  def place_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = "b_bot_suction_tool_tip_link"):
+    rospy.loginfo("Go to the target.")
+    res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
+    if not res:
+      rospy.logdebug("Couldn't go to the target.")
+      return False
+    res = self.switch_suction(False)
+    rospy.sleep(1)
+    if not res:
+      return False
 
     start_time = rospy.get_rostime()
     while ((rospy.get_rostime().secs - start_time.secs) <= 10.0):
@@ -310,39 +347,177 @@ class KittingClass(O2ASBaseRoutines):
     goal_pose_above.pose.position.y = bin_eff_yoff
     goal_pose_above.pose.position.z = bin_eff_height
     goal_pose_above.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 , 0))
-    res = self.move_lin(group_name, goal_pose_above, speed_slow, "")
+    res = self.move_lin(group_name, goal_pose_above, speed=speed_fast, end_effector_link=end_effector_link)
     if not res:
       rospy.loginfo("Couldn't go to the target.")
-    #TODO Problem with gazebo controller while controlling the robot with movelin
       return False
 
     #Open the gripper 
     self.send_gripper_command(gripper= "precision_gripper_inner", command="close")
-    #self.precision_gripper_inner_open()
+    self.precision_gripper_inner_open()
     rospy.sleep(1)
 
     #Descend
     rospy.loginfo("Descend on target.")
     goal_pose_descend = copy.deepcopy(goal_pose_above)
     goal_pose_descend.pose.position.z = goal_pose_descend.pose.position.z - approach_height
-    res  = self.move_lin(group_name, goal_pose_descend, speed_fast, end_effector_link)
+    res  = self.move_lin(group_name, goal_pose_descend, speed=speed_slow, end_effector_link=end_effector_link)
     if not res:
       rospy.loginfo("Couldn't go to above the target bin.")
       return False
 
     #Close the gripper 
     self.send_gripper_command(gripper= "precision_gripper_inner", command="open")
-    #self.precision_gripper_inner_close()
+    self.precision_gripper_inner_close()
     rospy.sleep(1)
 
     #Ascend
     rospy.loginfo("Ascend with target.")
     goal_pose_ascend = copy.deepcopy(goal_pose_descend)
     goal_pose_ascend.pose.position.z = goal_pose_ascend.pose.position.z + approach_height
-    res  = self.move_lin(group_name, goal_pose_ascend, speed_fast, end_effector_link)
+    res  = self.move_lin(group_name, goal_pose_ascend, speed=speed_slow, end_effector_link=end_effector_link)
     if not res:
       rospy.loginfo("Couldn't go to above the target bin.")
       return False
+
+  def pick_screw_precision_gripper(self, bin_id, screw_size, speed_fast = 1.0, speed_slow = .1, approach_height = 0.05, bin_eff_height = 0.07, bin_eff_deg_angle = 0,end_effector_link = ""):
+    success_pick = False
+    #Close the gripper and save the motor position
+    self.send_gripper_command(gripper= "precision_gripper_inner", command="open")
+    rospy.sleep(0.1)
+    close_pos = self._motorPos
+
+    posx = 0
+    posy = 0
+    posz = 0.08
+
+    while (not success_pick):
+      #Random pick
+      self.naive_pick("a_bot", bin_id, speed_fast, speed_slow, approach_height, posz, posx, posy, bin_eff_deg_angle, end_effector_link)
+
+
+      #Go to the bin center to start the screw checking
+      rospy.loginfo("Go to the bin center to start the screw checking")
+      goal_pose_incline = geometry_msgs.msg.PoseStamped()
+      goal_pose_incline.header.frame_id = bin_id
+      goal_pose_incline.pose.position.x = 0
+      goal_pose_incline.pose.position.y = 0.035
+      goal_pose_incline.pose.position.z = 0.30
+      goal_pose_incline.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+      res = self.move_lin("a_bot", goal_pose_incline, speed_slow)
+
+      #Check posture of the screw
+      rospy.loginfo("Begin check motion")
+      over_bin_3_joint_pose = [0.5639523868982476, -1.2023834734104668, 2.084380077110544, -4.115980903386012, -1.350262946004677, 1.5910085738144437]
+      self.groups["a_bot"].set_joint_value_target(over_bin_3_joint_pose)
+      self.groups["a_bot"].set_max_velocity_scaling_factor(.1)
+      self.groups["a_bot"].go(wait=True)
+
+      over_bin_3_inclined_joint_pose = [0.5646427393623301, -1.202333924982511, 2.040723585395901, -4.197616886811121, -1.3550737620026068, 1.6180429123653095]
+      self.groups["a_bot"].set_joint_value_target(over_bin_3_inclined_joint_pose)
+      self.groups["a_bot"].set_max_velocity_scaling_factor(.1)
+      self.groups["a_bot"].go(wait=True)
+
+      rospy.loginfo("Ending check motion")
+      if not res:
+        rospy.loginfo("Couldn't go to the target.")
+        return False
+
+      #Open just a bit the gripper
+      if(screw_size == 4):
+        open_range = 80
+      elif(screw_size == 3):
+        open_range = 60
+      else:
+        rospy.logerror("Screw size is wrong")
+        open_range = 0
+      rospy.loginfo("begin inner open slightly")
+      self.precision_gripper_inner_open_slightly(open_range)
+      rospy.loginfo("ending inner open slightly")
+      rospy.sleep(1.0)
+      #Close the gripper fully
+      self.send_gripper_command(gripper= "precision_gripper_inner", command="close")
+      rospy.sleep(1.0)
+      #Check the motor position 
+      success_pick = True
+      if(abs(self._motorPos - close_pos) > 25 ):
+        success_pick = True
+      if not self.use_real_robot:
+        rospy.loginfo("Assume success for the simulation")
+        success_pick = True
+
+    # goal_pose_pick = geometry_msgs.msg.PoseStamped()
+    # goal_pose_pick.header.frame_id = "rack_trays_center"
+    # goal_pose_pick.pose.position.x = 0
+    # goal_pose_pick.pose.position.y = 0
+    # goal_pose_pick.pose.position.z = 0.30
+    # goal_pose_pick.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0.75*pi))
+    # res = self.move_lin("a_bot", goal_pose_pick, speed_slow)
+    # if not res:
+    #   rospy.loginfo("Couldn't go to the pick position for the screw tool.")
+    #   return False
+    
+    above_handover_joint_pose = [1.3983707427978516, -1.343994442616598, 2.048433780670166, -4.056087795888082, -1.9765618483172815, 1.4695862531661987]
+    self.groups["a_bot"].set_joint_value_target(above_handover_joint_pose)
+    self.groups["a_bot"].set_max_velocity_scaling_factor(.3)
+    self.groups["a_bot"].go(wait=True)
+    self.go_to_named_pose("screw_handover", "a_bot")
+    self.precision_gripper_inner_open_slightly(open_range)
+    return True
+    
+  def pick_screw_from_precision_gripper(self, screw_size, attempts = 1):
+    """
+    Picks a screw from the precision gripper.
+    """
+    if not screw_size==3 and not screw_size==4:
+      rospy.logerr("Screw size needs to be 3 or 4!")
+      return False
+    
+    # Turn to the right to face the feeders
+    self.go_to_named_pose("screw_ready", "c_bot")
+    self.go_to_named_pose("screw_handover", "a_bot")
+    # ATTENTION: MAGIC NUMBERS
+    magic_y_offset = .004
+    magic_z_offset = -.008
+
+    pick_pose = geometry_msgs.msg.PoseStamped()
+    pick_pose.header.frame_id = "a_bot_gripper_screw_pickup"
+    pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/6, 0, 0))
+    pick_pose.pose.position.y = magic_y_offset
+    pick_pose.pose.position.z = magic_z_offset
+
+    prep_pose = copy.deepcopy(pick_pose)
+    prep_pose.pose.position.x = -0.03
+    prep_pose.pose.position.y = -0.06
+    
+    print("press enter")
+    raw_input()
+    self.move_lin("c_bot", prep_pose, .2, end_effector_link="c_bot_screw_tool_m"+str(screw_size)+"_tip_link")
+    prep_pose.pose.position.y = magic_y_offset
+    prep_pose.pose.position.z = magic_z_offset
+    self.move_lin("c_bot", prep_pose, .2, end_effector_link="c_bot_screw_tool_m"+str(screw_size)+"_tip_link")
+
+    attempt = 0
+    screw_picked = False
+    while attempt < attempts:
+      print("press enter")
+      raw_input()
+      self.do_pick_action("c_bot", pick_pose, screw_size = 4, use_complex_planning = True, tool_name = "screw_tool")
+      bool_msg = Bool()
+      try:
+        bool_msg = rospy.wait_for_message("/screw_tool_m" + str(screw_size) + "/screw_suctioned", Bool, 1.0)
+      except:
+        pass
+      screw_picked = bool_msg.data
+      if screw_picked:
+        rospy.loginfo("Successfully picked the screw")
+        return True
+      if not self.use_real_robot:
+        rospy.loginfo("Pretending the screw is picked, because this is simulation.")
+        return True
+      attempt += 1
+
+    return False
 
   def view_bin(self, group_name, bin_id, speed_fast = 1.0, speed_slow = 1.0, bin_eff_height = 0.2, bin_eff_xoff = 0, bin_eff_deg_angle = 20,end_effector_link = ""):
     # TODO: adjust the x,z and end effector orientatio for optimal view of the bin to use with the  \search_grasp service
@@ -470,7 +645,7 @@ class KittingClass(O2ASBaseRoutines):
             pointCam = geometry_msgs.msg.PointStamped()
 
             #simulation only
-            #poseArrayRes.header.frame_id = "a_bot_camera_fisheye_optical_frame"
+            poseArrayRes.header.frame_id = "a_bot_camera_fisheye_optical_frame"
             pointCam.header = poseArrayRes.header
             print("pointCam.header")
             print(pointCam.header)
@@ -601,6 +776,7 @@ class KittingClass(O2ASBaseRoutines):
     return True
     
 
+<<<<<<< HEAD
   def place_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = "b_bot_suction_tool_tip_link"):
     rospy.loginfo("Try place by suction.")
     res = self.suck(False)
@@ -618,11 +794,19 @@ class KittingClass(O2ASBaseRoutines):
     return False
 
 
+=======
+>>>>>>> 7fc3fa356665fc13fd11cbbb3d53de1c649437f9
   def set_orientation_for_suction_tool(self, target_pose):
     """Takes a pose and assigns a suitable orientation for the suction"""
     # This needs to transform the pose to the world and check if it is too close to b_bot.
     pass
 
+<<<<<<< HEAD
+=======
+  ################ ----- Demos  
+  ################ 
+  ################ 
+>>>>>>> 7fc3fa356665fc13fd11cbbb3d53de1c649437f9
 
   def pick_screw_from_bin_and_put_into_feeder(self, item, max_attempts = 10):
     robot_name = "a_bot"
@@ -673,6 +857,38 @@ class KittingClass(O2ASBaseRoutines):
       return True
     
     return False
+  
+  def get_grasp_position_from_phoxi(self, item, take_new_image=True):
+    update_image = True  
+    if item.ee_to_use == "suction":
+      req_search_grasp = SearchGraspRequest()
+      req_search_grasp.part_id = int(str(item.part_id).strip("part_"))
+      rospy.logerr("Using hard-coded bin ID assignment for graspability search!")
+      req_search_grasp.bin_id = int(bin_id_for_graspability_estimation[item.part_id])
+      if item.ee_to_use == "suction":
+        req_search_grasp.gripper = "suction"
+      else:
+        req_search_grasp.gripper = "two_finger"
+        #TODO: Is this still correct? What about inside/outside grasping with the precision gripper?
+      req_search_grasp.update_image = update_image
+      try:
+        resp_search_grasp = self._search_grasp(req_search_grasp)
+        update_image = False
+      except rospy.ServiceException as e:
+        rospy.logerr(e.message)
+        return False
+      object_position = geometry_msgs.msg.PointStamped()
+      object_position.header.frame_id = "a_phoxi_m_sensor"
+      object_position.point = geometry_msgs.msg.Point(
+        resp_search_grasp.pos3D[0].x, 
+        resp_search_grasp.pos3D[0].y, 
+        resp_search_grasp.pos3D[0].z)
+      rospy.logdebug("\nGrasp point in %s: (x, y, z) = (%f, %f, %f)", 
+        object_position.header.frame_id, 
+        object_position.point.x, 
+        object_position.point.y, 
+        object_position.point.z)
+    return object_position
 
   def get_item_pose(self, item, is_update=True):
     req = SearchGraspRequest()
@@ -735,10 +951,11 @@ class KittingClass(O2ASBaseRoutines):
       else:
         gripper_command = ""
 
-      self.pick(robot_name, pick_pose, 0.0, speed_fast = 0.3, speed_slow = 0.02, 
+      item_picked = self.pick(robot_name, pick_pose, 0.0, speed_fast = 0.3, speed_slow = 0.02, 
                         gripper_command=gripper_command, approach_height = 0.1)
-      # TODO: Check suction success for suction, grasp width for robotiq gripper, vision for precision gripper
-      item_picked = True
+      # TODO: Check grasp success via grasp width for robotiq gripper and vision for precision gripper
+      # Suction is checked inside the pick function
+      
       if not item_picked:
         rospy.logerr("Failed an attempt to pick item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + "). Reattempting. Current attempts: " + str(attempts))
         continue
@@ -747,7 +964,7 @@ class KittingClass(O2ASBaseRoutines):
       place_pose = geometry_msgs.msg.PoseStamped()
       place_pose.header.frame_id = item.target_frame
       if item.ee_to_use == "suction":
-        # This is inconvenient because the trays are rotated. tray_2s are rotated 180 degrees relative to set_1_tray_1
+        # This is inconvenient to set up because the trays are rotated. tray_2s are rotated 180 degrees relative to set_1_tray_1
         if item.set_number == 1:
           if item.target_frame[11] == '1':  # tray 1
             place_pose.pose.orientation = self.suction_orientation_from_45
@@ -967,14 +1184,20 @@ if __name__ == '__main__':
     i = 1
     while i:
       rospy.loginfo("Enter 1 to equip suction tool .")
+      rospy.loginfo("Enter 11 to unequip suction tool .")
       rospy.loginfo("Enter 2 to move the robots home to starting positions.")
-      rospy.loginfo("Enter 3 to pick and place b_bot using suction tool.")
-      rospy.loginfo("Enter 4 to place and place b_bot using suction tool.")
+      rospy.loginfo("Enter 3 to pick with b_bot using suction tool.")
+      rospy.loginfo("Enter 4 to place with b_bot using suction tool.")
+      rospy.loginfo("Enter 60 to pick screw from bin with a_bot.")
+      rospy.loginfo("Enter 61 to hand over screw from a_bot to c_bot.")
+      rospy.loginfo("Enter 62 to move robots back.")
       rospy.loginfo("Enter START to start the task.")
       rospy.loginfo("Enter x to exit.")
       i = raw_input()
       if i == '1':
         kit.do_change_tool_action("b_bot", equip=True, screw_size=50)   # 50 = suction tool
+      if i == '11':
+        kit.do_change_tool_action("b_bot", equip=False, screw_size=50)   # 50 = suction tool
       if i == '2':
         kit.prepare_robots()
       elif i == '3':
@@ -983,34 +1206,48 @@ if __name__ == '__main__':
         kit.place_suction_test()
       elif i == 'START' or i == 'start' or i == '5000':
         kit.kitting_task()
+      elif i == "60":
+        kit.go_to_named_pose("home", "a_bot")
+        kit.pick_screw_precision_gripper("bin1_3", screw_size= 4)
+      elif i == "61":
+        kit.pick_screw_from_precision_gripper(screw_size=4)
+      elif i == "62":
+        kit.go_to_named_pose("screw_ready", "c_bot")
+        kit.go_to_named_pose("back", "a_bot")
       elif i == "x":
         break
+      
     
     ##### EXAMPLE 3 (How to look into a bin)
-    # kit.view_bin("a_bot", "set2_bin1_4")
+    # kit.view_bin("a_bot", "bin1_4")
 
     ##### EXAMPLE 4 (Look into all bins)
     # kit.go_to_named_pose("home", "a_bot")
-    # kit.view_bin("a_bot", "set2_bin1_1")
+    # kit.view_bin("a_bot", "bin1_1")
     # rospy.sleep(1)
-    # kit.view_bin("a_bot", "set2_bin1_2")
+    # kit.view_bin("a_bot", "bin1_2")
     # rospy.sleep(1)
-    # kit.view_bin("a_bot", "set2_bin1_3")
+    # kit.view_bin("a_bot", "bin1_3")
     # rospy.sleep(1)
-    # kit.view_bin("a_bot", "set2_bin1_4")
+    # kit.view_bin("a_bot", "bin1_4")
     # rospy.sleep(1)
-    # kit.view_bin("a_bot", "set2_bin1_5")
+    # kit.view_bin("a_bot", "bin1_5")
     # rospy.sleep(1)
-    # kit.view_bin("a_bot", "set1_bin2_1")
+    # kit.view_bin("a_bot", "bin2_1")
     # rospy.sleep(1)
-    # kit.view_bin("a_bot", "set1_bin2_2")
+    # kit.view_bin("a_bot", "bin2_2")
     # rospy.sleep(1)
-    # kit.view_bin("a_bot", "set1_bin2_3")
+    # kit.view_bin("a_bot", "bin2_3")
     # rospy.sleep(1)
-    # kit.view_bin("a_bot", "set1_bin2_4")
+    # kit.view_bin("a_bot", "bin2_4")
     # rospy.sleep(1)
-    # kit.view_bin("a_bot", "set1_bin3_1")
+    # kit.view_bin("a_bot", "bin3_1")
     # rospy.sleep(1)
+
+    # kit.go_to_named_pose("home", "a_bot")
+    # kit.go_to_named_pose("home", "b_bot")
+    # kit.pick_screw_precision_gripper("bin1_3", screw_size= 4)
+    # kit.pick_screw_from_precision_gripper(screw_size=4)
 
     ##### OLD CODE
     # kit.pick_and_place_demo()
