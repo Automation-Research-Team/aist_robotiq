@@ -823,7 +823,6 @@ class KittingClass(O2ASBaseRoutines):
     # self.go_to_named_pose("back", "a_bot")
     screw_delivery_time = rospy.Time.now()
 
-    self.do_change_tool_action("b_bot", equip=True, screw_size=50)   # 50 = suction tool
     for item in self.suction_items:
       if rospy.is_shutdown():
         break
