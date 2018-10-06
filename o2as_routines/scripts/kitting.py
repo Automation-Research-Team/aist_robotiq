@@ -515,7 +515,7 @@ class KittingClass(O2ASBaseRoutines):
     if not res:
       rospy.loginfo("Couldn't go to the target.")
     #TODO Problem with gazebo controller while controlling the robot with movelin
-      return False
+      return False 
  
     #TODO Ensure that the the motion is finished before generating the mask.
 
@@ -650,15 +650,18 @@ class KittingClass(O2ASBaseRoutines):
         goal_part.pose.position.y = pointPartBin.point.y
         goal_part.pose.position.z = 0.01
         goal_part.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 , 0))
-        res = self.move_lin(group_name, goal_part, speed_slow, "")
-        if not res:
-          rospy.loginfo("Couldn't go to the target.")
-        #TODO Problem with gazebo controller while controlling the robot with movelin
-          return False
+
+        return goal_part     
+        #res = self.move_lin(group_name, goal_part, speed_slow, "")
+        #if not res:
+        #  rospy.loginfo("Couldn't go to the target.")
+        ##TODO Problem with gazebo controller while controlling the robot with movelin
+        #  break
 
     else:
         rospy.loginfo("no pose detected")
     #TODO if nothing is detected move the camera a bit to try to detect somethin
+        return False      
 
 
 
@@ -886,6 +889,11 @@ class KittingClass(O2ASBaseRoutines):
       # TODO: Get the position from vision
       pick_pose = geometry_msgs.msg.PoseStamped()
       pick_pose.header.frame_id = item.bin_name
+      if item.ee_to_use == "precision_gripper_from_inside":
+        #view the position inside the bin
+        res_view_bin=self.view_bin(robot_name, item.bin_name)    
+        if(res_view_bin):
+          pick_pose = res_view_bin
       # pick_pose = self.get_item_pose(item)
       if item.ee_to_use == "suction":      # Orientation needs to be adjusted for suction tool
         pick_point_on_table = self.listener.transformPose("workspace_center", pick_pose).pose.position
