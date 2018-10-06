@@ -55,8 +55,8 @@ class CalibrationClass(O2ASBaseRoutines):
     super(CalibrationClass, self).__init__()
     
     self.a_bot_downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
-    self.bin_names = ["set1_bin2_1", "set1_bin2_2", "set1_bin2_3", "set1_bin2_4", "set1_bin3_1", "set2_bin1_1", 
-                      "set2_bin1_2", "set2_bin1_3", "set2_bin1_4", "set2_bin1_5"]
+    self.bin_names = ["bin2_1", "bin2_2", "bin2_3", "bin2_4", "bin3_1", "bin1_1", 
+                      "bin1_2", "bin1_3", "bin1_4", "bin1_5"]
 
     # Neutral downward in the taskboard frames
     rospy.sleep(.5)   # Use this instead of waiting, so that simulation can be used
@@ -1025,7 +1025,7 @@ class CalibrationClass(O2ASBaseRoutines):
     poses = []
 
     pose0 = geometry_msgs.msg.PoseStamped()
-    # pose0.header.frame_id = "set1_bin2_1"
+    # pose0.header.frame_id = "bin2_1"
     pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     if end_effector_link and robot_name == "b_bot":
       pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
@@ -1033,10 +1033,10 @@ class CalibrationClass(O2ASBaseRoutines):
 
     for bin in self.bin_names:
       if robot_name == "b_bot":
-        if bin == "set1_bin3_1" or bin == "set2_bin1_5" or bin == "set2_bin1_4":
+        if bin == "bin3_1" or bin == "bin1_5" or bin == "bin1_4":
           continue
       if robot_name == "a_bot":
-        if bin == "set1_bin2_1" or bin == "set2_bin1_1" or bin == "set2_bin1_2":
+        if bin == "bin2_1" or bin == "bin1_1" or bin == "bin1_2":
           continue
       pose0.header.frame_id = bin
       poses.append(copy.deepcopy(pose0))
@@ -1071,10 +1071,10 @@ class CalibrationClass(O2ASBaseRoutines):
 
     for bin in self.bin_names:
       if robot_name == "b_bot":
-        if bin == "set1_bin3_1" or bin == "set2_bin1_5" or bin == "set2_bin1_4":
+        if bin == "bin3_1" or bin == "bin1_5" or bin == "bin1_4":
           continue
       if robot_name == "a_bot":
-        if bin == "set1_bin2_1" or bin == "set2_bin1_1" or bin == "set2_bin1_2":
+        if bin == "bin2_1" or bin == "bin1_1" or bin == "bin1_2":
           continue
       new_pose = copy.deepcopy(pose0)
       new_pose.header.frame_id = bin + "_top_back_left_corner"

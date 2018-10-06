@@ -73,7 +73,8 @@ def is_program_running(topic_namespace = ""):
     # throw()
 
 def wait_for_UR_program(topic_namespace = "", timeout_duration = rospy.Duration.from_sec(20.0)):
-  rospy.loginfo("Waiting for UR program to finish. Only run this after sending custom URScripts and not the regular motion commands, or this call will not terminate before the timeout.")
+  rospy.loginfo("Waiting for UR program to finish.")
+  # Only run this after sending custom URScripts and not the regular motion commands, or this call will not terminate before the timeout.
   rospy.sleep(1.0)
   t_start = rospy.Time.now()
   time_passed = rospy.Time.now() - t_start
@@ -119,6 +120,8 @@ class O2ASBaseRoutines(object):
     
     self.listener = tf.TransformListener()
     self.use_real_robot = rospy.get_param("use_real_robot")
+    self.force_ur_script_linear_motion = False
+    self.force_moveit_linear_motion = False
 
     moveit_commander.roscpp_initialize(sys.argv)
     rospy.init_node('assembly_example', anonymous=False)
@@ -201,9 +204,9 @@ class O2ASBaseRoutines(object):
     return all_close(pose_goal_stamped.pose, current_pose, 0.01)
 
   def transformTargetPoseFromTipLinkToEE(self, ps, robot_name, end_effector_link):
-    rospy.loginfo("Received pose to transform to EE link:")
-    rospy.loginfo(str(ps.pose.position.x) + ", " + str(ps.pose.position.y)  + ", " + str(ps.pose.position.z))
-    rospy.loginfo(str(ps.pose.orientation.x) + ", " + str(ps.pose.orientation.y)  + ", " + str(ps.pose.orientation.z)  + ", " + str(ps.pose.orientation.w))
+    rospy.logdebug("Received pose to transform to EE link:")
+    rospy.logdebug(str(ps.pose.position.x) + ", " + str(ps.pose.position.y)  + ", " + str(ps.pose.position.z))
+    rospy.logdebug(str(ps.pose.orientation.x) + ", " + str(ps.pose.orientation.y)  + ", " + str(ps.pose.orientation.z)  + ", " + str(ps.pose.orientation.w))
 
     t = self.listener.lookupTransform(end_effector_link, robot_name + "_tool0", rospy.Time())
 
@@ -236,9 +239,9 @@ class O2ASBaseRoutines(object):
 
     ps_new = self.listener.transformPose(ps.header.frame_id, ps_wrist)
 
-    rospy.loginfo("New pose:")
-    rospy.loginfo(str(ps_new.pose.position.x) + ", " + str(ps_new.pose.position.y)  + ", " + str(ps_new.pose.position.z))
-    rospy.loginfo(str(ps_new.pose.orientation.x) + ", " + str(ps_new.pose.orientation.y)  + ", " + str(ps_new.pose.orientation.z)  + ", " + str(ps_new.pose.orientation.w))
+    rospy.logdebug("New pose:")
+    rospy.logdebug(str(ps_new.pose.position.x) + ", " + str(ps_new.pose.position.y)  + ", " + str(ps_new.pose.position.z))
+    rospy.logdebug(str(ps_new.pose.orientation.x) + ", " + str(ps_new.pose.orientation.y)  + ", " + str(ps_new.pose.orientation.z)  + ", " + str(ps_new.pose.orientation.w))
 
     return ps_new
 
@@ -253,17 +256,18 @@ class O2ASBaseRoutines(object):
       elif group_name == "a_bot":
         end_effector_link = "a_bot_gripper_tip_link"
 
-    if self.use_real_robot:
-      rospy.loginfo("Real robot is being used. Send linear motion to robot controller directly via URScript.")
-      req = o2as_msgs.srv.sendScriptToURRequest()
-      req.program_id = "lin_move"
-      req.robot_name = group_name
-      req.target_pose = self.transformTargetPoseFromTipLinkToEE(pose_goal_stamped, group_name, end_effector_link)
-      req.velocity = speed
-      req.acceleration = acceleration
-      res = self.urscript_client.call(req)
-      wait_for_UR_program("/" + group_name +"_controller", rospy.Duration.from_sec(30.0))
-      return res.success
+    if self.force_ur_script_linear_motion or self.use_real_robot:
+      if not self.force_moveit_linear_motion:
+        rospy.logdebug("Real robot is being used. Send linear motion to robot controller directly via URScript.")
+        req = o2as_msgs.srv.sendScriptToURRequest()
+        req.program_id = "lin_move"
+        req.robot_name = group_name
+        req.target_pose = self.transformTargetPoseFromTipLinkToEE(pose_goal_stamped, group_name, end_effector_link)
+        req.velocity = speed
+        req.acceleration = acceleration
+        res = self.urscript_client.call(req)
+        wait_for_UR_program("/" + group_name +"_controller", rospy.Duration.from_sec(30.0))
+        return res.success
 
     group = self.groups[group_name]
       
@@ -601,14 +605,16 @@ class O2ASBaseRoutines(object):
       wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
     return res.success
   
-  def do_linear_push(self, robot_name, force, wait = False):
+  def do_linear_push(self, robot_name, force, wait = False, direction = "Z+"):
     # Directly calls the UR service rather than the action of the skill_server
     req = o2as_msgs.srv.sendScriptToURRequest()
     req.robot_name = robot_name
     req.max_force = force
+    req.force_direction = direction
     req.program_id = "linear_push"
     res = self.urscript_client.call(req)
     if wait:
+      rospy.sleep(2.0)    # This program seems to take some time
       wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
     return res.success
 
