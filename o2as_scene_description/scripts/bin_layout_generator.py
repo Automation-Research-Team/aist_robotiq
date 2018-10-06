@@ -212,7 +212,7 @@ def main():
     # outfile = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf", 'kitting_bins.xacro'),'w+')
     # write_file(outfile,directory,set_list,bin_definition)
 
-    write_roi_id_to_yaml(set_list)
+    # write_fge_bin_id_to_yaml(set_list)
     
 if __name__ == "__main__":
     main()
