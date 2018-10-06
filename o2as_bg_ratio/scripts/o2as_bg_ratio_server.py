@@ -25,7 +25,7 @@ class InnerPickDetection(object):
         self._w = 64
         self._h = 32
 
-        self._image_topic = "/c_bot_camera/color/image_raw"
+        self._image_topic = "/a_bot_camera/color/image_raw"
 
         # Subscriber
         rospy.Subscriber(self._image_topic, Image, self.image_callback)
@@ -37,7 +37,7 @@ class InnerPickDetection(object):
         rospy.loginfo('Action server '+ str(self._action_name)+" started.")
         self.action_result = o2as_msgs.msg.innerPickDetectionResult()
 
-        self.img_empty = cv2.imread('/root/catkin_ws/src/o2as_bg_ratio/images/image2.png')
+        self.img_empty = cv2.imread('/root/catkin_ws/src/o2as_bg_ratio/images/empty_close_gripper.png')
         self.img_empty = np.asarray(self.img_empty)[:, :, ::-1]
         self._empty_bg_ratio = self.compute_red_ratio(self.img_empty, self._x, self._y, self._w, self._h)
         #rospy.get_param("/empty_bg_ratio", '0.7')

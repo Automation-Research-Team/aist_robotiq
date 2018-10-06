@@ -74,7 +74,7 @@ class KittingClass(O2ASBaseRoutines):
 
     # action
     self.blob_detection_client = actionlib.SimpleActionClient('blob_detection_action', o2as_msgs.msg.blobDetectionAction)
-    self.pick_detection_client = actionlib.SimpleActionClient('inner_pick_detection_action', o2as_msgs.innerPickDetectionAction)
+    self.inner_pick_detection_client = actionlib.SimpleActionClient('inner_pick_detection_action', o2as_msgs.msg.innerPickDetectionAction)
     # self.blob_detection_client.wait_for_server()  
 
     self.initial_setup()
@@ -661,7 +661,7 @@ class KittingClass(O2ASBaseRoutines):
 
     #check pick
     goal = o2as_msgs.msg.innerPickDetectionGoal()
-    goal.part_id = part_id
+    #goal.part_id = part_id
     self.inner_pick_detection_client.send_goal(goal)
     self.inner_pick_detection_client.wait_for_result()
     result = self.inner_pick_detection_client.get_result()
@@ -1119,7 +1119,7 @@ class KittingClass(O2ASBaseRoutines):
       self.pick(robot_name, pick_pose, 0.0, speed_fast = 0.3, speed_slow = 0.02, 
                         gripper_command=gripper_command, approach_height = 0.1)
       # TODO: Check suction success for suction, grasp width for robotiq gripper, vision for precision gripper
-      if gripper not "suction":
+      if gripper_command == "precision_gripper_from_inside":
         item_picked = self.check_pick("a_bot", item.part_id)
       else:
         item_picked = True
@@ -1367,7 +1367,7 @@ if __name__ == '__main__':
     # kit.go_to_named_pose("home", "a_bot")
     # kit.go_to_named_pose("home", "b_bot")
     # kit.pick_screw_precision_gripper("a_bot", "set2_bin1_3", screw_size= 4)
-    kit.pick_screw_from_precision_gripper(screw_size=4)
+    kit.check_pick( "a_bot", "4")
 
     ##### OLD CODE
     # kit.pick_and_place_demo()
