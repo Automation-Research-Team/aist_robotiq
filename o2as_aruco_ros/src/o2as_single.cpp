@@ -237,9 +237,14 @@ Simple::print_bins(std::ostream& out) const
 	<< std::endl;
 
     for (const auto& bin : _bins)
-	out << bin << std::endl;
+	bin.print_pose(out) << std::endl;
     
-    return out << "</robot>" << std::endl;
+    out << "</robot>" << std::endl;
+
+    for (const auto& bin : _bins)
+	bin.print_part(out) << std::endl;
+    
+    return out;
 }
     
 void
