@@ -270,12 +270,12 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
                                           sensor_msgs.msg.Image, 1.0)
           try:
             bridge = CvBridge()
-            cv2_img = btidge.imgmsg_to_cv2(imgmsg, "bgr8")
+            cv2_img = bridge.imgmsg_to_cv2(imgmsg, "bgr8")
           except CvBridgeError, e:
             print(e)
           else:
             cv2.imwrite("camera_image-{}.jpeg".format(self.nimages), cv2_img)
-            ++self.nimages
+            self.nimages += 1
         except rospy.ServiceException as e:
           print "Service call failed: %s"%e
 
