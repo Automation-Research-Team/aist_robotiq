@@ -12,6 +12,7 @@ bool this_action_grasps_an_object
 float64 linear_motor_position           # 0 when at the bottom position. in m
 float64 outer_gripper_opening_width     # in m
 float64 inner_gripper_opening_width     # in m
+float64 slight_opening_width
 ---
 # Define the result
 bool success
