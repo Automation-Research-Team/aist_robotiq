@@ -676,7 +676,7 @@ class KittingClass(O2ASBaseRoutines):
 
   def get_item_pose(self, item, is_update=True):
     req = SearchGraspRequest()
-    req.part_id = int(str(item.part_id).strip("part_"))
+    req.parts_id = int(str(item.parts_id).strip("part_"))
     req.bin_name = item.bin_name
     req.gripper = item.ee_to_use
     req.is_updated = is_updated

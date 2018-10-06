@@ -46,8 +46,8 @@ class Sets:
 
 # write bin id for graspability based vision
 def write_fge_bin_id_to_yaml(set_list):
-    roi_id_dict = dict()
-    roi_id_dict["roi_id"] = dict()
+    bin_id_dict = dict()
+    bin_id_dict["fge_bin_id"] = dict()
     i = 1
     for s in set_list:
         for b in s.bins:
