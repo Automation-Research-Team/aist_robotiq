@@ -49,8 +49,8 @@ if __name__ == "__main__":
   # Config parameters
   # TODO: read values from config file
   node_name = "o2as_bg_ratio"
-  image_topic = "/c_bot_camera/color/image_raw"
-  bg_ratio_topic = "/c_bot_camera/bg_ratio"
+  image_topic = "/a_bot_camera/color/image_raw"
+  bg_ratio_topic = "/a_bot_camera/bg_ratio"
   x = 270
   y = 275
   w = 64

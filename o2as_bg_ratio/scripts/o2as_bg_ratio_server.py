@@ -22,7 +22,7 @@ class InnerPickDetection(object):
         self._w = 64
         self._h = 32
 
-        self._image_topic = "/c_bot_camera/color/image_raw"
+        self._image_topic = "/a_bot_camera/color/image_raw"
 
         # Subscriber
         rospy.Subscriber(self._image_topic, Image, self.image_callback)
