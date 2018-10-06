@@ -32,17 +32,33 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
 )
 
-add_executable(o2as_aruco_simple
-  src/o2as_aruco_simple.cpp
+add_executable(o2as_single
+  src/o2as_single.cpp
 )
 
-target_link_libraries(o2as_aruco_simple
+target_link_libraries(o2as_single
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
   ${OpenCV_LIBRARIES}
 )
 
-add_dependencies(o2as_aruco_simple
+add_dependencies(o2as_single
+  ${PROJECT_NAME}_gencpp
+  ${PROJECT_NAME}_gencfg
+  ${catkin_EXPORTED_TARGETS}
+)
+
+add_executable(marker_publish
+  src/marker_publish.cpp
+)
+
+target_link_libraries(marker_publish
+  ${catkin_LIBRARIES}
+  ${roscpp_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)
+
+add_dependencies(marker_publish
   ${PROJECT_NAME}_gencpp
   ${PROJECT_NAME}_gencfg
   ${catkin_EXPORTED_TARGETS}
@@ -53,7 +69,7 @@ add_dependencies(o2as_aruco_simple
 #############
 install(
   TARGETS
-    o2as_aruco_simple
+    o2as_single
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

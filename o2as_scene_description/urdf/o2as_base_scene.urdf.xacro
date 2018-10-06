@@ -29,7 +29,7 @@
 
   <!-- Scene items (trays, bins...) -->
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/taskboard_scene.xacro" /> -->
-  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xa -->cro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" /> -->
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/assembly_scene.xacro" /> -->
   
   <!-- Robot bases -->
@@ -173,11 +173,12 @@
 
   <!-- spawn and attach AR markers -->
   <xacro:include filename="$(find o2as_gazebo)/urdf/o2as_ar_marker.urdf.xacro"/>
-  <xacro:o2as_ar_marker prefix="a_bot_"
-  			parent="a_bot_ee_link"
-  			marker_id="26">
-    <origin xyz="0.08 0.0 0.065" rpy="0 0 0"/>
-  </xacro:o2as_ar_marker>
+  <!-- <xacro:o2as_ar_marker prefix="a_bot_" -->
+  <!-- 			parent="a_bot_ee_link" -->
+  <!-- 			marker_id="26"> -->
+  <!--   <origin xyz="0.08 0.00 0.065" rpy="0 0 0"/> -->
+  <!-- </xacro:o2as_ar_marker> -->
+
   <!-- <xacro:o2as_ar_marker prefix="b_bot_" -->
   <!-- 			parent="b_bot_dual_suction_gripper_base_link" -->
   <!-- 			marker_id="26"> -->
@@ -201,7 +202,7 @@
   <xacro:o2as_ar_marker prefix="workspace_"
 			parent="workspace_center"
 			marker_id="256">
-    <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+    <origin xyz="0.0 0.0 0.0005" rpy="0 0 0"/>
   </xacro:o2as_ar_marker>
 
   <!-- Add PhoXi 3D scanners -->
