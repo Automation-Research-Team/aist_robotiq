@@ -327,7 +327,7 @@ class KittingClass(O2ASBaseRoutines):
     if not res:
       rospy.logdebug("Couldn't go to the target.")
       return False
-    res = self.switch_suction(False)
+    res = self.suck(False)
     rospy.sleep(1)
     if not res:
       return False
