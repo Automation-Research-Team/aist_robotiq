@@ -80,7 +80,7 @@ class AssemblyClass(O2ASBaseRoutines):
       self.precision_gripper_inner_close()
     elif gripper_command=="complex_pick_from_outside":
       self.precision_gripper_inner_open()
-    elif gripper_command=="easy_pick_only_innerX":
+    elif gripper_command=="easy_pick_only_inner":
       self.precision_gripper_inner_close()
     else: 
       rospy.logerr("No gripper command was set")
@@ -98,7 +98,7 @@ class AssemblyClass(O2ASBaseRoutines):
     elif gripper_command=="complex_pick_from_outside":
       self.precision_gripper_inner_close(this_action_grasps_an_object = True)
       self.precision_gripper_outer_close()
-    elif gripper_command=="easy_pick_only_innerX":
+    elif gripper_command=="easy_pick_only_inner":
       self.precision_gripper_inner_open(this_action_grasps_an_object = True)
     rospy.sleep(2)
     rospy.loginfo("Going back up")
@@ -133,7 +133,7 @@ class AssemblyClass(O2ASBaseRoutines):
     elif gripper_command=="complex_pick_from_outside":
       self.precision_gripper_outer_open()
       self.precision_gripper_inner_open()
-    elif gripper_command=="easy_pick_only_innerX":
+    elif gripper_command=="easy_pick_only_inner":
       self.precision_gripper_inner_close()
     else: 
       rospy.logerr("No gripper command was set")
@@ -1374,8 +1374,6 @@ class AssemblyClass(O2ASBaseRoutines):
 if __name__ == '__main__':
   try:
     print ("Please refer to this page for details of each subtask. https://docs.google.com/spreadsheets/d/1Os2CfH80A7vzj6temt5L8BYpLvHKBzWT0dVuTvpx5Mk/edit#gid=1216221803")
-    print ("to run the function called 'pick' and 'place' in simulation correctly, change \"easy_pick_only_inner\" to something different like \"easy_pick_only_innerX\" in line 83, 101, 136")
-    print ("if the sequence is stuck at 'opening inner gripper' or 'closing inner gripper', just comment out the line that sends commands to precision gripper")
     assy = AssemblyClass()
     assy.set_up_item_parameters()
     # ========================= Sending robots to home position ======================================
