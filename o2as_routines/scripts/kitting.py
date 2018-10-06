@@ -152,10 +152,6 @@ class KittingClass(O2ASBaseRoutines):
       "part_6": "bin3_1", 
       "part_8": "bin2_2", 
       "part_9": "bin1_5" }
-<<<<<<< HEAD
-    # self.part_bin_list = rospy.get_param("kitting_parts_bin_list")
-=======
->>>>>>> 7fc3fa356665fc13fd11cbbb3d53de1c649437f9
 
 
     self.part_position_in_tray = {
@@ -776,37 +772,14 @@ class KittingClass(O2ASBaseRoutines):
     return True
     
 
-<<<<<<< HEAD
-  def place_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = "b_bot_suction_tool_tip_link"):
-    rospy.loginfo("Try place by suction.")
-    res = self.suck(False)
-    if not res:
-      return False
-    
-    res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
-    if not res:
-      return False
-
-    start_time = rospy.get_rostime()
-    while ((rospy.get_rostime().secs - start_time.secs) <= 10.0):
-      if not self._suctioned:
-        return True
-    return False
-
-
-=======
->>>>>>> 7fc3fa356665fc13fd11cbbb3d53de1c649437f9
   def set_orientation_for_suction_tool(self, target_pose):
     """Takes a pose and assigns a suitable orientation for the suction"""
     # This needs to transform the pose to the world and check if it is too close to b_bot.
     pass
 
-<<<<<<< HEAD
-=======
   ################ ----- Demos  
   ################ 
   ################ 
->>>>>>> 7fc3fa356665fc13fd11cbbb3d53de1c649437f9
 
   def pick_screw_from_bin_and_put_into_feeder(self, item, max_attempts = 10):
     robot_name = "a_bot"
