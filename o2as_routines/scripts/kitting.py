@@ -140,19 +140,17 @@ class KittingClass(O2ASBaseRoutines):
       "part_9": 6,
     }
 
-
     self.part_bin_list = {
-      "part_11": "bin2_3", 
-      "part_12": "bin1_2", 
-      "part_13": "bin2_4",
-      "part_16": "bin1_3", 
-      "part_17": "bin1_4", 
-      "part_18": "bin1_1", 
-      "part_4": "bin2_1",
-      "part_6": "bin3_1", 
-      "part_8": "bin2_2", 
-      "part_9": "bin1_5" }
-
+      "part_6" : "bin3_1",
+      "part_4" : "bin2_1",
+      "part_8" : "bin2_2",
+      "part_11" : "bin2_3",
+      "part_13" : "bin2_4",
+      "part_9" : "bin1_1",
+      "part_12" : "bin1_2",
+      "part_17" : "bin1_4",
+      "part_18" : "bin1_5",
+      "part_16" : "bin1_3"}
 
     self.part_position_in_tray = {
       "part_4" : "tray_1_partition_4",
@@ -763,7 +761,7 @@ class KittingClass(O2ASBaseRoutines):
   ################ 
   ################ 
 
-  def pick_screw_from_bin_and_put_into_feeder(self, item, max_attempts = 10):
+  def pick_screw_from_bin_and_put_into_feeder(self, item, max_attempts = 5):
     robot_name = "a_bot"
     end_effector_link = "a_bot_precision_gripper_tip_link"
     if item.part_id == 17:
@@ -777,9 +775,7 @@ class KittingClass(O2ASBaseRoutines):
       rospy.loginfo("Attempting to pick screw. Item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + "). Attempt nr. " + str(item.attempts))
       
       # Attempt to pick the item
-      pick_pose = geometry_msgs.msg.PoseStamped()
-      pick_pose.header.frame_id = item.bin_name
-      pick_pose.pose.orientation = self.downward_orientation
+      pick_pose = self.get_random_pose_in_bin(item)
       gripper_command = "inner_gripper_from_outside"
 
       rospy.logerr("TODO: Turn off the feeder")
@@ -844,6 +840,24 @@ class KittingClass(O2ASBaseRoutines):
         object_position.point.y, 
         object_position.point.z)
     return object_position
+  
+  def get_random_pose_in_bin(self, item):
+    pick_pose = geometry_msgs.msg.PoseStamped()
+    pick_pose.header.frame_id = item.bin_name
+    if "bin1" in item.bin_name:
+      bin_length = .04
+      bin_width = .04
+    elif "bin2" in item.bin_name:
+      bin_length = .08
+      bin_width = .04
+    elif "bin3" in item.bin_name:
+      bin_length = .10
+      bin_width = .07
+
+    pick_pose.pose.position.x += -bin_length/2 + random.random()*bin_length
+    pick_pose.pose.position.y += -bin_width/2 + random.random()*bin_width
+    pick_pose.pose.orientation = self.downward_orientation
+    return pick_pose
 
   def get_item_pose(self, item, is_update=True):
     req = SearchGraspRequest()
@@ -884,8 +898,7 @@ class KittingClass(O2ASBaseRoutines):
       
       # Attempt to pick the item
       # TODO: Get the position from vision
-      pick_pose = geometry_msgs.msg.PoseStamped()
-      pick_pose.header.frame_id = item.bin_name
+      pick_pose = self.get_random_pose_in_bin(item)
       # pick_pose = self.get_item_pose(item)
       if item.ee_to_use == "suction":      # Orientation needs to be adjusted for suction tool
         pick_point_on_table = self.listener.transformPose("workspace_center", pick_pose).pose.position
@@ -1001,13 +1014,13 @@ class KittingClass(O2ASBaseRoutines):
     # self.go_to_named_pose("back", "a_bot")
     screw_delivery_time = rospy.Time.now()
 
-    # for item in self.suction_items:
-    #   if rospy.is_shutdown():
-    #     break
-    #   self.go_to_named_pose("suction_pick_ready", "b_bot")
-    #   self.attempt_item(item, 10)
-    # self.do_change_tool_action("b_bot", equip=False, screw_size=50)   # 50 = suction tool
-    # self.go_to_named_pose("back", "b_bot")
+    for item in self.suction_items:
+      if rospy.is_shutdown():
+        break
+      self.go_to_named_pose("suction_pick_ready", "b_bot")
+      self.attempt_item(item, 10)
+    self.do_change_tool_action("b_bot", equip=False, screw_size=50)   # 50 = suction tool
+    self.go_to_named_pose("back", "b_bot")
 
     for item in self.precision_gripper_items:
       if rospy.is_shutdown():
@@ -1028,28 +1041,28 @@ class KittingClass(O2ASBaseRoutines):
     while not all_done and not rospy.is_shutdown():
       rospy.loginfo("Entering the loop to recover failed items and pick screws")
 
-      # ### Pick the screws when they should be ready
-      # if (rospy.Time.now() - screw_delivery_time) > rospy.Duration(5):
-      #   for screw_size in [4,3]:
-      #     if not self.screws_done["m"+str(screw_size)]:
-      #       rospy.loginfo("Picking m" + str(screw_size) + " screws from feeder")
-      #       self.go_to_named_pose("home", "c_bot")
-      #       self.do_change_tool_action("c_bot", equip=True, screw_size=screw_size)
-      #       for item in self.screws["m"+str(screw_size)]:
-      #         if rospy.is_shutdown():
-      #           break
-      #         if self.pick_screw_from_feeder(screw_size, attempts=2):
-      #           self.place_screw_in_tray(screw_size, item.set_number, self.screws_placed["m"+str(screw_size)][item.set_number]+1)
-      #           self.screws_placed["m"+str(screw_size)][item.set_number] += 1
-      #           self.fulfilled_items += 1
-      #           item.fulfilled = True
-      #         else:
-      #           rospy.loginfo("Failed to pick an m" + str(screw_size) + " screw from the feeder")
-      #           break
-      #       # TODO: Return excess screws
-      #       self.go_to_named_pose("screw_ready", "c_bot")
-      #       self.do_change_tool_action("c_bot", equip=False, screw_size=screw_size)
-      #       self.go_to_named_pose("back", "c_bot")
+      ### Pick the screws when they should be ready
+      if (rospy.Time.now() - screw_delivery_time) > rospy.Duration(5):
+        for screw_size in [4,3]:
+          if not self.screws_done["m"+str(screw_size)]:
+            rospy.loginfo("Picking m" + str(screw_size) + " screws from feeder")
+            self.go_to_named_pose("home", "c_bot")
+            self.do_change_tool_action("c_bot", equip=True, screw_size=screw_size)
+            for item in self.screws["m"+str(screw_size)]:
+              if rospy.is_shutdown():
+                break
+              if self.pick_screw_from_feeder(screw_size, attempts=2):
+                self.place_screw_in_tray(screw_size, item.set_number, self.screws_placed["m"+str(screw_size)][item.set_number]+1)
+                self.screws_placed["m"+str(screw_size)][item.set_number] += 1
+                self.fulfilled_items += 1
+                item.fulfilled = True
+              else:
+                rospy.loginfo("Failed to pick an m" + str(screw_size) + " screw from the feeder")
+                break
+            # TODO: Return excess screws
+            self.go_to_named_pose("screw_ready", "c_bot")
+            self.do_change_tool_action("c_bot", equip=False, screw_size=screw_size)
+            self.go_to_named_pose("back", "c_bot")
       
       # Check all items, find which groups are done, then reattempt those that are unfinished
       all_done = True

@@ -209,8 +209,8 @@ def main():
     directory=os.getcwd()
 
     set_list,bin_definition=read_csv_and_calc_bins_positions(directory)
-    # outfile = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf", 'kitting_bins.xacro'),'w+')
-    # write_file(outfile,directory,set_list,bin_definition)
+    outfile = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf", 'kitting_bins.xacro'),'w+')
+    write_file(outfile,directory,set_list,bin_definition)
 
     # write_fge_bin_id_to_yaml(set_list)
     

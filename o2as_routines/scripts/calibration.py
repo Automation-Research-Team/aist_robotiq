@@ -1032,13 +1032,14 @@ class CalibrationClass(O2ASBaseRoutines):
     pose0.pose.position.z = 0.1
 
     for bin in self.bin_names:
-      if robot_name == "b_bot":
-        if bin == "bin3_1" or bin == "bin1_5" or bin == "bin1_4":
-          continue
-      if robot_name == "a_bot":
-        if bin == "bin2_1" or bin == "bin1_1" or bin == "bin1_2":
-          continue
       pose0.header.frame_id = bin
+      world_pose = self.listener.transformPose("workspace_center", pose0)
+      if robot_name == "a_bot":
+        if world_pose.pose.position.y > .15:
+          continue
+      if robot_name == "b_bot":
+        if world_pose.pose.position.y < -.15:
+          continue
       poses.append(copy.deepcopy(pose0))
 
     self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
@@ -1070,11 +1071,13 @@ class CalibrationClass(O2ASBaseRoutines):
     pose0.pose.position.z = 0.03
 
     for bin in self.bin_names:
-      if robot_name == "b_bot":
-        if bin == "bin3_1" or bin == "bin1_5" or bin == "bin1_4":
-          continue
+      pose0.header.frame_id = bin
+      world_pose = self.listener.transformPose("workspace_center", pose0)
       if robot_name == "a_bot":
-        if bin == "bin2_1" or bin == "bin1_1" or bin == "bin1_2":
+        if world_pose.pose.position.y > .1:
+          continue
+      if robot_name == "b_bot":
+        if world_pose.pose.position.y < -.1:
           continue
       new_pose = copy.deepcopy(pose0)
       new_pose.header.frame_id = bin + "_top_back_left_corner"
