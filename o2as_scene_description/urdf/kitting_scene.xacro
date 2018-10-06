@@ -7,6 +7,16 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro"/>
 
 
+  <!-- Screw feeders -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/screw_feeder.xacro" />
+  <xacro:screw_feeder feedername="m3_feeder" parent="c_bot_base_smfl">
+    <origin xyz=".66 -0.25 .065" rpy="0 0 ${pi/2}" />   
+  </xacro:screw_feeder>
+  <xacro:screw_feeder feedername="m4_feeder" parent="c_bot_base_smfl">
+    <origin xyz=".52 -0.25 .065" rpy="0 0 ${pi/2}" />   
+  </xacro:screw_feeder>
+
+
   <!-- spawn and attach dual suction grippers -->
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro" />
   <xacro:dual_suction_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link">
@@ -33,20 +43,20 @@
     <origin xyz="+.01 0 0" rpy="0 0 ${pi}" />
   </xacro:kitting_tray2>
   <xacro:kitting_tray2 trayname="set_2_tray_2" parent="rack_trays_center">
-    <origin xyz="${tray_length+.01} 0 -.01" rpy="0 0 ${pi}" />
+    <origin xyz="${tray_length+.01} 0 0" rpy="0 0 ${pi}" />
   </xacro:kitting_tray2>
   <xacro:kitting_tray2 trayname="set_3_tray_2" parent="rack_trays_center">
-    <origin xyz="${tray_length+.01} ${tray_width} -.01" rpy="0 0 ${pi}" />
+    <origin xyz="${tray_length+.01} ${tray_width} 0" rpy="0 0 ${pi}" />
   </xacro:kitting_tray2>
 
   <xacro:kitting_tray1 trayname="set_1_tray_1" parent="rack_trays_center">
     <origin xyz="${-tray_length+.01} 0 0" rpy="0 0 0" />
   </xacro:kitting_tray1>
   <xacro:kitting_tray1 trayname="set_2_tray_1" parent="b_bot_base">
-    <origin xyz=".55 ${tray_length-.1} 0.01" rpy="0 0 ${pi/2}" />
+    <origin xyz=".55 -.1 0.01" rpy="0 0 ${pi/2}" />
   </xacro:kitting_tray1>
   <xacro:kitting_tray1 trayname="set_3_tray_1" parent="b_bot_base">
-    <origin xyz=".55 -.1 0.01" rpy="0 0 ${pi/2}" />
+    <origin xyz=".55 ${tray_length-.1} 0.01" rpy="0 0 ${pi/2}" />
   </xacro:kitting_tray1>
 
   <!-- <xacro:property name="tray_x" value="${-tray_length+.01}" />
