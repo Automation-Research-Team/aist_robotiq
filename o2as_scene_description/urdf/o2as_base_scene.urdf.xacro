@@ -195,6 +195,7 @@
   <!-- 			marker_id="256"> -->
   <!--   <origin xyz="0.0 0.0 0.0005" rpy="0 0 0"/> -->
   <!-- </xacro:o2as_ar_marker> -->
+
   <xacro:o2as_ar_marker_18cm prefix="workspace_"
 			parent="workspace_center"
 			marker_id="32">
