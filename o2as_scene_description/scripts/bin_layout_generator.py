@@ -44,6 +44,19 @@ class Sets:
     def add_bin(self, bin):
         self.bins.append(bin)
 
+# write bin id for graspability based vision
+def write_fge_bin_id_to_yaml(set_list):
+    roi_id_dict = dict()
+    roi_id_dict["roi_id"] = dict()
+    i = 1
+    for s in set_list:
+        for b in s.bins:
+            bin_id_dict["fge_bin_id"][b.bin_name] = i
+            # print("%d, %s"%(i, b.bin_name))
+            i+=1
+    with open(os.path.join(rp.get_path("o2as_graspability_estimation"), "config", "fge_bin_id.yaml"), 'w') as f:
+        yaml.dump(roi_id_dict, f)
+
 # write to outfile
 def write_head(outfile,directory):
     f = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf/templates", 'o2as_bin_template_front.xacro'),'r')
@@ -142,58 +155,6 @@ def read_bin_layout(directory,set_origin):
                 set_number = set_number+1
         return set_list
 
-def read_order_list(directory, set_origin):
-    part_set = set()
-    kitting_list = dict()
-
-    with open(os.path.join(rp.get_path("o2as_scene_description"), "config", "kitting_order_file.csv"), 'r') as f:
-        reader = csv.reader(f)
-        header = next(reader)
-        # [0, 1, 2, 3] = ["Set", "No.", "ID", "Name", "Note"]
-        for data in reader:
-            part_set.add("part_" + data[2])
-            try:
-                kitting_list["set_"+data[0]]["part_"+ data[2]] = data[3]
-            except KeyError:
-                kitting_list["set_"+data[0]] = dict()
-                kitting_list["set_"+data[0]]["part_"+ data[2]] = data[3]
-
-
-    part_bin_definition = dict()
-    with open(os.path.join(rp.get_path("o2as_scene_description"), "urdf/templates", "part_bin_definitions.csv"), 'r') as f:
-        reader = csv.reader(f)
-        header = next(reader)
-
-        for data in reader:
-            part_bin_definition[data[0]] = data[1]
-            
-    part_bin_list = list()
-    for part in part_set:
-        part_bin_list.append([part, part_bin_definition[part]])
-
-    part_bin_list_sorted = sorted(part_bin_list, key=itemgetter(1), reverse=True)
-
-    sets = [part_bin_list_sorted[4::-1], part_bin_list_sorted[5:]]
-
-    set_number = 0
-    set_list = set_origin
-
-    for s in sets:
-        bin_num = 1
-        previous_bin_type = ''
-        for b in s:
-            if previous_bin_type == b[1]:
-                bin_num += 1
-            else:
-                bin_num = 1
-            parts_name = b[0]
-            bin_type = b[1]
-            bin_name = "set" + str(set_number+1) + "_" + b[1] + "_" + str(bin_num)
-            bin = Bin(parts_name, bin_type, bin_name)
-            set_list[set_number].add_bin(bin)
-            previous_bin_type = b[1]
-        set_number += 1
-    return set_list, kitting_list
 
 def read_bins_origin(directory):
     with open(os.path.join(rp.get_path("o2as_scene_description"), "urdf/templates", 'bins_origin.csv'), 'r') as f:
@@ -239,44 +200,19 @@ def read_csv_and_calc_bins_positions(directory):
     bin_definition=read_bin_definition(directory)
     set_origin=read_bins_origin(directory)
     set_list=read_bin_layout(directory,set_origin)
-    # set_list, kitting_list=read_order_list(directory,set_origin)
     #calc bins positions
     set_list=calc_position_of_bins(set_list,bin_definition)
     return set_list,bin_definition
-    # return set_list,bin_definition, kitting_list
-
-def make_pair_part_bin(set_list):
-    pairs = dict()
-    pairs["part_bin_list"] = dict()
-
-    for s in set_list:
-        for i in range(len(s.bins)):
-            pairs["part_bin_list"][s.bins[i].parts_name] = s.bins[i].bin_name
-    
-    return pairs
-
-def write_pair_part_bin(outfilepath, set_list):
-    with open(outfilepath, 'w') as outfile:
-        yaml.dump(set_list, outfile)
-
-def write_kitting_parts_list(outfilepath, kitting_list):
-    with open(outfilepath, 'w') as outfile:
-        yaml.dump(kitting_list, outfile)
 
 def main():
     os.chdir('../')
     directory=os.getcwd()
 
     set_list,bin_definition=read_csv_and_calc_bins_positions(directory)
-    # set_list,bin_definition, kitting_list=read_csv_and_calc_bins_positions(directory)
-    outfile = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf", 'kitting_bins.xacro'),'w+')
-    write_file(outfile,directory,set_list,bin_definition)
+    # outfile = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf", 'kitting_bins.xacro'),'w+')
+    # write_file(outfile,directory,set_list,bin_definition)
 
-    # Make ros parameter files
-    # pairs = make_pair_part_bin(set_list)
-    # write_pair_part_bin(os.path.join(rp.get_path("o2as_routines"), "config", 'kitting_part_bin_list.yaml'), pairs)
-    # write_kitting_parts_list(os.path.join(rp.get_path("o2as_routines"), "config", 'kitting_item_list.yaml'), kitting_list)
-    
+    # write_fge_bin_id_to_yaml(set_list)
     
 if __name__ == "__main__":
     main()

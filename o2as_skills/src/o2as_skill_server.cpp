@@ -1722,12 +1722,12 @@ void SkillServer::executePick(const o2as_msgs::pickGoalConstPtr& goal)
   }
   else if (goal->tool_name == "screw_tool")
   {
-    goToNamedPose("screw_pick_ready", goal->robot_name);
+    // goToNamedPose("screw_pick_ready", goal->robot_name);
     std::string screw_tool_id = "screw_tool_m" + std::to_string(goal->screw_size);
     std::string screw_tool_link = goal->robot_name + "_screw_tool_m" + std::to_string(goal->screw_size) + "_tip_link";
     std::string fastening_tool_name = "screw_tool_m" + std::to_string(goal->screw_size);
     bool screw_picked = pickScrew(goal->item_pose, screw_tool_id, goal->robot_name, screw_tool_link, fastening_tool_name);
-    goToNamedPose("screw_pick_ready", goal->robot_name);
+    // goToNamedPose("screw_pick_ready", goal->robot_name);
     if (!screw_picked)
     {
       ROS_INFO("pickAction has failed to pick the screw");
