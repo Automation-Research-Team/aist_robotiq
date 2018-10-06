@@ -132,7 +132,8 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     
     self.needs_trigger = needs_trigger
     self.needs_calib   = needs_calib
-
+    self.nimages       = 0
+    
     if needs_trigger:
       self.flush_buffer      = get_service_proxy("flush_buffer",
                                                  camera_name, robot_name)
@@ -221,16 +222,22 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
       if self.needs_trigger:
         self.start_acquisition()
         rospy.sleep(1)
-        # self.trigger_frame()
-        # self.get_frame(0, True)
 
       if self.needs_calib:
         try:
           self.take_sample()
           sample_list = self.get_sample_list()
-          n1 = len(sample_list.samples.hand_world_samples.transforms)
-          n2 = len(sample_list.samples.camera_marker_samples.transforms)
-          print("  took {} hand-world samples and {} camera-marker samples").format(n1, n2)
+          n = len(sample_list.samples.hand_world_samples.transforms)
+          print("  took {} (hand-world, camera-marker) samples").format(n)
+          
+          try:
+            bridge = CvBridge()
+            cv2_img = btidge.imgmsg_to_cv2(imgmsg, "bgr8")
+          except CvBridgeError, e:
+            print(e)
+          else:
+            cv2.imwrite("camera_image-{}.jpeg".format(self.nimages), cv2_img)
+            ++self.nimages
         except rospy.ServiceException as e:
           print "Service call failed: %s"%e
 
