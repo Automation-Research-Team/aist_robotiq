@@ -34,6 +34,7 @@ include_directories(
 
 add_executable(o2as_single
   src/o2as_single.cpp
+  src/BinDescription.cpp
 )
 
 target_link_libraries(o2as_single
