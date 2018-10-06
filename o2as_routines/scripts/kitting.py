@@ -52,6 +52,8 @@ class kitting_order_entry():
     self.attempts = 0
     self.fulfilled = False
 
+    self.tf_listener = tf.TransformListener()
+
 class KittingClass(O2ASBaseRoutines):
   """
   This contains the routine used to run the kitting task. See base.py for shared convenience functions.
@@ -936,20 +938,22 @@ class KittingClass(O2ASBaseRoutines):
     
     return False
 
-  def get_item_pose(self, item, gripper, is_update=True):
+  def get_item_pose(self, item, is_update=True):
     req = SearchGraspRequest()
-    req.part_id = int(str(item).strip("part_"))
-    req.bin_name = self.part_bin_list[item]
-    req.gripper = gripper
+    req.part_id = int(str(item.part_id).strip("part_"))
+    req.bin_name = item.bin_name
+    req.gripper = item.ee_to_use
     req.is_updated = is_updated
     resp = self._search_grasp(req_search_grasp)
 
-    pose = geometry_msgs.PoseStamped()
-    pose.header.frame_id = "/a_phoxi_m_sensor"
-    pose.pose.position = resp.pos3D[0]
-    # pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(resp.rot3D[0].x, resp.rot3D[0].y, resp.rot3D[0].z))
+    pose_in_camera = geometry_msgs.PoseStamped()
+    pose_in_camera.header.frame_id = "a_phoxi_m_sensor"
+    pose_in_camera.pose.position = resp.pos3D[0]
+    pose_in_camera.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(resp.rot3D[0].x, resp.rot3D[0].y, resp.rot3D[0].z))
+    pose_in_bin.pose = tf_listener.transformPose(item.bin_name, pose_in_camera)
+    pose_in_bin.pose.orientation = self.downward_orientation
 
-    return pose
+    return pose_in_bin
 
   def attempt_item(self, item, max_attempts = 5):
     """This function attempts to pick an item.
@@ -975,7 +979,7 @@ class KittingClass(O2ASBaseRoutines):
       # TODO: Get the position from vision
       # pick_pose = geometry_msgs.msg.PoseStamped()
       # pick_pose.header.frame_id = item.bin_name
-      pick_pose = self.get_item_pose()
+      pick_pose = self.get_item_pose(item)
       if item.ee_to_use == "suction":      # Orientation needs to be adjusted for suction tool
         pick_point_on_table = self.listener.transformPose("workspace_center", pick_pose).pose.position
         if pick_point_on_table.y > -.1:
