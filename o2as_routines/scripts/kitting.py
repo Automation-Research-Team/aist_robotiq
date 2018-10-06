@@ -163,7 +163,7 @@ class KittingClass(O2ASBaseRoutines):
 
     #Open the gripper 
     self.send_gripper_command(gripper= "precision_gripper_inner", command="close")
-    #self.precision_gripper_inner_open()
+    self.precision_gripper_inner_open()
     rospy.sleep(1)
 
     #Descend
@@ -177,7 +177,7 @@ class KittingClass(O2ASBaseRoutines):
 
     #Close the gripper 
     self.send_gripper_command(gripper= "precision_gripper_inner", command="open")
-    #self.precision_gripper_inner_close()
+    self.precision_gripper_inner_close()
     rospy.sleep(1)
 
     #Ascend
@@ -256,11 +256,11 @@ class KittingClass(O2ASBaseRoutines):
         rospy.logerror("Screw size is wrong")
         open_range = 0
       rospy.loginfo("begin inner open slightly")
-      #self.precision_gripper_inner_open_slightly(open_range)
+      self.precision_gripper_inner_open_slightly(open_range)
       rospy.loginfo("ending inner open slightly")
       rospy.sleep(1.0)
       #Close the gripper fully
-      self.send_gripper_command(gripper= "precision_gripper_inner", command="open")
+      self.send_gripper_command(gripper= "precision_gripper_inner", command="close")
       rospy.sleep(0.1)
       #Check the motor position 
       #Simulation only
