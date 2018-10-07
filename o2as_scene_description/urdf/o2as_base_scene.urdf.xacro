@@ -205,11 +205,11 @@
   <!--   <origin xyz="0.0 0.0 0.0005" rpy="0 0 0"/> -->
   <!-- </xacro:o2as_ar_marker> -->
 
-  <xacro:o2as_ar_marker_16cm prefix="workspace_"
+  <xacro:o2as_ar_marker prefix="workspace_"
   			parent="workspace_center"
-  			marker_id="32">
+  			marker_id="26">
     <origin xyz="0.0 0.0 0.0005" rpy="0 0 0"/>
-  </xacro:o2as_ar_marker_16cm>
+  </xacro:o2as_ar_marker>
   
   <!-- Add PhoXi 3D scanners -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />
