@@ -66,12 +66,12 @@
           args="0 0 0.05 0 0 0 $(arg robot_effector_frame) $(arg tracking_base_frame) 10" />
   </group>
 
-  <!-- Run the ViSP solver to determine the extrinsic parameters -->
+  Run the ViSP solver to determine the extrinsic parameters
   <!-- <node ns="$(arg namespace)" name="hand_eye_solver" -->
   <!--       pkg="visp_hand2eye_calibration" -->
   <!--       type="visp_hand2eye_calibration_calibrator"> -->
   <node name="hand_eye_solver" pkg="o2as_easy_handeye" type="calibrator"
-	ns="$(arg namespace)" output="screen">
+  	ns="$(arg namespace)" output="screen">
     <remap from="/compute_effector_camera_quick" to="compute_effector_camera_quick"/>
   </node>
 

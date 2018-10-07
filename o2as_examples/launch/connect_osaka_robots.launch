@@ -6,6 +6,7 @@
 
   <!-- Publish robot model -->
   <include file="$(find o2as_scene_description)/launch/o2as_osakabase_scene_upload.launch" />
+  <param name="use_real_robot" type="bool" value="true" />
 
   <!-- Required for the UR scripts to be sent -->
   <param name="use_real_robot" type="bool" value="true" />

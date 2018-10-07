@@ -1,0 +1,12 @@
+import tf
+from geometry_msgs.msg import Quaternion
+
+def euler_to_quaternion(euler):
+    """Convert Euler Angles to Quaternion
+
+    euler: geometry_msgs/Vector3
+    quaternion: geometry_msgs/Quaternion
+    """
+    q = tf.transformations.quaternion_from_euler(euler.x, euler.y, euler.z)
+
+    return Quaternion(x=q[0], y=q[1], z=q[2], w=q[3])
