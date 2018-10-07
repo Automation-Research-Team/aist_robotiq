@@ -2,9 +2,22 @@
 <launch>
   <arg name="robot_name"	default="b_bot"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
-  <arg name="marker_size"	default="0.07"
-       doc="Size of the ArUco marker used, in meters"/>
   <arg name="config"		default="sim"/>
+
+  <!-- Set AR marker ID -->
+  <arg name="marker_id"		value="26"
+       unless="$(eval arg('camera_name') == 'a_bot_camera')"/>
+  <!-- <arg name="marker_id"		value="32" -->
+  <!--      if="$(eval arg('camera_name') == 'a_bot_camera')"/> -->
+  <arg name="marker_id"		value="26"
+       if="$(eval arg('camera_name') == 'a_bot_camera')"/>
+
+  <arg name="marker_size"	value="0.07"
+       unless="$(eval arg('camera_name') == 'a_bot_camera')" />
+  <!-- <arg name="marker_size"	value="0.16" -->
+  <!--      if="$(eval arg('camera_name') == 'a_bot_camera')" /> -->
+  <arg name="marker_size"	value="0.07"
+       if="$(eval arg('camera_name') == 'a_bot_camera')" />
 
   <arg name="eye_on_hand"	value="false"
        unless="$(eval arg('camera_name') == 'a_bot_camera')" />
@@ -22,12 +35,6 @@
   <param name="use_real_robot"	value="false"
 	 if="$(eval arg('config') == 'sim')"/>
   
-  <!-- Set AR marker ID -->
-  <arg name="marker_id"		value="26"
-       unless="$(eval arg('camera_name') == 'a_bot_camera')"/>
-  <arg name="marker_id"		value="32"
-       if="$(eval arg('camera_name') == 'a_bot_camera')"/>
-
   <!-- Start ArUco -->
   <!-- <node name="aruco_tracker" pkg="aruco_ros" type="single"> -->
   <node name="aruco_tracker" pkg="o2as_aruco_ros" type="o2as_single"

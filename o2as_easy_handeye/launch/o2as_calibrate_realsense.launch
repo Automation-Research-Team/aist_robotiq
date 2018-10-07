@@ -51,7 +51,7 @@
     </include>
 
     <!-- start easy_handeye calibrator -->
-    <include file="$(find o2as_easy_handeye)/launch/calibrate.launch" >
+    <include file="$(find o2as_easy_handeye)/launch/calibrate_realsense.launch" >
         <arg name="namespace_prefix" value="$(arg namespace_prefix)" />
         <arg name="eye_on_hand" value="true" />
 

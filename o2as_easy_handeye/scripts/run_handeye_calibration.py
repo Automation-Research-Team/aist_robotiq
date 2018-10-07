@@ -78,9 +78,13 @@ keyposes = {
   'a_bot_camera': {
     'a_bot': [
       [ 0.00, -0.20, 0.20, radians(90), radians( 70), radians( 90)],
+      [ 0.00, -0.17, 0.20, radians(90), radians( 80), radians( 90)],
       [ 0.00, -0.15, 0.20, radians(90), radians( 90), radians( 90)],
+      [ 0.00, -0.13, 0.20, radians(90), radians(110), radians( 90)],
       [ 0.00, -0.10, 0.20, radians(90), radians(110), radians( 90)],
       [-0.05, -0.15, 0.20, radians(90), radians( 90), radians( 70)],
+      [-0.02, -0.15, 0.20, radians(90), radians( 90), radians( 80)],
+      [ 0.02, -0.15, 0.20, radians(90), radians( 90), radians(100)],
       [ 0.05, -0.15, 0.20, radians(90), radians( 90), radians(110)],
     ]
   }
