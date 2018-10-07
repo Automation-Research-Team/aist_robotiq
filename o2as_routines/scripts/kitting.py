@@ -98,7 +98,7 @@ class KittingClass(O2ASBaseRoutines):
     # Image Publisher for monitoring    
     self.bridge = CvBridge()
 
-    self.img_innner_pick_topic = "kitting/img_w_goal_pose" 
+    self.img_innner_pick_topic = "o2as_monitor/vision_res" 
     self.img_innner_pick_pub = rospy.Publisher(self.img_innner_pick_topic, Image, latch=True, queue_size=10)
     self.current_img_w_goal = Image()
     self.current_img_w_blob = Image()
