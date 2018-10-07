@@ -631,32 +631,32 @@ class KittingClass(O2ASBaseRoutines):
       #min x min y in the bin frame
 
       if(result.success): 
-          poseArrayRes = result.posesDetected 
-          distanceToBinCenter = []
-          for i in range(len(poseArrayRes.poses)): 
-              pointCam = geometry_msgs.msg.PointStamped()
+        poseArrayRes = result.posesDetected 
+        distanceToBinCenter = []
+        for i in range(len(poseArrayRes.poses)): 
+          pointCam = geometry_msgs.msg.PointStamped()
 
-              #simulation only
-              poseArrayRes.header.frame_id = "a_bot_camera_fisheye_optical_frame"
-              pointCam.header = poseArrayRes.header
-              print("pointCam.header")
-              print(pointCam.header)
-              pointCam.point = poseArrayRes.poses[i].position
-              pointBin = self.listener.transformPoint(bin_id, pointCam).point
-              distanceToBinCenter.append(math.sqrt(pointBin.x*pointBin.x + pointBin.y*pointBin.y))
-          minPoseIndex = np.argmin(distanceToBinCenter)
-          
-          rospy.loginfo("pose closest to the bin center in the xy plane")
-          rospy.loginfo(poseArrayRes.poses[minPoseIndex])
+          #simulation only
+          poseArrayRes.header.frame_id = "a_bot_camera_fisheye_optical_frame"
+          pointCam.header = poseArrayRes.header
+          print("pointCam.header")
+          print(pointCam.header)
+          pointCam.point = poseArrayRes.poses[i].position
+          pointBin = self.listener.transformPoint(bin_id, pointCam).point
+          distanceToBinCenter.append(math.sqrt(pointBin.x*pointBin.x + pointBin.y*pointBin.y))
+        minPoseIndex = np.argmin(distanceToBinCenter)
+        
+        rospy.loginfo("pose closest to the bin center in the xy plane")
+        rospy.loginfo(poseArrayRes.poses[minPoseIndex])
 
-          #Place gripper above bin
-          pointPartCam = geometry_msgs.msg.PointStamped()
-          pointPartCam.header = poseArrayRes.header
-          pointPartCam.point = poseArrayRes.poses[i].position
-          pointPartBin = self.listener.transformPoint(bin_id, pointPartCam)
+        #Place gripper above bin
+        pointPartCam = geometry_msgs.msg.PointStamped()
+        pointPartCam.header = poseArrayRes.header
+        pointPartCam.point = poseArrayRes.poses[i].position
+        pointPartBin = self.listener.transformPoint(bin_id, pointPartCam)
 
-          rospy.loginfo("Pose in bin")
-          rospy.loginfo(pointPartBin)
+        rospy.loginfo("Pose in bin")
+        rospy.loginfo(pointPartBin)
 
         goal_part = geometry_msgs.msg.PoseStamped()
         goal_part.header.frame_id = pointPartBin.header.frame_id
@@ -665,12 +665,12 @@ class KittingClass(O2ASBaseRoutines):
         goal_part.pose.position.z = pointPartBin.point.z
         goal_part.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 , 0))
 
-          return goal_part     
-          #res = self.move_lin(group_name, goal_part, speed_slow, "")
-          #if not res:
-          #  rospy.loginfo("Couldn't go to the target.")
-          ##TODO Problem with gazebo controller while controlling the robot with movelin
-          #  break
+        return goal_part     
+        #res = self.move_lin(group_name, goal_part, speed_slow, "")
+        #if not res:
+        #  rospy.loginfo("Couldn't go to the target.")
+        ##TODO Problem with gazebo controller while controlling the robot with movelin
+        #  break
 
     else:
         rospy.loginfo("no pose detected")
@@ -926,13 +926,16 @@ class KittingClass(O2ASBaseRoutines):
     safe_pose = copy.deepcopy(pick_pose)
     safe_pose.pose.position.x = clamp(pick_pose.pose.position.x, -bin_length/2, bin_length/2)
     safe_pose.pose.position.y = clamp(pick_pose.pose.position.y, -bin_width/2, bin_width/2)
+    safe_pose.pose.position.z = clamp(pick_pose.pose.position.z, 0, 0.1)
 
     if safe_pose.pose.position.x != pick_pose.pose.position.x or safe_pose.pose.position.y != pick_pose.pose.position.y:
       rospy.loginfo("Pose was adjusted in make_pose_safe_for_bin. Before: " + 
                     str(pick_pose.pose.position.x) + ", " + 
-                    str(pick_pose.pose.position.y) + ". After: " + 
+                    str(pick_pose.pose.position.y) + ", " + 
+                    str(pick_pose.pose.position.z) + ". After: " + 
                     str(safe_pose.pose.position.x) + ", " + 
-                    str(safe_pose.pose.position.y) + ".")
+                    str(safe_pose.pose.position.y) + ", " + 
+                    str(safe_pose.pose.position.z) + ".")
     
     #TODO: Adjust the gripper orientation when close to the border
     return safe_pose
