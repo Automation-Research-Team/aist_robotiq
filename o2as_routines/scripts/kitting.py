@@ -103,6 +103,19 @@ class KittingClass(O2ASBaseRoutines):
     self.current_img_w_goal = Image()
     self.current_img_w_blob = Image()
 
+
+    #for gazebo
+    #    self.cameraMatK = np.array([[554.3827128226441, 0.0, 320.5],
+    #                           [0.0, 554.3827128226441, 240.5],
+    #                           [0.0, 0.0, 1.0]])
+
+    #for ID Realsense on robot ID61*41   width 640 height 360
+    self.cameraMatK = np.array([[461.605774, 0.0, 318.471497],
+                           [0.0, 461.605804, 180.336258],
+                           [0.0, 0.0, 1.0]])
+
+
+
     self.initial_setup()
     rospy.sleep(.5)
     rospy.loginfo("Kitting class started up!")
@@ -595,16 +608,6 @@ class KittingClass(O2ASBaseRoutines):
     #TODO take the parameters from the /camera_info topic instead
 
 
-    #for gazebo
-    #    cameraMatK = np.array([[554.3827128226441, 0.0, 320.5],
-    #                           [0.0, 554.3827128226441, 240.5],
-    #                           [0.0, 0.0, 1.0]])
-
-    #for ID Realsense on robot ID61*41   width 640 height 360
-    cameraMatK = np.array([[461.605774, 0.0, 318.471497],
-                           [0.0, 461.605804, 180.336258],
-                           [0.0, 0.0, 1.0]])
-
 
     point_top1_cam_np = np.array([point_top1_cam.x, point_top1_cam.y, point_top1_cam.z])   
     point_top2_cam_np = np.array([point_top2_cam.x, point_top2_cam.y, point_top2_cam.z])   
@@ -613,11 +616,11 @@ class KittingClass(O2ASBaseRoutines):
     #used to test the projection
     #point_test_center_cam_np = np.array([point_test_center_cam.x, point_test_center_cam.y, point_test_center_cam.z])   
       
-    point_top1_img_np = cameraMatK.dot(point_top1_cam_np)
-    point_top2_img_np = cameraMatK.dot(point_top2_cam_np)
-    point_top3_img_np = cameraMatK.dot(point_top3_cam_np)
-    point_top4_img_np = cameraMatK.dot(point_top4_cam_np)
-    #point_test_center_img_np = cameraMatK.dot(point_test_center_cam_np) 
+    point_top1_img_np = self.cameraMatK.dot(point_top1_cam_np)
+    point_top2_img_np = self.cameraMatK.dot(point_top2_cam_np)
+    point_top3_img_np = self.cameraMatK.dot(point_top3_cam_np)
+    point_top4_img_np = self.cameraMatK.dot(point_top4_cam_np)
+    #point_test_center_img_np = self.cameraMatK.dot(point_test_center_cam_np) 
 
     #print(point_top1_img_np)
     #print(point_top2_img_np)
@@ -683,28 +686,8 @@ class KittingClass(O2ASBaseRoutines):
         goal_part.pose.position.z = pointPartBin.point.z
         goal_part.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 , 0))
 
-        ### Project the goal on the image plane using the camera matrix like for the mask
-        #Copy the results
         self.current_img_w_blob = copy.deepcopy(result.blobImage)
-
-        # Project the point to the camera plane
-        pointPart_cam_np = np.array([pointPartCam.point.x, pointPartCam.point.y, pointPartCam.point.z])
-        pointPart_img_np = cameraMatK.dot(pointPart_cam_np)
-        #Transfom into pixel coordinate
-        pointPart_pix= pointCam = geometry_msgs.msg.Point(pointPart_img_np[0]/pointPart_img_np[2],pointPart_img_np[1]/pointPart_img_np[2],0)
-        img_blob_cv = self.bridge.imgmsg_to_cv2(self.current_img_w_blob , desired_encoding="passthrough")
-        #img_blob_cv_np = np.asarray(img_blob_cv)[:, :, ::-1]
-        #Draw the circle in orange for the propose pose
-        cv2.circle(img_blob_cv,(int(pointPart_pix.x),int(pointPart_pix.y)), 3, (255,165,0), 2) 
-
-        self.current_img_w_goal = self.bridge.cv2_to_imgmsg(img_blob_cv, "rgb8")
-
-        #publish the results
-        try:
-          print("publish")
-          self.img_innner_pick_pub.publish(self.current_img_w_goal)
-        except CvBridgeError as e:
-          print(e)
+        self.draw_point3D_after_view_bin(pointPartCam)
 
         return goal_part     
 
@@ -737,6 +720,31 @@ class KittingClass(O2ASBaseRoutines):
 
     #    point_top1_cam = t.transformPoint("a_bot_camera_depth_frame", point_top1)
     #    point_top1_cam = t.transformPoint(point_top4.header.frame_id, point_top1)
+  def draw_point3D_after_view_bin(self, pointPartCam):
+        ### Project the goal on the image plane using the camera matrix like for the mask
+        #Transform Point in camera reference
+        point3D_to_draw = geometry_msgs.msg.PointStamped()
+        point3D_to_draw  = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", pointPartCam)
+        #Copy the results
+
+        # Project the point to the camera plane
+        pointPart_cam_np = np.array([point3D_to_draw.point.x, point3D_to_draw.point.y, point3D_to_draw.point.z])
+        pointPart_img_np = self.cameraMatK.dot(pointPart_cam_np)
+        #Transfom into pixel coordinate
+        pointPart_pix= pointCam = geometry_msgs.msg.Point(pointPart_img_np[0]/pointPart_img_np[2],pointPart_img_np[1]/pointPart_img_np[2],0)
+        img_blob_cv = self.bridge.imgmsg_to_cv2(self.current_img_w_blob , desired_encoding="passthrough")
+        #img_blob_cv_np = np.asarray(img_blob_cv)[:, :, ::-1]
+        #Draw the circle in orange for the propose pose
+        cv2.circle(img_blob_cv,(int(pointPart_pix.x),int(pointPart_pix.y)), 3, (0,255,0), 4) 
+
+        self.current_img_w_goal = self.bridge.cv2_to_imgmsg(img_blob_cv, "rgb8")
+
+        #publish the results
+        try:
+          print("publish")
+          self.img_innner_pick_pub.publish(self.current_img_w_goal)
+        except CvBridgeError as e:
+          print(e)
 
   def check_pick(self, group_name, part_id):
     #Go to check position
