@@ -856,7 +856,7 @@ class KittingClass(O2ASBaseRoutines):
     goal.update_image = take_new_image
     try:
       self.search_grasp_client.send_goal(goal)
-      self.search_grasp_client.wait_for_result(rospy.Duration(5.0))
+      self.search_grasp_client.wait_for_result(rospy.Duration(15.0))
       resp_search_grasp = self.search_grasp_client.get_result()
     except:
       rospy.logerr("Could not get grasp from Phoxi")
