@@ -843,6 +843,25 @@ class KittingClass(O2ASBaseRoutines):
       return True
     
     return False
+    
+  def get_random_pose_in_bin(self, item):
+    pick_pose = geometry_msgs.msg.PoseStamped()
+    pick_pose.header.frame_id = item.bin_name
+
+    if "bin1" in item.bin_name:
+      bin_length = self.bin_1_width
+      bin_width = self.bin_1_length
+    elif "bin2" in item.bin_name:
+      bin_length = self.bin_2_width
+      bin_width = self.bin_2_length
+    elif "bin3" in item.bin_name:
+      bin_length = self.bin_3_width
+      bin_width = self.bin_3_length
+
+    pick_pose.pose.position.x += -bin_length/2 + random.random()*bin_length
+    pick_pose.pose.position.y += -bin_width/2 + random.random()*bin_width
+    pick_pose.pose.orientation = self.downward_orientation
+    return pick_pose
   
   def get_grasp_position_from_phoxi(self, item, take_new_image=True):
     # take_new_image = True  
@@ -865,49 +884,22 @@ class KittingClass(O2ASBaseRoutines):
       resp_search_grasp.pos3D[0].x, 
       resp_search_grasp.pos3D[0].y, 
       resp_search_grasp.pos3D[0].z)
+    # TODO We should talk about how to use rotiqz which the two_finger approaches.
     rospy.logdebug("\nGrasp point in %s: (x, y, z) = (%f, %f, %f)", 
       object_position.header.frame_id, 
       object_position.point.x, 
       object_position.point.y, 
       object_position.point.z)
-    self.publish_marker(object_position, "aist_vision_result")
-    return object_position
     
-  def get_random_pose_in_bin(self, item):
-    pick_pose = geometry_msgs.msg.PoseStamped()
-    pick_pose.header.frame_id = item.bin_name
-
-    if "bin1" in item.bin_name:
-      bin_length = self.bin_1_width
-      bin_width = self.bin_1_length
-    elif "bin2" in item.bin_name:
-      bin_length = self.bin_2_width
-      bin_width = self.bin_2_length
-    elif "bin3" in item.bin_name:
-      bin_length = self.bin_3_width
-      bin_width = self.bin_3_length
-
-    pick_pose.pose.position.x += -bin_length/2 + random.random()*bin_length
-    pick_pose.pose.position.y += -bin_width/2 + random.random()*bin_width
-    pick_pose.pose.orientation = self.downward_orientation
-    return pick_pose
-
-  def get_item_pose_from_phoxi(self, item, update_image=True):
-    req = SearchGraspRequest()
-    req.parts_id = int(str(item.parts_id).strip("part_"))
-    req.bin_name = item.bin_name
-    req.gripper = item.ee_to_use
-    req.is_updated = update_image
-    resp = self._search_grasp(req_search_grasp)
-
-    pose_in_camera = geometry_msgs.PoseStamped()
-    pose_in_camera.header.frame_id = "a_phoxi_m_sensor"
-    pose_in_camera.pose.position = resp.pos3D[0]
-    pose_in_camera.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(resp.rot3D[0].x, resp.rot3D[0].y, resp.rot3D[0].z))
-    pose_in_bin.pose = tf_listener.transformPose(item.bin_name, pose_in_camera)
+    obj_pose_in_camera = geometry_msgs.msg.PoseStamped()
+    obj_pose_in_camera.header = object_position.header
+    obj_pose_in_camera.pose.position = object_position.point
+    obj_pose_in_camera.pose.orientation.w = 1.0
+    # pose_in_bin = geometry_msgs.msg.PoseStamped()
+    # pose_in_bin.header.frame_id = item.bin_name
+    pose_in_bin = self.listener.transformPose(item.bin_name, obj_pose_in_camera)
     pose_in_bin.pose.orientation = self.downward_orientation
-    # TODO We should talk about how to use rotiqz which the two_finger approaches.
-
+    self.publish_marker(pose_in_bin, "aist_vision_result")
     return pose_in_bin
 
   def make_pose_safe_for_bin(self, pick_pose, item):
@@ -967,9 +959,8 @@ class KittingClass(O2ASBaseRoutines):
         if res_view_bin:
           pick_pose = res_view_bin
       
-      if item.ee_to_use == "suction":      
-        # TODO: Fix the vision in this function
-        # pick_pose = self.get_item_pose_from_phoxi(item)
+      if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
+        pick_pose = self.get_grasp_position_from_phoxi(item)
 
         # Orientation needs to be adjusted for suction tool
         pick_point_on_table = self.listener.transformPose("workspace_center", pick_pose).pose.position
@@ -1283,6 +1274,7 @@ if __name__ == '__main__':
         item = kit.ordered_items[int(i)-71]
         rospy.loginfo("Checking for item id " + str(item.part_id) + " in " + item.bin_name)
         obj_pose = kit.get_grasp_position_from_phoxi(item)
+
         rospy.loginfo(obj_pose)
       elif i == "x":
         break
