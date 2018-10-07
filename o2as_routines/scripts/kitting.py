@@ -616,7 +616,7 @@ class KittingClass(O2ASBaseRoutines):
 
     goal = o2as_msgs.msg.blobDetectionGoal()
     goal.maskCorner = mask_polygon
-    goal.param_part_id = part_id
+    goal.param_part_id = "part_" + str(part_id)
 
     self.blob_detection_client.send_goal(goal)
     self.blob_detection_client.wait_for_result()
