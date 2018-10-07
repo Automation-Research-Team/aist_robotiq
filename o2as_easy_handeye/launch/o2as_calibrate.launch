@@ -1,18 +1,18 @@
 <?xml version="1.0" ?>
 <launch>
-  <arg name="robot_name"	default="b_bost"/>
+  <arg name="robot_name"	default="b_bot"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
   <arg name="marker_size"	default="0.07"
        doc="Size of the ArUco marker used, in meters"/>
   <arg name="config"		default="sim"/>
 
   <arg name="eye_on_hand"	value="false"
-       if="$(eval arg('camera_name') == 'a_phoxi_m_camera')" />
+       unless="$(eval arg('camera_name') == 'a_bot_camera')" />
   <arg name="eye_on_hand"	value="true"
        if="$(eval arg('camera_name') == 'a_bot_camera')" />
 
   <arg name="robot_effector_frame"	value="$(arg robot_name)_ee_link"
-       if="$(eval arg('camera_name') == 'a_phoxi_camera')"/>
+       unless="$(eval arg('camera_name') == 'a_bot_camera')"/>
   <arg name="robot_effector_frame"	value="$(arg robot_name)_wrist_2_link"
        if="$(eval arg('camera_name') == 'a_bot_camera')"/>
   

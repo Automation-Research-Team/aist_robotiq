@@ -55,7 +55,7 @@ material Aruco/marker256
   }
 }
 
-material Aruco/marker32-16-1
+material Aruco/marker32-160-10
 {
   technique
   {
@@ -63,7 +63,7 @@ material Aruco/marker32-16-1
     {
       texture_unit
       {
-	texture aruco-32-16-1.png
+	texture aruco-32-160-10.png
       }
     }
   }

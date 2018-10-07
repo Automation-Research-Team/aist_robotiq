@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot>
-  <gazebo reference="a_bot_depth_optical_frame">
+  <gazebo reference="a_bot_camera_link">
     <sensor type="depth" name="a_bot_camera">
       <always_on>true</always_on>
       <visualize>true</visualize>             
@@ -23,7 +23,7 @@
         <alwaysOn>true</alwaysOn>
         <updateRate>10.0</updateRate>
         <cameraName>a_bot_camera</cameraName>
-        <frameName>a_bot_camera_depth_optical_frame</frameName>
+        <frameName>a_bot_camera_depth_frame</frameName>
         <imageTopicName>rgb/image_raw</imageTopicName>
         <depthImageTopicName>depth/image_raw</depthImageTopicName>
         <pointCloudTopicName>depth/points</pointCloudTopicName>
@@ -44,7 +44,7 @@
     </sensor>
   </gazebo>
 
-  <gazebo reference="b_bot_depth_optical_frame">
+  <gazebo reference="b_bot_camera_link">
     <sensor type="depth" name="b_bot_camera">       
       <always_on>true</always_on>
       <visualize>true</visualize>             
@@ -67,7 +67,7 @@
         <alwaysOn>true</alwaysOn>
         <updateRate>10.0</updateRate>
         <cameraName>b_bot_camera</cameraName>
-        <frameName>b_bot_camera_depth_optical_frame</frameName>
+        <frameName>b_bot_camera_depth_frame</frameName>
         <imageTopicName>rgb/image_raw</imageTopicName>
         <depthImageTopicName>depth/image_raw</depthImageTopicName>
         <pointCloudTopicName>depth/points</pointCloudTopicName>

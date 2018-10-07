@@ -35,7 +35,7 @@
 
   </xacro:macro>
 
-  <xacro:macro name="o2as_ar_marker_18cm" params="marker_id prefix parent *origin">
+  <xacro:macro name="o2as_ar_marker_16cm" params="marker_id prefix parent *origin">
 
     <joint name="${prefix}ar_marker_joint" type="fixed">
       <parent link="${parent}" />

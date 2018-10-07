@@ -205,7 +205,6 @@
   <!--   <origin xyz="0.0 0.0 0.0005" rpy="0 0 0"/> -->
   <!-- </xacro:o2as_ar_marker> -->
 
-  <xacro:include filename="$(find o2as_gazebo)/urdf/o2as_ar_marker_16cm.urdf.xacro"/>
   <xacro:o2as_ar_marker_16cm prefix="workspace_"
   			parent="workspace_center"
   			marker_id="32">
