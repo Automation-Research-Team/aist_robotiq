@@ -81,6 +81,7 @@ class KittingClass(O2ASBaseRoutines):
     self._suction_state = rospy.Subscriber("suction_tool/screw_suctioned", Bool, self._suction_state_callback)
     # self._suction.wait_for_server()
     self._search_grasp = rospy.ServiceProxy("search_grasp", SearchGrasp)
+    self.search_grasp_client = actionlib.SimpleActionClient("search_grasp_phoxi", o2as_msgs.msg.SearchGraspPhoxiAction)
     # action
     self.blob_detection_client = actionlib.SimpleActionClient('blob_detection_action', o2as_msgs.msg.blobDetectionAction)
     self.inner_pick_detection_client = actionlib.SimpleActionClient('inner_pick_detection_action', o2as_msgs.msg.innerPickDetectionAction)
@@ -155,16 +156,19 @@ class KittingClass(O2ASBaseRoutines):
     }
 
     self.part_bin_list = {
-      "part_6" : "bin3_1",
       "part_4" : "bin2_1",
+      "part_6" : "bin3_1",
       "part_8" : "bin2_2",
-      "part_11" : "bin2_3",
-      "part_13" : "bin2_4",
       "part_9" : "bin1_1",
+      "part_10" : "bin1_1",
+      "part_11" : "bin2_3",
       "part_12" : "bin1_2",
+      "part_13" : "bin2_4",
+      "part_14" : "bin1_1",
+      "part_15" : "bin1_2",
+      "part_16" : "bin1_3",
       "part_17" : "bin1_4",
-      "part_18" : "bin1_5",
-      "part_16" : "bin1_3"}
+      "part_18" : "bin1_5"}
 
     self.part_position_in_tray = {
       "part_4" : "tray_1_partition_4",
@@ -324,45 +328,15 @@ class KittingClass(O2ASBaseRoutines):
     res = self.suck(True)
     if not res:
       return False
-<<<<<<< HEAD
-    res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
-    if not res:
-      return False
-    start_time = rospy.get_rostime()
-    while ((rospy.get_rostime().secs - start_time.secs) <= 10.0):
-      if self._suctioned:
-        return True
-    return False
-  
-  def place_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = "b_bot_suction_tool_tip_link"):
-    rospy.loginfo("Go to the target.")
-    res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
-    if not res:
-      rospy.logdebug("Couldn't go to the target.")
-      return False
-    res = self.suck(False)
-    rospy.sleep(1)
-    if not res:
-      return False
-    start_time = rospy.get_rostime()
-    while ((rospy.get_rostime().secs - start_time.secs) <= 10.0):
-      if not self._suctioned:
-        return True
-    return False
-=======
-    
-    if not self.use_real_robot:
-      res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
-    else:
-      rospy.loginfo("Pushing into the bin.")
+    rospy.loginfo("Pushing into the bin.")
+    if self.use_real_robot:
       self.do_linear_push("b_bot", force=5.0, wait=True, direction="Y+")
       res = True
-    if not res:
-      return False
->>>>>>> e98ec771636fb03be2d45b1112581decd3316f0f
+    else:
+      res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
+    return res
 
   def naive_pick(self, group_name, bin_id, speed_fast = 1.0, speed_slow = 1.0, approach_height = 0.05, bin_eff_height = 0.07, bin_eff_xoff = 0, bin_eff_yoff = 0, bin_eff_deg_angle = 0,end_effector_link = ""):
-
     #Place gripper above bin
     goal_pose_above = geometry_msgs.msg.PoseStamped()
     goal_pose_above.header.frame_id = bin_id
@@ -872,22 +846,18 @@ class KittingClass(O2ASBaseRoutines):
   
   def get_grasp_position_from_phoxi(self, item, take_new_image=True):
     # take_new_image = True  
-    req_search_grasp = SearchGraspRequest()
-    req_search_grasp.parts_id = item.part_id
-    rospy.logerr("Using hard-coded bin ID assignment for graspability search!")
-    # req_search_grasp.bin_name = int(self.bin_id_for_graspability_estimation["part_" + str(item.part_id)])
-    req_search_grasp.bin_name = item.bin_name
-    if item.ee_to_use == "suction":
-      req_search_grasp.gripper_type = "suction"
-    else:
-      req_search_grasp.gripper_type = "two_finger"
-      #TODO: Is this still correct? What about inside/outside grasping with the precision gripper?
-    req_search_grasp.take_new_image = take_new_image
+    self.search_grasp_client
+    goal = o2as_msgs.msg.SearchGraspPhoxiGoal()
+    goal.part_id = item.part_id
+    goal.bin_name = item.bin_name
+    goal.gripper_type = item.ee_to_use
+    goal.update_image = take_new_image
     try:
-      resp_search_grasp = self._search_grasp(req_search_grasp)
-      take_new_image = False
-    except rospy.ServiceException as e:
-      rospy.logerr(e.message)
+      self.search_grasp_client.send_goal(goal)
+      self.search_grasp_client.wait_for_result(rospy.Duration(5.0))
+      resp_search_grasp = self.search_grasp_client.get_result()
+    except:
+      rospy.logerr("Could not get grasp from Phoxi")
       return False
     object_position = geometry_msgs.msg.PointStamped()
     object_position.header.frame_id = "a_phoxi_m_sensor"
@@ -1132,13 +1102,13 @@ class KittingClass(O2ASBaseRoutines):
     # self.go_to_named_pose("back", "a_bot")
     screw_delivery_time = rospy.Time.now()
 
-    for item in self.suction_items:
-      if rospy.is_shutdown():
-        break
-      self.go_to_named_pose("suction_pick_ready", "b_bot")
-      self.attempt_item(item, 10)
-    self.do_change_tool_action("b_bot", equip=False, screw_size=50)   # 50 = suction tool
-    self.go_to_named_pose("back", "b_bot")
+    # for item in self.suction_items:
+    #   if rospy.is_shutdown():
+    #     break
+    #   self.go_to_named_pose("suction_pick_ready", "b_bot")
+    #   self.attempt_item(item, 10)
+    # self.do_change_tool_action("b_bot", equip=False, screw_size=50)   # 50 = suction tool
+    # self.go_to_named_pose("back", "b_bot")
 
     for item in self.precision_gripper_items:
       if rospy.is_shutdown():
@@ -1147,16 +1117,17 @@ class KittingClass(O2ASBaseRoutines):
       self.attempt_item(item)
     self.go_to_named_pose("back", "a_bot")
 
-    for item in self.robotiq_gripper_items:
-      self.go_to_named_pose("home", "b_bot")
-      if rospy.is_shutdown():
-        break
-      self.attempt_item(item)
-    self.go_to_named_pose("back", "b_bot")
+    # for item in self.robotiq_gripper_items:
+    #   self.go_to_named_pose("home", "b_bot")
+    #   if rospy.is_shutdown():
+    #     break
+    #   self.attempt_item(item)
+    # self.go_to_named_pose("back", "b_bot")
 
     # ==== 2. Second, loop through all the items that were not successfully picked on first try, and place the screws when they are assumed to be ready.
     all_done = False
-    while not all_done and not rospy.is_shutdown():
+    while False:
+    # while not all_done and not rospy.is_shutdown():
       rospy.loginfo("Entering the loop to recover failed items and pick screws")
 
       ### Pick the screws when they should be ready

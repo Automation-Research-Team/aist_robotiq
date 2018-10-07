@@ -1476,7 +1476,7 @@ bool SkillServer::publishMarker(geometry_msgs::PoseStamped marker_pose, std::str
 
     marker.ns = "markers";
     marker.id = marker_id_count++;
-    marker.lifetime = ros::Duration();
+    marker.lifetime = ros::Duration(60.0);
     marker.action = visualization_msgs::Marker::ADD;
 
     if (marker_type == "pose")
