@@ -768,11 +768,11 @@ class CalibrationClass(O2ASBaseRoutines):
 
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "set_" + str(set_number) + "_tray_2_screw_m4_1"
-    if robot_name=="b_bot":
+    pose0.pose.position.x = -.01
+    if robot_name=="b_bot" or robot_name=="a_bot":
       pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, 0, 0))
       if task=="kitting":
-        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, 0, 0))
-      pose0.pose.position.x = -.01
+        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, 0, 0))
     elif robot_name=="c_bot":
       if set_number == 1:
         pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, 0, 0))
@@ -780,8 +780,6 @@ class CalibrationClass(O2ASBaseRoutines):
         pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/4, 0, 0))
       elif set_number == 3:
         pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
-      pose0.pose.position.x = -.01
-
     
     for i in range(8):
       poses.append(copy.deepcopy(pose0))
@@ -1109,7 +1107,6 @@ class CalibrationClass(O2ASBaseRoutines):
     rospy.sleep(0.2)
 
     cv2.imwrite('/root/catkin_ws/src/o2as_bg_ratio/images/empty_close_gripper.png', self._img)
-
     return
 
   def image_callback(self, msg_in):
@@ -1143,43 +1140,35 @@ if __name__ == '__main__':
       rospy.loginfo("23: Placement mat extended (for the taskboard task)")
       rospy.loginfo("231: Placement mat extended with b_bot")
       rospy.loginfo("24: a_bot gripper frame (rotate around EEF axis on taskboard)")
-      rospy.loginfo("3: KITTING TASK (no action)")
-      rospy.loginfo("311: Set 1 partitions with a_bot")
-      rospy.loginfo("312: Set 1 partitions with b_bot")
-      rospy.loginfo("313: Set 1 partitions with c_bot")
-      rospy.loginfo("314: Set 1 partitions with suction_tool (b_bot))")
-      rospy.loginfo("315: Set 1 partitions with screw_tool_m4 (c_bot)")
+      rospy.loginfo("3: ===== KITTING TASK (no action)")
+      rospy.loginfo("311, 312, 313: Set 1 partitions with a_bot, b_bot, c_bot")
+      rospy.loginfo("314, 315: Set 1 partitions with suction_tool (b_bot), screw_tool_m4 (c_bot)")
       rospy.loginfo("316 (3161, 3162): Screws in set 1 (2, 3) with screw_tool_m4 (c_bot)")
+      rospy.loginfo("3163, 3164, 3165: Screws in set 1 with a_bot, b_bot, b_bot_suction_tool")
       rospy.loginfo("318: Tray 1 set 2 partitions with b_bot")
       rospy.loginfo("319: Tray 1 set 3 partitions with b_bot")
-      rospy.loginfo("321: Bins with a_bot")
-      rospy.loginfo("322: Bins with b_bot")
-      rospy.loginfo("323: Bins with suction_tool (b_bot)")
-      rospy.loginfo("331: Bin corners with a_bot")
-      rospy.loginfo("332: Bin corners with b_bot")
-      rospy.loginfo("333: Bin corners with suction_tool (b_bot)")
+      rospy.loginfo("321, 322, 323: Bins with a_bot, b_bot, suction_tool (b_bot)")
+      rospy.loginfo("331, 332, 333: Bin corners with a_bot, b_bot, suction_tool (b_bot)")
       rospy.loginfo("341: Go to check pick pose and save image to file")
+      rospy.loginfo("371: Go to screw feeder outlets with m4 tool for c_bot")
+      rospy.loginfo("372, 373: Pick m4, m3 screw from feeder with c_bot (tool has to be equipped)")
       rospy.loginfo("4: Parts tray tests (assembly/kitting)")
+      rospy.loginfo("5: ===== ASSEMBLY TASK (no action)")
       rospy.loginfo("51: Assembly base plate (c_bot)")
       rospy.loginfo("52: Assembly base plate (b_bot)")
       rospy.loginfo("53: Assembly base plate (a_bot)")
       rospy.loginfo("54: Assembly assembled parts")
       rospy.loginfo("55: Assembly initial part locations (the plates)")
-      rospy.loginfo("6: Go to screw_ready with c and b (a goes to back)")
-      rospy.loginfo("611: Go to screw holder (with b_bot)")
-      rospy.loginfo("612: Go to screw holder (with c_bot)")
-      rospy.loginfo("621: Equip m4 tool (with b_bot)")
-      rospy.loginfo("622: Unequip m4 tool (with b_bot)")
-      rospy.loginfo("623: Equip m4 tool (with c_bot)")
-      rospy.loginfo("624: Unequip m4 tool (with c_bot)")
-      rospy.loginfo("63: Go to assembly base plate with m4 screw tool (b_bot; m4 tool has to be equipped)")
-      rospy.loginfo("64: Go to assembly base plate with m4 screw tool (c_bot; m4 tool has to be equipped)")
+      rospy.loginfo("6: ===== TOOLS|  Go to screw_ready with c and b (a goes to back)")
+      rospy.loginfo("611, 612: Go to screw holder with b_bot, c_bot")
+      rospy.loginfo("621, 622: Equip/unequip m4 tool (with b_bot)")
+      rospy.loginfo("623, 624: Equip/unequip m4 tool (with c_bot)")
+      rospy.loginfo("625, 626: Equip/unequip suction tool (with b_bot)")
+      rospy.loginfo("63, 64: Go to assembly base plate with m4 screw tool (b_bot, c_bot)")
       rospy.loginfo("641: Go to assembly base plate with m6 nut tool (c_bot; m6 nut tool has to be equipped)")
-      rospy.loginfo("65: Go to tray positions with m4 tool for b_bot (tool has to be equipped)")
-      rospy.loginfo("66: Go to tray positions with m4 tool for c_bot (tool has to be equipped)")
+      rospy.loginfo("65, 66: Go to tray positions with m4 tool for b_bot, c_bot (tool has to be equipped)")
       rospy.loginfo("661: Go to all 3 trays' positions with m4 tool for c_bot (tool has to be equipped)")
       rospy.loginfo("671: Pick up screw from tray with b_bot (tool has to be equipped)")
-      rospy.loginfo("672: Pick up screw from tray with c_bot (tool has to be equipped)")
       rospy.loginfo("681: Place screw in tray 1 with c_bot (tool+screw required)")
       rospy.loginfo("6812: As above, with screw 2")
       rospy.loginfo("6813: As above, with screw 3")
@@ -1187,9 +1176,6 @@ if __name__ == '__main__':
       rospy.loginfo("683: Place screw in tray 3 with c_bot (tool+screw required)")
       rospy.loginfo("691: Do screw action with b_bot on rightmost hole")
       rospy.loginfo("692: Do screw action with c_bot on pulley")
-      rospy.loginfo("71: Go to screw feeder outlets with m4 tool for c_bot (tool has to be equipped)")
-      rospy.loginfo("72: Pick m4 screw from feeder with c_bot (tool has to be equipped)")
-      rospy.loginfo("73: Pick m3 screw from feeder with c_bot (tool has to be equipped)")
       rospy.loginfo("81: Go to tray partitions using b_bot")
       rospy.loginfo("82: Go to screws on the tray using b_bot")
       rospy.loginfo("83: Go to screws on the tray using a_bot")
@@ -1273,6 +1259,12 @@ if __name__ == '__main__':
         c.tray_screw_calibration(robot_name="c_bot", end_effector_link="c_bot_screw_tool_m4_tip_link", task="kitting", set_number=2)
       elif r == '3162':
         c.tray_screw_calibration(robot_name="c_bot", end_effector_link="c_bot_screw_tool_m4_tip_link", task="kitting", set_number=3)
+      elif r == '3163':
+        c.tray_screw_calibration(robot_name="a_bot", task="kitting", set_number=1)
+      elif r == '3164':
+        c.tray_screw_calibration(robot_name="b_bot", task="kitting", set_number=1)
+      elif r == '3165':
+        c.tray_screw_calibration(robot_name="b_bot", end_effector_link="b_bot_suction_tool_tip_link", task="kitting", set_number=1)
       elif r == '318':
         c.tray_partition_calibration(robot_name="b_bot", set_number=2, tray_number=1)
       elif r == '319':
@@ -1291,8 +1283,14 @@ if __name__ == '__main__':
         c.bin_corner_calibration(robot_name="b_bot", end_effector_link="b_bot_suction_tool_tip_link")
       elif r == '341':
         c.check_inner_pick_calibration()
+      elif r == '371':
+        c.screw_feeder_calibration(robot_name="c_bot")
+      elif r == '372':
+        c.screw_feeder_pick_test(robot_name="c_bot", screw_size=4)
+      elif r == '373':
+        c.screw_feeder_pick_test(robot_name="c_bot", screw_size=3)
       elif r == '4':
-        c.parts_tray_tests()
+        c.parts_tray_tests()  # Outdated, probably
       elif r == '51':
         c.assembly_calibration_base_plate()
       elif r == '52':
@@ -1303,6 +1301,12 @@ if __name__ == '__main__':
         c.assembly_calibration_assembled_parts()
       elif r == '55':
         c.assembly_calibration_initial_plates()
+      elif r == '581':
+        c.tray_partition_calibration(robot_name="b_bot")
+      elif r == '582':
+        c.screw_tool_test_tray_with_fingertip(robot_name="b_bot")
+      elif r == '583':
+        c.screw_tool_test_tray_with_fingertip(robot_name="a_bot")
       elif r == '6':
         c.go_to_named_pose("back", "a_bot")
         c.go_to_named_pose("screw_ready", "b_bot")
@@ -1326,6 +1330,13 @@ if __name__ == '__main__':
         c.go_to_named_pose("back", "b_bot")
         c.go_to_named_pose("home", "c_bot")
         c.do_change_tool_action("c_bot", equip=False, screw_size = 4)
+      elif r == '625':
+        c.go_to_named_pose("back", "c_bot")
+        c.go_to_named_pose("home", "b_bot")
+        c.do_change_tool_action("b_bot", equip=True, screw_size = 50)
+      elif r == '626':
+        c.go_to_named_pose("back", "c_bot")
+        c.do_change_tool_action("b_bot", equip=False, screw_size = 50)
       elif r == '63':
         c.screw_tool_test_assembly(robot_name="b_bot")
       elif r == '64':
@@ -1340,8 +1351,6 @@ if __name__ == '__main__':
         c.kitting_trays_screw_test(robot_name="c_bot", end_effector_link="c_bot_screw_tool_m4_tip_link")
       elif r == '671':
         c.screw_pickup_test(robot_name="b_bot")
-      elif r == '672':
-        c.screw_pickup_test(robot_name="c_bot")
       elif r == '681':
         c.place_screw_test(set_name = "set_1_")
       elif r == '6812':
@@ -1356,18 +1365,6 @@ if __name__ == '__main__':
         c.screw_action_test(robot_name="b_bot")
       elif r == '692':
         c.screw_action_test(robot_name="c_bot")
-      elif r == '71':
-        c.screw_feeder_calibration(robot_name="c_bot")
-      elif r == '72':
-        c.screw_feeder_pick_test(robot_name="c_bot", screw_size=4)
-      elif r == '73':
-        c.screw_feeder_pick_test(robot_name="c_bot", screw_size=3)
-      elif r == '81':
-        c.tray_partition_calibration(robot_name="b_bot")
-      elif r == '82':
-        c.screw_tool_test_tray_with_fingertip(robot_name="b_bot")
-      elif r == '83':
-        c.screw_tool_test_tray_with_fingertip(robot_name="a_bot")
       elif r == 'x':
         break
       else:
