@@ -90,7 +90,6 @@ class KittingClass(O2ASBaseRoutines):
     # action
     self.blob_detection_client = actionlib.SimpleActionClient('blob_detection_action', o2as_msgs.msg.blobDetectionAction)
     self.inner_pick_detection_client = actionlib.SimpleActionClient('inner_pick_detection_action', o2as_msgs.msg.innerPickDetectionAction)
-    # self.blob_detection_client.wait_for_server()  
 
     # Image Subscriber for monitoring    
     self.img_blob_topic = "o2as_blob_detection/img_w_blob"    
@@ -498,8 +497,6 @@ class KittingClass(O2ASBaseRoutines):
     prep_pose.pose.position.x = -0.03
     prep_pose.pose.position.y = -0.06
     
-    print("press enter")
-    raw_input()
     self.move_lin("c_bot", prep_pose, .2, end_effector_link="c_bot_screw_tool_m"+str(screw_size)+"_tip_link")
     prep_pose.pose.position.y = magic_y_offset
     prep_pose.pose.position.z = magic_z_offset
@@ -508,8 +505,6 @@ class KittingClass(O2ASBaseRoutines):
     attempt = 0
     screw_picked = False
     while attempt < attempts:
-      print("press enter")
-      raw_input()
       self.do_pick_action("c_bot", pick_pose, screw_size = 4, use_complex_planning = True, tool_name = "screw_tool")
       bool_msg = Bool()
       try:
