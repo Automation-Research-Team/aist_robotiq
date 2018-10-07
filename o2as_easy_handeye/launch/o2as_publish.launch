@@ -4,7 +4,7 @@
   <arg name="camera_name"	default="a_phoxi_m_camera" />
     
   <arg name="eye_on_hand"	value="false"
-       if="$(eval arg('camera_name') == 'a_phoxi_m_camera')" />
+       unless="$(eval arg('camera_name') == 'a_bot_camera')" />
   <arg name="eye_on_hand"	value="true"
        if="$(eval arg('camera_name') == 'a_bot_camera')" />
   
