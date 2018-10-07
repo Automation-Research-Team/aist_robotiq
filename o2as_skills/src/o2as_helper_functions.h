@@ -79,7 +79,20 @@ geometry_msgs::PoseStamped transform_pose_now(geometry_msgs::PoseStamped& pose, 
 geometry_msgs::PoseStamped transformTargetPoseFromTipLinkToEE(geometry_msgs::PoseStamped ps, std::string robot_name, std::string end_effector_link, tf::TransformListener& listener)
 {
   tf::StampedTransform st_tip_to_wrist, st_ref_to_goal;
-  listener.lookupTransform(end_effector_link, robot_name + "_tool0", ros::Time::now(), st_tip_to_wrist);
+  bool success = false;
+  while (!success) {
+    try {
+      // ros::Time t = ros::Time::now();
+      ros::Time t = ros::Time(0);
+      listener.waitForTransform(end_effector_link, robot_name + "_tool0", t, ros::Duration(1.0));
+      listener.lookupTransform(end_effector_link, robot_name + "_tool0", ros::Time::now(), st_tip_to_wrist);
+      success = true;
+    } catch (tf::ExtrapolationException e) {
+      ROS_ERROR_STREAM("Something went wrong in transformTargetPoseFromTipLinkToEE");
+      ROS_ERROR(e.what());
+    }
+    sleep(0.1);
+  }
 
   tf::Quaternion q1(ps.pose.orientation.x, ps.pose.orientation.y, ps.pose.orientation.z, ps.pose.orientation.w);
   tf::Vector3 v1(ps.pose.position.x, ps.pose.position.y, ps.pose.position.z);

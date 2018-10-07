@@ -129,7 +129,17 @@ class URScriptRelay():
                 req.velocity = .03
             rospy.logdebug("original pose:")
             rospy.logdebug(req.target_pose)
-            robot_pose = self.listener.transformPose(req.robot_name + "_base", req.target_pose)
+            transform_success = False
+            counter = 50
+            while not transform_success:
+                try:
+                    counter += 1
+                    robot_pose = self.listener.transformPose(req.robot_name + "_base", req.target_pose)
+                    transform_success = True
+                except:
+                    rospy.logdebug("Failed to transform. Waiting for .1 seconds")
+                    sleep(.1)
+                    pass
             xyz = [robot_pose.pose.position.x, robot_pose.pose.position.y, robot_pose.pose.position.z]
             
             q = [robot_pose.pose.orientation.x, robot_pose.pose.orientation.y, 
@@ -177,7 +187,7 @@ class URScriptRelay():
             program_front = self.spiral_motion_template
             program_back = ""
             if (req.radius_increment < 0.0001) or (req.radius_increment > 0.005):
-                rospy.logerror("radius_incr needs to be between 0.0001 and 0.005 but is " + str(req.radius_increment))
+                rospy.logerr("radius_incr needs to be between 0.0001 and 0.005 but is " + str(req.radius_increment))
             if not req.acceleration:
                 req.acceleration = 0.1
             if not req.velocity:

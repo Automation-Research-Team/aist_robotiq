@@ -18,6 +18,12 @@ from easy_handeye.srv import TakeSample, RemoveSample, ComputeCalibration
 
 from o2as_routines.base import O2ASBaseRoutines
 
+import sensor_msgs.msg
+import cv2
+from cv_bridge import CvBridge, CvBridgeError
+
+# http://wiki.ros.org/cv_bridge/Tutorials/ConvertingBetweenROSImagesAndOpenCVImagesPython
+
 # Poses taken during handeye calibration
 # TODO: These poses are specific for `d_bot` camera, need to modify for Phoxi
 keyposes = {
@@ -72,8 +78,9 @@ keyposes = {
   'a_bot_camera': {
     'a_bot': [
 #      [0.15, -0.30, 0.25, radians( 30), radians( 25), radians(0)],
-      [0.0, -0.10, 0.45, radians(0), radians(90), radians(-90)],
-      [0.1, -0.20, 0.35, radians(0), radians(90), radians(-90)],
+      [0.00, -0.20, 0.15, radians(180), radians(90), radians(-90)],
+       # [-0.025855, -0.25188, 1.0543, -0.43332, 0.43411, 0.55841, 0.55852],
+       # [-0.025855, -0.25188, 1.0543, -0.43332, 0.43411, 0.55841, 0.55852],
     ]
   }
 }
@@ -133,7 +140,8 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     
     self.needs_trigger = needs_trigger
     self.needs_calib   = needs_calib
-
+    self.nimages       = 0
+    
     if needs_trigger:
       self.flush_buffer      = get_service_proxy("flush_buffer",
                                                  camera_name, robot_name)
@@ -156,8 +164,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     self.save_calibration    = get_service_proxy("save_calibration",
                                                  camera_name, robot_name)
 
-    self.camera_name = camera_name
-
+    self.nimages = 0
     ## Initialize `moveit_commander`
     self.robot_name = robot_name
     group = self.groups[robot_name]
@@ -166,6 +173,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     #group.set_pose_reference_frame(robot_name + "_base_link")
     group.set_pose_reference_frame("workspace_center")
     group.set_end_effector_link(robot_name + "_ee_link")
+    group.set_end_effector_link(robot_name + "_gripper_tip_link")
     #group.set_end_effector_link(robot_name + "_ar_marker")
 
     # Trajectory publisher
@@ -191,7 +199,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
         print("--- Subpose [{}/5]: Failed. ---".format(i+1))
       pose[3] -= radians(30)
 
-    pose[3] = roll - radians(30)
+    pose[3]  = roll - radians(30)
     pose[4] += radians(15)
 
     for i in range(2):
@@ -203,27 +211,28 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
         print("--- Subpose [{}/5]: Failed. ---".format(i+4))
       pose[4] -= radians(30)
 
-  
-    # 1. From rostopic echo /joint_states (careful with the order of the joints)
-    joint_pose = [-0.127, 0.556, 0.432, -1.591,  0.147, -0.285]
 
-    # 2. From Rviz, ee frame position after planning
-    poseStamped.pose.position.x = -0.16815
-    poseStamped.pose.position.y = -0.10744
-    poseStamped.pose.position.z = 1.1898
-    poseStamped.pose.orientation.x = -0.531
-    poseStamped.pose.orientation.y = 0.5318
-    poseStamped.pose.orientation.z = 0.46652
-    poseStamped.pose.orientation.w = 0.46647
+    # ### How to define poses/positions for calibration
+    # # 1. From rostopic echo /joint_states (careful with the order of the joints)
+    # joint_pose = [-0.127, 0.556, 0.432, -1.591,  0.147, -0.285]
 
-    # 3. Rotate an orientation using TF quaternions
-    quaternion_0 = tf_conversions.transformations.quaternion_from_euler(
-          pose[3], pose[4], pose[5])
-    q_rotate_30_in_y = tf_conversions.transformations.quaternion_from_euler(0, pi/6, 0)
-    q_rotated = tf_conversions.transformations.quaternion_multiply(quaternion_0, q_rotate_30_in_y)
-    poseStamped.pose.orientation = geometry_msgs.msg.Quaternion(*q_rotated)
+    # # 2. From Rviz, ee frame position after planning (Open TF Frames, unfold the frame a_bot_ee_link)
+    # poseStamped.pose.position.x = -0.16815
+    # poseStamped.pose.position.y = -0.10744
+    # poseStamped.pose.position.z = 1.1898
+    # poseStamped.pose.orientation.x = -0.531
+    # poseStamped.pose.orientation.y = 0.5318
+    # poseStamped.pose.orientation.z = 0.46652
+    # poseStamped.pose.orientation.w = 0.46647
 
-  def move(self, pose, speed, sleep_time):
+    # # 3. Rotate an orientation using TF quaternions
+    # quaternion_0 = tf_conversions.transformations.quaternion_from_euler(
+    #       pose[3], pose[4], pose[5])
+    # q_rotate_30_in_y = tf_conversions.transformations.quaternion_from_euler(0, pi/6, 0)
+    # q_rotated = tf_conversions.transformations.quaternion_multiply(quaternion_0, q_rotate_30_in_y)
+    # poseStamped.pose.orientation = geometry_msgs.msg.Quaternion(*q_rotated)
+
+  def move(self, pose, speed):
     """Move the end effector"""
     # TODO: check type of `pose`
     print("move to {}".format(pose))
@@ -232,28 +241,41 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     poseStamped.pose.position.x = pose[0]
     poseStamped.pose.position.y = pose[1]
     poseStamped.pose.position.z = pose[2]
-    poseStamped.pose.orientation \
-      = geometry_msgs.msg.Quaternion(
-        *tf_conversions.transformations.quaternion_from_euler(
-          pose[3], pose[4], pose[5]))
+    if len(pose) == 6:
+      poseStamped.pose.orientation \
+        = geometry_msgs.msg.Quaternion(
+          *tf_conversions.transformations.quaternion_from_euler(
+            pose[3], pose[4], pose[5]))
+    else:
+      poseStamped.psoe.orientation.x = pose[3]
+      poseStamped.psoe.orientation.y = pose[4]
+      poseStamped.psoe.orientation.z = pose[5]
+      poseStamped.psoe.orientation.w = pose[6]
     [all_close, move_success] = self.go_to_pose_goal(self.robot_name,
                                                      poseStamped, speed,
-                                                     move_lin=True)
+                                                     move_lin=False)
     if move_success:
       if self.needs_trigger:
         self.start_acquisition()
-        rospy.sleep(sleep_time)
-        # self.trigger_frame()
-        # self.get_frame(0, True)
+        rospy.sleep(1)
 
       if self.needs_calib:
         try:
           self.take_sample()
           sample_list = self.get_sample_list()
-          n1 = len(sample_list.samples.hand_world_samples.transforms)
-          n2 = len(sample_list.samples.camera_marker_samples.transforms)
-          # TODO: Save image
-          print("  took {} hand-world samples and {} camera-marker samples").format(n1, n2)
+          n = len(sample_list.samples.hand_world_samples.transforms)
+          print("  took {} (hand-world, camera-marker) samples").format(n)
+
+          imgmsg = rospy.wait_for_message("/a_bot_camera/rgb/image_raw",
+                                          sensor_msgs.msg.Image, 1.0)
+          try:
+            bridge = CvBridge()
+            cv2_img = bridge.imgmsg_to_cv2(imgmsg, "bgr8")
+          except CvBridgeError, e:
+            print(e)
+          else:
+            cv2.imwrite("camera_image-{}.jpeg".format(self.nimages), cv2_img)
+            self.nimages += 1
         except rospy.ServiceException as e:
           print "Service call failed: %s"%e
 
@@ -285,16 +307,10 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     #self.flush_buffer()
   
     # Collect samples over pre-defined poses
-    if self.camera_name == "a_bot_camera":
-      for i, keypose in enumerate(keyposes):
-        print("\n*** Keypose [{}/{}]: Try! ***".format(i+1, len(keyposes)))
-        self.move(keypose, speed, sleep_time)
-        print("*** Keypose [{}/{}]: Completed. ***".format(i+1, len(keyposes)))
-    else:
-      for i, keypose in enumerate(keyposes):
-        print("\n*** Keypose [{}/{}]: Try! ***".format(i+1, len(keyposes)))
-        self.move_to_subposes(keypose, speed, sleep_time)
-        print("*** Keypose [{}/{}]: Completed. ***".format(i+1, len(keyposes)))
+    for i, keypose in enumerate(keyposes):
+      print("\n*** Keypose [{}/{}]: Try! ***".format(i+1, len(keyposes)))
+      self.move_to_subposes(keypose, speed, sleep_time)
+      print("*** Keypose [{}/{}]: Completed. ***".format(i+1, len(keyposes)))
 
     if self.needs_calib:
       # Compute and save calibration

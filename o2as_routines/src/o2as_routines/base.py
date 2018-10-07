@@ -59,8 +59,6 @@ from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
 
-log_level = LOG_LEVEL = rospy.INFO
-
 import ur_modern_driver.msg
 
 
@@ -70,12 +68,13 @@ def is_program_running(topic_namespace = ""):
   if msg:
     return msg.is_program_running
   else:
-    rospy.logerror("No message received from the robot. Is everything running? Is the namespace entered correctly with a leading slash?")
+    rospy.logerr("No message received from the robot. Is everything running? Is the namespace entered correctly with a leading slash?")
     return False
     # throw()
 
 def wait_for_UR_program(topic_namespace = "", timeout_duration = rospy.Duration.from_sec(20.0)):
-  rospy.loginfo("Waiting for UR program to finish. Only run this after sending custom URScripts and not the regular motion commands, or this call will not terminate before the timeout.")
+  rospy.loginfo("Waiting for UR program to finish.")
+  # Only run this after sending custom URScripts and not the regular motion commands, or this call will not terminate before the timeout.
   rospy.sleep(1.0)
   t_start = rospy.Time.now()
   time_passed = rospy.Time.now() - t_start
@@ -121,11 +120,14 @@ class O2ASBaseRoutines(object):
     
     self.listener = tf.TransformListener()
     self.use_real_robot = rospy.get_param("use_real_robot")
+    self.force_ur_script_linear_motion = False
+    self.force_moveit_linear_motion = False
 
     moveit_commander.roscpp_initialize(sys.argv)
-    rospy.init_node('assembly_example', anonymous=False, log_level=LOG_LEVEL)
+    rospy.init_node('assembly_example', anonymous=False)
 
     self.robots = moveit_commander.RobotCommander()
+    self.planning_scene_interface = moveit_commander.PlanningSceneInterface()
     self.groups = {"a_bot":moveit_commander.MoveGroupCommander("a_bot"),
               "b_bot":moveit_commander.MoveGroupCommander("b_bot"),
               "c_bot":moveit_commander.MoveGroupCommander("c_bot"),
@@ -180,7 +182,7 @@ class O2ASBaseRoutines(object):
     group.set_end_effector_link(end_effector_link)
     
     group.set_pose_target(pose_goal_stamped)
-    rospy.loginfo("Setting velocity scaling to " + str(speed))
+    rospy.logdebug("Setting velocity scaling to " + str(speed))
     group.set_max_velocity_scaling_factor(speed)
 
     if high_precision:
@@ -202,9 +204,9 @@ class O2ASBaseRoutines(object):
     return all_close(pose_goal_stamped.pose, current_pose, 0.01), move_success
 
   def transformTargetPoseFromTipLinkToEE(self, ps, robot_name, end_effector_link):
-    rospy.loginfo("Received pose to transform to EE link:")
-    rospy.loginfo(str(ps.pose.position.x) + ", " + str(ps.pose.position.y)  + ", " + str(ps.pose.position.z))
-    rospy.loginfo(str(ps.pose.orientation.x) + ", " + str(ps.pose.orientation.y)  + ", " + str(ps.pose.orientation.z)  + ", " + str(ps.pose.orientation.w))
+    rospy.logdebug("Received pose to transform to EE link:")
+    rospy.logdebug(str(ps.pose.position.x) + ", " + str(ps.pose.position.y)  + ", " + str(ps.pose.position.z))
+    rospy.logdebug(str(ps.pose.orientation.x) + ", " + str(ps.pose.orientation.y)  + ", " + str(ps.pose.orientation.z)  + ", " + str(ps.pose.orientation.w))
 
     t = self.listener.lookupTransform(end_effector_link, robot_name + "_tool0", rospy.Time())
 
@@ -237,9 +239,9 @@ class O2ASBaseRoutines(object):
 
     ps_new = self.listener.transformPose(ps.header.frame_id, ps_wrist)
 
-    rospy.loginfo("New pose:")
-    rospy.loginfo(str(ps_new.pose.position.x) + ", " + str(ps_new.pose.position.y)  + ", " + str(ps_new.pose.position.z))
-    rospy.loginfo(str(ps_new.pose.orientation.x) + ", " + str(ps_new.pose.orientation.y)  + ", " + str(ps_new.pose.orientation.z)  + ", " + str(ps_new.pose.orientation.w))
+    rospy.logdebug("New pose:")
+    rospy.logdebug(str(ps_new.pose.position.x) + ", " + str(ps_new.pose.position.y)  + ", " + str(ps_new.pose.position.z))
+    rospy.logdebug(str(ps_new.pose.orientation.x) + ", " + str(ps_new.pose.orientation.y)  + ", " + str(ps_new.pose.orientation.z)  + ", " + str(ps_new.pose.orientation.w))
 
     return ps_new
 
@@ -254,23 +256,24 @@ class O2ASBaseRoutines(object):
       elif group_name == "a_bot":
         end_effector_link = "a_bot_gripper_tip_link"
 
-    if self.use_real_robot:
-      rospy.loginfo("Real robot is being used. Send linear motion to robot controller directly via URScript.")
-      req = o2as_msgs.srv.sendScriptToURRequest()
-      req.program_id = "lin_move"
-      req.robot_name = group_name
-      req.target_pose = self.transformTargetPoseFromTipLinkToEE(pose_goal_stamped, group_name, end_effector_link)
-      req.velocity = speed
-      req.acceleration = acceleration
-      res = self.urscript_client.call(req)
-      wait_for_UR_program("/" + group_name +"_controller", rospy.Duration.from_sec(30.0))
-      return res.success
+    if self.force_ur_script_linear_motion or self.use_real_robot:
+      if not self.force_moveit_linear_motion:
+        rospy.logdebug("Real robot is being used. Send linear motion to robot controller directly via URScript.")
+        req = o2as_msgs.srv.sendScriptToURRequest()
+        req.program_id = "lin_move"
+        req.robot_name = group_name
+        req.target_pose = self.transformTargetPoseFromTipLinkToEE(pose_goal_stamped, group_name, end_effector_link)
+        req.velocity = speed
+        req.acceleration = acceleration
+        res = self.urscript_client.call(req)
+        wait_for_UR_program("/" + group_name +"_controller", rospy.Duration.from_sec(30.0))
+        return res.success
 
     group = self.groups[group_name]
       
     group.set_end_effector_link(end_effector_link)
     group.set_pose_target(pose_goal_stamped)
-    rospy.loginfo("Setting velocity scaling to " + str(speed))
+    rospy.logdebug("Setting velocity scaling to " + str(speed))
     group.set_max_velocity_scaling_factor(speed)
     
 
@@ -291,7 +294,7 @@ class O2ASBaseRoutines(object):
                                       waypoints,   # waypoints to follow
                                       0.01,        # eef_step
                                       0.0)         # jump_threshold
-    rospy.loginfo("compute cartesian path succeeded with " + str(fraction*100) + "%")
+    rospy.loginfo("Compute cartesian path succeeded with " + str(fraction*100) + "%")
     plan = group.retime_trajectory(self.robots.get_current_state(), plan, speed)
 
     plan_success = group.execute(plan, wait=True)
@@ -368,10 +371,10 @@ class O2ASBaseRoutines(object):
     # return True
 
 
-  def go_to_named_pose(self, pose_name, robot_name, speed = 0.3):
+  def go_to_named_pose(self, pose_name, robot_name, speed = 0.5):
     # pose_name should be "home", "back" etc.
     self.groups[robot_name].set_named_target(pose_name)
-    rospy.loginfo("Setting velocity scaling to " + str(speed))
+    rospy.logdebug("Setting velocity scaling to " + str(speed))
     self.groups[robot_name].set_max_velocity_scaling_factor(speed)
     self.groups[robot_name].go(wait=True)
     self.groups[robot_name].stop()
@@ -384,25 +387,24 @@ class O2ASBaseRoutines(object):
     #self.publish_marker(object_pose, "pick_pose")
     #initial gripper_setup
     rospy.loginfo("Going above object to pick")
-    rospy.loginfo("Height 0: " + str(object_pose.pose.position.z))
-    rospy.loginfo("Approach height 0: " + str(approach_height))
+    rospy.logdebug("Approach height 0: " + str(approach_height))
     object_pose.pose.position.z += approach_height
-    rospy.loginfo("Height 1: " + str(object_pose.pose.position.z))
+    rospy.logdebug("Height 1: " + str(object_pose.pose.position.z))
     if special_pick == True:
       object_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*45/180, pi/2))
-    rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
+    rospy.logdebug("Going to height " + str(object_pose.pose.position.z))
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
     object_pose.pose.position.z -= approach_height
-    rospy.loginfo("Height 2: " + str(object_pose.pose.position.z))
+    rospy.logdebug("Height 2: " + str(object_pose.pose.position.z))
     self.publish_marker(object_pose, "place_pose")
 
     if gripper_command=="complex_pick_from_inside":
       self.precision_gripper_inner_close() 
     elif gripper_command=="complex_pick_from_outside":
       self.precision_gripper_inner_open()
-    elif gripper_command=="easy_pick_only_inner":
+    elif gripper_command=="easy_pick_only_inner" or gripper_command=="inner_gripper_from_inside":
       self.precision_gripper_inner_close()
-    elif gripper_command=="easy_pick_outside_only_inner":
+    elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
       self.precision_gripper_inner_open()
     elif gripper_command=="none":
       pass
@@ -410,9 +412,8 @@ class O2ASBaseRoutines(object):
       self.send_gripper_command(gripper=robotname, command="open")
 
     rospy.loginfo("Moving down to object")
-    rospy.loginfo(grasp_height)
     object_pose.pose.position.z += grasp_height
-    rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
+    rospy.logdebug("Going to height " + str(object_pose.pose.position.z))
     self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
     object_pose.pose.position.z -= grasp_height
 
@@ -424,9 +425,9 @@ class O2ASBaseRoutines(object):
     elif gripper_command=="complex_pick_from_outside":
       self.precision_gripper_inner_close(this_action_grasps_an_object = True)
       self.precision_gripper_outer_close()
-    elif gripper_command=="easy_pick_only_inner":
+    elif gripper_command=="easy_pick_only_inner" or gripper_command=="inner_gripper_from_inside":
       self.precision_gripper_inner_open(this_action_grasps_an_object = True)
-    elif gripper_command=="easy_pick_outside_only_inner":
+    elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
       self.precision_gripper_inner_close()
     elif gripper_command=="none":
       pass
@@ -441,6 +442,7 @@ class O2ASBaseRoutines(object):
     rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
     object_pose.pose.position.z -= approach_height
+    return True
 
   ######
 
@@ -453,7 +455,7 @@ class O2ASBaseRoutines(object):
 
     rospy.loginfo("Moving to place target")
     object_pose.pose.position.z += place_height
-    self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, move_lin=True)
     object_pose.pose.position.z -= place_height
 
     # print "============ Stopping at the placement height. Press `Enter` to keep moving moving the robot ..."
@@ -466,9 +468,9 @@ class O2ASBaseRoutines(object):
     elif gripper_command=="complex_pick_from_outside":
       self.precision_gripper_outer_open()
       self.precision_gripper_inner_open()
-    elif gripper_command=="easy_pick_only_inner":
+    elif gripper_command=="easy_pick_only_inner" or gripper_command=="inner_gripper_from_inside":
       self.precision_gripper_inner_close()
-    elif gripper_command=="easy_pick_outside_only_inner":
+    elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
       self.precision_gripper_inner_open()
     elif gripper_command=="none":
       pass
@@ -481,7 +483,7 @@ class O2ASBaseRoutines(object):
       object_pose.pose.position.z += approach_height
       self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)  
       object_pose.pose.position.z -= approach_height
-    return
+    return True
 
   ######
 
@@ -495,12 +497,12 @@ class O2ASBaseRoutines(object):
     goal.use_complex_planning = use_complex_planning
     goal.z_axis_rotation = z_axis_rotation
     rospy.loginfo("Sending pick action goal")
-    rospy.loginfo(goal)
+    rospy.logdebug(goal)
 
     self.pick_client.send_goal(goal)
-    rospy.loginfo("Waiting for result")
+    rospy.logdebug("Waiting for result")
     self.pick_client.wait_for_result()
-    rospy.loginfo("Getting result")
+    rospy.logdebug("Getting result")
     return self.pick_client.get_result()
 
   def do_place_action(self, robot_name, pose_stamped, tool_name = "", screw_size=0):
@@ -511,12 +513,12 @@ class O2ASBaseRoutines(object):
     goal.tool_name = tool_name
     goal.screw_size = screw_size
     rospy.loginfo("Sending place action goal")
-    rospy.loginfo(goal)
+    rospy.logdebug(goal)
 
     self.place_client.send_goal(goal)
-    rospy.loginfo("Waiting for result")
+    rospy.logdebug("Waiting for result")
     self.place_client.wait_for_result()
-    rospy.loginfo("Getting result")
+    rospy.logdebug("Getting result")
     return self.place_client.get_result()
 
   def do_insert_action(self, active_robot_name, passive_robot_name = "", 
@@ -603,14 +605,16 @@ class O2ASBaseRoutines(object):
       wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
     return res.success
   
-  def do_linear_push(self, robot_name, force, wait = False):
+  def do_linear_push(self, robot_name, force, wait = False, direction = "Z+"):
     # Directly calls the UR service rather than the action of the skill_server
     req = o2as_msgs.srv.sendScriptToURRequest()
     req.robot_name = robot_name
     req.max_force = force
+    req.force_direction = direction
     req.program_id = "linear_push"
     res = self.urscript_client.call(req)
     if wait:
+      rospy.sleep(2.0)    # This program seems to take some time
       wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
     return res.success
 
@@ -666,7 +670,10 @@ class O2ASBaseRoutines(object):
         goal.position = command     # This sets the opening width directly
         rospy.loginfo(command)
     else:
-      rospy.logerr("Could not parse gripper command")
+      try:
+        rospy.logerr("Could not parse gripper command: " + command + " for gripper " + gripper)
+      except:
+        pass
 
     action_client.send_goal(goal)
     rospy.loginfo("Sending command " + str(command) + " to gripper: " + gripper)
@@ -682,7 +689,7 @@ class O2ASBaseRoutines(object):
         goal.open_outer_gripper_fully = False
         self.gripper_action_clients["a_bot"].send_goal(goal)
         rospy.loginfo("close outer gripper")
-        self.gripper_action_clients["a_bot"].wait_for_result()
+        self.gripper_action_clients["a_bot"].wait_for_result(rospy.Duration(3.0))
         result = self.gripper_action_clients["a_bot"].get_result()
         rospy.loginfo(result)
     except rospy.ROSInterruptException:
@@ -696,7 +703,7 @@ class O2ASBaseRoutines(object):
         goal.close_outer_gripper_fully = False
         self.gripper_action_clients["a_bot"].send_goal(goal)
         rospy.loginfo("open outer gripper")
-        self.gripper_action_clients["a_bot"].wait_for_result()
+        self.gripper_action_clients["a_bot"].wait_for_result(rospy.Duration(3.0))
         result = self.gripper_action_clients["a_bot"].get_result()
         rospy.loginfo(result)
     except rospy.ROSInterruptException:
@@ -709,7 +716,7 @@ class O2ASBaseRoutines(object):
         goal.this_action_grasps_an_object = this_action_grasps_an_object
         self.gripper_action_clients["a_bot"].send_goal(goal)
         rospy.loginfo("Closing inner gripper")
-        self.gripper_action_clients["a_bot"].wait_for_result()
+        self.gripper_action_clients["a_bot"].wait_for_result(rospy.Duration(3.0))
         result = self.gripper_action_clients["a_bot"].get_result()
         rospy.loginfo(result)
     except rospy.ROSInterruptException:
@@ -724,13 +731,13 @@ class O2ASBaseRoutines(object):
         goal.this_action_grasps_an_object = this_action_grasps_an_object
         self.gripper_action_clients["a_bot"].send_goal(goal)
         rospy.loginfo("Opening inner gripper")
-        self.gripper_action_clients["a_bot"].wait_for_result()
+        self.gripper_action_clients["a_bot"].wait_for_result(rospy.Duration(3.0))
         result = self.gripper_action_clients["a_bot"].get_result()
         rospy.loginfo(result)
     except rospy.ROSInterruptException:
         rospy.loginfo("program interrupted before completion", file=sys.stderr)
   
-  def precision_gripper_inner_open_slightly(self, this_action_grasps_an_object = False):
+  def precision_gripper_inner_open_slightly(self, this_action_grasps_an_object = False, open_range = 30):
     try:
       action_client = self.gripper_action_clients["a_bot"]
       goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
@@ -738,11 +745,12 @@ class O2ASBaseRoutines(object):
       goal.open_inner_gripper_fully = False
       goal.close_inner_gripper_fully = False
       goal.this_action_grasps_an_object = this_action_grasps_an_object
+      goal.slight_opening_width = open_range
       self.gripper_action_clients["a_bot"].send_goal(goal)
       rospy.loginfo("Opening inner gripper slightly")
-      self.gripper_action_clients["a_bot"].wait_for_result()
+      self.gripper_action_clients["a_bot"].wait_for_result(rospy.Duration(3.0))
       result = self.gripper_action_clients["a_bot"].get_result()
       rospy.loginfo(result)
     except rospy.ServiceException, e:
-        print "Service call failed: %s"%e
+        rospy.logerror("Service call failed: %s", e)
 

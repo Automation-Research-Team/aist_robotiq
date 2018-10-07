@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot>
-  <gazebo reference="a_bot_camera_link">
+  <gazebo reference="a_bot_depth_optical_frame">
     <sensor type="depth" name="a_bot_camera">
       <always_on>true</always_on>
       <visualize>true</visualize>             
@@ -44,7 +44,7 @@
     </sensor>
   </gazebo>
 
-  <gazebo reference="b_bot_camera_link">
+  <gazebo reference="b_bot_depth_optical_frame">
     <sensor type="depth" name="b_bot_camera">       
       <always_on>true</always_on>
       <visualize>true</visualize>             

@@ -52,6 +52,20 @@ add_dependencies(calibrator
   ${catkin_EXPORTED_TARGETS}
 )
 
+add_executable(quat2rpy
+  src/quat2rpy/main.cpp
+)
+
+target_link_libraries(quat2rpy
+  ${catkin_LIBRARIES}
+  ${roscpp_LIBRARIES}
+)
+
+add_dependencies(quat2rpy
+  ${PROJECT_NAME}_gencpp
+  ${catkin_EXPORTED_TARGETS}
+)
+
 #############
 ## Install ##
 #############
@@ -66,7 +80,7 @@ catkin_install_python(
 
 install(
   TARGETS
-    calibrator
+    calibrator quat2rpy
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
