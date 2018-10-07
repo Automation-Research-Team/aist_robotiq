@@ -288,6 +288,14 @@
         <joint name="b_bot_wrist_2_joint" value="1.57" />
         <joint name="b_bot_wrist_3_joint" value="-3.1415" />
     </group_state>
+    <group_state name="suction_ready_back" group="b_bot">
+        <joint name="b_bot_elbow_joint" value="2.4472" />
+        <joint name="b_bot_shoulder_lift_joint" value="-2.9506" />
+        <joint name="b_bot_shoulder_pan_joint" value="2.2567" />
+        <joint name="b_bot_wrist_1_joint" value="0.4513" />
+        <joint name="b_bot_wrist_2_joint" value="1.57" />
+        <joint name="b_bot_wrist_3_joint" value="-3.1415" />
+    </group_state>
     <group_state name="suction_pick_ready" group="b_bot">
         <joint name="b_bot_elbow_joint" value="1.47" />
         <joint name="b_bot_shoulder_lift_joint" value="-1.47" />
