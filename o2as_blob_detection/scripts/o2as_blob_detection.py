@@ -54,7 +54,6 @@ class BlobDetection(object):
     def action_callback(self, goal):
       rospy.loginfo('Executing'+" "+str(self._action_name)+"."+"request sent:")
       rospy.loginfo(goal)
-      rospy.loginfo('Executing'+" "+str(self._action_name)+"."+"request sent:")
 
       res = self.detect_poses(goal.maskCorner, goal.param_part_id)
 
@@ -117,18 +116,30 @@ class BlobDetection(object):
 
           # Convert the blob position image in the 3D camera system
           #TODO synchronize the time stamp between image and cloud
+          rospy.loginfo( rospy.get_name() + " number of blob detected " + str(len(blob_array)))
+
           self.current_detected_poses.header = self.current_cloud.header
           tmp_pose_array = []
           for i in range(0,len(blob_array)):
             tmp_pose = geometry_msgs.msg.Pose() 
             res_point3D = self.compute_3D_pos1(self.current_cloud, int(blob_array[i].x), int(blob_array[i].y))
-            tmp_pose.position = res_point3D.point
-            tmp_pose_array.append(tmp_pose)
-          self.current_detected_poses.poses = tmp_pose_array
-          # Publish the results   
-          self.pub_cloud_pos.publish(self.current_detected_poses)
+            if(res_point3D.point.x == -0.0 and res_point3D.point.y ==0.0 and res_point3D.point.z ==0.0):
+                #TODO find a approximation with nearby point
+                rospy.loginfo( "Bad point cloud reading  (probably non dense) ")
+            else:
+                tmp_pose.position = res_point3D.point
+                tmp_pose_array.append(tmp_pose)
+          if(len(tmp_pose_array)>0):
+               rospy.loginfo( rospy.get_name() + " number of poses detected " + str(len(tmp_pose_array)))
+               self.current_detected_poses.poses = tmp_pose_array
+               # Publish the results   
+               self.pub_cloud_pos.publish(self.current_detected_poses)
+               return True
+          else:
+               rospy.loginfo( rospy.get_name() + "no poses detected" )
+               return False                    
 
-          return True
+
           # Slow down this node and reduce data transfer for image
           #rospy.sleep(0.01)
       else:
