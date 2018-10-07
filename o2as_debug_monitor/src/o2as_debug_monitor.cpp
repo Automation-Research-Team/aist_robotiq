@@ -75,10 +75,10 @@ cv_bridge::CvImagePtr convert2OpenCV(
 {
   auto type_val = sensor_msgs::image_encodings::BGR8;
 
-  if (type_str == "depth" || "DEPTH")
+  if ((type_str == "depth") || (type_str == "DEPTH"))
   {
     type_val = sensor_msgs::image_encodings::TYPE_32FC1;
-    ROS_INFO("Image encoding: %s", type_val.c_str());
+    // ROS_INFO("Image encoding: %s", type_val.c_str());
   }
 
   cv_bridge::CvImagePtr cv_ptr;
@@ -130,11 +130,6 @@ ImageCallback getCallbackForImage(
     auto encoding = cv_ptr -> encoding;
     if (encoding == "32FC1") // assume depth map
     {
-//      // check min/max value of matrix
-//      double min, max;
-//      cv::minMaxLoc(img_org, &min, &max);
-//      ROS_INFO("min, max = %f, %f", min, max);
-
       img = cv::Mat(img_org.size(), CV_8UC3);
 
       for (int i = 0; i < img_org.rows; i++)
