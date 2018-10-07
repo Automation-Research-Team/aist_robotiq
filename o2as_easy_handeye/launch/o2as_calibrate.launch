@@ -10,6 +10,11 @@
        if="$(eval arg('camera_name') == 'a_phoxi_m_camera')" />
   <arg name="eye_on_hand"	value="true"
        if="$(eval arg('camera_name') == 'a_bot_camera')" />
+
+  <arg name="robot_effector_frame"	value="$(arg robot_name)_ee_link"
+       if="$(eval arg('camera_name') == 'a_phoxi_camera')"/>
+  <arg name="robot_effector_frame"	value="$(arg robot_name)_wrist_2_link"
+       if="$(eval arg('camera_name') == 'a_bot_camera')"/>
   
   <arg name="move_group"	value="$(arg robot_name)"/>
   <arg name="namespace_prefix"	value="o2as_easy_handeye_$(arg robot_name)"/>
@@ -20,7 +25,7 @@
   <!-- Set AR marker ID -->
   <arg name="marker_id"		value="26"
        unless="$(eval arg('camera_name') == 'a_bot_camera')"/>
-  <arg name="marker_id"		value="256"
+  <arg name="marker_id"		value="32"
        if="$(eval arg('camera_name') == 'a_bot_camera')"/>
 
   <!-- Start ArUco -->
@@ -32,13 +37,13 @@
     <remap from="/image"	to="/$(arg camera_name)/texture"
 	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/pointcloud"	to="/$(arg camera_name)/pointcloud"
-	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
+    	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/camera_info"	to="/$(arg camera_name)/rgb/camera_info"
 	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/image"	to="/$(arg camera_name)/rgb/image_raw"
 	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/pointcloud"	to="/$(arg camera_name)/depth/points"
-	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
+    	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
 
     <!-- Other parameters -->
     <param name="image_is_rectified" value="false"/>
@@ -73,7 +78,7 @@
     <arg name="tracking_base_frame"	value="camera_link"/>
     <arg name="tracking_marker_frame"	value="camera_marker"/>
     <arg name="robot_base_frame"	value="$(arg robot_name)_base_link"/>
-    <arg name="robot_effector_frame"	value="$(arg robot_name)_ee_link"/>
+    <arg name="robot_effector_frame"	value="$(arg robot_effector_frame)"/>
 
     <arg name="freehand_robot_movement"	value="true"/>
     <arg name="robot_velocity_scaling"	value="0.5"/>
