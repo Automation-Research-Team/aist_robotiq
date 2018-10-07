@@ -157,23 +157,7 @@
   </xacro:sensor_d435> -->
 
   <!-- spawn and attach AR markers -->
-  <xacro:include filename="$(find o2as_gazebo)/urdf/o2as_ar_marker.urdf.xacro"/>
-  <!-- <xacro:o2as_ar_marker prefix="a_bot_" -->
-  <!-- 			parent="a_bot_ee_link" -->
-  <!-- 			marker_id="26"> -->
-  <!--   <origin xyz="0.08 0.00 0.065" rpy="0 0 0"/> -->
-  <!-- </xacro:o2as_ar_marker> -->
-
-  <!-- <xacro:o2as_ar_marker prefix="b_bot_" -->
-  <!-- 			parent="b_bot_dual_suction_gripper_base_link" -->
-  <!-- 			marker_id="26"> -->
-  <!--   <origin xyz="0.063 0.0 0.0215" rpy="0 0 0"/> -->
-  <!-- </xacro:o2as_ar_marker> -->
-  <!-- <xacro:o2as_ar_marker prefix="b_bot_" -->
-  <!-- 			parent="b_bot_single_suction_gripper_base_link" -->
-  <!-- 			marker_id="26"> -->
-  <!--   <origin xyz="0.063 0.0 0.0215" rpy="0 0 0"/> -->
-  <!-- </xacro:o2as_ar_marker> -->
+  <!-- <xacro:include filename="$(find o2as_gazebo)/urdf/o2as_ar_marker.urdf.xacro"/>
   <xacro:o2as_ar_marker prefix="b_bot_"
 			parent="b_bot_robotiq_85_tip_link"
 			marker_id="26">
@@ -184,17 +168,11 @@
 			marker_id="26">
     <origin xyz="0.0 0.0 0.0185" rpy="0 0 0"/>
   </xacro:o2as_ar_marker>
-  <!-- <xacro:o2as_ar_marker prefix="workspace_" -->
-  <!-- 			parent="workspace_center" -->
-  <!-- 			marker_id="256"> -->
-  <!--   <origin xyz="0.0 0.0 0.0005" rpy="0 0 0"/> -->
-  <!-- </xacro:o2as_ar_marker> -->
-
   <xacro:o2as_ar_marker_16cm prefix="workspace_"
   			parent="workspace_center"
   			marker_id="32">
     <origin xyz="0.0 0.0 0.0005" rpy="0 0 0"/>
-  </xacro:o2as_ar_marker_16cm>
+  </xacro:o2as_ar_marker_16cm> -->
   
   <!-- Add PhoXi 3D scanners -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />

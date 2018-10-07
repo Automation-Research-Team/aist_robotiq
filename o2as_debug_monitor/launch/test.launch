@@ -22,11 +22,11 @@
 
     image_topics:
       realsense:
-        topic_name: /c_bot_camera/color/image_raw
+        topic_name: /a_bot_camera/color/image_raw
         col: [0, 12]
         row: [0, 7]
       realsense2:
-        topic_name: /c_bot_camera/depth/image_raw
+        topic_name: /a_bot_camera/depth/image_raw
         col: [0, 12]
         row: [8, 15]
         vrange: [0, 64]
@@ -94,7 +94,7 @@
   </rosparam>
 
   <!-- This is for testing purpopse. -->
-  <rosparam command="load" file="$(find o2as_routines)/config/kitting_item_list.yaml"/>
+  <!-- <rosparam command="load" file="$(find o2as_routines)/config/kitting_item_list.yaml"/> -->
 
     <!-- ROS node for test, publishes test messages -->
   <node pkg="o2as_debug_monitor" type="test_debug_monitor.py"
