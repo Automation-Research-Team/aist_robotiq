@@ -382,26 +382,13 @@ class KittingClass(O2ASBaseRoutines):
     #Close the gripper and save the motor position
     self.send_gripper_command(gripper= "precision_gripper_inner", command="open")
     rospy.sleep(0.1)
-    close_pos = self._motorPos
+    close_pos = rospy.get_param("/precision_gripper_server/inner_close_motor_position", 2222)
 
     posx = 0
     posy = 0
     posz = 0.08
 
     while (not success_pick):
-      # #Random pick
-      # self.naive_pick("a_bot", bin_id, speed_fast, speed_slow, approach_height, posz, posx, posy, bin_eff_deg_angle, end_effector_link)
-      
-      # #Go to the bin center to start the screw checking
-      # rospy.loginfo("Go to the bin center to start the screw checking")
-      # goal_pose_incline = geometry_msgs.msg.PoseStamped()
-      # goal_pose_incline.header.frame_id = bin_id
-      # goal_pose_incline.pose.position.x = 0
-      # goal_pose_incline.pose.position.y = 0.035
-      # goal_pose_incline.pose.position.z = 0.30
-      # goal_pose_incline.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-      # res = self.move_lin("a_bot", goal_pose_incline, speed_slow)
-
       pick_pose = geometry_msgs.msg.PoseStamped()
       pick_pose.header.frame_id = bin_id
       pick_pose.pose.orientation = self.downward_orientation
@@ -413,12 +400,12 @@ class KittingClass(O2ASBaseRoutines):
       rospy.loginfo("Begin check motion")
       over_bin_3_joint_pose = [0.5639523868982476, -1.2023834734104668, 2.084380077110544, -4.115980903386012, -1.350262946004677, 1.5910085738144437]
       self.groups["a_bot"].set_joint_value_target(over_bin_3_joint_pose)
-      self.groups["a_bot"].set_max_velocity_scaling_factor(.1)
+      self.groups["a_bot"].set_max_velocity_scaling_factor(.5)
       self.groups["a_bot"].go(wait=True)
 
       over_bin_3_inclined_joint_pose = [0.5646427393623301, -1.202333924982511, 2.040723585395901, -4.197616886811121, -1.3550737620026068, 1.6180429123653095]
       self.groups["a_bot"].set_joint_value_target(over_bin_3_inclined_joint_pose)
-      self.groups["a_bot"].set_max_velocity_scaling_factor(.1)
+      self.groups["a_bot"].set_max_velocity_scaling_factor(.5)
       self.groups["a_bot"].go(wait=True)
 
       #Open just a bit the gripper
@@ -439,7 +426,7 @@ class KittingClass(O2ASBaseRoutines):
       #Check the motor position 
       success_pick = True
       if(abs(self._motorPos - close_pos) > 25 ):
-        rospy.loginfo("Screw was picked successfully")
+        rospy.loginfo("Screw was picked successfully. self._motorPos = " + str(self._motorPos))
         success_pick = True
       else:
         rospy.loginfo("Did not pick screw")
@@ -815,17 +802,12 @@ class KittingClass(O2ASBaseRoutines):
 
       rospy.logerr("TODO: Turn off the feeder")
 
-      self.pick(robot_name, pick_pose, 0.0, speed_fast = 0.3, speed_slow = 0.02, 
-                        gripper_command=gripper_command, approach_height = 0.08)
+      self.pick(robot_name, pick_pose, 0.0, speed_fast = 0.3, speed_slow = 0.05, 
+                        gripper_command=gripper_command, approach_height = 0.04)
 
       rospy.logerr("TODO: Turn on the feeder")
-      bool_msg = Bool()
-      try:
-        bool_msg = rospy.wait_for_message("/screw_tool_m" + str(screw_size) + "/screw_suctioned", Bool, 1.0)
-      except:
-        pass
-      screw_picked = bool_msg.data
-      if not screw_picked or not self.use_real_robot:
+      screw_picked = self.check_pick(item.part_id)
+      if not screw_picked and self.use_real_robot:
         rospy.logerr("Failed an attempt to pick item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + "). Reattempting. Current attempts: " + str(attempts))
         continue
       
@@ -835,8 +817,8 @@ class KittingClass(O2ASBaseRoutines):
       drop_pose.pose.orientation = self.downward_orientation
       drop_pose.header.frame_id = "m" + str(screw_size) + "_feeder_inlet_link"
 
-      self.place(robot_name, drop_pose, 0.04,
-                    speed_fast = 0.3, speed_slow = 0.02, gripper_command=gripper_command, approach_height=0.0)
+      self.place(robot_name, drop_pose, 0.01,
+                    speed_fast = 0.3, speed_slow = 0.02, gripper_command=gripper_command, approach_height=0.02)
       self.fulfilled_items += 1
       item.fulfilled = True
       rospy.loginfo("Delivered item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + ")! Total items delivered: " + str(self.fulfilled_items))
@@ -862,6 +844,7 @@ class KittingClass(O2ASBaseRoutines):
     pick_pose.pose.position.y += -bin_width/2 + random.random()*bin_width
     pick_pose.pose.orientation = self.downward_orientation
     return pick_pose
+  
   
   def get_grasp_position_from_phoxi(self, item, take_new_image=True):
     # take_new_image = True  
@@ -1262,7 +1245,7 @@ if __name__ == '__main__':
         kit.kitting_task()
       elif i == "60":
         kit.go_to_named_pose("home", "a_bot")
-        kit.pick_screw_with_precision_gripper("bin1_3", screw_size= 4)
+        kit.pick_screw_with_precision_gripper(kit.part_bin_list["part_17"], screw_size= 4)
       elif i == "61":
         kit.pick_screw_from_precision_gripper(screw_size=4)
       elif i == "62":
