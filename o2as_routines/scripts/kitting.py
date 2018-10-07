@@ -636,11 +636,6 @@ class KittingClass(O2ASBaseRoutines):
     goal_pose.pose.position.y = -.05
     goal_pose.pose.position.z = bin_eff_height - .12
 
-    #goal orientation for a_bot_camera_depth_frame 
-    #goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2 + 20*pi/180, 0))
-    #res = self.go_to_pose_goal(group_name, goal_pose, speed_slow, "a_bot_camera_depth_frame")
-    #goal orientation for gripper
-    #    goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 + 20*pi/180, 0))
     goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
     res = self.move_lin(group_name, goal_pose, speed_slow, end_effector_link="")
     if not res:
@@ -677,15 +672,6 @@ class KittingClass(O2ASBaseRoutines):
     point_top4_cam = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", point_top4).point
 
 
-    #print("point_top1_cam")
-    #print(point_top1_cam)
-    #print("point_top2_cam")
-    #print(point_top2_cam)
-    #print("point_top3_cam")
-    #print(point_top3_cam)
-    #print("point_top4_cam")
-    #print(point_top4_cam)
-
     #point_test_center_cam = geometry_msgs.msg.Point(0, 0, 0.4)
     #print(point_test_center_cam)
 
@@ -695,7 +681,6 @@ class KittingClass(O2ASBaseRoutines):
     #
     #P: [554.3827128226441, 0.0, 320.5, -38.80678989758509, 0.0, 554.3827128226441, 240.5, 0.0, 0.0, 0.0, 1.0, 0.0]
     #TODO take the parameters from the /camera_info topic instead
-
 
 
     point_top1_cam_np = np.array([point_top1_cam.x, point_top1_cam.y, point_top1_cam.z])   
@@ -711,11 +696,6 @@ class KittingClass(O2ASBaseRoutines):
     point_top4_img_np = self.cameraMatK.dot(point_top4_cam_np)
     #point_test_center_img_np = self.cameraMatK.dot(point_test_center_cam_np) 
 
-    #print(point_top1_img_np)
-    #print(point_top2_img_np)
-    #print(point_top3_img_np)
-    #print(point_top4_img_np)
-    #print(point_test_center_img_np)
 
     mask_polygon = Polygon()
     mask_polygon.points = [Point32(point_top1_img_np[0]/point_top1_img_np[2],point_top1_img_np[1]/point_top1_img_np[2],0),
@@ -785,30 +765,6 @@ class KittingClass(O2ASBaseRoutines):
     #TODO if nothing is detected move the camera a bit to try to detect somethin
         return False      
 
-
-
-    #mask_img = Image.new('L', (640,480), 0)
-    #ImageDraw.Draw(mask_img).polygon(mask_polygon, outline = 1, fill = 255)
-    #mask_image_np = np.array(mask_img)
-    #namefile = "mask_"+str(bin_id)+".png"
-    #mask_img.save(namefile,'PNG')
-
-
-    #used to do the bitwise comparison between the mask and the original image
-    #mask = Image.new('RGB', (640,480), 255)
-    #ImageDraw.Draw(mask).polygon(polygon, outline = 1, fill = 1)
-    #mask_np = np.array(mask)
- 
-    #img_original = Image.open("bin_origin.png")
-    #img_original_np = np.array(img_original)
- 
-    #img_res_np = np.bitwise_and(mask_np, img_original_np)
-    #img_res = Image.fromarray(np.uint8(img_res_np)) 
-    #img_res.save('mask_original_bin.png','PNG')
-
-
-    #    point_top1_cam = t.transformPoint("a_bot_camera_depth_frame", point_top1)
-    #    point_top1_cam = t.transformPoint(point_top4.header.frame_id, point_top1)
   def draw_point3D_after_view_bin(self, pointPartCam):
         ### Project the goal on the image plane using the camera matrix like for the mask
         #Transform Point in camera reference
