@@ -5,22 +5,23 @@ project(o2as_easy_handeye)
 add_compile_options(-std=c++14)
 
 find_package(catkin REQUIRED COMPONENTS
-  cv_bridge
-  geometry_msgs
+  roscpp
   image_proc
   image_transport
-  message_generation
-  roscpp
+  geometry_msgs
   sensor_msgs
   std_msgs
+  std_srvs
+  cv_bridge
   visp_bridge
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
-catkin_package(
-)
+catkin_python_setup()
+catkin_package()
 
 ###########
 ## Build ##
@@ -31,13 +32,13 @@ include_directories(
 )
 
 add_executable(calibrator
-  src/calibrator.cpp
-  src/calibrator.h
-  src/calibrator_main.cpp
-  src/aistCalibration.cpp
-  src/vpMatrix.cpp
-  src/names.cpp
-  src/names.h
+  src/calibrator/calibrator.cpp
+  src/calibrator/calibrator.h
+  src/calibrator/calibrator_main.cpp
+  src/calibrator/aistCalibration.cpp
+  src/calibrator/vpMatrix.cpp
+  src/calibrator/names.cpp
+  src/calibrator/names.h
 )
 
 target_link_libraries(calibrator
@@ -51,6 +52,20 @@ add_dependencies(calibrator
   ${catkin_EXPORTED_TARGETS}
 )
 
+add_executable(quat2rpy
+  src/quat2rpy/main.cpp
+)
+
+target_link_libraries(quat2rpy
+  ${catkin_LIBRARIES}
+  ${roscpp_LIBRARIES}
+)
+
+add_dependencies(quat2rpy
+  ${PROJECT_NAME}_gencpp
+  ${catkin_EXPORTED_TARGETS}
+)
+
 #############
 ## Install ##
 #############
@@ -58,13 +73,14 @@ catkin_install_python(
   PROGRAMS
     scripts/run_handeye_calibration.py
     scripts/go_home.py
-    scripts/convert_phoxi_camera_info_gazebo.py
+    scripts/calibrate.py
+    scripts/publish.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 install(
   TARGETS
-    calibrator
+    calibrator quat2rpy
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

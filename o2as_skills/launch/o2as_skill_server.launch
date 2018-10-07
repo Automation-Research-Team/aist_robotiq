@@ -5,8 +5,10 @@
     <arg name="serial_port_1" default="/dev/for_docker/screw"/>
   </include>
 
+  <!-- FOR KITTING -->
   <include file="$(find o2as_blob_detection)/launch/kitting_w_blob.launch" />
   <include file="$(find o2as_bg_ratio)/launch/o2as_bg_ratio.launch" />
+  <include file="$(find graspability_estimation)/launch/o2as_graspability_estimation.launch" />
     
   <!-- <group ns="o2as_skill_server"> -->
   <node name="ur_program_relay" pkg="o2as_skills" type="ur_program_relay.py" respawn="false" output="screen"/>

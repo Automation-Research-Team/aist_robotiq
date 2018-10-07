@@ -1,33 +1,49 @@
 <?xml version="1.0" ?>
 <launch>
-  <arg name="robot_name"/>  <!-- "a_bot", "b_bot", or "c_bot" -->
-  <arg name="move_group"	value  ="$(arg robot_name)"/>
+  <arg name="robot_name"	default="b_bot"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
-  <arg name="namespace_prefix"	value  ="o2as_easy_handeye_$(arg robot_name)"/>
   <arg name="marker_size"	default="0.07"
        doc="Size of the ArUco marker used, in meters"/>
   <arg name="config"		default="sim"/>
 
+  <arg name="eye_on_hand"	value="false"
+       unless="$(eval arg('camera_name') == 'a_bot_camera')" />
+  <arg name="eye_on_hand"	value="true"
+       if="$(eval arg('camera_name') == 'a_bot_camera')" />
+
+  <arg name="robot_effector_frame"	value="$(arg robot_name)_ee_link"
+       unless="$(eval arg('camera_name') == 'a_bot_camera')"/>
+  <arg name="robot_effector_frame"	value="$(arg robot_name)_wrist_2_link"
+       if="$(eval arg('camera_name') == 'a_bot_camera')"/>
+  
+  <arg name="move_group"	value="$(arg robot_name)"/>
+  <arg name="namespace_prefix"	value="o2as_easy_handeye_$(arg robot_name)"/>
+
+  <param name="use_real_robot"	value="false"
+	 if="$(eval arg('config') == 'sim')"/>
+  
   <!-- Set AR marker ID -->
-  <arg name="marker_id" value="17"  if="$(eval arg('robot_name') == 'a_bot')"/>
-  <arg name="marker_id" value="26"  if="$(eval arg('robot_name') == 'b_bot')"/>
-  <arg name="marker_id" value="256" if="$(eval arg('robot_name') == 'c_bot')"/>
+  <arg name="marker_id"		value="26"
+       unless="$(eval arg('camera_name') == 'a_bot_camera')"/>
+  <arg name="marker_id"		value="32"
+       if="$(eval arg('camera_name') == 'a_bot_camera')"/>
 
   <!-- Start ArUco -->
   <!-- <node name="aruco_tracker" pkg="aruco_ros" type="single"> -->
-  <node name="aruco_tracker" pkg="o2as_aruco_ros" type="marker_detector">
+  <node name="aruco_tracker" pkg="o2as_aruco_ros" type="o2as_single"
+  	output="screen">
     <remap from="/camera_info"	to="/$(arg camera_name)/camera_info"
 	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/image"	to="/$(arg camera_name)/texture"
 	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/pointcloud"	to="/$(arg camera_name)/pointcloud"
-	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
+    	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/camera_info"	to="/$(arg camera_name)/rgb/camera_info"
 	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/image"	to="/$(arg camera_name)/rgb/image_raw"
 	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
-    <remap from="/cloud"	to="/$(arg camera_name)/depth/points"
-	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
+    <remap from="/pointcloud"	to="/$(arg camera_name)/depth/points"
+    	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
 
     <!-- Other parameters -->
     <param name="image_is_rectified" value="false"/>
@@ -39,10 +55,6 @@
   </node>
 
   <!-- Start robot controller -->
-  <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch"
-	   if="$(eval arg('config') == 'sim')">
-    <arg name="sim" value="true"/>
-  </include>
   <include file="$(find o2as_examples)/launch/connect_real_robots.launch"
 	   if="$(eval arg('config') == 'real')">
   </include>
@@ -53,15 +65,20 @@
 	   if="$(eval arg('config') == 'osaka')">
   </include>
 
+  <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch">
+    <arg name="sim" value="true"  if    ="$(eval arg('config') == 'sim')"/>
+    <arg name="sim" value="false" unless="$(eval arg('config') == 'sim')"/>
+  </include>
+  <include file="$(find o2as_skills)/launch/o2as_skill_server.launch"/>
+
   <!-- Start easy_handeye calibrator -->
   <include file="$(find o2as_easy_handeye)/launch/calibrate.launch">
     <arg name="namespace_prefix"	value="$(arg namespace_prefix)"/>
-    <arg name="eye_on_hand"		value="false"/>
-
+    <arg name="eye_on_hand"		value="$(arg eye_on_hand)"/>
     <arg name="tracking_base_frame"	value="camera_link"/>
     <arg name="tracking_marker_frame"	value="camera_marker"/>
     <arg name="robot_base_frame"	value="$(arg robot_name)_base_link"/>
-    <arg name="robot_effector_frame"	value="$(arg robot_name)_ee_link"/>
+    <arg name="robot_effector_frame"	value="$(arg robot_effector_frame)"/>
 
     <arg name="freehand_robot_movement"	value="true"/>
     <arg name="robot_velocity_scaling"	value="0.5"/>

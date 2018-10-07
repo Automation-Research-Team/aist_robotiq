@@ -54,3 +54,18 @@ material Aruco/marker256
     }
   }
 }
+
+material Aruco/marker32-160-10
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+	texture aruco-32-160-10.png
+      }
+    }
+  }
+}
+

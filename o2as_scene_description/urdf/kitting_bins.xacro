@@ -18,10 +18,10 @@
  <xacro:property name="bin2_length" value="0.201"/>
  <xacro:property name="z_origin_offset_2" value="-.008" />
 
- <!-- bin3_definition -->
- <xacro:property name="bin3_width" value="0.192"/>
- <xacro:property name="bin3_length" value="0.285"/>
- <xacro:property name="z_origin_offset_3" value="-.004" />
+  <!-- bin3_definition -->
+  <xacro:property name="bin3_width" value="0.192"/>
+  <xacro:property name="bin3_length" value="0.285"/>
+  <xacro:property name="z_origin_offset_3" value="-.004" />
 
  <!-- A row of bin1 -->
  <xacro:property name="set1_x" value=".2425"/>
@@ -71,7 +71,7 @@
   <xacro:kitting_bin_1 binname="bin1_3" parent="workspace_center" z_origin_offset="-.005">
       <origin xyz=".449 -0.3175 0.005" rpy="0 0 0" />
   </xacro:kitting_bin_1>
- 
+  
 
   
 </robot>
