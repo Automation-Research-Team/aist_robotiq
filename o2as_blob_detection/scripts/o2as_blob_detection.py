@@ -21,11 +21,17 @@ import actionlib
 import o2as_msgs.msg
 from geometry_msgs.msg import PoseArray, Pose 
 
+import rospkg
+
 class BlobDetection(object):
     def __init__(self):
+#        self.rospack = rospkg.RosPack()
+#        print(self.rospack.get_path(rospy.get_name()))
+
         #Variable
         self.bridge = CvBridge()
         self.current_image = Image()
+        self.current_image_blob = Image()
         self.current_cloud = PointCloud2()
         self.current_detected_poses = PoseArray() 
 
@@ -35,15 +41,18 @@ class BlobDetection(object):
         self.cloud_topic = rospy.get_name()+ "/camera/cloud"
         self.blob_pos_img_topic = rospy.get_name()+"/blob_pos_img"
         self.blob_pos_cloud_topic = rospy.get_name()+"/blob_pos_cloud"
+        self.img_w_blob_topic = rospy.get_name()+"/img_w_blob"
 
+        # Publisher
         self.pub_img_pos = rospy.Publisher(self.blob_pos_img_topic, geometry_msgs.msg.Point, queue_size=10)
         self.pub_cloud_pos = rospy.Publisher(self.blob_pos_cloud_topic, geometry_msgs.msg.PoseArray, queue_size=10)
+        self.pub_img_w_blob = rospy.Publisher(self.img_w_blob_topic, Image, latch=True,queue_size=10)
 
         # Subscriber
         rospy.Subscriber(self.image_topic, Image, self.image_callback)
         rospy.Subscriber(self.cloud_topic, PointCloud2, self.cloud_callback)
 
-        #define the action
+        # Define the action
         self._action_name = "blob_detection_action"
         self._action_server = actionlib.SimpleActionServer(self._action_name, o2as_msgs.msg.blobDetectionAction, execute_cb=self.action_callback, auto_start = False)
         self._action_server.start()
@@ -307,10 +316,19 @@ class BlobDetection(object):
         keypoints = detector.detect(im_gray)
     
         # Draw the key points 
-        im_with_keypoints = cv2.drawKeypoints(im_rgb, keypoints, np.array([]), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        im_with_keypoints = cv2.drawKeypoints(im_rgb, keypoints, np.array([]), (255, 0, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     
         # Show blobs
-        cv2.imwrite("/root/catkin_ws/blob_detection_"+param_part_id+"_results.png", im_with_keypoints)
+
+        cv2.imwrite("/root/catkin_ws/src/o2as_blob_detection/img_res/blob_detection_"+param_part_id+"_results.png", cv2.cvtColor(im_with_keypoints, cv2.COLOR_BGR2RGB))
+        print("before publish")
+
+        try:
+          print("publish")
+          self.pub_img_w_blob.publish(self.bridge.cv2_to_imgmsg(im_with_keypoints, "rgb8"))
+        except CvBridgeError as e:
+          print(e)
+
 
         blob_array = []
      
