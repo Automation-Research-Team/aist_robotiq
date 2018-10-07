@@ -306,7 +306,7 @@ class KittingClass(O2ASBaseRoutines):
   def _suction_state_callback(self, msg):
     self._suctioned = msg.data
 
-  def suck(self, turn_suction_on=False, naive=False):
+  def suck(self, turn_suction_on=False):
     # Judge success or fail using pressure status.
     if not self.use_real_robot:
       return True
@@ -324,6 +324,32 @@ class KittingClass(O2ASBaseRoutines):
     res = self.suck(True)
     if not res:
       return False
+<<<<<<< HEAD
+    res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
+    if not res:
+      return False
+    start_time = rospy.get_rostime()
+    while ((rospy.get_rostime().secs - start_time.secs) <= 10.0):
+      if self._suctioned:
+        return True
+    return False
+  
+  def place_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link = "b_bot_suction_tool_tip_link"):
+    rospy.loginfo("Go to the target.")
+    res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
+    if not res:
+      rospy.logdebug("Couldn't go to the target.")
+      return False
+    res = self.suck(False)
+    rospy.sleep(1)
+    if not res:
+      return False
+    start_time = rospy.get_rostime()
+    while ((rospy.get_rostime().secs - start_time.secs) <= 10.0):
+      if not self._suctioned:
+        return True
+    return False
+=======
     
     if not self.use_real_robot:
       res = self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
@@ -333,6 +359,7 @@ class KittingClass(O2ASBaseRoutines):
       res = True
     if not res:
       return False
+>>>>>>> e98ec771636fb03be2d45b1112581decd3316f0f
 
   def naive_pick(self, group_name, bin_id, speed_fast = 1.0, speed_slow = 1.0, approach_height = 0.05, bin_eff_height = 0.07, bin_eff_xoff = 0, bin_eff_yoff = 0, bin_eff_deg_angle = 0,end_effector_link = ""):
 
@@ -897,7 +924,7 @@ class KittingClass(O2ASBaseRoutines):
 
   def get_item_pose_from_phoxi(self, item, update_image=True):
     req = SearchGraspRequest()
-    req.part_id = int(str(item.part_id).strip("part_"))
+    req.parts_id = int(str(item.parts_id).strip("part_"))
     req.bin_name = item.bin_name
     req.gripper = item.ee_to_use
     req.is_updated = update_image
@@ -909,6 +936,7 @@ class KittingClass(O2ASBaseRoutines):
     pose_in_camera.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(resp.rot3D[0].x, resp.rot3D[0].y, resp.rot3D[0].z))
     pose_in_bin.pose = tf_listener.transformPose(item.bin_name, pose_in_camera)
     pose_in_bin.pose.orientation = self.downward_orientation
+    # TODO We should talk about how to use rotiqz which the two_finger approaches.
 
     return pose_in_bin
 
