@@ -844,37 +844,38 @@ class KittingClass(O2ASBaseRoutines):
     return False
   
   def get_grasp_position_from_phoxi(self, item, take_new_image=True):
-    update_image = True  
+    # take_new_image = True  
+    req_search_grasp = SearchGraspRequest()
+    req_search_grasp.parts_id = item.part_id
+    rospy.logerr("Using hard-coded bin ID assignment for graspability search!")
+    # req_search_grasp.bin_name = int(self.bin_id_for_graspability_estimation["part_" + str(item.part_id)])
+    req_search_grasp.bin_name = item.bin_name
     if item.ee_to_use == "suction":
-      req_search_grasp = SearchGraspRequest()
-      req_search_grasp.part_id = int(str(item.part_id).strip("part_"))
-      rospy.logerr("Using hard-coded bin ID assignment for graspability search!")
-      req_search_grasp.bin_id = int(bin_id_for_graspability_estimation[item.part_id])
-      if item.ee_to_use == "suction":
-        req_search_grasp.gripper = "suction"
-      else:
-        req_search_grasp.gripper = "two_finger"
-        #TODO: Is this still correct? What about inside/outside grasping with the precision gripper?
-      req_search_grasp.update_image = update_image
-      try:
-        resp_search_grasp = self._search_grasp(req_search_grasp)
-        update_image = False
-      except rospy.ServiceException as e:
-        rospy.logerr(e.message)
-        return False
-      object_position = geometry_msgs.msg.PointStamped()
-      object_position.header.frame_id = "a_phoxi_m_sensor"
-      object_position.point = geometry_msgs.msg.Point(
-        resp_search_grasp.pos3D[0].x, 
-        resp_search_grasp.pos3D[0].y, 
-        resp_search_grasp.pos3D[0].z)
-      rospy.logdebug("\nGrasp point in %s: (x, y, z) = (%f, %f, %f)", 
-        object_position.header.frame_id, 
-        object_position.point.x, 
-        object_position.point.y, 
-        object_position.point.z)
+      req_search_grasp.gripper_type = "suction"
+    else:
+      req_search_grasp.gripper_type = "two_finger"
+      #TODO: Is this still correct? What about inside/outside grasping with the precision gripper?
+    req_search_grasp.take_new_image = take_new_image
+    try:
+      resp_search_grasp = self._search_grasp(req_search_grasp)
+      take_new_image = False
+    except rospy.ServiceException as e:
+      rospy.logerr(e.message)
+      return False
+    object_position = geometry_msgs.msg.PointStamped()
+    object_position.header.frame_id = "a_phoxi_m_sensor"
+    object_position.point = geometry_msgs.msg.Point(
+      resp_search_grasp.pos3D[0].x, 
+      resp_search_grasp.pos3D[0].y, 
+      resp_search_grasp.pos3D[0].z)
+    rospy.logdebug("\nGrasp point in %s: (x, y, z) = (%f, %f, %f)", 
+      object_position.header.frame_id, 
+      object_position.point.x, 
+      object_position.point.y, 
+      object_position.point.z)
+    self.publish_marker(object_position, "aist_vision_result")
     return object_position
-  
+    
   def get_random_pose_in_bin(self, item):
     pick_pose = geometry_msgs.msg.PoseStamped()
     pick_pose.header.frame_id = item.bin_name
@@ -1247,14 +1248,15 @@ if __name__ == '__main__':
     kit = KittingClass()
     i = 1
     while i:
-      rospy.loginfo("Enter 1 to equip suction tool .")
-      rospy.loginfo("Enter 11 to unequip suction tool .")
+      rospy.loginfo("Enter 1 to equip suction tool.")
+      rospy.loginfo("Enter 11 to unequip suction tool.")
       rospy.loginfo("Enter 2 to move the robots home to starting positions.")
       rospy.loginfo("Enter 3 to pick with b_bot using suction tool.")
       rospy.loginfo("Enter 4 to place with b_bot using suction tool.")
       rospy.loginfo("Enter 60 to pick screw from bin with a_bot.")
       rospy.loginfo("Enter 61 to hand over screw from a_bot to c_bot.")
       rospy.loginfo("Enter 62 to move robots back.")
+      rospy.loginfo("Enter 71, 72... to test phoxi on item 1, 2...")
       rospy.loginfo("Enter START to start the task.")
       rospy.loginfo("Enter x to exit.")
       i = raw_input()
@@ -1278,6 +1280,11 @@ if __name__ == '__main__':
       elif i == "62":
         kit.go_to_named_pose("screw_ready", "c_bot")
         kit.go_to_named_pose("back", "a_bot")
+      elif i in ["71", "72", "73", "74", "75", "76", "77", "78", "79"]:
+        item = kit.ordered_items[int(i)-71]
+        rospy.loginfo("Checking for item id " + str(item.part_id) + " in " + item.bin_name)
+        obj_pose = kit.get_grasp_position_from_phoxi(item)
+        rospy.loginfo(obj_pose)
       elif i == "x":
         break
       
