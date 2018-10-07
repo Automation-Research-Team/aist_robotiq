@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   aruco
   aruco_ros
+  aruco_msgs
   tf
 )
 
@@ -31,17 +32,18 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
 )
 
-add_executable(marker_detector
-  src/marker_detector_main.cpp
+add_executable(o2as_single
+  src/o2as_single.cpp
+  src/BinDescription.cpp
 )
 
-target_link_libraries(marker_detector
+target_link_libraries(o2as_single
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
   ${OpenCV_LIBRARIES}
 )
 
-add_dependencies(marker_detector
+add_dependencies(o2as_single
   ${PROJECT_NAME}_gencpp
   ${PROJECT_NAME}_gencfg
   ${catkin_EXPORTED_TARGETS}
@@ -52,7 +54,7 @@ add_dependencies(marker_detector
 #############
 install(
   TARGETS
-    marker_detector
+    o2as_single
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
