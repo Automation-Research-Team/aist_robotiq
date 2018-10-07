@@ -1105,7 +1105,7 @@ class CalibrationClass(O2ASBaseRoutines):
 
   def check_inner_pick_calibration(self):
     #Go to check pose
-    self.go_to_named_pose("check_precision_gripper_success", "a-bot")
+    self.go_to_named_pose("check_precision_gripper_success", "a_bot")
     rospy.sleep(0.2)
 
     cv2.imwrite('/root/catkin_ws/src/o2as_bg_ratio/images/empty_close_gripper.png', self._img)

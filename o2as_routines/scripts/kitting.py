@@ -54,6 +54,10 @@ class kitting_order_entry():
 
     self.tf_listener = tf.TransformListener()
 
+def clamp(n, minn, maxn):
+  """Constrain a number n to the interval [minn, maxn]"""
+  return min(max(n, minn), maxn)
+
 class KittingClass(O2ASBaseRoutines):
   """
   This contains the routine used to run the kitting task. See base.py for shared convenience functions.
@@ -79,6 +83,7 @@ class KittingClass(O2ASBaseRoutines):
     self._search_grasp = rospy.ServiceProxy("search_grasp", SearchGrasp)
     # action
     self.blob_detection_client = actionlib.SimpleActionClient('blob_detection_action', o2as_msgs.msg.blobDetectionAction)
+    self.inner_pick_detection_client = actionlib.SimpleActionClient('inner_pick_detection_action', o2as_msgs.msg.innerPickDetectionAction)
     # self.blob_detection_client.wait_for_server()  
 
     self.initial_setup()
@@ -91,6 +96,15 @@ class KittingClass(O2ASBaseRoutines):
   def initial_setup(self):
     ### First, set up internal parameters
     ### Then, read order file and create the list to iterate through
+
+    # Used for validating grasp poses
+    self.bin_1_width = .04
+    self.bin_1_length = .04
+    self.bin_2_width = .08
+    self.bin_2_length = .04
+    self.bin_3_width = .10
+    self.bin_3_length = .07
+
     self.grasp_strategy = {
         "part_4" : "suction", 
         "part_5" : "suction", 
@@ -608,7 +622,7 @@ class KittingClass(O2ASBaseRoutines):
     rospy.loginfo(result)
 
     #TODO select which poses to choose in the array
-    poseArrayRes = geometry_msgs.msg.PoseArray()    
+    poseArrayRes = geometry_msgs.msg.PoseArray()
     poseArrayRes = result.posesDetected 
 
     #TODO Sort pose in the midle of the bin
@@ -685,6 +699,24 @@ class KittingClass(O2ASBaseRoutines):
 
     #    point_top1_cam = t.transformPoint("a_bot_camera_depth_frame", point_top1)
     #    point_top1_cam = t.transformPoint(point_top4.header.frame_id, point_top1)
+
+  def check_pick(self, group_name, part_id):
+    #Go to check position
+    self.go_to_named_pose("check_precision_gripper_success", group_name)
+    rospy.sleep(0.2)
+
+    #check pick
+    goal = o2as_msgs.msg.innerPickDetectionGoal()
+    #goal.part_id = part_id
+    self.inner_pick_detection_client.send_goal(goal)
+    self.inner_pick_detection_client.wait_for_result()
+    result = self.inner_pick_detection_client.get_result()
+    rospy.loginfo(result)
+
+    #Move back the robot to home
+    self.go_to_named_pose("home", group_name)
+
+    return result
 
   def pick_screw_from_feeder(self, screw_size, attempts = 1):
     """
@@ -847,27 +879,28 @@ class KittingClass(O2ASBaseRoutines):
   def get_random_pose_in_bin(self, item):
     pick_pose = geometry_msgs.msg.PoseStamped()
     pick_pose.header.frame_id = item.bin_name
+
     if "bin1" in item.bin_name:
-      bin_length = .04
-      bin_width = .04
+      bin_length = self.bin_1_width
+      bin_width = self.bin_1_length
     elif "bin2" in item.bin_name:
-      bin_length = .08
-      bin_width = .04
+      bin_length = self.bin_2_width
+      bin_width = self.bin_2_length
     elif "bin3" in item.bin_name:
-      bin_length = .10
-      bin_width = .07
+      bin_length = self.bin_3_width
+      bin_width = self.bin_3_length
 
     pick_pose.pose.position.x += -bin_length/2 + random.random()*bin_length
     pick_pose.pose.position.y += -bin_width/2 + random.random()*bin_width
     pick_pose.pose.orientation = self.downward_orientation
     return pick_pose
 
-  def get_item_pose(self, item, is_update=True):
+  def get_item_pose_from_phoxi(self, item, update_image=True):
     req = SearchGraspRequest()
     req.part_id = int(str(item.part_id).strip("part_"))
     req.bin_name = item.bin_name
     req.gripper = item.ee_to_use
-    req.is_updated = is_updated
+    req.is_updated = update_image
     resp = self._search_grasp(req_search_grasp)
 
     pose_in_camera = geometry_msgs.PoseStamped()
@@ -878,6 +911,32 @@ class KittingClass(O2ASBaseRoutines):
     pose_in_bin.pose.orientation = self.downward_orientation
 
     return pose_in_bin
+
+  def make_pose_safe_for_bin(self, pick_pose, item):
+    """ This makes sure that the pick_pose is not outside the bin or would cause a collision."""
+    if "bin1" in item.bin_name:
+      bin_length = self.bin_1_width
+      bin_width = self.bin_1_length
+    elif "bin2" in item.bin_name:
+      bin_length = self.bin_2_width
+      bin_width = self.bin_2_length
+    elif "bin3" in item.bin_name:
+      bin_length = self.bin_3_width
+      bin_width = self.bin_3_length
+
+    safe_pose = copy.deepcopy(pick_pose)
+    safe_pose.pose.position.x = clamp(pick_pose.pose.position.x, -bin_length/2, bin_length/2)
+    safe_pose.pose.position.y = clamp(pick_pose.pose.position.y, -bin_width/2, bin_width/2)
+
+    if safe_pose.pose.position.x != pick_pose.pose.position.x or safe_pose.pose.position.y != pick_pose.pose.position.y:
+      rospy.loginfo("Pose was adjusted in make_pose_safe_for_bin. Before: " + 
+                    str(pick_pose.pose.position.x) + ", " + 
+                    str(pick_pose.pose.position.y) + ". After: " + 
+                    str(safe_pose.pose.position.x) + ", " + 
+                    str(safe_pose.pose.position.y) + ".")
+    
+    #TODO: Adjust the gripper orientation when close to the border
+    return safe_pose
 
   def attempt_item(self, item, max_attempts = 5):
     """This function attempts to pick an item.
@@ -909,7 +968,7 @@ class KittingClass(O2ASBaseRoutines):
       
       if item.ee_to_use == "suction":      
         # TODO: Fix the vision in this function
-        # pick_pose = self.get_item_pose(item)
+        # pick_pose = self.get_item_pose_from_phoxi(item)
 
         # Orientation needs to be adjusted for suction tool
         pick_point_on_table = self.listener.transformPose("workspace_center", pick_pose).pose.position
@@ -929,13 +988,13 @@ class KittingClass(O2ASBaseRoutines):
       else:
         gripper_command = ""
 
-
-      # TODO: self.adjust_pose_to_bin(pick_pose, item)
-      # Add sanity check for the poses, adjust orientations for the gripper near the border etc.
+      pick_pose = self.make_pose_safe_for_bin(pick_pose, item)
       
       item_picked = self.pick(robot_name, pick_pose, 0.0, speed_fast = 0.3, speed_slow = 0.02, 
                         gripper_command=gripper_command, approach_height = 0.1)
       # TODO: Check grasp success via grasp width for robotiq gripper and vision for precision gripper
+      if gripper_command == "precision_gripper_from_inside":
+        item_picked = self.check_pick("a_bot", item.part_id)
       # Suction is checked inside the pick function
       if not self.use_real_robot:
         item_picked = True
@@ -970,7 +1029,9 @@ class KittingClass(O2ASBaseRoutines):
       if item.part_id == 6:
         place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
       
-      if item.ee_to_use == "suction":
+      if "precision_gripper" in item.ee_to_use:
+        self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=.1)
+      elif item.ee_to_use == "suction":
         # Approach the place pose with controlled acceleration value
         rospy.loginfo("Approaching place pose")
         if item.set_number in [2,3] and item.target_frame[11] == '1':  # Tray 1
