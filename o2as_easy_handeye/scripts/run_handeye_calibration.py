@@ -72,7 +72,8 @@ keyposes = {
   'a_bot_camera': {
     'a_bot': [
 #      [0.15, -0.30, 0.25, radians( 30), radians( 25), radians(0)],
-      [0.0, -0.30, 0.20, radians(0), radians(90), radians(-90)],
+      [0.0, -0.10, 0.45, radians(0), radians(90), radians(-90)],
+      [0.1, -0.20, 0.35, radians(0), radians(90), radians(-90)],
     ]
   }
 }
@@ -155,6 +156,8 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     self.save_calibration    = get_service_proxy("save_calibration",
                                                  camera_name, robot_name)
 
+    self.camera_name = camera_name
+
     ## Initialize `moveit_commander`
     self.robot_name = robot_name
     group = self.groups[robot_name]
@@ -188,7 +191,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
         print("--- Subpose [{}/5]: Failed. ---".format(i+1))
       pose[3] -= radians(30)
 
-    pose[3]  = roll - radians(30)
+    pose[3] = roll - radians(30)
     pose[4] += radians(15)
 
     for i in range(2):
@@ -200,8 +203,27 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
         print("--- Subpose [{}/5]: Failed. ---".format(i+4))
       pose[4] -= radians(30)
 
-    
-  def move(self, pose, speed):
+  
+    # 1. From rostopic echo /joint_states (careful with the order of the joints)
+    joint_pose = [-0.127, 0.556, 0.432, -1.591,  0.147, -0.285]
+
+    # 2. From Rviz, ee frame position after planning
+    poseStamped.pose.position.x = -0.16815
+    poseStamped.pose.position.y = -0.10744
+    poseStamped.pose.position.z = 1.1898
+    poseStamped.pose.orientation.x = -0.531
+    poseStamped.pose.orientation.y = 0.5318
+    poseStamped.pose.orientation.z = 0.46652
+    poseStamped.pose.orientation.w = 0.46647
+
+    # 3. Rotate an orientation using TF quaternions
+    quaternion_0 = tf_conversions.transformations.quaternion_from_euler(
+          pose[3], pose[4], pose[5])
+    q_rotate_30_in_y = tf_conversions.transformations.quaternion_from_euler(0, pi/6, 0)
+    q_rotated = tf_conversions.transformations.quaternion_multiply(quaternion_0, q_rotate_30_in_y)
+    poseStamped.pose.orientation = geometry_msgs.msg.Quaternion(*q_rotated)
+
+  def move(self, pose, speed, sleep_time):
     """Move the end effector"""
     # TODO: check type of `pose`
     print("move to {}".format(pose))
@@ -216,11 +238,11 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
           pose[3], pose[4], pose[5]))
     [all_close, move_success] = self.go_to_pose_goal(self.robot_name,
                                                      poseStamped, speed,
-                                                     move_lin=False)
+                                                     move_lin=True)
     if move_success:
       if self.needs_trigger:
         self.start_acquisition()
-        rospy.sleep(1)
+        rospy.sleep(sleep_time)
         # self.trigger_frame()
         # self.get_frame(0, True)
 
@@ -230,6 +252,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
           sample_list = self.get_sample_list()
           n1 = len(sample_list.samples.hand_world_samples.transforms)
           n2 = len(sample_list.samples.camera_marker_samples.transforms)
+          # TODO: Save image
           print("  took {} hand-world samples and {} camera-marker samples").format(n1, n2)
         except rospy.ServiceException as e:
           print "Service call failed: %s"%e
@@ -262,10 +285,16 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     #self.flush_buffer()
   
     # Collect samples over pre-defined poses
-    for i, keypose in enumerate(keyposes):
-      print("\n*** Keypose [{}/{}]: Try! ***".format(i+1, len(keyposes)))
-      self.move_to_subposes(keypose, speed, sleep_time)
-      print("*** Keypose [{}/{}]: Completed. ***".format(i+1, len(keyposes)))
+    if self.camera_name == "a_bot_camera":
+      for i, keypose in enumerate(keyposes):
+        print("\n*** Keypose [{}/{}]: Try! ***".format(i+1, len(keyposes)))
+        self.move(keypose, speed, sleep_time)
+        print("*** Keypose [{}/{}]: Completed. ***".format(i+1, len(keyposes)))
+    else:
+      for i, keypose in enumerate(keyposes):
+        print("\n*** Keypose [{}/{}]: Try! ***".format(i+1, len(keyposes)))
+        self.move_to_subposes(keypose, speed, sleep_time)
+        print("*** Keypose [{}/{}]: Completed. ***".format(i+1, len(keyposes)))
 
     if self.needs_calib:
       # Compute and save calibration
