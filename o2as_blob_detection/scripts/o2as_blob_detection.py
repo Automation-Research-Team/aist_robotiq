@@ -258,6 +258,31 @@ class BlobDetection(object):
             # Filter by Inertia
             params.filterByInertia = False
             params.minInertiaRatio = 0.01
+        else:
+            # Segmentation Thresholds
+            params.minThreshold = 100
+            params.maxThreshold = 400
+
+            # Filter by color
+            params.filterByColor = True
+            params.blobColor = 0
+
+            # Filter by size of the blob.
+            params.filterByArea = True
+            params.minArea = 20
+            params.maxArea = 150
+
+            # Filter by Circularity
+            params.filterByCircularity = True
+            params.minCircularity = 0.7
+
+            # Filter by Convexity
+            params.filterByConvexity = False
+            params.minConvexity = 0.87
+
+            # Filter by Inertia
+            params.filterByInertia = False
+            params.minInertiaRatio = 0.01
 
     
        # Create a detector with the parameters
@@ -274,7 +299,7 @@ class BlobDetection(object):
         im_with_keypoints = cv2.drawKeypoints(im_rgb, keypoints, np.array([]), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     
         # Show blobs
-        cv2.imwrite("/root/catkin_ws/blob_detection_results.png", im_with_keypoints)
+        cv2.imwrite("/root/catkin_ws/blob_detection_"+param_part_id+"_results.png", im_with_keypoints)
 
         blob_array = []
      

@@ -509,7 +509,7 @@ class KittingClass(O2ASBaseRoutines):
 
     return False
 
-  def view_bin(self, group_name, bin_id, speed_fast = 1.0, speed_slow = 1.0, bin_eff_height = 0.2, bin_eff_xoff = 0, bin_eff_deg_angle = 20,end_effector_link = ""):
+  def view_bin(self, group_name, bin_id, part_id, speed_fast = 1.0, speed_slow = 1.0, bin_eff_height = 0.2, bin_eff_xoff = 0, bin_eff_deg_angle = 20,end_effector_link = ""):
     # TODO: adjust the x,z and end effector orientatio for optimal view of the bin to use with the  \search_grasp service
     goal_pose = geometry_msgs.msg.PoseStamped()
     goal_pose.header.frame_id = bin_id
@@ -616,6 +616,8 @@ class KittingClass(O2ASBaseRoutines):
 
     goal = o2as_msgs.msg.blobDetectionGoal()
     goal.maskCorner = mask_polygon
+    goal.param_part_id = part_id
+
     self.blob_detection_client.send_goal(goal)
     self.blob_detection_client.wait_for_result()
     result = self.blob_detection_client.get_result()
@@ -624,13 +626,12 @@ class KittingClass(O2ASBaseRoutines):
     #TODO select which poses to choose in the array
     if result:
       poseArrayRes = geometry_msgs.msg.PoseArray()
-      poseArrayRes = result.posesDetected 
 
       #TODO Sort pose in the midle of the bin
       #min x min y in the bin frame
 
       if(result.success): 
-
+          poseArrayRes = result.posesDetected 
           distanceToBinCenter = []
           for i in range(len(poseArrayRes.poses)): 
               pointCam = geometry_msgs.msg.PointStamped()
@@ -657,12 +658,12 @@ class KittingClass(O2ASBaseRoutines):
           rospy.loginfo("Pose in bin")
           rospy.loginfo(pointPartBin)
 
-          goal_part = geometry_msgs.msg.PoseStamped()
-          goal_part.header.frame_id = pointPartBin.header.frame_id
-          goal_part.pose.position.x = pointPartBin.point.x
-          goal_part.pose.position.y = pointPartBin.point.y
-          goal_part.pose.position.z = 0.01
-          goal_part.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 , 0))
+        goal_part = geometry_msgs.msg.PoseStamped()
+        goal_part.header.frame_id = pointPartBin.header.frame_id
+        goal_part.pose.position.x = pointPartBin.point.x
+        goal_part.pose.position.y = pointPartBin.point.y
+        goal_part.pose.position.z = pointPartBin.point.z
+        goal_part.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 , 0))
 
           return goal_part     
           #res = self.move_lin(group_name, goal_part, speed_slow, "")
@@ -960,7 +961,7 @@ class KittingClass(O2ASBaseRoutines):
       # TODO: Get the position from vision
       pick_pose = self.get_random_pose_in_bin(item)
       if item.ee_to_use == "precision_gripper_from_inside":
-        res_view_bin = self.view_bin(robot_name, item.bin_name)    
+        res_view_bin = self.view_bin(robot_name, item.bin_name, item.part_id)    
         if res_view_bin:
           pick_pose = res_view_bin
       
