@@ -28,7 +28,12 @@ import random
 
 import math
 from geometry_msgs.msg import Polygon, Point32
-from PIL import Image, ImageDraw
+from PIL import Image as ImagePIL
+from PIL import ImageDraw as ImageDrawPIL
+
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge, CvBridgeError
+import cv2
 
 LOG_LEVEL = log_level = rospy.DEBUG
 # LOG_LEVEL = log_level = rospy.INFO
@@ -86,6 +91,31 @@ class KittingClass(O2ASBaseRoutines):
     self.blob_detection_client = actionlib.SimpleActionClient('blob_detection_action', o2as_msgs.msg.blobDetectionAction)
     self.inner_pick_detection_client = actionlib.SimpleActionClient('inner_pick_detection_action', o2as_msgs.msg.innerPickDetectionAction)
     # self.blob_detection_client.wait_for_server()  
+
+    # Image Subscriber for monitoring    
+    self.img_blob_topic = "o2as_blob_detection/img_w_blob"    
+    #self.img_blob_sub =  rospy.Subscriber(self.img_blob_topic, Image, self.image_blob_callback)
+
+    # Image Publisher for monitoring    
+    self.bridge = CvBridge()
+
+    self.img_innner_pick_topic = "kitting/img_w_goal_pose" 
+    self.img_innner_pick_pub = rospy.Publisher(self.img_innner_pick_topic, Image, latch=True, queue_size=10)
+    self.current_img_w_goal = Image()
+    self.current_img_w_blob = Image()
+
+
+    #for gazebo
+    #    self.cameraMatK = np.array([[554.3827128226441, 0.0, 320.5],
+    #                           [0.0, 554.3827128226441, 240.5],
+    #                           [0.0, 0.0, 1.0]])
+
+    #for ID Realsense on robot ID61*41   width 640 height 360
+    self.cameraMatK = np.array([[461.605774, 0.0, 318.471497],
+                           [0.0, 461.605804, 180.336258],
+                           [0.0, 0.0, 1.0]])
+
+
 
     self.initial_setup()
     rospy.sleep(.5)
@@ -566,16 +596,6 @@ class KittingClass(O2ASBaseRoutines):
     #TODO take the parameters from the /camera_info topic instead
 
 
-    #for gazebo
-    #    cameraMatK = np.array([[554.3827128226441, 0.0, 320.5],
-    #                           [0.0, 554.3827128226441, 240.5],
-    #                           [0.0, 0.0, 1.0]])
-
-    #for ID Realsense on robot ID61*41   width 640 height 360
-    cameraMatK = np.array([[461.605774, 0.0, 318.471497],
-                           [0.0, 461.605804, 180.336258],
-                           [0.0, 0.0, 1.0]])
-
 
     point_top1_cam_np = np.array([point_top1_cam.x, point_top1_cam.y, point_top1_cam.z])   
     point_top2_cam_np = np.array([point_top2_cam.x, point_top2_cam.y, point_top2_cam.z])   
@@ -584,11 +604,11 @@ class KittingClass(O2ASBaseRoutines):
     #used to test the projection
     #point_test_center_cam_np = np.array([point_test_center_cam.x, point_test_center_cam.y, point_test_center_cam.z])   
       
-    point_top1_img_np = cameraMatK.dot(point_top1_cam_np)
-    point_top2_img_np = cameraMatK.dot(point_top2_cam_np)
-    point_top3_img_np = cameraMatK.dot(point_top3_cam_np)
-    point_top4_img_np = cameraMatK.dot(point_top4_cam_np)
-    #point_test_center_img_np = cameraMatK.dot(point_test_center_cam_np) 
+    point_top1_img_np = self.cameraMatK.dot(point_top1_cam_np)
+    point_top2_img_np = self.cameraMatK.dot(point_top2_cam_np)
+    point_top3_img_np = self.cameraMatK.dot(point_top3_cam_np)
+    point_top4_img_np = self.cameraMatK.dot(point_top4_cam_np)
+    #point_test_center_img_np = self.cameraMatK.dot(point_test_center_cam_np) 
 
     #print(point_top1_img_np)
     #print(point_top2_img_np)
@@ -609,7 +629,7 @@ class KittingClass(O2ASBaseRoutines):
     self.blob_detection_client.send_goal(goal)
     self.blob_detection_client.wait_for_result()
     result = self.blob_detection_client.get_result()
-    rospy.loginfo(result)
+    #rospy.loginfo(result)
 
     #TODO select which poses to choose in the array
     if result:
@@ -637,15 +657,16 @@ class KittingClass(O2ASBaseRoutines):
         rospy.loginfo("pose closest to the bin center in the xy plane")
         rospy.loginfo(poseArrayRes.poses[minPoseIndex])
 
-        #Place gripper above bin
+        #Transform point from camera reference to bin reference
         pointPartCam = geometry_msgs.msg.PointStamped()
         pointPartCam.header = poseArrayRes.header
-        pointPartCam.point = poseArrayRes.poses[i].position
+        pointPartCam.point = poseArrayRes.poses[minPoseIndex].position
         pointPartBin = self.listener.transformPoint(bin_id, pointPartCam)
 
         rospy.loginfo("Pose in bin")
         rospy.loginfo(pointPartBin)
 
+        #Transform point from camera reference to bin reference
         goal_part = geometry_msgs.msg.PoseStamped()
         goal_part.header.frame_id = pointPartBin.header.frame_id
         goal_part.pose.position.x = pointPartBin.point.x
@@ -653,12 +674,10 @@ class KittingClass(O2ASBaseRoutines):
         goal_part.pose.position.z = pointPartBin.point.z
         goal_part.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 , 0))
 
+        self.current_img_w_blob = copy.deepcopy(result.blobImage)
+        self.draw_point3D_after_view_bin(pointPartCam)
+
         return goal_part     
-        #res = self.move_lin(group_name, goal_part, speed_slow, "")
-        #if not res:
-        #  rospy.loginfo("Couldn't go to the target.")
-        ##TODO Problem with gazebo controller while controlling the robot with movelin
-        #  break
 
     else:
         rospy.loginfo("no pose detected")
@@ -689,6 +708,31 @@ class KittingClass(O2ASBaseRoutines):
 
     #    point_top1_cam = t.transformPoint("a_bot_camera_depth_frame", point_top1)
     #    point_top1_cam = t.transformPoint(point_top4.header.frame_id, point_top1)
+  def draw_point3D_after_view_bin(self, pointPartCam):
+        ### Project the goal on the image plane using the camera matrix like for the mask
+        #Transform Point in camera reference
+        point3D_to_draw = geometry_msgs.msg.PointStamped()
+        point3D_to_draw  = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", pointPartCam)
+        #Copy the results
+
+        # Project the point to the camera plane
+        pointPart_cam_np = np.array([point3D_to_draw.point.x, point3D_to_draw.point.y, point3D_to_draw.point.z])
+        pointPart_img_np = self.cameraMatK.dot(pointPart_cam_np)
+        #Transfom into pixel coordinate
+        pointPart_pix= pointCam = geometry_msgs.msg.Point(pointPart_img_np[0]/pointPart_img_np[2],pointPart_img_np[1]/pointPart_img_np[2],0)
+        img_blob_cv = self.bridge.imgmsg_to_cv2(self.current_img_w_blob , desired_encoding="passthrough")
+        #img_blob_cv_np = np.asarray(img_blob_cv)[:, :, ::-1]
+        #Draw the circle in orange for the propose pose
+        cv2.circle(img_blob_cv,(int(pointPart_pix.x),int(pointPart_pix.y)), 3, (0,255,0), 4) 
+
+        self.current_img_w_goal = self.bridge.cv2_to_imgmsg(img_blob_cv, "rgb8")
+
+        #publish the results
+        try:
+          print("publish")
+          self.img_innner_pick_pub.publish(self.current_img_w_goal)
+        except CvBridgeError as e:
+          print(e)
 
   def check_pick(self, part_id):
     #Go to check position

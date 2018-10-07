@@ -40,6 +40,7 @@ if __name__ == '__main__':
         client.send_goal(goal)
         client.wait_for_result()
         result = client.get_result()
-        rospy.loginfo(result)
+        rospy.loginfo(result.posesDetected)
+        rospy.loginfo(result.success)
     except rospy.ROSInterruptException:
         rospy.loginfo("program interrupted before completion", file=sys.stderr)

@@ -7,7 +7,7 @@ from std_msgs.msg import Float64
 import geometry_msgs.msg
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import PointCloud2
-from cv_bridge import CvBridge
+from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import sensor_msgs.point_cloud2 as pc2
 
@@ -21,11 +21,17 @@ import actionlib
 import o2as_msgs.msg
 from geometry_msgs.msg import PoseArray, Pose 
 
+import rospkg
+
 class BlobDetection(object):
     def __init__(self):
+#        self.rospack = rospkg.RosPack()
+#        print(self.rospack.get_path(rospy.get_name()))
+
         #Variable
         self.bridge = CvBridge()
         self.current_image = Image()
+        self.current_image_blob = Image()
         self.current_cloud = PointCloud2()
         self.current_detected_poses = PoseArray() 
 
@@ -35,15 +41,18 @@ class BlobDetection(object):
         self.cloud_topic = rospy.get_name()+ "/camera/cloud"
         self.blob_pos_img_topic = rospy.get_name()+"/blob_pos_img"
         self.blob_pos_cloud_topic = rospy.get_name()+"/blob_pos_cloud"
+        self.img_w_blob_topic = rospy.get_name()+"/img_w_blob"
 
+        # Publisher
         self.pub_img_pos = rospy.Publisher(self.blob_pos_img_topic, geometry_msgs.msg.Point, queue_size=10)
         self.pub_cloud_pos = rospy.Publisher(self.blob_pos_cloud_topic, geometry_msgs.msg.PoseArray, queue_size=10)
+        self.pub_img_w_blob = rospy.Publisher(self.img_w_blob_topic, Image, latch=True,queue_size=10)
 
         # Subscriber
         rospy.Subscriber(self.image_topic, Image, self.image_callback)
         rospy.Subscriber(self.cloud_topic, PointCloud2, self.cloud_callback)
 
-        #define the action
+        # Define the action
         self._action_name = "blob_detection_action"
         self._action_server = actionlib.SimpleActionServer(self._action_name, o2as_msgs.msg.blobDetectionAction, execute_cb=self.action_callback, auto_start = False)
         self._action_server.start()
@@ -54,13 +63,13 @@ class BlobDetection(object):
     def action_callback(self, goal):
       rospy.loginfo('Executing'+" "+str(self._action_name)+"."+"request sent:")
       rospy.loginfo(goal)
-      rospy.loginfo('Executing'+" "+str(self._action_name)+"."+"request sent:")
 
       res = self.detect_poses(goal.maskCorner, goal.param_part_id)
 
       self.action_result.success = res
       if(res):
           self.action_result.posesDetected = self.current_detected_poses
+          self.action_result.blobImage =  self.current_image_blob
           self._action_server.set_succeeded(self.action_result)
       else:
           self.action_result.posesDetected = PoseArray()
@@ -117,18 +126,30 @@ class BlobDetection(object):
 
           # Convert the blob position image in the 3D camera system
           #TODO synchronize the time stamp between image and cloud
+          rospy.loginfo( rospy.get_name() + " number of blob detected " + str(len(blob_array)))
+
           self.current_detected_poses.header = self.current_cloud.header
           tmp_pose_array = []
           for i in range(0,len(blob_array)):
             tmp_pose = geometry_msgs.msg.Pose() 
             res_point3D = self.compute_3D_pos1(self.current_cloud, int(blob_array[i].x), int(blob_array[i].y))
-            tmp_pose.position = res_point3D.point
-            tmp_pose_array.append(tmp_pose)
-          self.current_detected_poses.poses = tmp_pose_array
-          # Publish the results   
-          self.pub_cloud_pos.publish(self.current_detected_poses)
+            if(res_point3D.point.x == -0.0 and res_point3D.point.y ==0.0 and res_point3D.point.z ==0.0):
+                #TODO find a approximation with nearby point
+                rospy.loginfo( "Bad point cloud reading  (probably non dense) ")
+            else:
+                tmp_pose.position = res_point3D.point
+                tmp_pose_array.append(tmp_pose)
+          if(len(tmp_pose_array)>0):
+               rospy.loginfo( rospy.get_name() + " number of poses detected " + str(len(tmp_pose_array)))
+               self.current_detected_poses.poses = tmp_pose_array
+               # Publish the results   
+               self.pub_cloud_pos.publish(self.current_detected_poses)
+               return True
+          else:
+               rospy.loginfo( rospy.get_name() + "no poses detected" )
+               return False                    
 
-          return True
+
           # Slow down this node and reduce data transfer for image
           #rospy.sleep(0.01)
       else:
@@ -296,10 +317,20 @@ class BlobDetection(object):
         keypoints = detector.detect(im_gray)
     
         # Draw the key points 
-        im_with_keypoints = cv2.drawKeypoints(im_rgb, keypoints, np.array([]), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        im_with_keypoints = cv2.drawKeypoints(im_rgb, keypoints, np.array([]), (255, 0, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     
         # Show blobs
-        cv2.imwrite("/root/catkin_ws/blob_detection_"+param_part_id+"_results.png", im_with_keypoints)
+
+        cv2.imwrite("/root/catkin_ws/src/o2as_blob_detection/img_res/blob_detection_"+param_part_id+"_results.png", cv2.cvtColor(im_with_keypoints, cv2.COLOR_BGR2RGB))
+        print("before publish")
+
+        try:
+          print("publish")
+          self.pub_img_w_blob.publish(self.bridge.cv2_to_imgmsg(im_with_keypoints, "rgb8"))
+        except CvBridgeError as e:
+          print(e)
+
+        self.current_image_blob = self.bridge.cv2_to_imgmsg(im_with_keypoints, "rgb8")
 
         blob_array = []
      
