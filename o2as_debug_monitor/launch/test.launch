@@ -22,18 +22,20 @@
 
     image_topics:
       realsense:
-        topic_name: /a_bot_camera/color/image_raw
+        topic_name: /c_bot_camera/color/image_raw
         col: [0, 12]
         row: [0, 7]
       realsense2:
-        topic_name: /a_bot_camera/depth/image_raw
+        topic_name: /c_bot_camera/depth/image_raw
         col: [0, 12]
         row: [8, 15]
         vrange: [0, 64]
-      phoxi_texture:
-        topic_name: /a_phoxi_m_camera/texture
-        col: [0, 15]
-        row: [10, 17]
+      phoxi_depth_ueshiba:
+        topic_name: /o2as_phoxi_camera/depth_map
+        col: [13, 24]
+        row: [0, 7]
+        encoding: depth
+        vrange: [0, 2]
 
     caminfo_topics:
       phoxi_caminfo:
