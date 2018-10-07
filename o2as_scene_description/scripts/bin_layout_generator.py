@@ -54,7 +54,7 @@ def write_fge_bin_id_to_yaml(set_list):
             bin_id_dict["fge_bin_id"][b.bin_name] = i
             # print("%d, %s"%(i, b.bin_name))
             i+=1
-    with open(os.path.join(rp.get_path("o2as_graspability_estimation"), "config", "fge_bin_id.yaml"), 'w') as f:
+    with open(os.path.join(rp.get_path("graspability_estimation"), "config", "fge_bin_id.yaml"), 'w') as f:
         yaml.dump(bin_id_dict, f)
 
 # write to outfile
