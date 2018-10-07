@@ -21,9 +21,10 @@ main()
     {
 	constexpr tfScalar	degree = 180.0/M_PI;
 	tfScalar		qx, qy, qz, qw;
+	char			c;
 	
 	std::cerr << "> ";
-	std::cin >> qx >> qy >> qz >> qw;
+	std::cin >> qx >> c >> qy >> c >> qz >> c >> qw;
 
 	auto	rpy = TU::getRPY(tf::Quaternion(qx, qy, qz, qw));
 

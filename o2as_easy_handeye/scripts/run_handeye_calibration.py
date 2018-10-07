@@ -77,10 +77,11 @@ keyposes = {
   },
   'a_bot_camera': {
     'a_bot': [
-#      [0.15, -0.30, 0.25, radians( 30), radians( 25), radians(0)],
-      [0.00, -0.20, 0.15, radians(180), radians(90), radians(-90)],
-       # [-0.025855, -0.25188, 1.0543, -0.43332, 0.43411, 0.55841, 0.55852],
-       # [-0.025855, -0.25188, 1.0543, -0.43332, 0.43411, 0.55841, 0.55852],
+      [ 0.00, -0.20, 0.20, radians(90), radians( 70), radians( 90)],
+      [ 0.00, -0.15, 0.20, radians(90), radians( 90), radians( 90)],
+      [ 0.00, -0.10, 0.20, radians(90), radians(110), radians( 90)],
+      [-0.05, -0.15, 0.20, radians(90), radians( 90), radians( 70)],
+      [ 0.05, -0.15, 0.20, radians(90), radians( 90), radians(110)],
     ]
   }
 }
@@ -141,6 +142,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     self.needs_trigger = needs_trigger
     self.needs_calib   = needs_calib
     self.nimages       = 0
+    self.camera_name   = camera_name
     
     if needs_trigger:
       self.flush_buffer      = get_service_proxy("flush_buffer",
@@ -164,7 +166,6 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     self.save_calibration    = get_service_proxy("save_calibration",
                                                  camera_name, robot_name)
 
-    self.nimages = 0
     ## Initialize `moveit_commander`
     self.robot_name = robot_name
     group = self.groups[robot_name]
@@ -266,16 +267,15 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
           n = len(sample_list.samples.hand_world_samples.transforms)
           print("  took {} (hand-world, camera-marker) samples").format(n)
 
-          imgmsg = rospy.wait_for_message("/a_bot_camera/rgb/image_raw",
-                                          sensor_msgs.msg.Image, 1.0)
           try:
+            image_msg = rospy.wait_for_message("/a_bot_camera/rgb/image_raw",
+                                               sensor_msgs.msg.Image, 1.0)
             bridge = CvBridge()
-            cv2_img = bridge.imgmsg_to_cv2(imgmsg, "bgr8")
-          except CvBridgeError, e:
-            print(e)
-          else:
+            cv2_img = bridge.imgmsg_to_cv2(image_msg, "bgr8")
             cv2.imwrite("camera_image-{}.jpeg".format(self.nimages), cv2_img)
             self.nimages += 1
+          except CvBridgeError, e:
+            print(e)
         except rospy.ServiceException as e:
           print "Service call failed: %s"%e
 
@@ -309,7 +309,10 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     # Collect samples over pre-defined poses
     for i, keypose in enumerate(keyposes):
       print("\n*** Keypose [{}/{}]: Try! ***".format(i+1, len(keyposes)))
-      self.move_to_subposes(keypose, speed, sleep_time)
+      if self.camera_name == "a_bot_camera":
+        self.move(keypose, speed)
+      else:
+        self.move_to_subposes(keypose, speed, sleep_time)
       print("*** Keypose [{}/{}]: Completed. ***".format(i+1, len(keyposes)))
 
     if self.needs_calib:
