@@ -7,7 +7,7 @@ from std_msgs.msg import Float64
 import geometry_msgs.msg
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import PointCloud2
-from cv_bridge import CvBridge
+from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import sensor_msgs.point_cloud2 as pc2
 
@@ -69,6 +69,7 @@ class BlobDetection(object):
       self.action_result.success = res
       if(res):
           self.action_result.posesDetected = self.current_detected_poses
+          self.action_result.blobImage =  self.current_image_blob
           self._action_server.set_succeeded(self.action_result)
       else:
           self.action_result.posesDetected = PoseArray()
@@ -329,6 +330,7 @@ class BlobDetection(object):
         except CvBridgeError as e:
           print(e)
 
+        self.current_image_blob = self.bridge.cv2_to_imgmsg(im_with_keypoints, "rgb8")
 
         blob_array = []
      
