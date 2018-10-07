@@ -52,7 +52,7 @@
     <joint name="${prefix}robotiq_85_suction_tool_tip_joint" type="fixed">
       <parent link="${prefix}robotiq_85_tip_link"/>
       <child link="${prefix}suction_tool_tip_link"/>
-      <origin rpy="0.0 ${pi/2} 0.0" xyz="${dx+.008} 0.0 -0.126 "/>
+      <origin rpy="0.0 ${pi/2} 0.0" xyz="${dx+.013} 0.0 -0.131 "/>
     </joint>
     <link name="${prefix}suction_tool_tip_link"/>
 

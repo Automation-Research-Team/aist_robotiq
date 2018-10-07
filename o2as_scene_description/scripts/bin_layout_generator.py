@@ -46,16 +46,16 @@ class Sets:
 
 # write bin id for graspability based vision
 def write_fge_bin_id_to_yaml(set_list):
-    roi_id_dict = dict()
-    roi_id_dict["roi_id"] = dict()
+    bin_id_dict = dict()
+    bin_id_dict["fge_bin_id"] = dict()
     i = 1
     for s in set_list:
         for b in s.bins:
             bin_id_dict["fge_bin_id"][b.bin_name] = i
             # print("%d, %s"%(i, b.bin_name))
             i+=1
-    with open(os.path.join(rp.get_path("o2as_graspability_estimation"), "config", "fge_bin_id.yaml"), 'w') as f:
-        yaml.dump(roi_id_dict, f)
+    with open(os.path.join(rp.get_path("graspability_estimation"), "config", "fge_bin_id.yaml"), 'w') as f:
+        yaml.dump(bin_id_dict, f)
 
 # write to outfile
 def write_head(outfile,directory):
@@ -212,7 +212,7 @@ def main():
     outfile = open(os.path.join(rp.get_path("o2as_scene_description"), "urdf", 'kitting_bins.xacro'),'w+')
     write_file(outfile,directory,set_list,bin_definition)
 
-    # write_fge_bin_id_to_yaml(set_list)
+    write_fge_bin_id_to_yaml(set_list)
     
 if __name__ == "__main__":
     main()
