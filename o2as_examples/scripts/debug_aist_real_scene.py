@@ -182,7 +182,7 @@ class DebugAistRealRobotClass(O2ASBaseRoutines):
             But if you want to set origin of phoxi in URDF, you should calculate the pose of phoxi_m_camera.
         """
 
-        T_sensor = np.matrix([
+        T_sensor = np.array([
             [-0.034784670752, 0.873298269909, -0.485942546454, 0.594404677631629],
             [0.979858695089, -0.065869488303, -0.188515644360, 0.128504467275411],
             [-0.196639172950, -0.482712484078, -0.853417654714, 1.427249342095321],
@@ -190,12 +190,12 @@ class DebugAistRealRobotClass(O2ASBaseRoutines):
         ])
 
         try:
-            (trans,rot) = self.tf_listener.lookupTransform('/a_phoxi_m_sensor', '/a_phoxi_m_sensor', rospy.Time(0))
+            (trans,rot) = self.tf_listener.lookupTransform('/a_phoxi_m_sensor', '/a_phoxi_m_camera', rospy.Time(0))
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             pass
         
-        print(trans)
-        print(rot)
+        # print(trans)
+        # print(rot)
 
         T_camera_to_sensor = tf.transformations.quaternion_matrix(rot)
         T_camera_to_sensor[0,3] = trans[0]
@@ -207,7 +207,7 @@ class DebugAistRealRobotClass(O2ASBaseRoutines):
         # print(rpy)
         # print(xyz)
 
-        T_w = T_camera_to_sensor * T_sensor
+        pose_phoxi = np.dot(T_camera_to_sensor, T_sensor)
 
         print(T_w)
         rpy = tf.transformations.euler_from_matrix(T_w)

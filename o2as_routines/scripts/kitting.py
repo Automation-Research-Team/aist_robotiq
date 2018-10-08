@@ -60,6 +60,8 @@ class kitting_order_entry():
 
     self.tf_listener = tf.TransformListener()
 
+    self.has_scene_image = False
+
 def clamp(n, minn, maxn):
   """Constrain a number n to the interval [minn, maxn]"""
   return min(max(n, minn), maxn)
@@ -1026,8 +1028,9 @@ class KittingClass(O2ASBaseRoutines):
           pick_pose = res_view_bin
       if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
         self.go_to_named_pose("suction_ready_back", "b_bot")
-        phoxi_res = self.get_grasp_position_from_phoxi(item)
+        phoxi_res = self.get_grasp_position_from_phoxi(item, not self.has_scene_image)
         if phoxi_res:
+          self.has_scene_image = True
           pick_pose = phoxi_res
         self.go_to_named_pose("suction_pick_ready", "b_bot")
       
