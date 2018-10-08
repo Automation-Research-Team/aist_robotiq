@@ -174,20 +174,6 @@ class KittingClass(O2ASBaseRoutines):
         "part_17": 0.005, 
         "part_18": 0.005}
 
-    # TODO: Remove this hard-coded assignment
-    self.bin_id_for_graspability_estimation = {
-      "part_7": 1,
-      "part_13": 2,
-      "part_11": 3,
-      "part_8": 4,
-      "part_4": 5,
-      "part_14": 10,
-      "part_17": 7,
-      "part_5": 8,
-      "part_12": 9,
-      "part_9": 6,
-    }
-
     self.part_bin_list = {
       "part_4" : "bin2_1",
       "part_6" : "bin3_1",
