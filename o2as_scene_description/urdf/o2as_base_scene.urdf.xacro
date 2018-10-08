@@ -200,11 +200,11 @@
     <origin xyz="0.0 0.0 0.0185" rpy="0 0 0"/>
   </xacro:o2as_ar_marker>
 
-  <xacro:o2as_ar_marker prefix="workspace_"
-  			parent="workspace_center"
-  			marker_id="256">
+  <xacro:o2as_ar_marker_16cm prefix="workspace_"
+  			     parent="workspace_center"
+  			     marker_id="32">
     <origin xyz="0.0 0.0 0.0005" rpy="0 0 0"/>
-  </xacro:o2as_ar_marker>
+  </xacro:o2as_ar_marker_16cm>
 
   <!-- <xacro:o2as_ar_marker prefix="workspace_" -->
   <!-- 			parent="workspace_center" -->
@@ -215,9 +215,17 @@
   <!-- Add PhoXi 3D scanners -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />
   <xacro:phoxi_m_camera prefix="a_" parent="o2as_ground">
-    <!-- <origin xyz="0.56 0 ${bots_z + .1 + .8}" rpy="${-160*pi/180} 0 ${pi/2}"/> -->
-    <origin xyz="0.65526 -0.018791 1.4169"
-	    rpy="${-149.595*pi/180} ${0.473*pi/180} ${91.976*pi/180}"/>
+    <!-- <origin xyz="0.56 0 ${bots_z + .1 + .8}"
+	 rpy="${-160*pi/180} 0 ${pi/2}"/> -->
+    <!-- 181005@OSX -->
+    <!-- <origin xyz="0.65526 -0.018791 1.4169" -->
+    <!-- 	    rpy="${-149.595*pi/180} ${0.473*pi/180} ${91.976*pi/180}"/> -->
+    <!-- 181007@OSX -->
+    <!-- <origin xyz="0.6554 -0.020392 1.413" -->
+    <!-- 	    rpy="${-149.604*pi/180} ${0.34821*pi/180} ${91.866*pi/180}"/> -->
+    <!-- 181008@OSX -->
+    <origin xyz="0.674391 -0.0223742 ${bots_z + 0.696023}"
+	    rpy="${-149.801*pi/180} ${0.156861*pi/180} ${91.2544*pi/180}"/>
   </xacro:phoxi_m_camera>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->

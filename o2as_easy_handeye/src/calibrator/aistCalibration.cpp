@@ -49,7 +49,7 @@ calibrationAIST(const std::vector<Transform>& cMo,
     vpColVector	lambda;
     vpMatrix	V;
     C.eigenValues(lambda, V);
-    vpQuaternionVector	qx(V.getCol(0));
+    vpQuaternionVector	qx(V.getCol(0));	// computed rotation
 #ifdef DEBUG
     std::cerr << "--- lambda ---\n" << lambda << std::endl;
     vpMatrix	L;
@@ -92,6 +92,10 @@ calibrationAIST(const std::vector<Transform>& cMo,
 		      << err << std::endl;
 	}
 #endif
+    for (size_t i = 0; i < nposes; ++i)
+    {
+    }
+    
     return eMc;
 }
     

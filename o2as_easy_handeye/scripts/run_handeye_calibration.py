@@ -271,15 +271,15 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
           n = len(sample_list.samples.hand_world_samples.transforms)
           print("  took {} (hand-world, camera-marker) samples").format(n)
 
-          try:
-            image_msg = rospy.wait_for_message("/a_bot_camera/rgb/image_raw",
-                                               sensor_msgs.msg.Image, 1.0)
-            bridge = CvBridge()
-            cv2_img = bridge.imgmsg_to_cv2(image_msg, "bgr8")
-            cv2.imwrite("camera_image-{}.jpeg".format(self.nimages), cv2_img)
-            self.nimages += 1
-          except CvBridgeError, e:
-            print(e)
+          # try:
+          #   image_msg = rospy.wait_for_message("/a_bot_camera/rgb/image_raw",
+          #                                      sensor_msgs.msg.Image, 1.0)
+          #   bridge = CvBridge()
+          #   cv2_img = bridge.imgmsg_to_cv2(image_msg, "bgr8")
+          #   cv2.imwrite("camera_image-{}.jpeg".format(self.nimages), cv2_img)
+          #   self.nimages += 1
+          # except CvBridgeError, e:
+          #   print(e)
         except rospy.ServiceException as e:
           print "Service call failed: %s"%e
 
