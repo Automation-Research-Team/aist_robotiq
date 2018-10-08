@@ -728,14 +728,12 @@ class KittingClass(O2ASBaseRoutines):
             #simulation only
             poseArrayRes.header.frame_id = "a_bot_camera_fisheye_optical_frame"
             pointCam.header = poseArrayRes.header
-            print("pointCam.header")
-            print(pointCam.header)
             pointCam.point = poseArrayRes.poses[i].position
             pointBin = self.listener.transformPoint(bin_id, pointCam).point
             distanceToBinCenter.append(math.sqrt(pointBin.x*pointBin.x + pointBin.y*pointBin.y))
         minPoseIndex = np.argmin(distanceToBinCenter)
          
-        rospy.loginfo("pose closest to the bin center in the xy plane")
+        rospy.loginfo("point closest to the bin center in the xy plane")
         rospy.loginfo(poseArrayRes.poses[minPoseIndex])
 
         #Transform point from camera reference to bin reference
@@ -1367,6 +1365,8 @@ if __name__ == '__main__':
     
     ##### EXAMPLE 3 (How to look into a bin)
     #kit.view_bin("a_bot", "bin1_4", "test")
+    #kit.view_bin("a_bot", "bin1_4", "part_9")
+    #kit.view_bin("a_bot", "bin1_4", "part_15")
     #kit.mask_bin("a_bot", "bin1_1")
     #kit.mask_bin("a_bot", "bin1_2")
     #kit.mask_bin("a_bot", "bin1_3")
