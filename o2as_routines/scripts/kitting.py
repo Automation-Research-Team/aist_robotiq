@@ -993,7 +993,7 @@ class KittingClass(O2ASBaseRoutines):
         elif item.part_id == 18:
           self.screws_done["m3"] = False
     if not self.screws_done["m4"] or not self.screws_done["m3"]:
-      if (rospy.Time.now() - self.screw_delivery_time) > rospy.Duration(180):
+      if (rospy.Time.now() - self.screw_delivery_time) > rospy.Duration(1):  #180
         self.go_to_named_pose("back", "a_bot")
         self.go_to_named_pose("back", "b_bot")
         for screw_size in [4,3]:
@@ -1075,6 +1075,7 @@ class KittingClass(O2ASBaseRoutines):
         res_view_bin = self.view_bin(robot_name, item.bin_name, item.part_id)    
         if res_view_bin:
           pick_pose = res_view_bin
+          pick_pose.pose.position.z -= .01
       if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
         # self.go_to_named_pose("suction_ready_back", "b_bot")
         # phoxi_res = self.get_grasp_position_from_phoxi(item, not self.has_scene_image)
@@ -1215,16 +1216,18 @@ class KittingClass(O2ASBaseRoutines):
 
     # ==== 1. First, do an initial attempt on picking all items, ordered by the tool that they are picked with (screws, suction, precision_gripper, robotiq)
 
-    # self.go_to_named_pose("home", "a_bot")
-    # for item in self.screw_items:
-    #   if rospy.is_shutdown():
-    #     break
-    #   item.in_feeder=True  # HARD DEBUG
-    #   # self.pick_screw_from_bin_and_put_into_feeder(item)
-    #   # self.pick_screw_with_precision_gripper(item.bin_name, screw_size= 4)
-    #   self.go_to_named_pose("home", "a_bot")
-    # self.go_to_named_pose("back", "a_bot")
-    screw_delivery_time = rospy.Time.now()
+    self.go_to_named_pose("home", "a_bot")
+    for item in self.screw_items:
+      if rospy.is_shutdown():
+        break
+      # item.in_feeder = True   # Used to skip the screws and enable the feeder pickup
+      self.pick_screw_from_bin_and_put_into_feeder(item, 10)
+      # self.pick_screw_with_precision_gripper(item.bin_name, screw_size= 4)
+      self.go_to_named_pose("home", "a_bot")
+    self.go_to_named_pose("back", "a_bot")
+    self.screw_delivery_time = rospy.Time.now()
+
+    rospy.sleep(5)
 
     for item in self.suction_items:
       if rospy.is_shutdown():
@@ -1240,7 +1243,7 @@ class KittingClass(O2ASBaseRoutines):
       if rospy.is_shutdown():
         break
       self.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
-      self.attempt_item(item)
+      self.attempt_item(item, 3)
     self.go_to_named_pose("back", "a_bot")
 
     self.treat_screws()
@@ -1249,7 +1252,7 @@ class KittingClass(O2ASBaseRoutines):
       self.go_to_named_pose("home", "b_bot")
       if rospy.is_shutdown():
         break
-      self.attempt_item(item)
+      self.attempt_item(item, 3)
     self.go_to_named_pose("back", "b_bot")
 
     self.treat_screws()
