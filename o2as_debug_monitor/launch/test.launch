@@ -22,11 +22,11 @@
 
     image_topics:
       realsense:
-        topic_name: /c_bot_camera/color/image_raw
+        topic_name: /a_bot_camera/color/image_raw
         col: [0, 12]
         row: [0, 7]
       realsense2:
-        topic_name: /c_bot_camera/depth/image_raw
+        topic_name: /a_bot_camera/depth/image_raw
         col: [0, 12]
         row: [8, 15]
         vrange: [0, 64]
