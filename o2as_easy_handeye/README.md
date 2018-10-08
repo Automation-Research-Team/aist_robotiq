@@ -1,4 +1,4 @@
-# Run handeye calibration in simulator
+# Run handeye calibration in simulator and real environment
 
 1: Launch simulator
 ```bash
@@ -11,23 +11,28 @@ $ roslaunch o2as_gazebo o2as_gazebo.launch
 ```bash
 $ roslaunch o2as_easy_handeye o2as_calibrate.launch camera_name:=$CAMERA_NAME robot_name=$ROBOT_NAME
 ```
+After robots appear in the screen, open the RViz config file `o2as_easy_handeye.rviz`. Then the marker tracker and the hand-eye calibrator start.
 
 2-2: Run calibration software in a different terminal
 ```bash
 $ rosrun o2as_easy_handeye run_handeye_calibration.py $CAMERA_NAME $ROBOT_NAME notrigger
 ```
 
-2-3: Stop the program in 2-1
-
-3. Publish the estimated camera frames, loaded from the calibration files:
+2-3: Publish the estimated camera frames, loaded from the calibration files:
 ```bash
 $ roslaunch o2as_easy_handeye o2as_publish_handeye.launch camera_name:=$CAMERA_NAME robot_name=$ROBOT_NAME
 ```
+Estimated parameters are stored in `~/.ros/easy_handeye/o2as_easy_handeye_$ROBOT_NAME_eye_on[base|hand].yaml`.
 
-4. Calibration with real camera and robot
-You need not launch gazebo. You need to specify "config:=real" when launching services for calibration:
-```bash
-$ roslaunch o2as_easy_handeye o2as_calibrate.launch camera_name:=$CAMERA_NAME robot_name=$ROBOT_NAME config:=real
+3: Calibration with real camera and robot
+
+3-1: You need not launch gazebo.
+
+3-2: Launch services for calibration
+
+You need to specify `config:=real` when calibrating a real camera with a real robot. In addtion, you may need to specify marker ID according to the marker used in real situations. Since the marker ID attached to the top of workspace is 26 in OSX environment, you have to specify `marker_id:="26"` when calibrating `a_bot_camera` with `a_bot`:
+```
+$ roslaunch o2as_easy_handeye o2as_calibrate.launch camera_name:=$CAMERA_NAME robot_name=$ROBOT_NAME config:=real [marker_id:="26"]
 ```
 
-
+3-3: The estimation results can be visualized and the estimated parameters can be obtained with the same procedure as 2-3.
