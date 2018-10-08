@@ -61,6 +61,7 @@ class kitting_order_entry():
     self.tf_listener = tf.TransformListener()
 
     self.has_scene_image = False
+    self.max_candidates_from_phoxi = 5
 
 def clamp(n, minn, maxn):
   """Constrain a number n to the interval [minn, maxn]"""
@@ -908,7 +909,7 @@ class KittingClass(O2ASBaseRoutines):
         poses_in_bin = list()
         pose0 = geometry_msgs.msg.PoseStamped()
         pose0.header.frame_id = "a_phoxi_m_sensor"
-        pose_candidates_number = 3 if resp_search_grasp.result_num > 3 else resp_search_grasp.result_num
+        pose_candidates_number = self.max_candidates_from_phoxi if resp_search_grasp.result_num > self.max_candidates_from_phoxi else resp_search_grasp.result_num
         for i in range(pose_candidates_number):
           object_position = copy.deepcopy(pose0)
           object_position.point = geometry_msgs.msg.Point(
