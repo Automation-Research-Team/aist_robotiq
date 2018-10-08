@@ -7,16 +7,12 @@
   <!-- Set AR marker ID -->
   <arg name="marker_id"		value="26"
        unless="$(eval arg('camera_name') == 'a_bot_camera')"/>
-  <!-- <arg name="marker_id"		value="32" -->
-  <!--      if="$(eval arg('camera_name') == 'a_bot_camera')"/> -->
-  <arg name="marker_id"		value="26"
+  <arg name="marker_id"		value="32"
        if="$(eval arg('camera_name') == 'a_bot_camera')"/>
 
   <arg name="marker_size"	value="0.07"
        unless="$(eval arg('camera_name') == 'a_bot_camera')" />
-  <!-- <arg name="marker_size"	value="0.16" -->
-  <!--      if="$(eval arg('camera_name') == 'a_bot_camera')" /> -->
-  <arg name="marker_size"	value="0.07"
+  <arg name="marker_size"	value="0.16"
        if="$(eval arg('camera_name') == 'a_bot_camera')" />
 
   <arg name="eye_on_hand"	value="false"
