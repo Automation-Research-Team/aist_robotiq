@@ -138,6 +138,12 @@ class KittingClass(O2ASBaseRoutines):
     self.bin_3_width = .10
     self.bin_3_length = .07
 
+    # Used to prepare the suction place poses (because the UR linear driver goes through a singularity sometimes)
+    self.joints_above_set_1_tray_2 = [0.6957670450210571, -1.5090416113482874, 1.9396471977233887, -0.4243395964251917, 0.7138931751251221, -3.1503987948047083]
+    self.joints_above_set_2_tray_2 = [1.195457935333252, -1.6689851919757288, 2.0958428382873535, -0.4254062811480921, 1.2131953239440918, -3.146900002156393]
+    self.joints_above_set_3_tray_2 = [0.550778865814209, -1.4439471403705042, 1.867344856262207, -0.42732316652406865, -1.0016759077655237, -3.134343926106588]
+    self.joints_above_set_1_tray_1 = [1.4938385486602783, -1.470374886189596, 1.4696006774902344, -0.019773308430806935, 0.24262139201164246, -3.1440725962268274]
+
     self.grasp_strategy = {
         "part_4" : "suction", 
         "part_5" : "suction", 
@@ -1027,12 +1033,12 @@ class KittingClass(O2ASBaseRoutines):
         if res_view_bin:
           pick_pose = res_view_bin
       if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
-        self.go_to_named_pose("suction_ready_back", "b_bot")
-        phoxi_res = self.get_grasp_position_from_phoxi(item, not self.has_scene_image)
-        if phoxi_res:
-          self.has_scene_image = True
-          pick_pose = phoxi_res
-        self.go_to_named_pose("suction_pick_ready", "b_bot")
+        # self.go_to_named_pose("suction_ready_back", "b_bot")
+        # phoxi_res = self.get_grasp_position_from_phoxi(item, not self.has_scene_image)
+        # if phoxi_res:
+        #   self.has_scene_image = True
+        #   pick_pose = phoxi_res
+        # self.go_to_named_pose("suction_pick_ready", "b_bot")
       
         # Orientation needs to be adjusted for suction tool
         pick_point_on_table = self.listener.transformPose("workspace_center", pick_pose).pose.position
@@ -1042,6 +1048,8 @@ class KittingClass(O2ASBaseRoutines):
           pick_pose.pose.orientation = self.suction_orientation_from_45
       else:   # Precision_gripper, robotiq_gripper
         pick_pose.pose.orientation = self.downward_orientation
+      if item.part_id == 6: # Belt
+        pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
         
       
       approach_height = 0.08
@@ -1073,44 +1081,53 @@ class KittingClass(O2ASBaseRoutines):
       # Attempt to place the item
       place_pose = geometry_msgs.msg.PoseStamped()
       place_pose.header.frame_id = item.target_frame
+      required_intermediate_pose = []
+      
       if item.ee_to_use == "suction":
         # This is inconvenient to set up because the trays are rotated. tray_2s are rotated 180 degrees relative to set_1_tray_1
         if item.set_number == 1:
           if item.target_frame[11] == '1':  # tray 1
+            required_intermediate_pose = self.joints_above_set_1_tray_1
             place_pose.pose.orientation = self.suction_orientation_from_45
           elif item.target_frame[11] == '2':  # tray 2
+            required_intermediate_pose = self.joints_above_set_1_tray_2
             place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
         elif item.set_number == 2:
           if item.target_frame[11] == '1':  # tray 1
             place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0)) 
           elif item.target_frame[11] == '2':  # tray 2
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/4+pi))
+            required_intermediate_pose = self.joints_above_set_2_tray_2
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
         elif item.set_number == 3:
           if item.target_frame[11] == '1':  # tray 1
             place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi*30/180)) 
           elif item.target_frame[11] == '2':  # tray 2
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, +pi))
+            required_intermediate_pose = self.joints_above_set_3_tray_2
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
         if not place_pose.pose.orientation.w and not place_pose.pose.orientation.x and not place_pose.pose.orientation.y:
           rospy.logerr("SOMETHING WENT WRONG, ORIENTATION IS NOT ASSIGNED")
       else:   # Precision_gripper, robotiq_gripper
         place_pose.pose.orientation = self.downward_orientation
-      if item.part_id == 6:
-        place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
       
       approach_height = .05
       if "precision_gripper" in item.ee_to_use:
         self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=.2)
         approach_height = .03
       elif item.ee_to_use == "suction":
-        # Approach the place pose with controlled acceleration value
-        rospy.loginfo("Approaching place pose")
-        if item.set_number in [2,3] and item.target_frame[11] == '1':  # Tray 1
-          self.go_to_named_pose("suction_pick_ready", "b_bot", speed=.1)
-          self.go_to_named_pose("suction_place_intermediate_pose_for_sets_2_and_3", "b_bot", speed=.1)
-        self.force_moveit_linear_motion = True
-        place_pose.pose.position.z += .1
-        self.move_lin(robot_name, place_pose, speed = 0.1, acceleration = 0.08, end_effector_link = "b_bot_suction_tool_tip_link")
-        place_pose.pose.position.z -= .1
+        if required_intermediate_pose:
+          self.groups["b_bot"].set_joint_value_target(required_intermediate_pose)
+          self.groups["b_bot"].set_max_velocity_scaling_factor(.1)
+          self.groups["b_bot"].go(wait=True)
+        else:
+          # Approach the place pose with controlled acceleration value
+          rospy.loginfo("Approaching place pose")
+          if item.set_number in [2,3] and item.target_frame[11] == '1':  # Tray 1
+            self.go_to_named_pose("suction_pick_ready", "b_bot", speed=.1)
+            self.go_to_named_pose("suction_place_intermediate_pose_for_sets_2_and_3", "b_bot", speed=.1)
+          self.force_moveit_linear_motion = True
+          place_pose.pose.position.z += .08
+          self.move_lin(robot_name, place_pose, speed = 0.1, acceleration = 0.08, end_effector_link = "b_bot_suction_tool_tip_link")
+          place_pose.pose.position.z -= .08
       
       self.place(robot_name, place_pose,grasp_height=item.dropoff_height,
                     speed_fast = 0.2, speed_slow = 0.02, gripper_command=gripper_command, approach_height = approach_height)
@@ -1150,17 +1167,16 @@ class KittingClass(O2ASBaseRoutines):
 
     # ==== 1. First, do an initial attempt on picking all items, ordered by the tool that they are picked with (screws, suction, precision_gripper, robotiq)
 
-    self.go_to_named_pose("home", "a_bot")
-    for item in self.screw_items:
-      if rospy.is_shutdown():
-        break
-      item.in_feeder=True  # HARD DEBUG
-      # self.pick_screw_from_bin_and_put_into_feeder(item)
-      # self.pick_screw_with_precision_gripper(item.bin_name, screw_size= 4)
-      self.go_to_named_pose("home", "a_bot")
-    self.go_to_named_pose("back", "a_bot")
+    # self.go_to_named_pose("home", "a_bot")
+    # for item in self.screw_items:
+    #   if rospy.is_shutdown():
+    #     break
+    #   item.in_feeder=True  # HARD DEBUG
+    #   # self.pick_screw_from_bin_and_put_into_feeder(item)
+    #   # self.pick_screw_with_precision_gripper(item.bin_name, screw_size= 4)
+    #   self.go_to_named_pose("home", "a_bot")
+    # self.go_to_named_pose("back", "a_bot")
     screw_delivery_time = rospy.Time.now()
-    # TODO: Add an "in_feeder" flag to each screw so it can fail safely.
 
     for item in self.suction_items:
       if rospy.is_shutdown():
@@ -1278,6 +1294,8 @@ if __name__ == '__main__':
       rospy.loginfo("Enter 61 to hand over screw from a_bot to c_bot.")
       rospy.loginfo("Enter 62 to move robots back.")
       rospy.loginfo("Enter 71, 72... to test phoxi on item 1, 2...")
+      rospy.loginfo("Enter 81, 82... to move b_bot suction to trays...")
+      rospy.loginfo("Enter 91, 92... to do view_bin on bin1_1, bin1_2...")
       rospy.loginfo("Enter START to start the task.")
       rospy.loginfo("Enter x to exit.")
       i = raw_input()
@@ -1307,8 +1325,51 @@ if __name__ == '__main__':
         item = kit.ordered_items[int(i)-71]
         rospy.loginfo("Checking for item id " + str(item.part_id) + " in " + item.bin_name)
         obj_pose = kit.get_grasp_position_from_phoxi(item)
+      elif i == "80":
+        kit.go_to_named_pose("suction_pick_ready", "b_bot")
+      elif i in ["81", "82", "83", "84"]:
+        place_pose = geometry_msgs.msg.PoseStamped()
+        if i == "81":
+          place_pose.header.frame_id = "set_1_tray_2_partition_4"
+        elif i == "82":
+          place_pose.header.frame_id = "set_2_tray_2_partition_4"
+        elif i == "83":
+          place_pose.header.frame_id = "set_3_tray_2_partition_4"
+        elif i == "84":
+          place_pose.header.frame_id = "set_1_tray_1_partition_3"
+        
+        if place_pose.header.frame_id[4] == "1":
+          if place_pose.header.frame_id[11] == '1':  # tray 1
+            place_pose.pose.orientation = kit.suction_orientation_from_45
+          elif place_pose.header.frame_id[11] == '2':  # tray 2
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
+        elif place_pose.header.frame_id[4] == "2":
+          if place_pose.header.frame_id[11] == '1':  # tray 1
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0)) 
+          elif place_pose.header.frame_id[11] == '2':  # tray 2
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
+        elif place_pose.header.frame_id[4] == "3":
+          if place_pose.header.frame_id[11] == '1':  # tray 1
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi)) 
+          elif place_pose.header.frame_id[11] == '2':  # tray 2
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, +pi))
 
-        rospy.loginfo(obj_pose)
+
+        place_pose.pose.position.z = .08
+        kit.move_lin("b_bot", place_pose, .1, end_effector_link="b_bot_suction_tool_tip_link")
+      elif i in ["91", "92", "93", "94", "95"]:
+        if i == "91":
+          part_id = 16
+        elif i == "92":
+          part_id = 9
+        elif i == "93":
+          part_id = 15
+        elif i == "94":
+          part_id = 17
+        elif i == "95":
+          part_id = 18
+
+        kit.view_bin("a_bot", "bin1_" + i[1], part_id)
       elif i == "x":
         break
       
