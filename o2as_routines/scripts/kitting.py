@@ -101,7 +101,7 @@ class KittingClass(O2ASBaseRoutines):
     # Image Publisher for monitoring    
     self.bridge = CvBridge()
 
-    self.img_innner_pick_topic = "kitting/img_w_goal_pose" 
+    self.img_innner_pick_topic = "o2as_monitor/vision_res" 
     self.img_innner_pick_pub = rospy.Publisher(self.img_innner_pick_topic, Image, latch=True, queue_size=10)
     self.current_img_w_goal = Image()
     self.current_img_w_blob = Image()
@@ -116,8 +116,10 @@ class KittingClass(O2ASBaseRoutines):
     self.cameraMatK = np.array([[461.605774, 0.0, 318.471497],
                            [0.0, 461.605804, 180.336258],
                            [0.0, 0.0, 1.0]])
-
-
+    #For phoxi in omron
+    self.cameraPhoxiMatK = np.array([[2226.52477235, 0.0, 978.075053258],
+                           [0.0, 2226.52477235, 775.748572147],
+                           [0.0, 0.0, 1.0]])
 
     self.initial_setup()
     rospy.sleep(.5)
@@ -531,6 +533,93 @@ class KittingClass(O2ASBaseRoutines):
 
     return False
 
+  def mask_bin(self, group_name, bin_id):
+
+    mask_margin = 0.0
+    point_top1 = geometry_msgs.msg.PointStamped()
+    point_top1.header.frame_id = str(bin_id)+"_bottom_front_right_corner"
+    point_top1.point = geometry_msgs.msg.Point(-mask_margin, -mask_margin, 0.0)
+
+    point_top2 = geometry_msgs.msg.PointStamped()
+    point_top2.header.frame_id = str(bin_id)+"_bottom_back_right_corner"
+    point_top2.point = geometry_msgs.msg.Point(mask_margin, -mask_margin, 0.0)
+
+    point_top3 = geometry_msgs.msg.PointStamped()
+    point_top3.header.frame_id = str(bin_id)+"_bottom_back_left_corner"
+    point_top3.point = geometry_msgs.msg.Point(mask_margin, mask_margin, 0.0)
+
+    point_top4 = geometry_msgs.msg.PointStamped()
+    point_top4.header.frame_id = str(bin_id)+"_bottom_front_left_corner"
+    point_top4.point = geometry_msgs.msg.Point(-mask_margin, mask_margin, 0.0)
+
+    #TODO change the fisheye from to the depth frame in casse of offset. but fisheye should e ok since the two images are aligned (depth and rgb) after the real sense node
+    point_top1_cam = self.listener.transformPoint("a_phoxi_m_sensor", point_top1).point
+    point_top2_cam = self.listener.transformPoint("a_phoxi_m_sensor", point_top2).point
+    point_top3_cam = self.listener.transformPoint("a_phoxi_m_sensor", point_top3).point
+    point_top4_cam = self.listener.transformPoint("a_phoxi_m_sensor", point_top4).point
+
+
+    #print("point_top1_cam")
+    #print(point_top1_cam)
+    #print("point_top2_cam")
+    #print(point_top2_cam)
+    #print("point_top3_cam")
+    #print(point_top3_cam)
+    #print("point_top4_cam")
+    #print(point_top4_cam)
+
+    #point_test_center_cam = geometry_msgs.msg.Point(0, 0, 0.4)
+    #print(point_test_center_cam)
+
+    #TODO project the 4 points in the depth plane (which projection matrix to use from the camera)
+    #projection matrix
+    #554.3827128226441, 0.0, 320.5, 0.0, 554.3827128226441, 240.5, 0.0, 0.0, 1.0    
+    #
+    #P: [554.3827128226441, 0.0, 320.5, -38.80678989758509, 0.0, 554.3827128226441, 240.5, 0.0, 0.0, 0.0, 1.0, 0.0]
+    #TODO take the parameters from the /camera_info topic instead
+
+
+
+    point_top1_cam_np = np.array([point_top1_cam.x, point_top1_cam.y, point_top1_cam.z])   
+    point_top2_cam_np = np.array([point_top2_cam.x, point_top2_cam.y, point_top2_cam.z])   
+    point_top3_cam_np = np.array([point_top3_cam.x, point_top3_cam.y, point_top3_cam.z])   
+    point_top4_cam_np = np.array([point_top4_cam.x, point_top4_cam.y, point_top4_cam.z])   
+    #used to test the projection
+    #point_test_center_cam_np = np.array([point_test_center_cam.x, point_test_center_cam.y, point_test_center_cam.z])   
+    
+    #need the camera parameter of the phoxy
+      
+    point_top1_img_np = self.cameraPhoxiMatK.dot(point_top1_cam_np)
+    point_top2_img_np = self.cameraPhoxiMatK.dot(point_top2_cam_np)
+    point_top3_img_np = self.cameraPhoxiMatK.dot(point_top3_cam_np)
+    point_top4_img_np = self.cameraPhoxiMatK.dot(point_top4_cam_np)
+    #point_test_center_img_np = self.cameraMatK.dot(point_test_center_cam_np) 
+
+    #print(point_top1_img_np)
+    #print(point_top2_img_np)
+    #print(point_top3_img_np)
+    #print(point_top4_img_np)
+    #print(point_test_center_img_np)
+
+    in_polygon = Polygon()
+    in_polygon.points = [Point32(point_top1_img_np[0]/point_top1_img_np[2],point_top1_img_np[1]/point_top1_img_np[2],0),
+                    Point32(point_top2_img_np[0]/point_top2_img_np[2],point_top2_img_np[1]/point_top2_img_np[2],0),
+                    Point32(point_top3_img_np[0]/point_top3_img_np[2],point_top3_img_np[1]/point_top3_img_np[2],0),
+                    Point32(point_top4_img_np[0]/point_top4_img_np[2],point_top4_img_np[1]/point_top4_img_np[2],0)]
+
+    polygon = [ (in_polygon.points[0].x,in_polygon.points[0].y),
+                    (in_polygon.points[1].x,in_polygon.points[1].y),
+                    (in_polygon.points[2].x,in_polygon.points[2].y),
+                    (in_polygon.points[3].x,in_polygon.points[3].y)]
+
+
+    mask_img = ImagePIL.new('L', (2064,1544), 0)
+    ImageDrawPIL.Draw(mask_img).polygon(polygon, outline = 1, fill = 255)
+    mask_image_np = np.array(mask_img)
+    namefile = "mask_phoxi_"+str(bin_id)+".png"
+    mask_img.save(namefile,'PNG')
+
+
   def view_bin(self, group_name, bin_id, part_id, speed_fast = 1.0, speed_slow = 1.0, bin_eff_height = 0.2, bin_eff_xoff = 0, bin_eff_deg_angle = 20,end_effector_link = ""):
     # TODO: adjust the x,z and end effector orientatio for optimal view of the bin to use with the  \search_grasp service
     goal_pose = geometry_msgs.msg.PoseStamped()
@@ -539,11 +628,6 @@ class KittingClass(O2ASBaseRoutines):
     goal_pose.pose.position.y = -.05
     goal_pose.pose.position.z = bin_eff_height - .12
 
-    #goal orientation for a_bot_camera_depth_frame 
-    #goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2 + 20*pi/180, 0))
-    #res = self.go_to_pose_goal(group_name, goal_pose, speed_slow, "a_bot_camera_depth_frame")
-    #goal orientation for gripper
-    #    goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 + 20*pi/180, 0))
     goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
     res = self.move_lin(group_name, goal_pose, speed_slow, end_effector_link="")
     if not res:
@@ -580,15 +664,6 @@ class KittingClass(O2ASBaseRoutines):
     point_top4_cam = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", point_top4).point
 
 
-    #print("point_top1_cam")
-    #print(point_top1_cam)
-    #print("point_top2_cam")
-    #print(point_top2_cam)
-    #print("point_top3_cam")
-    #print(point_top3_cam)
-    #print("point_top4_cam")
-    #print(point_top4_cam)
-
     #point_test_center_cam = geometry_msgs.msg.Point(0, 0, 0.4)
     #print(point_test_center_cam)
 
@@ -598,7 +673,6 @@ class KittingClass(O2ASBaseRoutines):
     #
     #P: [554.3827128226441, 0.0, 320.5, -38.80678989758509, 0.0, 554.3827128226441, 240.5, 0.0, 0.0, 0.0, 1.0, 0.0]
     #TODO take the parameters from the /camera_info topic instead
-
 
 
     point_top1_cam_np = np.array([point_top1_cam.x, point_top1_cam.y, point_top1_cam.z])   
@@ -614,11 +688,6 @@ class KittingClass(O2ASBaseRoutines):
     point_top4_img_np = self.cameraMatK.dot(point_top4_cam_np)
     #point_test_center_img_np = self.cameraMatK.dot(point_test_center_cam_np) 
 
-    #print(point_top1_img_np)
-    #print(point_top2_img_np)
-    #print(point_top3_img_np)
-    #print(point_top4_img_np)
-    #print(point_test_center_img_np)
 
     mask_polygon = Polygon()
     mask_polygon.points = [Point32(point_top1_img_np[0]/point_top1_img_np[2],point_top1_img_np[1]/point_top1_img_np[2],0),
@@ -648,17 +717,15 @@ class KittingClass(O2ASBaseRoutines):
         for i in range(len(poseArrayRes.poses)): 
           pointCam = geometry_msgs.msg.PointStamped()
 
-          #simulation only
-          poseArrayRes.header.frame_id = "a_bot_camera_fisheye_optical_frame"
-          pointCam.header = poseArrayRes.header
-          print("pointCam.header")
-          print(pointCam.header)
-          pointCam.point = poseArrayRes.poses[i].position
-          pointBin = self.listener.transformPoint(bin_id, pointCam).point
-          distanceToBinCenter.append(math.sqrt(pointBin.x*pointBin.x + pointBin.y*pointBin.y))
+            #simulation only
+            poseArrayRes.header.frame_id = "a_bot_camera_fisheye_optical_frame"
+            pointCam.header = poseArrayRes.header
+            pointCam.point = poseArrayRes.poses[i].position
+            pointBin = self.listener.transformPoint(bin_id, pointCam).point
+            distanceToBinCenter.append(math.sqrt(pointBin.x*pointBin.x + pointBin.y*pointBin.y))
         minPoseIndex = np.argmin(distanceToBinCenter)
-        
-        rospy.loginfo("pose closest to the bin center in the xy plane")
+         
+        rospy.loginfo("point closest to the bin center in the xy plane")
         rospy.loginfo(poseArrayRes.poses[minPoseIndex])
 
         #Transform point from camera reference to bin reference
@@ -688,30 +755,6 @@ class KittingClass(O2ASBaseRoutines):
     #TODO if nothing is detected move the camera a bit to try to detect somethin
         return False      
 
-
-
-    #mask_img = Image.new('L', (640,480), 0)
-    #ImageDraw.Draw(mask_img).polygon(mask_polygon, outline = 1, fill = 255)
-    #mask_image_np = np.array(mask_img)
-    #namefile = "mask_"+str(bin_id)+".png"
-    #mask_img.save(namefile,'PNG')
-
-
-    #used to do the bitwise comparison between the mask and the original image
-    #mask = Image.new('RGB', (640,480), 255)
-    #ImageDraw.Draw(mask).polygon(polygon, outline = 1, fill = 1)
-    #mask_np = np.array(mask)
- 
-    #img_original = Image.open("bin_origin.png")
-    #img_original_np = np.array(img_original)
- 
-    #img_res_np = np.bitwise_and(mask_np, img_original_np)
-    #img_res = Image.fromarray(np.uint8(img_res_np)) 
-    #img_res.save('mask_original_bin.png','PNG')
-
-
-    #    point_top1_cam = t.transformPoint("a_bot_camera_depth_frame", point_top1)
-    #    point_top1_cam = t.transformPoint(point_top4.header.frame_id, point_top1)
   def draw_point3D_after_view_bin(self, pointPartCam):
         ### Project the goal on the image plane using the camera matrix like for the mask
         #Transform Point in camera reference

@@ -34,6 +34,7 @@ class BlobDetection(object):
         self.current_image_blob = Image()
         self.current_cloud = PointCloud2()
         self.current_detected_poses = PoseArray() 
+        self.current_param_part_id = "none"
 
         # Config parameters
         # TODO: read values from config file
@@ -64,6 +65,7 @@ class BlobDetection(object):
       rospy.loginfo('Executing'+" "+str(self._action_name)+"."+"request sent:")
       rospy.loginfo(goal)
 
+      self.current_param_part_id = goal.param_part_id
       res = self.detect_poses(goal.maskCorner, goal.param_part_id)
 
       self.action_result.success = res
@@ -81,24 +83,25 @@ class BlobDetection(object):
       # Convert the image to be used wit OpenCV library
       self.current_image = copy.deepcopy(msg_in)
 
-      mask_u = 200
-      mask_v = 100
+      #mask_u = 200
+      #mask_v = 100
 
-      test_polygon = Polygon()
-      test_polygon.points = [Point32(mask_u,mask_v,0),
-                             Point32(640-mask_u,mask_v,0),
-                             Point32(640-mask_u,360,0),
-                             Point32(mask_u,360,0)]
+      #test_polygon = Polygon()
+      #test_polygon.points = [Point32(mask_u,mask_v,0),
+      #                       Point32(640-mask_u,mask_v,0),
+      #                       Point32(640-mask_u,360,0),
+      #                       Point32(mask_u,360,0)]
 
 
-#      self.detect_poses(test_polygon)
+      #self.detect_poses(test_polygon)
     
     def detect_poses(self, in_polygon, param_part_id = "default"):
 
 
       #img_cv=cv2.imread('/root/catkin_ws/mask_extract/set2_bin1_4_img2.png')
       img_cv = self.bridge.imgmsg_to_cv2(self.current_image , desired_encoding="passthrough")
-      cv2.imwrite('/root/catkin_ws/original_image.png',img_cv)
+      #cv2.imwrite('/root/catkin_ws/original_image.png',img_cv)
+      cv2.imwrite("/root/catkin_ws/src/o2as_blob_detection/img_res/blob_detection_"+param_part_id+"_original.png", img_cv) 
       img = np.asarray(img_cv)[:, :, ::-1]
       # Apply the mask
       mask_u = 200
@@ -200,9 +203,11 @@ class BlobDetection(object):
         # Apply the mask to the image
         #img_cv = cv2.imread(img_to_mask)
         #mask_cv = cv2.imread(mask_img,0)
+        cv2.imwrite("/root/catkin_ws/src/o2as_blob_detection/img_res/blob_detection_"+self.current_param_part_id+"_mask.png", mask_image_np)
         img_cv = in_img_cv
         out_img = cv2.bitwise_and(img_cv,img_cv, mask = mask_image_np)
-        cv2.imwrite('/root/catkin_ws/masked_image.png',out_img)
+        #cv2.imwrite('/root/catkin_ws/masked_image.png',out_img)
+        cv2.imwrite("/root/catkin_ws/src/o2as_blob_detection/img_res/blob_detection_"+self.current_param_part_id+"_masked_image.png", cv2.cvtColor(out_img, cv2.COLOR_BGR2RGB))
         return out_img
 
     def detect_blob(self, img, param_part_id = "default"):
@@ -227,8 +232,8 @@ class BlobDetection(object):
     
 
         rospy.loginfo( rospy.get_name() + " parameter chosen: " + param_part_id)
-        if(param_part_id == "test"):
-            rospy.loginfo( "in: " + param_part_id)
+        if(param_part_id == "none"):
+            rospy.loginfo( rospy.get_name() +"in: " + param_part_id)
             # Segmentation Thresholds
             params.minThreshold = 100
             params.maxThreshold = 400
@@ -254,7 +259,8 @@ class BlobDetection(object):
             params.filterByInertia = False
             params.minInertiaRatio = 0.01
 
-        elif(param_part_id == "part_"):
+        elif(param_part_id == "part_9"):
+            rospy.loginfo( rospy.get_name() +"in: " + param_part_id)
             # Segmentation Thresholds
             params.minThreshold = 100
             params.maxThreshold = 400
@@ -276,6 +282,34 @@ class BlobDetection(object):
             params.filterByConvexity = False
             params.minConvexity = 0.87
     
+            # Filter by Inertia
+            params.filterByInertia = False
+            params.minInertiaRatio = 0.01
+
+        elif(param_part_id == "part_15"):
+            rospy.loginfo( rospy.get_name()+ "in: " + param_part_id)
+
+            # Segmentation Thresholds
+            params.minThreshold = 100
+            params.maxThreshold = 400
+
+            # Filter by color
+            params.filterByColor = True
+            params.blobColor = 0
+
+            # Filter by size of the blob.
+            params.filterByArea = True
+            params.minArea = 20
+            params.maxArea = 150
+
+            # Filter by Circularity
+            params.filterByCircularity = True
+            params.minCircularity = 0.7
+
+            # Filter by Convexity
+            params.filterByConvexity = False
+            params.minConvexity = 0.87
+
             # Filter by Inertia
             params.filterByInertia = False
             params.minInertiaRatio = 0.01
@@ -322,7 +356,7 @@ class BlobDetection(object):
         # Show blobs
 
         cv2.imwrite("/root/catkin_ws/src/o2as_blob_detection/img_res/blob_detection_"+param_part_id+"_results.png", cv2.cvtColor(im_with_keypoints, cv2.COLOR_BGR2RGB))
-        print("before publish")
+        #print("before publish")
 
         try:
           print("publish")
