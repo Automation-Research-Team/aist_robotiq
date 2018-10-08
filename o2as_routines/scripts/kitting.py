@@ -905,29 +905,33 @@ class KittingClass(O2ASBaseRoutines):
       return False
     if resp_search_grasp:
       if resp_search_grasp.success:
-        object_position = geometry_msgs.msg.PointStamped()
-        object_position.header.frame_id = "a_phoxi_m_sensor"
-        object_position.point = geometry_msgs.msg.Point(
-          resp_search_grasp.pos3D[0].x, 
-          resp_search_grasp.pos3D[0].y, 
-          resp_search_grasp.pos3D[0].z)
-        # TODO We should talk about how to use rotiqz which the two_finger approaches.
-        rospy.logdebug("\nGrasp point in %s: (x, y, z) = (%f, %f, %f)", 
+        poses_in_bin = list()
+        pose0 = geometry_msgs.msg.PoseStamped()
+        pose0.header.frame_id = "a_phoxi_m_sensor"
+        pose_candidates_number = 3 if resp_search_grasp.result_num > 3 else resp_search_grasp.result_num
+        for i in range(pose_candidates_number):
+          object_position = copy.deepcopy(pose0)
+          object_position.point = geometry_msgs.msg.Point(
+          resp_search_grasp.pos3D[i].x, 
+          resp_search_grasp.pos3D[i].y, 
+          resp_search_grasp.pos3D[i].z)
+          # TODO We should talk about how to use rotiqz which the two_finger approaches.
+          rospy.logdebug("\nGrasp point in %s: (x, y, z) = (%f, %f, %f)", 
           object_position.header.frame_id, 
           object_position.point.x, 
           object_position.point.y, 
           object_position.point.z)
-        
-        obj_pose_in_camera = geometry_msgs.msg.PoseStamped()
-        obj_pose_in_camera.header = object_position.header
-        obj_pose_in_camera.pose.position = object_position.point
-        obj_pose_in_camera.pose.orientation.w = 1.0
-        # pose_in_bin = geometry_msgs.msg.PoseStamped()
-        # pose_in_bin.header.frame_id = item.bin_name
-        pose_in_bin = self.listener.transformPose(item.bin_name, obj_pose_in_camera)
-        pose_in_bin.pose.orientation = self.downward_orientation
+          obj_pose_in_camera = geometry_msgs.msg.PoseStamped()
+          obj_pose_in_camera.header = object_position.header
+          obj_pose_in_camera.pose.position = object_position.point
+          obj_pose_in_camera.pose.orientation.w = 1.0
+          # pose_in_bin = geometry_msgs.msg.PoseStamped()
+          # pose_in_bin.header.frame_id = item.bin_name
+          pose_in_bin = self.listener.transformPose(item.bin_name, obj_pose_in_camera)
+          pose_in_bin.pose.orientation = self.downward_orientation
+          poses_in_bin.append(pose_in_bin)
         self.publish_marker(pose_in_bin, "aist_vision_result")
-        return pose_in_bin
+        return poses_in_bin
     else:
       rospy.loginfo("Could not find a pose via phoxi.")
       return False
@@ -1014,6 +1018,12 @@ class KittingClass(O2ASBaseRoutines):
       robot_name = "b_bot"
       # end_effector_link = "b_bot_suction_tool_tip_link"
 
+    if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
+        phoxi_res = self.get_grasp_position_from_phoxi(item, not self.has_scene_image)
+        if phoxi_res:
+          self.has_scene_image = True
+          pick_poses = phoxi_res
+
     attempts = 0
     while attempts < max_attempts and not rospy.is_shutdown():
       attempts += 1
@@ -1028,10 +1038,11 @@ class KittingClass(O2ASBaseRoutines):
           pick_pose = res_view_bin
       if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
         self.go_to_named_pose("suction_ready_back", "b_bot")
-        phoxi_res = self.get_grasp_position_from_phoxi(item, not self.has_scene_image)
-        if phoxi_res:
-          self.has_scene_image = True
-          pick_pose = phoxi_res
+        # phoxi_res = self.get_grasp_position_from_phoxi(item, not self.has_scene_image)
+        # if phoxi_res:
+        #   self.has_scene_image = True
+        #   pick_poses = phoxi_res
+        pick_pose = pick_poses.pop(0)
         self.go_to_named_pose("suction_pick_ready", "b_bot")
       
         # Orientation needs to be adjusted for suction tool
