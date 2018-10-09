@@ -1,0 +1,24 @@
+<launch>
+
+	<!-- realsense -->
+	<arg name="camera_name" default="b_bot_camera"/>
+	<arg name="camera_type" default="realsense"/>
+	<arg name="camera_serial_number" default="627201001218"/>
+	<include file="$(find o2as_realsense_camera)/launch/camera.launch">
+		<arg name="serial_number" value="$(arg camera_serial_number)"/>
+		<arg name="camera_name" default="$(arg camera_name)"/>
+		<arg name="trigger_mode" value="true"/>
+		<arg name="send_color" value="true"/>
+		<arg name="send_depth" value="true"/>
+		<arg name="send_cloud" value="true"/>
+	</include>
+
+	<!-- marker pose estimation -->
+	<include file="$(find o2as_aruco_marker_detection)/launch/demo.launch">
+		<arg name="camera_name" value="$(arg camera_name)"/>
+		<arg name="camera_type" value="$(arg camera_type)"/>
+		<arg name="camera_info" value="/$(arg camera_name)/color/camera_info"/>
+		<arg name="image_topic" value="/$(arg camera_name)/color/image_raw"/>
+	</include>
+
+</launch>

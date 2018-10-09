@@ -64,8 +64,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
+        Max Value: 1.07217693
+        Min Value: 0.563693166
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -83,7 +83,7 @@ Visualization Manager:
       Position Transformer: XYZ
       Queue Size: 10
       Selectable: true
-      Size (Pixels): 3
+      Size (Pixels): 1
       Size (m): 0.00999999978
       Style: Points
       Topic: /aruco_tracker/pointcloud
@@ -131,10 +131,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: -1.36979651
+      Pitch: -1.4747963
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.85355377
+      Yaw: 4.73855019
     Saved: ~
 Window Geometry:
   Displays:
@@ -154,5 +154,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1200
-  X: 140
-  Y: 98
+  X: 591
+  Y: 142
