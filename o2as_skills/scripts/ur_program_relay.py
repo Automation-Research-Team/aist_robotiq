@@ -217,7 +217,7 @@ class URScriptRelay():
             while program_line:
                 program += program_line
                 program_line = program_file.read(1024)
-        elif req.program_id == "movej":
+        elif req.program_id == "move_j":
             if not len(req.joint_positions) == 6:
                 rospy.logwarn("Joint pose vector not of the correct length")
                 return False

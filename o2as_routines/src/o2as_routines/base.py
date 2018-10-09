@@ -304,6 +304,24 @@ class O2ASBaseRoutines(object):
     current_pose = group.get_current_pose().pose
     return plan_success
 
+  def move_joints(self, group_name, joint_pose_goal, speed = 1.0, acceleration = 0.0, force_ur_script=False, force_moveit=False):
+    if self.force_ur_script_linear_motion or self.use_real_robot:
+      if not self.force_moveit_linear_motion:
+        rospy.logdebug("Real robot is being used. Send linear motion to robot controller directly via URScript.")
+        req = o2as_msgs.srv.sendScriptToURRequest()
+        req.program_id = "move_j"
+        req.robot_name = group_name
+        req.joint_positions = joint_pose_goal
+        req.velocity = speed
+        req.acceleration = acceleration
+        res = self.urscript_client.call(req)
+        wait_for_UR_program("/" + group_name +"_controller", rospy.Duration.from_sec(10.0))
+        return res.success
+
+    self.groups[group_name].set_joint_value_target(joint_pose_goal)
+    self.groups[group_name].set_max_velocity_scaling_factor(speed)
+    return self.groups[group_name].go(wait=True)
+
   def move_front_bots(self, pose_goal_a_bot, pose_goal_b_bot, speed = 0.05):
     rospy.logwarn("CAUTION: Moving front bots together, but MoveIt does not do continuous collision checking.")
     group = self.groups["front_bots"]
@@ -371,9 +389,15 @@ class O2ASBaseRoutines(object):
     # return True
 
 
-  def go_to_named_pose(self, pose_name, robot_name, speed = 0.5):
+  def go_to_named_pose(self, pose_name, robot_name, speed = 0.5, force_ur_script=True):
     # pose_name should be "home", "back" etc.
     self.groups[robot_name].set_named_target(pose_name)
+    if force_ur_script:
+      joint_pose = self.groups[robot_name].get_joint_value_target()
+      rospy.loginfo("joint_pose is ")
+      rospy.loginfo(joint_pose)
+      self.groups[robot_name].clear_pose_targets()
+      self.move_joints(robot_name, joint_pose, speed, force_ur_script=force_ur_script)
     rospy.logdebug("Setting velocity scaling to " + str(speed))
     self.groups[robot_name].set_max_velocity_scaling_factor(speed)
     self.groups[robot_name].go(wait=True)
