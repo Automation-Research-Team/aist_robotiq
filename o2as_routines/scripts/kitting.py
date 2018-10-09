@@ -136,6 +136,9 @@ class KittingClass(O2ASBaseRoutines):
     self.bin_2_length = .04
     self.bin_3_width = .10
     self.bin_3_length = .07
+    
+    self.has_scene_image = False
+    self.max_candidates_from_phoxi = 2
 
     # Used to prepare the suction place poses (because the UR linear driver goes through a singularity sometimes)
     self.joints_above_set_1_tray_2 = [0.6957670450210571, -1.5090416113482874, 1.9396471977233887, -0.4243395964251917, 0.7138931751251221, -3.1503987948047083]
