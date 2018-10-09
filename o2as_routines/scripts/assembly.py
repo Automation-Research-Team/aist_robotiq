@@ -1387,10 +1387,12 @@ if __name__ == '__main__':
     # assy.belt_demo()
     
     # =============================== SUBTASK F ======================================================
+    print("======== SUBTASK F ========")
     # assy.place_plate_2()
     print ("todo: add screw picking and fastening sequence")
 
     # ============= SUBTASK A (picking and inserting and fastening the motor shaft) =======================
+    print("======== SUBTASK A ========")
     # assy.pick_motor()
     # assy.adjust_centering()
     # assy.handover_motor()
@@ -1402,16 +1404,19 @@ if __name__ == '__main__':
     
 
     # ================================= SUBTASK B (motor pulley) ===========================================
+    print("======== SUBTASK B ========")
     # assy.pick_motor_pulley()
     # assy.insert_motor_pulley()
     print ("todo: fasten motor pulley")
 
     # ===== SUBTASK G (Placing and fastening the output (larger) plate, for idle pulley set and clamping pulley set) =========
+    print("======== SUBTASK G ========")
     # assy.place_plate_3_and_screw()
     print ("todo: add screw picking and fastening sequence for the second screw")
 
 
     # ==== SUBTASK C (clamping pulley set, everything but inserting and fastening clamping pulley) =================
+    print("======== SUBTASK C ========")
     # assy.pick_bearing()
     # assy.insert_bearing()
     print ("todo: pick up shaft, pick up cap, insert the cap, fasten the cap, insert using impedance Y negative direction (using b_bot)")
@@ -1421,11 +1426,13 @@ if __name__ == '__main__':
 
 
     # ============= SUBTASK D (inserting and fastening clamping pulley) =======================
+    print("======== SUBTASK D ========")
     # assy.pick_clamping_pulley()
     # assy.insert_clamping_pulley()
     print ("todo: fastening clamping pulley")
 
     # ======================== SUBTASK E (The idler pin) ============================================
+    print("======== SUBTASK E ========")
     # assy.pick_retainer_pin()
     # assy.adjust_centering()
     # assy.rotate_hand_facing_the_sky()
@@ -1450,6 +1457,7 @@ if __name__ == '__main__':
     # assy.fasten_retainer_pin_nut()
 
     # ====================================== SUBTASK H ===============================================
+    print("======== SUBTASK H ========")
     # assy.put_on_belt()
 
     # ====================== SAMPLE CODE ======================-
