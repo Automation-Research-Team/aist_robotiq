@@ -14,7 +14,8 @@ from o2as_msgs.srv import *
 import actionlib
 from o2as_msgs.msg import *
 # from o2as_usb_relay.srv import *
-from o2as_graspability_estimation.srv import *
+from graspability_estimation.srv import *
+# from o2as_graspability_estimation.srv import *
 from std_msgs.msg import Bool
 
 from o2as_routines.base import O2ASBaseRoutines
