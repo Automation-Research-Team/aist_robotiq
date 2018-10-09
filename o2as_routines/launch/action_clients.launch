@@ -1,0 +1,7 @@
+<launch>
+    <!-- Launch all of the action clients we keep launching manually -->
+  <node name="fastening_tools" pkg="actionlib" type="axclient.py" respawn="false" output="screen" args="/o2as_fastening_tools/fastener_gripper_control_action"/>
+  <node name="suction_control" pkg="actionlib" type="axclient.py" respawn="false" output="screen" args="/o2as_fastening_tools/suction_control"/>
+  <node name="precision_gripper" pkg="actionlib" type="axclient.py" respawn="false" output="screen" args="/precision_gripper_action"/>
+  
+</launch>

@@ -93,7 +93,7 @@ class URScriptRelay():
 
             program = program_front + "\n" + program_back
         elif req.program_id == "linear_push":
-            program_front = self.insertion_template
+            program_front = self.linear_push_template
             program_back = ""
 
             # Assign defaults
@@ -108,8 +108,6 @@ class URScriptRelay():
 
             ### Function definitions, for reference:
             ### rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 )
-            ### rq_spiral_search_new(max_insertion_distance, force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False):
-
             
             program_back += "    rq_zero_sensor()\n"
             program_back += "    textmsg(\"Approaching linearly.\")\n"
@@ -219,20 +217,21 @@ class URScriptRelay():
             while program_line:
                 program += program_line
                 program_line = program_file.read(1024)
-        elif req.program_id == "movej":
+        elif req.program_id == "move_j":
+
             if not len(req.joint_positions) == 6:
                 rospy.logwarn("Joint pose vector not of the correct length")
                 return False
             if not req.acceleration:
-                req.acceleration = 0.1
+                req.acceleration = 0.5
             if not req.velocity:
-                req.velocity = .03
+                req.velocity = 0.5
 
             program = ""
             program += "def move_to_joint_pose():\n"
             program += "    textmsg(\"Move_j to a pose.\")\n"
-            program += "    target_pos=[" + str(joint_positions[0]) + "," + str(joint_positions[1]) + "," + str(joint_positions[2]) + "," \
-                                      + str(joint_positions[3]) + "," + str(joint_positions[4]) + "," + str(joint_pose[5]) + "]\n"
+            program += "    target_pos=[" + str(req.joint_positions[0]) + "," + str(req.joint_positions[1]) + "," + str(req.joint_positions[2]) + "," \
+                                      + str(req.joint_positions[3]) + "," + str(req.joint_positions[4]) + "," + str(req.joint_positions[5]) + "]\n"
             program += "    movej(target_pos, " + \
                             "a = " + str(req.acceleration) + ", v = " + str(req.velocity) + ")\n"
             program += "    textmsg(\"Done.\")\n"
@@ -246,7 +245,7 @@ class URScriptRelay():
         program_msg = std_msgs.msg.String()
         program_msg.data = program
 
-        rospy.loginfo("Sending UR robot command.")
+        rospy.loginfo("Sending UR robot program " + req.program_id)
         # rospy.logdebug("Program is:")
         # rospy.logdebug(program)
         self.publishers[req.robot_name].publish(program_msg)
@@ -255,6 +254,7 @@ class URScriptRelay():
     def read_templates(self):
         # Read the files containing the program templates into memory
         self.insertion_template = self.read_template("peginholespiral_imp_osx.script")
+        self.linear_push_template = self.read_template("linear_search_short.script")
         self.spiral_motion_template = self.read_template("spiral_motion.script")
         
         return True
