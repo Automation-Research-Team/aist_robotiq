@@ -46,9 +46,9 @@ def SpiralMotion():
                     elif (spiral_axis_x):
                         pos[1] = x
                         pos[2] = y
-                    elif (spiral_axis_YZ):
+                    elif (spiral_axis_yz):
                         pos[0] = x
-                        pos[1] = -y/1.41
+                        pos[1] = y/1.41
                         pos[2] = y/1.41
                     end
                     r=r + radius_inc_set

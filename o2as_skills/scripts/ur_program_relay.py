@@ -229,8 +229,8 @@ class URScriptRelay():
             program = ""
             program += "def move_to_joint_pose():\n"
             program += "    textmsg(\"Move_j to a pose.\")\n"
-            program += "    target_pos=[" + str(joint_positions[0]) + "," + str(joint_positions[1]) + "," + str(joint_positions[2]) + "," \
-                                      + str(joint_positions[3]) + "," + str(joint_positions[4]) + "," + str(joint_pose[5]) + "]\n"
+            program += "    target_pos=[" + str(req.joint_positions[0]) + "," + str(req.joint_positions[1]) + "," + str(req.joint_positions[2]) + "," \
+                                      + str(req.joint_positions[3]) + "," + str(req.joint_positions[4]) + "," + str(req.joint_positions[5]) + "]\n"
             program += "    movej(target_pos, " + \
                             "a = " + str(req.acceleration) + ", v = " + str(req.velocity) + ")\n"
             program += "    textmsg(\"Done.\")\n"

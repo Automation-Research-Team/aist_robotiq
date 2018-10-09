@@ -264,7 +264,7 @@ bool SkillServer::moveToJointPose(std::vector<double> joint_positions, std::stri
   if (use_UR_script)
   {
     o2as_msgs::sendScriptToUR UR_srv;
-    UR_srv.request.program_id = "movej";
+    UR_srv.request.program_id = "move_j";
     UR_srv.request.robot_name = robot_name;  
     UR_srv.request.joint_positions = joint_positions;
     UR_srv.request.velocity = velocity_scaling_factor;
