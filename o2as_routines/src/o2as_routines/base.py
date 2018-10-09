@@ -305,8 +305,8 @@ class O2ASBaseRoutines(object):
     return plan_success
 
   def move_joints(self, group_name, joint_pose_goal, speed = 1.0, acceleration = 0.0, force_ur_script=False, force_moveit=False):
-    if self.force_ur_script_linear_motion or self.use_real_robot:
-      if not self.force_moveit_linear_motion:
+    if force_ur_script or self.use_real_robot:
+      if not force_moveit:
         rospy.logdebug("Real robot is being used. Send joint command to robot controller directly via URScript.") 
         req = o2as_msgs.srv.sendScriptToURRequest()
         req.program_id = "move_j"
@@ -389,16 +389,21 @@ class O2ASBaseRoutines(object):
     # return True
 
 
-  def go_to_named_pose(self, pose_name, robot_name, speed = 0.5, force_ur_script=True):
+  def go_to_named_pose(self, pose_name, robot_name, speed = 0.5, acceleration = 0.0, force_ur_script=False):
     # pose_name should be "home", "back" etc.
+    if force_ur_script and self.use_real_robot:
+      # joint_pose = self.groups[robot_name].get_joint_value_target() # This works only with a_bot. Bug?
+      d = self.groups[robot_name].get_named_target_values(pose_name)
+      joint_pose = [d[robot_name+"_shoulder_pan_joint"], 
+                    d[robot_name+"_shoulder_lift_joint"],
+                    d[robot_name+"_elbow_joint"],
+                    d[robot_name+"_wrist_1_joint"],
+                    d[robot_name+"_wrist_2_joint"],
+                    d[robot_name+"_wrist_3_joint"]]
+      self.move_joints(robot_name, joint_pose, speed, acceleration, force_ur_script=force_ur_script)
+    if speed > 1.0:
+      speed = 1.0
     self.groups[robot_name].set_named_target(pose_name)
-    if False:
-    # if force_ur_script:
-      joint_pose = self.groups[robot_name].get_joint_value_target()
-      rospy.loginfo("joint_pose is ")
-      rospy.loginfo(joint_pose)
-      self.groups[robot_name].clear_pose_targets()
-      self.move_joints(robot_name, joint_pose, speed, force_ur_script=force_ur_script)
     rospy.logdebug("Setting velocity scaling to " + str(speed))
     self.groups[robot_name].set_max_velocity_scaling_factor(speed)
     self.groups[robot_name].go(wait=True)

@@ -218,13 +218,14 @@ class URScriptRelay():
                 program += program_line
                 program_line = program_file.read(1024)
         elif req.program_id == "move_j":
+
             if not len(req.joint_positions) == 6:
                 rospy.logwarn("Joint pose vector not of the correct length")
                 return False
             if not req.acceleration:
-                req.acceleration = 0.1
+                req.acceleration = 0.5
             if not req.velocity:
-                req.velocity = .03
+                req.velocity = 0.5
 
             program = ""
             program += "def move_to_joint_pose():\n"
@@ -244,7 +245,7 @@ class URScriptRelay():
         program_msg = std_msgs.msg.String()
         program_msg.data = program
 
-        rospy.loginfo("Sending UR robot command.")
+        rospy.loginfo("Sending UR robot program " + req.program_id)
         # rospy.logdebug("Program is:")
         # rospy.logdebug(program)
         self.publishers[req.robot_name].publish(program_msg)

@@ -1114,9 +1114,9 @@ class KittingClass(O2ASBaseRoutines):
         if pick_poses:
           pick_pose = pick_poses.pop(0)
         if item.ee_to_use == "suction":
-          self.go_to_named_pose("suction_pick_ready", "b_bot")
+          self.go_to_named_pose("suction_pick_ready", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
         elif item.ee_to_use == "robotiq_gripper":
-          self.go_to_named_pose("home", "b_bot")
+          self.go_to_named_pose("home", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       
         # Orientation needs to be adjusted for suction tool
         pick_point_on_table = self.listener.transformPose("workspace_center", pick_pose).pose.position
@@ -1193,12 +1193,12 @@ class KittingClass(O2ASBaseRoutines):
       
       approach_height = .05
       if "precision_gripper" in item.ee_to_use:
-        self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=.2, force_ur_script=self.use_real_robot)
+        self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=.2, acceleration=.3, force_ur_script=self.use_real_robot)
         approach_height = .03
       elif item.ee_to_use == "suction":
         if required_intermediate_pose:
           rospy.loginfo("Going to intermediate pose")
-          self.go_to_named_pose(required_intermediate_pose, "b_bot", speed=.2, force_ur_script=self.use_real_robot)
+          self.go_to_named_pose(required_intermediate_pose, "b_bot", speed=.2, acceleration=.3, force_ur_script=self.use_real_robot)
         # Approach the place pose with controlled acceleration value
         rospy.loginfo("Approaching place pose")
         if item.set_number in [2,3] and item.target_frame[11] == '1':  # Tray 1
@@ -1233,8 +1233,8 @@ class KittingClass(O2ASBaseRoutines):
     # - Try to pick and return any excess screws
     # Ideally, we can fit all the trays into the scene.
 
-    self.go_to_named_pose("back", "c_bot", force_ur_script=self.use_real_robot)
-    self.go_to_named_pose("suction_ready_back", "b_bot", force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("back", "c_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("suction_ready_back", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
     start_time = rospy.Time.now()
     time_limit = rospy.Duration(1140) # 19 minutes
     self.fulfilled_items = 0
@@ -1247,15 +1247,15 @@ class KittingClass(O2ASBaseRoutines):
 
     # ==== 1. First, do an initial attempt on picking all items, ordered by the tool that they are picked with (screws, suction, precision_gripper, robotiq)
 
-    self.go_to_named_pose("home", "a_bot", force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("home", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
     for item in self.screw_items:
       if rospy.is_shutdown():
         break
       # item.in_feeder = True   # Used to skip the screws and enable the feeder pickup
       self.pick_screw_from_bin_and_put_into_feeder(item, 10)
       # self.pick_screw_with_precision_gripper(item.bin_name, screw_size= 4)
-      self.go_to_named_pose("home", "a_bot", force_ur_script=self.use_real_robot)
-    self.go_to_named_pose("back", "a_bot", force_ur_script=self.use_real_robot)
+      self.go_to_named_pose("home", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("back", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
     self.screw_delivery_time = rospy.Time.now()
 
     for item in self.suction_items:
@@ -1271,18 +1271,18 @@ class KittingClass(O2ASBaseRoutines):
     for item in self.precision_gripper_items:
       if rospy.is_shutdown():
         break
-      self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", force_ur_script=self.use_real_robot)
+      self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       self.attempt_item(item, 3)
     self.go_to_named_pose("back", "a_bot")
 
     self.treat_screws_in_feeders()
 
     for item in self.robotiq_gripper_items:
-      self.go_to_named_pose("home", "b_bot", force_ur_script=self.use_real_robot)
+      self.go_to_named_pose("home", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       if rospy.is_shutdown():
         break
       self.attempt_item(item, 3)
-    self.go_to_named_pose("back", "b_bot", force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("back", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
     self.treat_screws_in_feeders()
 
@@ -1318,23 +1318,23 @@ class KittingClass(O2ASBaseRoutines):
 
       if not precision_gripper_done:
         rospy.loginfo("Reattempting the remaining precision gripper items")
-        self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", force_ur_script=self.use_real_robot)
+        self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
         for item in self.precision_gripper_items:
           if rospy.is_shutdown():
                   break
           self.attempt_item(item)
-        self.go_to_named_pose("back", "a_bot", force_ur_script=self.use_real_robot)
+        self.go_to_named_pose("back", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
       self.treat_screws_in_feeders()
 
       if not robotiq_gripper_done:
         rospy.loginfo("Reattempting the remaining robotiq gripper items")
-        self.go_to_named_pose("home", "b_bot", force_ur_script=self.use_real_robot)
+        self.go_to_named_pose("home", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
         for item in self.robotiq_gripper_items:
           if rospy.is_shutdown():
                   break
           self.attempt_item(item)
-        self.go_to_named_pose("back", "b_bot", force_ur_script=self.use_real_robot)
+        self.go_to_named_pose("back", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
       self.treat_screws_in_feeders()
       
@@ -1345,10 +1345,10 @@ class KittingClass(O2ASBaseRoutines):
           if rospy.is_shutdown():
                   break
           if not item.fulfilled:
-            self.go_to_named_pose("suction_pick_ready", "b_bot", force_ur_script=self.use_real_robot)
+            self.go_to_named_pose("suction_pick_ready", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
             self.attempt_item(item, 5)
         self.do_change_tool_action("b_bot", equip=False, screw_size=50)   # 50 = suction tool
-        self.go_to_named_pose("back", "b_bot", force_ur_script=self.use_real_robot)
+        self.go_to_named_pose("back", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
       if (rospy.Time.now()-start_time) > time_limit:
         rospy.logerr("Time limit reached! Breaking out of the loop.")

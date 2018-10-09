@@ -254,20 +254,22 @@ SkillServer::SkillServer() :
   }
 }
 
-bool SkillServer::moveToJointPose(std::vector<double> joint_positions, std::string robot_name, bool wait, double velocity_scaling_factor, bool use_UR_script)
+bool SkillServer::moveToJointPose(std::vector<double> joint_positions, std::string robot_name, bool wait, double velocity_scaling_factor, bool use_UR_script, double acceleration)
 {
   if (joint_positions.size() != 6)
   {
     ROS_ERROR_STREAM("Size of joint positions in moveToJointPose is not correct! Expected 6, got " << joint_positions.size());
     return false;
   }
-  if (use_UR_script)
+  if (use_UR_script && use_real_robot_)
   {
     o2as_msgs::sendScriptToUR UR_srv;
     UR_srv.request.program_id = "move_j";
-    UR_srv.request.robot_name = robot_name;  
+    UR_srv.request.robot_name = robot_name;
     UR_srv.request.joint_positions = joint_positions;
     UR_srv.request.velocity = velocity_scaling_factor;
+    UR_srv.request.acceleration = acceleration;
+    sendScriptToURClient_.call(UR_srv);
     if (UR_srv.response.success == true)
     {
       ROS_INFO("Successfully called the URScript client to move joints.");
@@ -339,7 +341,7 @@ bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string
 
 // This works only for a single robot.
 // Acceleration is only used for the real robot.
-bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait, std::string end_effector_link, double velocity_scaling_factor, double acceleration)
+bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait, std::string end_effector_link, double velocity_scaling_factor, double acceleration, bool force_UR_script, bool force_moveit)
 {
   if (use_real_robot_)
   {
@@ -456,11 +458,24 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
   }
 }
 
-bool SkillServer::goToNamedPose(std::string pose_name, std::string robot_name)
+bool SkillServer::goToNamedPose(std::string pose_name, std::string robot_name, double speed, double acceleration, bool use_UR_script)
 {
   ROS_INFO_STREAM("Going to named pose " << pose_name << " with robot group " << robot_name << ".");
   moveit::planning_interface::MoveGroupInterface* group_pointer;
   group_pointer = robotNameToMoveGroup(robot_name);
+  if (use_UR_script && use_real_robot_)
+  {
+    std::map<std::string, double> d = group_pointer->getNamedTargetValues(pose_name);
+    std::vector<double> joint_pose = {d[robot_name+"_shoulder_pan_joint"], 
+                                      d[robot_name+"_shoulder_lift_joint"],
+                                      d[robot_name+"_elbow_joint"],
+                                      d[robot_name+"_wrist_1_joint"],
+                                      d[robot_name+"_wrist_2_joint"],
+                                      d[robot_name+"_wrist_3_joint"] };
+    return moveToJointPose(joint_pose, robot_name, true, speed, use_UR_script, acceleration);
+  }
+  if (speed > 1.0)
+    speed = 1.0;
 
   group_pointer->setStartStateToCurrentState();
   group_pointer->setNamedTarget(pose_name);
@@ -582,10 +597,8 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
       joint_group_positions_1[2] = 1.7915;
       joint_group_positions_1[3] = 0.872;
       joint_group_positions_1[4] = 1.5723;
-      joint_group_positions_1[5] = -3.1413;
-      group_pointer->setJointValueTarget(joint_group_positions_1);
-      
-      if (!moveToJointPose(joint_group_positions_1, robot_name, true, 1.0, false))
+      joint_group_positions_1[5] = -3.1413;      
+      if (!moveToJointPose(joint_group_positions_1, robot_name, true, 3.0, use_real_robot_, 3.0))
       {
         ROS_ERROR("Could not plan to before_tool_pickup joint state. Abort!");
         return false;
@@ -597,8 +610,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
       joint_group_positions_2[3] = 0.872;
       joint_group_positions_2[4] = -0.5723;
       joint_group_positions_2[5] = -3.1413;
-      group_pointer->setJointValueTarget(joint_group_positions_2);
-      group_pointer->move();
+      moveToJointPose(joint_group_positions_2, robot_name, true, 3.0, use_real_robot_, 3.0);
     }
     else
       ROS_INFO("Skipping intermediate high approach pose with b_bot");
@@ -611,8 +623,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     joint_group_positions_3[3] = -0.841;
     joint_group_positions_3[4] = -0.548;
     joint_group_positions_3[5] = -3.142;
-    group_pointer->setJointValueTarget(joint_group_positions_3);
-    group_pointer->move();
+    moveToJointPose(joint_group_positions_3, robot_name, true, 3.0, use_real_robot_, 3.0);
   }
 
   // Set up poses
@@ -792,8 +803,8 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   
   // Plan & execute linear motion away from the tool change position
   ROS_INFO("Moving back to screw tool approach pose LIN.");
-  if (equip)        lin_speed = 0.08;
-  else if (unequip) lin_speed = 0.3;
+  if (equip)        lin_speed = 0.3;
+  else if (unequip) lin_speed = 1.0;
 
   if ( (use_real_robot_) && (robot_name == "b_bot") )
   {
@@ -824,13 +835,11 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   if (robot_name == "b_bot")
   {
     ROS_INFO("Going to joint pose 3.");
-    group_pointer->setJointValueTarget(joint_group_positions_3);
-    group_pointer->move();
+    moveToJointPose(joint_group_positions_3, robot_name, true, 3.0, use_real_robot_, 3.0);
     ROS_INFO("Going to joint pose 2.");
-    group_pointer->setJointValueTarget(joint_group_positions_2);
-    group_pointer->move();
+    moveToJointPose(joint_group_positions_2, robot_name, true, 3.0, use_real_robot_, 3.0);
     ROS_INFO("Going to joint pose 1.");
-    group_pointer->setJointValueTarget(joint_group_positions_1);
+    moveToJointPose(joint_group_positions_1, robot_name, true, 3.0, use_real_robot_, 3.0);
     group_pointer->move();
     ROS_INFO("Done with joint poses, and with life.");
   }
@@ -840,7 +849,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
   if (unequip)
   {
-    goToNamedPose("home", robot_name);
+    goToNamedPose("home", robot_name, 3.0, 3.0, use_real_robot_);
   }
   else
   {
@@ -850,7 +859,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     }
     else if (robot_name == "c_bot")
     {
-      goToNamedPose("screw_ready", robot_name);
+      goToNamedPose("screw_ready", robot_name, 3.0, 3.0, use_real_robot_);
     }
   }
 
@@ -1893,9 +1902,9 @@ void SkillServer::executeRegrasp(const o2as_msgs::regraspGoalConstPtr& goal)
   ros::Duration(.1).sleep();
   tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "workspace_center", "handover_frame"));
 
-  goToNamedPose("back", picker_robot_name);
+  goToNamedPose("back", picker_robot_name, 2.0, 2.0, use_real_robot_);
   if (holder_robot_name == "b_bot")
-    goToNamedPose("regrasp_ready", holder_robot_name);
+    goToNamedPose("regrasp_ready", holder_robot_name, 1.0, 0.5, use_real_robot_);
 
   tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "workspace_center", "handover_frame"));
   // Move the Giver to the regrasp_pose
@@ -1964,7 +1973,7 @@ void SkillServer::executeInsert(const o2as_msgs::insertGoalConstPtr& goal)
     ros::Duration(.1).sleep();
     tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), "workspace_center", "in_hand_insertion_frame"));
 
-    goToNamedPose("back", passive_robot_name);
+    goToNamedPose("back", passive_robot_name, 2.0, 2.0, use_real_robot_);
 
     // Move the 
     ROS_INFO_STREAM("Moving active robot (" << active_robot_name << ") to insertion pose.");
