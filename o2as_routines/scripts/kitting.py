@@ -366,10 +366,18 @@ class KittingClass(O2ASBaseRoutines):
     if not turn_suction_on:
       goal_blow = SuctionControlGoal()
       goal_blow.fastening_tool_name = "suction_tool"
-      goal_blow.turn_suction_on = turn_suction_on
+      goal_blow.turn_suction_on = True
       goal_blow.eject_screw = True
       self._suction.send_goal(goal)
       self._suction.wait_for_result()
+      is_blowed = self._suction.get_result()
+      if is_blowed:
+        goal_blow = SuctionControlGoal()
+        goal_blow.fastening_tool_name = "suction_tool"
+        goal_blow.turn_suction_on = False
+        goal_blow.eject_screw = True
+        self._suction.send_goal(goal)
+        self._suction.wait_for_result()
     return self._suction.get_result()
 
   def pick_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link="b_bot_suction_tool_tip_link"):
@@ -1339,6 +1347,19 @@ class KittingClass(O2ASBaseRoutines):
       rospy.loginfo("STOPPED THE TASK")
     return
 
+    def suck_attachment_test(self):
+      rospy.loginfo("Enter to test suck on...")
+      raw_input()
+      if not self.suck(True):
+        rospy.logerr("The procedure to pick was failed.")
+        return
+      rospy.loginfo("Enter to test suck off...")
+      raw_input()
+      if not self.suck(False)
+        rospy.logerr("The procedure to place was failed.")
+        return
+      rospy.loginfo("Procedures to pick and place is succeeded!")
+
 if __name__ == '__main__':
   try:
     kit = KittingClass()
@@ -1347,8 +1368,7 @@ if __name__ == '__main__':
       rospy.loginfo("Enter 1 to equip suction tool.")
       rospy.loginfo("Enter 11 to unequip suction tool.")
       rospy.loginfo("Enter 2 to move the robots home to starting positions.")
-      rospy.loginfo("Enter 3 to pick with b_bot using suction tool.")
-      rospy.loginfo("Enter 4 to place with b_bot using suction tool.")
+      rospy.loginfo("Enter 3 to suction attachment test with b_bot using suction tool.")
       rospy.loginfo("Enter 60 to pick screw from bin with a_bot.")
       rospy.loginfo("Enter 61 to hand over screw from a_bot to c_bot.")
       rospy.loginfo("Enter 62 to move robots back.")
@@ -1367,9 +1387,8 @@ if __name__ == '__main__':
         kit.go_to_named_pose("back", "c_bot")
         kit.go_to_named_pose("suction_ready_back", "b_bot")
       elif i == '3':
-        kit.pick_suction_test()
-      elif i == '4':
-        kit.place_suction_test()
+        rospy.loginfo("Checking suction attachment procedures")
+        kit.suck_attachment_test()
       elif i == 'START' or i == 'start' or i == '5000':
         kit.kitting_task()
       elif i == "60":
