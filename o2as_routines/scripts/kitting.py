@@ -1355,7 +1355,7 @@ class KittingClass(O2ASBaseRoutines):
         return
       rospy.loginfo("Enter to test suck off...")
       raw_input()
-      if not self.suck(False)
+      if not self.suck(False):
         rospy.logerr("The procedure to place was failed.")
         return
       rospy.loginfo("Procedures to pick and place is succeeded!")
