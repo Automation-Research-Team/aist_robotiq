@@ -1440,7 +1440,7 @@ bool SkillServer::placeScrew(
     srv.request.program_id = "spiral_motion";
     srv.request.robot_name = robot_name;
     srv.request.max_radius = .005;
-    srv.request.radius_increment = .0015;
+    srv.request.radius_increment = .002;
     srv.request.theta_increment = 40;
     srv.request.spiral_axis = "YZ";
     sendScriptToURClient_.call(srv);
@@ -1463,7 +1463,7 @@ bool SkillServer::placeScrew(
   setSuctionEjection(screw_tool_id, false, true);     // Eject screw
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   // sendFasteningToolCommand(fastening_tool_name, "tighten", false, 0.1);
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   moveToCartPoseLIN(above_hole_pose_, robot_name, true, screw_tool_link, 0.05);
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   setSuctionEjection(screw_tool_id, false, false);    // Turn off both suction and ejection

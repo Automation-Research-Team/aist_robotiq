@@ -24,6 +24,8 @@ class InnerPickDetection(object):
         self._y = 275
         self._w = 64
         self._h = 32
+        # TODO: Write an image with the ROI drawn into it
+        # TODO: Publish the input and output image to o2as_debug_monitor
 
         self._image_topic = "/a_bot_camera/color/image_raw"
 
