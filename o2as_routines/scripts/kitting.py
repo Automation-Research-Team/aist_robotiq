@@ -75,7 +75,8 @@ class KittingClass(O2ASBaseRoutines):
     
     # params
     # self.bin_id = rospy.get_param('part_bin_list')
-    # self.gripper_id = rospy.get_param('gripper_id')
+    # self.gripper_id = rospy.get_param('gripper_id')        goal.direction = "tighten"
+
     # self.tray_id = rospy.get_param('tray_id')
     
     #subscribe to gripper position
@@ -356,12 +357,19 @@ class KittingClass(O2ASBaseRoutines):
     if not self.use_real_robot:
       return True
     
-    goal = SuctionControlGoal()
-    goal.fastening_tool_name = "suction_tool"
-    goal.turn_suction_on = turn_suction_on
-    goal.eject_screw = False
+    goal_vac = SuctionControlGoal()
+    goal_vac.fastening_tool_name = "suction_tool"
+    goal_vac.turn_suction_on = turn_suction_on
+    goal_vac.eject_screw = False
     self._suction.send_goal(goal)
     self._suction.wait_for_result()
+    if not turn_suction_on:
+      goal_blow = SuctionControlGoal()
+      goal_blow.fastening_tool_name = "suction_tool"
+      goal_blow.turn_suction_on = turn_suction_on
+      goal_blow.eject_screw = True
+      self._suction.send_goal(goal)
+      self._suction.wait_for_result()
     return self._suction.get_result()
 
   def pick_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link="b_bot_suction_tool_tip_link"):
