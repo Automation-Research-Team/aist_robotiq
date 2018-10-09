@@ -102,7 +102,7 @@ class KittingClass(O2ASBaseRoutines):
     # Image Publisher for monitoring    
     self.bridge = CvBridge()
 
-    self.img_innner_pick_topic = "kitting/img_w_goal_pose" 
+    self.img_innner_pick_topic = "o2as_monitor/vision_res" 
     self.img_innner_pick_pub = rospy.Publisher(self.img_innner_pick_topic, Image, latch=True, queue_size=10)
     self.current_img_w_goal = Image()
     self.current_img_w_blob = Image()
@@ -117,8 +117,10 @@ class KittingClass(O2ASBaseRoutines):
     self.cameraMatK = np.array([[461.605774, 0.0, 318.471497],
                            [0.0, 461.605804, 180.336258],
                            [0.0, 0.0, 1.0]])
-
-
+    #For phoxi in omron
+    self.cameraPhoxiMatK = np.array([[2226.52477235, 0.0, 978.075053258],
+                           [0.0, 2226.52477235, 775.748572147],
+                           [0.0, 0.0, 1.0]])
 
     self.initial_setup()
     rospy.sleep(.5)
@@ -138,6 +140,12 @@ class KittingClass(O2ASBaseRoutines):
     self.bin_2_length = .04
     self.bin_3_width = .10
     self.bin_3_length = .07
+
+    # Used to prepare the suction place poses (because the UR linear driver goes through a singularity sometimes)
+    self.joints_above_set_1_tray_2 = [0.6957670450210571, -1.5090416113482874, 1.9396471977233887, -0.4243395964251917, 0.7138931751251221, -3.1503987948047083]
+    self.joints_above_set_2_tray_2 = [1.195457935333252, -1.6689851919757288, 2.0958428382873535, -0.4254062811480921, 1.2131953239440918, -3.146900002156393]
+    self.joints_above_set_3_tray_2 = [0.550778865814209, -1.4439471403705042, 1.867344856262207, -0.42732316652406865, -1.0016759077655237, -3.134343926106588]
+    self.joints_above_set_1_tray_1 = [1.333075761795044, -1.8985555807696741, 2.2680954933166504, -0.3765481154071253, 2.572127342224121, -3.1496201197253626]
 
     self.grasp_strategy = {
         "part_4" : "suction", 
@@ -316,11 +324,12 @@ class KittingClass(O2ASBaseRoutines):
       above_place_pose.pose.position.z += approach_height + grasp_height
       place_pose.pose.position.z += grasp_height + .05
       
-      rospy.loginfo("Going above tray.")
-      self.move_lin(robot_name, above_place_pose, speed_slow, end_effector_link="b_bot_suction_tool_tip_link")
+      # rospy.loginfo("Going above tray.")
+      # self.move_lin(robot_name, above_place_pose, speed_slow, end_effector_link="b_bot_suction_tool_tip_link")
       rospy.loginfo("Placing in tray.")
       self.move_lin(robot_name, place_pose, speed_slow, end_effector_link="b_bot_suction_tool_tip_link")
       self.suck(False)
+      rospy.sleep(1.0)
       self.move_lin(robot_name, above_place_pose, speed_fast, end_effector_link="b_bot_suction_tool_tip_link")
       return True
     else:
@@ -512,6 +521,93 @@ class KittingClass(O2ASBaseRoutines):
 
     return False
 
+  def mask_bin(self, group_name, bin_id):
+
+    mask_margin = 0.0
+    point_top1 = geometry_msgs.msg.PointStamped()
+    point_top1.header.frame_id = str(bin_id)+"_bottom_front_right_corner"
+    point_top1.point = geometry_msgs.msg.Point(-mask_margin, -mask_margin, 0.0)
+
+    point_top2 = geometry_msgs.msg.PointStamped()
+    point_top2.header.frame_id = str(bin_id)+"_bottom_back_right_corner"
+    point_top2.point = geometry_msgs.msg.Point(mask_margin, -mask_margin, 0.0)
+
+    point_top3 = geometry_msgs.msg.PointStamped()
+    point_top3.header.frame_id = str(bin_id)+"_bottom_back_left_corner"
+    point_top3.point = geometry_msgs.msg.Point(mask_margin, mask_margin, 0.0)
+
+    point_top4 = geometry_msgs.msg.PointStamped()
+    point_top4.header.frame_id = str(bin_id)+"_bottom_front_left_corner"
+    point_top4.point = geometry_msgs.msg.Point(-mask_margin, mask_margin, 0.0)
+
+    #TODO change the fisheye from to the depth frame in casse of offset. but fisheye should e ok since the two images are aligned (depth and rgb) after the real sense node
+    point_top1_cam = self.listener.transformPoint("a_phoxi_m_sensor", point_top1).point
+    point_top2_cam = self.listener.transformPoint("a_phoxi_m_sensor", point_top2).point
+    point_top3_cam = self.listener.transformPoint("a_phoxi_m_sensor", point_top3).point
+    point_top4_cam = self.listener.transformPoint("a_phoxi_m_sensor", point_top4).point
+
+
+    #print("point_top1_cam")
+    #print(point_top1_cam)
+    #print("point_top2_cam")
+    #print(point_top2_cam)
+    #print("point_top3_cam")
+    #print(point_top3_cam)
+    #print("point_top4_cam")
+    #print(point_top4_cam)
+
+    #point_test_center_cam = geometry_msgs.msg.Point(0, 0, 0.4)
+    #print(point_test_center_cam)
+
+    #TODO project the 4 points in the depth plane (which projection matrix to use from the camera)
+    #projection matrix
+    #554.3827128226441, 0.0, 320.5, 0.0, 554.3827128226441, 240.5, 0.0, 0.0, 1.0    
+    #
+    #P: [554.3827128226441, 0.0, 320.5, -38.80678989758509, 0.0, 554.3827128226441, 240.5, 0.0, 0.0, 0.0, 1.0, 0.0]
+    #TODO take the parameters from the /camera_info topic instead
+
+
+
+    point_top1_cam_np = np.array([point_top1_cam.x, point_top1_cam.y, point_top1_cam.z])   
+    point_top2_cam_np = np.array([point_top2_cam.x, point_top2_cam.y, point_top2_cam.z])   
+    point_top3_cam_np = np.array([point_top3_cam.x, point_top3_cam.y, point_top3_cam.z])   
+    point_top4_cam_np = np.array([point_top4_cam.x, point_top4_cam.y, point_top4_cam.z])   
+    #used to test the projection
+    #point_test_center_cam_np = np.array([point_test_center_cam.x, point_test_center_cam.y, point_test_center_cam.z])   
+    
+    #need the camera parameter of the phoxy
+      
+    point_top1_img_np = self.cameraPhoxiMatK.dot(point_top1_cam_np)
+    point_top2_img_np = self.cameraPhoxiMatK.dot(point_top2_cam_np)
+    point_top3_img_np = self.cameraPhoxiMatK.dot(point_top3_cam_np)
+    point_top4_img_np = self.cameraPhoxiMatK.dot(point_top4_cam_np)
+    #point_test_center_img_np = self.cameraMatK.dot(point_test_center_cam_np) 
+
+    #print(point_top1_img_np)
+    #print(point_top2_img_np)
+    #print(point_top3_img_np)
+    #print(point_top4_img_np)
+    #print(point_test_center_img_np)
+
+    in_polygon = Polygon()
+    in_polygon.points = [Point32(point_top1_img_np[0]/point_top1_img_np[2],point_top1_img_np[1]/point_top1_img_np[2],0),
+                    Point32(point_top2_img_np[0]/point_top2_img_np[2],point_top2_img_np[1]/point_top2_img_np[2],0),
+                    Point32(point_top3_img_np[0]/point_top3_img_np[2],point_top3_img_np[1]/point_top3_img_np[2],0),
+                    Point32(point_top4_img_np[0]/point_top4_img_np[2],point_top4_img_np[1]/point_top4_img_np[2],0)]
+
+    polygon = [ (in_polygon.points[0].x,in_polygon.points[0].y),
+                    (in_polygon.points[1].x,in_polygon.points[1].y),
+                    (in_polygon.points[2].x,in_polygon.points[2].y),
+                    (in_polygon.points[3].x,in_polygon.points[3].y)]
+
+
+    mask_img = ImagePIL.new('L', (2064,1544), 0)
+    ImageDrawPIL.Draw(mask_img).polygon(polygon, outline = 1, fill = 255)
+    mask_image_np = np.array(mask_img)
+    namefile = "mask_phoxi_"+str(bin_id)+".png"
+    mask_img.save(namefile,'PNG')
+
+
   def view_bin(self, group_name, bin_id, part_id, speed_fast = 1.0, speed_slow = 1.0, bin_eff_height = 0.2, bin_eff_xoff = 0, bin_eff_deg_angle = 20,end_effector_link = ""):
     # TODO: adjust the x,z and end effector orientatio for optimal view of the bin to use with the  \search_grasp service
     goal_pose = geometry_msgs.msg.PoseStamped()
@@ -520,11 +616,6 @@ class KittingClass(O2ASBaseRoutines):
     goal_pose.pose.position.y = -.05
     goal_pose.pose.position.z = bin_eff_height - .12
 
-    #goal orientation for a_bot_camera_depth_frame 
-    #goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2 + 20*pi/180, 0))
-    #res = self.go_to_pose_goal(group_name, goal_pose, speed_slow, "a_bot_camera_depth_frame")
-    #goal orientation for gripper
-    #    goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2 + 20*pi/180, 0))
     goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi/2, 0))
     res = self.move_lin(group_name, goal_pose, speed_slow, end_effector_link="")
     if not res:
@@ -561,15 +652,6 @@ class KittingClass(O2ASBaseRoutines):
     point_top4_cam = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", point_top4).point
 
 
-    #print("point_top1_cam")
-    #print(point_top1_cam)
-    #print("point_top2_cam")
-    #print(point_top2_cam)
-    #print("point_top3_cam")
-    #print(point_top3_cam)
-    #print("point_top4_cam")
-    #print(point_top4_cam)
-
     #point_test_center_cam = geometry_msgs.msg.Point(0, 0, 0.4)
     #print(point_test_center_cam)
 
@@ -579,7 +661,6 @@ class KittingClass(O2ASBaseRoutines):
     #
     #P: [554.3827128226441, 0.0, 320.5, -38.80678989758509, 0.0, 554.3827128226441, 240.5, 0.0, 0.0, 0.0, 1.0, 0.0]
     #TODO take the parameters from the /camera_info topic instead
-
 
 
     point_top1_cam_np = np.array([point_top1_cam.x, point_top1_cam.y, point_top1_cam.z])   
@@ -595,11 +676,6 @@ class KittingClass(O2ASBaseRoutines):
     point_top4_img_np = self.cameraMatK.dot(point_top4_cam_np)
     #point_test_center_img_np = self.cameraMatK.dot(point_test_center_cam_np) 
 
-    #print(point_top1_img_np)
-    #print(point_top2_img_np)
-    #print(point_top3_img_np)
-    #print(point_top4_img_np)
-    #print(point_test_center_img_np)
 
     mask_polygon = Polygon()
     mask_polygon.points = [Point32(point_top1_img_np[0]/point_top1_img_np[2],point_top1_img_np[1]/point_top1_img_np[2],0),
@@ -628,18 +704,15 @@ class KittingClass(O2ASBaseRoutines):
         distanceToBinCenter = []
         for i in range(len(poseArrayRes.poses)): 
           pointCam = geometry_msgs.msg.PointStamped()
-
           #simulation only
           poseArrayRes.header.frame_id = "a_bot_camera_fisheye_optical_frame"
           pointCam.header = poseArrayRes.header
-          print("pointCam.header")
-          print(pointCam.header)
           pointCam.point = poseArrayRes.poses[i].position
           pointBin = self.listener.transformPoint(bin_id, pointCam).point
           distanceToBinCenter.append(math.sqrt(pointBin.x*pointBin.x + pointBin.y*pointBin.y))
         minPoseIndex = np.argmin(distanceToBinCenter)
-        
-        rospy.loginfo("pose closest to the bin center in the xy plane")
+         
+        rospy.loginfo("point closest to the bin center in the xy plane")
         rospy.loginfo(poseArrayRes.poses[minPoseIndex])
 
         #Transform point from camera reference to bin reference
@@ -669,30 +742,6 @@ class KittingClass(O2ASBaseRoutines):
     #TODO if nothing is detected move the camera a bit to try to detect somethin
         return False      
 
-
-
-    #mask_img = Image.new('L', (640,480), 0)
-    #ImageDraw.Draw(mask_img).polygon(mask_polygon, outline = 1, fill = 255)
-    #mask_image_np = np.array(mask_img)
-    #namefile = "mask_"+str(bin_id)+".png"
-    #mask_img.save(namefile,'PNG')
-
-
-    #used to do the bitwise comparison between the mask and the original image
-    #mask = Image.new('RGB', (640,480), 255)
-    #ImageDraw.Draw(mask).polygon(polygon, outline = 1, fill = 1)
-    #mask_np = np.array(mask)
- 
-    #img_original = Image.open("bin_origin.png")
-    #img_original_np = np.array(img_original)
- 
-    #img_res_np = np.bitwise_and(mask_np, img_original_np)
-    #img_res = Image.fromarray(np.uint8(img_res_np)) 
-    #img_res.save('mask_original_bin.png','PNG')
-
-
-    #    point_top1_cam = t.transformPoint("a_bot_camera_depth_frame", point_top1)
-    #    point_top1_cam = t.transformPoint(point_top4.header.frame_id, point_top1)
   def draw_point3D_after_view_bin(self, pointPartCam):
         ### Project the goal on the image plane using the camera matrix like for the mask
         #Transform Point in camera reference
@@ -935,7 +984,7 @@ class KittingClass(O2ASBaseRoutines):
         elif item.part_id == 18:
           self.screws_done["m3"] = False
     if not self.screws_done["m4"] or not self.screws_done["m3"]:
-      if (rospy.Time.now() - self.screw_delivery_time) > rospy.Duration(180):
+      if (rospy.Time.now() - self.screw_delivery_time) > rospy.Duration(1):  #180
         self.go_to_named_pose("back", "a_bot")
         self.go_to_named_pose("back", "b_bot")
         for screw_size in [4,3]:
@@ -1023,13 +1072,15 @@ class KittingClass(O2ASBaseRoutines):
         res_view_bin = self.view_bin(robot_name, item.bin_name, item.part_id)    
         if res_view_bin:
           pick_pose = res_view_bin
+          pick_pose.pose.position.z -= .01
       if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
         self.go_to_named_pose("suction_ready_back", "b_bot")
         # phoxi_res = self.get_grasp_position_from_phoxi(item, not self.has_scene_image)
         # if phoxi_res:
-        #   self.has_scene_image = True
-        #   pick_poses = phoxi_res
-        pick_pose = pick_poses.pop(0)
+          # self.has_scene_image = True
+          # pick_poses = phoxi_res
+        if pick_poses:
+          pick_pose = pick_poses.pop(0)
         self.go_to_named_pose("suction_pick_ready", "b_bot")
       
         # Orientation needs to be adjusted for suction tool
@@ -1040,6 +1091,8 @@ class KittingClass(O2ASBaseRoutines):
           pick_pose.pose.orientation = self.suction_orientation_from_45
       else:   # Precision_gripper, robotiq_gripper
         pick_pose.pose.orientation = self.downward_orientation
+      if item.part_id == 6: # Belt
+        pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
         
       
       approach_height = 0.08
@@ -1071,44 +1124,58 @@ class KittingClass(O2ASBaseRoutines):
       # Attempt to place the item
       place_pose = geometry_msgs.msg.PoseStamped()
       place_pose.header.frame_id = item.target_frame
+      required_intermediate_pose = []
+      
       if item.ee_to_use == "suction":
         # This is inconvenient to set up because the trays are rotated. tray_2s are rotated 180 degrees relative to set_1_tray_1
         if item.set_number == 1:
           if item.target_frame[11] == '1':  # tray 1
-            place_pose.pose.orientation = self.suction_orientation_from_45
+            required_intermediate_pose = "joints_above_set_1_tray_1"
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi*160/180))
           elif item.target_frame[11] == '2':  # tray 2
+            required_intermediate_pose = "joints_above_set_1_tray_2"
             place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
         elif item.set_number == 2:
           if item.target_frame[11] == '1':  # tray 1
             place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0)) 
           elif item.target_frame[11] == '2':  # tray 2
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/4+pi))
+            required_intermediate_pose = "joints_above_set_2_tray_2"
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
         elif item.set_number == 3:
           if item.target_frame[11] == '1':  # tray 1
             place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi*30/180)) 
           elif item.target_frame[11] == '2':  # tray 2
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, +pi))
+            required_intermediate_pose = "joints_above_set_3_tray_2"
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
         if not place_pose.pose.orientation.w and not place_pose.pose.orientation.x and not place_pose.pose.orientation.y:
           rospy.logerr("SOMETHING WENT WRONG, ORIENTATION IS NOT ASSIGNED")
       else:   # Precision_gripper, robotiq_gripper
         place_pose.pose.orientation = self.downward_orientation
-      if item.part_id == 6:
-        place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
       
       approach_height = .05
       if "precision_gripper" in item.ee_to_use:
         self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=.2)
         approach_height = .03
       elif item.ee_to_use == "suction":
+        if required_intermediate_pose:
+          rospy.loginfo("about to go to intermediate pose: " + required_intermediate_pose)
+          raw_input()
+          rospy.loginfo("Going to intermediate pose")
+          self.go_to_named_pose(required_intermediate_pose, "b_bot", speed=.2)
+          # self.groups["b_bot"].set_joint_value_target(required_intermediate_pose)
+          # self.groups["b_bot"].set_max_velocity_scaling_factor(.5)
+          # self.groups["b_bot"].go(wait=True)
+          rospy.loginfo("Done")
+          raw_input()
         # Approach the place pose with controlled acceleration value
         rospy.loginfo("Approaching place pose")
         if item.set_number in [2,3] and item.target_frame[11] == '1':  # Tray 1
           self.go_to_named_pose("suction_pick_ready", "b_bot", speed=.1)
           self.go_to_named_pose("suction_place_intermediate_pose_for_sets_2_and_3", "b_bot", speed=.1)
         self.force_moveit_linear_motion = True
-        place_pose.pose.position.z += .1
+        place_pose.pose.position.z += .08
         self.move_lin(robot_name, place_pose, speed = 0.1, acceleration = 0.08, end_effector_link = "b_bot_suction_tool_tip_link")
-        place_pose.pose.position.z -= .1
+        place_pose.pose.position.z -= .08
       
       self.place(robot_name, place_pose,grasp_height=item.dropoff_height,
                     speed_fast = 0.2, speed_slow = 0.02, gripper_command=gripper_command, approach_height = approach_height)
@@ -1152,13 +1219,14 @@ class KittingClass(O2ASBaseRoutines):
     for item in self.screw_items:
       if rospy.is_shutdown():
         break
-      item.in_feeder=True  # HARD DEBUG
-      # self.pick_screw_from_bin_and_put_into_feeder(item)
+      # item.in_feeder = True   # Used to skip the screws and enable the feeder pickup
+      self.pick_screw_from_bin_and_put_into_feeder(item, 10)
       # self.pick_screw_with_precision_gripper(item.bin_name, screw_size= 4)
       self.go_to_named_pose("home", "a_bot")
     self.go_to_named_pose("back", "a_bot")
-    screw_delivery_time = rospy.Time.now()
-    # TODO: Add an "in_feeder" flag to each screw so it can fail safely.
+    self.screw_delivery_time = rospy.Time.now()
+
+    rospy.sleep(5)
 
     for item in self.suction_items:
       if rospy.is_shutdown():
@@ -1174,7 +1242,7 @@ class KittingClass(O2ASBaseRoutines):
       if rospy.is_shutdown():
         break
       self.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
-      self.attempt_item(item)
+      self.attempt_item(item, 3)
     self.go_to_named_pose("back", "a_bot")
 
     self.treat_screws()
@@ -1183,7 +1251,7 @@ class KittingClass(O2ASBaseRoutines):
       self.go_to_named_pose("home", "b_bot")
       if rospy.is_shutdown():
         break
-      self.attempt_item(item)
+      self.attempt_item(item, 3)
     self.go_to_named_pose("back", "b_bot")
 
     self.treat_screws()
@@ -1276,6 +1344,8 @@ if __name__ == '__main__':
       rospy.loginfo("Enter 61 to hand over screw from a_bot to c_bot.")
       rospy.loginfo("Enter 62 to move robots back.")
       rospy.loginfo("Enter 71, 72... to test phoxi on item 1, 2...")
+      rospy.loginfo("Enter 81, 82... to move b_bot suction to trays...")
+      rospy.loginfo("Enter 91, 92... to do view_bin on bin1_1, bin1_2...")
       rospy.loginfo("Enter START to start the task.")
       rospy.loginfo("Enter x to exit.")
       i = raw_input()
@@ -1305,8 +1375,51 @@ if __name__ == '__main__':
         item = kit.ordered_items[int(i)-71]
         rospy.loginfo("Checking for item id " + str(item.part_id) + " in " + item.bin_name)
         obj_pose = kit.get_grasp_position_from_phoxi(item)
+      elif i == "80":
+        kit.go_to_named_pose("suction_pick_ready", "b_bot")
+      elif i in ["81", "82", "83", "84"]:
+        place_pose = geometry_msgs.msg.PoseStamped()
+        if i == "81":
+          place_pose.header.frame_id = "set_1_tray_2_partition_4"
+        elif i == "82":
+          place_pose.header.frame_id = "set_2_tray_2_partition_4"
+        elif i == "83":
+          place_pose.header.frame_id = "set_3_tray_2_partition_4"
+        elif i == "84":
+          place_pose.header.frame_id = "set_1_tray_1_partition_3"
+        
+        if place_pose.header.frame_id[4] == "1":
+          if place_pose.header.frame_id[11] == '1':  # tray 1
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi*160/180))
+          elif place_pose.header.frame_id[11] == '2':  # tray 2
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
+        elif place_pose.header.frame_id[4] == "2":
+          if place_pose.header.frame_id[11] == '1':  # tray 1
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0)) 
+          elif place_pose.header.frame_id[11] == '2':  # tray 2
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
+        elif place_pose.header.frame_id[4] == "3":
+          if place_pose.header.frame_id[11] == '1':  # tray 1
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi)) 
+          elif place_pose.header.frame_id[11] == '2':  # tray 2
+            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, +pi))
 
-        rospy.loginfo(obj_pose)
+
+        place_pose.pose.position.z = .08
+        kit.move_lin("b_bot", place_pose, .1, end_effector_link="b_bot_suction_tool_tip_link")
+      elif i in ["91", "92", "93", "94", "95"]:
+        if i == "91":
+          part_id = 16
+        elif i == "92":
+          part_id = 9
+        elif i == "93":
+          part_id = 15
+        elif i == "94":
+          part_id = 17
+        elif i == "95":
+          part_id = 18
+
+        kit.view_bin("a_bot", "bin1_" + i[1], part_id)
       elif i == "x":
         break
       

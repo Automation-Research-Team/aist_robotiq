@@ -147,7 +147,7 @@
   <joint name="a_bot_cam_holder_joint" type="fixed">
     <parent link="a_bot_wrist_2_link" />
     <child  link="a_bot_cam_holder_link" />
-    <origin xyz="0.0 -0.06 ${0.09465 + .13}" rpy="0.0 0.0 ${pi/2}" />
+    <origin xyz="0.04 -0.06 0.20" rpy="${12*pi/180} 0.0 ${pi/2}" />
   </joint>
   <xacro:sensor_d435 prefix="a_bot_" parent="a_bot_cam_holder_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>

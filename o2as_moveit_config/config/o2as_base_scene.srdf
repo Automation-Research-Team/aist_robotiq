@@ -320,6 +320,38 @@
         <joint name="a_bot_wrist_2_joint" value="-1.9116" />
         <joint name="a_bot_wrist_3_joint" value="1.5707" />
     </group_state>
+    <group_state name="joints_above_set_1_tray_2" group="b_bot">
+        <joint name="b_bot_elbow_joint" value="1.93965" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.5088" />
+        <joint name="b_bot_shoulder_pan_joint" value="0.695767" />
+        <joint name="b_bot_wrist_1_joint" value="-0.42434" />
+        <joint name="b_bot_wrist_2_joint" value="0.713893" />
+        <joint name="b_bot_wrist_3_joint" value="-3.1504" />
+    </group_state>
+    <group_state name="joints_above_set_2_tray_2" group="b_bot">
+        <joint name="b_bot_elbow_joint" value="2.0958" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.66898" />
+        <joint name="b_bot_shoulder_pan_joint" value="1.19546" />
+        <joint name="b_bot_wrist_1_joint" value="-0.425406" />
+        <joint name="b_bot_wrist_2_joint" value="1.2132" />
+        <joint name="b_bot_wrist_3_joint" value="-3.1469" />
+    </group_state>
+    <group_state name="joints_above_set_3_tray_2" group="b_bot">
+        <joint name="b_bot_elbow_joint" value="1.8673" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.44394" />
+        <joint name="b_bot_shoulder_pan_joint" value="0.550778" />
+        <joint name="b_bot_wrist_1_joint" value="-0.427323" />
+        <joint name="b_bot_wrist_2_joint" value="-1.00168" />
+        <joint name="b_bot_wrist_3_joint" value="-3.13434" />
+    </group_state>
+    <group_state name="joints_above_set_1_tray_1" group="b_bot">
+        <joint name="b_bot_elbow_joint" value="2.2681" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.89855" />
+        <joint name="b_bot_shoulder_pan_joint" value="1.33308" />
+        <joint name="b_bot_wrist_1_joint" value="-0.376548" />
+        <joint name="b_bot_wrist_2_joint" value="2.5721" />
+        <joint name="b_bot_wrist_3_joint" value="-3.14962" />
+    </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="c_bot_gripper" parent_link="c_bot_robotiq_85_tip_link" group="c_bot" />
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->

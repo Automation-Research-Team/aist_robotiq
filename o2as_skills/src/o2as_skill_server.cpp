@@ -628,7 +628,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
       ps_approach.pose.position.z = .052;
     if (screw_tool_id == "suction_tool")
     {
-      ps_approach.pose.position.x = -.07;
+      ps_approach.pose.position.x = -.12;
       ps_approach.pose.position.z = .03;
     }
 
