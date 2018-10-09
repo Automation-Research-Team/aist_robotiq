@@ -473,9 +473,7 @@ class KittingClass(O2ASBaseRoutines):
         success_pick = True
     
     above_handover_joint_pose = [1.3983707427978516, -1.343994442616598, 2.048433780670166, -4.056087795888082, -1.9765618483172815, 1.4695862531661987]
-    self.groups["a_bot"].set_joint_value_target(above_handover_joint_pose)
-    self.groups["a_bot"].set_max_velocity_scaling_factor(.3)
-    self.groups["a_bot"].go(wait=True)
+    self.move_joints("a_bot", above_handover_joint_pose, speed=.3, force_ur_script=self.use_real_robot)
     self.go_to_named_pose("screw_handover", "a_bot", force_ur_script=self.use_real_robot)
     self.precision_gripper_inner_open_slightly(open_range)
     return True
@@ -928,8 +926,14 @@ class KittingClass(O2ASBaseRoutines):
       bin_width = self.bin_3_length
 
     pick_pose.pose.position.x += -bin_length/2 + random.random()*bin_length
-    pick_pose.pose.position.y += -bin_width/2 + random.random()*bin_width
     pick_pose.pose.orientation = self.downward_orientation
+    if self.bin_is_inclined(item.bin_name):
+      pick_pose.pose.position.y = bin_length-.027
+      pick_pose.pose.position.z = .005
+      if item.part_id in [17,18]:
+        pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    else:
+      pick_pose.pose.position.y += -bin_width/2 + random.random()*bin_width
     return pick_pose
   
   
@@ -1067,7 +1071,7 @@ class KittingClass(O2ASBaseRoutines):
       
       # Attempt to pick the item
       pick_pose = self.get_random_pose_in_bin(item)
-      if item.ee_to_use == "precision_gripper_from_inside":
+      if item.ee_to_use == "precision_gripper_from_inside" and not self.bin_is_inclined(item.bin_name):
         res_view_bin = self.view_bin(robot_name, item.bin_name, item.part_id)    
         if res_view_bin:
           pick_pose = res_view_bin
@@ -1101,6 +1105,9 @@ class KittingClass(O2ASBaseRoutines):
         approach_height = .05
       elif item.ee_to_use == "suction":
         gripper_command = "suction"
+      elif item.ee_to_use = "robotiq_gripper":
+        approach_height = .15
+        gripper_command = ""
       else:
         gripper_command = ""
 
