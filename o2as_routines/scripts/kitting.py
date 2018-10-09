@@ -14,7 +14,8 @@ from o2as_msgs.srv import *
 import actionlib
 from o2as_msgs.msg import *
 # from o2as_usb_relay.srv import *
-from o2as_graspability_estimation.srv import *
+from graspability_estimation.srv import *
+# from o2as_graspability_estimation.srv import *
 from std_msgs.msg import Bool
 
 from o2as_routines.base import O2ASBaseRoutines
@@ -61,6 +62,7 @@ class kitting_order_entry():
     self.tf_listener = tf.TransformListener()
 
     self.has_scene_image = False
+    self.max_candidates_from_phoxi = 5
 
 def clamp(n, minn, maxn):
   """Constrain a number n to the interval [minn, maxn]"""
@@ -75,7 +77,8 @@ class KittingClass(O2ASBaseRoutines):
     
     # params
     # self.bin_id = rospy.get_param('part_bin_list')
-    # self.gripper_id = rospy.get_param('gripper_id')
+    # self.gripper_id = rospy.get_param('gripper_id')        goal.direction = "tighten"
+
     # self.tray_id = rospy.get_param('tray_id')
     
     #subscribe to gripper position
@@ -180,20 +183,6 @@ class KittingClass(O2ASBaseRoutines):
         "part_16": 0.005, 
         "part_17": 0.005, 
         "part_18": 0.005}
-
-    # TODO: Remove this hard-coded assignment
-    self.bin_id_for_graspability_estimation = {
-      "part_7": 1,
-      "part_13": 2,
-      "part_11": 3,
-      "part_8": 4,
-      "part_4": 5,
-      "part_14": 10,
-      "part_17": 7,
-      "part_5": 8,
-      "part_12": 9,
-      "part_9": 6,
-    }
 
     self.part_bin_list = {
       "part_4" : "bin2_1",
@@ -364,12 +353,27 @@ class KittingClass(O2ASBaseRoutines):
     if not self.use_real_robot:
       return True
     
-    goal = SuctionControlGoal()
-    goal.fastening_tool_name = "suction_tool"
-    goal.turn_suction_on = turn_suction_on
-    goal.eject_screw = False
+    goal_vac = SuctionControlGoal()
+    goal_vac.fastening_tool_name = "suction_tool"
+    goal_vac.turn_suction_on = turn_suction_on
+    goal_vac.eject_screw = False
     self._suction.send_goal(goal)
     self._suction.wait_for_result()
+    if not turn_suction_on:
+      goal_blow = SuctionControlGoal()
+      goal_blow.fastening_tool_name = "suction_tool"
+      goal_blow.turn_suction_on = True
+      goal_blow.eject_screw = True
+      self._suction.send_goal(goal)
+      self._suction.wait_for_result()
+      is_blowed = self._suction.get_result()
+      if is_blowed:
+        goal_blow = SuctionControlGoal()
+        goal_blow.fastening_tool_name = "suction_tool"
+        goal_blow.turn_suction_on = False
+        goal_blow.eject_screw = True
+        self._suction.send_goal(goal)
+        self._suction.wait_for_result()
     return self._suction.get_result()
 
   def pick_using_dual_suction_gripper(self, group_name, pose_goal_stamped, speed, end_effector_link="b_bot_suction_tool_tip_link"):
@@ -966,29 +970,33 @@ class KittingClass(O2ASBaseRoutines):
       return False
     if resp_search_grasp:
       if resp_search_grasp.success:
-        object_position = geometry_msgs.msg.PointStamped()
-        object_position.header.frame_id = "a_phoxi_m_sensor"
-        object_position.point = geometry_msgs.msg.Point(
-          resp_search_grasp.pos3D[0].x, 
-          resp_search_grasp.pos3D[0].y, 
-          resp_search_grasp.pos3D[0].z)
-        # TODO We should talk about how to use rotiqz which the two_finger approaches.
-        rospy.logdebug("\nGrasp point in %s: (x, y, z) = (%f, %f, %f)", 
+        poses_in_bin = list()
+        pose0 = geometry_msgs.msg.PoseStamped()
+        pose0.header.frame_id = "a_phoxi_m_sensor"
+        pose_candidates_number = self.max_candidates_from_phoxi if resp_search_grasp.result_num > self.max_candidates_from_phoxi else resp_search_grasp.result_num
+        for i in range(pose_candidates_number):
+          object_position = copy.deepcopy(pose0)
+          object_position.point = geometry_msgs.msg.Point(
+          resp_search_grasp.pos3D[i].x, 
+          resp_search_grasp.pos3D[i].y, 
+          resp_search_grasp.pos3D[i].z)
+          # TODO We should talk about how to use rotiqz which the two_finger approaches.
+          rospy.logdebug("\nGrasp point in %s: (x, y, z) = (%f, %f, %f)", 
           object_position.header.frame_id, 
           object_position.point.x, 
           object_position.point.y, 
           object_position.point.z)
-        
-        obj_pose_in_camera = geometry_msgs.msg.PoseStamped()
-        obj_pose_in_camera.header = object_position.header
-        obj_pose_in_camera.pose.position = object_position.point
-        obj_pose_in_camera.pose.orientation.w = 1.0
-        # pose_in_bin = geometry_msgs.msg.PoseStamped()
-        # pose_in_bin.header.frame_id = item.bin_name
-        pose_in_bin = self.listener.transformPose(item.bin_name, obj_pose_in_camera)
-        pose_in_bin.pose.orientation = self.downward_orientation
+          obj_pose_in_camera = geometry_msgs.msg.PoseStamped()
+          obj_pose_in_camera.header = object_position.header
+          obj_pose_in_camera.pose.position = object_position.point
+          obj_pose_in_camera.pose.orientation.w = 1.0
+          # pose_in_bin = geometry_msgs.msg.PoseStamped()
+          # pose_in_bin.header.frame_id = item.bin_name
+          pose_in_bin = self.listener.transformPose(item.bin_name, obj_pose_in_camera)
+          pose_in_bin.pose.orientation = self.downward_orientation
+          poses_in_bin.append(pose_in_bin)
         self.publish_marker(pose_in_bin, "aist_vision_result")
-        return pose_in_bin
+        return poses_in_bin
     else:
       rospy.loginfo("Could not find a pose via phoxi.")
       return False
@@ -1087,6 +1095,12 @@ class KittingClass(O2ASBaseRoutines):
       robot_name = "b_bot"
       # end_effector_link = "b_bot_suction_tool_tip_link"
 
+    if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
+        phoxi_res = self.get_grasp_position_from_phoxi(item, not self.has_scene_image)
+        if phoxi_res:
+          self.has_scene_image = True
+          pick_poses = phoxi_res
+
     attempts = 0
     while attempts < max_attempts and not rospy.is_shutdown():
       attempts += 1
@@ -1101,12 +1115,14 @@ class KittingClass(O2ASBaseRoutines):
           pick_pose = res_view_bin
           pick_pose.pose.position.z -= .01
       if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
-        # self.go_to_named_pose("suction_ready_back", "b_bot")
+        self.go_to_named_pose("suction_ready_back", "b_bot")
         # phoxi_res = self.get_grasp_position_from_phoxi(item, not self.has_scene_image)
         # if phoxi_res:
-        #   self.has_scene_image = True
-        #   pick_pose = phoxi_res
-        # self.go_to_named_pose("suction_pick_ready", "b_bot")
+          # self.has_scene_image = True
+          # pick_poses = phoxi_res
+        if pick_poses:
+          pick_pose = pick_poses.pop(0)
+        self.go_to_named_pose("suction_pick_ready", "b_bot")
       
         # Orientation needs to be adjusted for suction tool
         pick_point_on_table = self.listener.transformPose("workspace_center", pick_pose).pose.position
@@ -1355,6 +1371,19 @@ class KittingClass(O2ASBaseRoutines):
       rospy.loginfo("STOPPED THE TASK")
     return
 
+    def suck_attachment_test(self):
+      rospy.loginfo("Enter to test suck on...")
+      raw_input()
+      if not self.suck(True):
+        rospy.logerr("The procedure to pick was failed.")
+        return
+      rospy.loginfo("Enter to test suck off...")
+      raw_input()
+      if not self.suck(False):
+        rospy.logerr("The procedure to place was failed.")
+        return
+      rospy.loginfo("Procedures to pick and place is succeeded!")
+
 if __name__ == '__main__':
   try:
     kit = KittingClass()
@@ -1363,8 +1392,7 @@ if __name__ == '__main__':
       rospy.loginfo("Enter 1 to equip suction tool.")
       rospy.loginfo("Enter 11 to unequip suction tool.")
       rospy.loginfo("Enter 2 to move the robots home to starting positions.")
-      rospy.loginfo("Enter 3 to pick with b_bot using suction tool.")
-      rospy.loginfo("Enter 4 to place with b_bot using suction tool.")
+      rospy.loginfo("Enter 3 to suction attachment test with b_bot using suction tool.")
       rospy.loginfo("Enter 60 to pick screw from bin with a_bot.")
       rospy.loginfo("Enter 61 to hand over screw from a_bot to c_bot.")
       rospy.loginfo("Enter 62 to move robots back.")
@@ -1383,9 +1411,8 @@ if __name__ == '__main__':
         kit.go_to_named_pose("back", "c_bot", force_ur_script=kit.use_real_robot)
         kit.go_to_named_pose("suction_ready_back", "b_bot", force_ur_script=kit.use_real_robot)
       elif i == '3':
-        kit.pick_suction_test()
-      elif i == '4':
-        kit.place_suction_test()
+        rospy.loginfo("Checking suction attachment procedures")
+        kit.suck_attachment_test()
       elif i == 'START' or i == 'start' or i == '5000':
         kit.kitting_task()
       elif i == "60":
