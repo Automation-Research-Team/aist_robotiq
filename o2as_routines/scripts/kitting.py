@@ -665,10 +665,10 @@ class KittingClass(O2ASBaseRoutines):
     point_top4.point = geometry_msgs.msg.Point(-mask_margin, mask_margin, 0.0)
 
     #TODO change the fisheye from to the depth frame in casse of offset. but fisheye should e ok since the two images are aligned (depth and rgb) after the real sense node
-    point_top1_cam = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", point_top1).point
-    point_top2_cam = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", point_top2).point
-    point_top3_cam = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", point_top3).point
-    point_top4_cam = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", point_top4).point
+    point_top1_cam = self.listener.transformPoint("a_bot_camera_calibrated_frame_link", point_top1).point
+    point_top2_cam = self.listener.transformPoint("a_bot_camera_calibrated_frame_link", point_top2).point
+    point_top3_cam = self.listener.transformPoint("a_bot_camera_calibrated_frame_link", point_top3).point
+    point_top4_cam = self.listener.transformPoint("a_bot_camera_calibrated_frame_link", point_top4).point
 
 
     #point_test_center_cam = geometry_msgs.msg.Point(0, 0, 0.4)
@@ -724,7 +724,7 @@ class KittingClass(O2ASBaseRoutines):
         for i in range(len(poseArrayRes.poses)): 
           pointCam = geometry_msgs.msg.PointStamped()
           #simulation only
-          poseArrayRes.header.frame_id = "a_bot_camera_fisheye_optical_frame"
+          poseArrayRes.header.frame_id = "a_bot_camera_calibrated_frame_link"
           pointCam.header = poseArrayRes.header
           pointCam.point = poseArrayRes.poses[i].position
           pointBin = self.listener.transformPoint(bin_id, pointCam).point
@@ -765,7 +765,7 @@ class KittingClass(O2ASBaseRoutines):
         ### Project the goal on the image plane using the camera matrix like for the mask
         #Transform Point in camera reference
         point3D_to_draw = geometry_msgs.msg.PointStamped()
-        point3D_to_draw  = self.listener.transformPoint("a_bot_camera_fisheye_optical_frame", pointPartCam)
+        point3D_to_draw  = self.listener.transformPoint("a_bot_camera_calibrated_frame_link", pointPartCam)
         #Copy the results
 
         # Project the point to the camera plane
