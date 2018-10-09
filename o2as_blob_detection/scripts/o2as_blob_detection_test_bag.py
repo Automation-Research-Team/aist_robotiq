@@ -21,10 +21,8 @@ import actionlib
 import o2as_msgs.msg
 from geometry_msgs.msg import PoseArray, Pose 
 
-import rospkg
-
-from o2as_blob_detection.cfg import o2asBlobDetectionConfig
-from dynamic_reconfigure.server import Server
+from dynamic_reconfigure.server import Server as ServerDynamicReconfigure
+from o2as_blob_detection.cfg import O2asBlobDetectionConfig
 
 
 class BlobDetectionTestBag(object):
@@ -56,8 +54,41 @@ class BlobDetectionTestBag(object):
         # Subscriber
         rospy.Subscriber(self.image_topic, Image, self.image_callback)
 
+        # Dynamic reconfigure
+        srv = ServerDynamicReconfigure(O2asBlobDetectionConfig, callbackDynamicReconfigure)
+   
+        self.minThreshold = 100
+        self.maxThreshold = 400
+    
+        # Filter by color
+        self.filterByColor = True
+        self.blobColor = 0
+    
+        # Filter by size of the blob.
+        self.filterByArea = True
+        self.minArea = 20
+        self.maxArea = 150
+    
+        # Filter by Circularity
+        self.filterByCircularity = True
+        self.minCircularity = 0.7
+    
+        # Filter by Convexity
+        self.filterByConvexity = False
+        self.minConvexity = 0.87
+    
+        # Filter by Inertia
+        self.filterByInertia = False
+        self.minInertiaRatio = 0.01
+
 
     # Callback
+
+    def callbackDynamicReconfigure(config, level):
+        rospy.loginfo("""Reconfigure Request: {min_threshold_param}""".format(**config))
+        return config
+
+
     def image_callback(self, msg_in):
       # Convert the image to be used wit OpenCV library
       self.current_image = copy.deepcopy(msg_in)
