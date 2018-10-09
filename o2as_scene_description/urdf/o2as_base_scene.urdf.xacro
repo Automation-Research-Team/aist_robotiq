@@ -172,7 +172,7 @@
   <joint name="a_bot_camera_calibrated_frame_joint" type="fixed">
     <parent link="a_bot_wrist_2_link" />
     <child  link="a_bot_camera_calibrated_frame_link" />
-    <origin xyz="-0.00742849565969 -0.055347079996 0.196043734813" rpy="-1.517 -0.015 -0.014" />
+    <origin xyz="-0.00584875065097 -0.0601140904909 0.190359410313" rpy="-1.631 -0.020 -0.016" />
   </joint>
   <!-- <xacro:sensor_d435 prefix="d_bot_" parent="o2as_ground">
     <origin xyz="0 0 ${bots_z + 0.9}" rpy="0 ${pi/2} 0"/>

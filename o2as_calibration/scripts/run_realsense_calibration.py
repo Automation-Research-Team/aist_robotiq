@@ -63,12 +63,19 @@ poses_a_bot_ueshiba = [
 
 poses_a_bot_felix = []
 print("adding poses")
-for pitch in [70, 90, 110]:
-  for yaw in [70, 90, 110]:
-    for x in [-0.1, -.05, 0, 0.05, .1]:
-      for y in [-.2, -0.1, 0, .05]:
-        poses_a_bot_felix.append([x, y, .2, radians(90), radians(pitch), radians(yaw)])
-        print([x, y, .2, radians(90), radians(pitch), radians(yaw)])
+for pitch in [70, 110]:
+  for yaw in [70, 110]:
+    for z in [.2, .4]:
+      for x in [-0.1, 0, .1]:
+        for y in [-.15, -.05, .05]:
+          if pitch == 70 and y > 0:
+            continue
+          if z == .2 and y > 0:
+            continue
+          if pitch == 110 and y < -0.1:
+            continue
+          poses_a_bot_felix.append([x, y, z, radians(180), radians(pitch), radians(yaw)])
+          print(poses_a_bot_felix[-1].)
 
 
 # Initial poses are independent on cameras
@@ -143,7 +150,7 @@ class CalibrationCommander(object):
     if rob is not None and opt is not None:
       print("rob: " + str(rob))
       print("opt: " + str(opt))
-      raw_input("marker is detected.")
+      # raw_input("marker is detected.")
       return {'robot': rob, 'optical': opt}
     return None
 
@@ -186,8 +193,8 @@ class CalibrationCommander(object):
       elif group_name == "a_bot":
         end_effector_link = "a_bot_gripper_tip_link"
 
-    print ("Going to (move_lin) with ee " + end_effector_link)
-    print(pose_goal_stamped)
+    rospy.logdebug("Going to (move_lin) with ee " + end_effector_link)
+    rospy.logdebug(pose_goal_stamped)
     self.group.set_end_effector_link(end_effector_link)
     self.group.set_pose_target(pose_goal_stamped)
     rospy.logdebug("Setting velocity scaling to " + str(speed))
@@ -202,8 +209,8 @@ class CalibrationCommander(object):
                                       0.0)         # jump_threshold
     rospy.loginfo("Compute cartesian path succeeded with " + str(fraction*100) + "%")
     plan = self.group.retime_trajectory(self.robot.get_current_state(), plan, speed)
-    print ("pose goal world: ")
-    print(pose_goal_world)
+    rospy.logdebug ("pose goal world: ")
+    rospy.logdebug(pose_goal_world)
 
     plan_success = self.group.execute(plan, wait=True)
     self.group.stop()
@@ -281,7 +288,7 @@ def run_calibration(camera_name, robot_name):
     for pose in poses_a_bot_felix:
       if rospy.is_shutdown():
         break
-      mg.move_ueshiba(pose, speed=.5)
+      mg.move_ueshiba(pose, speed=1.0)
       sample = mg.take_sample()
       if sample is not None:
         samples.append(sample)
