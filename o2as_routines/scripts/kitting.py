@@ -824,7 +824,7 @@ class KittingClass(O2ASBaseRoutines):
     screw_picked = False
     while attempt < attempts:
       self.set_feeder_power(False)
-      self.do_pick_action("c_bot", pose_feeder, screw_size = 4, use_complex_planning = True, tool_name = "screw_tool")
+      self.do_pick_action("c_bot", pose_feeder, screw_size = screw_size, use_complex_planning = True, tool_name = "screw_tool")
       self.set_feeder_power(True)
       bool_msg = Bool()
       try:
