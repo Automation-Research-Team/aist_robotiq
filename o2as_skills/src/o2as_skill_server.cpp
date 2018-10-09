@@ -1390,6 +1390,7 @@ bool SkillServer::placeScrew(
   // - Assume it worked.
   
   // /// The block below is an attempt to put a helper transform into the scene, but too many issues occur with it.
+  // /// The reference frame has to have the x-axis pointing into the screw hole.
   // tf::Transform t;
   // tf::Quaternion q(hole_pose.pose.orientation.x, hole_pose.pose.orientation.y, hole_pose.pose.orientation.z, hole_pose.pose.orientation.w);
   // t.setOrigin(tf::Vector3(hole_pose.pose.position.x, hole_pose.pose.position.y, hole_pose.pose.position.z));
@@ -1429,10 +1430,10 @@ bool SkillServer::placeScrew(
     o2as_msgs::sendScriptToUR srv;
     srv.request.program_id = "spiral_motion";
     srv.request.robot_name = robot_name;
-    srv.request.max_radius = .002;
-    srv.request.radius_increment = .0007;
+    srv.request.max_radius = .005;
+    srv.request.radius_increment = .0015;
     srv.request.theta_increment = 60;
-    srv.request.spiral_axis = "Y";
+    srv.request.spiral_axis = "YZ";
     sendScriptToURClient_.call(srv);
     if (srv.response.success == true)
     {

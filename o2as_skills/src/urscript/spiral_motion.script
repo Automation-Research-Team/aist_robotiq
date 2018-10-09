@@ -7,18 +7,7 @@ def SpiralMotion():
             spiral_axis_y = (spiral_axis=="Y")
             spiral_axis_z = (spiral_axis=="Z")
 
-
-            # spiral_axis_x = False
-            # spiral_axis_y = False
-            # spiral_axis_z = False
-
-            # if (spiral_axis == "X"):
-            #     spiral_axis_x = True
-            # end
-            # if (spiral_axis == "Y"):
-            #     spiral_axis_y = True
-            # if (spiral_axis == "Z"):
-            #     spiral_axis_z = True
+            spiral_axis_yz = (spiral_axis=="YZ")
 
             if (radius_incr < 0.0001) or (radius_incr > 0.005):
                 textmsg("ERROR: radius_incr parameter in m must be between 0.0001 m and .005 m")
@@ -57,6 +46,10 @@ def SpiralMotion():
                     elif (spiral_axis_x):
                         pos[1] = x
                         pos[2] = y
+                    elif (spiral_axis_YZ):
+                        pos[0] = x
+                        pos[1] = -y/1.41
+                        pos[2] = y/1.41
                     end
                     r=r + radius_inc_set
                     RealRadius = sqrt(pow(norm(x),2)+pow(norm(y),2))
