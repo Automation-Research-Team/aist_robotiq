@@ -502,9 +502,9 @@ Simple::get_marker_transform(const aruco::Marker& marker,
 				 corners[2] + corners[3]);
 
   // Compute marker -> reference transfrom.
-    const tf::Transform		transform(tf::Matrix3x3(-p(0), n(0), q(0),
-							-p(1), n(1), q(1),
-							-p(2), n(2), q(2)),
+    const tf::Transform		transform(tf::Matrix3x3(p(0), q(0), n(0),
+							p(1), q(1), n(1),
+							p(2), q(2), n(2)),
 					  tf::Vector3(centroid(0),
 						      centroid(1),
 						      centroid(2)));
@@ -607,6 +607,7 @@ int
 main(int argc, char** argv)
 {
     ros::init(argc, argv, "o2as_single");
+    ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
 
     try
     {

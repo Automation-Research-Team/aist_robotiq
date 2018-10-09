@@ -35,6 +35,7 @@ rot         = result_tf.rotation.x, result_tf.rotation.y, \
 orig        = calib.transformation.header.frame_id  # tool or base link
 dest        = calib.transformation.child_frame_id   # tracking_base_frame
 
+# Compute camera optical -> camera_base transformation
 camera_base_frame    = rospy.get_param('camera_base_frame')
 camera_optical_frame = rospy.get_param('camera_optical_frame')
 listener             = TransformListener()

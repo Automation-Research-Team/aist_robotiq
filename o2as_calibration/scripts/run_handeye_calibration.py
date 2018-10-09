@@ -60,6 +60,16 @@ keyposes = {
       [-0.143,  0.424,  0.365, -0.699,  0.559, -0.428]
     ]
   }
+  'a_bot_camera': {
+    'a_bot': [
+      [0.245, 0.3, 0.30, radians(  0), radians(  0), radians(90)],
+      [0.245, 0.3, 0.30, radians(  0), radians( 30), radians(90)],
+      [0.245, 0.3, 0.30, radians( 30), radians( 30), radians(90)],
+      [0.245, 0.3, 0.30, radians( 30), radians(  0), radians(90)],
+      [0.245, 0.3, 0.30, radians(-30), radians(  0), radians(90)],
+      [0.245, 0.3, 0.30, radians(-30), radians( 30), radians(90)],
+    ],
+  }
 }
 
 ######################################################################

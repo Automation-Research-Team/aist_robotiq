@@ -66,6 +66,20 @@ add_dependencies(quat2rpy
   ${catkin_EXPORTED_TARGETS}
 )
 
+add_executable(transformer
+  src/transformer/main.cpp
+)
+
+target_link_libraries(transformer
+  ${catkin_LIBRARIES}
+  ${roscpp_LIBRARIES}
+)
+
+add_dependencies(transformer
+  ${PROJECT_NAME}_gencpp
+  ${catkin_EXPORTED_TARGETS}
+)
+
 #############
 ## Install ##
 #############
@@ -80,7 +94,7 @@ catkin_install_python(
 
 install(
   TARGETS
-    calibrator quat2rpy
+    calibrator quat2rpy transformer
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

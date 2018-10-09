@@ -78,9 +78,13 @@ keyposes = {
   'a_bot_camera': {
     'a_bot': [
       [ 0.00, -0.20, 0.20, radians(90), radians( 70), radians( 90)],
+      [ 0.00, -0.17, 0.20, radians(90), radians( 80), radians( 90)],
       [ 0.00, -0.15, 0.20, radians(90), radians( 90), radians( 90)],
+      [ 0.00, -0.13, 0.20, radians(90), radians(110), radians( 90)],
       [ 0.00, -0.10, 0.20, radians(90), radians(110), radians( 90)],
       [-0.05, -0.15, 0.20, radians(90), radians( 90), radians( 70)],
+      [-0.02, -0.15, 0.20, radians(90), radians( 90), radians( 80)],
+      [ 0.02, -0.15, 0.20, radians(90), radians( 90), radians(100)],
       [ 0.05, -0.15, 0.20, radians(90), radians( 90), radians(110)],
     ]
   }
@@ -267,15 +271,15 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
           n = len(sample_list.samples.hand_world_samples.transforms)
           print("  took {} (hand-world, camera-marker) samples").format(n)
 
-          try:
-            image_msg = rospy.wait_for_message("/a_bot_camera/rgb/image_raw",
-                                               sensor_msgs.msg.Image, 1.0)
-            bridge = CvBridge()
-            cv2_img = bridge.imgmsg_to_cv2(image_msg, "bgr8")
-            cv2.imwrite("camera_image-{}.jpeg".format(self.nimages), cv2_img)
-            self.nimages += 1
-          except CvBridgeError, e:
-            print(e)
+          # try:
+          #   image_msg = rospy.wait_for_message("/a_bot_camera/rgb/image_raw",
+          #                                      sensor_msgs.msg.Image, 1.0)
+          #   bridge = CvBridge()
+          #   cv2_img = bridge.imgmsg_to_cv2(image_msg, "bgr8")
+          #   cv2.imwrite("camera_image-{}.jpeg".format(self.nimages), cv2_img)
+          #   self.nimages += 1
+          # except CvBridgeError, e:
+          #   print(e)
         except rospy.ServiceException as e:
           print "Service call failed: %s"%e
 
@@ -343,7 +347,7 @@ def main():
 
     print("=== Calibration started for {} + {} ===".format(camera_name,
                                                            robot_name))
-    speed      = 1
+    speed      = 0.1
     sleep_time = 1
     routines.run(keyposes[camera_name][robot_name], speed, sleep_time)
     print("=== Calibration completed for {} + {} ===".format(camera_name,

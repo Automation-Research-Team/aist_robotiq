@@ -1,0 +1,7 @@
+sensor_msgs/PointCloud2 cloud
+sensor_msgs/Image image
+uint32 marker_id
+bool use_cloud
+---
+o2as_aruco_marker_detection/Marker marker
+bool success
