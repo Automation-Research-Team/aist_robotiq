@@ -1145,9 +1145,8 @@ if __name__ == '__main__':
       rospy.loginfo("314, 315: Set 1 partitions with suction_tool (b_bot), screw_tool_m4 (c_bot)")
       rospy.loginfo("316 (3161, 3162): Screws in set 1 (2, 3) with screw_tool_m4 (c_bot)")
       rospy.loginfo("317 (3171, 3172): Screws in set 1 (2, 3) with screw_tool_m3 (c_bot)")
-      rospy.loginfo("318, 3181, 3182: Screws in set 1 with a_bot, b_bot, b_bot_suction_tool")
-      rospy.loginfo("318: Tray 1 set 2 partitions with b_bot")
-      rospy.loginfo("319: Tray 1 set 3 partitions with b_bot")
+      rospy.loginfo("318, 3181, 3182: Screws in set 1 with b_bot_suction_tool, b_bot, a_bot")
+      rospy.loginfo("3191, 3192: Tray 1 set 2, 3 partitions with b_bot")
       rospy.loginfo("321, 322, 323: Bins with a_bot, b_bot, suction_tool (b_bot)")
       rospy.loginfo("331, 332, 333: Bin corners with a_bot, b_bot, suction_tool (b_bot)")
       rospy.loginfo("341: Go to check pick pose and save image to file")
@@ -1267,14 +1266,14 @@ if __name__ == '__main__':
       elif r == '3172':
         c.tray_screw_calibration(robot_name="c_bot", end_effector_link="c_bot_screw_tool_m3_tip_link", task="kitting", set_number=3)
       elif r == '318':
-        c.tray_screw_calibration(robot_name="a_bot", task="kitting", set_number=1)
+        c.tray_screw_calibration(robot_name="b_bot", end_effector_link="b_bot_suction_tool_tip_link", task="kitting", set_number=1)
       elif r == '3181':
         c.tray_screw_calibration(robot_name="b_bot", task="kitting", set_number=1)
       elif r == '3182':
-        c.tray_screw_calibration(robot_name="b_bot", end_effector_link="b_bot_suction_tool_tip_link", task="kitting", set_number=1)
-      elif r == '318':
+        c.tray_screw_calibration(robot_name="a_bot", task="kitting", set_number=1)
+      elif r == '3191':
         c.tray_partition_calibration(robot_name="b_bot", set_number=2, tray_number=1)
-      elif r == '319':
+      elif r == '3192':
         c.tray_partition_calibration(robot_name="b_bot", set_number=3, tray_number=1)
       elif r == '321':
         c.bin_calibration(robot_name="a_bot")

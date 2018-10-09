@@ -1432,7 +1432,7 @@ bool SkillServer::placeScrew(
     srv.request.robot_name = robot_name;
     srv.request.max_radius = .005;
     srv.request.radius_increment = .0015;
-    srv.request.theta_increment = 60;
+    srv.request.theta_increment = 40;
     srv.request.spiral_axis = "YZ";
     sendScriptToURClient_.call(srv);
     if (srv.response.success == true)

@@ -45,7 +45,7 @@ class kitting_order_entry():
   """
   Object that tracks if its order was fulfilled, and the number of attempts spent on it.
   """
-  def __init__(self, part_id, set_number, number_in_set, bin_name, target_frame, ee_to_use, item_name, dropoff_height):
+  def __init__(self, part_id, set_number, number_in_set, bin_name, target_frame, ee_to_use, item_name, dropoff_height, bin_is_inclined):
     self.part_id = part_id   # The part id
     self.set_number = set_number
     self.number_in_set = number_in_set
@@ -54,6 +54,7 @@ class kitting_order_entry():
     self.ee_to_use = ee_to_use
     self.item_name = item_name
     self.dropoff_height = dropoff_height
+    self.bin_is_inclined = bin_is_inclined
 
     self.attempts = 0
     self.fulfilled = False
@@ -74,19 +75,12 @@ class KittingClass(O2ASBaseRoutines):
   """
   def __init__(self):
     super(KittingClass, self).__init__()
-    
-    # params
-    # self.bin_id = rospy.get_param('part_bin_list')
-    # self.gripper_id = rospy.get_param('gripper_id')        goal.direction = "tighten"
-
-    # self.tray_id = rospy.get_param('tray_id')
-    
     #subscribe to gripper position
     self._inner_gripper_pos_sub = rospy.Subscriber("o2as_precision_gripper/inner_gripper_motor_pos", std_msgs.msg.Int32, self.update_motorPosition)
     self._motorPos = -1
 
     # services
-    self._feeder_srv = rospy.ServiceProxy("o2as_usb_relay/set_power", SetPower)
+    self._feeder_srv = rospy.ServiceProxy("o2as_usb_relay/set_power", o2as_msgs.srv.SetPower)
     self._suction = actionlib.SimpleActionClient('o2as_fastening_tools/suction_control', SuctionControlAction)
     self._suctioned = False
     self._suction_state = rospy.Subscriber("suction_tool/screw_suctioned", Bool, self._suction_state_callback)
@@ -104,8 +98,8 @@ class KittingClass(O2ASBaseRoutines):
     # Image Publisher for monitoring    
     self.bridge = CvBridge()
 
-    self.img_innner_pick_topic = "o2as_monitor/vision_res" 
-    self.img_innner_pick_pub = rospy.Publisher(self.img_innner_pick_topic, Image, latch=True, queue_size=10)
+    self.img_inner_pick_topic = "o2as_monitor/vision_res" 
+    self.img_inner_pick_pub = rospy.Publisher(self.img_inner_pick_topic, Image, latch=True, queue_size=10)
     self.current_img_w_goal = Image()
     self.current_img_w_blob = Image()
 
@@ -186,6 +180,7 @@ class KittingClass(O2ASBaseRoutines):
 
     self.part_bin_list = {
       "part_4" : "bin2_1",
+      "part_5" : "bin2_1",
       "part_6" : "bin3_1",
       "part_8" : "bin2_2",
       "part_9" : "bin1_1",
@@ -217,18 +212,21 @@ class KittingClass(O2ASBaseRoutines):
       "part_18": "tray_2_this_is_a_screw_so_should_be_ignored" }
 
     # This can be copied from kitting_part_bin_list_auto.yaml
-    self.bin_is_inclined = {
-      "bin2_3": False,
-      "bin1_2": False,
-      "bin2_4": False,
-      "bin1_3": False,
-      "bin1_4": False,
-      "bin1_1": False,
-      "bin2_1": False,
-      "bin3_1": False,
-      "bin2_2": False,
-      "bin1_5": False
-    }
+    self.bin_for_this_part_is_inclined = {
+      "part_4" : False,   
+      "part_5" : False,
+      "part_6" : False,
+      "part_8" : False,
+      "part_9" : False,
+      "part_10" : False,
+      "part_11" : False,
+      "part_12" : False,
+      "part_13" : False,
+      "part_14" : False,
+      "part_15" : False,
+      "part_16" : False,
+      "part_17" : False,
+      "part_18" : False}
 
     # The "from_behind" orientation is slightly turned to avoid the robot locking up
     self.suction_orientation_from_behind = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi*10/180))
@@ -291,7 +289,8 @@ class KittingClass(O2ASBaseRoutines):
                               target_frame="set_" + data[0] + "_" + self.part_position_in_tray["part_" + data[2]], 
                               ee_to_use=self.grasp_strategy["part_" + data[2]],
                               item_name=data[4],
-                              dropoff_height=self.dropoff_heights["part_" + data[2]]) )
+                              dropoff_height=self.dropoff_heights["part_" + data[2]],
+                              bin_is_inclined=self.bin_for_this_part_is_inclined["part_" + data[2]]))
     return kitting_list, order_entry_list
 
     
@@ -341,6 +340,7 @@ class KittingClass(O2ASBaseRoutines):
     if not self.use_real_robot:
       return True
     req = o2as_msgs.srv.SetPowerRequest()
+    req.port = 2
     req.on = turn_on
     res = self._feeder_srv.call(req)
     return res.success
@@ -783,7 +783,7 @@ class KittingClass(O2ASBaseRoutines):
         #publish the results
         try:
           print("publish")
-          self.img_innner_pick_pub.publish(self.current_img_w_goal)
+          self.img_inner_pick_pub.publish(self.current_img_w_goal)
         except CvBridgeError as e:
           print(e)
 
@@ -943,7 +943,7 @@ class KittingClass(O2ASBaseRoutines):
 
     pick_pose.pose.position.x += -bin_length/2 + random.random()*bin_length
     pick_pose.pose.orientation = self.downward_orientation
-    if self.bin_is_inclined(item.bin_name):
+    if item.bin_is_inclined:
       pick_pose.pose.position.y = bin_length-.027
       pick_pose.pose.position.z = .005
       if item.part_id in [17,18]:
@@ -1107,9 +1107,9 @@ class KittingClass(O2ASBaseRoutines):
       item.attempts += 1
       rospy.loginfo("=== Attempting item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + "). Attempt nr. " + str(item.attempts))
       
-      # Attempt to pick the item
+      # Get the pick_pose for the item, either random or from vision
       pick_pose = self.get_random_pose_in_bin(item)
-      if item.ee_to_use == "precision_gripper_from_inside" and not self.bin_is_inclined(item.bin_name):
+      if item.ee_to_use == "precision_gripper_from_inside" and not item.bin_is_inclined:
         res_view_bin = self.view_bin(robot_name, item.bin_name, item.part_id)    
         if res_view_bin:
           pick_pose = res_view_bin
@@ -1145,7 +1145,7 @@ class KittingClass(O2ASBaseRoutines):
         approach_height = .05
       elif item.ee_to_use == "suction":
         gripper_command = "suction"
-      elif item.ee_to_use = "robotiq_gripper":
+      elif item.ee_to_use == "robotiq_gripper":
         approach_height = .15
         gripper_command = ""
       else:
@@ -1266,8 +1266,6 @@ class KittingClass(O2ASBaseRoutines):
       self.go_to_named_pose("home", "a_bot", force_ur_script=self.use_real_robot)
     self.go_to_named_pose("back", "a_bot", force_ur_script=self.use_real_robot)
     self.screw_delivery_time = rospy.Time.now()
-
-    rospy.sleep(5)
 
     for item in self.suction_items:
       if rospy.is_shutdown():

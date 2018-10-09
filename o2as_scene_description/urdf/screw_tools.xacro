@@ -133,7 +133,7 @@
   <joint name="suction_tool_to_holder" type="fixed">
     <parent link="screw_tool_holder" />
     <child link="suction_tool_link" />
-    <origin xyz="-0.355 ${tool_offset} 0.004" rpy="0.0 0.0 0.0" />
+    <origin xyz="-0.355 ${tool_offset - .025} 0.004" rpy="0.0 0.0 0.0" />
   </joint>
 
   <link name="screw_tool_m4_link">

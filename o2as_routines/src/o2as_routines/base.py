@@ -307,7 +307,7 @@ class O2ASBaseRoutines(object):
   def move_joints(self, group_name, joint_pose_goal, speed = 1.0, acceleration = 0.0, force_ur_script=False, force_moveit=False):
     if self.force_ur_script_linear_motion or self.use_real_robot:
       if not self.force_moveit_linear_motion:
-        rospy.logdebug("Real robot is being used. Send linear motion to robot controller directly via URScript.")
+        rospy.logdebug("Real robot is being used. Send joint command to robot controller directly via URScript.") 
         req = o2as_msgs.srv.sendScriptToURRequest()
         req.program_id = "move_j"
         req.robot_name = group_name
@@ -392,7 +392,8 @@ class O2ASBaseRoutines(object):
   def go_to_named_pose(self, pose_name, robot_name, speed = 0.5, force_ur_script=True):
     # pose_name should be "home", "back" etc.
     self.groups[robot_name].set_named_target(pose_name)
-    if force_ur_script:
+    if False:
+    # if force_ur_script:
       joint_pose = self.groups[robot_name].get_joint_value_target()
       rospy.loginfo("joint_pose is ")
       rospy.loginfo(joint_pose)
