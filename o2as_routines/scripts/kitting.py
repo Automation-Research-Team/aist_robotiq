@@ -974,9 +974,10 @@ class KittingClass(O2ASBaseRoutines):
     if resp_search_grasp:
       if resp_search_grasp.success:
         poses_in_bin = list()
-        pose0 = geometry_msgs.msg.PoseStamped()
+        pose0 = geometry_msgs.msg.PointStamped()
         pose0.header.frame_id = "a_phoxi_m_sensor"
-        pose_candidates_number = self.max_candidates_from_phoxi if resp_search_grasp.result_num > self.max_candidates_from_phoxi else resp_search_grasp.result_num
+        pose_candidates_number = 5 if (resp_search_grasp.result_num > 5) else resp_search_grasp.result_num
+        # pose_candidates_number = self.max_candidates_from_phoxi if (resp_search_grasp.result_num > self.max_candidates_from_phoxi) else resp_search_grasp.result_num
         for i in range(pose_candidates_number):
           object_position = copy.deepcopy(pose0)
           object_position.point = geometry_msgs.msg.Point(
