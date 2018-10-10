@@ -89,7 +89,7 @@ find_package(catkin REQUIRED COMPONENTS
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-generate_dynamic_reconfigure_options( cfg/O2asBlobDetection.cfg )
+generate_dynamic_reconfigure_options( cfg/o2asBlobDetection.cfg )
 
 ###################################
 ## catkin specific configuration ##

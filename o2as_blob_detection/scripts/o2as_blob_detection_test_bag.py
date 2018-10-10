@@ -22,7 +22,7 @@ import o2as_msgs.msg
 from geometry_msgs.msg import PoseArray, Pose 
 
 from dynamic_reconfigure.server import Server as ServerDynamicReconfigure
-from o2as_blob_detection.cfg import O2asBlobDetectionConfig
+from o2as_blob_detection.cfg import o2asBlobDetectionConfig
 
 
 class BlobDetectionTestBag(object):
@@ -55,7 +55,7 @@ class BlobDetectionTestBag(object):
         rospy.Subscriber(self.image_topic, Image, self.image_callback)
 
         # Dynamic reconfigure
-        srv = ServerDynamicReconfigure(O2asBlobDetectionConfig, callbackDynamicReconfigure)
+        srv = ServerDynamicReconfigure(o2asBlobDetectionConfig, callbackDynamicReconfigure)
    
         self.minThreshold = 100
         self.maxThreshold = 400
