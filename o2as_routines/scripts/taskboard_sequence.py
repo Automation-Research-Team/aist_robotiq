@@ -712,9 +712,13 @@ if __name__ == '__main__':
 
         #pick screw
         partScrew = geometry_msgs.msg.PoseStamped()
-        partScrew.header.frame_id = "taskboard_part7_2"
+        partScrew.header.frame_id = "mat_part7_1"
+        partScrew_height = 0.01
         partScrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
-
+        taskboard.pick("b_bot",partScrew, partScrew_heigh,
+                       speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
+                       approach_height = 0.1)
+        #throw it into M6 feeder
 
         #pick up the tool
         tool_pose = geometry_msgs.msg.PoseStamped()
@@ -745,6 +749,21 @@ if __name__ == '__main__':
                                approach_height = 0.1)
         print("press enter")
         raw_input()
+        # Push into the nut to pick it up
+        taskboard.go_to_pose_goal("b_bot", pick_pose_low, speed=0.05, move_lin=True)
+        taskboard.do_linear_push("b_bot", 10, wait = True)
+        taskboard.horizontal_spiral_motion("b_bot", max_radius = .006, radius_increment = .01)
+        taskboard.do_linear_push("b_bot", 40, wait = True)
+        rospy.sleep(2.0)
+        print("press enter")
+        raw_input()
+        taskboard.go_to_pose_goal("b_bot", pick_pose_high, speed=0.05, move_lin=True)
+        # pick up the screw from M6 feeder
+
+        # move the screw
+        # move the nut to position
+        # move the screw to position
+        # move back home
 
   
       if i == 8:  
