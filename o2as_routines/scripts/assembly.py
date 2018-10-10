@@ -346,7 +346,6 @@ class AssemblyClass(O2ASBaseRoutines):
     ps_approach.pose.position.x = 0.0025
     ps_approach.pose.position.y = 0.0
     ps_approach.pose.position.z = 0.05
-    ps_approach = copy.deepcopy(ps_approach)
     ps_pickup = copy.deepcopy(ps_approach)
     ps_pickup.pose.position.z = -0.03    
     ps_high = copy.deepcopy(ps_approach)
@@ -418,18 +417,16 @@ class AssemblyClass(O2ASBaseRoutines):
 
   def place_plate_2(self):
     # Requires the tool to be equipped on b_bot
-    
     rospy.loginfo("Going to pick up and place plate_2 with c_bot")
     
     self.go_to_named_pose("home", "c_bot")
     self.send_gripper_command("c_bot", "open")
     ps_approach = geometry_msgs.msg.PoseStamped()
-    ps_approach.header.frame_id = "initial_assy_part_02_back_hole" # The top corner of the big plate
+    ps_approach.header.frame_id = "initial_assy_part_02_back_hole" # The top corner of the motor plate
     ps_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0, pi/2, pi/2))
     ps_approach.pose.position.x = 0.0025
     ps_approach.pose.position.y = 0.0
     ps_approach.pose.position.z = 0.05
-    ps_approach = copy.deepcopy(ps_approach)
     ps_pickup = copy.deepcopy(ps_approach)
     ps_pickup.pose.position.z = -0.03
     ps_high = copy.deepcopy(ps_approach)
@@ -459,6 +456,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.move_lin("c_bot", ps_move_away, 1.0)
     self.go_to_named_pose("home", "c_bot")
 
+    # TODO: Place the gripper closed against the back of the plate on the right side, so it does not move while it is fastened
 
     # # ==========
     # # Move b_bot to the hole and screw
@@ -469,12 +467,7 @@ class AssemblyClass(O2ASBaseRoutines):
     # self.do_screw_action("b_bot", pscrew, screw_height = 0.02, screw_size = 4)
 
   def pick_retainer_pin(self, robot_name = "b_bot"):
-    rospy.loginfo("============ Picking up a retainer pin using b_bot ============")
-    # if robot_name=="b_bot":
-    #   self.go_to_named_pose("back", "c_bot")
-    # elif robot_name=="c_bot":
-    #   self.go_to_named_pose("back", "b_bot")
-
+    rospy.loginfo("============ Pick up the retainer pin using b_bot ============")
     self.go_to_named_pose("home", robot_name)
 
     pose0 = geometry_msgs.msg.PoseStamped()
@@ -581,7 +574,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_named_pose("home", robot_name)
     return
 
-  def place_retainer_pin_spacer(self, robot_name = "a_bot", using_real_robot=True):
+  def place_retainer_pin_spacer(self, robot_name = "a_bot"):
     intermediate_facing_sky = geometry_msgs.msg.PoseStamped()
     intermediate_facing_sky.header.frame_id = "intermediate_assy_part_14_screw_head"
     intermediate_facing_sky.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
@@ -599,7 +592,7 @@ class AssemblyClass(O2ASBaseRoutines):
                                 speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
                                 approach_height = 0,approach_axis="x", lift_up_after_place = False)
     rospy.sleep(0.5)
-    if using_real_robot is True:
+    if self.use_real_robot:
       self.horizontal_spiral_motion("a_bot", .004)
       rospy.loginfo("doing spiral motion")
 
@@ -628,7 +621,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_named_pose("home", robot_name)
     return
 
-  def place_idle_pulley(self, robot_name = "a_bot", using_real_robot=True):
+  def place_idle_pulley(self, robot_name = "a_bot"):
     intermediate_facing_sky = geometry_msgs.msg.PoseStamped()
     intermediate_facing_sky.header.frame_id = "intermediate_assy_part_14_screw_head"
     intermediate_facing_sky.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
@@ -647,7 +640,7 @@ class AssemblyClass(O2ASBaseRoutines):
                                 approach_height = 0,approach_axis="x", lift_up_after_place = False)
     rospy.sleep(0.5)
     
-    if using_real_robot is True:
+    if self.use_real_robot:
       self.horizontal_spiral_motion("a_bot", .004)
       rospy.loginfo("doing spiral motion")
 
@@ -766,7 +759,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_named_pose("home", "a_bot")
     return
 
-  def place_retainer_pin_washer_2(self, robot_name = "a_bot", using_real_robot=True):
+  def place_retainer_pin_washer_2(self, robot_name = "a_bot"):
     intermediate_facing_sky = geometry_msgs.msg.PoseStamped()
     intermediate_facing_sky.header.frame_id = "intermediate_assy_part_14_screw_head"
     intermediate_facing_sky.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
@@ -784,7 +777,7 @@ class AssemblyClass(O2ASBaseRoutines):
                                 speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
                                 approach_height = 0,approach_axis="x", lift_up_after_place = False)
     rospy.sleep(0.5)
-    if using_real_robot is True:
+    if self.use_real_robot:
       self.horizontal_spiral_motion("a_bot", .004)
       rospy.loginfo("doing spiral motion")
 
@@ -880,7 +873,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_pose_goal("b_bot", assembled_retainer_pin_head_final,speed=.05, move_lin = True)
     return
   
-  def hold_idle_pulley_with_a_bot(self,using_real_robot=True):
+  def hold_idle_pulley_with_a_bot(s):
     assembled_retainer_pin_head = geometry_msgs.msg.PoseStamped()
     assembled_retainer_pin_head.header.frame_id = "assembled_assy_part_05_center"
     assembled_retainer_pin_head.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
@@ -890,12 +883,12 @@ class AssemblyClass(O2ASBaseRoutines):
     
     assembled_retainer_pin_head_approach = copy.deepcopy(assembled_retainer_pin_head)
     assembled_retainer_pin_head_approach.pose.position.z += 0.04
-    if using_real_robot is True:
+    if self.use_real_robot:
       self.precision_gripper_inner_open()
     self.go_to_pose_goal("a_bot", assembled_retainer_pin_head_approach, speed=.1, move_lin = True)
     self.go_to_pose_goal("a_bot", assembled_retainer_pin_head, speed=.01, move_lin = True)
 
-    if using_real_robot is True:
+    if self.use_real_robot:
       self.precision_gripper_inner_close(this_action_grasps_an_object = True)
     return
   
@@ -932,7 +925,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.do_linear_push("b_bot", 5, wait = True)
     return
 
-  def release_idle_pulley_from_a_bot(self, using_real_robot=True):
+  def release_idle_pulley_from_a_bot(s):
     x=raw_input("press enter to continue with the next part of the sequence")
     assembled_retainer_pin_head_retreat = geometry_msgs.msg.PoseStamped()
     assembled_retainer_pin_head_retreat.header.frame_id = "assembled_assy_part_05_center"
@@ -940,7 +933,7 @@ class AssemblyClass(O2ASBaseRoutines):
     assembled_retainer_pin_head_retreat.pose.position.x = 0
     assembled_retainer_pin_head_retreat.pose.position.y = -0.0024
     assembled_retainer_pin_head_retreat.pose.position.z = 0.045
-    if using_real_robot is True:
+    if self.use_real_robot:
       self.precision_gripper_inner_open()
     self.go_to_pose_goal("a_bot", assembled_retainer_pin_head_retreat, speed=.1, move_lin = True)
 
@@ -1241,7 +1234,7 @@ class AssemblyClass(O2ASBaseRoutines):
 
     self.go_to_pose_goal("b_bot", pre_insertion,speed=.2, move_lin = True)
 
-    print ("Please ask Felix what the differences between the two functions below are")
+    rospy.loginfo("Please ask Felix what the differences between the two functions below are")
     # self.do_insertion(robot_name="b_bot")
     # self.do_insert_action(active_robot_name="b_bot", passive_robot_name = "c_bot")
     return
@@ -1371,112 +1364,214 @@ class AssemblyClass(O2ASBaseRoutines):
     pre_insertion.pose.position.x = -0.04
     self.go_to_pose_goal("b_bot", pre_insertion, speed=.3, move_lin = True)
 
-if __name__ == '__main__':
-  try:
-    print ("Please refer to this page for details of each subtask. https://docs.google.com/spreadsheets/d/1Os2CfH80A7vzj6temt5L8BYpLvHKBzWT0dVuTvpx5Mk/edit#gid=1216221803")
-    assy = AssemblyClass()
-    assy.set_up_item_parameters()
-    # ========================= Sending robots to home position ======================================
-    # assy.go_to_named_pose("home", "c_bot")
-    # assy.go_to_named_pose("home", "b_bot")
-    # assy.go_to_named_pose("home", "a_bot")
+  def confirm_to_proceed(self, next_task_name):
+    rospy.loginfo("Press enter to proceed to: " + next_task_name)
+    i = raw_input()
+    if i == "":
+      if not rospy.is_shutdown():
+        return True
+    raise Exception("User caused exit!")
+    return False
 
-    # ================== leftover of old stuff written by Felix =======================
-    # assy.handover_demo()
-    # assy.insertion_demo()
-    # assy.belt_demo()
-    
-    # =============================== SUBTASK F ======================================================
-    print("======== SUBTASK F ========")
-    # assy.place_plate_2()
-    print ("todo: add screw picking and fastening sequence")
+  def subtask_f(self):
+    rospy.loginfo("======== SUBTASK F (motor plate) ========")
+    self.place_plate_2()
+    self.fasten_plate_2()
+    rospy.loginfo("todo: add screw picking and fastening sequence")
 
+  def subtask_a(self):
     # ============= SUBTASK A (picking and inserting and fastening the motor shaft) =======================
-    print("======== SUBTASK A ========")
-    # assy.pick_motor()
-    # assy.adjust_centering()
-    # assy.handover_motor()
-    print ("todo: pick up m3 tool using b bot, replace this print with the equip function")
-    # assy.insert_motor() # Joshua thinks this may be possible to do without impedance control, otherwise use insertion script in Y negative direction
-    # assy.go_to_named_pose("screw_ready", "b_bot")
-    # assy.fasten_motor_screw_1() # please ask Felix about the pick_screw function, I am not sure how he defined it
-    print ("todo: copy and paste fasten_motor_screw_1 to add fasten_motor_screw_2 ~ 6")
-    
+    rospy.loginfo("======== SUBTASK A (motor) ========")
+    self.pick_motor()
+    self.adjust_centering()
+    self.handover_motor()
+    rospy.loginfo("todo: pick up m3 tool using b bot, replace this print with the equip function")
+    self.insert_motor() # Joshua thinks this may be possible to do without impedance control, otherwise use insertion script in Y negative direction
+    self.go_to_named_pose("screw_ready", "b_bot")
+    self.fasten_motor_screw_1() # please ask Felix about the pick_screw function, I am not sure how he defined it
+    rospy.loginfo("todo: copy and paste fasten_motor_screw_1 to add fasten_motor_screw_2 ~ 6")
 
+  def subtask_b(self):
     # ================================= SUBTASK B (motor pulley) ===========================================
-    print("======== SUBTASK B ========")
-    # assy.pick_motor_pulley()
-    # assy.insert_motor_pulley()
-    print ("todo: fasten motor pulley")
+    rospy.loginfo("======== SUBTASK B (motor pulley) ========")
+    self.pick_motor_pulley()
+    self.insert_motor_pulley()
+    rospy.loginfo("todo: fasten motor pulley") # With the set screw
 
-    # ===== SUBTASK G (Placing and fastening the output (larger) plate, for idle pulley set and clamping pulley set) =========
-    print("======== SUBTASK G ========")
-    # assy.place_plate_3_and_screw()
-    print ("todo: add screw picking and fastening sequence for the second screw")
+  def subtask_g(self):
+    # ===== SUBTASK G (Placing and fastening the output (large) plate, for idle pulley set and clamping pulley set) =========
+    rospy.loginfo("======== SUBTASK G (large plate) ========")
+    self.place_plate_3_and_screw()
+    rospy.loginfo("todo: add screw picking and fastening sequence for the second screw")
 
-
+  def subtask_c(self):
     # ==== SUBTASK C (clamping pulley set, everything but inserting and fastening clamping pulley) =================
-    print("======== SUBTASK C ========")
-    # assy.pick_bearing()
-    # assy.insert_bearing()
-    print ("todo: pick up shaft, pick up cap, insert the cap, fasten the cap, insert using impedance Y negative direction (using b_bot)")
-    print ("todo: make the gripper not fully open while approaching for picking, may be important for motor pulley and clamping_shaft_spacer")
-    # assy.pick_shaft_spacer()
-    # assy.insert_shaft_spacer()
+    rospy.loginfo("======== SUBTASK C (bearing + shaft) ========")
+    self.pick_bearing()
+    self.insert_bearing()
+    rospy.loginfo("todo: pick up shaft, pick up cap, insert the cap, fasten the cap, insert using impedance Y negative direction (using b_bot)")
+    rospy.loginfo("todo: make the gripper not fully open while approaching for picking, may be important for motor pulley and clamping_shaft_spacer")
+    self.pick_shaft_spacer()
+    self.insert_shaft_spacer()
 
-
+  def subtask_d(self):
     # ============= SUBTASK D (inserting and fastening clamping pulley) =======================
-    print("======== SUBTASK D ========")
-    # assy.pick_clamping_pulley()
-    # assy.insert_clamping_pulley()
-    print ("todo: fastening clamping pulley")
+    rospy.loginfo("======== SUBTASK D (clamping pulley) ========")
+    self.pick_clamping_pulley()
+    self.insert_clamping_pulley()
+    rospy.loginfo("todo: fastening clamping pulley")
 
+  def subtask_e(self):
     # ======================== SUBTASK E (The idler pin) ============================================
-    print("======== SUBTASK E ========")
-    # assy.pick_retainer_pin()
-    # assy.adjust_centering()
-    # assy.rotate_hand_facing_the_sky()
-    # assy.pick_idle_pulley()
-    # assy.place_idle_pulley(using_real_robot=False)
-    # assy.pick_retainer_pin_spacer()
-    # assy.place_retainer_pin_spacer(using_real_robot=False)
-    # assy.pick_retainer_pin_washer_2()
-    # assy.place_retainer_pin_washer_2(using_real_robot=False)
-    # assy.pick_retainer_pin_nut()
-    print ("todo: pick nut with tool, fasten retainer pin nut")
-    print ("todo: add equip and unequip action into the codes")
-    # assy.place_retainer_pin_nut_and_pick_with_tool()
-    # assy.pick_retainer_pin_washer()
-    # assy.place_retainer_pin_washer_intermediate()
-    # assy.insert_retainer_pin_to_base()
-    # assy.hold_idle_pulley_with_a_bot()
-    # assy.release_and_push_with_b_bot()
-    # assy.release_idle_pulley_from_a_bot()
-    # assy.pick_retainer_pin_washer_intermediate()
-    # assy.place_retainer_pin_washer_final()
-    # assy.fasten_retainer_pin_nut()
+    rospy.loginfo("======== SUBTASK E ========")
+    self.confirm_to_proceed("pick_retainer_pin")
+    self.pick_retainer_pin()
+    self.confirm_to_proceed("adjust_centering")
+    self.adjust_centering()
+    self.confirm_to_proceed("rotate_hand_facing_the_sky")
+    self.rotate_hand_facing_the_sky()
+    self.confirm_to_proceed("pick_idle_pulley")
+    self.pick_idle_pulley()
+    self.confirm_to_proceed("place_idle_pulley")
+    self.place_idle_pulley()
+    self.confirm_to_proceed("pick_retainer_pin_spacer")
+    self.pick_retainer_pin_spacer()
+    self.confirm_to_proceed("place_retainer_pin_spacer")
+    self.place_retainer_pin_spacer()
+    self.confirm_to_proceed("pick_retainer_pin_washer_2")
+    self.pick_retainer_pin_washer_2()
+    self.confirm_to_proceed("place_retainer_pin_washer_2")
+    self.place_retainer_pin_washer_2()
+    self.confirm_to_proceed("pick_retainer_pin_nut")
+    self.pick_retainer_pin_nut()
+    rospy.loginfo("todo: pick nut with tool, fasten retainer pin nut")
+    rospy.loginfo("todo: add equip and unequip action into the codes")
+    self.confirm_to_proceed("place_retainer_pin_nut_and_pick_with_tool")
+    self.place_retainer_pin_nut_and_pick_with_tool()
+    self.confirm_to_proceed("pick_retainer_pin_washer")
+    self.pick_retainer_pin_washer()
+    self.confirm_to_proceed("place_retainer_pin_washer_intermediate")
+    self.place_retainer_pin_washer_intermediate()
+    self.confirm_to_proceed("insert_retainer_pin_to_base")
+    self.insert_retainer_pin_to_base()
+    self.confirm_to_proceed("hold_idle_pulley_with_a_bot")
+    self.hold_idle_pulley_with_a_bot()
+    self.confirm_to_proceed("release_and_push_with_b_bot")
+    self.release_and_push_with_b_bot()
+    self.confirm_to_proceed("release_idle_pulley_from_a_bot")
+    self.release_idle_pulley_from_a_bot()
+    self.confirm_to_proceed("pick_retainer_pin_washer_intermediate")
+    self.pick_retainer_pin_washer_intermediate()
+    self.confirm_to_proceed("place_retainer_pin_washer_final")
+    self.place_retainer_pin_washer_final()
+    self.confirm_to_proceed("fasten_retainer_pin_nut")
+    self.fasten_retainer_pin_nut()
 
-    # ====================================== SUBTASK H ===============================================
-    print("======== SUBTASK H ========")
-    # assy.put_on_belt()
+  def subtask_h(self):
+    # ====================================== SUBTASK H (belt) ========================================
+    rospy.loginfo("======== SUBTASK H (belt) ========")
+    self.put_on_belt()
+    rospy.loginfo("TODO: Tension the belt")
+  
+  def assembly_task(self):
+    # ========================= Sending robots to home position ======================================
+    self.go_to_named_pose("back", "a_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("home", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("screw_pick_ready", "b_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
+
+    self.subtask_g()  # Large plate
+    self.subtask_f()  # Motor plate
+    self.subtask_e()  # Idler pin
+    self.subtask_a()  # Motor
+    self.subtask_b()  # Motor pulley
+    self.subtask_c()  # Bearing + shaft
+    self.subtask_d()  # Clamping pulley
+    self.subtask_h()  # Belt
 
     # ====================== SAMPLE CODE ======================-
 
-    #  ============ Equip then unequip tool with c_bot ============
-    # assy.go_to_named_pose("home", "c_bot")
-    # assy.do_change_tool_action("c_bot", screw_size=4, equip=True)    
-    # assy.go_to_named_pose("screw_ready", "c_bot")
-    # assy.do_change_tool_action("c_bot", screw_size=4, equip=False)
-
-    # ============= Equip and unequip tool with b_bot ==========
+    # ============= Equip tool with b_bot ==========
     # while equiping and unequiping tool with b_bot, c_bot needs to be in "back" pose
-    # assy.go_to_named_pose("back", "c_bot")
-    # assy.do_change_tool_action("b_bot", screw_size=4, equip=True)
+    # self.go_to_named_pose("back", "c_bot")
+    # self.do_change_tool_action("b_bot", screw_size=4, equip=True)
 
-    print("=========== PLEASE ASK FELIX ABOUT THIS ===============")
-    # print(assy.planning_scene_interface.get_known_object_names())
-    # assy.planning_scene_interface.disallow_collisions("screw_tool_m4")
+    # rospy.loginfo("=========== PLEASE ASK FELIX ABOUT THIS ===============")
+    # rospy.loginfo(self.planning_scene_interface.get_known_object_names())
+    # self.planning_scene_interface.disallow_collisions("screw_tool_m4")
     # raw_input()
-    # assy.planning_scene_interface.allow_collisions("screw_tool_m4")
+    # self.planning_scene_interface.allow_collisions("screw_tool_m4")
+    return
+
+if __name__ == '__main__':
+  try:
+    rospy.loginfo("Please refer to this page for details of each subtask. https://docs.google.com/spreadsheets/d/1Os2CfH80A7vzj6temt5L8BYpLvHKBzWT0dVuTvpx5Mk/edit#gid=1216221803")
+    assy = AssemblyClass()
+    assy.set_up_item_parameters()
+    i = 1
+    while i:
+      rospy.loginfo("Enter 11 (12) to equip (unequip) m4 tool (b_bot).")
+      rospy.loginfo("Enter 13 (14) to equip (unequip) m3 tool (b_bot).")
+      rospy.loginfo("Enter 15 (16) to equip (unequip) m6 nut tool (c_bot).")
+      rospy.loginfo("Enter 2 to move the robots home to starting positions.")
+      rospy.loginfo("Enter 31-36 to pick screw m3 from tray with b_bot (number 1-6).")
+      rospy.loginfo("Enter 41-49 to pick screw m4 from tray with b_bot (number 1-9).")
+      rospy.loginfo("Enter 91-94 for subtasks (Large plate, motor plate, idler pin, motor).")
+      rospy.loginfo("Enter 95-98 for subtasks (motor pulley, bearing+shaft, clamp pulley, belt).")
+      rospy.loginfo("Enter 911 to place plate 3 (but don't screw)")
+      rospy.loginfo("Enter START to start the task.")
+      rospy.loginfo("Enter x to exit.")
+      i = raw_input()
+      if i == '11':
+        assy.go_to_named_pose("back", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=assy.use_real_robot)
+        assy.do_change_tool_action("b_bot", equip=True, screw_size=4)
+      if i == '12':
+        assy.go_to_named_pose("back", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=assy.use_real_robot)
+        assy.do_change_tool_action("b_bot", equip=False, screw_size=4)
+      if i == '13':
+        assy.go_to_named_pose("back", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=assy.use_real_robot)
+        assy.do_change_tool_action("b_bot", equip=True, screw_size=3)
+      if i == '14':
+        assy.go_to_named_pose("back", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=assy.use_real_robot)
+        assy.do_change_tool_action("b_bot", equip=False, screw_size=3)
+      if i == '15':
+        assy.go_to_named_pose("tool_pick_ready", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=assy.use_real_robot)
+        assy.do_change_tool_action("c_bot", equip=True, screw_size=66)
+      if i == '16':
+        assy.go_to_named_pose("tool_pick_ready", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=assy.use_real_robot)
+        assy.do_change_tool_action("c_bot", equip=False, screw_size=66)
+      if i == '2':
+        assy.go_to_named_pose("back", "a_bot", speed=3.0, acceleration=3.0, force_ur_script=assy.use_real_robot)
+        assy.go_to_named_pose("home", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=assy.use_real_robot)
+        assy.go_to_named_pose("screw_ready_back", "b_bot", speed=3.0, acceleration=3.0, force_ur_script=assy.use_real_robot)
+      elif i in ['31', '32', '33', '34', '35', '36']:
+        assy.go_to_named_pose("screw_pick_ready", "b_bot")
+        assy.pick_screw("b_bot", screw_size=3, screw_number=int(i)-30)
+        assy.go_to_named_pose("screw_pick_ready", "b_bot")
+      elif i in ['41', '42', '43', '44', '45', '46', '47', '48', '49']:
+        assy.go_to_named_pose("screw_pick_ready", "b_bot")
+        assy.pick_screw("b_bot", screw_size=4, screw_number=int(i)-40)
+        assy.go_to_named_pose("screw_pick_ready", "b_bot")
+      elif i == '91':
+        assy.subtask_g()  # Large plate
+      elif i == '911':
+        assy.place_plate_3_and_screw(place_plate_only=True)
+      elif i == '92':
+        assy.subtask_f()  # Motor plate
+      elif i == '93':
+        assy.subtask_e()  # Idler pin
+      elif i == '94':
+        assy.subtask_a()  # Motor
+      elif i == '95':
+        assy.subtask_b()  # Motor pulley
+      elif i == '96':
+        assy.subtask_c()  # Bearing + shaft
+      elif i == '97':
+        assy.subtask_d()  # Clamping pulley
+      elif i == '98':
+        assy.subtask_h()  # Belt
+      elif i == 'START' or i == 'start' or i == '5000':
+        assy.assembly_task()
+      elif i == 'x':
+        break
   except rospy.ROSInterruptException:
     pass

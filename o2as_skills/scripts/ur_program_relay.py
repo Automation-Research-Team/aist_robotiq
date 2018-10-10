@@ -135,9 +135,8 @@ class URScriptRelay():
                     robot_pose = self.listener.transformPose(req.robot_name + "_base", req.target_pose)
                     transform_success = True
                 except:
-                    rospy.logdebug("Failed to transform. Waiting for .1 seconds")
-                    sleep(.1)
-                    pass
+                    rospy.logdebug("Failed to transform from frame " + req.target_pose.header.frame_id + ". Waiting for .1 seconds")
+                    rospy.sleep(.1)
             xyz = [robot_pose.pose.position.x, robot_pose.pose.position.y, robot_pose.pose.position.z]
             
             q = [robot_pose.pose.orientation.x, robot_pose.pose.orientation.y, 

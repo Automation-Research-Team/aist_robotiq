@@ -597,7 +597,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
       joint_group_positions_1[2] = 1.7915;
       joint_group_positions_1[3] = 0.872;
       joint_group_positions_1[4] = 1.5723;
-      joint_group_positions_1[5] = -3.1413;      
+      joint_group_positions_1[5] = -3.1413;
       if (!moveToJointPose(joint_group_positions_1, robot_name, true, 3.0, use_real_robot_, 3.0))
       {
         ROS_ERROR("Could not plan to before_tool_pickup joint state. Abort!");
