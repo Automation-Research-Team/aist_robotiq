@@ -486,6 +486,26 @@ class AssemblyClass(O2ASBaseRoutines):
     # self.send_gripper_command(gripper="b_bot",command = 0.04)
     self.do_pick_action(robot_name, pose0, z_axis_rotation = 0.0, use_complex_planning = False)
     return
+  
+  def pick_retainer_pin_and_place_in_jig(self):
+    rospy.loginfo("============ Pick up the retainer pin using b_bot ============")
+    self.go_to_named_pose("home", "a_bot")
+
+    pick_pose = geometry_msgs.msg.PoseStamped()
+    pick_pose.header.frame_id = "tray_2_partition_2"
+    pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/4, pi/2))
+    pick_pose.pose.position.y = 0.01
+    pick_pose.pose.position.z = 0.006
+
+    self.pick("a_bot", pick_pose, grasp_height=0.0, speed_fast=1.0, speed_slow=.1, gripper_command="inner_gripper_from_outside", approach_height=.05)
+
+    place_pose = geometry_msgs.msg.PoseStamped()
+    place_pose.header.frame_id = "idler_pin_jig_link"
+    place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/4, pi/2))
+    pick_pose.pose.position.y = 0.01
+
+    self.place("a_bot", place_pose, place_height=0.01, speed_fast=.5, speed_slow=.2, gripper_command="inner_gripper_from_outside", approach_height=.05)
+    return
 
   def rotate_hand_facing_the_sky(self):
     rospy.loginfo("============ making b_bot end effector face the sky ============")
