@@ -2075,9 +2075,11 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
 
   // ROS_ERROR("Waiting for 20 seconds for screw spiral motion because the motors are not checked");
   // ros::Duration(30.0).sleep();
-  bool finished_before_timeout = fastening_tool_client.waitForResult(ros::Duration(10.0));
-  auto result = fastening_tool_client.getResult();
-  ROS_INFO_STREAM("Screw tool motor command " << (finished_before_timeout ? "returned" : "did not return before timeout") <<". Result: " << result->control_result);
+  if (use_real_robot_) {
+    bool finished_before_timeout = fastening_tool_client.waitForResult(ros::Duration(10.0));
+    auto result = fastening_tool_client.getResult();
+    ROS_INFO_STREAM("Screw tool motor command " << (finished_before_timeout ? "returned" : "did not return before timeout") <<". Result: " << result->control_result);
+  }
 
   // Move back up a little
   target_tip_link_pose.pose.position.x -= .05;
