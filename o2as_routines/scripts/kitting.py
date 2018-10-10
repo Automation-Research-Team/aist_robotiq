@@ -228,7 +228,7 @@ class KittingClass(O2ASBaseRoutines):
       "part_13" : False, # idler pulley/bearing
       "part_14" : False, # idler pin
       "part_15" : "left", # m6 nut
-      "part_16" : False, # m6 washer
+      "part_16" : "right", # m6 washer
       "part_17" : False, # m4 screw
       "part_18" : "right"} # m3 screw
 
@@ -1147,7 +1147,7 @@ class KittingClass(O2ASBaseRoutines):
         res_view_bin = self.view_bin(robot_name, item.bin_name, item.part_id)    
         if res_view_bin:
           pick_pose = res_view_bin
-          pick_pose.pose.position.z -= .02 # MAGIC NUMBER (to compensate for the Realsense calibration)
+          pick_pose.pose.position.z -= .025 # MAGIC NUMBER (to compensate for the Realsense calibration)
       if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
         if pick_poses:
           pick_pose = pick_poses.pop(0)
@@ -1170,7 +1170,7 @@ class KittingClass(O2ASBaseRoutines):
       if item.part_id == 6: # Belt
         pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
 
-      approach_height = 0.08
+      approach_height = 0.09
       speed_slow = 0.1
       speed_fast = 1.0
       if item.ee_to_use == "precision_gripper_from_inside":
@@ -1181,7 +1181,7 @@ class KittingClass(O2ASBaseRoutines):
         approach_height = .05
       elif item.ee_to_use == "suction":
         gripper_command = "suction"
-        approach_height = 0.08 - pick_pose.pose.position.z
+        approach_height = 0.09 - pick_pose.pose.position.z
         speed_slow = 0.05
         speed_fast = 0.1
       elif item.ee_to_use == "robotiq_gripper":
@@ -1240,7 +1240,7 @@ class KittingClass(O2ASBaseRoutines):
       
       approach_height = .05
       if "precision_gripper" in item.ee_to_use:
-        self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=.2, acceleration=.3, force_ur_script=self.use_real_robot)
+        self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=1.5, acceleration=1.0, force_ur_script=self.use_real_robot)
         approach_height = .03
       elif item.ee_to_use == "suction":
         if required_intermediate_pose:
@@ -1253,7 +1253,7 @@ class KittingClass(O2ASBaseRoutines):
           self.go_to_named_pose("suction_place_intermediate_pose_for_sets_2_and_3", "b_bot", speed=.1)
         self.force_moveit_linear_motion = True
         place_pose.pose.position.z += .08
-        self.move_lin(robot_name, place_pose, speed = 0.1, acceleration = 0.08, end_effector_link = "b_bot_suction_tool_tip_link")
+        self.move_lin(robot_name, place_pose, speed = 0.3, acceleration = 0.08, end_effector_link = "b_bot_suction_tool_tip_link")
         place_pose.pose.position.z -= .08
       
       self.place(robot_name, place_pose,grasp_height=item.dropoff_height,
@@ -1308,24 +1308,24 @@ class KittingClass(O2ASBaseRoutines):
     # rospy.sleep(2)
     self.treat_screws_in_feeders()
 
-    for item in self.suction_items:
-      if rospy.is_shutdown():
-        break
-      self.treat_screws_in_feeders()
-      self.attempt_item(item, 3)
-    self.do_change_tool_action("b_bot", equip=False, screw_size=50)   # 50 = suction tool
-    self.go_to_named_pose("back", "b_bot")
-    rospy.loginfo("==== Done with first suction pass")
+    # for item in self.suction_items:
+    #   if rospy.is_shutdown():
+    #     break
+    #   self.treat_screws_in_feeders()
+    #   self.attempt_item(item, 3)
+    # self.do_change_tool_action("b_bot", equip=False, screw_size=50)   # 50 = suction tool
+    # self.go_to_named_pose("back", "b_bot")
+    # rospy.loginfo("==== Done with first suction pass")
 
     # self.treat_screws_in_feeders()
 
-    # for item in self.precision_gripper_items:
-    #   if rospy.is_shutdown():
-    #     break
-    #   self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-    #   self.attempt_item(item, 3)
-    # self.go_to_named_pose("back", "a_bot")
-    # rospy.loginfo("==== Done with first precision gripper pass")
+    for item in self.precision_gripper_items:
+      if rospy.is_shutdown():
+        break
+      self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      self.attempt_item(item, 3)
+    self.go_to_named_pose("back", "a_bot")
+    rospy.loginfo("==== Done with first precision gripper pass")
 
     # self.treat_screws_in_feeders()
 
@@ -1439,6 +1439,7 @@ if __name__ == '__main__':
       rospy.loginfo("Enter 62 to move robots back.")
       rospy.loginfo("Enter 71, 72... to test phoxi on item 1, 2...")
       rospy.loginfo("Enter 81, 82... to move b_bot suction to trays...")
+      rospy.loginfo("Enter 90 to move a_bot to kitting_pick_ready.")
       rospy.loginfo("Enter 91, 92... to do view_bin on bin1_1, bin1_2...")
       rospy.loginfo("Enter START to start the task.")
       rospy.loginfo("Enter x to exit.")
@@ -1501,6 +1502,8 @@ if __name__ == '__main__':
 
         place_pose.pose.position.z = .08
         kit.move_lin("b_bot", place_pose, .1, end_effector_link="b_bot_suction_tool_tip_link")
+      elif i == "90":
+        kit.go_to_named_pose("kitting_pick_ready", "a_bot", force_ur_script=kit.use_real_robot)
       elif i in ["91", "92", "93", "94", "95"]:
         if i == "91":
           part_id = 16

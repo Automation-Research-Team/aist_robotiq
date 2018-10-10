@@ -1339,19 +1339,19 @@ if __name__ == '__main__':
         c.do_change_tool_action("b_bot", equip=False, screw_size = 4)
       elif r == '623':
         c.go_to_named_pose("back", "b_bot")
-        c.go_to_named_pose("home", "c_bot")
+        c.go_to_named_pose("tool_pick_ready", "c_bot")
         c.do_change_tool_action("c_bot", equip=True, screw_size = 4)
       elif r == '624':
         c.go_to_named_pose("back", "b_bot")
-        c.go_to_named_pose("home", "c_bot")
+        c.go_to_named_pose("tool_pick_ready", "c_bot")
         c.do_change_tool_action("c_bot", equip=False, screw_size = 4)
       elif r == '625':
         c.go_to_named_pose("back", "b_bot")
-        c.go_to_named_pose("home", "c_bot")
+        c.go_to_named_pose("tool_pick_ready", "c_bot")
         c.do_change_tool_action("c_bot", equip=True, screw_size = 3)
       elif r == '626':
         c.go_to_named_pose("back", "b_bot")
-        c.go_to_named_pose("home", "c_bot")
+        c.go_to_named_pose("tool_pick_ready", "c_bot")
         c.do_change_tool_action("c_bot", equip=False, screw_size = 3)
       elif r == '627':
         c.go_to_named_pose("back", "c_bot")
