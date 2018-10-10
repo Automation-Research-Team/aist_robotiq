@@ -1325,7 +1325,7 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
   double theta_incr = M_PI/3;
   double r, radius_increment;
   if (robot_name == "c_bot") {
-    r=0.0002;
+    r=0.00015;
     radius_increment = .0008;
   }
   else {

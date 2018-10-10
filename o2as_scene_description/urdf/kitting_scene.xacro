@@ -43,10 +43,10 @@
     <origin xyz="+.01 0 0" rpy="0 0 ${pi}" />
   </xacro:kitting_tray2>
   <xacro:kitting_tray2 trayname="set_2_tray_2" parent="rack_trays_center">
-    <origin xyz="${tray_length+.02} 0 -.01" rpy="0 0 ${pi}" />
+    <origin xyz="${tray_length+.02} 0 -.015" rpy="0 0 ${pi}" />
   </xacro:kitting_tray2>
   <xacro:kitting_tray2 trayname="set_3_tray_2" parent="rack_trays_center">
-    <origin xyz="${tray_length+.02} ${tray_width} -.01" rpy="0 0 ${pi}" />
+    <origin xyz="${tray_length+.02} ${tray_width} -.015" rpy="0 0 ${pi}" />
   </xacro:kitting_tray2>
 
   <xacro:kitting_tray1 trayname="set_1_tray_1" parent="rack_trays_center">

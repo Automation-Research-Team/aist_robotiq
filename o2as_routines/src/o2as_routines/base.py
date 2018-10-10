@@ -73,7 +73,7 @@ def is_program_running(topic_namespace = ""):
     # throw()
 
 def wait_for_UR_program(topic_namespace = "", timeout_duration = rospy.Duration.from_sec(20.0)):
-  rospy.loginfo("Waiting for UR program to finish.")
+  rospy.logdebug("Waiting for UR program to finish.")
   # Only run this after sending custom URScripts and not the regular motion commands, or this call will not terminate before the timeout.
   rospy.sleep(1.0)
   t_start = rospy.Time.now()
@@ -84,7 +84,7 @@ def wait_for_UR_program(topic_namespace = "", timeout_duration = rospy.Duration.
     if time_passed > timeout_duration:
       rospy.loginfo("Timeout reached.")
       return False
-  rospy.loginfo("UR Program has terminated.")
+  rospy.logdebug("UR Program has terminated.")
   return True
 
 def all_close(goal, actual, tolerance):
@@ -466,7 +466,7 @@ class O2ASBaseRoutines(object):
 
     # if special_pick == True:
     #   object_pose.pose.orientation = self.downward_orientation
-    rospy.sleep(.5)
+    rospy.sleep(1.0)
     rospy.loginfo("Going back up")
     object_pose.pose.position.z += approach_height
     rospy.loginfo("Going to height " + str(object_pose.pose.position.z))

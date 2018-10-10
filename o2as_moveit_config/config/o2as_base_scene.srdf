@@ -360,6 +360,30 @@
         <joint name="a_bot_wrist_2_joint" value="-1.57" />
         <joint name="a_bot_wrist_3_joint" value="0" />
     </group_state>
+    <group_state name="kitting_pick_ready" group="a_bot">
+        <joint name="a_bot_elbow_joint" value="1.77" />
+        <joint name="a_bot_shoulder_lift_joint" value="-1.47" />
+        <joint name="a_bot_shoulder_pan_joint" value="0.7984" />
+        <joint name="a_bot_wrist_1_joint" value="-1.87" />
+        <joint name="a_bot_wrist_2_joint" value="-1.57" />
+        <joint name="a_bot_wrist_3_joint" value="-0.7984" />
+    </group_state>
+    <group_state name="suction_ready_left_bins" group="b_bot">
+        <joint name="b_bot_elbow_joint" value="1.47" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.47" />
+        <joint name="b_bot_shoulder_pan_joint" value="1.4927" />
+        <joint name="b_bot_wrist_1_joint" value="-0.0232" />
+        <joint name="b_bot_wrist_2_joint" value="0.729" />
+        <joint name="b_bot_wrist_3_joint" value="-3.14" />
+    </group_state>
+    <group_state name="suction_ready_right_bins" group="b_bot">
+        <joint name="b_bot_elbow_joint" value="1.47" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.47" />
+        <joint name="b_bot_shoulder_pan_joint" value="1.5621" />
+        <joint name="b_bot_wrist_1_joint" value="-0.0232" />
+        <joint name="b_bot_wrist_2_joint" value="-0.8678" />
+        <joint name="b_bot_wrist_3_joint" value="-3.14" />
+    </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="c_bot_gripper" parent_link="c_bot_robotiq_85_tip_link" group="c_bot" />
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
