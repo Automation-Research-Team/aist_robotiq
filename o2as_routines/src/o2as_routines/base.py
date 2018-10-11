@@ -671,17 +671,17 @@ class O2ASBaseRoutines(object):
   ################ ----- Gripper interfaces
   
   def send_gripper_command(self, gripper, command, this_action_grasps_an_object = False, force = 5.0, velocity = .1):
-    if gripper == "precision_gripper_outer" or gripper == "precision_gripper_inner":
+    if gripper == "precision_gripper_outer" or gripper == "precision_gripper_inner" or gripper == "a_bot":
       goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
       if command == "stop":
         goal.stop = True
       elif command == "close":
-        if gripper == "precision_gripper_inner":
+        if gripper == "precision_gripper_inner" or gripper == "a_bot":
           goal.close_inner_gripper_fully = True
         else:
           goal.close_outer_gripper_fully = True
       elif command == "open":
-        if gripper == "precision_gripper_inner":
+        if gripper == "precision_gripper_inner" or gripper == "a_bot":
           goal.open_inner_gripper_fully = True
         else:
           goal.open_outer_gripper_fully = True
