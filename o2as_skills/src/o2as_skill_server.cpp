@@ -1358,6 +1358,7 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
     bool_msg_pointer = ros::topic::waitForMessage<std_msgs::Bool>("/" + screw_tool_id + "/screw_suctioned", ros::Duration(1.0));
     if (bool_msg_pointer != NULL){
       screw_picked = bool_msg_pointer->data;
+      ROS_INFO("Screw was suctioned.");
     }
     else if (!use_real_robot_) screw_picked = true;
 
@@ -2038,10 +2039,11 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
   target_tip_link_pose.pose.position.x -= goal->screw_height+.005;  // Add the screw height and tolerance
 
   if (goal->screw_height < 0.001) {target_tip_link_pose.pose.position.x -= .02;}   // In case screw_height was not set
+  double approach_height = .02;
 
   // Move above the screw hole
   ROS_INFO("Moving above the screw hole.");
-  target_tip_link_pose.pose.position.x -= .05;
+  target_tip_link_pose.pose.position.x -= approach_height;
   moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link);
 
   sendFasteningToolCommand(screw_tool_id, "tighten", false, 15.0, 800);
@@ -2052,7 +2054,7 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
 
   // Move 1 cm into to the screw hole
   ROS_INFO("Pushing into the screw hole and doing spiral motion.");
-  target_tip_link_pose.pose.position.x += .05 + .01;
+  target_tip_link_pose.pose.position.x += approach_height + .01;
   bool success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link, 0.02);
 
   // Do spiral motion
@@ -2081,7 +2083,7 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
   }
 
   // Move back up a little
-  target_tip_link_pose.pose.position.x -= .05;
+  target_tip_link_pose.pose.position.x -= approach_height;
   success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link);
 
   // TODO: Check if suction is lost. If not, report failure.

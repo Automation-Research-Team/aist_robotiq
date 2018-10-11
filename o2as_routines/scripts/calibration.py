@@ -416,16 +416,19 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3)
     return 
 
-  def assembly_calibration_base_plate(self, robot_name="c_bot", end_effector_link = ""):
+  def assembly_calibration_base_plate(self, robot_name="c_bot", end_effector_link = "", context = ""):
     rospy.loginfo("============ Calibrating base plate for the assembly task. ============")
     rospy.loginfo("eef link " + end_effector_link + " should be 5 mm above each corner of the plate.")
     if robot_name=="a_bot":
+      self.send_gripper_command("a_bot", "close")
       self.go_to_named_pose("back", "b_bot")
       self.go_to_named_pose("back", "c_bot")
     elif robot_name=="b_bot":
+      self.send_gripper_command("b_bot", "close")
       self.go_to_named_pose("back", "a_bot")
       self.go_to_named_pose("back", "c_bot")
     elif robot_name=="c_bot":
+      self.send_gripper_command("c_bot", "close")
       self.go_to_named_pose("back", "a_bot")
       self.go_to_named_pose("back", "b_bot")
 
@@ -437,7 +440,10 @@ class CalibrationClass(O2ASBaseRoutines):
     poses = []
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.pose.orientation.w = 1.0
-    pose0.pose.position.x = -.01
+    pose0.pose.position.x = -.005
+    if context == "b_bot_m4_assembly_plates":
+      self.go_to_named_pose("screw_plate_ready", robot_name)
+      pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/4, 0, 0) )
 
     for i in range(4):
       poses.append(copy.deepcopy(pose0))
@@ -799,7 +805,7 @@ class CalibrationClass(O2ASBaseRoutines):
 
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "set_" + str(set_number) + "_tray_2_screw_m4_1"
-    pose0.pose.position.x = -.01
+    pose0.pose.position.x = -.007
     if robot_name=="b_bot" or robot_name=="a_bot":
       pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, 0, 0))
       if task=="kitting":
@@ -1169,6 +1175,7 @@ if __name__ == '__main__':
       rospy.loginfo("5: ===== ASSEMBLY TASK (no action)")
       rospy.loginfo("501-503: Assembly base plate (c_bot, b_bot, a_bot)")
       rospy.loginfo("504-507: Assembly base plate (b_bot m4, b_bot m3, c_bot nut, c_bot set_screw)")
+      rospy.loginfo("53: Assembly base plate (a_bot)")
       rospy.loginfo("54: Assembly assembled parts")
       rospy.loginfo("55: Assembly initial part locations (the plates)")
       rospy.loginfo("56: Go to tray screw positions with m4 tool for b_bot")
@@ -1327,6 +1334,8 @@ if __name__ == '__main__':
         c.assembly_calibration_base_plate("a_bot")
       elif r == '504':
         c.assembly_calibration_base_plate("b_bot", end_effector_link="b_bot_screw_tool_m4_tip_link")
+      elif r == '5041':
+        c.assembly_calibration_base_plate("b_bot", end_effector_link="b_bot_screw_tool_m4_tip_link", context="b_bot_m4_assembly_plates")
       elif r == '505':
         c.assembly_calibration_base_plate("b_bot", end_effector_link="b_bot_screw_tool_m3_tip_link")
       elif r == '506':
