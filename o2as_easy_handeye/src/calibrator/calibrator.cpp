@@ -54,6 +54,7 @@
 #include <visp/vpHomogeneousMatrix.h>
 
 #define USE_AIST_CALIBRATION
+#define DEBUG
 
 namespace visp_hand2eye_calibration
 {
@@ -166,32 +167,55 @@ Calibrator::computeEffectorCameraQuickCallback(
     ROS_INFO("o2as_easy_handeye_calibrator: computing...");
 
 #ifdef USE_AIST_CALIBRATION
-    std::vector<aistCalibration::Transform>	cMo_vec;
-    std::vector<aistCalibration::Transform>	wMe_vec;
+    std::vector<aistCalibration::Transform>	cMo;
+    std::vector<aistCalibration::Transform>	wMe;
     for (unsigned int i = 0; i < camera_object.transforms.size(); i++)
     {
-	cMo_vec.push_back(aistCalibration::Transform(
-			      camera_object.transforms[i]));
-	wMe_vec.push_back(aistCalibration::Transform(
-			      world_effector.transforms[i]));
+	cMo.push_back(aistCalibration::Transform(
+			  camera_object.transforms[i]));
+	wMe.push_back(aistCalibration::Transform(
+			  world_effector.transforms[i]));
     }
 
-    res.effector_camera = aistCalibration::calibrationAIST(cMo_vec, wMe_vec);
+    res.effector_camera = aistCalibration::calibrationAIST(cMo, wMe);
 #else
-    std::vector<vpHomogeneousMatrix>	cMo_vec;
-    std::vector<vpHomogeneousMatrix>	wMe_vec;
+    std::vector<vpHomogeneousMatrix>	cMo_vp;
+    std::vector<vpHomogeneousMatrix>	wMe_vp;
     for (unsigned int i = 0; i < camera_object.transforms.size(); i++)
     {
-	cMo_vec.push_back(visp_bridge::toVispHomogeneousMatrix(
+	cMo_vp.push_back(visp_bridge::toVispHomogeneousMatrix(
 			      camera_object.transforms[i]));
-	wMe_vec.push_back(visp_bridge::toVispHomogeneousMatrix(
+	wMe_vp.push_back(visp_bridge::toVispHomogeneousMatrix(
 			      world_effector.transforms[i]));
     }
 
-    vpHomogeneousMatrix		eMc;
-    aistCalibration::calibrationTsai(cMo_vec, wMe_vec, eMc);
+    vpHomogeneousMatrix		eMc_vp;
+    aistCalibration::calibrationTsai(cMo_vp, wMe_vp, eMc_vp);
 
-    res.effector_camera = visp_bridge::toGeometryMsgsTransform(eMc);
+    res.effector_camera = visp_bridge::toGeometryMsgsTransform(eMc_vp);
+#endif
+
+#ifdef DEBUG
+#  ifndef USE_AIST_CALIBRATION
+    std::vector<aistCalibration::Transform>	cMo;
+    std::vector<aistCalibration::Transform>	wMe;
+    for (unsigned int i = 0; i < camera_object.transforms.size(); i++)
+    {
+	cMo.push_back(aistCalibration::Transform(
+			  camera_object.transforms[i]));
+	wMe.push_back(aistCalibration::Transform(
+			  world_effector.transforms[i]));
+    }
+#  endif
+    aistCalibration::Transform		eMc(res.effector_camera);
+    std::ofstream			out("cMo_wMe_pairs.txt");
+    out << cMo.size() << std::endl;
+    for (size_t n = 0; n < cMo.size(); ++n)
+	out << cMo[n] << std::endl
+	    << wMe[n] << std::endl << std::endl;
+
+    const auto	wMo = objectToWorld(cMo, wMe, eMc);
+    evaluateAccuracy(std::cout, cMo, wMe, eMc, wMo);
 #endif
     return true;
 }
