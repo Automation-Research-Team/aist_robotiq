@@ -320,7 +320,7 @@ class AssemblyClass(O2ASBaseRoutines):
     # self.go_to_named_pose("home", "b_bot")
     # self.go_to_named_pose("home", "c_bot")
   
-  def place_plate_3_and_screw(self, place_plate_only=False, screw_first_only=False):
+  def place_plate_3_and_screw(self, place_plate_only=False, screw_first_only=False, reverse_placement_only=False):
     # Requires the screw tool to be equipped on b_bot
     self.go_to_named_pose("back", "c_bot")
     self.go_to_named_pose("back", "a_bot")
@@ -335,7 +335,7 @@ class AssemblyClass(O2ASBaseRoutines):
       ps_approach.header.frame_id = "initial_assy_part_03_pulley_ridge_bottom" # The top corner of the big plate
       ps_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0, pi/2, -pi/2))
       ps_approach.pose.position.x = 0.0025
-      ps_approach.pose.position.y = 0.0
+      ps_approach.pose.position.y = -0.02
       ps_approach.pose.position.z = 0.05
       ps_pickup = copy.deepcopy(ps_approach)
       ps_pickup.pose.position.z = -0.03    
@@ -344,9 +344,27 @@ class AssemblyClass(O2ASBaseRoutines):
       ps_place = copy.deepcopy(ps_pickup)
       ps_place.header.frame_id = "assembled_assy_part_03_pulley_ridge_bottom"
       ps_place.pose.position.z += .001
-      ps_place.pose.position.x += .001 # MAGIC NUMBER!!
+      ps_place.pose.position.x += .001 # MAGIC NUMBER!!  positive points towards c_bot
+      ps_shake_off = copy.deepcopy(ps_place)
+      ps_shake_off.pose.position.z -= .002
       ps_move_away = copy.deepcopy(ps_place)
-      ps_move_away.pose.position.y += .06
+      ps_move_away.pose.position.y += .08
+      ps_hold = copy.deepcopy(ps_place)
+      ps_hold.pose.position.y += .02
+
+      if reverse_placement_only: # This is for finding the right initial pose of the plate
+        self.go_to_named_pose("home", "c_bot")
+        self.send_gripper_command("c_bot", "close")
+        self.move_lin("c_bot", ps_move_away, 1.0)
+        self.send_gripper_command("c_bot", "open")
+        self.move_lin("c_bot", ps_place, .2)
+        self.send_gripper_command("c_bot", "close")
+        self.move_lin("c_bot", ps_high, 1.0)
+        self.move_lin("c_bot", ps_approach, 1.0)
+        ps_pickup.pose.position.z = 0.0015
+        self.move_lin("c_bot", ps_pickup, 0.2)
+        rospy.loginfo("Done")
+        return
       
       self.go_to_named_pose("home", "c_bot")
       self.move_lin("c_bot", ps_approach, 1.0)
@@ -366,20 +384,20 @@ class AssemblyClass(O2ASBaseRoutines):
       self.move_lin("c_bot", ps_place, .2)
       self.send_gripper_command("c_bot", 0.008)
       rospy.sleep(1.0)
-
+      self.move_lin("c_bot", ps_shake_off, .1)
+      self.send_gripper_command("c_bot", 0.015)
       # Move to the side for the screw tool to pass
       self.move_lin("c_bot", ps_move_away, .3)
-      self.send_gripper_command("c_bot", 0.01)
 
       if place_plate_only:
         rospy.loginfo("Done placing the plate.")
         return True
 
     ###### ==========
-    # Move b_bot to the hole and screw
+    # Move b_bot to the first hole and screw
     self.go_to_named_pose("screw_plate_ready", "b_bot")
     if not screw_first_only:
-      self.move_lin("c_bot", ps_place, .1)    # Move c_bot to the plate so it does not move too much
+      self.move_lin("c_bot", ps_hold, .1)    # Move c_bot to the plate so it does not move too much
       # self.send_gripper_command("c_bot", 0.008)
 
     pscrew = geometry_msgs.msg.PoseStamped()
@@ -392,7 +410,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.move_lin("b_bot", pscrew_approach, speed=0.1, acceleration=0.1, end_effector_link="b_bot_screw_tool_m4_tip_link")
     self.do_screw_action("b_bot", pscrew, screw_height = 0.002, screw_size = 4)
     self.go_to_named_pose("screw_plate_ready", "b_bot")
-    # self.go_to_named_pose("screw_ready_back", "b_bot")
+    self.go_to_named_pose("screw_ready_back", "b_bot")
 
     if not screw_first_only:
       ###### ========== 
@@ -417,7 +435,7 @@ class AssemblyClass(O2ASBaseRoutines):
       self.go_to_named_pose("screw_plate_ready", "b_bot")
       pscrew_2 = geometry_msgs.msg.PoseStamped()
       pscrew_2.header.frame_id = "assembled_assy_part_03_bottom_screw_hole_2"
-      pscrew_2.pose.position.y = -.002   # MAGIC NUMBER
+      # pscrew_2.pose.position.y = -.001   # MAGIC NUMBER
       pscrew_2.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(-pi/4, 0,0))
       pscrew_2_approach = copy.deepcopy(pscrew_2)
       pscrew_2_approach.pose.position.y -= .02
@@ -459,10 +477,10 @@ class AssemblyClass(O2ASBaseRoutines):
     ps_place.pose.position.z += .001
     ps_place.pose.position.x += .001    # MAGIC NUMBER
     ps_hold = copy.deepcopy(ps_place)
-    ps_move_away.pose.position.y -= .01
+    ps_hold.pose.position.y -= .035
     ps_hold.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_multiply(
                             tf.transformations.quaternion_from_euler(0, pi/2, pi/2), 
-                            tf.transformations.quaternion_from_euler(0, -pi*10/180, 0) ))
+                            tf.transformations.quaternion_from_euler(0, -pi*6/180, 0) ))
     ps_move_away = copy.deepcopy(ps_place)
     ps_move_away.pose.position.x -= .01
     ps_move_away.pose.position.y -= .06
@@ -494,7 +512,7 @@ class AssemblyClass(O2ASBaseRoutines):
     pscrew_approach.pose.position.x -= .03
     self.move_lin("b_bot", pscrew_approach, speed=0.1, acceleration=0.1, end_effector_link="b_bot_screw_tool_m4_tip_link")
     self.do_screw_action("b_bot", pscrew, screw_height = 0.002, screw_size = 4)
-    self.move_lin("b_bot", pscrew_2_approach, speed=0.1, acceleration=0.1, end_effector_link="b_bot_screw_tool_m4_tip_link")
+    self.move_lin("b_bot", pscrew_approach, speed=0.1, acceleration=0.1, end_effector_link="b_bot_screw_tool_m4_tip_link")
     self.go_to_named_pose("screw_plate_ready", "b_bot")
 
     # Pick second screw 
@@ -505,24 +523,15 @@ class AssemblyClass(O2ASBaseRoutines):
 
     ### --- c_bot
     # Recenter the motor plate
-    # ps_recenter_1 = copy.deepcopy(ps_place)
-    # ps_recenter_1.pose.position.y += .02
-    ps_recenter_2 = copy.deepcopy(ps_place)
-    ps_recenter_2.pose.position.y -= .03
-    # self.go_to_named_pose("home", "c_bot")
-    # self.move_lin("c_bot", ps_move_away_more, 1.0)
-    # self.move_lin("c_bot", ps_move_away, 1.0)
-    # self.move_lin("c_bot", ps_recenter_1, 1.0)
-    # self.send_gripper_command("c_bot", .007)
-    # rospy.sleep(0.5)
+    ps_recenter = copy.deepcopy(ps_place)
+    ps_recenter.pose.position.y -= .03
     self.send_gripper_command("c_bot", "open")
-    self.move_lin("c_bot", ps_recenter_2, 0.2)
+    self.move_lin("c_bot", ps_recenter, 0.2)
     self.send_gripper_command("c_bot", "close")
     rospy.sleep(1.0)
     self.send_gripper_command("c_bot", "open")
     rospy.sleep(1.0)
-    self.move_lin("c_bot", ps_move_away, 1.0)
-    # self.move_lin("c_bot", ps_move_away_more, 1.0)
+    # self.move_lin("c_bot", ps_move_away, 1.0)
     self.go_to_named_pose("back", "c_bot")
 
     ### --- b_bot
@@ -531,7 +540,7 @@ class AssemblyClass(O2ASBaseRoutines):
     pscrew_2 = geometry_msgs.msg.PoseStamped()
     pscrew_2.header.frame_id = "assembled_assy_part_02_bottom_screw_hole_2"
     # pscrew_2.pose.position.y = -.003   # MAGIC NUMBER (negative goes towards c_bot)
-    pscrew_2.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(-pi*100/180, 0,0))
+    pscrew_2.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(-pi*80/180, 0,0))
     pscrew_2_approach = copy.deepcopy(pscrew_2)
     pscrew_2_approach.pose.position.y -= .02
     pscrew_2_approach.pose.position.x -= .03
@@ -1611,7 +1620,8 @@ if __name__ == '__main__':
       rospy.loginfo("Enter 91-94 for subtasks (Large plate, motor plate, idler pin, motor).")
       rospy.loginfo("Enter 95-98 for subtasks (motor pulley, bearing+shaft, clamp pulley, belt).")
       rospy.loginfo("Enter 911 to place plate 3 (but don't screw)")
-      rospy.loginfo("Enter 911 to screw in plate 3 (but don't place it)")
+      rospy.loginfo("Enter 912 to place plate 3 from the base plate and put it on the table")
+      rospy.loginfo("Enter 913 to screw in plate 3 (but don't place it)")
       rospy.loginfo("Enter START to start the task.")
       rospy.loginfo("Enter x to exit.")
       i = raw_input()
@@ -1650,6 +1660,8 @@ if __name__ == '__main__':
       elif i == '911':
         assy.place_plate_3_and_screw(place_plate_only=True)
       elif i == '912':
+        assy.place_plate_3_and_screw(reverse_placement_only=True)
+      elif i == '913':
         assy.place_plate_3_and_screw(screw_first_only=True)
       elif i == '92':
         assy.subtask_f()  # Motor plate

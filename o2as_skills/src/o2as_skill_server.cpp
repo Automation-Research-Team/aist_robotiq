@@ -2043,6 +2043,7 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
 
   if (goal->screw_height < 0.001) {target_tip_link_pose.pose.position.x -= .01;}   // In case screw_height was not set
   double approach_height = .01; // This should include tolerance
+  double insertion_amount = .01;   // This is the depth that is compensated for by the bit cushion/spring
 
   // Move above the screw hole
   ROS_INFO("Moving above the screw hole.");
@@ -2057,7 +2058,7 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
 
   // Move 1 cm into to the screw hole
   ROS_INFO("Pushing into the screw hole and doing spiral motion.");
-  target_tip_link_pose.pose.position.x += approach_height + .01;
+  target_tip_link_pose.pose.position.x += approach_height + insertion_amount;
   bool success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link, 0.02);
 
   // Do spiral motion
@@ -2085,8 +2086,8 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
     ROS_INFO_STREAM("Screw tool motor command " << (finished_before_timeout ? "returned" : "did not return before timeout") <<". Result: " << result->control_result);
   }
 
-  // Move back up a little
-  target_tip_link_pose.pose.position.x -= approach_height;
+  // Move up and away
+  target_tip_link_pose.pose.position.x -= approach_height + insertion_amount;
   success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link);
 
   // TODO: Check if suction is lost. If not, report failure.
