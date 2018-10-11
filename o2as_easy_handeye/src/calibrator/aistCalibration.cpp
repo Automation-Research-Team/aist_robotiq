@@ -16,7 +16,7 @@ namespace aistCalibration
 {
 Transform
 calibrationAIST(const std::vector<Transform>& cMo,
-		const std::vector<Transform>& rMe)
+		const std::vector<Transform>& wMe)
 {
     const auto	nposes = cMo.size();
 
@@ -25,7 +25,7 @@ calibrationAIST(const std::vector<Transform>& cMo,
     for (size_t i = 0; i < nposes; ++i)
 	for (size_t j = i + 1; j < nposes; ++j)
 	{
-	    const auto			A = rMe[j].inverse() * rMe[i];
+	    const auto			A = wMe[j].inverse() * wMe[i];
 	    const auto			B = cMo[j] * cMo[i].inverse();
 	    const vpTranslationVector	a(A.q(0), A.q(1), A.q(2));
 	    const vpTranslationVector	b(B.q(0), B.q(1), B.q(2));
@@ -51,10 +51,7 @@ calibrationAIST(const std::vector<Transform>& cMo,
     C.eigenValues(lambda, V);
     vpQuaternionVector	qx(V.getCol(0));	// computed rotation
 #ifdef DEBUG
-    std::cerr << "--- lambda ---\n" << lambda << std::endl;
-    vpMatrix	L;
-    L.diag(lambda);
-    std::cerr << "--- C*V - V*L ---\n" << C*V - V*L << std::endl;
+    std::cerr << "--- Rotation: lambda ---\n" << lambda << std::endl;
 #endif
 
   // Compute translation.
@@ -63,7 +60,7 @@ calibrationAIST(const std::vector<Transform>& cMo,
     for (size_t i = 0; i < nposes; ++i)
 	for (size_t j = i + 1; j < nposes; ++j)
 	{
-	    const auto	A = rMe[j].inverse() * rMe[i];
+	    const auto	A = wMe[j].inverse() * wMe[i];
 	    const auto	B = cMo[j] * cMo[i].inverse();
 
 	    vpMatrix	M = A.R();
@@ -77,39 +74,104 @@ calibrationAIST(const std::vector<Transform>& cMo,
 	}
     
     const vpTranslationVector	tx(D.inverseByCholesky() * d);
-    const Transform		eMc(tx, qx);
 
-#ifdef DEBUG
-    for (size_t i = 0; i < nposes; ++i)
-	for (size_t j = i + 1; j < nposes; ++j)
-	{
-	    const auto	A = rMe[j].inverse() * rMe[i];
-	    const auto	B = cMo[j] * cMo[i].inverse();
+    return Transform(tx, qx);
+}
 
-	    const auto	err = A * eMc * B.inverse() * eMc.inverse();
-	    
-	    std::cerr << "==== (" << i << ", " << j << ") ====\n"
-		      << err << std::endl;
-	}
-#endif
+Transform
+objectToWorld(const std::vector<Transform>& cMo,
+	      const std::vector<Transform>& wMe, const Transform& eMc)
+{
+    const auto	nposes = cMo.size();
+    vpMatrix	C(4, 4);	// 4x4 matrix initialized with zeros.
+    vpColVector	ty(3, 0.0);
     for (size_t i = 0; i < nposes; ++i)
     {
+      // Transformation from object to world computed from estimated eMc.
+	const auto	M = wMe[i] * eMc * cMo[i];
+
+	for (size_t r = 0; r < 4; ++r)
+	{
+	    C[r][r] += 1;
+
+	    for (size_t c = 0; c < 4; ++c)
+		C[r][c] -= M.q(r)*M.q(c);
+	}
+
+	ty += M.t();
     }
+    vpColVector	lambda;
+    vpMatrix	V;
+    C.eigenValues(lambda, V);
+#ifdef DEBUG
+    std::cerr << "--- Translation: lambda ---\n" << lambda << std::endl;
+#endif
+    vpQuaternionVector	qy(V.getCol(0));
+    ty *= (1.0/double(nposes));
+
+    return Transform(vpTranslationVector(ty), qy);
+}
     
-    return eMc;
+void
+evaluateAccuracy(std::ostream& out,
+		 const std::vector<Transform>& cMo,
+		 const std::vector<Transform>& wMe,
+		 const Transform& eMc, const Transform& wMo)
+{
+    constexpr double	degree = 180.0/M_PI;
+
+    const auto	nposes = cMo.size();
+    double	tdiff_mean = 0;	// mean translational difference
+    double	tdiff_max  = 0;	// max. translational difference
+    double	adiff_mean = 0;	// mean angular difference
+    double	adiff_max  = 0;	// max. angular difference
+    
+    for (size_t i = 0; i < nposes; ++i)
+    {
+	const auto	AX    = wMe[i] * eMc;
+	const auto	YBinv = wMo * cMo[i].inverse();
+	const auto	tdiff = AX.translational_difference(YBinv);
+	const auto	adiff = AX.angular_difference(YBinv);
+
+	if (tdiff > tdiff_max)
+	    tdiff_max = tdiff;
+	if (adiff > adiff_max)
+	    adiff_max = adiff;
+
+	tdiff_mean += tdiff*tdiff;
+	adiff_mean += adiff*adiff;
+    }
+    tdiff_mean = std::sqrt(tdiff_mean/nposes);
+    adiff_mean = std::sqrt(adiff_mean/nposes);
+
+    out << "trans. err(m): (mean, max) = ("
+	<< tdiff_mean << ", " << tdiff_max
+	<< ")\nangle err(deg.): (mean, max) = ("
+	<< adiff_mean * degree << ", " << adiff_max * degree << ')'
+	<< std::endl;
+
+    out << "estimated eMc:\n" << eMc << std::endl
+	<< "estimated wMo:\n" << wMo << std::endl << std::endl;
+
+    std::cout << "=== estimated eMc: ====\n";
+    eMc.print();
+    std::cout << std::endl;
+    std::cout << "=== estimated wMo: ===\n";
+    wMo.print();
+    std::cout << std::endl;
 }
     
     
 void
 calibrationTsai(const std::vector<vpHomogeneousMatrix>& cMo,
-		const std::vector<vpHomogeneousMatrix>& rMe,
+		const std::vector<vpHomogeneousMatrix>& wMe,
 		vpHomogeneousMatrix& eMc)
 {
     unsigned int	nbPose = (unsigned int)cMo.size();
 
-    if (cMo.size() != rMe.size())
+    if (cMo.size() != wMe.size())
 	throw vpCalibrationException(vpCalibrationException::dimensionError,
-				     "cMo and rMe have different sizes");
+				     "cMo and wMe have different sizes");
     
     vpMatrix		A;
     vpColVector		B;
@@ -118,16 +180,16 @@ calibrationTsai(const std::vector<vpHomogeneousMatrix>& cMo,
     for (unsigned int i = 0; i < nbPose; i++)
     {
 	vpRotationMatrix	rRei, ciRo;
-	rMe[i].extract(rRei);
+	wMe[i].extract(rRei);
 	cMo[i].extract(ciRo);
-      // std::cout << "rMei: " << std::endl << rMe[i] << std::endl;
+      // std::cout << "wMei: " << std::endl << wMe[i] << std::endl;
 
 	for (unsigned int j = i + 1; j < nbPose; j++)
 	{
 	    vpRotationMatrix	rRej, cjRo;
-	    rMe[j].extract(rRej);
+	    wMe[j].extract(rRej);
 	    cMo[j].extract(cjRo);
-	  // std::cout << "rMej: " << std::endl << rMe[j] << std::endl;
+	  // std::cout << "wMej: " << std::endl << wMe[j] << std::endl;
 
 	    vpRotationMatrix	rReij = rRej.t() * rRei;
 	    vpRotationMatrix	cijRo = cjRo * ciRo.t();
@@ -214,19 +276,19 @@ calibrationTsai(const std::vector<vpHomogeneousMatrix>& cMo,
     {
 	vpRotationMatrix	rRei, ciRo;
 	vpTranslationVector	rTei, ciTo;
-	rMe[i].extract(rRei);
+	wMe[i].extract(rRei);
 	cMo[i].extract(ciRo);
-	rMe[i].extract(rTei);
+	wMe[i].extract(rTei);
 	cMo[i].extract(ciTo);
 
 	for (unsigned int j = i + 1; j < nbPose; j++)
 	{
 	    vpRotationMatrix	rRej, cjRo;
-	    rMe[j].extract(rRej);
+	    wMe[j].extract(rRej);
 	    cMo[j].extract(cjRo);
 
 	    vpTranslationVector	rTej, cjTo;
-	    rMe[j].extract(rTej);
+	    wMe[j].extract(rTej);
 	    cMo[j].extract(cjTo);
 
 	    vpRotationMatrix	rReij = rRej.t() * rRei;

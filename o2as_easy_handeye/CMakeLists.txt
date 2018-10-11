@@ -29,6 +29,7 @@ catkin_package()
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
+  src/calibrator
 )
 
 add_executable(calibrator
@@ -76,6 +77,23 @@ target_link_libraries(transformer
 )
 
 add_dependencies(transformer
+  ${PROJECT_NAME}_gencpp
+  ${catkin_EXPORTED_TARGETS}
+)
+
+add_executable(calibrator_test
+  src/calibrator_test/main.cpp
+  src/calibrator/aistCalibration.cpp
+  src/calibrator/vpMatrix.cpp
+)
+
+target_link_libraries(calibrator_test
+  ${catkin_LIBRARIES}
+  ${roscpp_LIBRARIES}
+  gsl
+)
+
+add_dependencies(calibrator_test
   ${PROJECT_NAME}_gencpp
   ${catkin_EXPORTED_TARGETS}
 )
