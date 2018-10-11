@@ -976,13 +976,14 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_pose_goal("b_bot", assembled_retainer_pin_head_final,speed=.05, move_lin = True)
     return
   
-  def hold_idle_pulley_with_a_bot(s):
+  def hold_idle_pulley_with_a_bot(self):
+    self.go_to_named_pose("home", "a_bot")
     assembled_retainer_pin_head = geometry_msgs.msg.PoseStamped()
-    assembled_retainer_pin_head.header.frame_id = "assembled_assy_part_05_center"
-    assembled_retainer_pin_head.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
-    assembled_retainer_pin_head.pose.position.x = 0
-    assembled_retainer_pin_head.pose.position.y = -0.0024
-    assembled_retainer_pin_head.pose.position.z = 0.005
+    assembled_retainer_pin_head.header.frame_id = "b_bot_robotiq_85_tip_link"
+    assembled_retainer_pin_head.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    assembled_retainer_pin_head.pose.position.x = -0.015   # Points away from plate  
+    # assembled_retainer_pin_head.pose.position.y = -0.0024  # MAGIC NUMBER
+    assembled_retainer_pin_head.pose.position.z = .005
     
     assembled_retainer_pin_head_approach = copy.deepcopy(assembled_retainer_pin_head)
     assembled_retainer_pin_head_approach.pose.position.z += 0.04
@@ -1028,11 +1029,11 @@ class AssemblyClass(O2ASBaseRoutines):
     self.do_linear_push("b_bot", 5, wait = True)
     return
 
-  def release_idle_pulley_from_a_bot(s):
+  def release_idle_pulley_from_a_bot(self):
     x=raw_input("press enter to continue with the next part of the sequence")
     assembled_retainer_pin_head_retreat = geometry_msgs.msg.PoseStamped()
-    assembled_retainer_pin_head_retreat.header.frame_id = "assembled_assy_part_05_center"
-    assembled_retainer_pin_head_retreat.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
+    assembled_retainer_pin_head_retreat.header.frame_id = "assembled_assy_part_14_screw_head"
+    assembled_retainer_pin_head_retreat.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     assembled_retainer_pin_head_retreat.pose.position.x = 0
     assembled_retainer_pin_head_retreat.pose.position.y = -0.0024
     assembled_retainer_pin_head_retreat.pose.position.z = 0.045
