@@ -407,7 +407,7 @@ class O2ASBaseRoutines(object):
     rospy.logdebug("Setting velocity scaling to " + str(speed))
     self.groups[robot_name].set_max_velocity_scaling_factor(speed)
     self.groups[robot_name].go(wait=True)
-    self.groups[robot_name].stop()
+    # self.groups[robot_name].stop()
     self.groups[robot_name].clear_pose_targets()
     return True
 

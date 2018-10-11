@@ -343,37 +343,39 @@ bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string
 // Acceleration is only used for the real robot.
 bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait, std::string end_effector_link, double velocity_scaling_factor, double acceleration, bool force_UR_script, bool force_moveit)
 {
-  if (use_real_robot_)
+  if (use_real_robot_ || force_UR_script)
   {
-    if (end_effector_link == "")
+    if (!force_moveit)
     {
-      if (robot_name == "c_bot")
-        end_effector_link = "c_bot_robotiq_85_tip_link";
-      else if (robot_name == "b_bot")
-        end_effector_link = "b_bot_robotiq_85_tip_link";
-      else if (robot_name == "a_bot")
-        end_effector_link = "a_bot_gripper_tip_link";
-    }
-    ROS_WARN("Real robot is being used. Sending linear motion to robot controller directly via URScript.");
-    o2as_msgs::sendScriptToUR UR_srv;
-    UR_srv.request.program_id = "lin_move";
-    UR_srv.request.robot_name = robot_name;  
-    UR_srv.request.target_pose = transformTargetPoseFromTipLinkToEE(pose, robot_name, end_effector_link, tflistener_);
-    publishMarker(transformTargetPoseFromTipLinkToEE(pose, robot_name, end_effector_link, tflistener_), "pose");
-    UR_srv.request.velocity = velocity_scaling_factor;
-    UR_srv.request.acceleration = acceleration;
-    sendScriptToURClient_.call(UR_srv);
-    if (UR_srv.response.success == true)
-    {
-      ROS_INFO("Successfully called the URScript client to do linear motion to approach pose.");
-      waitForURProgram("/" + robot_name +"_controller");
-      return true;
-    }
-    else
-    {
-      ROS_ERROR("Could not go to approach pose. Aborting tool pickup.");
-      planning_scene_interface_.applyPlanningScene(planning_scene_);
-      return false;
+      if (end_effector_link == "")
+      {
+        if (robot_name == "c_bot")
+          end_effector_link = "c_bot_robotiq_85_tip_link";
+        else if (robot_name == "b_bot")
+          end_effector_link = "b_bot_robotiq_85_tip_link";
+        else if (robot_name == "a_bot")
+          end_effector_link = "a_bot_gripper_tip_link";
+      }
+      ROS_DEBUG("Real robot is being used. Sending linear motion to robot controller directly via URScript.");
+      o2as_msgs::sendScriptToUR UR_srv;
+      UR_srv.request.program_id = "lin_move";
+      UR_srv.request.robot_name = robot_name;  
+      UR_srv.request.target_pose = transformTargetPoseFromTipLinkToEE(pose, robot_name, end_effector_link, tflistener_);
+      publishMarker(transformTargetPoseFromTipLinkToEE(pose, robot_name, end_effector_link, tflistener_), "pose");
+      UR_srv.request.velocity = velocity_scaling_factor;
+      UR_srv.request.acceleration = acceleration;
+      sendScriptToURClient_.call(UR_srv);
+      if (UR_srv.response.success == true)
+      {
+        ROS_DEBUG("Successfully called the URScript client to do linear motion.");
+        waitForURProgram("/" + robot_name +"_controller");
+        return true;
+      }
+      else
+      {
+        ROS_ERROR("Could not go LIN to pose via UR script.");
+        return false;
+      }
     }
   }
 
@@ -1345,7 +1347,7 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
     // tfbroadcaster_.sendTransform(tf::StampedTransform(t, ros::Time::now(), above_screw_head_pose_.header.frame_id, "screw_pick_frame_"));
     sendFasteningToolCommand(fastening_tool_name, "loosen", false, 2.0);
 
-    ROS_INFO_STREAM("Moving into screw.");
+    ROS_INFO_STREAM("Moving into screw to pick it up.");
     adjusted_pose.pose.position.x += .02;
     moveToCartPoseLIN(adjusted_pose, robot_name, true, screw_tool_link, 0.05);
 
@@ -1358,7 +1360,8 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
     bool_msg_pointer = ros::topic::waitForMessage<std_msgs::Bool>("/" + screw_tool_id + "/screw_suctioned", ros::Duration(1.0));
     if (bool_msg_pointer != NULL){
       screw_picked = bool_msg_pointer->data;
-      ROS_INFO("Screw was suctioned.");
+      if (screw_picked)
+        break;
     }
     else if (!use_real_robot_) screw_picked = true;
 
@@ -1366,7 +1369,7 @@ bool SkillServer::pickScrew(geometry_msgs::PoseStamped screw_head_pose, std::str
       break;
 
     // Adjust the position (spiral search)
-    ROS_INFO("Adjusting the position of the pick attempt slightly and retrying");
+    ROS_INFO("Retrying pickup with adjusted position");
     theta=theta+theta_incr;
     y=cos(theta)*r;
     z=sin(theta)*r;
@@ -2036,10 +2039,10 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
   // std::string screw_tool_link = held_screw_tool_ + "_tip";
   ROS_INFO_STREAM("screw tool link:  " << screw_tool_link);
 
-  target_tip_link_pose.pose.position.x -= goal->screw_height+.005;  // Add the screw height and tolerance
+  target_tip_link_pose.pose.position.x -= goal->screw_height;  // Add the screw height
 
-  if (goal->screw_height < 0.001) {target_tip_link_pose.pose.position.x -= .02;}   // In case screw_height was not set
-  double approach_height = .02;
+  if (goal->screw_height < 0.001) {target_tip_link_pose.pose.position.x -= .01;}   // In case screw_height was not set
+  double approach_height = .01; // This should include tolerance
 
   // Move above the screw hole
   ROS_INFO("Moving above the screw hole.");

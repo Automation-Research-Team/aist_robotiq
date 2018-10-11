@@ -444,13 +444,22 @@ class CalibrationClass(O2ASBaseRoutines):
     if context == "b_bot_m4_assembly_plates":
       self.go_to_named_pose("screw_plate_ready", robot_name)
       pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/4, 0, 0) )
+    if context == "motor_plate" and "screw" in end_effector_link:
+      self.go_to_named_pose("screw_plate_ready", robot_name)
+      pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/3, 0, 0) )
 
-    for i in range(4):
-      poses.append(copy.deepcopy(pose0))
-    poses[0].header.frame_id = "assembled_assy_part_03_bottom_screw_hole_aligner_2"
-    poses[1].header.frame_id = "assembled_assy_part_03_bottom_screw_hole_aligner_1"
-    poses[2].header.frame_id = "assembled_assy_part_01_corner_3"
-    poses[3].header.frame_id = "assembled_assy_part_01_corner_4"
+    if context == "motor_plate":
+      for i in range(2):
+        poses.append(copy.deepcopy(pose0))
+      poses[0].header.frame_id = "assembled_assy_part_02_bottom_screw_hole_aligner_2"
+      poses[1].header.frame_id = "assembled_assy_part_02_bottom_screw_hole_aligner_1"
+    else:
+      for i in range(4):
+        poses.append(copy.deepcopy(pose0))
+      poses[0].header.frame_id = "assembled_assy_part_03_bottom_screw_hole_aligner_2"
+      poses[1].header.frame_id = "assembled_assy_part_03_bottom_screw_hole_aligner_1"
+      poses[2].header.frame_id = "assembled_assy_part_01_corner_3"
+      poses[3].header.frame_id = "assembled_assy_part_01_corner_4"
 
     self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, go_home=False, end_effector_link=end_effector_link, move_lin=True)
     return 
@@ -1175,6 +1184,7 @@ if __name__ == '__main__':
       rospy.loginfo("5: ===== ASSEMBLY TASK (no action)")
       rospy.loginfo("501-503: Assembly base plate (c_bot, b_bot, a_bot)")
       rospy.loginfo("504-507: Assembly base plate (b_bot m4, b_bot m3, c_bot nut, c_bot set_screw)")
+      rospy.loginfo("511-513: Motor plate (c_bot, b_bot, b_bot m4)")
       rospy.loginfo("53: Assembly base plate (a_bot)")
       rospy.loginfo("54: Assembly assembled parts")
       rospy.loginfo("55: Assembly initial part locations (the plates)")
@@ -1342,6 +1352,12 @@ if __name__ == '__main__':
         c.assembly_calibration_base_plate("c_bot", end_effector_link="c_bot_nut_tool_m6_tip_link")
       elif r == '507':
         c.assembly_calibration_base_plate("c_bot", end_effector_link="c_bot_set_screw_tool_tip_link")
+      elif r == '511':
+        c.assembly_calibration_base_plate("c_bot", context="motor_plate")
+      elif r == '512':
+        c.assembly_calibration_base_plate("b_bot", context="motor_plate")
+      elif r == '513':
+        c.assembly_calibration_base_plate("b_bot", end_effector_link="b_bot_screw_tool_m4_tip_link", context="motor_plate")
       elif r == '54':
         c.assembly_calibration_assembled_parts()
       elif r == '55':
