@@ -3,14 +3,13 @@
        name="o2as_base_scene" >
 
 
-  <!-- Calibration from 20 August 2018 -->
+  <!-- Calibration from 12 October 2018 -->
   <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
   <xacro:property name="a_bot_x" value="-0.01"/>
   <xacro:property name="a_bot_y" value="-0.5"/>
-  <xacro:property name="b_bot_x" value="-0.009"/>
-  <xacro:property name="b_bot_y" value="0.503"/>
-  <xacro:property name="b_bot_theta" value="-3.12832815"/>
-  <!-- The above is 0.76 degrees away from pi (Sep 17; not perfect) -->
+  <xacro:property name="b_bot_x" value="-0.008"/>
+  <xacro:property name="b_bot_y" value="0.50"/>
+  <xacro:property name="b_bot_theta" value="-3.14"/>
   <xacro:property name="c_bot_x" value="-0.499"/>
   <xacro:property name="c_bot_y" value="0.0"/>
 
