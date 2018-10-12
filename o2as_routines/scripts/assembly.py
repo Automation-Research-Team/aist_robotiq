@@ -60,6 +60,11 @@ class AssemblyClass(O2ASBaseRoutines):
     # self.action_client.wait_for_server()
     rospy.sleep(.5)   # Use this instead of waiting, so that simulation can be used
 
+    # MAGIC NUMBERS!
+    # This list is not exhaustive, but it's a start
+    self.idler_pin_handover_offset_y = 0.0
+    self.idler_pin_handover_offset_z = 0.0
+
   def set_up_item_parameters(self):
     # TODO: Publish the items to the scene, or do something equivalent. 
     self.item_names = []
@@ -402,7 +407,7 @@ class AssemblyClass(O2ASBaseRoutines):
 
     pscrew = geometry_msgs.msg.PoseStamped()
     pscrew.header.frame_id = "assembled_assy_part_03_bottom_screw_hole_1"
-    # pscrew.pose.position.y = .00   # MAGIC NUMBER
+    # pscrew.pose.position.y = .00   # MAGIC NUMBER (negative goes towards c_bot)
     pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(-pi/4, 0,0))
     pscrew_approach = copy.deepcopy(pscrew)
     pscrew_approach.pose.position.y -= .02
@@ -435,7 +440,7 @@ class AssemblyClass(O2ASBaseRoutines):
       self.go_to_named_pose("screw_plate_ready", "b_bot")
       pscrew_2 = geometry_msgs.msg.PoseStamped()
       pscrew_2.header.frame_id = "assembled_assy_part_03_bottom_screw_hole_2"
-      # pscrew_2.pose.position.y = -.001   # MAGIC NUMBER
+      # pscrew_2.pose.position.y = -.001   # MAGIC NUMBER  (negative goes towards c_bot)
       pscrew_2.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(-pi/4, 0,0))
       pscrew_2_approach = copy.deepcopy(pscrew_2)
       pscrew_2_approach.pose.position.y -= .02
@@ -549,6 +554,8 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_named_pose("screw_plate_ready", "b_bot")
     return
 
+  # ============================================ IDLER PIN SUBTASK
+
   def pick_retainer_pin(self, robot_name = "b_bot"):
     rospy.loginfo("============ Pick up the retainer pin using b_bot ============")
     self.go_to_named_pose("home", robot_name)
@@ -603,6 +610,8 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_pose_goal("b_bot", intermediate_retainer_pin_tip,speed=.3, move_lin = True)
     intermediate_retainer_pin_tip.pose.position.z -= 0.4
     self.go_to_pose_goal("b_bot", intermediate_retainer_pin_tip,speed=.3, move_lin = True)
+    # The joint poses at this pose are:
+    # 2.053785800933838, -1.21775991121401, 2.5320937633514404, -2.8856785933123987, 1.5664243698120117, -0.48553735414613897
     return
 
   def adjust_centering(self, robot_name = "b_bot"):
@@ -622,7 +631,7 @@ class AssemblyClass(O2ASBaseRoutines):
     pose2 = geometry_msgs.msg.PoseStamped()
     pose2.header.frame_id = "b_bot_robotiq_85_tip_link"
     pose2.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2,0,pi/2))
-    pose2.pose.position.z = 0.004
+    pose2.pose.position.z = 0.0  # MAGIC NUMBER!
     pose2.pose.position.y = 0.025
     pose2.pose.position.x = 0.015
     self.go_to_pose_goal("c_bot", pose2,speed=.3, move_lin = True)
@@ -668,7 +677,7 @@ class AssemblyClass(O2ASBaseRoutines):
     pose0.header.frame_id = "tray_2_partition_3"
     pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     pose0.pose.position.x = 0
-    pose0.pose.position.z = 0.02
+    pose0.pose.position.z = 0.01
 
     self.pick("a_bot",pose0,-0.015,
                                 speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
@@ -688,8 +697,8 @@ class AssemblyClass(O2ASBaseRoutines):
     intermediate_retainer_pin_tip.header.frame_id = "intermediate_assy_part_14_screw_tip"
     intermediate_retainer_pin_tip.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi, 0))
     intermediate_retainer_pin_tip.pose.position.x = -0.022
-    intermediate_retainer_pin_tip.pose.position.y = 0.001
-    intermediate_retainer_pin_tip.pose.position.z += 0.008
+    intermediate_retainer_pin_tip.pose.position.y = self.idler_pin_handover_offset_y
+    intermediate_retainer_pin_tip.pose.position.z += self.idler_pin_handover_offset_z
 
     self.place("a_bot",intermediate_retainer_pin_tip,-0.022,
                                 speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
@@ -735,8 +744,8 @@ class AssemblyClass(O2ASBaseRoutines):
     intermediate_retainer_pin_tip.header.frame_id = "intermediate_assy_part_14_screw_tip"
     intermediate_retainer_pin_tip.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi, 0))
     intermediate_retainer_pin_tip.pose.position.x = -0.022
-    intermediate_retainer_pin_tip.pose.position.y = 0.001
-    intermediate_retainer_pin_tip.pose.position.z += 0.008
+    intermediate_retainer_pin_tip.pose.position.y = self.idler_pin_handover_offset_y
+    intermediate_retainer_pin_tip.pose.position.z += self.idler_pin_handover_offset_z
 
     self.place("a_bot",intermediate_retainer_pin_tip,-0.022,
                                 speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
@@ -747,6 +756,16 @@ class AssemblyClass(O2ASBaseRoutines):
       self.horizontal_spiral_motion("a_bot", .004)
       rospy.loginfo("doing spiral motion")
 
+    # Push the pulley down, in case it got stuck
+    push_down_pose_1 = copy.deepcopy(intermediate_retainer_pin_tip)
+    push_down_pose_1.pose.position.x = -0.01
+    push_down_pose_2 = copy.deepcopy(push_down_pose_1)
+    push_down_pose_2.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, pi, 0))
+    self.send_gripper_command("a_bot", "open")
+    self.go_to_pose_goal("a_bot", push_down_pose_2,speed=.1, move_lin = True)
+    self.go_to_pose_goal("a_bot", push_down_pose_1,speed=.1, move_lin = True)
+
+    self.go_to_named_pose("home", "a_bot")
     intermediate_facing_sky.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
     intermediate_facing_sky.pose.position.x = 0.
     intermediate_facing_sky.pose.position.y = 0.
@@ -767,33 +786,10 @@ class AssemblyClass(O2ASBaseRoutines):
 
     self.pick("a_bot",pose0,-0.015,
                                 speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
-                                approach_height = 0.1)
+                                approach_height = 0.05)
 
     self.go_to_named_pose("home", "a_bot")
     return
-
-  def pick_nut_with_spiral_search(self,max_radius=0.005,rotation_axis="z",object_pose="",grasp_height=0.0,speed_fast=0.31,speed_slow=0.05,approach_height=0.1,end_effector_link=""):
-    real_radius=0
-    x_original=object_pose.pose.position.x
-    y_original=object_pose.pose.position.y
-    z_original=object_pose.pose.position.z
-
-    while(real_radius<max_radius):
-      self.pick(robotname="c_bot",object_pose=object_pose,grasp_height=grasp_height,
-                                  speed_fast = speed_fast, speed_slow = speed_slow, gripper_command="not_going_to_do_anything",
-                                  approach_height = approach_height,end_effector_link=end_effector_link)
-      real_radius=10000
-    # todo [IMPORTANT]: implement a spiral search like the ones for picking up screws
-
-    # ROS_INFO("Adjusting the position of the pick attempt slightly and retrying");
-    # theta=theta+theta_incr;
-    # y=cos(theta)*r;
-    # z=sin(theta)*r;
-    # adjusted_pose = search_start_pose;
-    # adjusted_pose.pose.position.y += y;
-    # adjusted_pose.pose.position.z += z;
-    # r = r + radius_inc_set;
-    # RealRadius = sqrt(pow(y,2)+pow(z,2));
 
   def place_retainer_pin_nut_and_pick_with_tool(self):
     self.go_to_named_pose("home", "a_bot")
@@ -809,20 +805,58 @@ class AssemblyClass(O2ASBaseRoutines):
 
     self.place("a_bot",nut_intermediate_a_bot,0.0,
                                 speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
-                                approach_height = 0.1,approach_axis="z", lift_up_after_place = True)
+                                approach_height = 0.05,approach_axis="z", lift_up_after_place = True)
 
     self.go_to_named_pose("back", "a_bot")
     self.go_to_named_pose("screw_ready", "c_bot")
-    rospy.logwarn("The following sequence assumes that the nut tool m6 is being grasped by c_bot")
-    #todo: pick up nut tool with c
-    max_radius=0.005
-    real_radius=0.
-    rotation_axis="z"
     self.pick_nut_with_spiral_search(object_pose=nut_intermediate_c_bot,end_effector_link="c_bot_nut_tool_m6_tip_link")
-    #do not make the grasp height of the above pick lower than 0.0!
-    #to do: pick up nut with nut tool
-    self.go_to_named_pose("screw_ready", "c_bot")
+    self.go_to_named_pose("home", "c_bot")
     return
+  
+  def pick_nut_with_spiral_search(self,max_radius=0.005, object_pose):
+    # Spiral search to pick up the nut
+    ###################
+    max_radius = .005
+    theta_incr = M_PI/3
+    r=0.00015
+    radius_increment = .0008
+    radius_inc_set = radius_increment / (2*M_PI / theta_incr)
+    theta=0
+    RealRadius=0
+    
+    # Try to pick the nut multiple times
+    adjusted_pose = copy.deepcopy(object_pose)
+    while RealRadius < max_radius and not rospy.is_shutdown():
+      ROS_INFO_STREAM("Moving into screw to pick it up.")
+      # adjusted_pose.pose.position.x += .02
+      # self.go_to_pose_goal("c_bot", adjusted_pose, speed=.1, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
+      self.pick(robotname="c_bot",object_pose=object_pose,grasp_height=0.0,
+                                  speed_fast = .3, speed_slow = .03, gripper_command="None",
+                                  approach_height = .05,end_effector_link="c_bot_nut_tool_m6_tip_link")
+
+      # TODO: Test if pushing linear works better
+
+      # Adjust the position (spiral search)
+      ROS_INFO("Retrying pickup with adjusted position")
+      theta=theta+theta_incr
+      y=cos(theta)*r
+      z=sin(theta)*r
+      adjusted_pose = copy.deepcopy(object_pose)
+      adjusted_pose.pose.position.y += y
+      adjusted_pose.pose.position.z += z
+      r = r + radius_inc_set
+      RealRadius = sqrt(pow(y,2)+pow(z,2))
+    ###################
+
+    # ROS_INFO("Adjusting the position of the pick attempt slightly and retrying");
+    # theta=theta+theta_incr;
+    # y=cos(theta)*r;
+    # z=sin(theta)*r;
+    # adjusted_pose = search_start_pose;
+    # adjusted_pose.pose.position.y += y;
+    # adjusted_pose.pose.position.z += z;
+    # r = r + radius_inc_set;
+    # RealRadius = sqrt(pow(y,2)+pow(z,2));
 
   def pick_retainer_pin_washer(self):
     rospy.loginfo("============ Picking up the retainer pin washer 1 using a_bot ============")
@@ -837,12 +871,12 @@ class AssemblyClass(O2ASBaseRoutines):
 
     self.pick("a_bot",pose0,-0.015,
                                 speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
-                                approach_height = 0.1)
+                                approach_height = 0.05)
 
     self.go_to_named_pose("home", "a_bot")
     return
 
-  def pick_retainer_pin_washer_2(self):
+  def pick_retainer_pin_washer_1(self):
     rospy.loginfo("============ Picking up the retainer pin washer 2 using a_bot ============")
 
     self.go_to_named_pose("home", "a_bot")
@@ -857,12 +891,12 @@ class AssemblyClass(O2ASBaseRoutines):
 
     self.pick("a_bot",pose0,-0.015,
                                 speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
-                                approach_height = 0.1)
+                                approach_height = 0.05)
 
     self.go_to_named_pose("home", "a_bot")
     return
 
-  def place_retainer_pin_washer_2(self, robot_name = "a_bot"):
+  def place_retainer_pin_washer_1(self, robot_name = "a_bot"):
     intermediate_facing_sky = geometry_msgs.msg.PoseStamped()
     intermediate_facing_sky.header.frame_id = "intermediate_assy_part_14_screw_head"
     intermediate_facing_sky.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
@@ -873,8 +907,8 @@ class AssemblyClass(O2ASBaseRoutines):
     intermediate_retainer_pin_tip.header.frame_id = "intermediate_assy_part_14_screw_tip"
     intermediate_retainer_pin_tip.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi, 0))
     intermediate_retainer_pin_tip.pose.position.x = -0.022
-    intermediate_retainer_pin_tip.pose.position.y = 0.001
-    intermediate_retainer_pin_tip.pose.position.z += 0.008
+    intermediate_retainer_pin_tip.pose.position.y = self.idler_pin_handover_offset_y
+    intermediate_retainer_pin_tip.pose.position.z += self.idler_pin_handover_offset_z
 
     self.place("a_bot",intermediate_retainer_pin_tip,-0.022,
                                 speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
@@ -891,15 +925,14 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_pose_goal("b_bot", intermediate_facing_sky,speed=.31, move_lin = True)
     return
 
-  def place_retainer_pin_washer_intermediate(self):
-    intermediate_facing_sky = geometry_msgs.msg.PoseStamped()
-    intermediate_facing_sky.header.frame_id = "workspace_center"
-    intermediate_facing_sky.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
-    intermediate_facing_sky.pose.position.x = -.13
-    intermediate_facing_sky.pose.position.y = -.20
+  def place_retainer_pin_washer_on_table(self):
+    place_pose = geometry_msgs.msg.PoseStamped()
+    place_pose.header.frame_id = "workspace_center"
+    place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+    place_pose.pose.position.x = -.13
+    place_pose.pose.position.y = -.20
 
-    #0.01637; 0.0021364; 0.012837
-    self.place("a_bot",intermediate_facing_sky,0.0,
+    self.place("a_bot",place_pose,0.0,
                                 speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
                                 approach_height = 0.1,approach_axis="z", lift_up_after_place = False)
 
@@ -907,17 +940,17 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_named_pose("home", "a_bot")
     return
 
-  def pick_retainer_pin_washer_intermediate(self):
-    intermediate_facing_sky = geometry_msgs.msg.PoseStamped()
-    intermediate_facing_sky.header.frame_id = "workspace_center"
-    intermediate_facing_sky.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
-    intermediate_facing_sky.pose.position.x = -.13
-    intermediate_facing_sky.pose.position.y = -.20
+  def pick_retainer_pin_washer_from_table(self):
+    pick_pose = geometry_msgs.msg.PoseStamped()
+    pick_pose.header.frame_id = "workspace_center"
+    pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+    pick_pose.pose.position.x = -.13
+    pick_pose.pose.position.y = -.20
+    pick_pose.pose.position.z = 0
 
-    #0.01637; 0.0021364; 0.012837
-    self.pick("a_bot",intermediate_facing_sky, 0.0,
+    self.pick("a_bot",pick_pose, -0.005,
                                 speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
-                                approach_height = 0.1)
+                                approach_height = 0.05)
 
     self.go_to_named_pose("home", "a_bot")
     return
@@ -925,19 +958,19 @@ class AssemblyClass(O2ASBaseRoutines):
   def place_retainer_pin_washer_final(self):
     assembled_retainer_pin_tip = geometry_msgs.msg.PoseStamped()
     assembled_retainer_pin_tip.header.frame_id = "assembled_assy_part_14_screw_tip"
-    #tilted approach
-    # assembled_retainer_pin_tip.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi*3./4.,0))
-    #straight from above approach
     assembled_retainer_pin_tip.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi*2./4.,pi))
     assembled_retainer_pin_tip.pose.position.x = -0.003
     assembled_retainer_pin_tip.pose.position.y = 0
-    assembled_retainer_pin_tip.pose.position.z = -0.001
+    assembled_retainer_pin_tip.pose.position.z = -0.001  # MAGIC NUMBER?
 
-    #0.01637; 0.0021364; 0.012837
-    self.place("a_bot",assembled_retainer_pin_tip,-0.015,
+    self.place("a_bot",assembled_retainer_pin_tip,0.0,
                                 speed_fast = 0.1, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
-                                approach_height = 0.1,approach_axis="z", lift_up_after_place = True)
+                                approach_height = 0.1,approach_axis="z", lift_up_after_place = False)
 
+    self.horizontal_spiral_motion("a_bot", .004)
+    a_bot_retrat = copy.deepcopy.pose(a_bot_retreat)
+    a_bot_retreat.pose.position.z += .1
+    self.self.go_to_pose_goal("a_bot", a_bot_retreat, speed=.1, move_lin = True)
 
     self.go_to_named_pose("home", "a_bot")
     return
@@ -951,13 +984,13 @@ class AssemblyClass(O2ASBaseRoutines):
     assembled_retainer_pin_head.header.frame_id = "assembled_assy_part_14_screw_head"
     assembled_retainer_pin_head.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
     assembled_retainer_pin_head.pose.position.x = 0.00
-    assembled_retainer_pin_head.pose.position.y = -0.0024
-    assembled_retainer_pin_head.pose.position.z = 0.01
+    # assembled_retainer_pin_head.pose.position.y = -0.0024  # MAGIC NUMBER
+    assembled_retainer_pin_head.pose.position.z = 0.015  # Offset 
 
     assembled_retainer_pin_head_final=copy.deepcopy(assembled_retainer_pin_head)
-    assembled_retainer_pin_head_final.pose.position.x = 0.0052989
-    assembled_retainer_pin_head_final.pose.position.y = -0.0022852
-    assembled_retainer_pin_head_final.pose.position.z = 0.0032796
+    assembled_retainer_pin_head_final.pose.position.x = 0.0053 # MAGIC NUMBERS
+    # assembled_retainer_pin_head_final.pose.position.y = -0.0023 # MAGIC NUMBERS
+    # assembled_retainer_pin_head_final.pose.position.z = 0.0033 # MAGIC NUMBERS
 
     self.groups["b_bot"].set_joint_value_target([1.315, -1.24, 1.28, -0.00, 0.23, -1.55])
     self.groups["b_bot"].set_max_velocity_scaling_factor(.31)
@@ -988,30 +1021,22 @@ class AssemblyClass(O2ASBaseRoutines):
     assembled_retainer_pin_head_approach = copy.deepcopy(assembled_retainer_pin_head)
     assembled_retainer_pin_head_approach.pose.position.z += 0.04
     if self.use_real_robot:
-      self.precision_gripper_inner_open()
+      self.send_gripper_command("a_bot", "close")
     self.go_to_pose_goal("a_bot", assembled_retainer_pin_head_approach, speed=.1, move_lin = True)
     self.go_to_pose_goal("a_bot", assembled_retainer_pin_head, speed=.01, move_lin = True)
-
-    if self.use_real_robot:
-      self.precision_gripper_inner_close(this_action_grasps_an_object = True)
     return
   
   def release_and_push_with_b_bot(self):
-    x=raw_input("press enter to continue with the next part of the sequence")
-    self.send_gripper_command("b_bot", "open")
-    self.send_gripper_command("b_bot", "open")
-    self.send_gripper_command("b_bot", "open")
-    self.send_gripper_command("b_bot", "open")
+    self.send_gripper_command("b_bot", "close")
+    rospy.sleep(1.0)
     self.send_gripper_command("b_bot", "open")
     rospy.sleep(1.0)
-    rospy.loginfo("Moving backwards. Did the gripper open? If yes, press enter.")
-    raw_input()
 
     b_bot_going_back = geometry_msgs.msg.PoseStamped()
     b_bot_going_back.header.frame_id = "assembled_assy_part_14_screw_head"
     b_bot_going_back.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
     b_bot_going_back.pose.position.x = -0.03
-    b_bot_going_back.pose.position.y = -0.0024
+    # b_bot_going_back.pose.position.y = -0.0024 # MAGIC NUMBER
     b_bot_going_back.pose.position.z = 0.01
 
 
@@ -1026,19 +1051,16 @@ class AssemblyClass(O2ASBaseRoutines):
     self.send_gripper_command("b_bot", "close")
     rospy.sleep(0.5)
     self.go_to_pose_goal("b_bot", b_bot_going_back_below, speed=.01, move_lin = True)
-    self.do_linear_push("b_bot", 5, wait = True)
+    self.do_linear_push("b_bot", 3, wait = True)
     return
 
   def release_idle_pulley_from_a_bot(self):
-    x=raw_input("press enter to continue with the next part of the sequence")
     assembled_retainer_pin_head_retreat = geometry_msgs.msg.PoseStamped()
     assembled_retainer_pin_head_retreat.header.frame_id = "assembled_assy_part_14_screw_head"
     assembled_retainer_pin_head_retreat.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     assembled_retainer_pin_head_retreat.pose.position.x = 0
-    assembled_retainer_pin_head_retreat.pose.position.y = -0.0024
+    # assembled_retainer_pin_head_retreat.pose.position.y = -0.0024 # MAGIC NUMBER
     assembled_retainer_pin_head_retreat.pose.position.z = 0.045
-    if self.use_real_robot:
-      self.precision_gripper_inner_open()
     self.go_to_pose_goal("a_bot", assembled_retainer_pin_head_retreat, speed=.1, move_lin = True)
 
     self.go_to_named_pose("home", "a_bot")
@@ -1046,33 +1068,34 @@ class AssemblyClass(O2ASBaseRoutines):
 
   def fasten_retainer_pin_nut(self):
     rospy.loginfo("ToDo, fasten_retainer_pin_nut")
-    assembled_retainer_pin_tip = geometry_msgs.msg.PoseStamped()
-    assembled_retainer_pin_tip.header.frame_id = "assembled_assy_part_14_screw_tip"
+    nut_approach = geometry_msgs.msg.PoseStamped()
+    nut_approach.header.frame_id = "assembled_assy_part_14_screw_tip"
 
-    assembled_retainer_pin_tip.pose.position.x = 0.050309
-    assembled_retainer_pin_tip.pose.position.y = -0.0051578
-    assembled_retainer_pin_tip.pose.position.z = 0.040285
-    assembled_retainer_pin_tip.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi, 0))
-    # assembled_retainer_pin_tip.pose.orientation.x = 0.14067
-    # assembled_retainer_pin_tip.pose.orientation.y = 0.99003
-    # assembled_retainer_pin_tip.pose.orientation.z = 0.00022566
-    # assembled_retainer_pin_tip.pose.orientation.w = 0.0078231
+    nut_approach.pose.position.x = 0.05
+    # nut_approach.pose.position.y = -0.0051578  # MAGIC NUMBER
+    nut_approach.pose.position.z = 0.04
+    nut_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi, 0))
 
-    assembled_retainer_pin_tip_2 = copy.deepcopy(assembled_retainer_pin_tip)
-    assembled_retainer_pin_tip_2.pose.position.x = 0.01
-    assembled_retainer_pin_tip_2.pose.position.y = 0.00
-    assembled_retainer_pin_tip_2.pose.position.z = -0.007
+    at_pin_tip = copy.deepcopy(nut_approach)
+    at_pin_tip.pose.position.x = 0.01
 
-    assembled_retainer_pin_tip_3 = copy.deepcopy(assembled_retainer_pin_tip)
-    assembled_retainer_pin_tip_3.pose.position.x = -0.002
-    assembled_retainer_pin_tip_3.pose.position.y = 0.00
-    assembled_retainer_pin_tip_3.pose.position.z = -0.007
+    at_pin_end = copy.deepcopy(at_pin_tip)
+    at_pin_end.pose.position.x = -0.002
 
     self.go_to_named_pose("home", "c_bot")
-    self.go_to_pose_goal("c_bot", assembled_retainer_pin_tip, speed=.1, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
-    self.go_to_pose_goal("c_bot", assembled_retainer_pin_tip_2, speed=.1, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
-    self.go_to_pose_goal("c_bot", assembled_retainer_pin_tip_3, speed=.1, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
+    self.go_to_pose_goal("c_bot", nut_approach, speed=.1, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
+    self.set_motor("nut_tool_m6", direction = "tighten", wait=False, speed = 500, duration = 15)
+    self.go_to_pose_goal("c_bot", at_pin_tip, speed=.02, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
+    self.horizontal_spiral_motion("c_bot", .004, radius_increment = .002, speed = 0.02, spiral_axis="YZ")
+    self.go_to_pose_goal("c_bot", at_pin_end, speed=.02, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
+    self.horizontal_spiral_motion("c_bot", .004, radius_increment = .002, speed = 0.02, spiral_axis="YZ")
+    rospy.sleep(3)
+    
+    self.go_to_pose_goal("c_bot", at_pin_tip, speed=.05, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
+    self.go_to_pose_goal("c_bot", nut_approach, speed=.1, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
+    self.go_to_named_pose("home", "c_bot")
 
+  # ================================================= BELT SUBTASK
 
   def put_on_belt(self):
     ps_b_pick_approach = geometry_msgs.msg.PoseStamped()
@@ -1343,6 +1366,8 @@ class AssemblyClass(O2ASBaseRoutines):
     # self.do_insert_action(active_robot_name="b_bot", passive_robot_name = "c_bot")
     return
 
+  # =================
+
   def pick_motor(self):
     self.go_to_named_pose("home", "b_bot")
     pose0 = geometry_msgs.msg.PoseStamped()
@@ -1355,6 +1380,7 @@ class AssemblyClass(O2ASBaseRoutines):
                                 approach_height = 0.13)
     self.go_to_named_pose("home", "b_bot")
     return
+  
   def handover_motor(self):
     pose1 = geometry_msgs.msg.PoseStamped()
     pose1.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, -pi/2, 0))
@@ -1468,6 +1494,20 @@ class AssemblyClass(O2ASBaseRoutines):
     pre_insertion.pose.position.x = -0.04
     self.go_to_pose_goal("b_bot", pre_insertion, speed=.3, move_lin = True)
 
+  def pick_retainer_pin_and_place_in_holder(self):
+    self.confirm_to_proceed("pick_retainer_pin")
+    self.pick_retainer_pin()
+    self.confirm_to_proceed("adjust_centering")
+    self.adjust_centering()
+
+    self.go_to_named_pose("home", "b_bot")
+    place_pose = geometry_msgs.msg.PoseStamped()
+    place_pose.header.frame_id = "retainer_pin_holder_link"
+    # place_pose.pose.orientation = 
+    self.place("b_bot", place_pose, place_height=.01, speed_fast=1.0, speed_slow=0.5)
+    self.go_to_named_pose("home", "b_bot")
+    return
+
   def confirm_to_proceed(self, next_task_name):
     rospy.loginfo("Press enter to proceed to: " + next_task_name)
     i = raw_input()
@@ -1480,7 +1520,6 @@ class AssemblyClass(O2ASBaseRoutines):
   def subtask_f(self):
     rospy.loginfo("======== SUBTASK F (motor plate) ========")
     self.place_plate_2_and_screw()
-    rospy.loginfo("todo: add screw picking and fastening sequence")
 
   def subtask_a(self):
     # ============= SUBTASK A (picking and inserting and fastening the motor shaft) =======================
@@ -1527,48 +1566,52 @@ class AssemblyClass(O2ASBaseRoutines):
   def subtask_e(self):
     # ======================== SUBTASK E (The idler pin) ============================================
     rospy.loginfo("======== SUBTASK E ========")
-    self.confirm_to_proceed("pick_retainer_pin")
-    self.pick_retainer_pin()
-    self.confirm_to_proceed("adjust_centering")
-    self.adjust_centering()
-    self.confirm_to_proceed("rotate_hand_facing_the_sky")
-    self.rotate_hand_facing_the_sky()
-    self.confirm_to_proceed("pick_idle_pulley")
-    self.pick_idle_pulley()
-    self.confirm_to_proceed("place_idle_pulley")
-    self.place_idle_pulley()
-    self.confirm_to_proceed("pick_retainer_pin_spacer")
-    self.pick_retainer_pin_spacer()
-    self.confirm_to_proceed("place_retainer_pin_spacer")
-    self.place_retainer_pin_spacer()
-    self.confirm_to_proceed("pick_retainer_pin_washer_2")
-    self.pick_retainer_pin_washer_2()
-    self.confirm_to_proceed("place_retainer_pin_washer_2")
-    self.place_retainer_pin_washer_2()
-    self.confirm_to_proceed("pick_retainer_pin_nut")
-    self.pick_retainer_pin_nut()
-    rospy.loginfo("todo: pick nut with tool, fasten retainer pin nut")
-    rospy.loginfo("todo: add equip and unequip action into the codes")
-    self.confirm_to_proceed("place_retainer_pin_nut_and_pick_with_tool")
-    self.place_retainer_pin_nut_and_pick_with_tool()
-    self.confirm_to_proceed("pick_retainer_pin_washer")
-    self.pick_retainer_pin_washer()
-    self.confirm_to_proceed("place_retainer_pin_washer_intermediate")
-    self.place_retainer_pin_washer_intermediate()
-    self.confirm_to_proceed("insert_retainer_pin_to_base")
-    self.insert_retainer_pin_to_base()
-    self.confirm_to_proceed("hold_idle_pulley_with_a_bot")
-    self.hold_idle_pulley_with_a_bot()
-    self.confirm_to_proceed("release_and_push_with_b_bot")
-    self.release_and_push_with_b_bot()
-    self.confirm_to_proceed("release_idle_pulley_from_a_bot")
-    self.release_idle_pulley_from_a_bot()
-    self.confirm_to_proceed("pick_retainer_pin_washer_intermediate")
-    self.pick_retainer_pin_washer_intermediate()
-    self.confirm_to_proceed("place_retainer_pin_washer_final")
-    self.place_retainer_pin_washer_final()
+    # TODO: Pick retainer pin from holder
+    # self.confirm_to_proceed("pick_retainer_pin")
+    # self.pick_retainer_pin()
+    # self.confirm_to_proceed("adjust_centering")
+    # self.adjust_centering()
+
+
+    # self.confirm_to_proceed("rotate_hand_facing_the_sky")
+    # self.rotate_hand_facing_the_sky()
+    # self.confirm_to_proceed("pick_idle_pulley")
+    # self.pick_idle_pulley()
+    # self.confirm_to_proceed("place_idle_pulley")
+    # self.place_idle_pulley()
+    # self.confirm_to_proceed("pick_retainer_pin_spacer")
+    # self.pick_retainer_pin_spacer()
+    # self.confirm_to_proceed("place_retainer_pin_spacer")
+    # self.place_retainer_pin_spacer()
+    # self.confirm_to_proceed("pick_retainer_pin_washer_1")
+    # self.pick_retainer_pin_washer_1()
+    # self.confirm_to_proceed("place_retainer_pin_washer_1")
+    # self.place_retainer_pin_washer_1()
+    # self.confirm_to_proceed("pick_retainer_pin_nut")
+    # self.pick_retainer_pin_nut()
+    self.do_change_tool_action("c_bot", equip=True, screw_size=66)
+    # rospy.loginfo("todo: pick nut with tool, fasten retainer pin nut")
+    # self.confirm_to_proceed("place_retainer_pin_nut_and_pick_with_tool")
+    # self.place_retainer_pin_nut_and_pick_with_tool()
+    # self.confirm_to_proceed("pick_retainer_pin_washer")
+    # self.pick_retainer_pin_washer()
+    # self.confirm_to_proceed("place_retainer_pin_washer_on_table")
+    # self.place_retainer_pin_washer_on_table()
+    # self.confirm_to_proceed("insert_retainer_pin_to_base")
+    # self.insert_retainer_pin_to_base()
+    # self.confirm_to_proceed("hold_idle_pulley_with_a_bot")
+    # self.hold_idle_pulley_with_a_bot()
+    # self.confirm_to_proceed("release_and_push_with_b_bot")
+    # self.release_and_push_with_b_bot()
+    # self.confirm_to_proceed("release_idle_pulley_from_a_bot")
+    # self.release_idle_pulley_from_a_bot()
+    # self.confirm_to_proceed("pick_retainer_pin_washer_from_table")
+    # self.pick_retainer_pin_washer_from_table()
+    # self.confirm_to_proceed("place_retainer_pin_washer_final")
+    # self.place_retainer_pin_washer_final()
     self.confirm_to_proceed("fasten_retainer_pin_nut")
     self.fasten_retainer_pin_nut()
+    self.do_change_tool_action("c_bot", equip=False, screw_size=66)
 
   def subtask_h(self):
     # ====================================== SUBTASK H (belt) ========================================
