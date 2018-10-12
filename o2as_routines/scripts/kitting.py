@@ -1269,7 +1269,7 @@ class KittingClass(O2ASBaseRoutines):
       if item.part_id == 6: # Belt
         pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
 
-      approach_height = 0.09
+      approach_height = 0.1
       speed_slow = 0.1
       speed_fast = 1.0
       if item.ee_to_use == "precision_gripper_from_inside":
@@ -1280,7 +1280,7 @@ class KittingClass(O2ASBaseRoutines):
         approach_height = .05
       elif item.ee_to_use == "suction":
         gripper_command = "suction"
-        approach_height = 0.09 - pick_pose.pose.position.z
+        approach_height = 0.1 - pick_pose.pose.position.z
         speed_slow = 0.05
         speed_fast = 0.1
       elif item.ee_to_use == "robotiq_gripper":
@@ -1590,6 +1590,9 @@ if __name__ == '__main__':
             place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, +pi))
 
 
+        self.go_to_named_pose("back", "c_bot")
+        self.go_to_named_pose("back", "b_bot")
+        self.go_to_named_pose("screw_ready", robot_name)
         place_pose.pose.position.z = .08
         kit.move_lin("b_bot", place_pose, .1, end_effector_link="b_bot_suction_tool_tip_link")
       elif i == "90":
