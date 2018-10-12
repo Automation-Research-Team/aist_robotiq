@@ -60,11 +60,6 @@ class kitting_order_entry():
     self.fulfilled = False
     self.in_feeder = False
 
-    self.tf_listener = tf.TransformListener()
-
-    self.has_scene_image = False
-    self.max_candidates_from_phoxi = 5
-
 def clamp(n, minn, maxn):
   """Constrain a number n to the interval [minn, maxn]"""
   return min(max(n, minn), maxn)
