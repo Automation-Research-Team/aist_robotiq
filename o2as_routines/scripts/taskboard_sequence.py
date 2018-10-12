@@ -740,63 +740,98 @@ if __name__ == '__main__':
         # taskboard.go_to_named_pose("back", "c_bot")
 
       if i == 7:
-
-        #pick screw
+        # Pick up M6 screw, arrange it in the gripper, and pick it with b_bot
         partScrew = geometry_msgs.msg.PoseStamped()
         partScrew.header.frame_id = "mat_part7_1"
-        partScrew_height = 0.01
-        partScrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
-        taskboard.pick("b_bot",partScrew, partScrew_heigh,
+        partScrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/4, -pi/2))
+        taskboard.pick("a_bot",partScrew, grasp_height=.01,
                        speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
                        approach_height = 0.1)
-        #throw it into M6 feeder
+        taskboard.tilt_up_gripper(speed_fast=0.1, speed_slow=0.02)
 
-        #pick up the tool
-        tool_pose = geometry_msgs.msg.PoseStamped()
-        tool_pose.header.frame_id = "M6nut_tool"
-        tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
-        tool_grasped_height = 0.042
-        ## MAGIC NUMBERS!!
-        b_bot_dx_pick = 0.01
-        b_bot_dy_pick = 0.03
-        # b_bot_dx_place = 0.0
-        b_bot_dy_place = 0.005
+        taskboard.do_change_tool_action("b_bot", equip=True, screw_size = 6)        
+        taskboard.pick_screw_from_precision_gripper(screw_size=4, robot_name="b_bot")
+        taskboard.go_to_named_pose("home", "a_bot")
+        taskboard.go_to_named_pose("screw_ready", "b_bot")
+        taskboard.go_to_named_pose("screw_ready_back", "b_bot")
 
-        pick_pose_low = copy.deepcopy(taskboard.pick_poses[i-1])
-        pick_pose_low.pose.position.x += b_bot_dx_pick
-        pick_pose_low.pose.position.y += b_bot_dy_pick
-        pick_pose_low.pose.position.z = taskboard.item_pick_heights[i-1] + tool_grasped_height + .01
-        pick_pose_high = copy.deepcopy(pick_pose_low)
-        pick_pose_high.pose.position.z += .15
+        # Pick the nut with a_bot, place it near c_bot
+        self.go_to_named_pose("home", "a_bot")
+        nut_pick_pose = geometry_msgs.msg.PoseStamped()
+        nut_pick_pose.header.frame_id = "mat_part7_2"
+        nut_pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+        self.pick("a_bot",nut_pick_pose, 0.0,
+                                    speed_fast = 0.31, speed_slow = 0.05, gripper_command="inner_gripper_from_inside",
+                                    approach_height = 0.05)
+        self.go_to_named_pose("home", "a_bot")     
 
-        place_pose_low = copy.deepcopy(taskboard.place_poses[i-1])
-        place_pose_low.pose.position.y += b_bot_dy_place
-        place_pose_low.pose.position.z = .02 + tool_grasped_height + .01
-        place_pose_high = copy.deepcopy(place_pose_low)
-        place_pose_high.pose.position.z += .1
+        nut_place_a_bot = geometry_msgs.msg.PoseStamped()
+        nut_place_a_bot.header.frame_id = "workspace_center"
+        nut_place_a_bot.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+        nut_place_a_bot.pose.position.x = -.40
+        nut_place_a_bot.pose.position.y = -.25
+        nut_place_a_bot.pose.position.z = -.015
+
+        nut_place_c_bot = copy.deepcopy(nut_place_a_bot)
+        nut_place_c_bot.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/4))
+
+        self.place("a_bot",nut_place_a_bot,0.0,
+                                    speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
+                                    approach_height = 0.05,lift_up_after_place = True)
+        self.go_to_named_pose("back", "a_bot")   
+
+        # Pick up the nut with c_bot
+        self.do_change_tool_action("c_bot", equip=True, screw_size=66)  #66 = nut tool m6
+        self.pick_nut_from_table(object_pose=nut_place_c_bot,end_effector_link="c_bot_nut_tool_m6_tip_link")
+
+        # Position b_bot screw tool (via intermediate pose?)
+        # self.go_to_named_pose("taskboard_screw_tool_horizontal_approach", "b_bot")  #TODO
+        rospy.logerr("Is the intermediate pose for the screw tool set up?")
+        raw_input()
+        screw_tool_hold = geometry_msgs.msg.PoseStamped()
+        screw_tool_hold.header.frame_id = "taskboard_part7_1"
+        screw_tool_hold.pose.orientation.w = 1.0
+        screw_tool_hold_approach = copy.deepcopy(screw_tool_hold)
+        screw_tool_hold_approach.pose.position.x = -.01
+        screw_tool_hold_approach_high = copy.deepcopy(screw_tool_hold_approach)
+        screw_tool_hold_approach_high.pose.position.z = +.05
+        self.go_to_pose_goal("b_bot", screw_tool_hold_approach_high, speed=.1, move_lin = True, end_effector_link="b_bot_screw_tool_m6_tip_link")
+        self.go_to_pose_goal("b_bot", screw_tool_hold_approach, speed=.01, move_lin = True, end_effector_link="b_bot_screw_tool_m6_tip_link")
+        self.go_to_pose_goal("b_bot", screw_tool_hold, speed=.01, move_lin = True, end_effector_link="b_bot_screw_tool_m6_tip_link")
+        self.horizontal_spiral_motion("b_bot", .004, radius_increment = .002, spiral_axis="Y")
+        self.go_to_pose_goal("b_bot", screw_tool_hold, speed=.01, move_lin = True, end_effector_link="b_bot_screw_tool_m6_tip_link")
+
+        # Position c_bot 
+        nut_tool_hold = geometry_msgs.msg.PoseStamped()
+        nut_tool_hold.header.frame_id = "taskboard_part7_2"
+        nut_tool_hold.pose.orientation.w = 1.0
+        nut_tool_hold_approach = copy.deepcopy(nut_tool_hold)
+        nut_tool_hold_approach.pose.position.x = -.01
+        nut_tool_hold_approach_high = copy.deepcopy(nut_tool_hold_approach)
+        nut_tool_hold_approach_high.pose.position.z = +.05
+
+        # self.go_to_named_pose("taskboard_nut_tool_approach", "c_bot")  #TODO
+        self.go_to_pose_goal("c_bot", nut_tool_hold_approach_high, speed=.1, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
+        self.go_to_pose_goal("c_bot", nut_tool_hold_approach, speed=.01, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
         
-        taskboard.pick("b_bot",tool_pose, tool_grasped_height,
-                               speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
-                               approach_height = 0.1)
-        print("press enter")
-        raw_input()
-        # Push into the nut to pick it up
-        taskboard.go_to_pose_goal("b_bot", pick_pose_low, speed=0.05, move_lin=True)
-        taskboard.do_linear_push("b_bot", 10, wait = True)
-        taskboard.horizontal_spiral_motion("b_bot", max_radius = .006, radius_increment = .01)
-        taskboard.do_linear_push("b_bot", 40, wait = True)
+        # Fix the nut with the nut tool
+        self.set_motor("nut_tool_m6", direction = "tighten", wait=False, speed = 500, duration = 15)
+        self.horizontal_spiral_motion("c_bot", .004, radius_increment = .002, spiral_axis="YZ")
+        self.go_to_pose_goal("c_bot", nut_tool_hold, speed=.01, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
+        self.horizontal_spiral_motion("c_bot", .004, radius_increment = .002, spiral_axis="YZ")
+
         rospy.sleep(2.0)
-        print("press enter")
-        raw_input()
-        taskboard.go_to_pose_goal("b_bot", pick_pose_high, speed=0.05, move_lin=True)
-        # pick up the screw from M6 feeder
+        self.go_to_pose_goal("c_bot", nut_tool_hold_approach, speed=.01, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
+        self.go_to_pose_goal("c_bot", nut_tool_hold_approach_high, speed=.1, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
+        self.go_to_named_pose("home", "c_bot")
+        self.go_to_named_pose("tool_pick_ready", "c_bot")
 
-        # move the screw
-        # move the nut to position
-        # move the screw to position
-        # move back home
+        # Go home with b_bot and unequip the tool
+        self.set_suction("screw_tool_m6", False, False)
+        self.go_to_pose_goal("b_bot", screw_tool_hold_approach, speed=.01, move_lin = True, end_effector_link="b_bot_screw_tool_m6_tip_link")
+        self.go_to_pose_goal("b_bot", screw_tool_hold_approach_high, speed=.02, move_lin = True, end_effector_link="b_bot_screw_tool_m6_tip_link")
+        self.go_to_named_pose("screw_ready", "b_bot")
 
-  
       if i == 8:  
         #pick up the tool
         tool_pose = geometry_msgs.msg.PoseStamped()
