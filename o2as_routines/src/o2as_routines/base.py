@@ -160,6 +160,7 @@ class O2ASBaseRoutines(object):
     self.toggleCollisions_client = rospy.ServiceProxy('/o2as_skills/toggleCollisions', std_srvs.srv.SetBool)
 
     self.resetTimerForDebugMonitor_client = rospy.ServiceProxy('/o2as_debug_monitor/reset_timer', o2as_debug_monitor.srv.ResetTimer)
+    self.debugmonitor_publishers = dict() # used in log_to_debug_monitor()
 
     rospy.sleep(.5)
     rospy.loginfo("Finished initializing class")
@@ -1023,3 +1024,23 @@ class O2ASBaseRoutines(object):
   def start_task_timer(self):
     """Reset timer in debug monitor"""
     _ = self.resetTimerForDebugMonitor_client.call()
+
+  def log_to_debug_monitor(self, text, category):
+    """Send message to rospy.loginfo and debug monitor.
+
+    This method create publisher on the fly. It's name is defined as "/o2as_state/{}".format(category).
+    The topic name should be included in the parameter server. See test.launch in o2as_debug_monitor.
+    """
+    rospy.loginfo(category + ": " + text)
+
+    topic_name = "/o2as_state/{}".format(category)
+
+    if topic_name not in self.debugmonitor_publishers:
+      pub = rospy.Publisher(topic_name, String, queue_size=1)
+      self.debugmonitor_publishers[topic_name] = pub
+    else:
+      pub = self.debugmonitor_publishers[topic_name]
+
+    msg = String()
+    msg.data = text
+    pub.publish(msg)
