@@ -16,6 +16,7 @@
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/imgproc/imgproc.hpp>
+#include "o2as_debug_monitor/ResetTimer.h"
 
 using ImageCallback =
   boost::function<void(const sensor_msgs::ImageConstPtr&)>;
@@ -208,7 +209,7 @@ CamInfoCallback getCallbackForCameraInfo(
 
 //boost::function<void(const std_msgs::String::ConstPtr& msg)>
 StringCallback getCallbackForString(cv::Rect rect, XmlRpc::XmlRpcValue &params,
-                                    cv::Mat& monitor_, long start_time)
+                                    cv::Mat& monitor_, long& start_time)
 {
   // Values captured by closure
   int offset_x = params["offset"][0];
@@ -223,7 +224,7 @@ StringCallback getCallbackForString(cv::Rect rect, XmlRpc::XmlRpcValue &params,
   std::vector<int> ivec;
 
   // This function returns callback function
-  return [=](const std_msgs::String::ConstPtr& msg) mutable {
+  return [=, &start_time](const std_msgs::String::ConstPtr& msg) mutable {
     check_window();
     clear_buffer_rect(rect, monitor_);
 
@@ -386,6 +387,15 @@ namespace o2as_debug_monitor
         setSuctionSuccessCallbacks(nh, suction_success_topics);
       }
 
+      bool resetTimer(o2as_debug_monitor::ResetTimer::Request &req,
+                      o2as_debug_monitor::ResetTimer::Response &res)
+      {
+        start_time = now();
+        res.success = true;
+        ROS_INFO("Debug monitor timer reset");
+        return true;
+      }
+
     private:
       std::vector<image_transport::Subscriber> i_sub_rs_;
       std::vector<ros::Subscriber> n_sub_rs_;
@@ -543,12 +553,21 @@ namespace o2as_debug_monitor
       O2asDebugMonitor() {}
       ~O2asDebugMonitor() {}
       boost::shared_ptr<Monitor> inst_;
+      Monitor *monitor;
+      ros::ServiceServer srv_resettimer;
 
     private:
       virtual void onInit()
       {
-        // cv::namedWindow("Monitor", cv::WINDOW_NORMAL);
-        inst_.reset(new Monitor(getNodeHandle()));
+        auto nh = getNodeHandle();
+        monitor = new Monitor(getNodeHandle());
+        inst_.reset(monitor);
+        // inst_.reset(new Monitor(getNodeHandle()));
+
+        // Add service ResetTimer
+        srv_resettimer = nh.advertiseService(
+          "/o2as_debug_monitor/reset_timer", &Monitor::resetTimer, monitor
+        );
       }
   };
 
