@@ -151,7 +151,7 @@ class KittingClass(O2ASBaseRoutines):
         "part_11": "suction",  # Can be one of the grippers
         "part_12": "suction",  # Can be precision_gripper_from_outside in inclined bin
         "part_13": "suction",  # Should be precision_gripper_from_inside
-        "part_14": "precision_gripper_from_inside", 
+        "part_14": "suction", 
         "part_15": "precision_gripper_from_inside", 
         "part_16": "precision_gripper_from_inside", 
         "part_17": "precision_gripper_from_outside", 
@@ -1408,93 +1408,93 @@ class KittingClass(O2ASBaseRoutines):
 
     self.treat_screws_in_feeders()
 
-    # for item in self.precision_gripper_items:
-    #   if rospy.is_shutdown():
-    #     break
-    #   self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-    #   self.attempt_item(item, 3)
-    # self.go_to_named_pose("back", "a_bot")
-    # rospy.loginfo("==== Done with first precision gripper pass")
+    for item in self.precision_gripper_items:
+      if rospy.is_shutdown():
+        break
+      self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      self.attempt_item(item, 3)
+    self.go_to_named_pose("back", "a_bot")
+    rospy.loginfo("==== Done with first precision gripper pass")
 
-    # self.treat_screws_in_feeders()
+    self.treat_screws_in_feeders()
 
-    # for item in self.robotiq_gripper_items:
-    #   self.go_to_named_pose("home", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-    #   if rospy.is_shutdown():
-    #     break
-    #   self.attempt_item(item, 3)
-    # self.go_to_named_pose("back", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    for item in self.robotiq_gripper_items:
+      self.go_to_named_pose("home", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      if rospy.is_shutdown():
+        break
+      self.attempt_item(item, 3)
+    self.go_to_named_pose("back", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
-    # self.treat_screws_in_feeders()
+    self.treat_screws_in_feeders()
 
     # ==== 2. Second, loop through all the items that were not successfully picked on first try, and place the screws when they are assumed to be ready.
     all_done = False
     # while False:
-    # # while not all_done and not rospy.is_shutdown():
-    #   rospy.loginfo("Entering the loop to recover failed items and pick screws")
+    while not all_done and not rospy.is_shutdown():
+      rospy.loginfo("Entering the loop to recover failed items and pick screws")
       
-    #   # Check all items, find which groups are done, then reattempt those that are unfinished
-    #   all_done = True
-    #   suction_done = True
-    #   precision_gripper_done = True
-    #   robotiq_gripper_done = True
-    #   self.screws_done["m4"] = True
-    #   self.screws_done["m3"] = True
-    #   for item in self.ordered_items:
-    #     if not item.fulfilled:
-    #       rospy.loginfo("Found an undelivered item in the order: item nr. " + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + ")")
-    #       all_done = False
-    #       if "precision_gripper" in item.ee_to_use:
-    #         precision_gripper_done = False
-    #       elif "robotiq_gripper" in item.ee_to_use:
-    #         robotiq_gripper_done = False
-    #       elif item.ee_to_use == "suction":
-    #         suction_done = False
-    #       if item.part_id == 17:
-    #         self.screws_done["m4"] = False
-    #       elif item.part_id == 18:
-    #         self.screws_done["m3"] = False
+      # Check all items, find which groups are done, then reattempt those that are unfinished
+      all_done = True
+      suction_done = True
+      precision_gripper_done = True
+      robotiq_gripper_done = True
+      self.screws_done["m4"] = True
+      self.screws_done["m3"] = True
+      for item in self.ordered_items:
+        if not item.fulfilled:
+          rospy.loginfo("Found an undelivered item in the order: item nr. " + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + ")")
+          all_done = False
+          if "precision_gripper" in item.ee_to_use:
+            precision_gripper_done = False
+          elif "robotiq_gripper" in item.ee_to_use:
+            robotiq_gripper_done = False
+          elif item.ee_to_use == "suction":
+            suction_done = False
+          if item.part_id == 17:
+            self.screws_done["m4"] = False
+          elif item.part_id == 18:
+            self.screws_done["m3"] = False
 
-    #   self.treat_screws_in_feeders()
+      self.treat_screws_in_feeders()
 
-    #   if not precision_gripper_done:
-    #     rospy.loginfo("Reattempting the remaining precision gripper items")
-    #     self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-    #     for item in self.precision_gripper_items:
-    #       if rospy.is_shutdown():
-    #               break
-    #       self.attempt_item(item)
-    #     self.go_to_named_pose("back", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      if not precision_gripper_done:
+        rospy.loginfo("Reattempting the remaining precision gripper items")
+        self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+        for item in self.precision_gripper_items:
+          if rospy.is_shutdown():
+                  break
+          self.attempt_item(item)
+        self.go_to_named_pose("back", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
-    #   self.treat_screws_in_feeders()
+      self.treat_screws_in_feeders()
 
-    #   if not robotiq_gripper_done:
-    #     rospy.loginfo("Reattempting the remaining robotiq gripper items")
-    #     self.go_to_named_pose("home", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-    #     for item in self.robotiq_gripper_items:
-    #       if rospy.is_shutdown():
-    #               break
-    #       self.attempt_item(item)
-    #     self.go_to_named_pose("back", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      if not robotiq_gripper_done:
+        rospy.loginfo("Reattempting the remaining robotiq gripper items")
+        self.go_to_named_pose("home", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+        for item in self.robotiq_gripper_items:
+          if rospy.is_shutdown():
+                  break
+          self.attempt_item(item)
+        self.go_to_named_pose("back", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
-    #   self.treat_screws_in_feeders()
+      self.treat_screws_in_feeders()
       
-    #   if not suction_done:
-    #     self.reset_grasp_candidates()
-    #     rospy.loginfo("Reattempting the remaining suction items")
-    #     self.do_change_tool_action("b_bot", equip=True, screw_size=50)   # 50 = suction tool
-    #     for item in self.suction_items:
-    #       if rospy.is_shutdown():
-    #               break
-    #       if not item.fulfilled:
-    #         self.go_to_named_pose("suction_pick_ready", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-    #         self.attempt_item(item, 5)
-    #     self.do_change_tool_action("b_bot", equip=False, screw_size=50)   # 50 = suction tool
-    #     self.go_to_named_pose("back", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      if not suction_done:
+        self.reset_grasp_candidates()
+        rospy.loginfo("Reattempting the remaining suction items")
+        self.do_change_tool_action("b_bot", equip=True, screw_size=50)   # 50 = suction tool
+        for item in self.suction_items:
+          if rospy.is_shutdown():
+                  break
+          if not item.fulfilled:
+            self.go_to_named_pose("suction_pick_ready", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+            self.attempt_item(item, 5)
+        self.do_change_tool_action("b_bot", equip=False, screw_size=50)   # 50 = suction tool
+        self.go_to_named_pose("back", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
-    #   if (rospy.Time.now()-start_time) > time_limit:
-    #     rospy.logerr("Time limit reached! Breaking out of the loop.")
-    #     break
+      if (rospy.Time.now()-start_time) > time_limit:
+        rospy.logerr("Time limit reached! Breaking out of the loop.")
+        break
 
     if all_done:
       rospy.loginfo("Completed the task.")
