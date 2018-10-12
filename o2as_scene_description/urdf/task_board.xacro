@@ -239,7 +239,7 @@
   <joint name="${boardname}_part15" type="fixed">
     <parent link="${boardname}_surface"/>
     <child link="${boardname}_part15"/>
-    <origin rpy="0.0 0.0 ${pi/2}" xyz="0.16 0.36 0.0515"/>
+    <origin rpy="0.0 0.0 ${pi/2}" xyz="0.08 0.31 0.076"/>
   </joint>
   <link name="${boardname}_part15"/> 
    <!-- The cylinder is already defined under part10 -->

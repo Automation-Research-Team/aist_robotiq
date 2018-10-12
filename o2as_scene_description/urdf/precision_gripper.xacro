@@ -17,10 +17,11 @@
         <material name="darkgrey">
           <color rgba="0.1 0.1 0.1 1"/>
         </material>
+      
     </visual>
 
 
-    <!-- <visual>
+    <visual>
       <origin rpy="0 ${pi/2} 0" xyz="-0.05 0 0"/>
       <geometry>
         <box size="0.18 0.09 0.13"/>
@@ -37,7 +38,7 @@
       <material name="cyan2">
         <color rgba="0.3 0.5 0.5 0.3"/>
       </material>
-    </visual> -->
+    </visual>
 
     <!-- TODO: Do this properly and check the offset above. -->
     <!-- Back part -->
