@@ -766,6 +766,43 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, go_home=False)
     return
 
+  def idler_pin_holder_calibration(self, robot_name="b_bot"):
+    rospy.loginfo("============ Going to screw tool holder with " + robot_name + ". ============")
+
+    if robot_name == "b_bot":
+      self.go_to_named_pose("back", "a_bot")
+    elif robot_name == "a_bot":
+      self.go_to_named_pose("back", "b_bot")
+      self.go_to_named_pose("back", "c_bot")
+    elif robot_name == "c_bot":
+      rospy.loginfo("c_bot cannot reach.")
+      return
+
+    pick_pose = geometry_msgs.msg.PoseStamped()
+    pick_pose.header.frame_id = "retainer_pin_holder_link"
+    pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    # pick_pose.pose.position.z = .001  #up/down
+    approach_pose = copy.deepcopy(pick_pose)
+    approach_pose.pose.position.z = .03  #up/down
+
+    self.go_to_named_pose("home", robot_name)
+    self.send_gripper_command(robot_name, "open")
+    self.go_to_pose_goal(robot_name, approach_pose,speed=.5, move_lin = True)
+    self.go_to_pose_goal(robot_name, pick_pose,speed=.1, move_lin = True)
+    rospy.loginfo("Press enter to close the gripper")
+    raw_input()
+    self.send_gripper_command(robot_name, "close")
+    rospy.loginfo("Press enter to open and go back up")
+    raw_input()
+    
+    
+    self.send_gripper_command(robot_name, "open")
+    self.send_gripper_command(robot_name, .06)
+    self.send_gripper_command(robot_name, "open")
+    self.go_to_pose_goal(robot_name, approach_pose,speed=.5, move_lin = True)
+    self.go_to_named_pose("home", robot_name)
+    return
+
   def screw_tool_test_assembly(self, robot_name = "b_bot", tool_name="_screw_tool_m4_tip_link"):
     rospy.loginfo("============ Moving the screw tool m4 to the four corners of the base plate ============")
     rospy.loginfo("============ The screw tool m4 has to be carried by the robot! ============")
@@ -973,10 +1010,15 @@ class CalibrationClass(O2ASBaseRoutines):
 
   def tray_partition_calibration(self, robot_name="b_bot", end_effector_link="", task="assembly", set_number=1, tray_number=1):
     rospy.loginfo("============ Calibrating trays. ============")
-    rospy.loginfo(robot_name + " end effector should be 3 cm above tray partition.")
-    if robot_name=="b_bot":
+    rospy.loginfo(robot_name + " end effector should be 2 cm above tray partition.")
+    if robot_name=="1_bot":
+      self.go_to_named_pose("back", "b_bot")
       self.go_to_named_pose("back", "c_bot")
+    elif robot_name=="b_bot":
+      self.go_to_named_pose("back", "c_bot")
+      self.go_to_named_pose("back", "a_bot")
     elif robot_name=="c_bot":
+      self.go_to_named_pose("back", "a_bot")
       self.go_to_named_pose("back", "b_bot")
     
     if end_effector_link=="":
@@ -999,7 +1041,7 @@ class CalibrationClass(O2ASBaseRoutines):
         pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
 
       pose0.pose.position.x = 0
-      pose0.pose.position.z = 0.03
+      pose0.pose.position.z = 0.02
 
       for i in range(8):
         poses.append(copy.deepcopy(pose0))
@@ -1028,10 +1070,17 @@ class CalibrationClass(O2ASBaseRoutines):
       poses[3].header.frame_id = "set_" + str(set_number) + "_tray_1_partition_4"
       poses[4].header.frame_id = "set_" + str(set_number) + "_tray_1_partition_5"
     
-    if task=="assembly":
+    if task=="assembly" or task=="pickup":
       for pose in poses:
         pose.header.frame_id = pose.header.frame_id[6:]   # Removes "set_1_"
+        if task=="pickup":
+          pose.header.frame_id += "_pickup"
         rospy.loginfo("Shortened tray frame to: " + pose.header.frame_id)
+    
+    if task == "pickup" and tray_number == 2:
+      poses.append(copy.deepcopy(pose0))
+      poses[7].header.frame_id = "tray_2_partition_8_pickup_1"
+      poses[8].header.frame_id = "tray_2_partition_8_pickup_2"
 
     self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
     return 
@@ -1190,7 +1239,9 @@ if __name__ == '__main__':
       rospy.loginfo("55: Assembly initial part locations (the plates)")
       rospy.loginfo("56: Go to tray screw positions with m4 tool for b_bot")
       rospy.loginfo("561, 562: Go to tray screw positions with b_bot, a_bot")
-      rospy.loginfo("571, 572: Go to tray positions with b_bot, a_bot")
+      rospy.loginfo("571, 572 (573, 574): Go to tray 1, 2 (pickup) positions with b_bot")
+      rospy.loginfo("575, 576 (577, 578): Go to tray 1, 2 (pickup) positions with a_bot")
+      rospy.loginfo("58: Go to retainer pin holder with b_bot")
       rospy.loginfo("6: ===== TOOLS|  Go to screw_ready with c and b (a goes to back)")
       rospy.loginfo("611, 612: Go to screw holder with b_bot, c_bot")
       rospy.loginfo("621, 622: Equip/unequip m4 tool (with b_bot)")
@@ -1369,9 +1420,23 @@ if __name__ == '__main__':
       elif r == '562':
         c.tray_screw_calibration(robot_name="a_bot", task="assembly")
       elif r == '571':
-        c.tray_partition_calibration(robot_name="b_bot")
+        c.tray_partition_calibration(robot_name="b_bot", task="assembly", tray_number=1)
       elif r == '572':
-        c.tray_partition_calibration(robot_name="a_bot")
+        c.tray_partition_calibration(robot_name="b_bot", task="assembly", tray_number=2)
+      elif r == '573':
+        c.tray_partition_calibration(robot_name="b_bot", task="pickup", tray_number=1)
+      elif r == '574':
+        c.tray_partition_calibration(robot_name="b_bot", task="pickup", tray_number=2)
+      elif r == '575':
+        c.tray_partition_calibration(robot_name="a_bot", task="assembly", tray_number=1)
+      elif r == '576':
+        c.tray_partition_calibration(robot_name="a_bot", task="assembly", tray_number=2)
+      elif r == '577':
+        c.tray_partition_calibration(robot_name="a_bot", task="pickup", tray_number=1)
+      elif r == '578':
+        c.tray_partition_calibration(robot_name="a_bot", task="pickup", tray_number=2)
+      elif r == '58':
+        c.idler_pin_holder_calibration(robot_name="b_bot")
       elif r == '6':
         c.go_to_named_pose("back", "a_bot")
         c.go_to_named_pose("screw_ready", "b_bot")
