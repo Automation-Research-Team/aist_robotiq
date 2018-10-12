@@ -1316,25 +1316,9 @@ class KittingClass(O2ASBaseRoutines):
       if item.ee_to_use == "suction":
         # This is inconvenient to set up because the trays are rotated. tray_2s are rotated 180 degrees relative to set_1_tray_1
         # SUCTION_PREP_POSES
-        if item.set_number == 1:
-          if item.target_frame[11] == '1':  # tray 1
-            required_intermediate_pose = "joints_above_set_1_tray_1"
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi*160/180))
-          elif item.target_frame[11] == '2':  # tray 2
-            required_intermediate_pose = "joints_above_set_1_tray_2"
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
-        elif item.set_number == 2:
-          if item.target_frame[11] == '1':  # tray 1
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0)) 
-          elif item.target_frame[11] == '2':  # tray 2
-            required_intermediate_pose = "joints_above_set_2_tray_2"
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
-        elif item.set_number == 3:
-          if item.target_frame[11] == '1':  # tray 1
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi*30/180)) 
-          elif item.target_frame[11] == '2':  # tray 2
-            required_intermediate_pose = "joints_above_set_3_tray_2"
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+        place_pose.pose.orientation, required_intermediate_pose = self.get_tray_placement_orientation_for_suction_in_kitting(
+                                                  set_number=item.set_number, 
+                                                  tray_number=int(place_pose.header.frame_id[11]))
         if not place_pose.pose.orientation.w and not place_pose.pose.orientation.x and not place_pose.pose.orientation.y:
           rospy.logerr("SOMETHING WENT WRONG, ORIENTATION IS NOT ASSIGNED")
       else:   # Precision_gripper, robotiq_gripper
@@ -1573,22 +1557,9 @@ if __name__ == '__main__':
           place_pose.header.frame_id = "set_1_tray_1_partition_3"
         
         # SUCTION_PREP_POSES
-        if place_pose.header.frame_id[4] == "1":
-          if place_pose.header.frame_id[11] == '1':  # tray 1
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi*160/180))
-          elif place_pose.header.frame_id[11] == '2':  # tray 2
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
-        elif place_pose.header.frame_id[4] == "2":
-          if place_pose.header.frame_id[11] == '1':  # tray 1
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0)) 
-          elif place_pose.header.frame_id[11] == '2':  # tray 2
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
-        elif place_pose.header.frame_id[4] == "3":
-          if place_pose.header.frame_id[11] == '1':  # tray 1
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi)) 
-          elif place_pose.header.frame_id[11] == '2':  # tray 2
-            place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, +pi))
-
+        place_pose.pose.orientation = self.get_tray_placement_orientation_for_suction_in_kitting(
+                                                  set_number=int(place_pose.header.frame_id[4]), 
+                                                  tray_number=int(place_pose.header.frame_id[11]))
 
         self.go_to_named_pose("back", "c_bot")
         self.go_to_named_pose("back", "b_bot")
