@@ -985,3 +985,34 @@ class O2ASBaseRoutines(object):
       adjusted_pose.pose.position.z += z
       r = r + radius_inc_set
       RealRadius = math.sqrt(math.pow(y,2)+math.pow(z,2))
+
+######
+
+  def get_tray_placement_orientation_for_suction_in_kitting(self, set_number, tray_number):
+    required_intermediate_pose = ""
+    if set_number == 1:
+      if tray_number == 1:  # tray 1
+        orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi*160/180))
+        required_intermediate_pose = "joints_above_set_1_tray_1"
+      elif tray_number == 2:  # tray 2
+        orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
+        required_intermediate_pose = "joints_above_set_1_tray_2"
+    elif set_number == 2:
+      if tray_number == 1:  # tray 1
+        orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0)) 
+      elif tray_number == 2:  # tray 2
+        orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi))
+        required_intermediate_pose = "joints_above_set_2_tray_2"
+    elif set_number == 3:
+      if tray_number == 1:  # tray 1
+        orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi)) 
+      elif tray_number == 2:  # tray 2
+        orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, +pi))
+        required_intermediate_pose = "joints_above_set_3_tray_2"
+    else:
+      rospy.loginfo("Error.")
+      return False
+    return orientation, required_intermediate_pose
+    
+    
+    

@@ -1037,8 +1037,12 @@ class CalibrationClass(O2ASBaseRoutines):
     if tray_number == 2:
       pose0.header.frame_id = "set_" + str(set_number) + "_tray_2_partition_1"
       pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-      if end_effector_link and robot_name == "b_bot" and task=="kitting":
-        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+      if "suction" in end_effector_link or "screw" in end_effector_link:
+        if robot_name == "b_bot" and task=="kitting":
+          pose0.pose.orientation, required_intermediate_pose = self.get_tray_placement_orientation_for_suction_in_kitting(set_number, tray_number)
+          if required_intermediate_pose:
+            rospy.loginfo("Going to intermediate pose:" + required_intermediate_pose)
+            self.go_to_named_pose(required_intermediate_pose, "b_bot", speed=0.5)
 
       pose0.pose.position.x = 0
       pose0.pose.position.z = 0.02
@@ -1057,8 +1061,13 @@ class CalibrationClass(O2ASBaseRoutines):
     elif tray_number == 1:
       pose0.header.frame_id = "set_" + str(set_number) + "_tray_1_partition_1"
       pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
-      if end_effector_link and robot_name == "b_bot" and task=="kitting":
-        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+
+      if "suction" in end_effector_link or "screw" in end_effector_link:
+        if robot_name == "b_bot" and task=="kitting":
+          pose0.pose.orientation, required_intermediate_pose = self.get_tray_placement_orientation_for_suction_in_kitting(set_number, tray_number)
+          if required_intermediate_pose:
+            rospy.loginfo("Going to intermediate pose")
+            self.go_to_named_pose(required_intermediate_pose, "b_bot", speed=0.5)
       pose0.pose.position.x = 0
       pose0.pose.position.z = 0.05
       for i in range(5):
