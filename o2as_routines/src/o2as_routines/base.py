@@ -458,7 +458,7 @@ class O2ASBaseRoutines(object):
     elif gripper_command=="easy_pick_only_inner" or gripper_command=="inner_gripper_from_inside":
       self.precision_gripper_inner_open(this_action_grasps_an_object = True)
     elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
-      self.precision_gripper_inner_close()
+      self.precision_gripper_inner_close(this_action_grasps_an_object = True)
     elif gripper_command=="none":
       pass
     else: 
@@ -704,6 +704,14 @@ class O2ASBaseRoutines(object):
         rospy.logerr("Could not parse gripper command: " + command + " for gripper " + gripper)
       except:
         pass
+
+    if command == "open" and gripper == "b_bot":    # This intermediate opening may fix the driver issues in b_bot
+      rospy.loginfo("Sending intermediate b_bot gripper opening")
+      goal.position = 0.06
+      action_client.send_goal(goal)
+      action_client.wait_for_result(rospy.Duration(3.0))
+      rospy.loginfo("Sending second b_bot gripper opening")
+      goal.position = 0.085
 
     action_client.send_goal(goal)
     rospy.loginfo("Sending command " + str(command) + " to gripper: " + gripper)

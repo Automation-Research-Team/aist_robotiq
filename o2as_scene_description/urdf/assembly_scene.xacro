@@ -58,6 +58,6 @@
   </xacro:assy_part_frames_only_03>
 
   <xacro:assy_part_frames_only_14 prefix="intermediate_" parent="workspace_center" spawn_attached="true">
-    <origin xyz=".25 -0.15 .40" rpy="${pi/2} ${-pi/2} 0" />   
+    <origin xyz=".25 -0.15 .50" rpy="${pi/2} ${-pi/2} 0" />   
   </xacro:assy_part_frames_only_14>
 </robot>

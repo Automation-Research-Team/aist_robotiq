@@ -795,6 +795,9 @@ class CalibrationClass(O2ASBaseRoutines):
     rospy.loginfo("Press enter to open and go back up")
     raw_input()
     
+    
+    self.send_gripper_command(robot_name, "open")
+    self.send_gripper_command(robot_name, .06)
     self.send_gripper_command(robot_name, "open")
     self.go_to_pose_goal(robot_name, approach_pose,speed=.5, move_lin = True)
     self.go_to_named_pose("home", robot_name)
