@@ -11,6 +11,8 @@ import cv2
 import actionlib
 import o2as_msgs.msg
 
+import copy
+
 class InnerPickDetection(object):
 
     def __init__(self):
@@ -51,11 +53,27 @@ class InnerPickDetection(object):
         rospy.loginfo('Executing'+ str(self._action_name)+"."+"request sent:")
 
         #TODO consider the part to compare the red ratio
+        #Save image of with the ROI
+        try:
+            if(goal.saveROIImage):
+                self.saveROIImage()
+        except rospy.ROSInterruptException:
+            print "ROI image of calibrartion no saved"
+            print "goal.saveROIImage is not defined in the call of inner_pick_detection-action"
+
         res = self.compute_red_ratio(self._current_image, self._x, self._y, self._w, self._h) < self._empty_bg_ratio
 
         self.action_result.success = res
         self.action_result.picked = res
         self._action_server.set_succeeded(self.action_result)
+
+    #Save Image with ROI
+    def saveROIImage(self):
+        imageROI = copy.deepcopy(self._current_image)
+
+        cv2.rectangle(imageROI, (self._x,self._y), (self._x+self._w,self._y + self._h), (255,0,0), 3, ) 
+        cv2.imwrite("/root/catkin_ws/src/o2as_bg_ratio/images/ROIempty_close_gripper.png'", cv2.cvtColor(imageROI, cv2.COLOR_BGR2RGB))
+
 
     # Image Callback
     def image_callback(self, msg_in):
