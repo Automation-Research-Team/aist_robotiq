@@ -40,7 +40,7 @@ class SuctionController(object):
         self.tool_suction_publisher = dict()
         self.in_port_name = dict()
         self.operation_mode_in_port_name = dict()
-        self.operation_mode_publisher = dict()
+        self.operation_mode_publishers = dict()
 
         # get data for .yaml
         self.suction_tool_list = conf_file_content['suction_control']
@@ -56,7 +56,7 @@ class SuctionController(object):
         self.operation_mode_list = conf_operation_mode_file_content['operation_mode']
         for operation_mode_data in self.operation_mode_list:
             self.operation_mode_in_port_name.update({operation_mode_data['digital_in_port']: operation_mode_data['name']})
-            self.operation_mode_publisher[operation_mode_data['name']] = rospy.Publisher(operation_mode_data['name'] + '/in_state', Bool, queue_size=1)
+            self.operation_mode_publishers[operation_mode_data['name']] = rospy.Publisher(operation_mode_data['name'], Bool, queue_size=1)
 
         self._action_name = 'o2as_fastening_tools/suction_control'
         self._as = actionlib.SimpleActionServer(self._action_name, SuctionControlAction, execute_cb=self.suction_control, auto_start = False)
@@ -72,7 +72,7 @@ class SuctionController(object):
             if read_in_status.pin in self.operation_mode_in_port_name:
                 mode_read = Bool()
                 mode_read.data = read_in_status.state
-                self.operation_mode_publisher[self.operation_mode_in_port_name[read_in_status.pin]].publish(mode_read)
+                self.operation_mode_publishers[self.operation_mode_in_port_name[read_in_status.pin]].publish(mode_read)
 
         for read_out_status in data.digital_out_states:
             self.out_state.update({read_out_status.pin: read_out_status.state})
