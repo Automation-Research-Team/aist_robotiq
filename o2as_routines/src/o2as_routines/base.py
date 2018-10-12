@@ -146,6 +146,7 @@ class O2ASBaseRoutines(object):
     self.screw_client = actionlib.SimpleActionClient('/o2as_skills/screw', o2as_msgs.msg.screwAction)
     self.change_tool_client = actionlib.SimpleActionClient('/o2as_skills/changeTool', o2as_msgs.msg.changeToolAction)
 
+    self.suction_client = actionlib.SimpleActionClient('/o2as_fastening_tools/suction_control', o2as_msgs.msg.SuctionControlAction)
     self.fastening_tool_client = actionlib.SimpleActionClient('/o2as_fastening_tools/fastener_gripper_control_action', o2as_msgs.msg.FastenerGripperControlAction)
     self.nut_peg_tool_client = actionlib.SimpleActionClient('/nut_tools_action', o2as_msgs.msg.ToolsCommandAction)
 
@@ -608,6 +609,19 @@ class O2ASBaseRoutines(object):
     if wait:
       self.fastening_tool_client.wait_for_result()
     return self.fastening_tool_client.get_result()
+
+  def set_suction(self, tool_name, suction_on=False, eject=False):
+    if not self.use_real_robot:
+      return True
+    goal = o2as_msgs.msg.SuctionControlGoal()
+    goal.fastening_tool_name = motor_name
+    goal.turn_suction_on = turn_suction_on
+    goal.eject_screw = eject_screw
+    rospy.loginfo("Sending suction action goal.")
+    self.suction_client.send_goal(goal)
+    if wait:
+      self.suction_client.wait_for_result()
+    return self.suction_client.get_result()
 
   def do_nut_fasten_action(self, item_name, wait = False):
     if not self.use_real_robot:
