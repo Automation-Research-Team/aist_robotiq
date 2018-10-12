@@ -57,6 +57,7 @@
   <build_depend>cv_bridge</build_depend>
   <build_depend>opencv3</build_depend>
   <build_depend>message_generation</build_depend>
+  <build_depend>o2as_msgs</build_depend>
   <build_export_depend>nodelet</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>sensor_msgs</build_export_depend>
@@ -73,6 +74,7 @@
   <exec_depend>cv_bridge</exec_depend>
   <exec_depend>opencv3</exec_depend>
   <exec_depend>message_runtime</exec_depend>
+  <exec_depend>o2as_msgs</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
