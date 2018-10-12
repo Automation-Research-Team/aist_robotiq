@@ -29,7 +29,7 @@
   <!-- Scene items (trays, bins...) -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/taskboard_scene.xacro" />
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" /> -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/assembly_scene.xacro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/assembly_scene.xacro" /> -->
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/calibration_scene.xacro" /> -->
   
   <!-- Robot bases -->
@@ -125,6 +125,15 @@
   <xacro:o2as_b_bot_gripper prefix="b_bot_" parent = "b_bot_ee_link" />
   <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_c_bot_gripper.urdf.xacro" />
   <xacro:o2as_c_bot_gripper prefix="c_bot_" parent = "c_bot_ee_link"/>
+
+  <!-- Feeders -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/screw_feeder.xacro" />
+  <xacro:screw_feeder feedername="m3_feeder" parent="c_bot_base_smfl">
+    <origin xyz=".66 -0.25 .065" rpy="0 0 ${pi/2}" />   
+  </xacro:screw_feeder>
+  <xacro:screw_feeder feedername="m4_feeder" parent="c_bot_base_smfl">
+    <origin xyz=".52 -0.25 .065" rpy="0 0 ${pi/2}" />   
+  </xacro:screw_feeder>
 
   <!-- Add cameras -->
   <xacro:include filename="$(find o2as_realsense2_camera)/urdf/_d435.urdf.xacro" />

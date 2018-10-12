@@ -50,6 +50,7 @@ import geometry_msgs.msg
 import std_msgs.msg
 import robotiq_msgs.msg
 import std_srvs.srv
+from std_msgs.msg import Bool
 
 import o2as_msgs
 import o2as_msgs.msg
@@ -169,7 +170,7 @@ class O2ASBaseRoutines(object):
                       end_effector_link = "", move_lin = True):
     if move_lin:
       return self.move_lin(group_name, pose_goal_stamped, speed, acceleration, end_effector_link)
-    self.publish_marker(pose_goal_stamped, "pose")
+    # self.publish_marker(pose_goal_stamped, "pose")
     group = self.groups[group_name]
     
     if not end_effector_link:
@@ -246,7 +247,7 @@ class O2ASBaseRoutines(object):
     return ps_new
 
   def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, end_effector_link = ""):
-    self.publish_marker(pose_goal_stamped, "pose")
+    # self.publish_marker(pose_goal_stamped, "pose")
 
     if not end_effector_link:
       if group_name == "c_bot":
@@ -342,6 +343,8 @@ class O2ASBaseRoutines(object):
 
   def horizontal_spiral_motion(self, robot_name, max_radius, radius_increment = .001, speed = 0.02, spiral_axis="Z"):
     rospy.loginfo("Performing horizontal spiral motion " + str(speed))
+    if not self.use_real_robot:
+      return True
     req = o2as_msgs.srv.sendScriptToURRequest()
     req.program_id = "spiral_motion"
     req.robot_name = robot_name
@@ -426,7 +429,7 @@ class O2ASBaseRoutines(object):
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
     object_pose.pose.position.z -= approach_height
     rospy.logdebug("Height 2: " + str(object_pose.pose.position.z))
-    self.publish_marker(object_pose, "place_pose")
+    # self.publish_marker(object_pose, "place_pose")
 
     if gripper_command=="complex_pick_from_inside":
       self.precision_gripper_inner_close() 
@@ -593,6 +596,8 @@ class O2ASBaseRoutines(object):
     return self.screw_client.get_result()
 
   def set_motor(self, motor_name, direction = "tighten", wait=False, speed = 0, duration = 0):
+    if not self.use_real_robot:
+      return True
     goal = o2as_msgs.msg.FastenerGripperControlGoal()
     goal.fastening_tool_name = motor_name
     goal.direction = direction
@@ -605,6 +610,8 @@ class O2ASBaseRoutines(object):
     return self.fastening_tool_client.get_result()
 
   def do_nut_fasten_action(self, item_name, wait = False):
+    if not self.use_real_robot:
+      return True
     goal = o2as_msgs.msg.ToolsCommandGoal()
     # goal.stop = stop
     goal.peg_fasten = (item_name == "peg")
@@ -621,6 +628,8 @@ class O2ASBaseRoutines(object):
                         max_approach_distance = .1, max_force = 5,
                         max_radius = .001, radius_increment = .0001,
                         wait = False):
+    if not self.use_real_robot:
+      return True
     # Directly calls the UR service rather than the action of the skill_server
     req = o2as_msgs.srv.sendScriptToURRequest()
     req.robot_name = robot_name
@@ -636,6 +645,8 @@ class O2ASBaseRoutines(object):
     return res.success
   
   def do_linear_push(self, robot_name, force, wait = False, direction = "Z+"):
+    if not self.use_real_robot:
+      return True
     # Directly calls the UR service rather than the action of the skill_server
     req = o2as_msgs.srv.sendScriptToURRequest()
     req.robot_name = robot_name
@@ -783,4 +794,104 @@ class O2ASBaseRoutines(object):
       rospy.loginfo(result)
     except rospy.ServiceException, e:
         rospy.logerror("Service call failed: %s", e)
+        
+  def pick_screw_from_feeder(self, screw_size, attempts = 1):
+    """
+    Picks a screw from one of the feeders. The screw tool already has to be equipped!
+    """
+    # Use this command to equip the screw tool: do_change_tool_action(self, "c_bot", equip=True, screw_size = 4)
+    
+    if not screw_size==3 and not screw_size==4:
+      rospy.logerr("Screw size needs to be 3 or 4!")
+      return False
+    
+    # Turn to the right to face the feeders
+    self.go_to_named_pose("feeder_pick_ready", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
+
+    pose_feeder = geometry_msgs.msg.PoseStamped()
+    pose_feeder.header.frame_id = "m" + str(screw_size) + "_feeder_outlet_link"
+    pose_feeder.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    pose_feeder.pose.position.x = 0.0
+
+    attempt = 0
+    screw_picked = False
+    while attempt < attempts:
+      self.set_feeder_power(False)
+      self.do_pick_action("c_bot", pose_feeder, screw_size = screw_size, use_complex_planning = True, tool_name = "screw_tool")
+      self.set_feeder_power(True)
+      bool_msg = Bool()
+      try:
+        bool_msg = rospy.wait_for_message("/screw_tool_m" + str(screw_size) + "/screw_suctioned", Bool, 1.0)
+      except:
+        pass
+      screw_picked = bool_msg.data
+      if screw_picked:
+        rospy.loginfo("Successfully picked the screw")
+        return True
+      if not self.use_real_robot:
+        rospy.loginfo("Pretending the screw is picked, because this is simulation.")
+        return True
+      attempt += 1
+
+    return False
+
+  def pick_screw_from_precision_gripper(self, screw_size, robot_name="c_bot",attempts = 1):
+    """
+    Picks a screw from the precision gripper.
+    """
+    if not screw_size==3 and not screw_size==4:
+      rospy.logerr("Screw size needs to be 3 or 4!")
+      return False
+    
+    # Turn to the right to face the feeders
+    self.go_to_named_pose("screw_ready", robot_name, force_ur_script=self.use_real_robot)
+
+    self.go_to_named_pose("screw_handover", "a_bot", force_ur_script=self.use_real_robot)
+    # ATTENTION: MAGIC NUMBERS
+    magic_y_offset = .004
+    magic_z_offset = -.008
+
+    pick_pose = geometry_msgs.msg.PoseStamped()
+    pick_pose.header.frame_id = "a_bot_gripper_screw_pickup"
+    pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/6, 0, 0))
+    pick_pose.pose.position.y = magic_y_offset
+    pick_pose.pose.position.z = magic_z_offset
+
+    prep_pose = copy.deepcopy(pick_pose)
+    prep_pose.pose.position.x = -0.03
+    prep_pose.pose.position.y = -0.06
+
+    self.move_lin(robot_name, prep_pose, .2, end_effector_link="c_bot_screw_tool_m"+str(screw_size)+"_tip_link")
+    prep_pose.pose.position.y = magic_y_offset
+    prep_pose.pose.position.z = magic_z_offset
+    self.move_lin(robot_name, prep_pose, .2, end_effector_link=str(robot_name)+"_screw_tool_m"+str(screw_size)+"_tip_link")
+
+    attempt = 0
+    screw_picked = False
+    while attempt < attempts:
+      self.do_pick_action(robot_name, pick_pose, screw_size = 4, use_complex_planning = True, tool_name = "screw_tool")
+      bool_msg = Bool()
+      try:
+        bool_msg = rospy.wait_for_message("/screw_tool_m" + str(screw_size) + "/screw_suctioned", Bool, 1.0)
+      except:
+        pass
+      screw_picked = bool_msg.data
+      if screw_picked:
+        rospy.loginfo("Successfully picked the screw")
+        return True
+      if not self.use_real_robot:
+        rospy.loginfo("Pretending the screw is picked, because this is simulation.")
+        return True
+      attempt += 1
+
+    return False
+
+  def set_feeder_power(self, turn_on=True):
+    if not self.use_real_robot:
+      return True
+    req = o2as_msgs.srv.SetPowerRequest()
+    req.port = 2
+    req.on = turn_on
+    res = self._feeder_srv.call(req)
+    return res.success
 
