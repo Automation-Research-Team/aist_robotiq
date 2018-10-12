@@ -515,7 +515,20 @@ if __name__ == '__main__':
         # TODO: Make sure the task succeeded by pushing with b_bot and plate 3
 
       if i == 2: #unadjusted 
-
+        ###set the tool
+        tool_pose = geometry_msgs.msg.PoseStamped()
+        tool_pose.header.frame_id = "peg_tool"
+        tool_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+        tool_grasped_height = 0.03
+        taskboard.pick("b_bot",tool_pose, tool_grasped_height,
+                           speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
+                           approach_height = 0.1)
+        taskboard.place("b_bot",taskboard.place_poses[i-1], 0.03,
+                        speed_fast = 0.2, speed_slow = 0.02, gripper_command="none",
+                        approach_height = 0.1, lift_up_after_place = True)
+        # taskboard.send_gripper_command(gripper="b_bot", command="open", velocity = .013)
+        taskboard.go_to_named_pose("home","b_bot")
+        
         ###pick up screw
         inclined_pick_pose = copy.deepcopy(taskboard.pick_poses[i-1])
         inclined_pick_pose.pose.position.x += -.025
@@ -562,12 +575,18 @@ if __name__ == '__main__':
 
         taskboard.place_poses[i-1].pose.position.z = 0.1
         taskboard.go_to_pose_goal("b_bot", taskboard.place_poses[i-1], speed=0.1, move_lin=True)
-
+         
         # taskboard.go_to_named_pose("home","a_bot")
         ###push
         taskboard.place_poses[i-1].pose.position.x += 0.004
         taskboard.go_to_pose_goal("b_bot", taskboard.place_poses[i-1], speed=0.1, move_lin=True)
         taskboard.do_linear_push("b_bot", 15, wait = True)
+        ###throw away
+        taskboard.place_poses[i-1].pose.position.z += 0.15
+        taskboard.go_to_pose_goal("b_bot", taskboard.place_poses[i-1], speed=0.1, move_lin=True)
+        taskboard.place_poses[i-1].pose.position.x += 0.4
+        taskboard.place_poses[i-1].pose.position.y += 0.4
+        taskboard.go_to_pose_goal("b_bot", taskboard.place_poses[i-1], speed=0.2, move_lin=True)
         taskboard.send_gripper_command(gripper="b_bot", command="open")
         taskboard.go_to_named_pose("home","b_bot")
 
