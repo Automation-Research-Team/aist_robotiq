@@ -1503,8 +1503,8 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_named_pose("home", "b_bot")
     place_pose = geometry_msgs.msg.PoseStamped()
     place_pose.header.frame_id = "retainer_pin_holder_link"
-    # place_pose.pose.orientation = 
-    self.place("b_bot", place_pose, place_height=.01, speed_fast=1.0, speed_slow=0.5)
+    place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    self.place("b_bot", place_pose, place_height=.01, speed_fast=1.0, speed_slow=0.5, approach_height=.05)
     self.go_to_named_pose("home", "b_bot")
     return
 
