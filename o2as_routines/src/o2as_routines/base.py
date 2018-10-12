@@ -861,7 +861,7 @@ class O2ASBaseRoutines(object):
     except rospy.ServiceException, e:
         rospy.logerror("Service call failed: %s", e)
   
-   def put_screw_in_feeder(self, screw_size):
+  def put_screw_in_feeder(self, screw_size):
     if not screw_size in [3,4]:
       rospy.logerr("There are no feeders of size " + str(screw_size) + ". Aborting.")
       return False
