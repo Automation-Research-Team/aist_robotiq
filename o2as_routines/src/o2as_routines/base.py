@@ -895,12 +895,16 @@ class O2ASBaseRoutines(object):
     pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/6, 0, 0))
     pick_pose.pose.position.y = magic_y_offset
     pick_pose.pose.position.z = magic_z_offset
-
+    self.publish_marker(pick_pose, "pose")
+    
+    if robot_name == "b_bot":
+      pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(5*pi/6, 0, 0))
     prep_pose = copy.deepcopy(pick_pose)
     prep_pose.pose.position.x = -0.03
     prep_pose.pose.position.y = -0.06
+    self.publish_marker(prep_pose, "pose")
 
-    self.move_lin(robot_name, prep_pose, .2, end_effector_link="c_bot_screw_tool_m"+str(screw_size)+"_tip_link")
+    self.move_lin(robot_name, prep_pose, .2, end_effector_link=str(robot_name)+"_screw_tool_m"+str(screw_size)+"_tip_link")
     prep_pose.pose.position.y = magic_y_offset
     prep_pose.pose.position.z = magic_z_offset
     self.move_lin(robot_name, prep_pose, .2, end_effector_link=str(robot_name)+"_screw_tool_m"+str(screw_size)+"_tip_link")

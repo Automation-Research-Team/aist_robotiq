@@ -1089,33 +1089,73 @@ if __name__ == '__main__':
         pass
 
       if i == 12:      #unadjusted
-        taskboard.pick_poses[i-1].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/5, pi))
-        taskboard.pick_poses[i-1].pose.position.x = -0.0025
+        # taskboard.pick_poses[i-1].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/5, pi))
+        # taskboard.pick_poses[i-1].pose.position.x = -0.0025
+        # taskboard.pick("a_bot",taskboard.pick_poses[i-1],0.01,
+        #                          speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
+        #                          approach_height = 0.1)
+        # ###move to feeder
+        # taskboard.go_to_named_pose("above_feeder", "a_bot", speed=0.3, acceleration=1.0)
+        
+        # taskboard.send_gripper_command(gripper="precision_gripper_inner", command="open")
+        # taskboard.go_to_named_pose("home", "a_bot")
+        # ###pick up by screw tool
+        # taskboard.do_change_tool_action("c_bot", equip=True, 
+        #                 screw_size = 3)
+        # taskboard.pick_screw_from_feeder(screw_size=3, attempts = 1)
+        
+        # ### screw
+        # taskboard.place_poses[i-1].pose.position.x -= 0.1
+        # screwM3Position = copy.deepcopy(taskboard.place_poses[i-1])
+        # screwM3Position.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, 0, 0))
+ 
+        # taskboard.go_to_pose_goal("c_bot", screwM3Position, speed=0.2, end_effector_link="c_bot_screw_tool_m3_tip_link", move_lin=True)
+        # taskboard.do_screw_action("c_bot", screwM3Position, screw_height = 0.002, screw_size = 4)
+
+        # taskboard.go_to_named_pose("home","c_bot")
+
         taskboard.pick("a_bot",taskboard.pick_poses[i-1],0.01,
-                                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
-                                 approach_height = 0.1)
-        ###move to feed
-        taskboard.go_to_named_pose("above_feeder", "a_bot", speed=0.3, acceleration=1.0)
+                               speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
+                               approach_height = 0.1, special_pick = True)    
+        #move to feeder
+        # taskboard.m3_feeder_pose.pose.position.x +=0.1
+        # taskboard.m3_feeder_pose.pose.position.y +=0.1
+        # taskboard.m3_feeder_pose.pose.position.z +=0.2
+        # taskboard.place("a_bot",taskboard.m3_feeder_pose, place_height=0.05,
+        #                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
+        #                 approach_height = 0.1) 
+        # taskboard.go_to_named_pose("home","a_bot")
+
+        ###arrange M4 screw
+        taskboard.tilt_up_gripper(speed_fast=0.1, speed_slow=0.02)
+
+        #pick up the screw tool
+        taskboard.do_change_tool_action("b_bot", equip=True, 
+                screw_size = 3)        
         
-        taskboard.send_gripper_command(gripper="precision_gripper_inner", command="open")
+        #pick up the screw from a_bot
+        taskboard.go_to_named_pose("back", "c_bot")
+        taskboard.pick_screw_from_precision_gripper(screw_size=3, robot_name="b_bot")
         taskboard.go_to_named_pose("home", "a_bot")
-        ###pick up by screw tool
-        taskboard.do_change_tool_action("c_bot", equip=False, 
-                        screw_size = 3)
-        taskboard.pick_screw_from_feeder(screw_size=3, attempts = 1)
-        
-        ### screw
-        taskboard.place_poses[i-1].pose.position.z = 0.4
-        taskboard.go_to_pose_goal("c_bot", taskboard.place_poses[i-1], speed=0.2)
-        taskboard.do_linear_push("c_bot", 15, wait = True)
-        taskboard.go_to_pose_goal("c_bot", taskboard.place_poses[i-1], speed=0.2, move_lin=True)
-        taskboard.go_to_named_pose("home","c_bot")
+
+        #screw onto the cap
+        taskboard.go_to_named_pose("screw_ready", "b_bot")
+        taskboard.place_poses[i-1].pose.position.x -= 0.05
+        # taskboard.place_poses[i-1].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, pi/2))
+        taskboard.place_poses[i-1].pose.position.x = 0.001
+        taskboard.place_poses[i-1].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, 0, 0))
+
+        screwPosition = copy.deepcopy(taskboard.place_poses[i-1])
+        screwPosition.pose.position.x = 0.0
+
+        taskboard.go_to_pose_goal("b_bot", screwPosition, speed=0.2, end_effector_link="b_bot_screw_tool_m3_tip_link", move_lin=True)
+        taskboard.do_screw_action("b_bot", taskboard.place_poses[i-1], screw_height = 0.002, screw_size = 3)
 
 
         
 
       if i == 13:      #unadjusted
-        taskboard.pick("a_bot",taskboard.pick_poses[4],taskboard.item_pick_heights[4],
+        taskboard.pick("a_bot",taskboard.pick_poses[i-1],0.01,
                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
                                approach_height = 0.1, special_pick = True)    
         #move to feeder
@@ -1135,12 +1175,20 @@ if __name__ == '__main__':
                 screw_size = 4)        
         
         #pick up the screw from a_bot
+        taskboard.go_to_named_pose("back", "c_bot")
         taskboard.pick_screw_from_precision_gripper(screw_size=4, robot_name="b_bot")
+        taskboard.go_to_named_pose("home", "a_bot")
 
         #screw onto the cap
-        taskboard.place_poses[i-1].pose.position.z += 0.2
-        taskboard.go_to_pose_goal("b_bot", taskboard.place_poses[i-1], speed=0.2)
-        taskboard.place_poses[i-1].pose.position.z == 0.001
+        taskboard.go_to_named_pose("screw_ready", "b_bot")
+        taskboard.place_poses[i-1].pose.position.x -= 0.23
+        # taskboard.place_poses[i-1].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, pi/2))
+        screwPosition = copy.deepcopy(taskboard.place_poses[i-1])
+        screwPosition.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+        taskboard.go_to_pose_goal("b_bot", screwPosition, speed=0.2, end_effector_link="b_bot_screw_tool_m4_tip_link", move_lin=True)
+
+        taskboard.place_poses[i-1].pose.position.x = 0.001
+        taskboard.place_poses[i-1].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
         taskboard.do_screw_action("b_bot", taskboard.place_poses[i-1], screw_height = 0.002, screw_size = 4)
 
       if i == 14:
