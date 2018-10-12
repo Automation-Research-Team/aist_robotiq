@@ -37,6 +37,7 @@
 # This file is based on the kinetic MoveIt tutorial for the Python movegroup interface.
 
 import sys
+import threading
 import copy
 import rospy
 import tf_conversions
@@ -155,10 +156,33 @@ class O2ASBaseRoutines(object):
     self.publishMarker_client = rospy.ServiceProxy('/o2as_skills/publishMarker', o2as_msgs.srv.publishMarker)
     self.toggleCollisions_client = rospy.ServiceProxy('/o2as_skills/toggleCollisions', std_srvs.srv.SetBool)
 
+    self.run_mode_ = False
+    self.pause_mode_ = False
+    self.test_mode_ = False
+    self.sub_run_mode_ = rospy.Subscriber("/run_mode", Bool, self.run_mode_callback)
+    self.sub_pause_mode_ = rospy.Subscriber("/pause_mode", Bool, self.pause_mode_callback)
+    self.sub_test_mode_ = rospy.Subscriber("/test_mode", Bool, self.test_mode_callback)
+    self.reduced_mode_speed_limit = .25
+    
+    self.my_mutex = threading.Lock()
+
     rospy.sleep(.5)
     rospy.loginfo("Finished initializing class")
     
   ############## ------ Internal functions (and convenience functions)
+
+  def run_mode_callback(self, msg):
+    self.my_mutex.acquire()
+    self.run_mode_ = msg.data
+    self.my_mutex.release()
+  def pause_mode_callback(self, msg):
+    self.my_mutex.acquire()
+    self.pause_mode_ = msg.data
+    self.my_mutex.release()
+  def test_mode_callback(self, msg):
+    self.my_mutex.acquire()
+    self.test_mode_ = msg.data
+    self.my_mutex.release()
 
   def publish_marker(self, pose_stamped, marker_type):
     req = o2as_msgs.srv.publishMarkerRequest()
@@ -169,6 +193,10 @@ class O2ASBaseRoutines(object):
 
   def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, high_precision = False, 
                       end_effector_link = "", move_lin = True):
+    if self.pause_mode_ or self.test_mode_:
+      if speed > self.reduced_mode_speed_limit:
+        rospy.loginfo("Reducing speed from " + str(speed) + " to " + str(self.reduced_mode_speed_limit) + " because robot is in test or pause mode")
+        speed = self.reduced_mode_speed_limit
     if move_lin:
       return self.move_lin(group_name, pose_goal_stamped, speed, acceleration, end_effector_link)
     # self.publish_marker(pose_goal_stamped, "pose")
@@ -249,6 +277,10 @@ class O2ASBaseRoutines(object):
 
   def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, end_effector_link = ""):
     # self.publish_marker(pose_goal_stamped, "pose")
+    if self.pause_mode_ or self.test_mode_:
+      if speed > self.reduced_mode_speed_limit:
+        rospy.loginfo("Reducing speed from " + str(speed) + " to " + str(self.reduced_mode_speed_limit) + " because robot is in test or pause mode")
+        speed = self.reduced_mode_speed_limit
 
     if not end_effector_link:
       if group_name == "c_bot":
@@ -307,6 +339,10 @@ class O2ASBaseRoutines(object):
     return plan_success
 
   def move_joints(self, group_name, joint_pose_goal, speed = 1.0, acceleration = 0.0, force_ur_script=False, force_moveit=False):
+    if self.pause_mode_ or self.test_mode_:
+      if speed > self.reduced_mode_speed_limit:
+        rospy.loginfo("Reducing speed from " + str(speed) + " to " + str(self.reduced_mode_speed_limit) + " because robot is in test or pause mode")
+        speed = self.reduced_mode_speed_limit
     if force_ur_script or self.use_real_robot:
       if not force_moveit:
         rospy.logdebug("Real robot is being used. Send joint command to robot controller directly via URScript.") 
@@ -325,6 +361,10 @@ class O2ASBaseRoutines(object):
     return self.groups[group_name].go(wait=True)
 
   def move_front_bots(self, pose_goal_a_bot, pose_goal_b_bot, speed = 0.05):
+    if self.pause_mode_ or self.test_mode_:
+      if speed > .25:
+        rospy.loginfo("Reducing speed from " + str(speed) + " to .25 because robot is in test or pause mode")
+        speed = .25
     rospy.logwarn("CAUTION: Moving front bots together, but MoveIt does not do continuous collision checking.")
     group = self.groups["front_bots"]
     group.set_pose_target(pose_goal_a_bot, end_effector_link="a_bot_gripper_tip_link")
@@ -394,6 +434,10 @@ class O2ASBaseRoutines(object):
 
 
   def go_to_named_pose(self, pose_name, robot_name, speed = 0.5, acceleration = 0.0, force_ur_script=False):
+    if self.pause_mode_ or self.test_mode_:
+      if speed > self.reduced_mode_speed_limit:
+        rospy.loginfo("Reducing speed from " + str(speed) + " to " + str(self.reduced_mode_speed_limit) + " because robot is in test or pause mode")
+        speed = self.reduced_mode_speed_limit
     # pose_name should be "home", "back" etc.
     if force_ur_script and self.use_real_robot:
       # joint_pose = self.groups[robot_name].get_joint_value_target() # This works only with a_bot. Bug?

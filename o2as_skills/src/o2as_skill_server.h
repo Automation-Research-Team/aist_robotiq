@@ -18,6 +18,7 @@
 #include <chrono>
 #include <thread>
 #include <cmath>
+#include <boost/thread/mutex.hpp>
 
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
@@ -104,6 +105,10 @@ public:
   bool toggleCollisionsCallback(std_srvs::SetBool::Request &req,
                         std_srvs::SetBool::Response &res);
 
+  void runModeCallback(const std_msgs::BoolConstPtr& msg);
+  void pauseModeCallback(const std_msgs::BoolConstPtr& msg);
+  void testModeCallback(const std_msgs::BoolConstPtr& msg);
+
   // Actions
   void executeAlign(const o2as_msgs::alignGoalConstPtr& goal);
   void executePick(const o2as_msgs::pickGoalConstPtr& goal);
@@ -117,7 +122,11 @@ public:
 // private:
   ros::NodeHandle n_;
   bool use_real_robot_;
+  bool run_mode_, pause_mode_, test_mode_;
+  double reduced_speed_limit_ = .25;
+  boost::mutex mutex_;
 
+  ros::Subscriber subRunMode_, subPauseMode_, subTestMode_;
   ros::Publisher pubMarker_;
   int marker_id_count = 0;
 
@@ -125,7 +134,6 @@ public:
   ros::ServiceServer goToNamedPoseService_;
   ros::ServiceServer publishMarkerService_;
   ros::ServiceServer toggleCollisionsService_;
-
 
   // Service clients
   ros::ServiceClient sendScriptToURClient_;

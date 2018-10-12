@@ -17,6 +17,11 @@ SkillServer::SkillServer() :
   // Topics to publish
   pubMarker_ = n_.advertise<visualization_msgs::Marker>("visualization_marker", 10);
 
+  // Topics to subscribe to
+  subRunMode_ = n_.subscribe("run_mode", 1, &SkillServer::runModeCallback, this);
+  subPauseMode_ = n_.subscribe("pause_mode", 1, &SkillServer::pauseModeCallback, this);
+  subTestMode_ = n_.subscribe("test_mode", 1, &SkillServer::testModeCallback, this);
+
   // Services to advertise
   goToNamedPoseService_ = n_.advertiseService("o2as_skills/goToNamedPose", &SkillServer::goToNamedPoseCallback,
                                         this);
@@ -256,6 +261,14 @@ SkillServer::SkillServer() :
 
 bool SkillServer::moveToJointPose(std::vector<double> joint_positions, std::string robot_name, bool wait, double velocity_scaling_factor, bool use_UR_script, double acceleration)
 {
+  if (pause_mode_ || test_mode_)
+  {
+    if (velocity_scaling_factor > reduced_speed_limit_)
+    {
+      ROS_INFO_STREAM("Reducing velocity_scaling_factor from " << velocity_scaling_factor << " to " << reduced_speed_limit_ << " because robot is in test or pause mode!");
+      velocity_scaling_factor = reduced_speed_limit_;
+    }
+  }
   if (joint_positions.size() != 6)
   {
     ROS_ERROR_STREAM("Size of joint positions in moveToJointPose is not correct! Expected 6, got " << joint_positions.size());
@@ -285,6 +298,7 @@ bool SkillServer::moveToJointPose(std::vector<double> joint_positions, std::stri
   moveit::planning_interface::MoveGroupInterface* group_pointer = robotNameToMoveGroup(robot_name);;
   moveit::planning_interface::MoveGroupInterface::Plan my_plan;
   moveit::planning_interface::MoveItErrorCode success, motion_done;
+  group_pointer->setMaxVelocityScalingFactor(velocity_scaling_factor);
   group_pointer->setJointValueTarget(joint_positions);
     
   success = (group_pointer->plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
@@ -303,6 +317,14 @@ bool SkillServer::moveToJointPose(std::vector<double> joint_positions, std::stri
 // This works only for a single robot.
 bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait, std::string end_effector_link, double velocity_scaling_factor)
 {
+  if (pause_mode_ || test_mode_)
+  {
+    if (velocity_scaling_factor > reduced_speed_limit_)
+    {
+      ROS_INFO_STREAM("Reducing velocity_scaling_factor from " << velocity_scaling_factor << " to " << reduced_speed_limit_ << " because robot is in test or pause mode!");
+      velocity_scaling_factor = reduced_speed_limit_;
+    }
+  }
   moveit::planning_interface::MoveGroupInterface::Plan myplan;
   moveit::planning_interface::MoveItErrorCode 
     success_plan = moveit_msgs::MoveItErrorCodes::FAILURE, 
@@ -343,6 +365,14 @@ bool SkillServer::moveToCartPosePTP(geometry_msgs::PoseStamped pose, std::string
 // Acceleration is only used for the real robot.
 bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string robot_name, bool wait, std::string end_effector_link, double velocity_scaling_factor, double acceleration, bool force_UR_script, bool force_moveit)
 {
+  if (pause_mode_ || test_mode_)
+  {
+    if (velocity_scaling_factor > reduced_speed_limit_)
+    {
+      ROS_INFO_STREAM("Reducing velocity_scaling_factor from " << velocity_scaling_factor << " to " << reduced_speed_limit_ << " because robot is in test or pause mode!");
+      velocity_scaling_factor = reduced_speed_limit_;
+    }
+  }
   if (use_real_robot_ || force_UR_script)
   {
     if (!force_moveit)
@@ -463,6 +493,14 @@ bool SkillServer::moveToCartPoseLIN(geometry_msgs::PoseStamped pose, std::string
 bool SkillServer::goToNamedPose(std::string pose_name, std::string robot_name, double speed, double acceleration, bool use_UR_script)
 {
   ROS_INFO_STREAM("Going to named pose " << pose_name << " with robot group " << robot_name << ".");
+  if (pause_mode_ || test_mode_)
+  {
+    if (velocity_scaling_factor > reduced_speed_limit_)
+    {
+      ROS_INFO_STREAM("Reducing velocity_scaling_factor from " << velocity_scaling_factor << " to " << reduced_speed_limit_ << " because robot is in test or pause mode!");
+      velocity_scaling_factor = reduced_speed_limit_;
+    }
+  }
   moveit::planning_interface::MoveGroupInterface* group_pointer;
   group_pointer = robotNameToMoveGroup(robot_name);
   if (use_UR_script && use_real_robot_)
@@ -842,7 +880,6 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     moveToJointPose(joint_group_positions_2, robot_name, true, 3.0, use_real_robot_, 3.0);
     ROS_INFO("Going to joint pose 1.");
     moveToJointPose(joint_group_positions_1, robot_name, true, 3.0, use_real_robot_, 3.0);
-    group_pointer->move();
     ROS_INFO("Done with joint poses, and with life.");
   }
   
@@ -1615,6 +1652,23 @@ bool SkillServer::toggleCollisionsCallback(std_srvs::SetBool::Request &req,
   ROS_INFO("Received toggleCollisions callback.");
   return toggleCollisions(req.data);
 }
+
+void SkillServer::runModeCallback(const std_msgs::BoolConstPtr& msg)
+{
+  boost::mutex::scoped_lock lock(mutex_);
+  run_mode_ = msg->data;
+}
+void SkillServer::pauseModeCallback(const std_msgs::BoolConstPtr& msg)
+{
+  boost::mutex::scoped_lock lock(mutex_);
+  pause_mode_ = msg->data;
+}
+void SkillServer::testModeCallback(const std_msgs::BoolConstPtr& msg)
+{
+  boost::mutex::scoped_lock lock(mutex_);
+  test_mode_ = msg->data;
+}
+
 // ----------- Action servers
 
 // alignAction
