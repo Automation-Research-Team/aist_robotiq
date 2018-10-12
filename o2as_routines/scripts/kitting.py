@@ -238,6 +238,22 @@ class KittingClass(O2ASBaseRoutines):
         }
     }
 
+    # self.part_bin_list = {
+    #   "part_4" : "bin2_1",
+    #   "part_5" : "bin2_1",
+    #   "part_6" : "bin3_1",
+    #   "part_8" : "bin2_2",
+    #   "part_9" : "bin1_1",
+    #   "part_10" : "bin1_1",
+    #   "part_11" : "bin2_3",
+    #   "part_12" : "bin1_2",
+    #   "part_13" : "bin2_4",
+    #   "part_14" : "bin1_1",
+    #   "part_15" : "bin1_2",
+    #   "part_16" : "bin1_3",
+    #   "part_17" : "bin1_4",
+    #   "part_18" : "bin1_5"}
+    self.part_bin_list = rospy.get_param("part_bin_list")
 
     self.part_position_in_tray = {
       "part_4" : "tray_1_partition_4",
