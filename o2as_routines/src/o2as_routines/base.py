@@ -816,6 +816,23 @@ class O2ASBaseRoutines(object):
       rospy.loginfo(result)
     except rospy.ServiceException, e:
         rospy.logerror("Service call failed: %s", e)
+  
+   def put_screw_in_feeder(self, screw_size):
+    if not screw_size in [3,4]:
+      rospy.logerr("There are no feeders of size " + str(screw_size) + ". Aborting.")
+      return False
+    
+    self.go_to_named_pose("above_feeder", "a_bot", speed=1.5, acceleration=1.0, force_ur_script=self.use_real_robot)
+    drop_pose = geometry_msgs.msg.PoseStamped()
+    drop_pose.pose.position.z = .015
+    drop_pose.pose.orientation = self.downward_orientation_2
+    drop_pose.header.frame_id = "m" + str(screw_size) + "_feeder_inlet_link"
+
+    self.set_feeder_power(False)
+    self.move_lin(robot_name, drop_pose, speed = 1.0, acceleration = 1.0, end_effector_link = "a_bot_gripper_tip_link")
+    self.send_gripper_command(gripper= "precision_gripper_inner", command="open")
+    self.set_feeder_power(True)
+    return True
         
   def pick_screw_from_feeder(self, screw_size, attempts = 1):
     """
@@ -917,3 +934,50 @@ class O2ASBaseRoutines(object):
     res = self._feeder_srv.call(req)
     return res.success
 
+
+  def pick_nut_from_table(self,robot_name, object_pose, max_radius=0.005, end_effector_link="c_bot_nut_tool_m6_tip_link"):
+    approach_pose = copy.deepcopy(object_pose)
+    approach_pose.pose.position.z += .02  # Assumes that z points upward
+    self.go_to_pose_goal(robot_name, approach_pose, speed=.1, move_lin = True, end_effector_link=end_effector_link)
+    if robot_name == "c_bot":
+      spiral_axis = "YZ"
+    else:
+      spiral_axis = "Y"
+    self.do_linear_push(robot_name, 10, wait = True)
+    self.set_motor("nut_tool_m6", direction="loosen", duration=15)
+    self.horizontal_spiral_motion(robot_name, max_radius = .006, radius_increment = .02, spiral_axis=spiral_axis)
+    self.do_linear_push(robot_name, 40, wait = True)
+    self.go_to_pose_goal(robot_name, approach_pose, speed=.03, move_lin = True, end_effector_link=end_effector_link)
+
+  def pick_nut_using_spiral_search(self,object_pose, max_radius=0.005, end_effector_link="c_bot_nut_tool_m6_tip_link"):
+    # This spiral search does not work as well as we hoped. When the nut is not perfectly picked, it falls to a completely different place
+    max_radius = .005
+    theta_incr = pi/3
+    r=0.00015
+    radius_increment = .0008
+    radius_inc_set = radius_increment / (2*pi / theta_incr)
+    theta=0
+    RealRadius=0
+    
+    # Try to pick the nut multiple times
+    adjusted_pose = copy.deepcopy(object_pose)
+    while RealRadius < max_radius and not rospy.is_shutdown():
+      rospy.loginfo("Moving into screw to pick it up.")
+      # adjusted_pose.pose.position.x += .02
+      # self.go_to_pose_goal("c_bot", adjusted_pose, speed=.1, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
+      self.pick(robotname="c_bot",object_pose=object_pose,grasp_height=-0.002,
+                                  speed_fast = .3, speed_slow = .03, gripper_command="none",
+                                  approach_height = .05,end_effector_link=end_effector_link)
+
+      # TODO: Test if pushing linear works better
+
+      # Adjust the position (spiral search)
+      rospy.loginfo("Retrying pickup with adjusted position")
+      theta=theta+theta_incr
+      y=math.cos(theta)*r
+      z=math.sin(theta)*r
+      adjusted_pose = copy.deepcopy(object_pose)
+      adjusted_pose.pose.position.y += y
+      adjusted_pose.pose.position.z += z
+      r = r + radius_inc_set
+      RealRadius = math.sqrt(math.pow(y,2)+math.pow(z,2))

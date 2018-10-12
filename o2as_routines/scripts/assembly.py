@@ -806,8 +806,8 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def place_retainer_pin_nut_and_pick_with_tool(self):
-    # self.go_to_named_pose("home", "a_bot")
-    # self.go_to_named_pose("screw_ready", "c_bot")
+    self.go_to_named_pose("home", "a_bot")
+    self.go_to_named_pose("screw_ready", "c_bot")
     nut_intermediate_a_bot = geometry_msgs.msg.PoseStamped()
     nut_intermediate_a_bot.header.frame_id = "workspace_center"
     nut_intermediate_a_bot.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
@@ -817,52 +817,16 @@ class AssemblyClass(O2ASBaseRoutines):
     nut_intermediate_c_bot = copy.deepcopy(nut_intermediate_a_bot)
     nut_intermediate_c_bot.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/4))
 
-    # self.place_joshua("a_bot",nut_intermediate_a_bot,0.0,
-    #                             speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
-    #                             approach_height = 0.05,approach_axis="z", lift_up_after_place = True)
-    # self.go_to_named_pose("back", "a_bot")
+    self.place_joshua("a_bot",nut_intermediate_a_bot,0.0,
+                                speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
+                                approach_height = 0.05,approach_axis="z", lift_up_after_place = True)
+    self.go_to_named_pose("back", "a_bot")
     
-    # self.go_to_named_pose("tool_pick_ready", "c_bot")
+    self.go_to_named_pose("tool_pick_ready", "c_bot")
     self.do_change_tool_action("c_bot", equip=True, screw_size=66)
     self.go_to_named_pose("screw_ready", "c_bot")
-    # self.pick_nut_with_spiral_search(object_pose=nut_intermediate_c_bot,end_effector_link="c_bot_nut_tool_m6_tip_link")
-    self.go_to_pose_goal("c_bot", adjusted_pose, speed=.1, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
-    self.set_motor("nut_tool_m6")
-    self.go_to_named_pose("home", "c_bot")
+    self.pick_nut_from_table(object_pose=nut_intermediate_c_bot,end_effector_link="c_bot_nut_tool_m6_tip_link")
     return
-  
-  def pick_nut_with_spiral_search(self,object_pose, max_radius=0.005, end_effector_link="c_bot_nut_tool_m6_tip_link"):
-    # This does not work as well as we hoped. When the nut is not perfectly picked, it falls to a completely different place
-    max_radius = .005
-    theta_incr = pi/3
-    r=0.00015
-    radius_increment = .0008
-    radius_inc_set = radius_increment / (2*pi / theta_incr)
-    theta=0
-    RealRadius=0
-    
-    # Try to pick the nut multiple times
-    adjusted_pose = copy.deepcopy(object_pose)
-    while RealRadius < max_radius and not rospy.is_shutdown():
-      rospy.loginfo("Moving into screw to pick it up.")
-      # adjusted_pose.pose.position.x += .02
-      # self.go_to_pose_goal("c_bot", adjusted_pose, speed=.1, move_lin = True, end_effector_link="c_bot_nut_tool_m6_tip_link")
-      self.pick_joshua(robotname="c_bot",object_pose=object_pose,grasp_height=-0.002,
-                                  speed_fast = .3, speed_slow = .03, gripper_command="none",
-                                  approach_height = .05,end_effector_link=end_effector_link)
-
-      # TODO: Test if pushing linear works better
-
-      # Adjust the position (spiral search)
-      rospy.loginfo("Retrying pickup with adjusted position")
-      theta=theta+theta_incr
-      y=math.cos(theta)*r
-      z=math.sin(theta)*r
-      adjusted_pose = copy.deepcopy(object_pose)
-      adjusted_pose.pose.position.y += y
-      adjusted_pose.pose.position.z += z
-      r = r + radius_inc_set
-      RealRadius = math.sqrt(math.pow(y,2)+math.pow(z,2))
 
   def pick_retainer_pin_washer_2(self):
     rospy.loginfo("============ Picking up the retainer pin washer 1 using a_bot ============")

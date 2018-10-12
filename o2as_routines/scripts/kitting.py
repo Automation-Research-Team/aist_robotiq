@@ -562,59 +562,8 @@ class KittingClass(O2ASBaseRoutines):
     self.go_to_named_pose("screw_handover", "a_bot", force_ur_script=self.use_real_robot)
     self.precision_gripper_inner_open_slightly(open_range)
     return True
-    
-  def pick_screw_from_precision_gripper(self, screw_size, attempts = 1):
-    """
-    Picks a screw from the precision gripper.
-    """
-    if not screw_size==3 and not screw_size==4:
-      rospy.logerr("Screw size needs to be 3 or 4!")
-      return False
-    
-    # Turn to the right to face the feeders
-    self.go_to_named_pose("screw_ready", "c_bot", force_ur_script=self.use_real_robot)
-    self.go_to_named_pose("screw_handover", "a_bot", force_ur_script=self.use_real_robot)
-    # ATTENTION: MAGIC NUMBERS
-    magic_y_offset = .004
-    magic_z_offset = -.008
-
-    pick_pose = geometry_msgs.msg.PoseStamped()
-    pick_pose.header.frame_id = "a_bot_gripper_screw_pickup"
-    pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/6, 0, 0))
-    pick_pose.pose.position.y = magic_y_offset
-    pick_pose.pose.position.z = magic_z_offset
-
-    prep_pose = copy.deepcopy(pick_pose)
-    prep_pose.pose.position.x = -0.03
-    prep_pose.pose.position.y = -0.06
-    
-    self.move_lin("c_bot", prep_pose, .2, end_effector_link="c_bot_screw_tool_m"+str(screw_size)+"_tip_link")
-    prep_pose.pose.position.y = magic_y_offset
-    prep_pose.pose.position.z = magic_z_offset
-    self.move_lin("c_bot", prep_pose, .2, end_effector_link="c_bot_screw_tool_m"+str(screw_size)+"_tip_link")
-
-    attempt = 0
-    screw_picked = False
-    while attempt < attempts:
-      self.do_pick_action("c_bot", pick_pose, screw_size = 4, use_complex_planning = True, tool_name = "screw_tool")
-      bool_msg = Bool()
-      try:
-        bool_msg = rospy.wait_for_message("/screw_tool_m" + str(screw_size) + "/screw_suctioned", Bool, 1.0)
-      except:
-        pass
-      screw_picked = bool_msg.data
-      if screw_picked:
-        rospy.loginfo("Successfully picked the screw")
-        return True
-      if not self.use_real_robot:
-        rospy.loginfo("Pretending the screw is picked, because this is simulation.")
-        return True
-      attempt += 1
-
-    return False
 
   def mask_bin(self, group_name, bin_id):
-
     mask_margin = 0.0
     point_top1 = geometry_msgs.msg.PointStamped()
     point_top1.header.frame_id = str(bin_id)+"_bottom_front_right_corner"
@@ -875,46 +824,6 @@ class KittingClass(O2ASBaseRoutines):
 
     return result.picked
 
-  def pick_screw_from_feeder(self, screw_size, attempts = 1):
-    """
-    Picks a screw from one of the feeders. The screw tool already has to be equipped!
-    """
-    # Use this command to equip the screw tool: do_change_tool_action(self, "c_bot", equip=True, screw_size = 4)
-    
-    if not screw_size==3 and not screw_size==4:
-      rospy.logerr("Screw size needs to be 3 or 4!")
-      return False
-    
-    # Turn to the right to face the feeders
-    self.go_to_named_pose("feeder_pick_ready", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
-
-    pose_feeder = geometry_msgs.msg.PoseStamped()
-    pose_feeder.header.frame_id = "m" + str(screw_size) + "_feeder_outlet_link"
-    pose_feeder.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
-    pose_feeder.pose.position.x = 0.0
-
-    attempt = 0
-    screw_picked = False
-    while attempt < attempts:
-      self.set_feeder_power(False)
-      self.do_pick_action("c_bot", pose_feeder, screw_size = screw_size, use_complex_planning = True, tool_name = "screw_tool")
-      self.set_feeder_power(True)
-      bool_msg = Bool()
-      try:
-        bool_msg = rospy.wait_for_message("/screw_tool_m" + str(screw_size) + "/screw_suctioned", Bool, 1.0)
-      except:
-        pass
-      screw_picked = bool_msg.data
-      if screw_picked:
-        rospy.loginfo("Successfully picked the screw")
-        return True
-      if not self.use_real_robot:
-        rospy.loginfo("Pretending the screw is picked, because this is simulation.")
-        return True
-      attempt += 1
-
-    return False
-
   def place_screw_in_tray(self, screw_size, set_number, hole_number):
     """
     Places a screw in a tray. A screw needs to be carried by the screw tool!
@@ -982,19 +891,7 @@ class KittingClass(O2ASBaseRoutines):
         rospy.logerr("Failed an attempt to pick item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + "). Reattempting. Current attempts: " + str(attempts))
         continue
       
-      # Put the screw in the feeder
-      self.go_to_named_pose("above_feeder", "a_bot", speed=1.5, acceleration=1.0, force_ur_script=self.use_real_robot)
-      drop_pose = geometry_msgs.msg.PoseStamped()
-      drop_pose.pose.position.z = .015
-      drop_pose.pose.orientation = self.downward_orientation_2
-      drop_pose.header.frame_id = "m" + str(screw_size) + "_feeder_inlet_link"
-
-      self.set_feeder_power(False)
-      self.move_lin(robot_name, drop_pose, speed = 1.0, acceleration = 1.0, end_effector_link = "a_bot_gripper_tip_link")
-      self.send_gripper_command(gripper= "precision_gripper_inner", command="open")
-      # self.place(robot_name, drop_pose, 0.0,
-      #               speed_fast = 1.0, speed_slow = 0.02, gripper_command=gripper_command, approach_height=0.0)
-      self.set_feeder_power(True)
+      self.put_screw_in_feeder
       
       item.in_feeder = True
       rospy.loginfo("Delivered screw m" + str(screw_size) + " to feeder (item nr." + str(item.number_in_set) + " from set " + str(item.set_number))
