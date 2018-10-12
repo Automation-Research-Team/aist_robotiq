@@ -131,7 +131,7 @@ class KittingClass(O2ASBaseRoutines):
     self.bin_3_width = .10
     self.bin_3_length = .07
     
-    self.update_image = True
+    self.initial_phoxi_image_recorded = False
     self.max_candidates_from_phoxi = 10
 
     # Used to prepare the suction place poses (because the UR linear driver goes through a singularity sometimes)
@@ -177,78 +177,78 @@ class KittingClass(O2ASBaseRoutines):
 
     self.grasp_candidates = {
         4 : {
-          "pick_was_attempted": False,
-          "vision_was_attempted":False,
+          "pick_was_successful": False,
+          "vision_was_attempted": False,
           "positions": []
         },
         5 : {
-          "pick_was_attempted": False,
-          "vision_was_attempted":False,
+          "pick_was_successful": False,
+          "vision_was_attempted": False,
           "positions": []
         }, 
         6 : {
-          "pick_was_attempted": False,
-          "vision_was_attempted":False,
+          "pick_was_successful": False,
+          "vision_was_attempted": False,
           "positions": []
         }, 
         7 : {
-          "pick_was_attempted": False,
-          "vision_was_attempted":False,
+          "pick_was_successful": False,
+          "vision_was_attempted": False,
           "positions": []
         },
         8 : {
-          "pick_was_attempted": False,
-          "vision_was_attempted":False,
+          "pick_was_successful": False,
+          "vision_was_attempted": False,
           "positions": []
         }, 
         9 : {
-          "pick_was_attempted": False,
-          "vision_was_attempted":False,
+          "pick_was_successful": False,
+          "vision_was_attempted": False,
           "positions": []
         }, 
         10: {
-          "pick_was_attempted": False,
-          "vision_was_attempted":False,
+          "pick_was_successful": False,
+          "vision_was_attempted": False,
           "positions": []
         }, 
         11: {
-          "pick_was_attempted": False,
-          "vision_was_attempted":False,
+          "pick_was_successful": False,
+          "vision_was_attempted": False,
           "positions": []
         },
         12: {
-          "pick_was_attempted": False,
-          "vision_was_attempted":False,
+          "pick_was_successful": False,
+          "vision_was_attempted": False,
           "positions": []
         },
         13: {
-          "pick_was_attempted": False,
-          "vision_was_attempted":False,
+          "pick_was_successful": False,
+          "vision_was_attempted": False,
           "positions": []
         },
         14: {
-          "pick_was_attempted": False,
-          "vision_was_attempted":False,
+          "pick_was_successful": False,
+          "vision_was_attempted": False,
           "positions": []
         }, 
         15: {
-          "pick_was_attempted": False,
-          "vision_was_attempted":False,
+          "pick_was_successful": False,
+          "vision_was_attempted": False,
           "positions": []
         }, 
         16: {
-          "pick_was_attempted": False,
-          "vision_was_attempted":False,
+          "pick_was_successful": False,
+          "vision_was_attempted": False,
           "positions": []
         }, 
         17: {
-          "pick_was_attempted": False,
-          "vision_was_attempted":False,
+          "pick_was_successful": False,
+          "vision_was_attempted": False,
           "positions": []
         }, 
         18: {
-          "pick_was_attempted": False,
-          "vision_was_attempted":False,
+          "pick_was_successful": False,
+          "vision_was_attempted": False,
           "positions": []
         }
     }
@@ -1039,15 +1039,14 @@ class KittingClass(O2ASBaseRoutines):
     else:
       pick_pose.pose.position.y += -bin_width/2 + random.random()*bin_width
     return pick_pose
-  
-  
-  def get_grasp_position_from_phoxi(self, item):
-    """This requests a list of grasp positions and takes a new image with the phoxi if self.update_image is True."""
+
+  def get_grasp_candidates_from_phoxi(self, item, take_new_image=False):
+    """This requests a list of grasp positions and takes a new image with the phoxi if take_new_image is True."""
     goal = o2as_msgs.msg.SearchGraspPhoxiGoal()
     goal.part_id = item.part_id
     goal.bin_name = item.bin_name
     goal.gripper_type = item.ee_to_use
-    goal.update_image = self.update_image
+    goal.update_image = take_new_image
     try:
       self.search_grasp_client.send_goal(goal)
       self.search_grasp_client.wait_for_result(rospy.Duration(15.0))
@@ -1056,7 +1055,6 @@ class KittingClass(O2ASBaseRoutines):
       rospy.logerr("Could not get grasp from Phoxi")
       return False
     if resp_search_grasp:
-      self.update_image = False
       if resp_search_grasp.success:
         poses_in_bin = list()
         pose0 = geometry_msgs.msg.PointStamped()
@@ -1191,6 +1189,31 @@ class KittingClass(O2ASBaseRoutines):
       rospy.logerr("This item is already fulfilled. Something is going wrong.")
       return False
 
+    take_new_image = False
+    if not self.initial_phoxi_image_recorded:
+      self.initial_phoxi_image_recorded = True
+      take_new_image = True
+    
+    if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
+      if self.grasp_candidates[item.part_id]["pick_was_successful"]:
+        # If the pick was successful for an item, the scene has changed, so a new image needs to be taken
+        rospy.loginfo("Resetting grasp candidates for item " + str(item.part_id))
+        self.grasp_candidates[item.part_id]["pick_was_successful"] = False
+        self.grasp_candidates[item.part_id]["vision_was_attempted"] = False
+        self.grasp_candidates[item.part_id]["positions"] = []
+        take_new_image = True
+      self.go_to_named_pose("suction_ready_back", "b_bot")
+      if not self.grasp_candidates[item.part_id]["vision_was_attempted"]:
+        # Vision is only attempted once, unless it succeeds in picking
+        phoxi_res = self.get_grasp_candidates_from_phoxi(item, take_new_image)
+        self.grasp_candidates[item.part_id]["vision_was_attempted"] = True
+        take_new_image = False
+        self.go_to_named_pose("suction_pick_ready", "b_bot")
+        if phoxi_res:
+          self.grasp_candidates[item.part_id]["positions"].extend(phoxi_res)
+          rospy.loginfo("self.grasp_candidates: ")
+          rospy.loginfo(self.grasp_candidates[item.part_id]["positions"][0])
+
     # Go to preparatory pose
     if item.ee_to_use == "suction":
       bin_center = geometry_msgs.msg.PoseStamped()
@@ -1214,27 +1237,18 @@ class KittingClass(O2ASBaseRoutines):
       
       # Get the pick_pose for the item, either random or from vision
       pick_pose = self.get_random_pose_in_bin(item)
+      grasp_candidate_from_vision = False
       if item.ee_to_use == "precision_gripper_from_inside" and not item.bin_is_inclined and not item.part_id in [17, 18]:
         res_view_bin = self.view_bin(robot_name, item.bin_name, item.part_id)    
         if res_view_bin:
           pick_pose = res_view_bin
           pick_pose.pose.position.z -= .025 # MAGIC NUMBER (to compensate for the Realsense calibration)
       if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
-        if self.grasp_candidates[item.part_id]["pick_was_attempted"]:
-          self.reset_grasp_candidates()
-        if not self.grasp_candidates[item.part_id]["vision_was_attempted"]:
-          self.go_to_named_pose("suction_ready_back", "b_bot")
-          phoxi_res = self.get_grasp_position_from_phoxi(item)
-          if phoxi_res:
-            self.grasp_candidates[item.part_id]["vision_was_attempted"] = True
-            self.grasp_candidates[item.part_id]["positions"].extend(phoxi_res)
-            rospy.loginfo("self.grasp_candidates: ")
-            rospy.loginfo(self.grasp_candidates[item.part_id]["positions"][0])
-
         if self.grasp_candidates[item.part_id]["positions"]:
           rospy.loginfo("Got pose from phoxi grasp candidates:")
           rospy.loginfo(pick_pose.pose.position)
           pick_pose = self.grasp_candidates[item.part_id]["positions"].pop(0)
+          grasp_candidate_from_vision = True
 
         if item.ee_to_use == "robotiq_gripper":
           self.go_to_named_pose("home", "b_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
@@ -1279,14 +1293,15 @@ class KittingClass(O2ASBaseRoutines):
       
       item_picked = self.pick(robot_name, pick_pose, 0.0, speed_fast = speed_fast, speed_slow = speed_slow, 
                         gripper_command=gripper_command, approach_height = approach_height)
-      if item_picked:
-        self.grasp_candidates[item.part_id]["pick_was_attempted"] = True
+      if not self.use_real_robot:
+        item_picked = True
+      
+      if item_picked and grasp_candidate_from_vision:
+        self.grasp_candidates[item.part_id]["pick_was_successful"] = True
       # TODO: Check grasp success via grasp width for robotiq gripper and vision for precision gripper
       if "precision_gripper" in item.ee_to_use:
         item_picked = self.check_pick(item.part_id)
       # Suction is checked inside the pick function
-      if not self.use_real_robot:
-        item_picked = True
       if not item_picked:
         rospy.logerr("Failed an attempt to pick item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + "). Reattempting. Current attempts: " + str(attempts))
         if item.ee_to_use == "suction":
@@ -1355,14 +1370,10 @@ class KittingClass(O2ASBaseRoutines):
       rospy.loginfo("Delivered item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + ")! Total items delivered: " + str(self.fulfilled_items))
       return True
     rospy.logerr("Was not able to pick item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + ")! Total attempts: " + str(item.attempts))
+    
+    # TODO: Move up safely if not successful
+    # self.move_lin(robot_name, place_pose, speed = 0.3, acceleration = 0.08, end_effector_link = "b_bot_suction_tool_tip_link")
     return False
-
-  def reset_grasp_candidates(self):
-    rospy.loginfo("Resetting grasp candidates")
-    self.update_image = True
-    for item in self.grasp_candidates:
-      item["vision_was_attempted"] = False
-      item["positions"].clear()
   
   def kitting_task(self):
     # Strategy:
@@ -1534,9 +1545,6 @@ if __name__ == '__main__':
         kit.go_to_named_pose("back", "a_bot", force_ur_script=kit.use_real_robot)
         kit.go_to_named_pose("back", "c_bot", force_ur_script=kit.use_real_robot)
         kit.go_to_named_pose("suction_ready_back", "b_bot", force_ur_script=kit.use_real_robot)
-      elif i == '3':
-        rospy.loginfo("Checking suction attachment procedures")
-        kit.suck_attachment_test()
       elif i == 'START' or i == 'start' or i == '5000':
         kit.kitting_task()
       elif i == "60":
@@ -1550,7 +1558,7 @@ if __name__ == '__main__':
       elif i in ["71", "72", "73", "74", "75", "76", "77", "78", "79"]:
         item = kit.ordered_items[int(i)-71]
         rospy.loginfo("Checking for item id " + str(item.part_id) + " in " + item.bin_name)
-        obj_pose = kit.get_grasp_position_from_phoxi(item)
+        obj_pose = kit.get_grasp_candidates_from_phoxi(item, True)
       elif i == "80":
         kit.go_to_named_pose("suction_pick_ready", "b_bot", force_ur_script=kit.use_real_robot)
       elif i in ["81", "82", "83", "84"]:

@@ -59,7 +59,7 @@ def convert_parts_info_to_dict(bin_layout):
     parts_info_dict["part_bin_list"] = dict()
 
     for b in bin_layout:
-        parts_info_dict["part_bin_list"][int(b.parts_name.strip("part_"))] = b.bin_name
+        parts_info_dict["part_bin_list"][b.parts_name] = b.bin_name
 
     return parts_info_dict
 
