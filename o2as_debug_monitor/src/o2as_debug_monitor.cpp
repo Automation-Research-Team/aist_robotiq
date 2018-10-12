@@ -16,7 +16,7 @@
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/imgproc/imgproc.hpp>
-#include "o2as_debug_monitor/ResetTimer.h"
+#include "o2as_msgs/ResetTimer.h"
 
 using ImageCallback =
   boost::function<void(const sensor_msgs::ImageConstPtr&)>;

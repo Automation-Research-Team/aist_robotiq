@@ -56,10 +56,6 @@ import o2as_msgs
 import o2as_msgs.msg
 import o2as_msgs.srv
 
-# TODO: Move service in o2as_debug_monitor to o2as_msgs
-import o2as_debug_monitor
-import o2as_debug_monitor.srv
-
 from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
@@ -159,7 +155,7 @@ class O2ASBaseRoutines(object):
     self.publishMarker_client = rospy.ServiceProxy('/o2as_skills/publishMarker', o2as_msgs.srv.publishMarker)
     self.toggleCollisions_client = rospy.ServiceProxy('/o2as_skills/toggleCollisions', std_srvs.srv.SetBool)
 
-    self.resetTimerForDebugMonitor_client = rospy.ServiceProxy('/o2as_debug_monitor/reset_timer', o2as_debug_monitor.srv.ResetTimer)
+    self.resetTimerForDebugMonitor_client = rospy.ServiceProxy('/o2as_debug_monitor/reset_timer', o2as_msgs.srv.ResetTimer)
     self.debugmonitor_publishers = dict() # used in log_to_debug_monitor()
 
     rospy.sleep(.5)
