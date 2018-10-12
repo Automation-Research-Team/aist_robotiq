@@ -177,62 +177,77 @@ class KittingClass(O2ASBaseRoutines):
 
     self.grasp_candidates = {
         4 : {
+          "picked": False,
           "searched":False,
           "positions": []
         },
         5 : {
+          "picked": False,
           "searched":False,
           "positions": []
         }, 
         6 : {
+          "picked": False,
           "searched":False,
           "positions": []
         }, 
         7 : {
+          "picked": False,
           "searched":False,
           "positions": []
         },
         8 : {
+          "picked": False,
           "searched":False,
           "positions": []
         }, 
         9 : {
+          "picked": False,
           "searched":False,
           "positions": []
         }, 
         10: {
+          "picked": False,
           "searched":False,
           "positions": []
         }, 
         11: {
+          "picked": False,
           "searched":False,
           "positions": []
         },
         12: {
+          "picked": False,
           "searched":False,
           "positions": []
         },
         13: {
+          "picked": False,
           "searched":False,
           "positions": []
         },
         14: {
+          "picked": False,
           "searched":False,
           "positions": []
         }, 
         15: {
+          "picked": False,
           "searched":False,
           "positions": []
         }, 
         16: {
+          "picked": False,
           "searched":False,
           "positions": []
         }, 
         17: {
+          "picked": False,
           "searched":False,
           "positions": []
         }, 
         18: {
+          "picked": False,
           "searched":False,
           "positions": []
         }
@@ -1200,8 +1215,6 @@ class KittingClass(O2ASBaseRoutines):
           pick_pose = res_view_bin
           pick_pose.pose.position.z -= .025 # MAGIC NUMBER (to compensate for the Realsense calibration)
       if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
-        # if pick_poses:
-        #   pick_pose = pick_poses.pop(0)
 
         if self.grasp_candidates[item.part_id]["positions"]:
           pick_pose = self.grasp_candidates[item.part_id]["positions"].pop(0)
@@ -1249,6 +1262,8 @@ class KittingClass(O2ASBaseRoutines):
       
       item_picked = self.pick(robot_name, pick_pose, 0.0, speed_fast = speed_fast, speed_slow = speed_slow, 
                         gripper_command=gripper_command, approach_height = approach_height)
+      if item_picked:
+        self.grasp_candidates[item.part_id]["picked"] = True
       # TODO: Check grasp success via grasp width for robotiq gripper and vision for precision gripper
       if "precision_gripper" in item.ee_to_use:
         item_picked = self.check_pick(item.part_id)
@@ -1324,6 +1339,12 @@ class KittingClass(O2ASBaseRoutines):
       return True
     rospy.logerr("Was not able to pick item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + ")! Total attempts: " + str(item.attempts))
     return False
+
+  def reset_grasp_candidates(self):
+    self.update_image = True
+    for item in self.grasp_candidates:
+      item["searched"] = False
+      item["positions"].clear()
   
   def kitting_task(self):
     # Strategy:
@@ -1366,6 +1387,8 @@ class KittingClass(O2ASBaseRoutines):
     for item in self.suction_items:
       if rospy.is_shutdown():
         break
+      if self.grasp_candidates[item.part_id]["picked"]:
+        self.reset_grasp_candidates()
       if not self.grasp_candidates[item.part_id]["searched"]:
         phoxi_res = self.get_grasp_position_from_phoxi(item)
         if phoxi_res:
