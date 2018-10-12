@@ -434,7 +434,7 @@ if __name__ == '__main__':
       ################################################################################################
       ################################################################################################
 
-      if i == 1: #unadjusted
+      if i == 1: 
         ## MAGIC NUMBERS!!
         b_bot_dx_pick = -0.01
         b_bot_dy_pick = 0.005
@@ -491,12 +491,12 @@ if __name__ == '__main__':
         taskboard.go_to_named_pose("home","a_bot")
         
         # ### Push with b_bot
-        # ### Pushing with b_bot only does not work. The tool needs to be grasped beforehand.
-        # taskboard.go_to_pose_goal("b_bot", bearing_a_place_pose, speed=0.15, move_lin=True)
-        # taskboard.send_gripper_command(gripper="b_bot", command="close")
-        # taskboard.do_linear_push("b_bot", 20, wait = True)
-        # taskboard.go_to_pose_goal("b_bot", bearing_a_place_pose, speed=0.15, move_lin=True)
-        # taskboard.go_to_named_pose("home","b_bot")
+        ### Pushing with b_bot only does not work. The tool needs to be grasped beforehand.
+        taskboard.go_to_pose_goal("b_bot", bearing_a_place_pose, speed=0.15, move_lin=True)
+        taskboard.send_gripper_command(gripper="b_bot", command=0.043)
+        taskboard.do_linear_push("b_bot", 20, wait = True)
+        taskboard.go_to_pose_goal("b_bot", bearing_a_place_pose, speed=0.15, move_lin=True)
+        taskboard.go_to_named_pose("home","b_bot")
         rospy.loginfo("Done")
 
         # TODO: Make sure the task succeeded by pushing with b_bot and plate 3

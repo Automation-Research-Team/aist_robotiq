@@ -70,13 +70,14 @@
   <joint name="${boardname}_part5" type="fixed">
     <parent link="${boardname}_surface"/>
     <child link="${boardname}_part5"/>
-    <origin rpy="0.0 0.0 ${pi/2}" xyz="0.07 0.26 0.0045"/>
+    <origin rpy="0.0 0.0 ${pi/2}" xyz="0.07 0.26 0.002"/>
   </joint>
   <link name="${boardname}_part5">
     <visual>
-      <origin xyz="0 0 -.00275" rpy="0 0 0"/>
+      <origin xyz="0 0 .0375" rpy="0 0 0"/>
       <geometry>
-        <cylinder length=".0045" radius=".002"/> 
+        <!-- <cylinder length=".0045" radius=".002"/>  -->
+        <cylinder length=".075" radius=".005"/> 
       </geometry>
       <material name="grey">
         <color rgba=".3 .3 .3 1"/>
@@ -124,14 +125,14 @@
   <joint name="${boardname}_part7_1" type="fixed">
     <parent link="${boardname}_surface"/>
     <child link="${boardname}_part7_1"/>
-    <origin rpy="0.0 0.0 ${pi/2}" xyz="0.335 0.056 0.05"/>
+    <origin rpy="0.0 0.0 ${pi/2}" xyz="0.362 0.056 0.05"/>
   </joint>
   <link name="${boardname}_part7_1"/>
 
   <joint name="${boardname}_part7_2" type="fixed">
     <parent link="${boardname}_surface"/>
     <child link="${boardname}_part7_2"/>
-    <origin rpy="0.0 0.0 ${pi/2}" xyz="0.338 0.056 0.05"/>
+    <origin rpy="0.0 0.0 ${pi/2}" xyz="0.365 0.056 0.05"/>
   </joint>
   <link name="${boardname}_part7_2">
     <visual>
