@@ -870,11 +870,11 @@ class O2ASBaseRoutines(object):
     self.go_to_named_pose("above_feeder", "a_bot", speed=1.5, acceleration=1.0, force_ur_script=self.use_real_robot)
     drop_pose = geometry_msgs.msg.PoseStamped()
     drop_pose.pose.position.z = .015
-    drop_pose.pose.orientation = self.downward_orientation_2
+    drop_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
     drop_pose.header.frame_id = "m" + str(screw_size) + "_feeder_inlet_link"
 
     self.set_feeder_power(False)
-    self.move_lin(robot_name, drop_pose, speed = 1.0, acceleration = 1.0, end_effector_link = "a_bot_gripper_tip_link")
+    self.move_lin("a_bot", drop_pose, speed = 1.0, acceleration = 1.0, end_effector_link = "a_bot_gripper_tip_link")
     self.send_gripper_command(gripper= "precision_gripper_inner", command="open")
     self.set_feeder_power(True)
     return True
