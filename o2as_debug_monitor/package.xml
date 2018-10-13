@@ -74,7 +74,6 @@
   <exec_depend>cv_bridge</exec_depend>
   <exec_depend>opencv3</exec_depend>
   <exec_depend>message_runtime</exec_depend>
-  <exec_depend>o2as_msgs</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

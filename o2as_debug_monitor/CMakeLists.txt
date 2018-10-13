@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   image_transport
   cv_bridge
   message_generation
+  o2as_msgs
 )
 
 ## System dependencies are found with CMake's conventions

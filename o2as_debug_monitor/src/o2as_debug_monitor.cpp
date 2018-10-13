@@ -387,8 +387,8 @@ namespace o2as_debug_monitor
         setSuctionSuccessCallbacks(nh, suction_success_topics);
       }
 
-      bool resetTimer(o2as_debug_monitor::ResetTimer::Request &req,
-                      o2as_debug_monitor::ResetTimer::Response &res)
+      bool resetTimer(o2as_msgs::ResetTimer::Request &req,
+                      o2as_msgs::ResetTimer::Response &res)
       {
         start_time = now();
         res.success = true;
