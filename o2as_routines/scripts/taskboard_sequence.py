@@ -766,40 +766,15 @@ class TaskboardClass(O2ASBaseRoutines):
       self.equip_unequip_set_screw_tool(equip=False)
     
 
-    if i == 12:      # M3 screw
-      self.pick("a_bot",self.pick_poses[i-1],0.01,
-                              speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
-                              approach_height = 0.1, special_pick = True)    
-      
-      # If we decide to use the feeder, there is self.place_screw_in_feeder(screw_size) and self.pick_screw_from_feeder(screw_size)
+    if i in [12, 13]:      # M3, M4 screw
+      if i == 12:
+        screw_size = 3
+      elif i == 13:
+        screw_size = 4
 
-      ###arrange M4 screw 
-      self.tilt_up_gripper(speed_fast=0.1, speed_slow=0.02)
-
-      #pick up the screw tool
-      self.do_change_tool_action("b_bot", equip=True, screw_size = 3)        
-      
-      #pick up the screw from a_bot
+      self.go_to_named_pose("home", "a_bot")
+      self.go_to_named_pose("home", "b_bot")
       self.go_to_named_pose("back", "c_bot")
-      self.pick_screw_from_precision_gripper(screw_size=3, robot_name="b_bot")
-      self.go_to_named_pose("home", "a_bot")
-
-      #screw onto the cap
-      self.go_to_named_pose("screw_ready", "b_bot")
-      self.place_poses[i-1].pose.position.x -= 0.05
-      # self.place_poses[i-1].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, pi/2))
-      self.place_poses[i-1].pose.position.x = 0.001
-      self.place_poses[i-1].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, 0, 0))
-      screw_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi*135/180, 0, 0))
-
-      screwPosition = copy.deepcopy(self.place_poses[i-1])
-      screwPosition.pose.position.x = 0.0
-
-      self.go_to_pose_goal("b_bot", screwPosition, speed=0.2, end_effector_link="b_bot_screw_tool_m3_tip_link", move_lin=True)
-      self.do_screw_action("b_bot", self.place_poses[i-1], screw_height = 0.002, screw_size = 3)
-
-    if i == 13:       # M4 screw
-      self.go_to_named_pose("home", "a_bot")
       screw_pick_pose = copy.deepcopy(self.pick_poses[i-1])
       screw_pick_pose.pose.position.y += .005
       screw_pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*45/180, pi*90/180))
@@ -812,18 +787,13 @@ class TaskboardClass(O2ASBaseRoutines):
       ###arrange M4 screw
       self.tilt_up_gripper(speed_fast=0.1, speed_slow=0.02)
 
-      print("press enter")
-      raw_input()
-      if rospy.is_shutdown():
-        return
-
       #pick up the screw tool
       self.go_to_named_pose("back", "c_bot")
-      # self.do_change_tool_action("b_bot", equip=True, screw_size = 4)
+      self.do_change_tool_action("b_bot", equip=True, screw_size = screw_size)
       self.go_to_named_pose("screw_ready_back", "b_bot")
       
       #pick up the screw from a_bot
-      self.pick_screw_from_precision_gripper(screw_size=4, robot_name="b_bot")
+      self.pick_screw_from_precision_gripper(screw_size=screw_size, robot_name="b_bot")
       self.go_to_named_pose("screw_ready", "b_bot")
       self.go_to_named_pose("home", "a_bot")
 
@@ -833,20 +803,16 @@ class TaskboardClass(O2ASBaseRoutines):
       screw_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi*135/180, 0, 0))
       
       screw_approach.pose.position.x -= 0.03
-      self.go_to_pose_goal("b_bot", screw_approach, speed=0.08, end_effector_link="b_bot_screw_tool_m4_tip_link", move_lin=True)
+      self.go_to_pose_goal("b_bot", screw_approach, speed=0.08, end_effector_link="b_bot_screw_tool_m" + str(screw_size) + "_tip_link", move_lin=True)
 
       screw_pose = copy.deepcopy(screw_approach)
       screw_pose.pose.position.x = 0.001
-      self.do_screw_action("b_bot", screw_pose, screw_height = 0.01, screw_size = 4)
+      self.do_screw_action("b_bot", screw_pose, screw_height = 0.01, screw_size = screw_size)
 
-      self.go_to_pose_goal("b_bot", screw_approach, speed=0.05, end_effector_link="b_bot_screw_tool_m4_tip_link", move_lin=True)
+      self.go_to_pose_goal("b_bot", screw_approach, speed=0.05, end_effector_link="b_bot_screw_tool_m" + str(screw_size) + "_tip_link", move_lin=True)
 
       self.go_to_named_pose("screw_ready", "b_bot")
-      print("press enter")
-      raw_input()
-      if rospy.is_shutdown():
-        return
-      self.do_change_tool_action("b_bot", equip=False, screw_size = 4)        
+      self.do_change_tool_action("b_bot", equip=False, screw_size = screw_size)
 
     if i == 14:
       self.pick("a_bot",self.pick_poses[i-1],self.item_pick_heights[i-1], approach_height = 0.05,

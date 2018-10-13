@@ -965,7 +965,7 @@ class O2ASBaseRoutines(object):
     attempt = 0
     screw_picked = False
     while attempt < attempts:
-      self.do_pick_action(robot_name, pick_pose, screw_size = 4, use_complex_planning = True, tool_name = "screw_tool")
+      self.do_pick_action(robot_name, pick_pose, screw_size = screw_size, use_complex_planning = True, tool_name = "screw_tool")
       bool_msg = Bool()
       try:
         bool_msg = rospy.wait_for_message("/screw_tool_m" + str(screw_size) + "/screw_suctioned", Bool, 1.0)
