@@ -229,7 +229,7 @@ StringCallback getCallbackForString(cv::Rect rect, XmlRpc::XmlRpcValue &params,
 
     long elapsed_time = now() - start_time;
     char buf[255];
-    sprintf(buf, "%.1lfs: ", (float)elapsed_time / 1000);
+    sprintf(buf, "%6.1lfs: ", (float)elapsed_time / 1000);
     std::string text = buf + std::string(msg->data.c_str());
     messages.push_back(text);
     messages.pop_front();
