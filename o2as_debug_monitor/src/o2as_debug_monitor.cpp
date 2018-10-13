@@ -207,7 +207,6 @@ CamInfoCallback getCallbackForCameraInfo(
   };
 }
 
-//boost::function<void(const std_msgs::String::ConstPtr& msg)>
 StringCallback getCallbackForString(cv::Rect rect, XmlRpc::XmlRpcValue &params,
                                     cv::Mat& monitor_, long& start_time)
 {
@@ -277,23 +276,6 @@ KittingSetIdCallback getCallbackForKittingSetId(
               it->first);
       i++;
     }
-
-    // long elapsed_time = now() - start_time;
-    // char buf[255];
-    // sprintf(buf, "%.1lfs: ", (float)elapsed_time / 1000);
-    // std::string text = buf + std::string(msg->data.c_str());
-    // messages.push_back(text);
-    // messages.pop_front();
-
-    // for (int i = 0; i < n_history; i++)
-    // {
-    //   putText(monitor_, rect.x + offset_x, rect.y + offset_y + 32 * i,
-    //           messages[i]);
-    // }
-    
-    // // Copy the image buffer in the window
-    // cv::imshow("Monitor", monitor_);
-    // cv::waitKey(3);
   };
 }
 
@@ -341,6 +323,13 @@ SuctionSuccessCallback getCallbackForSuctionSuccess(
   };
 }
 
+
+void timerCallback(const ros::TimerEvent&)
+{
+    check_window();
+    cv::waitKey(3);
+}
+
 namespace o2as_debug_monitor
 {
   class Monitor
@@ -385,6 +374,9 @@ namespace o2as_debug_monitor
         nh.getParam("o2as_debug_monitor/suction_success_topics",
                     suction_success_topics);
         setSuctionSuccessCallbacks(nh, suction_success_topics);
+
+        // Timer callback to keep this instance alive
+        timer = nh.createTimer(ros::Duration(1), timerCallback);
       }
 
       bool resetTimer(o2as_msgs::ResetTimer::Request &req,
@@ -404,6 +396,8 @@ namespace o2as_debug_monitor
       std::vector<StringCallback> stringcbs_;
       std::vector<KittingSetIdCallback> setidcbs_;
       std::vector<SuctionSuccessCallback> sscbs_;
+
+      ros::Timer timer;
 
       cv::Mat monitor_;
 
@@ -562,7 +556,6 @@ namespace o2as_debug_monitor
         auto nh = getNodeHandle();
         monitor = new Monitor(getNodeHandle());
         inst_.reset(monitor);
-        // inst_.reset(new Monitor(getNodeHandle()));
 
         // Add service ResetTimer
         srv_resettimer = nh.advertiseService(
