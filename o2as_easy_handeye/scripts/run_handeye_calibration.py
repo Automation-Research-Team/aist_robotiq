@@ -40,21 +40,39 @@ keyposes = {
     ],
 
     'b_bot': [
-      [0.38,  0.15, 0.10, radians( 30), radians( 25), radians(0)],
-      [0.38,  0.00, 0.10, radians( 30), radians( 25), radians(0)],
-      [0.38, -0.15, 0.10, radians(  0), radians( 25), radians(0)],
+      # configulation for real
+      # [0.38,  0.15, 0.10, radians( 30), radians( 25), radians(0)],
+      # [0.38,  0.00, 0.10, radians( 30), radians( 25), radians(0)],
+      # [0.38, -0.15, 0.10, radians(  0), radians( 25), radians(0)],
 
-      [0.32, -0.10, 0.20, radians( 30), radians( 25), radians(0)],
-      [0.32,  0.00, 0.20, radians( 30), radians( 25), radians(0)],
-      [0.32,  0.10, 0.20, radians( 30), radians( 25), radians(0)],
+      # [0.32, -0.10, 0.20, radians( 30), radians( 25), radians(0)],
+      # [0.32,  0.00, 0.20, radians( 30), radians( 25), radians(0)],
+      # [0.32,  0.10, 0.20, radians( 30), radians( 25), radians(0)],
 
-      [0.20,  0.15, 0.20, radians( 30), radians( 25), radians(0)],
-      [0.20,  0.00, 0.20, radians( 30), radians( 25), radians(0)],
-      [0.20, -0.15, 0.20, radians(  0), radians( 25), radians(0)],
+      # [0.20,  0.15, 0.20, radians( 30), radians( 25), radians(0)],
+      # [0.20,  0.00, 0.20, radians( 30), radians( 25), radians(0)],
+      # [0.20, -0.15, 0.20, radians(  0), radians( 25), radians(0)],
 
-      [0.15, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
-      [0.15,  0.05, 0.10, radians( 30), radians( 25), radians(0)],
-      [0.15,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
+      # [0.15, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
+      # [0.15,  0.05, 0.10, radians( 30), radians( 25), radians(0)],
+      # [0.15,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
+
+      # configulation for AIST
+      [0.48,  0.10, 0.10, radians( 30), radians( 25), radians(0)],
+      #[0.48,  0.00, 0.10, radians( 30), radians( 25), radians(0)],
+      [0.48, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
+
+      [0.53, -0.10, 0.15, radians( 30), radians( 25), radians(0)],
+      #[0.53,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
+      [0.53,  0.10, 0.15, radians( 30), radians( 25), radians(0)],
+
+      # [0.40,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
+      # #[0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
+      # [0.40, -0.15, 0.15, radians(  0), radians( 25), radians(0)],
+
+      # [0.35, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
+      # [0.35,  0.05, 0.10, radians( 30), radians( 25), radians(0)],
+      # #[0.35,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
     ],
 
     'c_bot': [
@@ -143,22 +161,17 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
   def __init__(self, camera_name, robot_name, needs_trigger, needs_calib):
     super(HandEyeCalibrationRoutines, self).__init__()
     
-    self.needs_trigger = needs_trigger
-    self.needs_calib   = needs_calib
-    self.nimages       = 0
-    self.camera_name   = camera_name
+    self.needs_calib = needs_calib
+    self.camera_name = camera_name
     
     if needs_trigger:
-      self.flush_buffer      = get_service_proxy("flush_buffer",
-                                                 camera_name, robot_name)
-      self.trigger_frame     = get_service_proxy("trigger_frame",
-                                                 camera_name, robot_name)
-      self.get_frame         = get_service_proxy("get_frame",
-                                                 camera_name, robot_name)
       self.start_acquisition = get_service_proxy("start_acquisition",
                                                  camera_name, robot_name)
       self.stop_acquisition  = get_service_proxy("stop_acquisition",
                                                  camera_name, robot_name)
+    else:
+      self.start_acquisition = False
+      self.stop_acquisition  = False
     self.take_sample         = get_service_proxy("take_sample",
                                                  camera_name, robot_name)
     self.get_sample_list     = get_service_proxy("get_sample_list",
@@ -193,11 +206,11 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     print("============ End effector: %s"    % group.get_end_effector_link())
 
     
-  def move_to_subposes(self, pose, speed, sleep_time):
+  def move_to_subposes(self, pose, speed, sleep_time, keypose_num):
     roll = pose[3]
     for i in range(3):
       print("\n--- Subpose [{}/5]: Try! ---".format(i+1))
-      if self.move(pose, speed):
+      if self.move(pose, speed, keypose_num, i+1):
         rospy.sleep(sleep_time)
         print("--- Subpose [{}/5]: Succeeded. ---".format(i+1))
       else:
@@ -209,7 +222,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
 
     for i in range(2):
       print("\n--- Subpose [{}/5]: Try! ---".format(i+4))
-      if self.move(pose, speed):
+      if self.move(pose, speed, keypose_num, i+4):
         rospy.sleep(sleep_time)
         print("--- Subpose [{}/5]: Succeeded. ---".format(i+4))
       else:
@@ -237,7 +250,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     # q_rotated = tf_conversions.transformations.quaternion_multiply(quaternion_0, q_rotate_30_in_y)
     # poseStamped.pose.orientation = geometry_msgs.msg.Quaternion(*q_rotated)
 
-  def move(self, pose, speed):
+  def move(self, pose, speed, keypose_num, subpose_num):
     """Move the end effector"""
     # TODO: check type of `pose`
     print("move to {}".format(pose))
@@ -260,30 +273,30 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
                                                      poseStamped, speed,
                                                      move_lin=False)
     if move_success:
-      if self.needs_trigger:
+      if self.start_acquisition:
         self.start_acquisition()
-        rospy.sleep(1)
 
+      try:
+        img_msg = rospy.wait_for_message("/aruco_tracker/result",
+                                         sensor_msgs.msg.Image, 10)
+        bridge = CvBridge()
+        img = bridge.imgmsg_to_cv2(img_msg, "bgr8")
+        cv2.imwrite("aruco_result-{:0=2}-{:0=2}.jpeg".format(keypose_num, subpose_num), img)
+      except CvBridgeError, e:
+        print(e)
+
+      rospy.sleep(1)
+      
       if self.needs_calib:
         try:
           self.take_sample()
           sample_list = self.get_sample_list()
           n = len(sample_list.samples.hand_world_samples.transforms)
           print("  took {} (hand-world, camera-marker) samples").format(n)
-
-          # try:
-          #   image_msg = rospy.wait_for_message("/a_bot_camera/rgb/image_raw",
-          #                                      sensor_msgs.msg.Image, 1.0)
-          #   bridge = CvBridge()
-          #   cv2_img = bridge.imgmsg_to_cv2(image_msg, "bgr8")
-          #   cv2.imwrite("camera_image-{}.jpeg".format(self.nimages), cv2_img)
-          #   self.nimages += 1
-          # except CvBridgeError, e:
-          #   print(e)
         except rospy.ServiceException as e:
           print "Service call failed: %s"%e
 
-      if self.needs_trigger:
+      if self.stop_acquisition:
         self.stop_acquisition()
 
     return move_success
@@ -296,7 +309,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
   def run(self, keyposes, speed, sleep_time):
     """Run handeye calibration for the specified robot (e.g., "b_bot")"""
     # Clear samples in the buffer if exist
-    if self.needs_trigger:
+    if self.stop_acquisition:
       self.stop_acquisition()
     
     if self.needs_calib:
@@ -308,15 +321,13 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     # Reset pose
     self.go_home()
 
-    #self.flush_buffer()
-  
     # Collect samples over pre-defined poses
     for i, keypose in enumerate(keyposes):
       print("\n*** Keypose [{}/{}]: Try! ***".format(i+1, len(keyposes)))
       if self.camera_name == "a_bot_camera":
-        self.move(keypose, speed)
+        self.move(keypose, speed, i+1, 1)
       else:
-        self.move_to_subposes(keypose, speed, sleep_time)
+        self.move_to_subposes(keypose, speed, sleep_time, i+1)
       print("*** Keypose [{}/{}]: Completed. ***".format(i+1, len(keyposes)))
 
     if self.needs_calib:
