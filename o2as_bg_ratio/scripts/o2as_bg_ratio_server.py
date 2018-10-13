@@ -85,8 +85,8 @@ class InnerPickDetection(object):
         :param int w: Width of ROI.
         :param int h: Height of ROI.
         """
-        # Keep original image
-        img0 = img
+        # Input
+        img0 = img[y:(y + h), x:(x + w), :]
 
         # bright pixels
         img = img / 255.0
@@ -108,7 +108,7 @@ class InnerPickDetection(object):
         ixs_bg = np.where(red_ratio > red_threshold)[0]
 
         # publish input image
-        img_message = self.bridge.cv2_to_imgmsg(img0, "bgr8")
+        img_message = self.bridge.cv2_to_imgmsg(img0, "rgb8")
         self.pub_input_image.publish(img_message)
 
         # compute background ratio

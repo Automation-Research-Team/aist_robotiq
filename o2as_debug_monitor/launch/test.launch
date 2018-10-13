@@ -40,7 +40,11 @@
         topic_name: /search_grasp_phoxi/image_grasp_candidates
         col: [13, 24]
         row: [0, 12]
-        
+      bg_ratio_input_image:
+        topic_name: /o2as_debug_monitor/bg_ratio_input_image
+        col: [15, 20]
+        row: [10, 15]
+
     caminfo_topics:
       phoxi_caminfo:
         topic_name: /a_phoxi_m_camera/camera_info
