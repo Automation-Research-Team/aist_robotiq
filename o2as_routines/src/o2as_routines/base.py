@@ -740,6 +740,8 @@ class O2ASBaseRoutines(object):
   ################ ----- Gripper interfaces
   
   def send_gripper_command(self, gripper, command, this_action_grasps_an_object = False, force = 5.0, velocity = .1):
+    if not self.use_real_robot:
+      return True
     if gripper == "precision_gripper_outer" or gripper == "precision_gripper_inner" or gripper == "a_bot":
       goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
       if command == "stop":
@@ -773,15 +775,6 @@ class O2ASBaseRoutines(object):
         rospy.logerr("Could not parse gripper command: " + command + " for gripper " + gripper)
       except:
         pass
-
-    # if command == "open" and gripper == "b_bot":    # This intermediate opening may fix the driver issues in b_bot
-    #   rospy.loginfo("Sending intermediate b_bot gripper opening")
-    #   goal.position = 0.06
-    #   action_client.send_goal(goal)
-    #   rospy.sleep(.5)
-    #   action_client.wait_for_result(rospy.Duration(3.0))
-    #   rospy.loginfo("Sending second b_bot gripper opening")
-    #   goal.position = 0.085
 
     action_client.send_goal(goal)
     rospy.sleep(.5)

@@ -1,4 +1,4 @@
-def spiralSearchAndImpedanceInsert():
+def linearSearch():
   set_standard_analog_input_domain(0, 1)
   set_standard_analog_input_domain(1, 1)
   set_tool_analog_input_domain(0, 1)
