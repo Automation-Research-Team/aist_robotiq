@@ -294,18 +294,6 @@ Simple::cloud_callback(const cloud_p& cloud_msg)
 void
 Simple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 {
-    if ((_image_pub.getNumSubscribers()	    == 0) &&
-	(_debug_pub.getNumSubscribers()	    == 0) &&
-	(_pose_pub.getNumSubscribers()	    == 0) &&
-	(_transform_pub.getNumSubscribers() == 0) &&
-	(_position_pub.getNumSubscribers()  == 0) &&
-	(_marker_pub.getNumSubscribers()    == 0) &&
-	(_pixel_pub.getNumSubscribers()	    == 0))
-    {
-	ROS_DEBUG_STREAM("No subscribers, not looking for aruco markers");
-	return;
-    }
-
     if (!_camParam.isValid())
 	return;
 
@@ -492,8 +480,8 @@ Simple::get_marker_transform(const aruco::Marker& marker,
   // Compute p and q, i.e. marker's local x-axis and y-axis respectively.
     const auto&	n = plane.normal();
     const auto	c = (corners[2] + corners[3] - corners[0] - corners[1])
-		  + (corners[1] + corners[2] - corners[3] - corners[0])
-			.cross(n);
+		  + (corners[1] + corners[2] -
+		     corners[3] - corners[0]).cross(n);
     const auto	p = c / cv::norm(c);
     const auto	q = n.cross(p);
 
@@ -502,9 +490,14 @@ Simple::get_marker_transform(const aruco::Marker& marker,
 				 corners[2] + corners[3]);
 
   // Compute marker -> reference transfrom.
-    const tf::Transform		transform(tf::Matrix3x3(p(0), q(0), n(0),
-							p(1), q(1), n(1),
-							p(2), q(2), n(2)),
+  // Post-mulriply
+  //   -1 0 0
+  //    0 0 1
+  //    0 1 0
+  // according to ROS convensions.
+    const tf::Transform		transform(tf::Matrix3x3(-p(0), n(0), q(0),
+							-p(1), n(1), q(1),
+							-p(2), n(2), q(2)),
 					  tf::Vector3(centroid(0),
 						      centroid(1),
 						      centroid(2)));
@@ -531,6 +524,19 @@ void
 Simple::publish_marker_info(const aruco::Marker& marker,
 			    const cloud_t& cloud_msg, const ros::Time& stamp)
 {
+#ifdef DEBUG
+    {
+	tf::Transform		transform = aruco_ros::arucoMarker2Tf(marker);
+	tf::StampedTransform	cameraToReference;
+	tf::StampedTransform	stampedTransform(transform, stamp,
+						 _reference_frame,
+						 _marker_frame);
+	_tfBroadcaster.sendTransform(stampedTransform);
+	geometry_msgs::TransformStamped transformMsg;
+	tf::transformStampedTFToMsg(stampedTransform, transformMsg);
+	_transform_pub.publish(transformMsg);
+    }
+#endif
     const tf::StampedTransform	stampedTransform(
 				    get_marker_transform(marker, cloud_msg),
 				    stamp, _reference_frame, _marker_frame);

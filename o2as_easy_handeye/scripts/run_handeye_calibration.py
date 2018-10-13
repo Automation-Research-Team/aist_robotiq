@@ -41,19 +41,19 @@ keyposes = {
 
     'b_bot': [
       [0.38,  0.15, 0.10, radians( 30), radians( 25), radians(0)],
-     # [0.38,  0.00, 0.10, radians( 30), radians( 25), radians(0)],
+      [0.38,  0.00, 0.10, radians( 30), radians( 25), radians(0)],
       [0.38, -0.15, 0.10, radians(  0), radians( 25), radians(0)],
 
       [0.32, -0.10, 0.20, radians( 30), radians( 25), radians(0)],
-     # [0.32,  0.00, 0.20, radians( 30), radians( 25), radians(0)],
+      [0.32,  0.00, 0.20, radians( 30), radians( 25), radians(0)],
       [0.32,  0.10, 0.20, radians( 30), radians( 25), radians(0)],
 
       [0.20,  0.15, 0.20, radians( 30), radians( 25), radians(0)],
-     # [0.20,  0.00, 0.20, radians( 30), radians( 25), radians(0)],
+      [0.20,  0.00, 0.20, radians( 30), radians( 25), radians(0)],
       [0.20, -0.15, 0.20, radians(  0), radians( 25), radians(0)],
 
       [0.15, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
-     # [0.15,  0.05, 0.10, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.05, 0.10, radians( 30), radians( 25), radians(0)],
       [0.15,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
     ],
 
@@ -177,7 +177,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     # Set `_ee_link` as end effector wrt `_base_link` of the robot
     #group.set_pose_reference_frame(robot_name + "_base_link")
     group.set_pose_reference_frame("workspace_center")
-    group.set_end_effector_link(robot_name + "_ee_link")
+    #group.set_end_effector_link(robot_name + "_ee_link")
     group.set_end_effector_link(robot_name + "_gripper_tip_link")
     #group.set_end_effector_link(robot_name + "_ar_marker")
 
