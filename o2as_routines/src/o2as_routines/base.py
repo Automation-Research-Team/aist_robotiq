@@ -1030,6 +1030,69 @@ class O2ASBaseRoutines(object):
       r = r + radius_inc_set
       RealRadius = math.sqrt(math.pow(y,2)+math.pow(z,2))
 
+  def adjust_centering(self, robot_name = "b_bot", go_fast=False):
+    rospy.loginfo("============ Adjusting the position of the pin/shaft ============")
+    self.go_to_named_pose("home", robot_name)
+    self.send_gripper_command(gripper="c_bot",command = "open")
+
+    speed = .3
+    acceleration = .5
+    force_ur_script = False
+    if go_fast:
+      speed = 1.5
+      acceleration = 1.5
+      force_ur_script = True
+
+    pose1 = geometry_msgs.msg.PoseStamped()
+    pose1.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    pose1.header.frame_id = "b_bot_robotiq_85_tip_link"
+    pose1.pose.position.y = -0.15
+    pose1.pose.position.z = 0.15
+    self.go_to_pose_goal("b_bot", pose1,speed=speed, acceleration=acceleration, move_lin = True)
+
+    rospy.sleep(1)
+
+    pose2 = geometry_msgs.msg.PoseStamped()
+    pose2.header.frame_id = "b_bot_robotiq_85_tip_link"
+    pose2.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2,0,pi/2))
+    pose2.pose.position.z = 0.0  # MAGIC NUMBER!
+    pose2.pose.position.y = 0.025
+    pose2.pose.position.x = 0.015
+    self.go_to_pose_goal("c_bot", pose2, speed=speed, acceleration=acceleration, move_lin = True)
+
+    # self.send_gripper_command(gripper="b_bot",command = "close", velocity = .015, force = 1.0)
+    self.send_gripper_command(gripper="c_bot",command = "close")
+    rospy.sleep(.5)
+    self.send_gripper_command(gripper="b_bot",command = .03)
+    rospy.sleep(.5)
+    self.send_gripper_command(gripper="b_bot",command = "open")
+    rospy.sleep(1.0)
+    self.send_gripper_command(gripper="b_bot",command = "close", velocity = .05, force = 1.0)
+    # self.send_gripper_command(gripper="b_bot",command = "close", force = 1.0)
+    rospy.sleep(.5)
+    self.send_gripper_command(gripper="c_bot",command = "open")
+    rospy.sleep(.5)
+
+    pose3 = geometry_msgs.msg.PoseStamped()
+    pose3.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, 0, 0))
+    pose3.header.frame_id = "b_bot_robotiq_85_tip_link"
+    pose3.pose.position.y = 0
+    pose3.pose.position.z = 0
+    self.go_to_pose_goal("b_bot", pose3, speed=speed, acceleration=acceleration, move_lin = True)
+
+    self.send_gripper_command(gripper="c_bot",command = "close")
+    rospy.sleep(1)
+    self.send_gripper_command(gripper="b_bot",command = "open")
+    # self.send_gripper_command(gripper="b_bot",command = .03)
+    rospy.sleep(2)
+    self.send_gripper_command(gripper="b_bot",command = "close")
+    rospy.sleep(2)
+    self.send_gripper_command(gripper="c_bot",command = "open")
+    rospy.sleep(1)
+
+    self.go_to_named_pose("home", "c_bot", speed=speed, acceleration=acceleration, force_ur_script=force_ur_script)
+    return
+
 ######
 
   def get_tray_placement_orientation_for_suction_in_kitting(self, set_number, tray_number):
