@@ -7,9 +7,11 @@ from std_msgs.msg import Float64
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
+from cv_bridge import CvBridge
 
 import actionlib
 import o2as_msgs.msg
+from sensor_msgs.msg import Image
 
 class InnerPickDetection(object):
 
@@ -25,7 +27,12 @@ class InnerPickDetection(object):
         self._w = 64
         self._h = 32
         # TODO: Write an image with the ROI drawn into it
-        # TODO: Publish the input and output image to o2as_debug_monitor
+
+        # Publish input image (and output value)
+        # The image is published when bg ratio is computed
+        self.bridge = CvBridge()
+        self.pub_input_image = rospy.Publisher("/o2as_debug_monitor/bg_ratio_input_image", Image, queue_size=1)
+        #self.pub_output_value = rospy.Publisher("/o2as_debug_monitor/bg_ratio_input_image", Float32, queue_size=1)
 
         self._image_topic = "/a_bot_camera/color/image_raw"
 
@@ -78,6 +85,9 @@ class InnerPickDetection(object):
         :param int w: Width of ROI.
         :param int h: Height of ROI.
         """
+        # Keep original image
+        img0 = img
+
         # bright pixels
         img = img / 255.0
         img = img[y:(y + h), x:(x + w), :]
@@ -96,6 +106,10 @@ class InnerPickDetection(object):
         red_ratio = pixels[:, 0] / brightness
         # plt.hist(red_ratio)
         ixs_bg = np.where(red_ratio > red_threshold)[0]
+
+        # publish input image
+        img_message = self.bridge.cv2_to_imgmsg(img0, "bgr8")
+        self.pub_input_image.publish(img_message)
 
         # compute background ratio
         return float(ixs_bg.shape[0]) / pixels.shape[0]
