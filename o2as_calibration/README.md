@@ -11,14 +11,21 @@ See readme of omron_cad_matching package.
 
 ## Online training
 
-Run command below.
+Run the commands below.
 This moves robot and collect tf data for calibration and calculate calibration.
-Collected transformations is saved into the csv file to offline debug. 
+Collected transformations are saved into the csv file to offline debug. 
+
+    ```
+    roslaunch o2as_calibration robot_control.launch
+    roslaunch o2as_calibration realsense_startup.launch
+    roslaunch o2as_calibration realsense_data_collection.launch
+    ```
+
+Same for the phoxi (maybe)
 
     ```
     roslaunch o2as_calibration phoxi_calibration.launch
-    or 
-    roslaunch o2as_calibration realsense_calibration.launch
+    roslaunch o2as_calibration phoxi_data_collection.launch
     ```
 
 ## Offline training

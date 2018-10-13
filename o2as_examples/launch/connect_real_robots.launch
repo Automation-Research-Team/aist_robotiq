@@ -22,8 +22,14 @@
   <!-- The max_velocity parameter is only used for debugging in the ur_driver. It's not related to actual velocity limits -->
   <arg name="max_velocity" default="10.0"/> <!-- [rad/s] -->
 
+  <!-- a_bot realsense parameters -->
+  <arg name="trigger_mode" default="false"/>
+  <arg name="send_color" default="true"/>
+  <arg name="send_depth" default="true"/>
+  <arg name="send_cloud" default="true"/>
 
-  <!-- The three lines below are commented out because it is annoying to restart the robot. They are incompatible with Gazebo. -->
+
+  <!-- The three lines below are commented out because it is annoying to restart the robot. They are required for Gazebo, however. -->
   <!-- Publish robot model -->
   <!-- <include file="$(find o2as_scene_description)/launch/o2as_base_scene_upload.launch" /> -->
   <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" /> -->
@@ -100,6 +106,10 @@
     <arg name="camera_name" default="a_bot_camera"/>
     <arg name="camera_frame" default="a_bot_camera"/>
     <arg name="serial_number" value="627201001218"/> 
+    <arg name="trigger_mode" value="$(arg trigger_mode)"/>
+    <arg name="send_color" value="$(arg send_color)"/>
+    <arg name="send_depth" value="$(arg send_depth)"/>
+    <arg name="send_cloud" value="$(arg send_cloud)"/>
   </include>
 
   <!-- <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch">

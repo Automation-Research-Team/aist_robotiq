@@ -70,16 +70,25 @@ long now() {
 // Adopted from team-NAIST-Panasonic ARC repository
 // https://github.com/warehouse-picking-automation-challenges/team_naist_panasonic
 cv_bridge::CvImagePtr convert2OpenCV(
-  const sensor_msgs::Image &img, const std::string type
+  const sensor_msgs::Image &img, const std::string type_str
   )
 {
+  auto type_val = sensor_msgs::image_encodings::BGR8;
+
+  if ((type_str == "depth") || (type_str == "DEPTH"))
+  {
+    type_val = sensor_msgs::image_encodings::TYPE_32FC1;
+    // ROS_INFO("Image encoding: %s", type_val.c_str());
+  }
+
   cv_bridge::CvImagePtr cv_ptr;
   try {
-    cv_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::BGR8);
+    cv_ptr = cv_bridge::toCvCopy(img, type_val);
   }
   catch (cv_bridge::Exception &e) {
     ROS_ERROR("Image converter, cv_bridge exception: %s", e.what());
   }
+
   return cv_ptr;
 }
 
@@ -91,12 +100,17 @@ ImageCallback getCallbackForImage(
   // Values captured by closure
   double vmin = 0;
   double vmax = 255;
+  auto img_type_str = sensor_msgs::image_encodings::RGB8;
 
   if (params.hasMember("vrange") == true) {
     int tmp1 = params["vrange"][0];
     int tmp2 = params["vrange"][1];
     vmin = tmp1;
     vmax = tmp2;
+  }
+
+  if (params.hasMember("encoding") == true) {
+    img_type_str = std::string(params["encoding"]);
   }
 
   // This function returns callback function
@@ -108,26 +122,54 @@ ImageCallback getCallbackForImage(
     }
 
     // Convert sent message into cv::Mat
-    cv::Mat img = convert2OpenCV(
-      *msg, sensor_msgs::image_encodings::RGB8
-    ) -> image;
+    cv_bridge::CvImagePtr cv_ptr = convert2OpenCV(*msg, img_type_str);
+    cv::Mat img_org = cv_ptr -> image; // convert2OpenCV(*msg, img_type_str) -> image;
+    cv::Mat img;
+
+    // For float image type
+    auto encoding = cv_ptr -> encoding;
+    if (encoding == "32FC1") // assume depth map
+    {
+      img = cv::Mat(img_org.size(), CV_8UC3);
+
+      for (int i = 0; i < img_org.rows; i++)
+      {
+        for (int j = 0; j < img_org.cols; j++)
+        {
+          double tmp = img_org.at<float>(i, j);
+          tmp = (tmp - vmin) / (vmax - vmin) * 255;
+          if (tmp > 255) { tmp = 255; }
+          if (tmp < 0) { tmp = 0; }
+          img.at<cv::Vec3b>(i, j)[0] = (uint8_t)tmp;
+          img.at<cv::Vec3b>(i, j)[1] = (uint8_t)tmp;
+          img.at<cv::Vec3b>(i, j)[2] = (uint8_t)tmp;
+        }
+      }
+    }
+    else {
+      img = img_org;
+    }
 
     // Resize the image and put it to the buffer
     cv::Size size = cv::Size(rect.width, rect.height);
     cv::Mat resized;
     cv::resize(img, resized, size, 0, 0, cv::INTER_CUBIC);
 
-    for (int i = 0; i < resized.rows ; i++)
+    // Color scaling for BGR8
+    if (encoding == "BGR8" || encoding == "RGB8")
     {
-      for(int j = 0; j < resized.cols; j++)
+      for (int i = 0; i < resized.rows ; i++)
       {
-        for (int idx = 0; idx < 3; idx++)
+        for(int j = 0; j < resized.cols; j++)
         {
-          double tmp = resized.at<cv::Vec3b>(i,j)[idx];
-          tmp = (tmp - vmin) / (vmax - vmin) * 255;
-          if (tmp > 255) { tmp = 255; }
-          if (tmp < 0) { tmp = 0; }
-          resized.at<cv::Vec3b>(i,j)[idx] = (uint8_t)tmp;
+          for (int idx = 0; idx < 3; idx++)
+          {
+            double tmp = resized.at<cv::Vec3b>(i,j)[idx];
+            tmp = (tmp - vmin) / (vmax - vmin) * 255;
+            if (tmp > 255) { tmp = 255; }
+            if (tmp < 0) { tmp = 0; }
+            resized.at<cv::Vec3b>(i,j)[idx] = (uint8_t)tmp;
+          }
         }
       }
     }

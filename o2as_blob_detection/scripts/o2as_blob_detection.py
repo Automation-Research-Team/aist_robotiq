@@ -7,7 +7,7 @@ from std_msgs.msg import Float64
 import geometry_msgs.msg
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import PointCloud2
-from cv_bridge import CvBridge
+from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import sensor_msgs.point_cloud2 as pc2
 
@@ -21,13 +21,20 @@ import actionlib
 import o2as_msgs.msg
 from geometry_msgs.msg import PoseArray, Pose 
 
+import rospkg
+
 class BlobDetection(object):
     def __init__(self):
+#        self.rospack = rospkg.RosPack()
+#        print(self.rospack.get_path(rospy.get_name()))
+
         #Variable
         self.bridge = CvBridge()
         self.current_image = Image()
+        self.current_image_blob = Image()
         self.current_cloud = PointCloud2()
         self.current_detected_poses = PoseArray() 
+        self.current_param_part_id = "none"
 
         # Config parameters
         # TODO: read values from config file
@@ -35,15 +42,18 @@ class BlobDetection(object):
         self.cloud_topic = rospy.get_name()+ "/camera/cloud"
         self.blob_pos_img_topic = rospy.get_name()+"/blob_pos_img"
         self.blob_pos_cloud_topic = rospy.get_name()+"/blob_pos_cloud"
+        self.img_w_blob_topic = rospy.get_name()+"/img_w_blob"
 
+        # Publisher
         self.pub_img_pos = rospy.Publisher(self.blob_pos_img_topic, geometry_msgs.msg.Point, queue_size=10)
         self.pub_cloud_pos = rospy.Publisher(self.blob_pos_cloud_topic, geometry_msgs.msg.PoseArray, queue_size=10)
+        self.pub_img_w_blob = rospy.Publisher(self.img_w_blob_topic, Image, latch=True,queue_size=10)
 
         # Subscriber
         rospy.Subscriber(self.image_topic, Image, self.image_callback)
         rospy.Subscriber(self.cloud_topic, PointCloud2, self.cloud_callback)
 
-        #define the action
+        # Define the action
         self._action_name = "blob_detection_action"
         self._action_server = actionlib.SimpleActionServer(self._action_name, o2as_msgs.msg.blobDetectionAction, execute_cb=self.action_callback, auto_start = False)
         self._action_server.start()
@@ -54,13 +64,14 @@ class BlobDetection(object):
     def action_callback(self, goal):
       rospy.loginfo('Executing'+" "+str(self._action_name)+"."+"request sent:")
       rospy.loginfo(goal)
-      rospy.loginfo('Executing'+" "+str(self._action_name)+"."+"request sent:")
 
+      self.current_param_part_id = goal.param_part_id
       res = self.detect_poses(goal.maskCorner, goal.param_part_id)
 
       self.action_result.success = res
       if(res):
           self.action_result.posesDetected = self.current_detected_poses
+          self.action_result.blobImage =  self.current_image_blob
           self._action_server.set_succeeded(self.action_result)
       else:
           self.action_result.posesDetected = PoseArray()
@@ -72,24 +83,25 @@ class BlobDetection(object):
       # Convert the image to be used wit OpenCV library
       self.current_image = copy.deepcopy(msg_in)
 
-      mask_u = 200
-      mask_v = 100
+      #mask_u = 200
+      #mask_v = 100
 
-      test_polygon = Polygon()
-      test_polygon.points = [Point32(mask_u,mask_v,0),
-                             Point32(640-mask_u,mask_v,0),
-                             Point32(640-mask_u,360,0),
-                             Point32(mask_u,360,0)]
+      #test_polygon = Polygon()
+      #test_polygon.points = [Point32(mask_u,mask_v,0),
+      #                       Point32(640-mask_u,mask_v,0),
+      #                       Point32(640-mask_u,360,0),
+      #                       Point32(mask_u,360,0)]
 
 
-#      self.detect_poses(test_polygon)
+      #self.detect_poses(test_polygon)
     
     def detect_poses(self, in_polygon, param_part_id = "default"):
 
 
       #img_cv=cv2.imread('/root/catkin_ws/mask_extract/set2_bin1_4_img2.png')
       img_cv = self.bridge.imgmsg_to_cv2(self.current_image , desired_encoding="passthrough")
-      cv2.imwrite('/root/catkin_ws/original_image.png',img_cv)
+      #cv2.imwrite('/root/catkin_ws/original_image.png',img_cv)
+      cv2.imwrite("/root/catkin_ws/src/o2as_blob_detection/img_res/blob_detection_"+param_part_id+"_original.png", img_cv) 
       img = np.asarray(img_cv)[:, :, ::-1]
       # Apply the mask
       mask_u = 200
@@ -117,18 +129,30 @@ class BlobDetection(object):
 
           # Convert the blob position image in the 3D camera system
           #TODO synchronize the time stamp between image and cloud
+          rospy.loginfo( rospy.get_name() + " number of blob detected " + str(len(blob_array)))
+
           self.current_detected_poses.header = self.current_cloud.header
           tmp_pose_array = []
           for i in range(0,len(blob_array)):
             tmp_pose = geometry_msgs.msg.Pose() 
             res_point3D = self.compute_3D_pos1(self.current_cloud, int(blob_array[i].x), int(blob_array[i].y))
-            tmp_pose.position = res_point3D.point
-            tmp_pose_array.append(tmp_pose)
-          self.current_detected_poses.poses = tmp_pose_array
-          # Publish the results   
-          self.pub_cloud_pos.publish(self.current_detected_poses)
+            if(res_point3D.point.x == -0.0 and res_point3D.point.y ==0.0 and res_point3D.point.z ==0.0):
+                #TODO find a approximation with nearby point
+                rospy.loginfo( "Bad point cloud reading  (probably non dense) ")
+            else:
+                tmp_pose.position = res_point3D.point
+                tmp_pose_array.append(tmp_pose)
+          if(len(tmp_pose_array)>0):
+               rospy.loginfo( rospy.get_name() + " number of poses detected " + str(len(tmp_pose_array)))
+               self.current_detected_poses.poses = tmp_pose_array
+               # Publish the results   
+               self.pub_cloud_pos.publish(self.current_detected_poses)
+               return True
+          else:
+               rospy.loginfo( rospy.get_name() + "no poses detected" )
+               return False                    
 
-          return True
+
           # Slow down this node and reduce data transfer for image
           #rospy.sleep(0.01)
       else:
@@ -179,9 +203,11 @@ class BlobDetection(object):
         # Apply the mask to the image
         #img_cv = cv2.imread(img_to_mask)
         #mask_cv = cv2.imread(mask_img,0)
+        cv2.imwrite("/root/catkin_ws/src/o2as_blob_detection/img_res/blob_detection_"+self.current_param_part_id+"_mask.png", mask_image_np)
         img_cv = in_img_cv
         out_img = cv2.bitwise_and(img_cv,img_cv, mask = mask_image_np)
-        cv2.imwrite('/root/catkin_ws/masked_image.png',out_img)
+        #cv2.imwrite('/root/catkin_ws/masked_image.png',out_img)
+        cv2.imwrite("/root/catkin_ws/src/o2as_blob_detection/img_res/blob_detection_"+self.current_param_part_id+"_masked_image.png", cv2.cvtColor(out_img, cv2.COLOR_BGR2RGB))
         return out_img
 
     def detect_blob(self, img, param_part_id = "default"):
@@ -206,8 +232,8 @@ class BlobDetection(object):
     
 
         rospy.loginfo( rospy.get_name() + " parameter chosen: " + param_part_id)
-        if(param_part_id == "test"):
-            rospy.loginfo( "in: " + param_part_id)
+        if(param_part_id == "none"):
+            rospy.loginfo( rospy.get_name() +"in: " + param_part_id)
             # Segmentation Thresholds
             params.minThreshold = 100
             params.maxThreshold = 400
@@ -233,7 +259,8 @@ class BlobDetection(object):
             params.filterByInertia = False
             params.minInertiaRatio = 0.01
 
-        elif(param_part_id == "part_"):
+        elif(param_part_id == "part_9"):
+            rospy.loginfo( rospy.get_name() +"in: " + param_part_id)
             # Segmentation Thresholds
             params.minThreshold = 100
             params.maxThreshold = 400
@@ -255,6 +282,34 @@ class BlobDetection(object):
             params.filterByConvexity = False
             params.minConvexity = 0.87
     
+            # Filter by Inertia
+            params.filterByInertia = False
+            params.minInertiaRatio = 0.01
+
+        elif(param_part_id == "part_15"):
+            rospy.loginfo( rospy.get_name()+ "in: " + param_part_id)
+
+            # Segmentation Thresholds
+            params.minThreshold = 100
+            params.maxThreshold = 400
+
+            # Filter by color
+            params.filterByColor = True
+            params.blobColor = 0
+
+            # Filter by size of the blob.
+            params.filterByArea = True
+            params.minArea = 20
+            params.maxArea = 150
+
+            # Filter by Circularity
+            params.filterByCircularity = True
+            params.minCircularity = 0.7
+
+            # Filter by Convexity
+            params.filterByConvexity = False
+            params.minConvexity = 0.87
+
             # Filter by Inertia
             params.filterByInertia = False
             params.minInertiaRatio = 0.01
@@ -296,10 +351,20 @@ class BlobDetection(object):
         keypoints = detector.detect(im_gray)
     
         # Draw the key points 
-        im_with_keypoints = cv2.drawKeypoints(im_rgb, keypoints, np.array([]), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        im_with_keypoints = cv2.drawKeypoints(im_rgb, keypoints, np.array([]), (255, 0, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     
         # Show blobs
-        cv2.imwrite("/root/catkin_ws/blob_detection_"+param_part_id+"_results.png", im_with_keypoints)
+
+        cv2.imwrite("/root/catkin_ws/src/o2as_blob_detection/img_res/blob_detection_"+param_part_id+"_results.png", cv2.cvtColor(im_with_keypoints, cv2.COLOR_BGR2RGB))
+        #print("before publish")
+
+        try:
+          print("publish")
+          self.pub_img_w_blob.publish(self.bridge.cv2_to_imgmsg(im_with_keypoints, "rgb8"))
+        except CvBridgeError as e:
+          print(e)
+
+        self.current_image_blob = self.bridge.cv2_to_imgmsg(im_with_keypoints, "rgb8")
 
         blob_array = []
      

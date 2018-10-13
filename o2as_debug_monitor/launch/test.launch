@@ -30,11 +30,17 @@
         col: [0, 12]
         row: [8, 15]
         vrange: [0, 64]
-      phoxi_texture:
-        topic_name: /a_phoxi_m_camera/texture
-        col: [0, 15]
-        row: [10, 17]
-
+      phoxi_depth_ueshiba:
+        topic_name: /o2as_phoxi_camera/depth_map
+        col: [13, 24]
+        row: [0, 7]
+        encoding: depth
+        vrange: [0, 2]
+      grasp_candidates:
+        topic_name: /search_grasp_phoxi/image_grasp_candidates
+        col: [13, 24]
+        row: [0, 12]
+        
     caminfo_topics:
       phoxi_caminfo:
         topic_name: /a_phoxi_m_camera/camera_info

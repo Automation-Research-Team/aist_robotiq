@@ -12,7 +12,7 @@ class HandeyeCalibrator(object):
   def __init__(self):
     self.samples = []
     # get params
-    self.eye_on_hand = rospy.get_param('eye_on_hand', False)
+    self.eye_on_hand = rospy.get_param('~eye_on_hand', False)
     self.robot_effector_frame = rospy.get_param('robot_effector_frame', 'tool0')
     self.robot_base_frame = rospy.get_param('robot_base_frame', 'base_link')
     self.tracking_base_frame = rospy.get_param('tracking_base_frame', 'optical_origin')
@@ -48,6 +48,7 @@ class HandeyeCalibrator(object):
     # run calibration
     rospy.loginfo("Computing from %g poses..." % len(self.samples))
     try:
+      rospy.loginfo("Eye on hand is: {}".format(self.eye_on_hand))
       result = self.calibrate(camera_marker_samples, hand_world_samples)
       rospy.loginfo("Computed calibration: {}".format(str(result)))
       transl = result.effector_camera.translation
