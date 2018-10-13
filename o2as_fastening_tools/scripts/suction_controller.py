@@ -18,6 +18,7 @@ class SuctionController(object):
         self.pin_state = False
         config_dir = rospy.get_param("~config_dir")
         config_file = rospy.get_param("~suction_control")
+        operation_mode_file = rospy.get_param("~operation_mode")
         
         rospy.Subscriber("b_bot_controller/ur_driver/io_states", IOStates, self.io_state_callback, queue_size=1)
         
@@ -27,6 +28,9 @@ class SuctionController(object):
         conf_suction_filename = config_dir + "/" + config_file + ".yaml"
         conf_file_content = read_object_yaml_config(conf_suction_filename)
 
+        conf_operation_mode_filename = config_dir + "/" + operation_mode_file + ".yaml"
+        conf_operation_mode_file_content = read_object_yaml_config(conf_operation_mode_filename)
+
         # initialize ur_control table
         self.digital_in_port = dict()
         self.digital_out_port_vac = dict()
@@ -35,6 +39,8 @@ class SuctionController(object):
         self.out_state = dict()
         self.tool_suction_publisher = dict()
         self.in_port_name = dict()
+        self.operation_mode_in_port_name = dict()
+        self.operation_mode_publisher = dict()
 
         # get data for .yaml
         self.suction_tool_list = conf_file_content['suction_control']
@@ -45,6 +51,12 @@ class SuctionController(object):
             self.digital_out_port_blow.update({tool_data['name']: tool_data['digital_out_port_blow']})
             self.tool_suction_publisher[tool_data['name']] = rospy.Publisher(tool_data['name'] + '/screw_suctioned', Bool, queue_size=1)
             # Goal: Publish a boolean for each tool under '[tool_name]/screw_suctioned'
+
+        # for operation_mode
+        self.operation_mode_list = conf_operation_mode_file_content['operation_mode']
+        for operation_mode_data in self.operation_mode_list:
+            self.operation_mode_in_port_name.update({operation_mode_data['digital_in_port']: operation_mode_data['name']})
+            self.operation_mode_publisher[operation_mode_data['name']] = rospy.Publisher(operation_mode_data['name'] + '/in_state', Bool, queue_size=1)
 
         self._action_name = 'o2as_fastening_tools/suction_control'
         self._as = actionlib.SimpleActionServer(self._action_name, SuctionControlAction, execute_cb=self.suction_control, auto_start = False)
@@ -57,6 +69,10 @@ class SuctionController(object):
                 bool_msg = Bool()
                 bool_msg.data = read_in_status.state
                 self.tool_suction_publisher[self.in_port_name[read_in_status.pin]].publish(bool_msg)
+            if read_in_status.pin in self.operation_mode_in_port_name:
+                mode_read = Bool()
+                mode_read.data = read_in_status.state
+                self.operation_mode_publisher[self.operation_mode_in_port_name[read_in_status.pin]].publish(mode_read)
 
         for read_out_status in data.digital_out_states:
             self.out_state.update({read_out_status.pin: read_out_status.state})

@@ -21,8 +21,8 @@ assy_part_07_back_hole, assy_part_09_inner_surface,   0, 0, 0,   -0.001,0,0, Bea
 assy_part_09_inner_surface, assy_part_08_back_tip,   0, 0, pi,   0,0,0, End Cap + Rotary Shaft
 
 # The idler assembly in the middle
-assy_part_03_pulley_ridge_middle, assy_part_12_center,   0, 0, 0,   0.00475,0,0, Panel2 + Spacer
+assy_part_03_pulley_ridge_bottom, assy_part_12_center,   0, 0, 0,   0.00475,0,0, Panel2 + Spacer
 assy_part_12_center, assy_part_13_center,   0, 0, 0,   0.00475+0.009,0,0, Spacer + Pulley
 assy_part_13_center, assy_part_14_inserted,   0, 0, 0,   0,0,0, Pulley + Screw
-assy_part_03_pulley_ridge_middle, assy_part_16_center,   0, 0, 0,   -(0.005+.001),0,0, Panel2 + Washer
+assy_part_03_pulley_ridge_bottom, assy_part_16_center,   0, 0, 0,   -(0.005+.001),0,0, Panel2 + Washer
 assy_part_16_center, assy_part_15_center,   0, 0, pi,   .001+.0025,0,0, Washer + Nut

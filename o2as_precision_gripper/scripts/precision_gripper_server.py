@@ -8,6 +8,16 @@ import o2as_msgs.msg
 import o2as_msgs.srv
 import std_msgs.msg
 
+def signum(x):
+    if x > 0:
+        return 1.
+    elif x < 0:
+        return -1.
+    elif x == 0:
+        return 0
+    else:
+        return x
+    
 class PrecisionGripperAction:
     def __init__(self):
         name = rospy.get_name()
@@ -84,11 +94,11 @@ class PrecisionGripperAction:
             else:
                 command_is_sent = self.inner_gripper_close_fully(self.inner_force)
         elif goal.open_inner_gripper_slightly:
-            rospy.loginfo("inner gripper open slightly")
             if goal.slight_opening_width:
-                steps = goal.slight_opening_width
+                steps = int(goal.slight_opening_width)
             else:
                 steps = self.inner_slight_open
+            rospy.loginfo("inner gripper open slightly, by " + str(steps) + " steps")
             command_is_sent = self.inner_gripper_open_slightly(steps)
 
         else:
@@ -241,11 +251,13 @@ class PrecisionGripperAction:
 
     def inner_gripper_open_slightly(self, open_range):
         try:
-            self.p1.set_operating_mode("currentposition")
-            self.p1.set_current(12)
             current_position = self.p1.read_current_position()
-            current_position = current_position - open_range
-            print("Current position: " + str(current_position))
+            sign = signum(self.inner_open_motor_position - self.inner_close_motor_position)
+            current_position = int(current_position + sign*open_range)
+            print("Target position: " + str(current_position))
+            self.p1.set_operating_mode("currentposition")
+            self.p1.set_positive_direction("cw")
+            self.p1.set_current(current)
             self.p1.set_goal_position(current_position)
             rospy.sleep(0.1)
             return True

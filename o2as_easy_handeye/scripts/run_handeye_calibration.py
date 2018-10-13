@@ -347,7 +347,7 @@ def main():
 
     print("=== Calibration started for {} + {} ===".format(camera_name,
                                                            robot_name))
-    speed      = 1
+    speed      = 0.1
     sleep_time = 1
     routines.run(keyposes[camera_name][robot_name], speed, sleep_time)
     print("=== Calibration completed for {} + {} ===".format(camera_name,
