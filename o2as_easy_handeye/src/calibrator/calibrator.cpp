@@ -215,7 +215,7 @@ Calibrator::computeEffectorCameraQuickCallback(
 	    << wMe[n] << std::endl << std::endl;
 
     const auto	wMo = objectToWorld(cMo, wMe, eMc);
-    evaluateAccuracy(std::cout, cMo, wMe, eMc, wMo);
+    evaluateAccuracy(out, cMo, wMe, eMc, wMo);
 #endif
     return true;
 }

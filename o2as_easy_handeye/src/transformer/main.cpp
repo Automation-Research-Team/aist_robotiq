@@ -92,10 +92,10 @@ getTransform(const Vector6& xyz_rpy)
 }
 
 void
-convert(const tf::Transform& trns)
+print(std::ostream& out, const tf::Transform& trns)
 {
-    std::cout << getMatrix4x4(trns);
-    std::cout << getVector6(trns) << std::endl;
+    out << getMatrix4x4(trns);
+    out << getVector6(trns) << std::endl;
 }
 
 
@@ -116,13 +116,11 @@ main()
     trns.setRotation(rot);
 
   // Convert to 4x4 matrix
-    convert(trns);
+    print(std::cout, trns);
 
     std::cerr << "===================" << std::endl;
 
-
-    convert((getTransform(bTs)*trns).inverse());
-
+    print(std::cout, (getTransform(bTs)*trns).inverse());
 
     return 0;
 }

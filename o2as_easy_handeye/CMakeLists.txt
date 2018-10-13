@@ -15,12 +15,19 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   visp_bridge
   message_generation
+  pcl_ros
+  pcl_conversions
+)
+
+catkin_python_setup()
+
+generate_dynamic_reconfigure_options(
+  cfg/o2as_easy_handeye.cfg
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
-catkin_python_setup()
 catkin_package()
 
 ###########
@@ -31,7 +38,6 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
   src/calibrator
 )
-
 add_executable(calibrator
   src/calibrator/calibrator.cpp
   src/calibrator/calibrator.h
@@ -98,6 +104,22 @@ add_dependencies(calibrator_test
   ${catkin_EXPORTED_TARGETS}
 )
 
+add_executable(plane_detector
+  src/plane_detector/main.cpp
+)
+
+target_link_libraries(plane_detector
+  ${catkin_LIBRARIES}
+  ${roscpp_LIBRARIES}
+  ${pcl_LIBRARIES}
+)
+
+add_dependencies(plane_detector
+  ${PROJECT_NAME}_gencpp
+  ${PROJECT_NAME}_gencfg
+  ${catkin_EXPORTED_TARGETS}
+)
+
 #############
 ## Install ##
 #############
@@ -112,7 +134,7 @@ catkin_install_python(
 
 install(
   TARGETS
-    calibrator quat2rpy transformer
+    calibrator quat2rpy transformer plane_detector
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
