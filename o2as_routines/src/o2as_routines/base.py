@@ -1033,6 +1033,7 @@ class O2ASBaseRoutines(object):
 
     if topic_name not in self.debugmonitor_publishers:
       pub = rospy.Publisher(topic_name, String, queue_size=1)
+      rospy.sleep(0.5)
       self.debugmonitor_publishers[topic_name] = pub
     else:
       pub = self.debugmonitor_publishers[topic_name]
