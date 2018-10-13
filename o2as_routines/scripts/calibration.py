@@ -283,62 +283,54 @@ class CalibrationClass(O2ASBaseRoutines):
       self.go_to_named_pose("home", "b_bot", speed=0.1)
     return
   
-  def taskboard_calibration(self):
-    rospy.loginfo("============ Calibrating taskboard. ============")
-    poses = []
-
-    pose0 = geometry_msgs.msg.PoseStamped()
-    pose0.header.frame_id = "taskboard_corner2"
-    pose0.pose.orientation = self.a_bot_downward_orientation
-    pose0.pose.position.z = .003
-
-    for i in range(3):
-      poses.append(copy.deepcopy(pose0))
-
-    poses[1].header.frame_id = "taskboard_corner3"
-    # poses[1].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
-    poses[2].header.frame_id = "taskboard_part10"
+  def taskboard_calibration(self, robot_name = "a_bot", context = "initial"):
+    rospy.loginfo("============ Taskboard calibration. ============")
+    if context == "initial":
+      rospy.loginfo("Robot will move to 3 points for initial calibration of the taskboard")
+    else:
+      rospy.loginfo(robot_name + "will move to relevant points on the taskboard")
     
-    self.cycle_through_calibration_poses(poses, "a_bot", speed=0.08)
-    return
-
-  def taskboard_calibration_extended(self, robot_name = "a_bot"):
-    rospy.loginfo("============ Demonstrating the calibration of the taskboard. ============")
-    rospy.loginfo("This moves " + robot_name + " to the top of the parts pre-mounted in the taskboard.")
     poses = []
-
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.pose.orientation = self.a_bot_downward_orientation
-    pose0.pose.position.z = 0.002
+    pose0.pose.position.z = .002
+    speed = .3
+    move_lin = True
 
-    # On top of the metal sheet
-    pose0 = copy.deepcopy(pose0)
-
-    if robot_name == "a_bot":
-      for i in range(4):
+    if context == "initial":
+      for i in range(3):
         poses.append(copy.deepcopy(pose0))
 
-      poses[0].header.frame_id = "taskboard_part7_2"
-      poses[0].pose.position.y = .0015
-      poses[0].pose.position.z = .0253 + 0.0
-      poses[1].header.frame_id = "taskboard_part8"
-      poses[2].header.frame_id = "taskboard_part9"
-      poses[3].header.frame_id = "taskboard_part14"
+      poses[0].header.frame_id = "taskboard_corner2"
+      poses[1].header.frame_id = "taskboard_corner3"
+      # poses[1].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
+      poses[2].header.frame_id = "taskboard_part10"
+      
+    else:   # "Full" calibration of the board
+      if robot_name == "a_bot":
+        for i in range(4):
+          poses.append(copy.deepcopy(pose0))
 
-      self.cycle_through_calibration_poses(poses, robot_name, speed=0.3)
-    elif robot_name == "c_bot":
-      for i in range(4):
-        poses.append(copy.deepcopy(pose0))
+        poses[0].header.frame_id = "taskboard_part7_2"  # On top of the metal plate
+        poses[0].pose.position.y = .0015
+        poses[0].pose.position.z = .0253 + 0.0
+        poses[1].header.frame_id = "taskboard_part15"
+        poses[2].header.frame_id = "taskboard_part9"
+        poses[3].header.frame_id = "taskboard_part"
 
-      poses[0].header.frame_id = "taskboard_part8"
-      poses[1].header.frame_id = "taskboard_part9"
-      poses[2].header.frame_id = "taskboard_part14"
-      poses[3].header.frame_id = "taskboard_part5"
+      if robot_name == "b_bot":
+        for i in range(4):
+          poses.append(copy.deepcopy(pose0))
 
-      self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, move_lin = True)
+        poses[0].header.frame_id = "taskboard_part7_2"
+        poses[1].header.frame_id = "taskboard_part8"   # big nut
+        poses[2].header.frame_id = "taskboard_part"
+        poses[3].header.frame_id = "taskboard_part14"  # retainer pin
+    if poses:
+      self.cycle_through_calibration_poses(poses, robot_name, speed=speed, move_lin = move_lin)
     return
 
-  def taskboard_calibration_mat(self, extended = False, robot_name = "a_bot"):
+  def taskboard_mat_calibration(self, robot_name = "a_bot", context = "initial"):
     rospy.loginfo("============ Calibrating placement mat for the taskboard task. ============")
     rospy.loginfo("a_bot gripper tip should be 3 mm above the surface.")
     self.go_to_named_pose("home", "a_bot", speed=0.1)
@@ -349,14 +341,14 @@ class CalibrationClass(O2ASBaseRoutines):
     pose0.pose.orientation = self.a_bot_downward_orientation
     pose0.pose.position.z = .002
     
-    if not extended: 
+    if context == "initial": 
       for i in range(3):
         poses.append(copy.deepcopy(pose0))
       poses[0].header.frame_id = "mat_part15"
       poses[1].header.frame_id = "mat_part7_1"
       poses[2].header.frame_id = "mat_part3"
       self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, move_lin = True)
-    else:
+    elif context == "complete":
       pose0.pose.position.z = .005
       for i in range(16):
         poses.append(copy.deepcopy(pose0))
@@ -364,7 +356,6 @@ class CalibrationClass(O2ASBaseRoutines):
       poses[1].header.frame_id = "mat_part2"
       poses[2].header.frame_id = "mat_part3"
       poses[3].header.frame_id = "mat_part4"
-      poses[4].header.frame_id = "mat_part5"
       poses[5].header.frame_id = "mat_part6"
       poses[6].header.frame_id = "mat_part7_1"
       poses[7].header.frame_id = "mat_part7_2"
@@ -376,11 +367,29 @@ class CalibrationClass(O2ASBaseRoutines):
       poses[13].header.frame_id = "mat_part13"
       poses[14].header.frame_id = "mat_part14"
       poses[15].header.frame_id = "mat_part15"
-      # Go to above center of mat quickly
-      # above_mat = copy.deepcopy(pose0)
-      # above_mat.header.frame_id = "mat"
-      # above_
-      # self.go_to_pose_goal(robot_name, ,speed=.1, move_lin = True)
+    elif context == "competition":
+      if robot_name == "a_bot":
+        for i in range(16):
+          poses.append(copy.deepcopy(pose0))
+        # poses[1].header.frame_id = "mat_part2" # Retainer pin. b_bot?
+        poses[2].header.frame_id = "mat_part3"
+        poses[3].header.frame_id = "mat_part4"
+        poses[6].header.frame_id = "mat_part7_1"
+        poses[7].header.frame_id = "mat_part7_2"
+        poses[9].header.frame_id = "mat_part9"
+        poses[10].header.frame_id = "mat_part10"
+        poses[11].header.frame_id = "mat_part11"
+        poses[12].header.frame_id = "mat_part12"
+        poses[13].header.frame_id = "mat_part13"
+        poses[14].header.frame_id = "mat_part14"
+        poses[15].header.frame_id = "mat_part15"
+      elif robot_name == "b_bot":
+        for i in range(3):
+          poses.append(copy.deepcopy(pose0))
+        poses[0].header.frame_id = "mat_part1"
+        poses[1].header.frame_id = "mat_part6"
+        poses[2].header.frame_id = "mat_part8"
+        # poses[4].header.frame_id = "mat_part2" # Retainer pin. b_bot?
       self.cycle_through_calibration_poses(poses, robot_name, speed=0.05, go_home=False, move_lin=True)
     return 
 
@@ -1219,10 +1228,9 @@ if __name__ == '__main__':
       rospy.loginfo("13: Align c/b grippers part 1 (near board)")
       rospy.loginfo("14: Align c/b grippers part 2 (by holders)")
       rospy.loginfo("15: Align c/b grippers part 3 (high up)")
-      rospy.loginfo("2: Taskboard (a_bot)")
-      rospy.loginfo("21: Taskboard extended fun tour")
-      rospy.loginfo("211: Taskboard extended with b_bot")
-      rospy.loginfo("22: Placement mat (for the taskboard task)")
+      rospy.loginfo("2: Taskboard initial 3-point (a_bot)")
+      rospy.loginfo("211, 212: Taskboard full (a_bot, b_bot)")
+      rospy.loginfo("221, 222: Placement mat (a_bot, b_bot)")
       rospy.loginfo("23: Placement mat extended (for the taskboard task)")
       rospy.loginfo("231: Placement mat extended with b_bot")
       rospy.loginfo("24: a_bot gripper frame (rotate around EEF axis on taskboard)")
@@ -1322,17 +1330,21 @@ if __name__ == '__main__':
       elif r == '15':
         c.align_c_b(part=3)
       elif r == '2':
-        c.taskboard_calibration()
-      elif r == '21':
-        c.taskboard_calibration_extended()
+        c.taskboard_calibration(robot_name = "a_bot", context="initial")
       elif r == '211':
-        c.taskboard_calibration_extended("b_bot")
+        c.taskboard_calibration(robot_name = "a_bot", context="full")
+      elif r == '212':
+        c.taskboard_calibration(robot_name = "a_bot", context="full")
+      elif r == '221':
+        c.taskboard_mat_calibration(robot_name = "a_bot", context="full")
+      elif r == '222':
+        c.taskboard_mat_calibration(robot_name = "a_bot", context="full")
       elif r == '22':
-        c.taskboard_calibration_mat()
+        c.taskboard_mat_calibration()
       elif r == '23':
-        c.taskboard_calibration_mat(extended=True)
+        c.taskboard_mat_calibration(extended=True)
       elif r == '231':
-        c.taskboard_calibration_mat(extended=True, robot_name="b_bot")
+        c.taskboard_mat_calibration(extended=True, robot_name="b_bot")
       elif r == '24':
         c.gripper_frame_calibration()
       elif r == '3':

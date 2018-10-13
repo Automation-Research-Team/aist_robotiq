@@ -19,11 +19,18 @@
 
 
   <joint name="belt_placement_tool" type="fixed">
-    <parent link="taskboard"/>
+    <parent link="workspace_center"/>
     <child link="belt_placement_tool"/>
-    <origin rpy="0.0 0.0 0" xyz="-0.06 0.06 0"/>
+    <origin rpy="0.0 0.0 0" xyz="-.15 0.3 0"/>
   </joint>
   <link name="belt_placement_tool"/>
+
+  <joint name="retainer_pin_insertion_tool" type="fixed">
+    <parent link="workspace_center"/>
+    <child link="retainer_pin_insertion_tool"/>
+    <origin rpy="0.0 0.0 0" xyz="-0.1 0.3 0"/>
+  </joint>
+  <link name="retainer_pin_insertion_tool"/>
 
   <joint name="M10nut_tool" type="fixed">
     <parent link="taskboard"/>
