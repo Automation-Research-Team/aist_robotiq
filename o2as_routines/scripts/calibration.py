@@ -71,6 +71,8 @@ class CalibrationClass(O2ASBaseRoutines):
 
   def cycle_through_calibration_poses(self, poses, robot_name, speed=0.3, with_approach=False, move_lin=False, go_home=True, end_effector_link=""):
     home_pose = "home"
+    if "screw" in end_effector_link:
+      home_pose = "screw_ready"
       
     # rospy.loginfo("============ Moving " + robot_name + " to " + poses[0].header.frame_id)
     if with_approach:                 # To calculate the approach, we publish the target pose to TF
@@ -115,11 +117,11 @@ class CalibrationClass(O2ASBaseRoutines):
       if go_home:
         self.go_to_named_pose(home_pose, robot_name)
     
-    if go_home:
-      rospy.loginfo("Moving all robots home again.")
-      self.go_to_named_pose("home", "a_bot")
-      self.go_to_named_pose("home", "b_bot")
-      self.go_to_named_pose("home", "c_bot")
+    # if go_home:
+    #   rospy.loginfo("Moving all robots home again.")
+    #   self.go_to_named_pose("home", "a_bot")
+    #   self.go_to_named_pose("home", "b_bot")
+    #   self.go_to_named_pose("home", "c_bot")
     return
   
   def check_robot_calibration(self, position=""):
@@ -394,6 +396,28 @@ class CalibrationClass(O2ASBaseRoutines):
         # poses[4].header.frame_id = "mat_part2" # Retainer pin. b_bot?
       self.cycle_through_calibration_poses(poses, robot_name, speed=0.05, go_home=False, move_lin=True)
     return 
+
+  def taskboard_screw_tool_calibration(self, robot_name = "b_bot", end_effector_link=""):
+    rospy.loginfo("============ Taskboard calibration. ============")
+    rospy.loginfo("Robot will move to a point on the taskboard for checking tool and robot calibrations")
+    
+    poses = []
+    pose0 = geometry_msgs.msg.PoseStamped()
+    if "screw" in end_effector_link or "nut" in end_effector_link or "suction" in end_effector_link:
+      pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi*135/180, 0, 0))
+    else:
+      pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    move_lin = True
+
+    for i in range(2):
+      poses.append(copy.deepcopy(pose0))
+
+    poses[0].header.frame_id = "taskboard_part12"
+    poses[1].header.frame_id = "taskboard_part13"
+    speed = .05
+      
+    self.cycle_through_calibration_poses(poses, robot_name, end_effector_link=end_effector_link, speed=speed, move_lin = move_lin)
+    return
 
   def gripper_frame_calibration(self):
     rospy.loginfo("============ Calibrating the a_bot gripper tip frame for a_bot. ============")
@@ -1234,6 +1258,7 @@ if __name__ == '__main__':
       rospy.loginfo("23: Placement mat extended (for the taskboard task)")
       rospy.loginfo("231: Placement mat extended with b_bot")
       rospy.loginfo("24: a_bot gripper frame (rotate around EEF axis on taskboard)")
+      rospy.loginfo("241, 242: b_bot m4, m3 screw tools (go to screw poses)")
       rospy.loginfo("3: ===== KITTING TASK (no action)")
       rospy.loginfo("311, 312, 313: Set 1 partitions with a_bot, b_bot, c_bot")
       rospy.loginfo("314, 315: Set 1 partitions with suction_tool (b_bot), screw_tool_m4 (c_bot)")
@@ -1261,9 +1286,9 @@ if __name__ == '__main__':
       rospy.loginfo("58: Go to retainer pin holder with b_bot")
       rospy.loginfo("6: ===== TOOLS|  Go to screw_ready with c and b (a goes to back)")
       rospy.loginfo("611, 612: Go to screw holder with b_bot, c_bot")
-      rospy.loginfo("621, 622: Equip/unequip m4 tool (with b_bot)")
-      rospy.loginfo("623, 624 (625, 626): Equip/unequip m4 (m3) tool (with c_bot)")
-      rospy.loginfo("627, 628: Equip/unequip suction tool (with b_bot)")
+      rospy.loginfo("621, 622 (623, 624): Equip/unequip m4 (m3) tool (with b_bot)")
+      rospy.loginfo("625, 626 (627, 628): Equip/unequip m4 (m3) tool (with c_bot)")
+      rospy.loginfo("629, 6291: Equip/unequip suction tool (with b_bot)")
       rospy.loginfo("63, 64: Go to assembly base plate with m4 screw tool (b_bot, c_bot)")
       rospy.loginfo("641: Go to assembly base plate with m6 nut tool (c_bot; m6 nut tool has to be equipped)")
       rospy.loginfo("661: Go to all 3 trays' positions with m4 tool for c_bot (tool has to be equipped)")
@@ -1345,6 +1370,10 @@ if __name__ == '__main__':
         c.taskboard_mat_calibration(robot_name = "a_bot", context="complete")
       elif r == '231':
         c.taskboard_mat_calibration(extended=True, robot_name="b_bot")
+      elif r == '241':
+        c.taskboard_screw_tool_calibration(robot_name="b_bot", end_effector_link="b_bot_screw_tool_m4_tip_link")
+      elif r == '242':
+        c.taskboard_screw_tool_calibration(robot_name="b_bot", end_effector_link="b_bot_screw_tool_m3_tip_link")
       elif r == '3':
         rospy.loginfo("NOT YET IMPLEMENTED")
       elif r == '311':
@@ -1472,26 +1501,33 @@ if __name__ == '__main__':
         c.go_to_named_pose("back", "c_bot")
         c.do_change_tool_action("b_bot", equip=False, screw_size = 4)
       elif r == '623':
-        c.go_to_named_pose("back", "b_bot")
-        c.go_to_named_pose("tool_pick_ready", "c_bot")
-        c.do_change_tool_action("c_bot", equip=True, screw_size = 4)
+        c.go_to_named_pose("back", "c_bot")
+        c.go_to_named_pose("home", "b_bot")
+        c.do_change_tool_action("b_bot", equip=True, screw_size = 3)
       elif r == '624':
-        c.go_to_named_pose("back", "b_bot")
-        c.go_to_named_pose("tool_pick_ready", "c_bot")
-        c.do_change_tool_action("c_bot", equip=False, screw_size = 4)
+        c.go_to_named_pose("back", "c_bot")
+        c.do_change_tool_action("b_bot", equip=False, screw_size = 3)
       elif r == '625':
         c.go_to_named_pose("back", "b_bot")
         c.go_to_named_pose("tool_pick_ready", "c_bot")
-        c.do_change_tool_action("c_bot", equip=True, screw_size = 3)
+        c.do_change_tool_action("c_bot", equip=True, screw_size = 4)
       elif r == '626':
         c.go_to_named_pose("back", "b_bot")
         c.go_to_named_pose("tool_pick_ready", "c_bot")
-        c.do_change_tool_action("c_bot", equip=False, screw_size = 3)
+        c.do_change_tool_action("c_bot", equip=False, screw_size = 4)
       elif r == '627':
+        c.go_to_named_pose("back", "b_bot")
+        c.go_to_named_pose("tool_pick_ready", "c_bot")
+        c.do_change_tool_action("c_bot", equip=True, screw_size = 3)
+      elif r == '628':
+        c.go_to_named_pose("back", "b_bot")
+        c.go_to_named_pose("tool_pick_ready", "c_bot")
+        c.do_change_tool_action("c_bot", equip=False, screw_size = 3)
+      elif r == '629':
         c.go_to_named_pose("back", "c_bot")
         c.go_to_named_pose("home", "b_bot")
         c.do_change_tool_action("b_bot", equip=True, screw_size = 50)
-      elif r == '628':
+      elif r == '6291':
         c.go_to_named_pose("back", "c_bot")
         c.do_change_tool_action("b_bot", equip=False, screw_size = 50)
       elif r == '63':
