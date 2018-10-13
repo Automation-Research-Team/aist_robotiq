@@ -108,50 +108,62 @@ class TaskboardClass(O2ASBaseRoutines):
   ################ 
   ################ 
       
-  def belt_circle_motion(self, robot_name, speed = 0.02):
+  def belt_circle_motion(self, robot_name, speed = 0.02, go_fast = False, rotations = 1):
     self.toggle_collisions(collisions_on=False)
-    group = self.groups[robot_name]
-    rospy.loginfo("Performing belt spiral motion " + str(speed))
-    rospy.loginfo("Setting velocity scaling to " + str(speed))
-    group.set_max_velocity_scaling_factor(speed)
+    if go_fast:
+      self.send_gripper_command("a_bot", "close", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      speed_fast = 1.0
+      speed_slow = .01
+    else:
+      self.send_gripper_command("a_bot", "close")
+      speed_fast = .2
+      speed_slow = .02
     
-    if number == 1:
-      r_pulley=0.034
+    turning_around_large_pulley = True
+    if turning_around_large_pulley:
+      r_pulley=0.036
     else:
       r_pulley=0.019
 
     theta_offset = 90  # To adjust the starting angle
     theta_belt= 0 + theta_offset
-    theta_increase=20
+    theta_increase=40
 
     start_pose = geometry_msgs.msg.PoseStamped()
-    start_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    start_pose.header.frame_id = "taskboard_part6_large_pulley"
-    start_pose.pose.position.z = 0.07
+    start_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+    start_pose.header.frame_id = "workspace_center"
+    start_pose = self.listener.transformPose("taskboard_part6_large_pulley", start_pose)    
     start_pose.pose.position.x = cos(radians(theta_belt))*r_pulley
     start_pose.pose.position.y = sin(radians(theta_belt))*r_pulley
-    self.go_to_pose_goal(robot_name, start_pose, speed=0.5, move_lin=True)
-
     start_pose.pose.position.z = 0
-    self.go_to_pose_goal(robot_name, start_pose, speed=0.02, move_lin=True)
-    
-    next_pose = geometry_msgs.msg.PoseStamped()
-    next_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    next_pose.header.frame_id = "taskboard_part6_large_pulley"
-    while theta_belt <= 340+theta_offset and not rospy.is_shutdown():
-        #By default, the Spiral_Search function will maintain contact between both mating parts at all times
-         theta_belt=theta_belt+theta_increase
-         x=cos(radians(theta_belt))*r_pulley
-         y=sin(radians(theta_belt))*r_pulley
-         next_pose.pose.position.x = x
-         next_pose.pose.position.y = y
-         print(theta_belt)
-        #  print(radians(theta_belt))
-         print(cos(radians(theta_belt)))
-         print(cos(radians(theta_belt))*r_pulley)
-         print(next_pose.pose.position)
-         self.go_to_pose_goal(robot_name, next_pose, move_lin=True)
-         rospy.sleep(0.1)
+
+    approach_pose = copy.deepcopy(start_pose)
+    approach_pose.pose.position.z = 0.07
+    self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast, move_lin=True)
+    self.go_to_pose_goal(robot_name, start_pose, speed=speed_slow, move_lin=True)
+
+    rotation_count = 0
+    while rotation_count < rotations:
+      rotation_count += 1
+      theta_belt= 0 + theta_offset
+      next_pose = geometry_msgs.msg.PoseStamped()
+      next_pose.pose.orientation = start_pose.pose.orientation
+      next_pose.header.frame_id = "taskboard_part6_large_pulley"
+      while theta_belt <= 340+theta_offset and not rospy.is_shutdown():
+          #By default, the Spiral_Search function will maintain contact between both mating parts at all times
+          theta_belt=theta_belt+theta_increase
+          x=cos(radians(theta_belt))*r_pulley
+          y=sin(radians(theta_belt))*r_pulley
+          next_pose.pose.position.x = x
+          next_pose.pose.position.y = y
+          print(theta_belt)
+          #  print(radians(theta_belt))
+          print(cos(radians(theta_belt)))
+          print(cos(radians(theta_belt))*r_pulley)
+          print(next_pose.pose.position)
+          self.go_to_pose_goal(robot_name, next_pose, move_lin=True)
+      
+    self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast, move_lin=True)
     
     self.toggle_collisions(collisions_on=True)
     # -------------
@@ -459,10 +471,10 @@ class TaskboardClass(O2ASBaseRoutines):
       # b_pose.pose.position.x += 0.4
       # b_pose.pose.position.y += 0.4
       # self.go_to_pose_goal("b_bot", b_pose, speed=0.2, move_lin=True)
-      self.go_to_named_pose("discard_taskboard_tool","b_bot", speed=2.0, acceleration=2.0, force_ur_script=True)
+      self.go_to_named_pose("discard_taskboard_tool","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       self.send_gripper_command(gripper="b_bot", command="open")
       
-      self.go_to_named_pose("home","b_bot", speed=2.0, acceleration=2.0, force_ur_script=True)
+      self.go_to_named_pose("home","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
     if i == 3:   # Washer
       self.pick("a_bot",self.pick_poses[i-1],self.item_pick_heights[i-1],
@@ -490,87 +502,103 @@ class TaskboardClass(O2ASBaseRoutines):
       pass
 
     if i == 6: # Belt
-      self.go_to_named_pose("back", "c_bot")
+      self.go_to_named_pose("back", "c_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      self.go_to_named_pose("back", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       
       # Set the placement aid
-      self.go_to_named_pose("home", "b_bot")
+      self.go_to_named_pose("home", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       belt_tool_pick_pose = geometry_msgs.msg.PoseStamped()
       belt_tool_pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
       belt_tool_pick_pose.header.frame_id = "belt_placement_tool"
-      belt_tool_grasp_height = .11
-      self.pick("b_bot", belt_tool_pick_pose, grasp_height=belt_tool_grasp_height, speed_fast = 0.5, speed_slow = 0.1, gripper_command="close",
-                              approach_height = 0.05)
-      self.go_to_named_pose("home", "b_bot")
+      belt_tool_grasp_height = .011
+      self.send_gripper_command("b_bot", "open")
+      self.pick("b_bot", belt_tool_pick_pose, grasp_height=belt_tool_grasp_height, speed_fast = 0.8, speed_slow = 0.8, gripper_command="close",
+                              approach_height = 0.15)
+      
+      # self.go_to_named_pose("home", "b_bot")
 
       # TODO: Push on the bearing?
       
       belt_tool_place_pose = geometry_msgs.msg.PoseStamped()
       belt_tool_place_pose.header.frame_id = "taskboard_part6_small_pulley"
       belt_tool_place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-      belt_tool_place_pose.pose.position.y = .07
+      belt_tool_place_pose.pose.position.y = .045
       belt_tool_place_pose.pose.position.z = belt_tool_grasp_height + .002
 
       belt_tool_place_pose_approach = copy.deepcopy(belt_tool_place_pose)
-      belt_tool_place_pose.pose.position.z += .15
+      belt_tool_place_pose_approach.pose.position.z += .15
 
       self.move_lin("b_bot", belt_tool_place_pose_approach, speed=1.0)
       self.move_lin("b_bot", belt_tool_place_pose, speed=.3)
 
-      self.do_linear_push("b_bot", direction="Y-", force=3)
+      self.do_linear_push("b_bot", direction="X+", force=3, wait=True)
       self.send_gripper_command("b_bot", .01)
+      rospy.sleep(1.0)
       self.send_gripper_command("b_bot", "open")
       self.move_lin("b_bot", belt_tool_place_pose_approach, speed=1.0)
 
-      # self.place("b_bot", belt_tool_place_pose, place_height=grasp_height, speed_fast = 0.5, speed_slow = 0.05, gripper_command="open",
-      #                         approach_height = 0.03, lift_up_after_place = True)
-      
-      self.go_to_named_pose("taskboard_center_pose", "b_bot")
+      self.go_to_named_pose("taskboard_center_pose", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
       # Pick up the belt
       belt_pick_pose = copy.deepcopy(self.pick_poses[5])
       belt_pick_pose.pose.position.y += .055
       self.pick("b_bot", belt_pick_pose, grasp_height=.002,
-                      speed_fast = 0.2, speed_slow = 0.04, gripper_command="close")
-      self.go_to_named_pose("taskboard_center_pose", "b_bot")
+                      speed_fast = 0.8, speed_slow = 0.04, gripper_command="close")
+      self.go_to_named_pose("taskboard_center_pose", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
       # Place the belt
-      belt_place_pose = geometry_msgs.msg.PoseStamped()
-      belt_place_pose.header.frame_id = "taskboard_part6_large_pulley"
-      belt_place_pose.pose.position.x = 0.0
-      belt_place_pose.pose.position.y = .068
-      belt_place_pose.pose.position.z = .06 + .1
-      belt_place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-      self.go_to_pose_goal("b_bot", belt_place_pose, speed=0.3)
-      belt_place_pose.pose.position.z = .06
-      self.go_to_pose_goal("b_bot", belt_place_pose, speed=0.3)
+      belt_place_intermediate = geometry_msgs.msg.PoseStamped()
+      belt_place_intermediate.header.frame_id = "taskboard_part6_large_pulley"
+      belt_place_intermediate.pose.position.y = .068
+      belt_place_intermediate.pose.position.z = .04
+      belt_place_intermediate.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
 
-      # In large pulley frame
-      belt_place_pose.header.frame_id = "taskboard_part6_large_pulley"
-      belt_place_pose.pose.position.x = 0.0
-      belt_place_pose.pose.position.y = .01
-      belt_place_pose.pose.position.z = .0085
-      belt_place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-      self.go_to_pose_goal("b_bot", belt_place_pose, speed=0.1)
+      belt_place_approach = copy.deepcopy(belt_place_intermediate)
+      belt_place_approach.pose.position.z = .07
+      belt_place_approach_start = copy.deepcopy(belt_place_approach)
+      belt_place_approach_start.pose.position.y = .01
+      belt_place_approach_high = copy.deepcopy(belt_place_approach_start)
+      belt_place_approach_high.pose.position.z = .18
+
+      belt_place_pose_final = geometry_msgs.msg.PoseStamped()
+      belt_place_pose_final.header.frame_id = "taskboard_part6_large_pulley"
+      belt_place_pose_final.pose.position.y = .01
+      belt_place_pose_final.pose.position.z = .0085
+      belt_place_pose_final.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+
+      self.go_to_pose_goal("b_bot", belt_place_approach_high, speed=0.5)
+      self.go_to_pose_goal("b_bot", belt_place_approach_start, speed=0.3)
+      self.go_to_pose_goal("b_bot", belt_place_approach, speed=0.3)
+      self.go_to_pose_goal("b_bot", belt_place_intermediate, speed=0.3)
+      self.go_to_pose_goal("b_bot", belt_place_pose_final, speed=0.1)
       
       self.send_gripper_command(gripper="b_bot", command=.01)
       rospy.sleep(1)
       self.send_gripper_command(gripper="b_bot", command="open")
-      belt_place_pose.pose.position.z += .02
-      self.go_to_pose_goal("b_bot", belt_place_pose, speed=1.0)
-      rospy.sleep(1)
-      self.go_to_named_pose("back", "b_bot", wait=True)
+      belt_place_retreat = copy.deepcopy(belt_place_pose_final)
+      belt_place_retreat.pose.position.z += .03
+      self.go_to_pose_goal("b_bot", belt_place_retreat, speed=1.0)
+      self.go_to_named_pose("back", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
       # Fiddle in the belt
       rospy.logwarn("Doing belt spiral motion")
-      self.belt_circle_motion("a_bot")
-      self.go_to_named_pose("home", "a_bot", wait=True)
+      self.go_to_named_pose("home", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      self.belt_circle_motion("a_bot", rotations=2, go_fast=True)
+      self.go_to_named_pose("home", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
       # Remove the placement aid
       self.go_to_named_pose("taskboard_center_pose", "b_bot")
       self.pick("b_bot", belt_tool_place_pose, grasp_height=belt_tool_grasp_height, speed_fast = 1.0, speed_slow = 0.1, gripper_command="close",
                               approach_height = 0.15)
-      self.place("b_bot", belt_tool_place_pose, place_height=belt_tool_grasp_height+.002, speed_fast = 0.2, speed_slow = 0.03, gripper_command="open",
-                              approach_height = 0.03, lift_up_after_place = True)
+      
+      # Drop the tool
+      self.go_to_named_pose("discard_taskboard_tool","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      self.send_gripper_command(gripper="b_bot", command="open")
+      
+      self.go_to_named_pose("home","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      
+      # self.place("b_bot", belt_tool_place_pose, place_height=belt_tool_grasp_height+.002, speed_fast = 0.2, speed_slow = 0.03, gripper_command="open",
+      #                         approach_height = 0.03, lift_up_after_place = True)
 
     if i == 7:
       # Pick up M6 screw, arrange it in the gripper, and pick it with b_bot
@@ -719,10 +747,10 @@ class TaskboardClass(O2ASBaseRoutines):
       # Go back up
       self.go_to_pose_goal("b_bot", place_pose_high, speed=0.1, move_lin=True)
       # Drop the tool
-      self.go_to_named_pose("discard_taskboard_tool","b_bot", speed=2.0, acceleration=2.0, force_ur_script=True)
+      self.go_to_named_pose("discard_taskboard_tool","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       self.send_gripper_command(gripper="b_bot", command="open")
       
-      self.go_to_named_pose("home","b_bot", speed=2.0, acceleration=2.0, force_ur_script=True)
+      self.go_to_named_pose("home","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
     if i in [9, 10]:
       self.pick("a_bot",self.pick_poses[i-1],self.item_pick_heights[i-1], approach_height = 0.03,
@@ -1035,6 +1063,7 @@ if __name__ == '__main__':
       rospy.loginfo("Enter 32 to do m4 screw handover with b_bot")
       rospy.loginfo("Enter 40 to do a spiral motion with a_bot")
       rospy.loginfo("Enter 41 to do the belt circle motion with a_bot (this will not move to the pulley)")
+      rospy.loginfo("Enter 42 to do the belt circle motion with two rotations")
       rospy.loginfo("Enter 82 to pick part 4 and tilt gripper up")
       rospy.loginfo("Enter 91, 92,... 915 to perform part 1, 2,... 15")
       rospy.loginfo("Enter start to start the task")
@@ -1069,6 +1098,8 @@ if __name__ == '__main__':
         taskboard.horizontal_spiral_motion("a_bot", .05)
       if i == "41":
         taskboard.belt_circle_motion("a_bot")
+      if i == "42":
+        taskboard.belt_circle_motion("a_bot", rotations=2)
       if i == "82":
         taskboard.pick("a_bot",taskboard.pick_poses[3],taskboard.item_pick_heights[3]-0.026-0.06,
                                  speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",

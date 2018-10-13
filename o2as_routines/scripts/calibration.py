@@ -327,8 +327,10 @@ class CalibrationClass(O2ASBaseRoutines):
           poses.append(copy.deepcopy(pose0))
 
         poses[0].header.frame_id = "taskboard_part7_2"
+        poses[2].pose.position.x -= .01
         poses[1].header.frame_id = "taskboard_part8"   # big nut
-        poses[2].header.frame_id = "taskboard_part"
+        poses[2].header.frame_id = "taskboard_part6"
+        poses[2].pose.position.y = .07
         poses[3].header.frame_id = "taskboard_part14"  # small washer
     if poses:
       self.cycle_through_calibration_poses(poses, robot_name, speed=speed, move_lin = move_lin)
@@ -1361,7 +1363,7 @@ if __name__ == '__main__':
       elif r == '211':
         c.taskboard_calibration(robot_name = "a_bot", context="full")
       elif r == '212':
-        c.taskboard_calibration(robot_name = "a_bot", context="full")
+        c.taskboard_calibration(robot_name = "b_bot", context="full")
       elif r == '22':
         c.taskboard_mat_calibration(robot_name = "a_bot", context="initial")
       elif r == '221':
