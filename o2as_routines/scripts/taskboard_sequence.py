@@ -984,8 +984,9 @@ if __name__ == '__main__':
       rospy.loginfo("Enter 17, 18, 181 to equip/unequip/discard retainer pin guide tool")
       rospy.loginfo("Enter 191, 192 to equip/unequip m4 screw tool")
       rospy.loginfo("Enter 2 to move robots to home")
-      rospy.loginfo("Enter 3 to do belt circle motion with a_bot")
-      rospy.loginfo("Enter 4 to do m4 screw handover with b_bot")
+      # rospy.loginfo("Enter 3 to do belt circle motion with a_bot")
+      rospy.loginfo("Enter 31 to do m4 screw handover with b_bot")
+      rospy.loginfo("Enter 32 to do m4 screw handover with b_bot")
       rospy.loginfo("Enter 40 to do a spiral motion with a_bot")
       rospy.loginfo("Enter 41 to do the belt circle motion with a_bot (this will not move to the pulley)")
       rospy.loginfo("Enter 82 to pick part 4 and tilt gripper up")
@@ -1004,12 +1005,18 @@ if __name__ == '__main__':
         taskboard.do_change_tool_action("b_bot", equip=True, screw_size = 4)
       if i == "192":
         taskboard.do_change_tool_action("b_bot", equip=False, screw_size = 4)
+      if i == "193":
+        taskboard.do_change_tool_action("b_bot", equip=True, screw_size = 3)
+      if i == "194":
+        taskboard.do_change_tool_action("b_bot", equip=False, screw_size = 3)
       if i == "2":
         taskboard.go_to_named_pose("home","a_bot")
         taskboard.go_to_named_pose("home","b_bot")
         taskboard.go_to_named_pose("back","c_bot")
-      if i == "4":
+      if i == "31":
         taskboard.pick_screw_from_precision_gripper(screw_size=4, robot_name="b_bot")
+      if i == "32":
+        taskboard.pick_screw_from_precision_gripper(screw_size=3, robot_name="b_bot")
       if i == "50":
         taskboard.go_to_pose_goal("a_bot",  taskboard.pick_poses[0], "b_bot", taskboard.pick_poses[2])
       if i == "40":
