@@ -199,7 +199,7 @@ class O2ASBaseRoutines(object):
         speed = self.reduced_mode_speed_limit
     if move_lin:
       return self.move_lin(group_name, pose_goal_stamped, speed, acceleration, end_effector_link)
-    # self.publish_marker(pose_goal_stamped, "pose")
+    self.publish_marker(pose_goal_stamped, "pose")
     group = self.groups[group_name]
     
     if not end_effector_link:
@@ -760,7 +760,7 @@ class O2ASBaseRoutines(object):
       goal = robotiq_msgs.msg.CModelCommandGoal()
       action_client = self.gripper_action_clients[gripper]
       goal.velocity = velocity   # from 0.013 to 0.1
-      goal.force = force
+      goal.force = force         # from 40 to 100?
       if command == "close":
         goal.position = 0.0
       elif command == "open":
@@ -774,15 +774,17 @@ class O2ASBaseRoutines(object):
       except:
         pass
 
-    if command == "open" and gripper == "b_bot":    # This intermediate opening may fix the driver issues in b_bot
-      rospy.loginfo("Sending intermediate b_bot gripper opening")
-      goal.position = 0.06
-      action_client.send_goal(goal)
-      action_client.wait_for_result(rospy.Duration(3.0))
-      rospy.loginfo("Sending second b_bot gripper opening")
-      goal.position = 0.085
+    # if command == "open" and gripper == "b_bot":    # This intermediate opening may fix the driver issues in b_bot
+    #   rospy.loginfo("Sending intermediate b_bot gripper opening")
+    #   goal.position = 0.06
+    #   action_client.send_goal(goal)
+    #   rospy.sleep(.5)
+    #   action_client.wait_for_result(rospy.Duration(3.0))
+    #   rospy.loginfo("Sending second b_bot gripper opening")
+    #   goal.position = 0.085
 
     action_client.send_goal(goal)
+    rospy.sleep(.5)
     rospy.loginfo("Sending command " + str(command) + " to gripper: " + gripper)
     action_client.wait_for_result(rospy.Duration(6.0))  # Default wait time: 6 s
     result = action_client.get_result()
@@ -1120,6 +1122,7 @@ class O2ASBaseRoutines(object):
       rospy.loginfo("Error.")
       return False
     return orientation, required_intermediate_pose
+    
     
     
     

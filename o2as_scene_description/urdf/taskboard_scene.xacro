@@ -21,7 +21,7 @@
   <joint name="belt_placement_tool" type="fixed">
     <parent link="workspace_center"/>
     <child link="belt_placement_tool"/>
-    <origin rpy="0.0 0.0 0" xyz="-.15 0.3 0"/>
+    <origin rpy="0.0 0.0 0" xyz="-.2 0.3 0"/>
   </joint>
   <link name="belt_placement_tool"/>
 
@@ -38,13 +38,6 @@
     <origin rpy="0.0 0.0 0" xyz="-0.06 0.46 0"/>
   </joint>
   <link name="M10nut_tool"/>
-
-  <joint name="peg_tool" type="fixed">
-    <parent link="taskboard"/>
-    <child link="peg_tool"/>
-    <origin rpy="0.0 0.0 0" xyz="-0.06 0.56 0"/>
-  </joint>
-  <link name="peg_tool"/>
 
   <joint name="taskboard_set_screw_tool_joint" type="fixed">
     <parent link="taskboard"/>
