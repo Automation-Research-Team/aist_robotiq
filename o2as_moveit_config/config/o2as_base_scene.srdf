@@ -416,6 +416,14 @@
         <joint name="b_bot_wrist_2_joint" value="-1.57" />
         <joint name="b_bot_wrist_3_joint" value="0" />
     </group_state>
+    <group_state name="screw_handover_retreat" group="a_bot">
+        <joint name="a_bot_elbow_joint" value="2.482" />
+        <joint name="a_bot_shoulder_lift_joint" value="-1.4927" />
+        <joint name="a_bot_shoulder_pan_joint" value="2.1175" />
+        <joint name="a_bot_wrist_1_joint" value="-3.7143" />
+        <joint name="a_bot_wrist_2_joint" value="-1.9116" />
+        <joint name="a_bot_wrist_3_joint" value="1.5707" />
+    </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="c_bot_gripper" parent_link="c_bot_robotiq_85_tip_link" group="c_bot" />
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->

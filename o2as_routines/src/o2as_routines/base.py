@@ -846,14 +846,13 @@ class O2ASBaseRoutines(object):
     except rospy.ROSInterruptException:
         rospy.loginfo("program interrupted before completion", file=sys.stderr)
   
-  def precision_gripper_inner_open_slightly(self, this_action_grasps_an_object = False, open_range = 30):
+  def precision_gripper_inner_open_slightly(self, open_range = 30):
     try:
       action_client = self.gripper_action_clients["a_bot"]
       goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
       goal.open_inner_gripper_slightly = True
       goal.open_inner_gripper_fully = False
       goal.close_inner_gripper_fully = False
-      goal.this_action_grasps_an_object = this_action_grasps_an_object
       goal.slight_opening_width = open_range
       self.gripper_action_clients["a_bot"].send_goal(goal)
       rospy.loginfo("Opening inner gripper slightly")
@@ -929,26 +928,34 @@ class O2ASBaseRoutines(object):
       return False
     
     # Turn to the right to face the feeders
-    self.go_to_named_pose("screw_ready", robot_name, force_ur_script=self.use_real_robot)
-
+    self.go_to_named_pose("back", "c_bot", force_ur_script=self.use_real_robot)
     self.go_to_named_pose("screw_handover", "a_bot", force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("screw_ready", robot_name, force_ur_script=self.use_real_robot)
+    
     # ATTENTION: MAGIC NUMBERS
-    magic_y_offset = .004
-    magic_z_offset = -.008
+    if robot_name == "c_bot":
+      magic_y_offset = .004
+      magic_z_offset = -.008
+    elif robot_name == "b_bot":
+      magic_y_offset = .004
+      magic_z_offset = -0.008
 
     pick_pose = geometry_msgs.msg.PoseStamped()
     pick_pose.header.frame_id = "a_bot_gripper_screw_pickup"
-    pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/6, 0, 0))
+    if robot_name == "b_bot":
+      pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi*5/4, 0, 0))
+    elif robot_name == "c_bot":
+      pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/6, 0, 0))
     pick_pose.pose.position.y = magic_y_offset
     pick_pose.pose.position.z = magic_z_offset
     self.publish_marker(pick_pose, "pose")
     
-    if robot_name == "b_bot":
-      pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(5*pi/6, 0, 0))
     prep_pose = copy.deepcopy(pick_pose)
     prep_pose.pose.position.x = -0.03
     prep_pose.pose.position.y = -0.06
     self.publish_marker(prep_pose, "pose")
+
+    self.toggle_collisions(False)
 
     self.move_lin(robot_name, prep_pose, .2, end_effector_link=str(robot_name)+"_screw_tool_m"+str(screw_size)+"_tip_link")
     prep_pose.pose.position.y = magic_y_offset
@@ -967,13 +974,23 @@ class O2ASBaseRoutines(object):
       screw_picked = bool_msg.data
       if screw_picked:
         rospy.loginfo("Successfully picked the screw")
-        return True
+        break
       if not self.use_real_robot:
         rospy.loginfo("Pretending the screw is picked, because this is simulation.")
-        return True
+        break
       attempt += 1
+    
 
-    return False
+    if screw_picked:
+      self.send_gripper_command("a_bot", "open")
+      self.go_to_named_pose("screw_handover_retreat", "a_bot")
+    else: # Did not pick screw
+      pass
+      # self.send_gripper_command("a_bot", "close")
+      # self.move_lin(robot_name, prep_pose, .2, end_effector_link=str(robot_name)+"_screw_tool_m"+str(screw_size)+"_tip_link")
+
+    self.toggle_collisions(True)
+    return screw_picked
 
   def set_feeder_power(self, turn_on=True):
     if not self.use_real_robot:
