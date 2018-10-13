@@ -52,6 +52,7 @@ class PrecisionGripperAction:
         self.inner_open_motor_position = rospy.get_param(name + "/inner_open_motor_position", 2500)
         self.inner_close_motor_position = rospy.get_param(name + "/inner_close_motor_position", 2222)
         self.inner_slight_open = rospy.get_param(name + "/inner_slight_open", 70)
+        self.inner_opensilghtly_motor_position = rospy.get_param(name + "/inner_opensilghtly_motor_position", 2200)
         rospy.loginfo("inner_open_motor_position = " + str(self.inner_open_motor_position))
 
         # Define the action
@@ -97,7 +98,8 @@ class PrecisionGripperAction:
             if goal.slight_opening_width:
                 steps = int(goal.slight_opening_width)
             else:
-                steps = self.inner_slight_open
+                rospy.loginfo("Using default slight_open range of " + str(self.inner_slight_open) + " steps")
+                steps = int(self.inner_slight_open)
             rospy.loginfo("inner gripper open slightly, by " + str(steps) + " steps")
             command_is_sent = self.inner_gripper_open_slightly(steps)
 
@@ -242,7 +244,6 @@ class PrecisionGripperAction:
             self.p1.set_positive_direction("cw")
             self.p1.set_current(current)
             self.p1.set_goal_position(self.inner_close_motor_position)
-            rospy.logerr(self.inner_close_motor_position)
             rospy.sleep(0.1)
             return True
         except:
@@ -257,12 +258,29 @@ class PrecisionGripperAction:
             print("Target position: " + str(current_position))
             self.p1.set_operating_mode("currentposition")
             self.p1.set_positive_direction("cw")
-            self.p1.set_current(current)
+            self.p1.set_current(10)
             self.p1.set_goal_position(current_position)
             rospy.sleep(0.1)
             return True
         except:
-            rospy.logerr("Failed to run commands.")
+            rospy.logerr("What????")
+            return False
+
+    # def inner_gripper_open_slightly(self, current):
+    #     try:
+    #         # current_position = self.p1.read_current_position()
+    #         # sign = signum(self.inner_open_motor_position - self.inner_close_motor_position)
+    #         # current_position = int(current_position + sign*open_range)
+    #         # print("Target position: " + str(current_position))
+    #         self.p1.set_operating_mode("currentposition")
+    #         self.p1.set_positive_direction("cw")
+    #         self.p1.set_current(10)
+    #         # self.p1.set_goal_position(current_position)
+    #         self.p1.set_goal_position(self.inner_opensilghtly_motor_position)
+    #         rospy.sleep(0.1)
+    #         return True
+    #     except:
+    #         rospy.logerr("Failed to run commands.")
 
     def inner_gripper_disable_torque(self):
         try:
