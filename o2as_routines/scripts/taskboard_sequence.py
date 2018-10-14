@@ -299,29 +299,32 @@ class TaskboardClass(O2ASBaseRoutines):
       taskboard.go_to_named_pose("set_screw_intermediate_pose", "b_bot")
 
   def equip_unequip_belt_tool(self, equip=True):
-    pick_up_set_screw_tool_pose = geometry_msgs.msg.PoseStamped()
-    pick_up_set_screw_tool_pose.header.frame_id = "taskboard_set_screw_tool_link"
-    pick_up_set_screw_tool_pose.pose.position.x = -.005
-    pick_up_set_screw_tool_pose.pose.orientation.w = 1.0
+    self.go_to_named_pose("home", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    belt_tool_pick_pose = geometry_msgs.msg.PoseStamped()
+    belt_tool_pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    belt_tool_pick_pose.header.frame_id = "belt_placement_tool"
+    belt_tool_pick_pose.pose.position.z = .011
+    
+    belt_tool_approach = copy.deepcopy(belt_tool_pick_pose)
+    belt_tool_approach.pose.position.z += .1
+    
     if equip: # Pick up tool
-      taskboard.send_gripper_command(gripper="b_bot", command="open")
-      taskboard.go_to_pose_goal("b_bot", pick_up_set_screw_tool_pose, speed=0.06, move_lin=True)
-      taskboard.send_gripper_command(gripper="b_bot", command="close")
-      print("Press enter to proceed.")
-      inp = raw_input()
-      pick_up_set_screw_tool_pose.pose.position.x -= .03
-      taskboard.go_to_pose_goal("b_bot", pick_up_set_screw_tool_pose, speed=0.04, move_lin=True)
-      pick_up_set_screw_tool_pose.pose.position.x += .03
-      taskboard.go_to_named_pose("set_screw_intermediate_pose", "b_bot")
-    elif not equip: # Place tool
-      pick_up_set_screw_tool_pose.pose.position.x -= .01
-      taskboard.go_to_pose_goal("b_bot", pick_up_set_screw_tool_pose, speed=0.04, move_lin=True)
-      pick_up_set_screw_tool_pose.pose.position.x += .01
-      taskboard.send_gripper_command(gripper="b_bot", command="open")
-      pick_up_set_screw_tool_pose.pose.position.x -= .06
-      taskboard.go_to_pose_goal("b_bot", pick_up_set_screw_tool_pose, speed=0.06, move_lin=True)
-      pick_up_set_screw_tool_pose.pose.position.x += .06
-      taskboard.go_to_named_pose("set_screw_intermediate_pose", "b_bot")
+      self.send_gripper_command("b_bot", "open")
+    
+    taskboard.go_to_pose_goal("b_bot", belt_tool_approach, speed=0.1, move_lin=True)
+    taskboard.go_to_pose_goal("b_bot", belt_tool_pick_pose, speed=0.1, move_lin=True)
+
+    if equip:
+      self.send_gripper_command("b_bot", "close")
+    else:
+      self.send_gripper_command("b_bot", "open")
+    
+    print("Press enter to move back up.")
+    inp = raw_input()
+    if rospy.is_shutdown():
+      return
+    
+    taskboard.go_to_pose_goal("b_bot", belt_tool_approach, speed=0.1, move_lin=True)
 
   def do_task_number(self, i):
     if i == 1: 
@@ -677,6 +680,8 @@ class TaskboardClass(O2ASBaseRoutines):
       # self.go_to_named_pose("taskboard_screw_tool_horizontal_approach", "b_bot")  #TODO
       rospy.logerr("Is the intermediate pose for the screw tool set up?")
       raw_input()
+      if rospy.is_shutdown():
+        return
       screw_tool_hold = geometry_msgs.msg.PoseStamped()
       screw_tool_hold.header.frame_id = "taskboard_part7_1"
       screw_tool_hold.pose.orientation.w = 1.0
@@ -1134,7 +1139,7 @@ if __name__ == '__main__':
       rospy.loginfo("Enter 17, 18, 181 to equip/unequip/discard retainer pin guide tool")
       rospy.loginfo("Enter 191, 192 to equip/unequip m4 screw tool")
       rospy.loginfo("Enter 2 to move robots to home")
-      # rospy.loginfo("Enter 3 to do belt circle motion with a_bot")
+      rospy.loginfo("Enter 21, 22 to move b_bot to set_screw_insert_pose / screw_ready")
       rospy.loginfo("Enter 31 to do m4 screw handover with b_bot")
       rospy.loginfo("Enter 32 to do m4 screw handover with b_bot")
       rospy.loginfo("Enter 40 to do a spiral motion with a_bot")
@@ -1149,9 +1154,24 @@ if __name__ == '__main__':
       if i == "start":
         taskboard.full_taskboard_task()
       if i == "11":
-        taskboard.equip_unequip_set_screw_tool(equip=True)
+        # taskboard.equip_unequip_set_screw_tool(equip=True)
+        taskboard.do_change_tool_action("b_bot", equip=True, screw_size = 1)
       if i == "12":
-        taskboard.equip_unequip_set_screw_tool(equip=False)
+        taskboard.do_change_tool_action("b_bot", equip=False, screw_size = 1)
+      if i == "15":
+        taskboard.equip_unequip_belt_tool(equip=True)
+      if i == "16":
+        taskboard.equip_unequip_belt_tool(equip=False)
+      if i == "17":
+        tool_pickup_pose = geometry_msgs.msg.PoseStamped()
+        tool_pickup_pose.header.frame_id = "retainer_pin_insertion_tool"
+        tool_pickup_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+        tool_pickup_pose.pose.position.z = 0.03
+        taskboard.go_to_pose_goal("b_bot", tool_pickup_pose, speed=.1)
+        # tool_grasped_height = 0.03
+        # self.pick("b_bot",tool_pickup_pose, tool_grasped_height,
+        #                     speed_fast = 1.0, speed_slow = 0.5, gripper_command="close",
+        #                     approach_height = 0.1)
       if i == "191":
         taskboard.do_change_tool_action("b_bot", equip=True, screw_size = 4)
       if i == "192":
@@ -1164,6 +1184,10 @@ if __name__ == '__main__':
         taskboard.go_to_named_pose("home","a_bot")
         taskboard.go_to_named_pose("home","b_bot")
         taskboard.go_to_named_pose("back","c_bot")
+      if i == "21":
+        taskboard.go_to_named_pose("set_screw_insert_pose", "b_bot")
+      if i == "22":
+        taskboard.go_to_named_pose("screw_ready", "b_bot")
       if i == "31":
         taskboard.pick_screw_from_precision_gripper(screw_size=4, robot_name="b_bot")
       if i == "32":
