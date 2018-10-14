@@ -66,6 +66,12 @@ class AssemblyClass(O2ASBaseRoutines):
     self.idler_pin_handover_offset_y = 0.0
     self.idler_pin_handover_offset_z = 0.0
 
+    # Initialize debug monitor
+    self.start_task_timer()
+    self.log_to_debug_monitor(text="Inizialize", category="task")
+    self.log_to_debug_monitor(text="Inizialize", category="subtask")
+    self.log_to_debug_monitor(text="Inizialize", category="operation")
+
   def set_up_item_parameters(self):
     # TODO: Publish the items to the scene, or do something equivalent. 
     self.item_names = []
@@ -343,6 +349,7 @@ class AssemblyClass(O2ASBaseRoutines):
   
   def place_plate_3_and_screw(self, place_plate_only=False, screw_first_only=False, reverse_placement_only=False):
     # Requires the screw tool to be equipped on b_bot
+    self.log_to_debug_monitor("Home position", "operation")
     self.go_to_named_pose("back", "c_bot")
     self.go_to_named_pose("back", "a_bot")
     self.go_to_named_pose("screw_ready_back", "b_bot")
@@ -374,6 +381,7 @@ class AssemblyClass(O2ASBaseRoutines):
       ps_hold.pose.position.y += .02
 
       if reverse_placement_only: # This is for finding the right initial pose of the plate
+        self.log_to_debug_monitor("Find the right initial pose of the plate", "operation")
         self.go_to_named_pose("home", "c_bot")
         self.send_gripper_command("c_bot", "close")
         self.move_lin("c_bot", ps_move_away, 1.0)
@@ -394,6 +402,7 @@ class AssemblyClass(O2ASBaseRoutines):
       rospy.sleep(1)
 
     # Pick up screw while the plate is grasped, so the cable does not interfere
+    self.log_to_debug_monitor("Pickup screw", "operation")
     if not place_plate_only:
       self.go_to_named_pose("screw_pick_ready", "b_bot")
       self.pick_screw("b_bot", screw_size=4, screw_number=1)
@@ -401,6 +410,7 @@ class AssemblyClass(O2ASBaseRoutines):
 
     if not screw_first_only:
       # Deliver the plate to its assembled position
+      self.log_to_debug_monitor("Driver the plate", "operation")
       self.move_lin("c_bot", ps_high, 1.0)
       self.move_lin("c_bot", ps_place, .2)
       self.send_gripper_command("c_bot", 0.008)
@@ -416,6 +426,7 @@ class AssemblyClass(O2ASBaseRoutines):
 
     ###### ==========
     # Move b_bot to the first hole and screw
+    self.log_to_debug_monitor("Screw the plate", "operation")
     self.go_to_named_pose("screw_plate_ready", "b_bot")
     if not screw_first_only:
       self.move_lin("c_bot", ps_hold, .1)    # Move c_bot to the plate so it does not move too much
@@ -436,6 +447,7 @@ class AssemblyClass(O2ASBaseRoutines):
     if not screw_first_only:
       ###### ========== 
       # Recenter the plate with c_bot and then move away
+      self.log_to_debug_monitor("Recenter the plate with c_bot and then move away", "operation")
       self.send_gripper_command("c_bot", "open")
       rospy.sleep(1.0)
       self.send_gripper_command("c_bot", "close")
@@ -448,7 +460,7 @@ class AssemblyClass(O2ASBaseRoutines):
 
       ##### ========== Pick another screw with b_bot and fix the plate
       # Pick up screw from tray
-      
+      self.log_to_debug_monitor("Pick up screw from tray", "operation")
       self.go_to_named_pose("screw_pick_ready", "b_bot")
       self.pick_screw("b_bot", screw_size=4, screw_number=2)
       self.go_to_named_pose("screw_pick_ready", "b_bot")
@@ -473,6 +485,7 @@ class AssemblyClass(O2ASBaseRoutines):
 
     ### --- b_bot
     # Pick first screw with b_bot
+    self.log_to_debug_monitor("Pick up screw with b_bot", "operation")
     self.go_to_named_pose("screw_pick_ready", "b_bot")
     self.pick_screw("b_bot", screw_size=4, screw_number=3)
     self.go_to_named_pose("screw_pick_ready", "b_bot")
@@ -480,7 +493,8 @@ class AssemblyClass(O2ASBaseRoutines):
 
     ### --- c_bot
     # Place plate and hold
-    rospy.loginfo("Going to pick up and place motor plate with c_bot")
+    # rospy.loginfo("Going to pick up and place motor plate with c_bot")
+    self.log_to_debug_monitor("Pick up and place motor plate with c_bot", "operation")
     self.go_to_named_pose("home", "c_bot")
     self.send_gripper_command("c_bot", "open")
     ps_approach = geometry_msgs.msg.PoseStamped()
@@ -523,6 +537,7 @@ class AssemblyClass(O2ASBaseRoutines):
     
     ### --- b_bot
     # Fasten motor plate with first screw
+    self.log_to_debug_monitor("Fasten motor plate with first screw", "operation")
     self.go_to_named_pose("screw_plate_ready", "b_bot")
     pscrew = geometry_msgs.msg.PoseStamped()
     pscrew.header.frame_id = "assembled_assy_part_02_bottom_screw_hole_1"
@@ -536,7 +551,8 @@ class AssemblyClass(O2ASBaseRoutines):
     self.move_lin("b_bot", pscrew_approach, speed=0.1, acceleration=0.1, end_effector_link="b_bot_screw_tool_m4_tip_link")
     self.go_to_named_pose("screw_plate_ready", "b_bot")
 
-    # Pick second screw 
+    # Pick second screw
+    self.log_to_debug_monitor("Pick up second screw", "operation")
     self.go_to_named_pose("screw_pick_ready", "b_bot")
     self.pick_screw("b_bot", screw_size=4, screw_number=4)
     self.go_to_named_pose("screw_pick_ready", "b_bot")
@@ -544,6 +560,7 @@ class AssemblyClass(O2ASBaseRoutines):
 
     ### --- c_bot
     # Recenter the motor plate
+    self.log_to_debug_monitor("Recenter motor plate", "operation")
     ps_recenter = copy.deepcopy(ps_place)
     ps_recenter.pose.position.y -= .03
     self.send_gripper_command("c_bot", "open")
@@ -557,6 +574,7 @@ class AssemblyClass(O2ASBaseRoutines):
 
     ### --- b_bot
     # Fasten motor plate with second screw
+    self.log_to_debug_monitor("Fasten motor plate with second screw", "operation")
     self.go_to_named_pose("screw_plate_ready", "b_bot")
     pscrew_2 = geometry_msgs.msg.PoseStamped()
     pscrew_2.header.frame_id = "assembled_assy_part_02_bottom_screw_hole_2"
@@ -573,7 +591,8 @@ class AssemblyClass(O2ASBaseRoutines):
   # ============================================ IDLER PIN SUBTASK
   
   def pick_retainer_pin_from_tray_and_place_in_holder(self, do_centering=False):
-    rospy.loginfo("============ Pick up the retainer pin using b_bot ============")
+    # rospy.loginfo("============ Pick up the retainer pin using b_bot ============")
+    self.log_to_debug_monitor("Pick up the retainer pin using b_bot", "operation")
     self.go_to_named_pose("back", "a_bot")
     self.go_to_named_pose("home", "b_bot")
 
@@ -596,7 +615,8 @@ class AssemblyClass(O2ASBaseRoutines):
 
     
   def pick_retainer_pin_from_holder(self):
-    rospy.loginfo("============ Pick up the retainer pin from holder using b_bot ============")
+    # rospy.loginfo("============ Pick up the retainer pin from holder using b_bot ============")
+    self.log_to_debug_monitor("Pick up the retainer pin from holder using b_bot", "operation")
     self.go_to_named_pose("back", "a_bot")
     self.go_to_named_pose("home", "b_bot")
     self.send_gripper_command("b_bot", "open")
@@ -610,7 +630,8 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def rotate_hand_facing_the_sky(self):
-    rospy.loginfo("============ making b_bot end effector face the sky ============")
+    # rospy.loginfo("============ making b_bot end effector face the sky ============")
+    self.log_to_debug_monitor("Making b_bot end effector face the sky", "operation")
     #self.go_to_named_pose("home", "b_bot")
     self.groups["b_bot"].set_joint_value_target([1.75, -1.24, 1.28, -0.00, 0.23, -1.55])
     self.groups["b_bot"].set_max_velocity_scaling_factor(.3)
@@ -629,8 +650,8 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def pick_retainer_pin_spacer(self, robot_name = "a_bot"):
-    rospy.loginfo("============ Picking up a retainer pin spacer using a_bot ============")
-
+    # rospy.loginfo("============ Picking up a retainer pin spacer using a_bot ============")
+    self.log_to_debug_monitor("Picking up a retainer pin spacer using a_bot", "operation")
     self.go_to_named_pose("home", robot_name)
 
     pose0 = geometry_msgs.msg.PoseStamped()
@@ -676,8 +697,8 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def pick_idle_pulley(self, robot_name = "a_bot"):
-    rospy.loginfo("============ Picking up the idle pulley using a_bot ============")
-
+    # rospy.loginfo("============ Picking up the idle pulley using a_bot ============")
+    self.log_to_debug_monitor("Picking up the idle pulley using a_bot", "operation")
     self.go_to_named_pose("home", robot_name)
 
     pose0 = geometry_msgs.msg.PoseStamped()
@@ -717,6 +738,7 @@ class AssemblyClass(O2ASBaseRoutines):
       rospy.loginfo("doing spiral motion")
 
     # Push the pulley down, in case it got stuck
+    self.log_to_debug_monitor("Push the pulley down", "operation")
     push_down_pose_1 = copy.deepcopy(intermediate_retainer_pin_tip)
     push_down_pose_1.pose.position.x = -0.02
     push_down_pose_2 = copy.deepcopy(push_down_pose_1)
@@ -734,8 +756,8 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def pick_retainer_pin_nut(self):
-    rospy.loginfo("============ Picking up the retainer pin nut using a_bot ============")
-
+    # rospy.loginfo("============ Picking up the retainer pin nut using a_bot ============")
+    self.log_to_debug_monitor("Picking up the retainer pin nut using a_bot", "operation")
     self.go_to_named_pose("home", "a_bot")
 
     pose0 = geometry_msgs.msg.PoseStamped()
@@ -775,7 +797,8 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def pick_retainer_pin_washer_2(self):
-    rospy.loginfo("============ Picking up the retainer pin washer 1 using a_bot ============")
+    # rospy.loginfo("============ Picking up the retainer pin washer 1 using a_bot ============")
+    self.log_to_debug_monitor("Picking up the retainer pin washer 1 using a_bot", "operation")
 
     self.go_to_named_pose("home", "a_bot")
 
@@ -793,8 +816,8 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def pick_retainer_pin_washer_1(self):
-    rospy.loginfo("============ Picking up the retainer pin washer 2 using a_bot ============")
-
+    # rospy.loginfo("============ Picking up the retainer pin washer 2 using a_bot ============")
+    self.log_to_debug_monitor("Picking up the retainer pin washer 2 using a_bot", "operation")
     self.go_to_named_pose("home", "a_bot")
 
     pose0 = geometry_msgs.msg.PoseStamped()
@@ -889,7 +912,8 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def insert_retainer_pin_to_base(self):
-    rospy.loginfo("============ inserting retainer pin to the base plate ============")
+    # rospy.loginfo("============ inserting retainer pin to the base plate ============")
+    self.log_to_debug_monitor("Insert retainer pin to the base plate", "operation")
     self.go_to_named_pose("home", "a_bot")
     self.go_to_named_pose("home", "c_bot")
     
@@ -923,6 +947,7 @@ class AssemblyClass(O2ASBaseRoutines):
     return
   
   def hold_idle_pulley_with_a_bot(self):
+    self.log_to_debug_monitor("Hold idel pulley with a_bot", "operation")
     self.go_to_named_pose("home", "a_bot")
     hold_pose_approach = geometry_msgs.msg.PoseStamped()
     hold_pose_approach.header.frame_id = "assembled_assy_part_14_screw_head"
@@ -944,6 +969,7 @@ class AssemblyClass(O2ASBaseRoutines):
     return
   
   def release_and_push_with_b_bot(self):
+    self.log_to_debug_monitor("Release and push with b_bot", "operation")
     self.send_gripper_command("b_bot", "close")
     rospy.sleep(1.0)
     self.send_gripper_command("b_bot", "open")
@@ -972,6 +998,7 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def release_idle_pulley_from_a_bot(self):
+    self.log_to_debug_monitor("Release idle pulley from a_bot", "operation")
     assembled_retainer_pin_head_retreat = geometry_msgs.msg.PoseStamped()
     assembled_retainer_pin_head_retreat.header.frame_id = "assembled_assy_part_14_screw_head"
     assembled_retainer_pin_head_retreat.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
@@ -1266,7 +1293,8 @@ class AssemblyClass(O2ASBaseRoutines):
     self.send_gripper_command("b_bot", 0.015)
 
   def pick_shaft_spacer(self):
-    rospy.loginfo("============ Picking up a retainer pin using b_bot ============")
+    # rospy.loginfo("============ Picking up a retainer pin using b_bot ============")
+    self.log_to_debug_monitor("Picking up a retainer pin using b_bot", "operation")
 
     self.go_to_named_pose("home", "b_bot")
 
@@ -1280,6 +1308,7 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def insert_shaft_spacer(self):
+    self.log_to_debug_monitor("Insert shaft spacer", "operation")
     pre_insertion = geometry_msgs.msg.PoseStamped()
     pre_insertion.header.frame_id = "assembled_assy_part_11_front_hole"
     pre_insertion.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
@@ -1297,6 +1326,7 @@ class AssemblyClass(O2ASBaseRoutines):
   # =================
 
   def pick_motor(self):
+    self.log_to_debug_monitor("Pick motor", "operation")
     self.go_to_named_pose("home", "b_bot")
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "tray_1_partition_4"
@@ -1310,6 +1340,7 @@ class AssemblyClass(O2ASBaseRoutines):
     return
   
   def handover_motor(self):
+    self.log_to_debug_monitor("Handover motor", "operation")
     pose1 = geometry_msgs.msg.PoseStamped()
     pose1.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, -pi/2, 0))
     pose1.header.frame_id = "b_bot_robotiq_85_tip_link"
@@ -1337,6 +1368,7 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def insert_motor(self):
+    self.log_to_debug_monitor("Insert motor", "operation")
     pre_insertion = geometry_msgs.msg.PoseStamped()
     pre_insertion.header.frame_id = "assembled_assy_part_04_inserted_13"
     pre_insertion.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, -pi/2, 0))
@@ -1348,6 +1380,7 @@ class AssemblyClass(O2ASBaseRoutines):
     return
   
   def fasten_motor_screw_1(self):#for picking up and fastening a screw. need to expand this for 6 screws. I think just make 6 different functions.
+    self.log_to_debug_monitor("Fasten motor screw", "operation")
     pose1 = geometry_msgs.msg.PoseStamped()
     pose1.header.frame_id = "assembled_assy_part_02_motor_screw_hole_1"
     pose1.pose.orientation.w =   0.707
@@ -1366,6 +1399,7 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def pick_motor_pulley(self):
+    self.log_to_debug_monitor("Pick motor pulley", "operation")
     self.go_to_named_pose("home", "b_bot")
 
     pose0 = geometry_msgs.msg.PoseStamped()
@@ -1378,6 +1412,7 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def insert_motor_pulley(self):
+    self.log_to_debug_monitor("Insert motor pulley", "operation")
     pre_insertion = geometry_msgs.msg.PoseStamped()
     pre_insertion.header.frame_id = "assembled_assy_part_04_tip"
     pre_insertion.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi, 0))
@@ -1385,6 +1420,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_pose_goal("b_bot", pre_insertion, speed=.3, move_lin = True)
 
   def pick_bearing(self):
+    self.log_to_debug_monitor("Pick bearing", "operation")
     self.go_to_named_pose("home", "b_bot")
 
     pose0 = geometry_msgs.msg.PoseStamped()
@@ -1397,6 +1433,7 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def insert_bearing(self):
+    self.log_to_debug_monitor("Insert bearing", "operation")
     pre_insertion = geometry_msgs.msg.PoseStamped()
     pre_insertion.header.frame_id = "assembled_assy_part_11_front_hole"
     pre_insertion.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
@@ -1404,6 +1441,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_pose_goal("b_bot", pre_insertion, speed=.3, move_lin = True)
 
   def pick_clamping_pulley(self):
+    self.log_to_debug_monitor("Pick clamping pulley", "operation")
     self.go_to_named_pose("home", "b_bot")
 
     pose0 = geometry_msgs.msg.PoseStamped()
@@ -1416,6 +1454,7 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def insert_clamping_pulley(self):
+    self.log_to_debug_monitor("Insert clamping pulley", "operation")
     pre_insertion = geometry_msgs.msg.PoseStamped()
     pre_insertion.header.frame_id = "assembled_assy_part_11_front_hole"
     pre_insertion.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
@@ -1423,6 +1462,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_pose_goal("b_bot", pre_insertion, speed=.3, move_lin = True)
 
   def pick_retainer_pin_and_place_in_holder(self):
+    self.log_to_debug_monitor("Pick retainer pin and place in holder", "operation")
     self.confirm_to_proceed("pick_retainer_pin")
     self.pick_retainer_pin()
     self.confirm_to_proceed("adjust_centering")
@@ -1447,12 +1487,17 @@ class AssemblyClass(O2ASBaseRoutines):
     return False
 
   def subtask_f(self):
-    rospy.loginfo("======== SUBTASK F (motor plate) ========")
+    # rospy.loginfo("======== SUBTASK F (motor plate) ========")
+    self.log_to_debug_monitor("SUBTASK F (motor plate)", "subtask")
+    self.log_to_debug_monitor("=== Subtask F start ===", "operation")
     self.place_plate_2_and_screw()
+    self.log_to_debug_monitor("=== Subtask F end ===", "operation")
 
   def subtask_a(self):
     # ============= SUBTASK A (picking and inserting and fastening the motor shaft) =======================
-    rospy.loginfo("======== SUBTASK A (motor) ========")
+    # rospy.loginfo("======== SUBTASK A (motor) ========")
+    self.log_to_debug_monitor("SUBTASK A (motor)", "subtask")
+    self.log_to_debug_monitor("=== Subtask F start ===", "operation")
     self.pick_motor()
     self.adjust_centering()
     self.handover_motor()
@@ -1461,41 +1506,55 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_named_pose("screw_ready", "b_bot")
     self.fasten_motor_screw_1() # please ask Felix about the pick_screw function, I am not sure how he defined it
     rospy.loginfo("todo: copy and paste fasten_motor_screw_1 to add fasten_motor_screw_2 ~ 6")
+    self.log_to_debug_monitor("=== Subtask A end ===", "operation")
 
   def subtask_b(self):
     # ================================= SUBTASK B (motor pulley) ===========================================
-    rospy.loginfo("======== SUBTASK B (motor pulley) ========")
+    # rospy.loginfo("======== SUBTASK B (motor pulley) ========")
+    self.log_to_debug_monitor("SUBTASK B (motor pulley)", "subtask")
+    self.log_to_debug_monitor("=== Subtask B start ===", "operation")
     self.pick_motor_pulley()
     self.insert_motor_pulley()
     rospy.loginfo("todo: fasten motor pulley") # With the set screw
+    self.log_to_debug_monitor("=== Subtask B end ===", "operation")
 
   def subtask_g(self):
     # ===== SUBTASK G (Placing and fastening the output (large) plate, for idle pulley set and clamping pulley set) =========
-    rospy.loginfo("======== SUBTASK G (large plate) ========")
+    # rospy.loginfo("======== SUBTASK G (large plate) ========")
+    self.log_to_debug_monitor("SUBTASK G (large plate)", "subtask")
+    self.log_to_debug_monitor("=== Subtask G start ===", "operation")
     self.place_plate_3_and_screw()
     rospy.loginfo("todo: add screw picking and fastening sequence for the second screw")
+    self.log_to_debug_monitor("=== Subtask G end ===", "operation")
 
   def subtask_c(self):
     # ==== SUBTASK C (clamping pulley set, everything but inserting and fastening clamping pulley) =================
-    rospy.loginfo("======== SUBTASK C (bearing + shaft) ========")
+    # rospy.loginfo("======== SUBTASK C (bearing + shaft) ========")
+    self.log_to_debug_monitor("SUBTASK C (bearing + shaft)", "subtask")
+    self.log_to_debug_monitor("=== Subtask C start ===", "operation")
     self.pick_bearing()
     self.insert_bearing()
     rospy.loginfo("todo: pick up shaft, pick up cap, insert the cap, fasten the cap, insert using impedance Y negative direction (using b_bot)")
     rospy.loginfo("todo: make the gripper not fully open while approaching for picking, may be important for motor pulley and clamping_shaft_spacer")
     self.pick_shaft_spacer()
     self.insert_shaft_spacer()
+    self.log_to_debug_monitor("=== Subtask C end ===", "operation")
 
   def subtask_d(self):
     # ============= SUBTASK D (inserting and fastening clamping pulley) =======================
-    rospy.loginfo("======== SUBTASK D (clamping pulley) ========")
+    # rospy.loginfo("======== SUBTASK D (clamping pulley) ========")
+    self.log_to_debug_monitor("SUBTASK D (clamping pulley)", "subtask")
+    self.log_to_debug_monitor("=== Subtask D start ===", "operation")
     self.pick_clamping_pulley()
     self.insert_clamping_pulley()
     rospy.loginfo("todo: fastening clamping pulley")
+    self.log_to_debug_monitor("=== Subtask D end ===", "operation")
 
   def subtask_e(self):
     # ======================== SUBTASK E (The idler pin) ============================================
-    rospy.loginfo("======== SUBTASK E ========")
-
+    # rospy.loginfo("======== SUBTASK E ========")
+    self.log_to_debug_monitor("SUBTASK E", "subtask")
+    self.log_to_debug_monitor("=== Subtask E start ===", "operation")
     # ====== (This is the first thing to do in the task)
     self.confirm_to_proceed("pick_retainer_pin_from_tray_and_place_in_holder")
     self.pick_retainer_pin_from_tray_and_place_in_holder()
@@ -1544,15 +1603,21 @@ class AssemblyClass(O2ASBaseRoutines):
     self.confirm_to_proceed("fasten_retainer_pin_nut")
     self.fasten_retainer_pin_nut()
     # self.do_change_tool_action("c_bot", equip=False, screw_size=66)
+    self.log_to_debug_monitor("=== Subtask E end ===", "operation")
 
   def subtask_h(self):
     # ====================================== SUBTASK H (belt) ========================================
-    rospy.loginfo("======== SUBTASK H (belt) ========")
+    # rospy.loginfo("======== SUBTASK H (belt) ========")
+    self.log_to_debug_monitor("SUBTASK H (belt)", "subtask")
+    self.log_to_debug_monitor("=== Subtask H start ===", "operation")
     self.put_on_belt()
     rospy.loginfo("TODO: Tension the belt")
+    self.log_to_debug_monitor("=== Subtask H end ===", "operation")
   
   def assembly_task(self):
     # ========================= Sending robots to home position ======================================
+    self.start_task_timer()
+    self.log_to_debug_monitor(text="Assembly", category="task")
     self.go_to_named_pose("back", "a_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
     self.go_to_named_pose("home", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
     self.go_to_named_pose("screw_pick_ready", "b_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)

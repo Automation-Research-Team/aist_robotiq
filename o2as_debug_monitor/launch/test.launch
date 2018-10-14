@@ -40,13 +40,10 @@
         topic_name: /search_grasp_phoxi/image_grasp_candidates
         col: [13, 24]
         row: [0, 12]
-        
-    caminfo_topics:
-      phoxi_caminfo:
-        topic_name: /a_phoxi_m_camera/camera_info
-        col: [16, 23]
-        row: [10, 17]
-        offset: [8, 32]
+      bg_ratio_input_image:
+        topic_name: /o2as_debug_monitor/bg_ratio_input_image
+        col: [15, 20]
+        row: [10, 15]
 
     string_topics:
       task:
@@ -99,12 +96,4 @@
         offset: [8, 32]
   </rosparam>
 
-  <!-- This is for testing purpopse. -->
-  <!-- <rosparam command="load" file="$(find o2as_routines)/config/kitting_item_list.yaml"/> -->
-
-    <!-- ROS node for test, publishes test messages -->
-  <node pkg="o2as_debug_monitor" type="test_debug_monitor.py"
-        name="test_debug_monitor" output="screen">
-    <!--<remap from="/Plus/out" to="remapped_output"/>-->
-  </node>
 </launch>
