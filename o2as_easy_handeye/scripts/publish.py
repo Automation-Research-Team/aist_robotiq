@@ -3,8 +3,15 @@
 import rospy
 from tf import TransformBroadcaster, TransformListener, TransformerROS, transformations as tfs
 from geometry_msgs.msg import Transform
+from math import radians, degrees
 from easy_handeye.handeye_calibration import HandeyeCalibration
 
+def get_transform(dst_frm, src_frm):
+    listener = TransformListener()
+    now = rospy.Time.now()
+    listener.waitForTransform(dst_frm, src_frm, now, rospy.Duration(10))
+    return listener.lookupTransform(dst_frm, src_frm, now)
+    
 rospy.init_node('o2as_handeye_calibration_publisher')
 while rospy.get_time() == 0.0:
     pass
@@ -27,33 +34,46 @@ if overriding_tracking_base_frame != "":
 rospy.loginfo('loading calibration parameters into namespace {}'.format(rospy.get_namespace()))
 calib.to_parameters()
 
-result_tf   = calib.transformation.transform
-trns        = result_tf.translation.x, result_tf.translation.y, \
-              result_tf.translation.z
-rot         = result_tf.rotation.x, result_tf.rotation.y, \
-              result_tf.rotation.z, result_tf.rotation.w
-orig        = calib.transformation.header.frame_id  # tool or base link
-dest        = calib.transformation.child_frame_id   # tracking_base_frame
+# Estimated camera -> robot(effector or base_link) transformation
+result_tf = calib.transformation.transform
+trns      = result_tf.translation.x, result_tf.translation.y, \
+            result_tf.translation.z
+rot       = result_tf.rotation.x, result_tf.rotation.y, \
+            result_tf.rotation.z, result_tf.rotation.w
+bot       = calib.transformation.header.frame_id  # effector or base link
+optEst    = calib.transformation.child_frame_id   # tracking_base_frame
 
-# Compute camera optical -> camera_base transformation
-camera_base_frame    = rospy.get_param('camera_base_frame')
-camera_optical_frame = rospy.get_param('camera_optical_frame')
-listener             = TransformListener()
-now                  = rospy.Time.now()
-listener.waitForTransform(camera_optical_frame,
-                          camera_base_frame, now, rospy.Duration(10))
-xyz, rpy             = listener.lookupTransform(camera_optical_frame,
-                                                camera_base_frame, now)
-body                 = rospy.get_param('camera_body_frame')
+# Compute camera base -> camera_optical transformation
+opt_base  = get_transform(rospy.get_param('camera_optical_frame'),
+                             rospy.get_param('camera_base_frame'))
+# Compute tracking_base_frame -> o2as_ground transformation
+grnd_bot  = get_transform('o2as_ground', bot)
 
-rospy.loginfo('publishing transformation ' + orig + ' -> ' + dest + ':\n'
-              + str((trns, rot)))
-
-broad = TransformBroadcaster()
-rate  = rospy.Rate(50)
+broad     = TransformBroadcaster()
+rate      = rospy.Rate(50)
+baseEst   = rospy.get_param('camera_body_frame')
 
 while not rospy.is_shutdown():
     now = rospy.Time.now()
-    broad.sendTransform(trns, rot, now, dest, orig)  # takes ..., child, parent
-    broad.sendTransform(xyz,  rpy, now, body, dest)
+    broad.sendTransform(trns, rot, now, optEst, bot)  # ..., child, parent
+    broad.sendTransform(opt_base[0], opt_base[1], now, baseEst, optEst)
     rate.sleep()
+
+transformer = TransformerROS()
+mat = tfs.concatenate_matrices( \
+        transformer.fromTranslationRotation(*grnd_bot),
+        transformer.fromTranslationRotation(trns, rot),
+        transformer.fromTranslationRotation(*opt_base))
+xyz = tfs.translation_from_matrix(mat)
+rpy = map(degrees, tfs.euler_from_matrix(mat))
+q   = tfs.quaternion_from_matrix(mat)
+
+print "\n"
+print "translation =", str(xyz)
+print "rotation    =", str(q)
+print "\n"
+print "<origin xyz=\"{0[0]} {0[1]} {0[2]}\" rpy=\"${{{1[0]}*pi/180}} ${{{1[1]}*pi/180}} ${{{1[2]}*pi/180}}\"/>".format(xyz, rpy)
+print "\n"
+
+# <origin xyz="0.674391 -0.0223742 ${bots_z + 0.696023}"
+#         rpy="${-149.801*pi/180} ${0.156861*pi/180} ${91.2544*pi/180}"/>
