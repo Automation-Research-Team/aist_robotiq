@@ -59,11 +59,11 @@ keyposes = {
 
       # configulation for AIST
       [0.48,  0.10, 0.10, radians( 30), radians( 25), radians(0)],
-      #[0.48,  0.00, 0.10, radians( 30), radians( 25), radians(0)],
+      [0.48,  0.00, 0.10, radians( 30), radians( 25), radians(0)],
       [0.48, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
 
       [0.53, -0.10, 0.15, radians( 30), radians( 25), radians(0)],
-      #[0.53,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
+      [0.53,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
       [0.53,  0.10, 0.15, radians( 30), radians( 25), radians(0)],
 
       # [0.40,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
@@ -277,7 +277,9 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
         cv2.imwrite("aruco_result-{:0=2}-{:0=2}.jpeg".format(keypose_num, subpose_num), img)
       except CvBridgeError, e:
         print(e)
-
+      except rospy.ROSException, e:
+        print(e)
+        
       rospy.sleep(1)
       
       if self.needs_calib:
