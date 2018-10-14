@@ -52,6 +52,34 @@ import o2as_msgs.srv
 
 from o2as_routines.base import O2ASBaseRoutines
 
+
+
+import ur_modern_driver.msg
+def is_program_running(topic_namespace = ""):
+  """Checks if a program is running on the UR"""
+  msg = rospy.wait_for_message(topic_namespace + "/ur_driver/robot_mode_state", ur_modern_driver.msg.RobotModeDataMsg)
+  if msg:
+    return msg.is_program_running
+  else:
+    rospy.logerr("No message received from the robot. Is everything running? Is the namespace entered correctly with a leading slash?")
+    return False
+    # throw()
+def wait_for_UR_program(topic_namespace = "", timeout_duration = rospy.Duration.from_sec(20.0)):
+  rospy.logdebug("Waiting for UR program to finish.")
+  # Only run this after sending custom URScripts and not the regular motion commands, or this call will not terminate before the timeout.
+  rospy.sleep(1.0)
+  t_start = rospy.Time.now()
+  time_passed = rospy.Time.now() - t_start
+  while is_program_running(topic_namespace):
+    rospy.sleep(.05)
+    time_passed = rospy.Time.now() - t_start
+    if time_passed > timeout_duration:
+      rospy.loginfo("Timeout reached.")
+      return False
+  rospy.logdebug("UR Program has terminated.")
+  return True
+
+
 class TaskboardClass(O2ASBaseRoutines):
   """
   This contains the routine used to run the taskboard task.
@@ -767,36 +795,84 @@ class TaskboardClass(O2ASBaseRoutines):
 
     
     if i == 11:      #set screw
-      approach_insert_pose_b = geometry_msgs.msg.PoseStamped()
-      approach_insert_pose_b.header.frame_id = "taskboard_part11"
-      approach_insert_pose_b.pose.position.z = .035
-      approach_insert_pose_b.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi*160/180, pi/2, 0))
+      # approach_insert_pose_b = geometry_msgs.msg.PoseStamped()
+      # approach_insert_pose_b.header.frame_id = "taskboard_part11"
+      # approach_insert_pose_b.pose.position.z = .035
+      # approach_insert_pose_b.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi*160/180, pi/2, 0))
       
-      insert_pose_b = copy.deepcopy(approach_insert_pose_b)
-      insert_pose_b.pose.position.z = 0.002
+      # insert_pose_b = copy.deepcopy(approach_insert_pose_b)
+      # insert_pose_b.pose.position.z = 0.002
 
-      # TODO: Change to just moving downwards and then turning on the tool
-      ### Move to insertion point
-      self.go_to_named_pose("set_screw_insert_pose", "b_bot")
-      self.go_to_pose_goal("b_bot", approach_insert_pose_b, speed=0.04, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
-      self.set_motor("set_screw_tool", "tighten", duration = 20.0)
+      # # TODO: Change to just moving downwards and then turning on the tool
+      # ### Move to insertion point
+      # self.go_to_named_pose("set_screw_insert_pose", "b_bot")
+      # self.go_to_pose_goal("b_bot", approach_insert_pose_b, speed=0.04, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
 
-      ### Turn on motor, do spiral motions while descending
-      self.go_to_pose_goal("b_bot", insert_pose_b, speed=0.02, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
-      self.horizontal_spiral_motion("b_bot", .003, spiral_axis="Y", radius_increment = .001)
-      insert_pose_b.pose.position.z -= .002
-      self.go_to_pose_goal("b_bot", insert_pose_b, speed=0.02, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
-      self.horizontal_spiral_motion("b_bot", .003, spiral_axis="Y", radius_increment = .001)
-      self.go_to_pose_goal("b_bot", insert_pose_b, speed=0.01, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
+      req = o2as_msgs.srv.sendScriptToURRequest()
+      req.program_id = "lin_move_rel"
+      req.robot_name = "b_bot"
+      req.relative_translation.y = .002
+      req.velocity = .005
+      res = self.urscript_client.call(req)
+      wait_for_UR_program("/b_bot_controller", rospy.Duration.from_sec(4.0))
+      # self.horizontal_spiral_motion("b_bot", .003, spiral_axis="Y", radius_increment = .002)
+
+      print("do motor?")
+      raw_input()
+      if rospy.is_shutdown():
+        return
+      
+      self.set_motor("set_screw_tool", "tighten", duration = 5.0)
       rospy.sleep(5.0)
+
+      print("go down?")
+      raw_input()
+      if rospy.is_shutdown():
+        return
+
+      req = o2as_msgs.srv.sendScriptToURRequest()
+      req.program_id = "lin_move_rel"
+      req.robot_name = "b_bot"
+      req.relative_translation.y = .002
+      req.velocity = .005
+      res = self.urscript_client.call(req)
+      wait_for_UR_program("/b_bot_controller", rospy.Duration.from_sec(4.0))
+
+      print("return?")
+      raw_input()
+      if rospy.is_shutdown():
+        return
+
+      # ### Turn on motor, do spiral motions while descending
+      # self.go_to_pose_goal("b_bot", insert_pose_b, speed=0.02, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
+      # self.horizontal_spiral_motion("b_bot", .003, spiral_axis="Y", radius_increment = .001)
+      # insert_pose_b.pose.position.z -= .002
+      # self.go_to_pose_goal("b_bot", insert_pose_b, speed=0.02, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
+      # self.horizontal_spiral_motion("b_bot", .003, spiral_axis="Y", radius_increment = .001)
+      # self.go_to_pose_goal("b_bot", insert_pose_b, speed=0.01, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
+      # rospy.sleep(5.0)
       
       ### Go up, drop the tool
-      self.go_to_pose_goal("b_bot", approach_insert_pose_b, speed=0.02, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
-      self.go_to_named_pose("set_screw_insert_pose", "b_bot")
-      self.go_to_named_pose("set_screw_intermediate_pose", "b_bot")
-      
+      # self.go_to_pose_goal("b_bot", approach_insert_pose_b, speed=0.02, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
+      # self.go_to_named_pose("set_screw_insert_pose", "b_bot")
+      # self.go_to_named_pose("set_screw_intermediate_pose", "b_bot")
+
       # Place tool
-      self.equip_unequip_set_screw_tool(equip=False)
+      # self.equip_unequip_set_screw_tool(equip=False)
+
+      req = o2as_msgs.srv.sendScriptToURRequest()
+      req.program_id = "lin_move_rel"
+      req.robot_name = "b_bot"
+      req.relative_translation.y = -.1
+      req.velocity = .05
+      res = self.urscript_client.call(req)
+      wait_for_UR_program("/b_bot_controller", rospy.Duration.from_sec(10.0))
+
+      drop_tool_joint_pose = [0.178453728556633, -1.6114686171161097, 2.1463537216186523, -0.0819476286517542, 1.0472468137741089, -2.776330296193258]
+      self.move_joints("b_bot", drop_tool_joint_pose, speed=.15)
+      self.send_gripper_command("b_bot", "open")
+      rospy.sleep(3.0)
+      self.go_to_named_pose("home", "b_bot")
     
     if i == 12:
       screw_size = 3
