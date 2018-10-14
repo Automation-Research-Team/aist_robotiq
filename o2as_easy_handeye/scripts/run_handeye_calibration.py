@@ -154,10 +154,9 @@ def get_service_proxy(service_name, camera_name, robot_name):
 
 
 ######################################################################
-#  class CalibrationCommander                                        #
+#  class HandEyeCalibrationRoutines                                  #
 ######################################################################
 class HandEyeCalibrationRoutines(O2ASBaseRoutines):
-  """Wrapper of MoveGroupCommander specific for this script"""
   def __init__(self, camera_name, robot_name, needs_trigger, needs_calib):
     super(HandEyeCalibrationRoutines, self).__init__()
     
@@ -259,16 +258,10 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     poseStamped.pose.position.x = pose[0]
     poseStamped.pose.position.y = pose[1]
     poseStamped.pose.position.z = pose[2]
-    if len(pose) == 6:
-      poseStamped.pose.orientation \
-        = geometry_msgs.msg.Quaternion(
-          *tf_conversions.transformations.quaternion_from_euler(
-            pose[3], pose[4], pose[5]))
-    else:
-      poseStamped.psoe.orientation.x = pose[3]
-      poseStamped.psoe.orientation.y = pose[4]
-      poseStamped.psoe.orientation.z = pose[5]
-      poseStamped.psoe.orientation.w = pose[6]
+    poseStamped.pose.orientation \
+      = geometry_msgs.msg.Quaternion(
+        *tf_conversions.transformations.quaternion_from_euler(
+          pose[3], pose[4], pose[5]))
     [all_close, move_success] = self.go_to_pose_goal(self.robot_name,
                                                      poseStamped, speed,
                                                      move_lin=False)
@@ -278,7 +271,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
 
       try:
         img_msg = rospy.wait_for_message("/aruco_tracker/result",
-                                         sensor_msgs.msg.Image, 10)
+                                         sensor_msgs.msg.Image, timeout=10.0)
         bridge = CvBridge()
         img = bridge.imgmsg_to_cv2(img_msg, "bgr8")
         cv2.imwrite("aruco_result-{:0=2}-{:0=2}.jpeg".format(keypose_num, subpose_num), img)
@@ -307,7 +300,6 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
 
 
   def run(self, keyposes, speed, sleep_time):
-    """Run handeye calibration for the specified robot (e.g., "b_bot")"""
     # Clear samples in the buffer if exist
     if self.stop_acquisition:
       self.stop_acquisition()
