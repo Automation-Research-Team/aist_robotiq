@@ -970,8 +970,18 @@ class TaskboardClass(O2ASBaseRoutines):
       self.do_change_tool_action("b_bot", equip=False, screw_size = screw_size)
 
     if i == 14:
-      self.pick("a_bot",self.pick_poses[i-1],self.item_pick_heights[i-1], approach_height = 0.05,
-                              speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
+      # self.pick("a_bot",self.pick_poses[i-1],self.item_pick_heights[i-1], approach_height = 0.05,
+      #                         speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
+      self.send_gripper_command("a_bot","close")
+      approach_pose = copy.deepcopy(self.pick_poses[i-1])
+      approach_pose.pose.position.z = 0.05
+      self.go_to_pose_goal("a_bot", approach_pose, speed=0.1, move_lin=True)
+      pickup_pose = copy.deepcopy(self.pick_poses[i-1])
+      pickup_pose.pose.position.z = 0.007
+      self.go_to_pose_goal("a_bot", pickup_pose, speed=0.01, move_lin=True)
+      self.horizontal_spiral_motion("a_bot", .003, radius_increment = .001)
+      self.send_gripper_command("a_bot","open")
+
       self.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
 
       self.place("a_bot",self.place_poses[i-1],self.item_place_heights[i-1], approach_height = 0.05,
@@ -979,7 +989,7 @@ class TaskboardClass(O2ASBaseRoutines):
                               lift_up_after_place = False)
       self.horizontal_spiral_motion("a_bot", .002, radius_increment = .0005)
 
-      self.send_gripper_command(gripper="c_bot", command=0.02)
+      self.send_gripper_command(gripper="b_bot", command=0.02)
       pose = copy.deepcopy(self.place_poses[i-1])
       pose.pose.position.z += .05
       self.go_to_pose_goal("a_bot", pose, speed=0.02, move_lin=True)
@@ -987,144 +997,76 @@ class TaskboardClass(O2ASBaseRoutines):
       
       # TODO: Try pushing with the a_bot's open inner gripper (it would save time)
       # Push down with the c_bot in case it is blocked
-      self.go_to_named_pose("home", "c_bot")
+      self.go_to_named_pose("home", "b_bot")
       # TODO: Turn the pose around by 180 degrees to speed up the motion
-      self.place("c_bot",self.place_poses[i-1],self.item_place_heights[i-1] - .01, approach_height = 0.02,
+      self.place("b_bot",self.place_poses[i-1],self.item_place_heights[i-1] - .01, approach_height = 0.02,
                       speed_fast = 0.2, speed_slow = 0.05, gripper_command="none",
                       lift_up_after_place = True)
-      self.go_to_named_pose("home", "c_bot")
+      self.go_to_named_pose("home", "b_bot")
 
     if i == 15: 
+      self.pick("b_bot",self.pick_poses[i-1], 0.005,
+                      speed_fast = 0.3, speed_slow = 0.02, gripper_command="close",
+                      approach_height = 0.04)
+      
+      handover_b = geometry_msgs.msg.PoseStamped()
+      handover_b.header.frame_id = "workspace_center"
+      handover_b.pose.position.x = 0.2
+      handover_b.pose.position.y = .0
+      handover_b.pose.position.z = 0.7
+      handover_b.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, 0, -pi/2))
+      
 
-      pick_with_a_bot = True
-      if pick_with_a_bot:
-        self.go_to_named_pose("home", "b_bot")
-        self.go_to_named_pose("home", "a_bot")
+      handover_a_approach = copy.deepcopy(handover_b)
+      handover_a_approach.pose.position.y -= 0.05
+      handover_a_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, pi/2))
+    #  regrasp 
+      self.go_to_pose_goal("b_bot", handover_b, speed=0.2)
+      self.go_to_pose_goal("a_bot", handover_a_approach, speed=0.12)
 
-        # Hold with b_bot
-        b_pick_pose = copy.deepcopy(self.pick_poses[i-1])
-        b_pick_pose.pose.position.z = .01
-        b_pick_pose.pose.position.y -= .01
-        b_pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi*135/180, pi/2, -pi/2))
-        b_pick_approach = copy.deepcopy(b_pick_pose)
-        b_pick_approach.pose.position.z += .02
-        b_pick_retreat = copy.deepcopy(b_pick_approach)
-        b_pick_retreat.pose.position.z += .25
+      handover_a  = copy.deepcopy(handover_a_approach)
+      handover_a.pose.position.y += 0.05
+      handover_a.pose.position.y += 0.017
+      handover_a.pose.position.x += 0.004 # MAGIC
+      handover_a.pose.position.z -= 0.002 # MAGIC
 
-        # self.go_to_pose_goal("b_bot", b_pick_retreat, speed=0.2, move_lin=True)
-        # print("b_bot orientation?")
-        # raw_input()
-        # if rospy.is_shutdown():
-        #   return
+      self.send_gripper_command(gripper="a_bot", command="close")
+      self.go_to_pose_goal("a_bot", handover_a, speed=0.03, move_lin= True)
+      self.horizontal_spiral_motion("a_bot", .003, radius_increment = .001)
+      self.send_gripper_command(gripper="a_bot", command="open")
+      
+      handover_b_retreat = copy.deepcopy(handover_a)
+      handover_b_retreat.pose.position.y -= 0.017
+      handover_b_retreat.pose.position.x -= 0.004 # MAGIC
+      handover_b_retreat.pose.position.z += 0.002 #MAGIC
+      handover_b_retreat.pose.position.y += 0.03
+      handover_b_retreat.pose.orientation = handover_b.pose.orientation
+      
+      self.send_gripper_command(gripper="b_bot", command="open")
+      rospy.sleep(1.0)
+      self.go_to_pose_goal("b_bot", handover_b_retreat, speed=0.02, move_lin= True)
+      # rospy.loginfo("Press enter to confirm that b_bot moved backwards")
+      # raw_input()
+      self.go_to_named_pose("back", "b_bot")
 
-        self.send_gripper_command("b_bot", .025)
-        joints = [1.5759320259094238, -1.212271515523092, 2.1332263946533203, -3.2381704489337366, -1.5791609922992151, -0.013281170521871388]
-        self.move_joints("b_bot", joints, speed=.05)
+      self.place("a_bot", self.place_poses[i-1],self.item_place_heights[i-1],
+                              speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
+                              approach_height = 0.05, lift_up_after_place = False)
 
-        print("b_bot arrived?")
-        raw_input()
-        if rospy.is_shutdown():
-          return
+    #  self.send_gripper_command(gripper="precision_gripper_inner", command="open")
+    #  self.horizontal_spiral_motion("a_bot", .002, radius_increment = .0005)
+      p = copy.deepcopy(self.place_poses[i-1])
+      p.pose.position.z += 0.02
+      self.go_to_pose_goal("a_bot", p, speed=0.01, move_lin= True)
+      self.go_to_named_pose("home", "a_bot")
 
-        self.go_to_pose_goal("b_bot", b_pick_retreat, speed=0.2, move_lin=True)
-        self.go_to_pose_goal("b_bot", b_pick_approach, speed=0.2, move_lin=True)
-        self.go_to_pose_goal("b_bot", b_pick_pose, speed=0.01, move_lin=True)
-        self.send_gripper_command("b_bot", "close")
-
-        print("b_bot grasped the cap?")
-        raw_input()
-        if rospy.is_shutdown():
-          return
-
-        # Pick with a_bot
-        pick_pose = copy.deepcopy(self.pick_poses[i-1])
-        pick_pose.pose.position.z = self.item_pick_heights[i-1]
-        pick_approach = copy.deepcopy(pick_pose)
-        pick_approach.pose.position.z += .02
-        pick_approach = copy.deepcopy(pick_approach)
-
-        self.send_gripper_command("a_bot", "close")
-        self.go_to_pose_goal("a_bot", pick_approach, speed=0.5, move_lin=True)
-        self.go_to_pose_goal("a_bot", pick_pose, speed=0.02, move_lin=True)
-        self.horizontal_spiral_motion("a_bot", .002, radius_increment = .001)
-        print("Is it in?")
-        raw_input()
-        if rospy.is_shutdown():
-          return
-
-        self.send_gripper_command("a_bot", "open")
-        self.go_to_pose_goal("a_bot", pick_approach, speed=0.5, move_lin=True)
-
-        self.place("a_bot", self.place_poses[i-1],self.item_place_heights[i-1],
-                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
-                                approach_height = 0.05, lift_up_after_place = False)
-
-        a_bot_retreat = copy.deepcopy(self.place_poses[i-1])
-        a_bot_retreat.pose.position.z += 0.03
-        self.go_to_pose_goal("a_bot", a_bot_retreat, speed=0.01, move_lin= True)
-        self.go_to_named_pose("home", "a_bot")
-
-        # Push with b_bot
-        self.send_gripper_command(gripper="b_bot", command="close")
-        b_bot_push_pose = copy.deepcopy(self.place_poses[i-1])
-        b_bot_push_pose.pose.position.z += 0.015
-        self.go_to_pose_goal("b_bot", b_bot_push_pose, speed=0.2)
-        self.do_linear_push("b_bot", 3, wait = True)
-        self.go_to_pose_goal("b_bot", b_bot_push_pose, speed=0.03, move_lin= True)
-        self.go_to_named_pose("home", "b_bot")
-      else:
-        self.go_to_named_pose("home", "a_bot")
-        self.go_to_named_pose("taskboard_center_pose", "b_bot")
-
-        pick_pose = copy.deepcopy(self.pick_poses[i-1])
-        pick_pose.pose.position.z = self.item_pick_heights[i-1]+.003
-        pick_pose_rotated = copy.deepcopy(pick_pose)
-        pick_pose_rotated.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
-        pick_approach = copy.deepcopy(pick_pose)
-        pick_approach.pose.position.z += .02
-        pick_retreat = copy.deepcopy(pick_approach)
-        pick_retreat.pose.position.z += .15
-
-        self.send_gripper_command("b_bot", .02)
-        self.go_to_pose_goal("b_bot", pick_approach, speed=0.5, move_lin=True)
-        self.go_to_pose_goal("b_bot", pick_pose, speed=0.02, move_lin=True)
-
-        # Center the piece and grasp it
-        self.send_gripper_command("b_bot", .009, force=40, velocity=.013)  # Close to center
-        rospy.sleep(1.0)
-        self.send_gripper_command("b_bot", .02, velocity=.013)
-        rospy.sleep(1.0)
-        self.go_to_pose_goal("b_bot", pick_pose_rotated, speed=1.0, move_lin=True)
-        self.send_gripper_command("b_bot", .009, force=40, velocity=.013)  # Close to center
-        rospy.sleep(1.0)
-        self.send_gripper_command("b_bot", .02, velocity=.013)
-        rospy.sleep(1.0)
-        self.go_to_pose_goal("b_bot", pick_pose, speed=1.0, move_lin=True)
-        self.send_gripper_command("b_bot", .005, force=40, velocity=.013)
-        rospy.sleep(1.0)
-
-        self.go_to_pose_goal("b_bot", pick_approach, speed=0.5, move_lin=True)
-
-        self.place("b_bot", self.place_poses[i-1],self.item_place_heights[i-1],
-                                speed_fast = 0.2, speed_slow = 0.01, gripper_command="none",
-                                approach_height = 0.03, lift_up_after_place = False)
-        
-        self.do_linear_push("b_bot", 4, wait = True)
-        self.horizontal_spiral_motion("b_bot", .001)
-        self.do_linear_push("b_bot", 4, wait = True)
-        self.send_gripper_command("b_bot", .02, velocity=.013)
-        rospy.sleep(1.0)
-                                
-        b_bot_retreat = copy.deepcopy(self.place_poses[i-1])
-        b_bot_retreat.pose.position.z += 0.03
-        self.go_to_pose_goal("b_bot", b_bot_retreat, speed=0.01, move_lin= True)
-
-        # Push with b_bot
-        self.send_gripper_command(gripper="b_bot", command="close")
-        self.do_linear_push("b_bot", 3, wait = True)
-        self.go_to_pose_goal("b_bot", b_bot_retreat, speed=0.03, move_lin= True)
-        self.go_to_named_pose("home", "b_bot")
-    
+      #push with b
+      self.send_gripper_command(gripper="b_bot", command="close")
+      self.go_to_named_pose("home", "b_bot")
+      self.go_to_pose_goal("b_bot", p, speed=0.2)
+      self.do_linear_push("b_bot", 3, wait = True)
+      self.go_to_pose_goal("b_bot", p, speed=0.2)
+      self.go_to_named_pose("home", "b_bot")
 
 if __name__ == '__main__':
   try:
