@@ -7,18 +7,13 @@ import rospy
 
 import moveit_msgs.msg
 import geometry_msgs.msg
-import sensor_msgs.msg
 import tf_conversions
 
-from math import radians, degrees
-
-#from std_msgs.msg import String
-#from std_srvs.srv import Empty
+from o2as_aruco_ros.msg import Corners
 from std_srvs.srv import Trigger
-#from o2as_phoxi_camera.srv import GetFrame
 
 from o2as_routines.base import O2ASBaseRoutines
-from o2as_aruco_ros.msg import Corners
+from math import radians, degrees
 
 
 
@@ -31,10 +26,8 @@ class VisitRoutines(O2ASBaseRoutines):
     super(VisitRoutines, self).__init__()
     
     cs = "/{}/".format(camera_name)
-    self.start_acquisition = rospy.ServiceProxy(cs + "start_acquisition",
-                                                Trigger)
-    self.stop_acquisition  = rospy.ServiceProxy(cs + "stop_acquisition",
-                                                Trigger)
+    self.start_acquisition = rospy.ServiceProxy(cs + "start_acquisition", Trigger)
+    self.stop_acquisition  = rospy.ServiceProxy(cs + "stop_acquisition",  Trigger)
 
     ## Initialize `moveit_commander`
     self.robot_name = robot_name
