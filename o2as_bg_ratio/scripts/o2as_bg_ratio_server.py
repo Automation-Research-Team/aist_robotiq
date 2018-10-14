@@ -32,7 +32,7 @@ class InnerPickDetection(object):
         # The image is published when bg ratio is computed
         self.bridge = CvBridge()
         self.pub_input_image = rospy.Publisher("/o2as_debug_monitor/bg_ratio_input_image", Image, queue_size=1)
-        #self.pub_output_value = rospy.Publisher("/o2as_debug_monitor/bg_ratio_input_image", Float32, queue_size=1)
+        self.pub_output_value = rospy.Publisher("/o2as_debug_monitor/bg_ratio_output_value", Float64, queue_size=1)
 
         self._image_topic = "/a_bot_camera/color/image_raw"
 
@@ -112,8 +112,12 @@ class InnerPickDetection(object):
         self.pub_input_image.publish(img_message)
 
         # compute background ratio
-        return float(ixs_bg.shape[0]) / pixels.shape[0]
+        bg_ratio = float(ixs_bg.shape[0]) / pixels.shape[0]
+        bg_ratio_message = Float64()
+        bg_ratio_message.data = bg_ratio
+        self.pub_output_value.publish(bg_ratio_message)
 
+        return bg_ratio
 
 if __name__ == "__main__":
 
