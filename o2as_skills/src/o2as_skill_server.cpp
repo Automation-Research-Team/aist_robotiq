@@ -495,10 +495,10 @@ bool SkillServer::goToNamedPose(std::string pose_name, std::string robot_name, d
   ROS_INFO_STREAM("Going to named pose " << pose_name << " with robot group " << robot_name << ".");
   if (pause_mode_ || test_mode_)
   {
-    if (velocity_scaling_factor > reduced_speed_limit_)
+    if (speed > reduced_speed_limit_)
     {
-      ROS_INFO_STREAM("Reducing velocity_scaling_factor from " << velocity_scaling_factor << " to " << reduced_speed_limit_ << " because robot is in test or pause mode!");
-      velocity_scaling_factor = reduced_speed_limit_;
+      ROS_INFO_STREAM("Reducing speed from " << speed << " to " << reduced_speed_limit_ << " because robot is in test or pause mode!");
+      speed = reduced_speed_limit_;
     }
   }
   moveit::planning_interface::MoveGroupInterface* group_pointer;
@@ -627,33 +627,21 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     current_state->copyJointGroupPositions(joint_model_group, joint_group_positions_1);
     ROS_INFO_STREAM("Current joint state: " << joint_group_positions_1[0] << ", " << joint_group_positions_1[1] << "...");
 
-    moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-    moveit::planning_interface::MoveItErrorCode success, motion_done;
-    if (joint_group_positions_1[0] > -0.2)
-    {
-      // This position puts the gripper up high, in preparation of going to the holder
-      joint_group_positions_1[0] = 1.5722;
-      joint_group_positions_1[1] = -2.6696;
-      joint_group_positions_1[2] = 1.7915;
-      joint_group_positions_1[3] = 0.872;
-      joint_group_positions_1[4] = 1.5723;
-      joint_group_positions_1[5] = -3.1413;
-      if (!moveToJointPose(joint_group_positions_1, robot_name, true, 3.0, use_real_robot_, 3.0))
-      {
-        ROS_ERROR("Could not plan to before_tool_pickup joint state. Abort!");
-        return false;
-      }
-      joint_group_positions_2 = joint_group_positions_1;
-      joint_group_positions_2[0] = -0.5722;
-      joint_group_positions_2[1] = -2.6696;
-      joint_group_positions_2[2] = 1.7915;
-      joint_group_positions_2[3] = 0.872;
-      joint_group_positions_2[4] = -0.5723;
-      joint_group_positions_2[5] = -3.1413;
-      moveToJointPose(joint_group_positions_2, robot_name, true, 3.0, use_real_robot_, 3.0);
-    }
-    else
-      ROS_INFO("Skipping intermediate high approach pose with b_bot");
+    // This position puts the gripper up high, in preparation of going to the holder
+    joint_group_positions_1[0] = 1.5722;
+    joint_group_positions_1[1] = -2.6696;
+    joint_group_positions_1[2] = 1.7915;
+    joint_group_positions_1[3] = 0.872;
+    joint_group_positions_1[4] = 1.5723;
+    joint_group_positions_1[5] = -3.1413;
+    
+    joint_group_positions_2 = joint_group_positions_1;
+    joint_group_positions_2[0] = -0.5722;
+    joint_group_positions_2[1] = -2.6696;
+    joint_group_positions_2[2] = 1.7915;
+    joint_group_positions_2[3] = 0.872;
+    joint_group_positions_2[4] = -0.5723;
+    joint_group_positions_2[5] = -3.1413;
 
     // This position is in front of the tool holder
     joint_group_positions_3 = joint_group_positions_1;
@@ -663,6 +651,21 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     joint_group_positions_3[3] = -0.841;
     joint_group_positions_3[4] = -0.548;
     joint_group_positions_3[5] = -3.142;
+
+    moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+    moveit::planning_interface::MoveItErrorCode success, motion_done;
+    if (joint_group_positions_1[0] > -0.2)
+    {
+      if (!moveToJointPose(joint_group_positions_1, robot_name, true, 3.0, use_real_robot_, 3.0))
+      {
+        ROS_ERROR("Could not plan to before_tool_pickup joint state. Abort!");
+        return false;
+      }
+      moveToJointPose(joint_group_positions_2, robot_name, true, 3.0, use_real_robot_, 3.0);
+    }
+    else
+      ROS_INFO("Skipping intermediate high approach pose with b_bot");
+
     moveToJointPose(joint_group_positions_3, robot_name, true, 3.0, use_real_robot_, 3.0);
   }
 
@@ -677,6 +680,8 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     ROS_INFO_STREAM("screw_tool_id: " << screw_tool_id);
     if (screw_tool_id == "nut_tool_m6")
       ps_approach.pose.position.z = .052;
+    if (screw_tool_id == "set_screw_tool")
+      ps_approach.pose.position.z = .045;
     if (screw_tool_id == "suction_tool")
     {
       ps_approach.pose.position.x = -.12;
@@ -693,6 +698,8 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     ps_tool_holder.pose.position.x = 0.03;
     if (screw_tool_id == "nut_tool_m6")
       ps_tool_holder.pose.position.x = 0.02;
+    if (screw_tool_id == "set_screw_tool")
+      ps_tool_holder.pose.position.x = 0.03;
     if (screw_tool_id == "suction_tool")
       ps_tool_holder.pose.position.x = 0.01;
     if (unequip) ps_tool_holder.pose.position.x -= 0.001;  
@@ -711,7 +718,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     ps_approach.pose.position.x = -.04;
     ps_approach.pose.position.y = -.002;  // ATTENTION: MAGIC NUMBER!
     ps_approach.pose.position.z = .07;
-    if (screw_tool_id == "nut_tool_m6")
+    if (screw_tool_id == "nut_tool_m6" || screw_tool_id == "set_screw_tool")
       ps_approach.pose.position.z = .09;
     ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, M_PI/2, 0);
 
@@ -719,7 +726,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     ps_tool_holder.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, M_PI/4, 0);
     ps_tool_holder.pose.position.x = 0.025;
     ps_tool_holder.pose.position.z = .003;
-    if (screw_tool_id == "nut_tool_m6") {
+    if (screw_tool_id == "nut_tool_m6" || screw_tool_id == "set_screw_tool") {
       ps_tool_holder.pose.position.x = 0.01;
       ps_tool_holder.pose.position.z = .015;
     }
@@ -2167,8 +2174,10 @@ void SkillServer::executeChangeTool(const o2as_msgs::changeToolGoalConstPtr& goa
   std::string screw_tool_id = "screw_tool_m" + std::to_string(goal->screw_size);
   if (goal->screw_size == 66)
     screw_tool_id = "nut_tool_m6";
-  if (goal->screw_size == 50)
+  else if (goal->screw_size == 50)
     screw_tool_id = "suction_tool";
+  else if (goal->screw_size == 1)
+    screw_tool_id = "set_screw_tool";
   bool success = equipUnequipScrewTool(goal->robot_name, screw_tool_id, equip_or_unequip);
   
   if (success) { changeToolActionServer_.setSucceeded(); }
