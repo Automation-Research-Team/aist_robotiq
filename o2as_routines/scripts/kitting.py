@@ -1126,13 +1126,19 @@ class KittingClass(O2ASBaseRoutines):
       self.grasp_candidates[item.part_id]["vision_was_attempted"] = False
       self.grasp_candidates[item.part_id]["positions"] = []
       take_new_image = True
-    self.go_to_named_pose("suction_ready_back", "b_bot")
+    if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":    
+      self.go_to_named_pose("suction_ready_back", "b_bot")
+    elif "precision_gripper" in item.ee_to_use:
+      self.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
     if not self.grasp_candidates[item.part_id]["vision_was_attempted"]:
       # Vision is only attempted once, unless it succeeds in picking
       phoxi_res = self.get_grasp_candidates_from_phoxi(item, take_new_image)
       self.grasp_candidates[item.part_id]["vision_was_attempted"] = True
       take_new_image = False
-      self.go_to_named_pose("suction_pick_ready", "b_bot")
+      if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":    
+        self.go_to_named_pose("suction_pick_ready", "b_bot")
+      elif "precision_gripper" in item.ee_to_use:
+        self.go_to_named_pose("kitting_pick_ready", "a_bot")
       if phoxi_res:
         self.grasp_candidates[item.part_id]["positions"].extend(phoxi_res)
         rospy.loginfo("self.grasp_candidates: ")
