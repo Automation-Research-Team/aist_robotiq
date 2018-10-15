@@ -2151,22 +2151,39 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
     ROS_INFO_STREAM("Screw tool motor command " << (finished_before_timeout ? "returned" : "did not return before timeout") <<". Result: " << result->control_result);
   }
 
-  // Move up and away
-  target_tip_link_pose.pose.position.x -= approach_height + insertion_amount;
-  success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link);
 
-  // TODO: Check if suction is lost. If not, report failure.
-  
+  if (!goal->stay_put_after_screwing)
+  {
+    // Move up and away
+    target_tip_link_pose.pose.position.x -= approach_height + insertion_amount;
+    success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link);
+  }
+
+  bool_msg_pointer = ros::topic::waitForMessage<std_msgs::Bool>("/" + screw_tool_id + "/screw_suctioned", ros::Duration(1.0));
+  if (bool_msg_pointer != NULL){
+    screw_not_suctioned_anymore = bool_msg_pointer->data;
+    if (screw_not_suctioned_anymore)
+      break;
+  }
+  else if (!use_real_robot_) screw_not_suctioned_anymore = true;
+
   // Enable collision for screw tool again
   moveit_msgs::PlanningScene ps_reset_collisions = planning_scene_;
   acm_original.getMessage(ps_reset_collisions.allowed_collision_matrix);
   planning_scene_interface_.applyPlanningScene(ps_reset_collisions);
-  
-  // TODO: Return success or not
-  setSuctionEjection(screw_tool_id, false, false);    // Turn off both suction and ejection
 
-  ROS_INFO("screwAction is set as succeeded");
-  screwActionServer_.setSucceeded();
+  goal->success = screw_not_suctioned_anymore;
+  if (screw_not_suctioned_anymore)
+  {
+    setSuctionEjection(screw_tool_id, false, false);    // Turn off both suction and ejection
+    ROS_INFO("screwAction is set as succeeded");
+    screwActionServer_.setSucceeded();
+  }
+  else
+  {
+    ROS_INFO("screwAction did not succeed: screw is still suctioned.");
+    screwActionServer_.setAborted();
+  }
 }
 
 void SkillServer::executeChangeTool(const o2as_msgs::changeToolGoalConstPtr& goal)
