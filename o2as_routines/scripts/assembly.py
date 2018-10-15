@@ -783,7 +783,7 @@ class AssemblyClass(O2ASBaseRoutines):
     nut_intermediate_a_bot.pose.position.y = -.20
 
     nut_intermediate_c_bot = copy.deepcopy(nut_intermediate_a_bot)
-    nut_intermediate_c_bot.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/4))
+    nut_intermediate_c_bot.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi*3/4))
 
     self.place_joshua("a_bot",nut_intermediate_a_bot,0.0,
                                 speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
@@ -1475,16 +1475,6 @@ class AssemblyClass(O2ASBaseRoutines):
     self.place_joshua("b_bot", place_pose, place_height=.01, speed_fast=1.0, speed_slow=0.5, approach_height=.05)
     self.go_to_named_pose("home", "b_bot")
     return
-
-  def confirm_to_proceed(self, next_task_name):
-    # TODO: Disable this when the real competition is on (via a rosparam/member variable)
-    rospy.loginfo("Press enter to proceed to: " + next_task_name)
-    i = raw_input()
-    if i == "":
-      if not rospy.is_shutdown():
-        return True
-    raise Exception("User caused exit!")
-    return False
 
   def subtask_f(self):
     # rospy.loginfo("======== SUBTASK F (motor plate) ========")

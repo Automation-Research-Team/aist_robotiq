@@ -904,11 +904,11 @@ class TaskboardClass(O2ASBaseRoutines):
       # self.put_screw_in_feeder(screw_size)
       # self.go_to_named_pose("back", "a_bot")
 
-      # #pick up the screw tool
-      # self.go_to_named_pose("tool_pick_ready", "c_bot")
-      # self.confirm_to_proceed("good to pick?")
-      # self.do_change_tool_action("c_bot", equip=True, screw_size = screw_size)
-      # ## self.go_to_named_pose("screw_ready", "c_bot")
+      #pick up the screw tool
+      self.go_to_named_pose("tool_pick_ready", "c_bot")
+      self.confirm_to_proceed("good to pick?")
+      self.do_change_tool_action("c_bot", equip=True, screw_size = screw_size)
+      ## self.go_to_named_pose("screw_ready", "c_bot")
       
       #pick up the screw from feeder
       self.pick_screw_from_feeder(screw_size)
@@ -925,8 +925,7 @@ class TaskboardClass(O2ASBaseRoutines):
       self.confirm_to_proceed("Proceed to screw_pose?")
 
       screw_pose = copy.deepcopy(screw_approach)
-      screw_pose.pose.position.x = 0.001
-      self.go_to_named_pose("screw_ready", "c_bot")
+      screw_pose.pose.position.x = 0.003
       self.do_screw_action("c_bot", screw_pose, screw_height = 0.01, screw_size = screw_size)
 
       self.go_to_pose_goal("c_bot", screw_approach, speed=0.05, end_effector_link="c_bot_screw_tool_m" + str(screw_size) + "_tip_link", move_lin=True)
@@ -939,23 +938,23 @@ class TaskboardClass(O2ASBaseRoutines):
     if i == 13:      # M3, M4 screw
       screw_size = 4
 
-      self.go_to_named_pose("home", "a_bot")
-      self.go_to_named_pose("home", "b_bot")
-      self.go_to_named_pose("back", "c_bot")
-      screw_pick_pose = copy.deepcopy(self.pick_poses[i-1])
-      screw_pick_pose.pose.position.y += .005
-      screw_pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*45/180, pi*90/180))
-      self.pick("a_bot",screw_pick_pose,0.001,
-                              speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
-                              approach_height = 0.05, special_pick = False)    
+      # self.go_to_named_pose("home", "a_bot")
+      # self.go_to_named_pose("home", "b_bot")
+      # self.go_to_named_pose("back", "c_bot")
+      # screw_pick_pose = copy.deepcopy(self.pick_poses[i-1])
+      # screw_pick_pose.pose.position.y += .005
+      # screw_pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*45/180, pi*90/180))
+      # self.pick("a_bot",screw_pick_pose,0.001,
+      #                         speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
+      #                         approach_height = 0.05, special_pick = False)    
       
-      # If we decide to use the feeder, there is self.place_screw_in_feeder(screw_size) and self.pick_screw_from_feeder(screw_size)
+      # # If we decide to use the feeder, there is self.place_screw_in_feeder(screw_size) and self.pick_screw_from_feeder(screw_size)
 
-      ###arrange M4 screw
-      self.tilt_up_gripper(speed_fast=0.1, speed_slow=0.02)
+      # ###arrange M4 screw
+      # self.tilt_up_gripper(speed_fast=0.1, speed_slow=0.02)
 
-      #pick up the screw tool
-      self.go_to_named_pose("back", "c_bot")
+      # #pick up the screw tool
+      # self.go_to_named_pose("back", "c_bot")
       self.do_change_tool_action("b_bot", equip=True, screw_size = screw_size)
       self.go_to_named_pose("screw_ready_back", "b_bot")
       
@@ -966,7 +965,9 @@ class TaskboardClass(O2ASBaseRoutines):
 
       #screw on the cap
       screw_approach = copy.deepcopy(self.place_poses[i-1])
-      point_in_taskboard_frame = self.listener.transformPose("taskboard", screw_approach).pose.position
+      print(screw_approach)
+      # self.confirm_to_proceed("pose good?")
+      # point_in_taskboard_frame = self.listener.transformPose("taskboard", screw_approach).pose.position
       screw_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi*135/180, 0, 0))
       
       screw_approach.pose.position.x -= 0.03

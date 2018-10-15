@@ -942,10 +942,10 @@ class O2ASBaseRoutines(object):
     # ATTENTION: MAGIC NUMBERS
     if robot_name == "c_bot":
       magic_y_offset = .004
-      magic_z_offset = -.008
+      magic_z_offset = -.01
     elif robot_name == "b_bot":
       magic_y_offset = .004
-      magic_z_offset = -0.008
+      magic_z_offset = -0.01
 
     pick_pose = geometry_msgs.msg.PoseStamped()
     pick_pose.header.frame_id = "a_bot_gripper_screw_pickup"
