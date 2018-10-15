@@ -2133,6 +2133,8 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
     srv.request.max_radius = .002;
     srv.request.radius_increment = .0005;
     srv.request.spiral_axis = "Y";
+    if (goal->robot_name=="c_bot")
+      srv.request.spiral_axis = "YZ";
     sendScriptToURClient_.call(srv);
     if (srv.response.success == true)
     {
