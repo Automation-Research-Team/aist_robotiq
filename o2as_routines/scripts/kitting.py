@@ -174,6 +174,25 @@ class KittingClass(O2ASBaseRoutines):
         "part_16": 0.005, 
         "part_17": 0.005, 
         "part_18": 0.005}
+    
+    # How high the end effector should insert the bin when pick up the item.
+    self.insert_offsets = {
+        "part_4" : 0.000, 
+        "part_5" : 0.000, 
+        "part_6" : 0.002, 
+        "part_7" : 0.000,
+        "part_8" : 0.000, 
+        "part_9" : 0.003, 
+        "part_10": 0.002, 
+        "part_11": 0.000,
+        "part_12": 0.000,
+        "part_13": 0.000,
+        "part_14": 0.000, 
+        "part_15": 0.002, 
+        "part_16": 0.0005, 
+        "part_17": 0.0035, 
+        "part_18": 0.0025
+    }
 
     self.grasp_candidates = {
         4 : {
@@ -1002,8 +1021,9 @@ class KittingClass(O2ASBaseRoutines):
           # pose_in_bin.header.frame_id = item.bin_name
           pose_in_bin = self.listener.transformPose(item.bin_name, obj_pose_in_camera)
           pose_in_bin.pose.orientation = self.downward_orientation
-          if item.ee_to_use in ["robotiq_gripper", "precision_gripper_from_inside"]:
-            pose_in_bin.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, resp_search_grasp.rotipz[i]*pi/180.0))
+          if item.ee_to_use in ["precision_gripper_from_outside", "robotiq_gripper"]:
+            pose_in_bin.pose.orientation = geometry_msgs.msg.Quaternion(
+              *tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi - resp_search_grasp.rotipz[i]))
           poses_in_bin.append(pose_in_bin)
         self.publish_marker(pose_in_bin, "aist_vision_result")
         rospy.loginfo("Calculated " + str(number_of_pose_candidates) + " for item nr. " + str(item.part_id) + " in bin " + str(item.bin_name))
@@ -1168,17 +1188,28 @@ class KittingClass(O2ASBaseRoutines):
       # Get the pick_pose for the item, either random or from vision
       pick_pose = self.get_random_pose_in_bin(item)
       grasp_candidate_from_vision = False
-      if item.ee_to_use == "precision_gripper_from_inside" and not item.bin_is_inclined and not item.part_id in [17, 18]:
-        res_view_bin = self.view_bin(robot_name, item.bin_name, item.part_id)    
-        if res_view_bin:
-          pick_pose = res_view_bin
-          pick_pose.pose.position.z -= .025 # MAGIC NUMBER (to compensate for the Realsense calibration)
-      if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
+
+      if not item.bin_is_inclined and not item.part_id in [17, 18]:
         if self.grasp_candidates[item.part_id]["positions"]:
           rospy.loginfo("Got pose from phoxi grasp candidates:")
           rospy.loginfo(pick_pose.pose.position)
           pick_pose = self.grasp_candidates[item.part_id]["positions"].pop(0)
+          pick_pose.pose.position.z += self.insert_offsets
           grasp_candidate_from_vision = True
+
+      # if item.ee_to_use == "precision_gripper_from_inside" and not item.bin_is_inclined and not item.part_id in [17, 18]:
+      #   res_view_bin = self.view_bin(robot_name, item.bin_name, item.part_id)    
+      #   if res_view_bin:
+      #     pick_pose = res_view_bin
+      #     pick_pose.pose.position.z -= .025 # MAGIC NUMBER (to compensate for the Realsense calibration)
+
+      # if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
+      #   if self.grasp_candidates[item.part_id]["positions"]:
+      #     rospy.loginfo("Got pose from phoxi grasp candidates:")
+      #     rospy.loginfo(pick_pose.pose.position)
+      #     pick_pose = self.grasp_candidates[item.part_id]["positions"].pop(0)
+      #     pick_pose.pose.position.z += self.insert_offsets
+      #     grasp_candidate_from_vision = True
 
         if item.ee_to_use == "robotiq_gripper":
           self.go_to_named_pose("home", "b_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
@@ -1193,11 +1224,11 @@ class KittingClass(O2ASBaseRoutines):
             pick_pose.pose.orientation = self.suction_orientation_right_bins
           else:
             pick_pose.pose.orientation = self.suction_orientation_left_bins
-      else:   # Precision_gripper, robotiq_gripper
-        if not item.bin_is_inclined:
-          pick_pose.pose.orientation = self.downward_orientation_2
-      if item.part_id == 6: # Belt
-        pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
+      # else:   # Precision_gripper, robotiq_gripper
+      #   if not item.bin_is_inclined:
+      #     pick_pose.pose.orientation = self.downward_orientation_2
+      # if item.part_id == 6: # Belt
+      #   pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
 
       approach_height = 0.1
       speed_slow = 0.1
