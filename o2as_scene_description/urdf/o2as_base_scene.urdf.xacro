@@ -129,10 +129,10 @@
   <!-- Feeders -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/screw_feeder.xacro" />
   <xacro:screw_feeder feedername="m3_feeder" parent="c_bot_base_smfl">
-    <origin xyz=".66 -0.25 .065" rpy="0 0 ${pi/2}" />   
+    <origin xyz=".64 -0.25 .035" rpy="0 0 ${pi/2}" />   
   </xacro:screw_feeder>
   <xacro:screw_feeder feedername="m4_feeder" parent="c_bot_base_smfl">
-    <origin xyz=".52 -0.25 .065" rpy="0 0 ${pi/2}" />   
+    <origin xyz=".50 -0.25 .035" rpy="0 0 ${pi/2}" />   
   </xacro:screw_feeder>
 
   <!-- Add cameras -->
