@@ -115,7 +115,7 @@ class CalibrationClass(O2ASBaseRoutines):
         # rospy.sleep(.2)
         self.go_to_pose_goal(robot_name, ps_approach,speed=speed,end_effector_link=end_effector_link, move_lin = move_lin)
       if go_home:
-        self.go_to_named_pose(home_pose, robot_name)
+        self.go_to_named_pose(home_pose, robot_name, force_ur_script=move_lin)
     
     # if go_home:
     #   rospy.loginfo("Moving all robots home again.")
@@ -180,59 +180,49 @@ class CalibrationClass(O2ASBaseRoutines):
     self.go_to_named_pose("home", "c_bot")
     return
 
-  def check_c_bot_calibration(self):
-    rospy.loginfo("============ Going to 5 mm above workspace center points with c_bot. ============")
-    self.go_to_named_pose("back", "b_bot")
-    self.go_to_named_pose("back", "a_bot")
-    self.go_to_named_pose("home", "c_bot")
+  def check_level_calibration(self, robot_name="c_bot"):
+    rospy.loginfo("============ Going to 5 mm above workspace center points with " + robot_name + " ============")
+    if not robot_name == "b_bot":
+      self.go_to_named_pose("back", "b_bot")
+    if not robot_name == "a_bot":
+      self.go_to_named_pose("back", "a_bot")
+    if not robot_name == "c_bot":
+      self.go_to_named_pose("back", "c_bot")
     poses = []
 
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "workspace_center"
     pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    pose0.pose.position.x = -.3
-    pose0.pose.position.z = .005
-    
-    for i in range(4):
-      poses.append(copy.deepcopy(pose0))
+    if robot_name == "c_bot":
+      pose0.pose.position.x = -.3
+      pose0.pose.position.z = .005
+      
+      for i in range(4):
+        poses.append(copy.deepcopy(pose0))
 
-    poses[1].pose.position.x = 0.0
-    
-    poses[2].pose.position.y = -.3
-    poses[2].pose.position.x = -.3
-    
-    poses[3].pose.position.y = .3
+      poses[1].pose.position.x = 0.0
+      
+      poses[2].pose.position.y = -.3
+      poses[2].pose.position.x = -.3
+      
+      poses[3].pose.position.y = .3
+    elif robot_name == "b_bot" or robot_name == "a_bot":
+      pose0.pose.position.z = .005
+      
+      for i in range(5):
+        poses.append(copy.deepcopy(pose0))
 
-    self.cycle_through_calibration_poses(poses, "c_bot", speed=0.3, go_home=True)
-    return
+      poses[1].pose.position.x = -.3
+      poses[1].pose.position.y = .2
+      poses[3].pose.position.x = -.3
+      poses[2].pose.position.y = -.2
+      
+      poses[3].pose.position.x = .3
+      poses[3].pose.position.y = .2
+      poses[4].pose.position.x = .3
+      poses[4].pose.position.y = -.2
 
-  def check_b_bot_calibration(self):
-    rospy.loginfo("============ Going to 5 mm above workspace center points with b_bot. ============")
-    self.go_to_named_pose("back", "c_bot")
-    self.go_to_named_pose("back", "a_bot")
-    self.go_to_named_pose("home", "b_bot")
-    poses = []
-
-    pose0 = geometry_msgs.msg.PoseStamped()
-    pose0.header.frame_id = "workspace_center"
-    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    pose0.pose.position.z = .005
-    
-    for i in range(7):
-      poses.append(copy.deepcopy(pose0))
-
-    poses[1].pose.position.y = .3
-    poses[2].pose.position.y = -.3
-    
-    poses[3].pose.position.y = 0.0
-    poses[3].pose.position.x = -.3
-    poses[4].pose.position.x = .3
-
-    poses[5].pose.position.y = -.3
-    poses[5].pose.position.x = -.3
-    poses[6].pose.position.x = .3
-
-    self.cycle_through_calibration_poses(poses, "b_bot", speed=0.3, go_home=True)
+    self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, move_lin=True, go_home=True)
     return
   
   def align_c_b(self, part):
@@ -306,7 +296,7 @@ class CalibrationClass(O2ASBaseRoutines):
       poses[0].header.frame_id = "taskboard_corner2"
       poses[1].header.frame_id = "taskboard_corner3"
       # poses[1].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
-      poses[2].header.frame_id = "taskboard_part10"
+      poses[2].header.frame_id = "taskboard_part15"
       speed = .1
       
     else:   # "Full" calibration of the board
@@ -483,6 +473,9 @@ class CalibrationClass(O2ASBaseRoutines):
     if context == "motor_plate" and "screw" in end_effector_link:
       self.go_to_named_pose("screw_plate_ready", robot_name)
       pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/3, 0, 0) )
+    if robot_name == "c_bot" and "nut" in end_effector_link:
+      self.go_to_named_pose("screw_ready", robot_name)
+      pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, 0, 0) )
 
     if context == "motor_plate":
       for i in range(2):
@@ -543,7 +536,7 @@ class CalibrationClass(O2ASBaseRoutines):
     pose_a.header.frame_id = "workspace_center"
     pose_a.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     pose_a.pose.position.x = .0
-    pose_a.pose.position.y = -.3
+    pose_a.pose.position.y = -.2
     pose_a.pose.position.z = .03
 
     pose_b = copy.deepcopy(pose_a)
@@ -558,14 +551,17 @@ class CalibrationClass(O2ASBaseRoutines):
     rospy.loginfo("============ Going to 2 cm above the table. ============")
     self.go_to_pose_goal("c_bot", pose_c, speed=1.0)
     self.go_to_pose_goal("b_bot", pose_b, speed=1.0)
+    self.go_to_pose_goal("a_bot", pose_a, speed=1.0)
 
     rospy.loginfo("============ Press enter to go to .1 cm above the table. ============")
     i = raw_input()
     if not rospy.is_shutdown():
+      pose_a.pose.position.z = .001
       pose_b.pose.position.z = .001
       pose_c.pose.position.z = .001
       self.go_to_pose_goal("c_bot", pose_c, speed=0.01)
       self.go_to_pose_goal("b_bot", pose_b, speed=0.01)
+      self.go_to_pose_goal("a_bot", pose_a, speed=0.01)
 
     rospy.loginfo("============ Press enter to go home. ============")
     raw_input()
@@ -1250,8 +1246,7 @@ if __name__ == '__main__':
       rospy.loginfo("112: The robots (Using the corner between b/c)")
       rospy.loginfo("113: The robots (Using the corner between a/b)")
       rospy.loginfo("12: Touch the table (all bots)")
-      rospy.loginfo("122: Go to different spots on table with c_bot")
-      rospy.loginfo("123: Go to different spots on table with b_bot")
+      rospy.loginfo("122-124: Level workspace = Go to different spots on table with c, b, a_bot")
       rospy.loginfo("131, 132, 133: Align c/b grippers part 1 (near board /  by holders / high up)")
       rospy.loginfo("14: a_bot gripper frame")
       rospy.loginfo("2: Taskboard initial 3-point (a_bot)")
@@ -1288,9 +1283,11 @@ if __name__ == '__main__':
       rospy.loginfo("58: Go to retainer pin holder with b_bot")
       rospy.loginfo("6: ===== TOOLS|  Go to screw_ready with c and b (a goes to back)")
       rospy.loginfo("611, 612: Go to screw holder with b_bot, c_bot")
-      rospy.loginfo("621, 622 (623, 624): Equip/unequip m4 (m3) tool (with b_bot)")
-      rospy.loginfo("625, 626 (627, 628): Equip/unequip m4 (m3) tool (with c_bot)")
-      rospy.loginfo("629, 6291: Equip/unequip suction tool (with b_bot)")
+      rospy.loginfo("6211, 6212 (6221, 6222): Equip/unequip m4 (m3) tool (with b_bot)")
+      rospy.loginfo("6231, 6232 (6241, 6242): Equip/unequip m4 (m3) tool (with c_bot)")
+      rospy.loginfo("6251, 6252 (6261, 6262): Equip/unequip m6 screw tool with b_bot (or c_bot)")
+      rospy.loginfo("6271, 6272 (6281, 6282): Equip/unequip m6 nut tool with b_bot (or c_bot)")
+      rospy.loginfo("6291, 6292: Equip/unequip suction tool (with b_bot)")
       rospy.loginfo("63, 64: Go to assembly base plate with m4 screw tool (b_bot, c_bot)")
       rospy.loginfo("641: Go to assembly base plate with m6 nut tool (c_bot; m6 nut tool has to be equipped)")
       rospy.loginfo("661: Go to all 3 trays' positions with m4 tool for c_bot (tool has to be equipped)")
@@ -1347,9 +1344,11 @@ if __name__ == '__main__':
       elif r == '12':
         c.touch_the_table()
       elif r == '122':
-        c.check_c_bot_calibration()
+        c.check_level_calibration("c_bot")
       elif r == '123':
-        c.check_b_bot_calibration()
+        c.check_level_calibration("b_bot")
+      elif r == '124':
+        c.check_level_calibration("a_bot")
       elif r == '131':
         c.align_c_b(part=1)
       elif r == '132':
@@ -1499,37 +1498,64 @@ if __name__ == '__main__':
         c.go_to_named_pose("back", "c_bot")
         c.go_to_named_pose("home", "b_bot")
         c.do_change_tool_action("b_bot", equip=True, screw_size = 4)
-      elif r == '622':
+      elif r == '6212':
         c.go_to_named_pose("back", "c_bot")
         c.do_change_tool_action("b_bot", equip=False, screw_size = 4)
-      elif r == '623':
+      elif r == '6221':
         c.go_to_named_pose("back", "c_bot")
         c.go_to_named_pose("home", "b_bot")
         c.do_change_tool_action("b_bot", equip=True, screw_size = 3)
-      elif r == '624':
+      elif r == '6222':
         c.go_to_named_pose("back", "c_bot")
         c.do_change_tool_action("b_bot", equip=False, screw_size = 3)
-      elif r == '625':
+      elif r == '6231':
         c.go_to_named_pose("back", "b_bot")
         c.go_to_named_pose("tool_pick_ready", "c_bot")
         c.do_change_tool_action("c_bot", equip=True, screw_size = 4)
-      elif r == '626':
+      elif r == '6232':
         c.go_to_named_pose("back", "b_bot")
         c.go_to_named_pose("tool_pick_ready", "c_bot")
         c.do_change_tool_action("c_bot", equip=False, screw_size = 4)
-      elif r == '627':
+      elif r == '6241':
         c.go_to_named_pose("back", "b_bot")
         c.go_to_named_pose("tool_pick_ready", "c_bot")
         c.do_change_tool_action("c_bot", equip=True, screw_size = 3)
-      elif r == '628':
+      elif r == '6242':
         c.go_to_named_pose("back", "b_bot")
         c.go_to_named_pose("tool_pick_ready", "c_bot")
         c.do_change_tool_action("c_bot", equip=False, screw_size = 3)
-      elif r == '629':
+      elif r == '6251':
         c.go_to_named_pose("back", "c_bot")
-        c.go_to_named_pose("home", "b_bot")
-        c.do_change_tool_action("b_bot", equip=True, screw_size = 50)
+        c.do_change_tool_action("b_bot", equip=True, screw_size = 6)
+      elif r == '6252':
+        c.go_to_named_pose("back", "c_bot")
+        c.do_change_tool_action("b_bot", equip=False, screw_size = 6)
+      elif r == '6261':
+        c.go_to_named_pose("back", "b_bot")
+        c.go_to_named_pose("tool_pick_ready", "c_bot")
+        c.do_change_tool_action("c_bot", equip=True, screw_size = 6)
+      elif r == '6262':
+        c.go_to_named_pose("back", "b_bot")
+        c.go_to_named_pose("tool_pick_ready", "c_bot")
+        c.do_change_tool_action("c_bot", equip=False, screw_size = 6)
+      elif r == '6271':
+        c.go_to_named_pose("back", "c_bot")
+        c.do_change_tool_action("b_bot", equip=True, screw_size = 66)
+      elif r == '6272':
+        c.go_to_named_pose("back", "c_bot")
+        c.do_change_tool_action("b_bot", equip=False, screw_size = 66)
+      elif r == '6281':
+        c.go_to_named_pose("back", "b_bot")
+        c.go_to_named_pose("tool_pick_ready", "c_bot")
+        c.do_change_tool_action("c_bot", equip=True, screw_size = 66)
+      elif r == '6282':
+        c.go_to_named_pose("back", "b_bot")
+        c.go_to_named_pose("tool_pick_ready", "c_bot")
+        c.do_change_tool_action("c_bot", equip=False, screw_size = 66)
       elif r == '6291':
+        c.go_to_named_pose("back", "c_bot")
+        c.do_change_tool_action("b_bot", equip=True, screw_size = 50)
+      elif r == '6292':
         c.go_to_named_pose("back", "c_bot")
         c.do_change_tool_action("b_bot", equip=False, screw_size = 50)
       elif r == '63':
