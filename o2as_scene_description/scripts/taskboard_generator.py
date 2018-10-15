@@ -41,8 +41,9 @@ with open(os.path.join(rp.get_path("o2as_scene_description"), "urdf/templates", 
         
         outfile.write("    <child link=\"${boardname}_part"+str(row[0])+"\"/>\n")
 
-        if str(row[4]) == "N.A":
-            outfile.write("    <origin rpy=\"0.0 0.0 ${pi/2}\" xyz=\""+str(row[1])+" "+str(row[2])+" "+str(row[3])+"\"/>\n")
+        if str(row[0]) == "12" or str(row[0]) == "13":
+            temp_angle = (90. + float(row[4]))/180.
+            outfile.write("    <origin rpy=\"${pi*-0.5} ${pi*0.5} ${pi*0.}\" xyz=\""+str(row[1])+" "+str(row[2])+" "+str(row[3])+"\"/>\n")
         else:
             temp_angle = (90. + float(row[4]))/180.
             outfile.write("    <origin rpy=\"0.0 0.0 ${pi*"+str(temp_angle)+"}\" xyz=\""+str(row[1])+" "+str(row[2])+" "+str(row[3])+"\"/>\n")
