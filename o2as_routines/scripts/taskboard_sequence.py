@@ -956,7 +956,14 @@ class TaskboardClass(O2ASBaseRoutines):
 
       screw_pose = copy.deepcopy(screw_approach)
       screw_pose.pose.position.x = 0.003
-      self.do_screw_action("c_bot", screw_pose, screw_height = 0.01, screw_size = screw_size)
+      self.do_screw_action("c_bot", screw_pose, screw_height = 0.01, screw_size = screw_size, stay_put_after_screwing=True)
+
+      screw_pose_manual_followup = copy.deepcopy(screw_approach)
+      screw_pose_manual_followup.pose.position.x = 0.006      
+      self.set_motor("screw_tool_m3", direction = "tighten", wait=False, speed = 500, duration = 10)
+      self.horizontal_spiral_motion(max_radius = .002. radius_increment = .001, spiral_axis="YZ")
+      rospy.sleep(5.0)
+      self.set_suction("screw_tool_m3", False, False)
 
       self.go_to_pose_goal("c_bot", screw_approach, speed=0.05, end_effector_link="c_bot_screw_tool_m" + str(screw_size) + "_tip_link", move_lin=True)
 
@@ -1005,7 +1012,14 @@ class TaskboardClass(O2ASBaseRoutines):
 
       screw_pose = copy.deepcopy(screw_approach)
       screw_pose.pose.position.x = 0.001
-      self.do_screw_action("b_bot", screw_pose, screw_height = 0.01, screw_size = screw_size)
+      self.do_screw_action("b_bot", screw_pose, screw_height = 0.01, screw_size = screw_size, stay_put_after_screwing=True)
+
+      screw_pose_manual_followup = copy.deepcopy(screw_approach)
+      screw_pose_manual_followup.pose.position.x = 0.005      
+      self.set_motor("screw_tool_m3", direction = "tighten", wait=False, speed = 500, duration = 10)
+      self.horizontal_spiral_motion(max_radius = .002. radius_increment = .001, spiral_axis="YZ")
+      rospy.sleep(5.0)
+      self.set_suction("screw_tool_m3", False, False)
 
       self.go_to_pose_goal("b_bot", screw_approach, speed=0.05, end_effector_link="b_bot_screw_tool_m" + str(screw_size) + "_tip_link", move_lin=True)
 
