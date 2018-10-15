@@ -715,11 +715,12 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   }
   else if (robot_name == "c_bot")
   {
-    ps_approach.pose.position.x = -.04;
+    ps_approach.pose.position.x = -.02;
     ps_approach.pose.position.y = -.002;  // ATTENTION: MAGIC NUMBER!
     ps_approach.pose.position.z = .07;
     if (screw_tool_id == "nut_tool_m6" || screw_tool_id == "set_screw_tool")
-      ps_approach.pose.position.z = .09;
+      ps_approach.pose.position.z = .07;
+      ps_tool_holder.pose.position.y = -.006;  // ATTENTION: MAGIC NUMBER!  
     ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, M_PI/2, 0);
 
     ps_tool_holder = ps_approach;
@@ -727,6 +728,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     ps_tool_holder.pose.position.x = 0.025;
     ps_tool_holder.pose.position.z = .003;
     if (screw_tool_id == "nut_tool_m6" || screw_tool_id == "set_screw_tool") {
+      ps_tool_holder.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, M_PI*60.0/180.0, 0);
       ps_tool_holder.pose.position.x = 0.01;
       ps_tool_holder.pose.position.z = .015;
     }
@@ -735,7 +737,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     
     ps_move_away = ps_tool_holder;
     ps_move_away.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, M_PI/2, 0);
-    ps_move_away.pose.position.x = -.12;
+    ps_move_away.pose.position.x = -.08;
     ps_move_away.pose.position.z = .06;
 
     ps_high_up = ps_move_away;

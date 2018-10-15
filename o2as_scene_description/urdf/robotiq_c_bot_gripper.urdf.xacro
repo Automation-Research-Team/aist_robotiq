@@ -10,40 +10,48 @@
     
     <xacro:robotiq_85_gripper_with_ft300 prefix="${prefix}" parent="${parent}"/>
 
-    <!-- This helper frame is oriented like the screw tool tip frame -->
-    <joint name="${prefix}robotiq_85_tip_rotation_helper_joint" type="fixed">
+    <!-- This helper frame is oriented like the screw tool tip frames -->
+    <joint name="${prefix}robotiq_85_tip_45deg_helper_joint" type="fixed">
       <parent link="${prefix}robotiq_85_tip_link"/>
-      <child link="${prefix}robotiq_85_tip_rotation_helper_link"/>
+      <child link="${prefix}robotiq_85_tip_45deg_helper_link"/>
       <origin rpy="0.0 ${-pi/4} 0.0" xyz="-.03 0 0"/>
     </joint>
-    <link name="${prefix}robotiq_85_tip_rotation_helper_link"/>
+    <link name="${prefix}robotiq_85_tip_45deg_helper_link"/>
+
+    <!-- This helper frame is oriented like the nut tool tip frame -->
+    <joint name="${prefix}robotiq_85_tip_30deg_helper_joint" type="fixed">
+      <parent link="${prefix}robotiq_85_tip_link"/>
+      <child link="${prefix}robotiq_85_tip_30deg_helper_link"/>
+      <origin rpy="0.0 ${-pi/6} 0.0" xyz="-.03 0 0"/>
+    </joint>
+    <link name="${prefix}robotiq_85_tip_30deg_helper_link"/>
 
     <!-- Screw tool tips. X-axis points along the screw into the hole. -->
     <joint name="${prefix}robotiq_85_m6_screw_tool_tip_joint" type="fixed">
-      <parent link="${prefix}robotiq_85_tip_rotation_helper_link"/>
+      <parent link="${prefix}robotiq_85_tip_45deg_helper_link"/>
       <child link="${prefix}screw_tool_m6_tip_link"/>
       <origin rpy="0.0 0 0" xyz="0.12 0 .006"/>
     </joint>
     <link name="${prefix}screw_tool_m6_tip_link"/>
     
     <joint name="${prefix}robotiq_85_m4_screw_tool_tip_joint" type="fixed">
-      <parent link="${prefix}robotiq_85_tip_rotation_helper_link"/>
+      <parent link="${prefix}robotiq_85_tip_45deg_helper_link"/>
       <child link="${prefix}screw_tool_m4_tip_link"/>
       <origin rpy="0.0 0 0" xyz="0.151 0 .006"/>
     </joint>
     <link name="${prefix}screw_tool_m4_tip_link"/>
 
     <joint name="${prefix}robotiq_85_m3_screw_tool_tip_joint" type="fixed">
-      <parent link="${prefix}robotiq_85_tip_rotation_helper_link"/>
+      <parent link="${prefix}robotiq_85_tip_45deg_helper_link"/>
       <child link="${prefix}screw_tool_m3_tip_link"/>
       <origin rpy="0.0 0 0" xyz="0.132 0 .006"/>
     </joint>
     <link name="${prefix}screw_tool_m3_tip_link"/>
 
     <joint name="${prefix}robotiq_85_nut_tool_m6_tip_joint" type="fixed">
-      <parent link="${prefix}robotiq_85_tip_rotation_helper_link"/>
+      <parent link="${prefix}robotiq_85_tip_30deg_helper_link"/>
       <child link="${prefix}nut_tool_m6_tip_link"/>
-      <origin rpy="0 0 0" xyz="0.052 0.0 .006 "/>
+      <origin rpy="0 0 0" xyz="0.057 0.0 -.014 "/>
     </joint>
     <link name="${prefix}nut_tool_m6_tip_link"/>
 

@@ -105,7 +105,7 @@
   <joint name="nut_tool_m6_to_holder" type="fixed">
     <parent link="screw_tool_holder" />
     <child link="nut_tool_m6_link" />
-    <origin xyz="-0.05 ${tool_offset} 0.004" rpy="0.0 0.0 0.0" />
+    <origin xyz="-0.35 ${tool_offset} 0.004" rpy="0.0 0.0 0.0" />
   </joint>
 
   
