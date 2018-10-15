@@ -61,7 +61,7 @@ class VisitRoutines(O2ASBaseRoutines):
     poseStamped.header.frame_id = "workspace_center"
     poseStamped.pose.position.x = position.vector.x
     poseStamped.pose.position.y = position.vector.y
-    poseStamped.pose.position.z = position.vector.z - 0.0285 + 0.05
+    poseStamped.pose.position.z = position.vector.z + 0.05 # - 0.0285
     poseStamped.pose.orientation \
       = geometry_msgs.msg.Quaternion(
         *tf_conversions.transformations.quaternion_from_euler(
@@ -70,7 +70,7 @@ class VisitRoutines(O2ASBaseRoutines):
                                                      poseStamped, speed,
                                                      move_lin=False)
     rospy.sleep(1)
-    poseStamped.pose.position.z = position.vector.z -0.0285 + 0.01
+    poseStamped.pose.position.z = position.vector.z + 0.01 # -0.0285
     [all_close, move_success] = self.go_to_pose_goal(self.robot_name,
                                                      poseStamped, speed,
                                                      move_lin=False)
