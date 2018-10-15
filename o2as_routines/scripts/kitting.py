@@ -977,6 +977,8 @@ class KittingClass(O2ASBaseRoutines):
           # pose_in_bin.header.frame_id = item.bin_name
           pose_in_bin = self.listener.transformPose(item.bin_name, obj_pose_in_camera)
           pose_in_bin.pose.orientation = self.downward_orientation
+          if item.ee_to_use in ["robotiq_gripper", "precision_gripper_from_inside"]:
+            pose_in_bin.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, resp_search_grasp.rotiqz[i]*pi/180.0))
           poses_in_bin.append(pose_in_bin)
         self.publish_marker(pose_in_bin, "aist_vision_result")
         rospy.loginfo("Calculated " + str(number_of_pose_candidates) + " for item nr. " + str(item.part_id) + " in bin " + str(item.bin_name))
