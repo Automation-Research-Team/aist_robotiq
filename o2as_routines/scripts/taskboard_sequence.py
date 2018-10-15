@@ -349,7 +349,9 @@ class TaskboardClass(O2ASBaseRoutines):
     taskboard.go_to_pose_goal("b_bot", belt_tool_approach, speed=0.1, move_lin=True)
 
   def do_task_number(self, i):
-    if i == 1: 
+    self.log_to_debug_monitor("=== Subtask id {} start ===".format(i), "operation")
+
+    if i == 1:
       b_bot_dx_pick = 0.0 ## MAGIC NUMBER
       b_bot_dy_pick = 0.0 ## MAGIC NUMBER
       bearing_pick_pose_b = copy.deepcopy(self.pick_poses[i-1])
@@ -359,6 +361,7 @@ class TaskboardClass(O2ASBaseRoutines):
       self.go_to_named_pose("home","a_bot")
       self.go_to_named_pose("home","b_bot")
       self.go_to_named_pose("back","c_bot")
+      self.log_to_debug_monitor("Pick", "operation")
       self.pick("b_bot",self.pick_poses[i-1],self.item_pick_heights[i-1],
                       speed_fast = 0.5, speed_slow = 0.1, gripper_command="close",
                       approach_height = 0.07)
@@ -376,6 +379,7 @@ class TaskboardClass(O2ASBaseRoutines):
       bearing_b_place_pose_approach.pose.position.z = .15
       self.go_to_pose_goal("b_bot", bearing_b_place_pose_approach, speed=0.5, move_lin=True)
       self.go_to_pose_goal("b_bot", bearing_b_place_pose, speed=0.15, move_lin=True)
+      self.log_to_debug_monitor("Push", "operation")
       self.do_linear_push("b_bot", 5, wait = True)
       self.send_gripper_command(gripper="b_bot", command="open")
       rospy.sleep(1.0)
@@ -391,6 +395,7 @@ class TaskboardClass(O2ASBaseRoutines):
       bearing_b_place_pose.pose.position.z = 0.0
       
       z_a_bot = 0.015
+      self.log_to_debug_monitor("Place", "operation")
       self.place("a_bot", bearing_b_place_pose, z_a_bot,
                               speed_fast = 0.5, speed_slow = 0.02, gripper_command="none",
                               approach_height = 0.05, lift_up_after_place = False)
@@ -405,21 +410,23 @@ class TaskboardClass(O2ASBaseRoutines):
       
       # ### Push with b_bot
       ### Pushing with b_bot only does not work. The tool needs to be grasped beforehand.
+      self.log_to_debug_monitor("Push", "operation")
       self.go_to_pose_goal("b_bot", bearing_a_place_pose, speed=0.15, move_lin=True)
       self.send_gripper_command(gripper="b_bot", command=0.04)
+      self.log_to_debug_monitor("Push", "operation")
       self.do_linear_push("b_bot", 20, wait = True)
       self.go_to_pose_goal("b_bot", bearing_a_place_pose, speed=0.15, move_lin=True)
       self.go_to_named_pose("home","b_bot")
       rospy.loginfo("Done")
-
       # TODO: Make sure the task succeeded by pushing with b_bot and plate 3
 
-    if i == 2: #unadjusted 
+    if i == 2: #unadjusted
       ###set the tool
       tool_pickup_pose = geometry_msgs.msg.PoseStamped()
       tool_pickup_pose.header.frame_id = "retainer_pin_insertion_tool"
       tool_pickup_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
       tool_grasped_height = 0.03
+      self.log_to_debug_monitor("Pick", "operation")
       self.pick("b_bot",tool_pickup_pose, tool_grasped_height,
                           speed_fast = 1.0, speed_slow = 0.5, gripper_command="close",
                           approach_height = 0.1)
@@ -433,6 +440,7 @@ class TaskboardClass(O2ASBaseRoutines):
       self.place("b_bot",self.place_poses[i-1], tool_grasped_height + .001,
                       speed_fast = 1.0, speed_slow = 0.5, gripper_command="none",
                       approach_height = 0.05, lift_up_after_place = False)
+
       self.send_gripper_command(gripper="b_bot", command=.02, velocity = .013)
       rospy.sleep(2.0)
       self.send_gripper_command(gripper="b_bot", command="open")
@@ -482,6 +490,7 @@ class TaskboardClass(O2ASBaseRoutines):
                                 speed_fast = 1.0, speed_slow = 0.2, gripper_command="",
                                 approach_height = 0.1, special_pick = False)
         self.go_to_pose_goal("b_bot", pin_pick_approach, speed=1.0, move_lin=True)
+
 
         self.adjust_centering(go_fast=True)
 
@@ -539,7 +548,7 @@ class TaskboardClass(O2ASBaseRoutines):
                               approach_height = 0.1, lift_up_after_place = False)
       self.horizontal_spiral_motion("a_bot", .004)
       rospy.loginfo("doing spiral motion")
-    
+
     if i == 4:    # Washer
       self.pick("a_bot",self.pick_poses[i-1],self.item_pick_heights[i-1],
                               speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
@@ -549,7 +558,7 @@ class TaskboardClass(O2ASBaseRoutines):
                               speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
                               approach_height = 0.1, lift_up_after_place = False)
       self.horizontal_spiral_motion("a_bot", max_radius=.004, radius_increment=.002)
-    
+
     if i == 5:
       rospy.loginfo("Part 5 was deleted and is skipped.")
       pass
@@ -649,7 +658,6 @@ class TaskboardClass(O2ASBaseRoutines):
       self.send_gripper_command(gripper="b_bot", command="open")
       
       self.go_to_named_pose("home","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-      
       # self.place("b_bot", belt_tool_place_pose, place_height=belt_tool_grasp_height+.002, speed_fast = 0.2, speed_slow = 0.03, gripper_command="open",
       #                         approach_height = 0.03, lift_up_after_place = True)
 
@@ -748,7 +756,7 @@ class TaskboardClass(O2ASBaseRoutines):
       self.go_to_pose_goal("b_bot", screw_tool_hold_approach_high, speed=.02, move_lin = True, end_effector_link="b_bot_screw_tool_m6_tip_link")
       self.go_to_named_pose("screw_ready", "b_bot")
 
-    if i == 8:  
+    if i == 8:
       #pick up the tool
       tool_pose = geometry_msgs.msg.PoseStamped()
       tool_pose.header.frame_id = "M10nut_tool"
@@ -1089,6 +1097,8 @@ class TaskboardClass(O2ASBaseRoutines):
       self.do_linear_push("b_bot", 3, wait = True)
       self.go_to_pose_goal("b_bot", p, speed=0.2)
       self.go_to_named_pose("home", "b_bot")
+
+    self.log_to_debug_monitor("=== Subtask id {} end ===".format(i), "operation")
 
 if __name__ == '__main__':
   try:

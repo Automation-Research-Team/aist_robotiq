@@ -467,7 +467,8 @@ class O2ASBaseRoutines(object):
   def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False):
     #self.publish_marker(object_pose, "pick_pose")
     #initial gripper_setup
-    rospy.loginfo("Going above object to pick")
+    #rospy.loginfo("Going above object to pick")
+    self.log_to_debug_monitor("Pick", "operation")
     rospy.logdebug("Approach height 0: " + str(approach_height))
     object_pose.pose.position.z += approach_height
     rospy.logdebug("Height 1: " + str(object_pose.pose.position.z))
@@ -519,6 +520,7 @@ class O2ASBaseRoutines(object):
     #   object_pose.pose.orientation = self.downward_orientation
     rospy.sleep(1.0)
     rospy.loginfo("Going back up")
+
     object_pose.pose.position.z += approach_height
     rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
@@ -529,6 +531,7 @@ class O2ASBaseRoutines(object):
 
   def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, lift_up_after_place = True):
     #self.publish_marker(object_pose, "place_pose")
+    self.log_to_debug_monitor("Place", "operation")
     rospy.loginfo("Going above place target")
     object_pose.pose.position.z += approach_height
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
@@ -622,6 +625,7 @@ class O2ASBaseRoutines(object):
 
   def do_change_tool_action(self, robot_name, equip=True, 
                         screw_size = 4):
+    self.log_to_debug_monitor("Change tool", "operation")
     goal = o2as_msgs.msg.changeToolGoal()
     goal.robot_name = robot_name
     goal.equip_the_tool = equip
@@ -788,6 +792,8 @@ class O2ASBaseRoutines(object):
     return 
 
   def precision_gripper_outer_close(self):
+    self.log_to_debug_monitor("Precision gripper outer close", "operation")
+
     try:
         goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
         goal.close_outer_gripper_fully = True
@@ -802,6 +808,8 @@ class O2ASBaseRoutines(object):
 
 
   def precision_gripper_outer_open(self):
+    self.log_to_debug_monitor("Precision gripper outer open", "operation")
+
     try:
         goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
         goal.open_outer_gripper_fully = True
@@ -815,6 +823,8 @@ class O2ASBaseRoutines(object):
         rospy.loginfo("program interrupted before completion", file=sys.stderr)
 
   def precision_gripper_inner_close(self, this_action_grasps_an_object = False):
+    self.log_to_debug_monitor("Precision gripper inner close", "operation")
+
     try:
         goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
         goal.close_inner_gripper_fully = True
@@ -829,6 +839,8 @@ class O2ASBaseRoutines(object):
 
 
   def precision_gripper_inner_open(self, this_action_grasps_an_object = False):
+    self.log_to_debug_monitor("Precision gripper inner open", "operation")
+
     try:
         goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
         goal.open_inner_gripper_fully = True
@@ -843,6 +855,8 @@ class O2ASBaseRoutines(object):
         rospy.loginfo("program interrupted before completion", file=sys.stderr)
   
   def precision_gripper_inner_open_slightly(self, open_range = 30):
+    self.log_to_debug_monitor("Precision gripper inner open slightly","operation")
+
     try:
       action_client = self.gripper_action_clients["a_bot"]
       goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
@@ -862,7 +876,9 @@ class O2ASBaseRoutines(object):
     if not screw_size in [3,4]:
       rospy.logerr("There are no feeders of size " + str(screw_size) + ". Aborting.")
       return False
-    
+
+    self.log_to_debug_monitor("Put screw in feeder", "operation")
+
     self.go_to_named_pose("above_feeder", "a_bot", speed=1.5, acceleration=1.0, force_ur_script=self.use_real_robot)
     drop_pose = geometry_msgs.msg.PoseStamped()
     drop_pose.pose.position.z = .015
@@ -884,7 +900,9 @@ class O2ASBaseRoutines(object):
     if not screw_size==3 and not screw_size==4:
       rospy.logerr("Screw size needs to be 3 or 4!")
       return False
-    
+
+    self.log_to_debug_monitor("Pick screw from feeder", "operation")
+
     # Turn to the right to face the feeders
     self.go_to_named_pose("feeder_pick_ready", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
 
@@ -919,9 +937,13 @@ class O2ASBaseRoutines(object):
     """
     Picks a screw from the precision gripper.
     """
+    self.log_to_debug_monitor("Pick screw from precision gripper", "operation")
+
     if not screw_size==3 and not screw_size==4:
       rospy.logerr("Screw size needs to be 3 or 4!")
       return False
+
+    self.log_to_debug_monitor("Pick screw from precision gripper", "operation")
     
     # Turn to the right to face the feeders
     self.go_to_named_pose("back", "c_bot", force_ur_script=self.use_real_robot)
@@ -999,6 +1021,7 @@ class O2ASBaseRoutines(object):
 
 
   def pick_nut_from_table(self,robot_name, object_pose, max_radius=0.005, end_effector_link="c_bot_nut_tool_m6_tip_link"):
+    self.log_to_debug_monitor("Pick nut from table", "operation")
     approach_pose = copy.deepcopy(object_pose)
     approach_pose.pose.position.z += .02  # Assumes that z points upward
     self.go_to_pose_goal(robot_name, approach_pose, speed=.1, move_lin = True, end_effector_link=end_effector_link)
@@ -1013,6 +1036,8 @@ class O2ASBaseRoutines(object):
     self.go_to_pose_goal(robot_name, approach_pose, speed=.03, move_lin = True, end_effector_link=end_effector_link)
 
   def pick_nut_using_spiral_search(self,object_pose, max_radius=0.005, end_effector_link="c_bot_nut_tool_m6_tip_link"):
+    self.log_to_debug_monitor("Pick nut using spiral search", "operation")
+
     # This spiral search does not work as well as we hoped. When the nut is not perfectly picked, it falls to a completely different place
     max_radius = .005
     theta_incr = pi/3
@@ -1046,7 +1071,10 @@ class O2ASBaseRoutines(object):
       RealRadius = math.sqrt(math.pow(y,2)+math.pow(z,2))
 
   def adjust_centering(self, robot_name = "b_bot", go_fast=False):
-    rospy.loginfo("============ Adjusting the position of the pin/shaft ============")
+
+    #rospy.loginfo("============ Adjusting the position of the pin/shaft
+    # ============")
+    self.log_to_debug_monitor("Adjust centering", "operation")
     self.go_to_named_pose("home", robot_name)
     self.send_gripper_command(gripper="c_bot",command = "open")
 
