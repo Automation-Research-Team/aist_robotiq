@@ -170,8 +170,8 @@
   <!-- Add PhoXi 3D scanners -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />
   <xacro:phoxi_m_camera prefix="a_" parent="o2as_ground">
-    <origin xyz="0.674391 -0.0223742 ${bots_z + 0.696023}"
-	    rpy="${-149.801*pi/180} ${0.156861*pi/180} ${91.2544*pi/180}"/>
+  <origin xyz="0.656427245186 -0.0191234201169 1.50626196172"
+          rpy="${-161.285833025*pi/180} ${0.547979734685*pi/180} ${91.027298919*pi/180}"/>
   </xacro:phoxi_m_camera>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
