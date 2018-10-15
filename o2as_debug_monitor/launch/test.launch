@@ -87,6 +87,13 @@
         row: [13, 15]
         offset: [8, 32]
         index: 2
+      suction_success:
+        topic_name: /suction_tool/screw_suctioned
+        str: suction
+        col: [24, 31]
+        row: [13, 15]
+        offset: [8, 32]
+        index: 3
 
     kitting_set_id_topics:
       kitting_item_set:
