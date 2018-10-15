@@ -1,8 +1,8 @@
   <link name="${boardname}_part5">
     <visual>
-      <origin xyz="0 0 -.00275" rpy="0 0 0"/>
+      <origin xyz="0 0 .0375" rpy="0 0 0"/>
       <geometry>
-        <cylinder length=".0045" radius=".002"/> 
+        <cylinder length=".075" radius=".005"/> 
       </geometry>
       <material name="grey">
         <color rgba=".3 .3 .3 1"/>
