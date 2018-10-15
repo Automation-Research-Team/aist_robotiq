@@ -1118,25 +1118,25 @@ class KittingClass(O2ASBaseRoutines):
       self.initial_phoxi_image_recorded = True
       take_new_image = True
     
-    if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
-      if self.grasp_candidates[item.part_id]["pick_was_successful"]:
-        # If the pick was successful for an item, the scene has changed, so a new image needs to be taken
-        rospy.loginfo("Resetting grasp candidates for item " + str(item.part_id))
-        self.grasp_candidates[item.part_id]["pick_was_successful"] = False
-        self.grasp_candidates[item.part_id]["vision_was_attempted"] = False
-        self.grasp_candidates[item.part_id]["positions"] = []
-        take_new_image = True
-      self.go_to_named_pose("suction_ready_back", "b_bot")
-      if not self.grasp_candidates[item.part_id]["vision_was_attempted"]:
-        # Vision is only attempted once, unless it succeeds in picking
-        phoxi_res = self.get_grasp_candidates_from_phoxi(item, take_new_image)
-        self.grasp_candidates[item.part_id]["vision_was_attempted"] = True
-        take_new_image = False
-        self.go_to_named_pose("suction_pick_ready", "b_bot")
-        if phoxi_res:
-          self.grasp_candidates[item.part_id]["positions"].extend(phoxi_res)
-          rospy.loginfo("self.grasp_candidates: ")
-          rospy.loginfo(self.grasp_candidates[item.part_id]["positions"][0])
+    # if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
+    if self.grasp_candidates[item.part_id]["pick_was_successful"]:
+      # If the pick was successful for an item, the scene has changed, so a new image needs to be taken
+      rospy.loginfo("Resetting grasp candidates for item " + str(item.part_id))
+      self.grasp_candidates[item.part_id]["pick_was_successful"] = False
+      self.grasp_candidates[item.part_id]["vision_was_attempted"] = False
+      self.grasp_candidates[item.part_id]["positions"] = []
+      take_new_image = True
+    self.go_to_named_pose("suction_ready_back", "b_bot")
+    if not self.grasp_candidates[item.part_id]["vision_was_attempted"]:
+      # Vision is only attempted once, unless it succeeds in picking
+      phoxi_res = self.get_grasp_candidates_from_phoxi(item, take_new_image)
+      self.grasp_candidates[item.part_id]["vision_was_attempted"] = True
+      take_new_image = False
+      self.go_to_named_pose("suction_pick_ready", "b_bot")
+      if phoxi_res:
+        self.grasp_candidates[item.part_id]["positions"].extend(phoxi_res)
+        rospy.loginfo("self.grasp_candidates: ")
+        rospy.loginfo(self.grasp_candidates[item.part_id]["positions"][0])
 
     # Go to preparatory pose
     if item.ee_to_use == "suction":
