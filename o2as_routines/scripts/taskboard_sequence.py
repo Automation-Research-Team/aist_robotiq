@@ -91,6 +91,12 @@ class TaskboardClass(O2ASBaseRoutines):
     # self.action_client.wait_for_server()
     rospy.sleep(.5)   # Use this instead of waiting, so that simulation can be used
 
+    # Initialize debug monitor
+    self.start_task_timer()
+    self.log_to_debug_monitor(text="Init", category="task")
+    self.log_to_debug_monitor(text="Init", category="subtask")
+    self.log_to_debug_monitor(text="Init", category="operation")
+
   def set_up_item_parameters(self):
     # These parameters should probably be read from a csv file.
     self.item_names = ["Bearing with housing", "6 mm bearing retainer pin", "17 mm spacer for bearings", 
@@ -201,6 +207,8 @@ class TaskboardClass(O2ASBaseRoutines):
   ####
 
   def full_taskboard_task(self):
+    self.start_task_timer()
+    self.log_to_debug_monitor("Taskboard task", "task")
     self.go_to_named_pose("home", "c_bot")
     self.go_to_named_pose("home", "a_bot")
 
@@ -218,24 +226,38 @@ class TaskboardClass(O2ASBaseRoutines):
     # - Belt 6 after bearing 1. nut/bolt 7 anytime.
     
     # Set screw has to be first, because b_bot is right on top of it
-    self.do_task_number(11) # set screw 
+    self.log_to_debug_monitor("No.  1 / 14: Set screw (id=11)", "subtask")
+    self.do_task_number(11) # set screw
+    self.log_to_debug_monitor("No.  2 / 14: Retainer pin (id=2)", "subtask")
     self.do_task_number(2)  # Retainer pin
 
+    self.log_to_debug_monitor("No.  3 / 14: Spacer small (id=3)", "subtask")
     self.do_task_number(3)  # Spacer small
+    self.log_to_debug_monitor("No.  4 / 14: Spacer large (id=4)", "subtask")
     self.do_task_number(4)  # Spacer large
 
+    self.log_to_debug_monitor("No.  5 / 14: Washer small (id=9)", "subtask")
     self.do_task_number(9)  # Washer small
+    self.log_to_debug_monitor("No.  6 / 14: Washer large (id=10)", "subtask")
     self.do_task_number(10) # Washer large
+    self.log_to_debug_monitor("No.  7 / 14: Retainer pin (id=14)", "subtask")
     self.do_task_number(14) # Retainer pin
 
+    self.log_to_debug_monitor("No.  8 / 14: Bearing (id=1)", "subtask")
     self.do_task_number(1)  # Bearing
+    self.log_to_debug_monitor("No.  9 / 14: Belt (id=6)", "subtask")
     self.do_task_number(6)  # Belt
-    
+
+    self.log_to_debug_monitor("No. 10 / 14: End cap (id=15)", "subtask")
     self.do_task_number(15) # end cap
+    self.log_to_debug_monitor("No. 11 / 14: M3 screw (id=13)", "subtask")
     self.do_task_number(13) # M3 screw?
+    self.log_to_debug_monitor("No. 12 / 14: M4 screw (id=12)", "subtask")
     self.do_task_number(12) # M4 screw?
 
+    self.log_to_debug_monitor("No. 13 / 14: M10 nut (id=8)", "subtask")
     self.do_task_number(8)  # M10 nut
+    self.log_to_debug_monitor("No. 14 / 14: M6 nut/bolt (id=7)", "subtask")
     self.do_task_number(7)  # M6 nut/bolt
     
 
