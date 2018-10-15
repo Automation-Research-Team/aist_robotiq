@@ -6,12 +6,25 @@ from geometry_msgs.msg import Transform
 from math import radians, degrees
 from easy_handeye.handeye_calibration import HandeyeCalibration
 
+#########################################################################
+#  local functions                                                      #
+#########################################################################
 def get_transform(dst_frm, src_frm):
     listener = TransformListener()
     now = rospy.Time.now()
     listener.waitForTransform(dst_frm, src_frm, now, rospy.Duration(10))
     return listener.lookupTransform(dst_frm, src_frm, now)
+
+def print_mat(mat):
+    xyz = tfs.translation_from_matrix(mat)
+    rpy = map(degrees, tfs.euler_from_matrix(mat))
+    print "<origin xyz=\"{0[0]} {0[1]} {0[2]}\" rpy=\"${{{1[0]}*pi/180}} ${{{1[1]}*pi/180}} ${{{1[2]}*pi/180}}\"/>".format(xyz, rpy)
+    q   = tfs.quaternion_from_matrix(mat)
+    print xyz, q
     
+#########################################################################
+#  main part                                                            #
+#########################################################################
 rospy.init_node('o2as_handeye_calibration_publisher')
 while rospy.get_time() == 0.0:
     pass
@@ -45,7 +58,7 @@ optEst    = calib.transformation.child_frame_id   # tracking_base_frame
 
 # Compute camera base -> camera_optical transformation
 opt_base  = get_transform(rospy.get_param('camera_optical_frame'),
-                             rospy.get_param('camera_base_frame'))
+                          rospy.get_param('camera_base_frame'))
 # Compute tracking_base_frame -> o2as_ground transformation
 grnd_bot  = get_transform('o2as_ground', bot)
 
@@ -60,20 +73,18 @@ while not rospy.is_shutdown():
     rate.sleep()
 
 transformer = TransformerROS()
+
+mat = transformer.fromTranslationRotation(trns, rot)
+print "\n=== Estimated camera -> robot(effector or base_link) transformation ==="
+print_mat(mat)
+
 mat = tfs.concatenate_matrices( \
         transformer.fromTranslationRotation(*grnd_bot),
-        transformer.fromTranslationRotation(trns, rot),
+        mat,
         transformer.fromTranslationRotation(*opt_base))
-xyz = tfs.translation_from_matrix(mat)
-rpy = map(degrees, tfs.euler_from_matrix(mat))
-q   = tfs.quaternion_from_matrix(mat)
+print "\n=== Estimated camera_base -> ground transformation ==="
+print_mat(mat)
 
-print "\n"
-print "translation =", str(xyz)
-print "rotation    =", str(q)
-print "\n"
-print "<origin xyz=\"{0[0]} {0[1]} {0[2]}\" rpy=\"${{{1[0]}*pi/180}} ${{{1[1]}*pi/180}} ${{{1[2]}*pi/180}}\"/>".format(xyz, rpy)
-print "\n"
 
 # <origin xyz="0.674391 -0.0223742 ${bots_z + 0.696023}"
 #         rpy="${-149.801*pi/180} ${0.156861*pi/180} ${91.2544*pi/180}"/>

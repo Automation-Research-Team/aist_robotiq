@@ -26,28 +26,39 @@ from cv_bridge import CvBridge, CvBridgeError
 
 # Poses taken during handeye calibration
 # TODO: These poses are specific for `d_bot` camera, need to modify for Phoxi
+initposes = {
+  'a_phoxi_m_camera': {
+    'a_bot':[0.38, -0.30, 0.10, radians( 90), radians( 90), radians(0)],
+    'b_bot':[0.38,  0.15, 0.10, radians( 30), radians( 25), radians(0)],
+    'c_bot':[0.05, -0.05, 0.15, radians(  0), radians( 25), radians(0)],
+  },
+  'a_bot_camera': {
+    'a_bot':[]
+  }
+}
+
 keyposes = {
   'a_phoxi_m_camera': {
     'a_bot': [
 #      [0.15, -0.30, 0.25, radians( 30), radians( 25), radians(0)],
-      [0.38, -0.10, 0.10, radians(-90), radians( 25), radians(0)],
-      [0.38,  0.00, 0.10, radians(-60), radians( 25), radians(0)],
-      [0.38,  0.10, 0.10, radians(-60), radians( 25), radians(0)],
+      [0.40, -0.10, 0.06, radians(-90), radians( 25), radians(0)],
+      [0.45,  0.00, 0.06, radians(-60), radians( 25), radians(0)],
+      [0.45,  0.10, 0.06, radians(-60), radians( 25), radians(0)],
 
-      [0.30,  0.10, 0.20, radians(-60), radians( 25), radians(0)],
-      [0.30,  0.00, 0.20, radians(-60), radians( 25), radians(0)],
-      [0.30, -0.10, 0.20, radians(-60), radians( 25), radians(0)],
+      [0.40,  0.10, 0.16, radians(-60), radians( 25), radians(0)],
+      [0.40,  0.00, 0.16, radians(-60), radians( 25), radians(0)],
+      [0.40, -0.10, 0.16, radians(-60), radians( 25), radians(0)],
     ],
 
     'b_bot': [
       # configulation for real
-      # [0.38,  0.15, 0.10, radians( 30), radians( 25), radians(0)],
-      # [0.38,  0.00, 0.10, radians( 30), radians( 25), radians(0)],
-      # [0.38, -0.15, 0.10, radians(  0), radians( 25), radians(0)],
+      [0.38,  0.15, 0.10, radians( 30), radians( 25), radians(0)],
+      [0.38,  0.00, 0.10, radians( 30), radians( 25), radians(0)],
+      [0.38, -0.15, 0.10, radians( 30), radians( 25), radians(0)],
 
-      # [0.32, -0.10, 0.20, radians( 30), radians( 25), radians(0)],
-      # [0.32,  0.00, 0.20, radians( 30), radians( 25), radians(0)],
-      # [0.32,  0.10, 0.20, radians( 30), radians( 25), radians(0)],
+      [0.32, -0.10, 0.20, radians( 30), radians( 25), radians(0)],
+      [0.32,  0.00, 0.20, radians( 30), radians( 25), radians(0)],
+      [0.32,  0.10, 0.20, radians( 30), radians( 25), radians(0)],
 
       # [0.20,  0.15, 0.20, radians( 30), radians( 25), radians(0)],
       # [0.20,  0.00, 0.20, radians( 30), radians( 25), radians(0)],
@@ -58,13 +69,13 @@ keyposes = {
       # [0.15,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
 
       # configulation for AIST
-      [0.48,  0.10, 0.10, radians( 30), radians( 25), radians(0)],
-      [0.48,  0.00, 0.10, radians( 30), radians( 25), radians(0)],
-      [0.48, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
+      # [0.48,  0.10, 0.10, radians( 30), radians( 25), radians(0)],
+      # [0.48,  0.00, 0.10, radians( 30), radians( 25), radians(0)],
+      # [0.48, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
 
-      [0.53, -0.10, 0.15, radians( 30), radians( 25), radians(0)],
-      [0.53,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
-      [0.53,  0.10, 0.15, radians( 30), radians( 25), radians(0)],
+      # [0.53, -0.10, 0.15, radians( 30), radians( 25), radians(0)],
+      # [0.53,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
+      # [0.53,  0.10, 0.15, radians( 30), radians( 25), radians(0)],
 
       # [0.40,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
       # #[0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
@@ -253,36 +264,26 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     """Move the end effector"""
     # TODO: check type of `pose`
     print("move to {}".format(pose))
-    poseStamped                 = geometry_msgs.msg.PoseStamped()
-    poseStamped.header.frame_id = "workspace_center"
-    poseStamped.pose.position.x = pose[0]
-    poseStamped.pose.position.y = pose[1]
-    poseStamped.pose.position.z = pose[2]
-    poseStamped.pose.orientation \
-      = geometry_msgs.msg.Quaternion(
-        *tf_conversions.transformations.quaternion_from_euler(
-          pose[3], pose[4], pose[5]))
-    [all_close, move_success] = self.go_to_pose_goal(self.robot_name,
-                                                     poseStamped, speed,
-                                                     move_lin=False)
+    move_success = self.move_to(pose, speed)
+
     if move_success:
       if self.start_acquisition:
         self.start_acquisition()
 
-      try:
-        img_msg = rospy.wait_for_message("/aruco_tracker/result",
-                                         sensor_msgs.msg.Image, timeout=10.0)
-        bridge = CvBridge()
-        img = bridge.imgmsg_to_cv2(img_msg, "bgr8")
-        cv2.imwrite("aruco_result-{:0=2}-{:0=2}.jpeg".format(keypose_num, subpose_num), img)
-      except CvBridgeError, e:
-        print(e)
-      except rospy.ROSException, e:
-        print(e)
-        
-      rospy.sleep(1)
-      
       if self.needs_calib:
+        try:
+          img_msg = rospy.wait_for_message("/aruco_tracker/result",
+                                           sensor_msgs.msg.Image, timeout=10.0)
+          bridge = CvBridge()
+          img = bridge.imgmsg_to_cv2(img_msg, "bgr8")
+          cv2.imwrite("aruco_result-{:0=2}-{:0=2}.jpeg".format(keypose_num, subpose_num), img)
+        except CvBridgeError, e:
+          print(e)
+        except rospy.ROSException, e:
+          print(e)
+        
+        rospy.sleep(1)
+      
         try:
           self.take_sample()
           sample_list = self.get_sample_list()
@@ -301,7 +302,23 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     self.go_to_named_pose("home", self.robot_name)
 
 
-  def run(self, keyposes, speed, sleep_time):
+  def move_to(self, pose, speed):
+    poseStamped                 = geometry_msgs.msg.PoseStamped()
+    poseStamped.header.frame_id = "workspace_center"
+    poseStamped.pose.position.x = pose[0]
+    poseStamped.pose.position.y = pose[1]
+    poseStamped.pose.position.z = pose[2]
+    poseStamped.pose.orientation \
+      = geometry_msgs.msg.Quaternion(
+        *tf_conversions.transformations.quaternion_from_euler(
+          pose[3], pose[4], pose[5]))
+    [all_close, move_success] = self.go_to_pose_goal(self.robot_name,
+                                                     poseStamped, speed,
+                                                     move_lin=False)
+    return move_success
+
+
+  def run(self, initpose, keyposes, speed, sleep_time):
     # Clear samples in the buffer if exist
     if self.stop_acquisition:
       self.stop_acquisition()
@@ -314,6 +331,8 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
 
     # Reset pose
     self.go_home()
+
+    #self.go_pose(initpose, speed)
 
     # Collect samples over pre-defined poses
     for i, keypose in enumerate(keyposes):
@@ -354,7 +373,8 @@ def main():
                                                            robot_name))
     speed      = 0.1
     sleep_time = 1
-    routines.run(keyposes[camera_name][robot_name], speed, sleep_time)
+    routines.run(initposes[camera_name][robot_name],
+                 keyposes[camera_name][robot_name], speed, sleep_time)
     print("=== Calibration completed for {} + {} ===".format(camera_name,
                                                              robot_name))
     
