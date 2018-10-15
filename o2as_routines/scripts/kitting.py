@@ -1194,7 +1194,7 @@ class KittingClass(O2ASBaseRoutines):
           rospy.loginfo("Got pose from phoxi grasp candidates:")
           rospy.loginfo(pick_pose.pose.position)
           pick_pose = self.grasp_candidates[item.part_id]["positions"].pop(0)
-          pick_pose.pose.position.z += self.insert_offsets
+          pick_pose.pose.position.z += self.insert_offsets[item.part_id]
           grasp_candidate_from_vision = True
 
       # if item.ee_to_use == "precision_gripper_from_inside" and not item.bin_is_inclined and not item.part_id in [17, 18]:
