@@ -22,21 +22,21 @@
 
     image_topics:
       realsense:
-        topic_name: /a_bot_camera/color/image_raw
+        topic_name: /c_bot_camera/color/image_raw
         col: [0, 11]
         row: [0, 7]
-      bg_ratio_input_image:
-        topic_name: /o2as_debug_monitor/bg_ratio_input_image
-        col: [0, 11]
-        row: [8, 15]
       phoxi_depth_ueshiba:
-        topic_name: /o2as_phoxi_camera/depth_map
+        topic_name: /c_bot_camera/depth/image_raw
         col: [12, 23]
         row: [0, 7]
         encoding: depth
         vrange: [0, 2]
       grasp_candidates:
-        topic_name: /search_grasp_phoxi/image_grasp_candidates
+        topic_name: /c_bot_camera/depth/image_raw
+        col: [0, 11]
+        row: [8, 15]
+      bg_ratio_input_image:
+        topic_name: /c_bot_camera/depth/image_raw
         col: [12, 23]
         row: [8, 15]
 

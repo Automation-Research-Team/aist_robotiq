@@ -68,9 +68,9 @@ class AssemblyClass(O2ASBaseRoutines):
 
     # Initialize debug monitor
     self.start_task_timer()
-    self.log_to_debug_monitor(text="Inizialize", category="task")
-    self.log_to_debug_monitor(text="Inizialize", category="subtask")
-    self.log_to_debug_monitor(text="Inizialize", category="operation")
+    self.log_to_debug_monitor(text="Init", category="task")
+    self.log_to_debug_monitor(text="Init", category="subtask")
+    self.log_to_debug_monitor(text="Init", category="operation")
 
   def set_up_item_parameters(self):
     # TODO: Publish the items to the scene, or do something equivalent. 

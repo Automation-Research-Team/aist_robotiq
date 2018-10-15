@@ -91,6 +91,12 @@ class TaskboardClass(O2ASBaseRoutines):
     # self.action_client.wait_for_server()
     rospy.sleep(.5)   # Use this instead of waiting, so that simulation can be used
 
+    # Initialize debug monitor
+    self.start_task_timer()
+    self.log_to_debug_monitor(text="Init", category="task")
+    self.log_to_debug_monitor(text="Init", category="subtask")
+    self.log_to_debug_monitor(text="Init", category="operation")
+
   def set_up_item_parameters(self):
     # These parameters should probably be read from a csv file.
     self.item_names = ["Bearing with housing", "6 mm bearing retainer pin", "17 mm spacer for bearings", 
@@ -201,6 +207,8 @@ class TaskboardClass(O2ASBaseRoutines):
   ####
 
   def full_taskboard_task(self):
+    self.start_task_timer()
+    self.log_to_debug_monitor("Taskboard task", "task")
     self.go_to_named_pose("home", "c_bot")
     self.go_to_named_pose("home", "a_bot")
 
@@ -218,24 +226,38 @@ class TaskboardClass(O2ASBaseRoutines):
     # - Belt 6 after bearing 1. nut/bolt 7 anytime.
     
     # Set screw has to be first, because b_bot is right on top of it
-    self.do_task_number(11) # set screw 
+    self.log_to_debug_monitor("No.  1 / 14: Set screw (id=11)", "subtask")
+    self.do_task_number(11) # set screw
+    self.log_to_debug_monitor("No.  2 / 14: Retainer pin (id=2)", "subtask")
     self.do_task_number(2)  # Retainer pin
 
+    self.log_to_debug_monitor("No.  3 / 14: Spacer small (id=3)", "subtask")
     self.do_task_number(3)  # Spacer small
+    self.log_to_debug_monitor("No.  4 / 14: Spacer large (id=4)", "subtask")
     self.do_task_number(4)  # Spacer large
 
+    self.log_to_debug_monitor("No.  5 / 14: Washer small (id=9)", "subtask")
     self.do_task_number(9)  # Washer small
+    self.log_to_debug_monitor("No.  6 / 14: Washer large (id=10)", "subtask")
     self.do_task_number(10) # Washer large
+    self.log_to_debug_monitor("No.  7 / 14: Retainer pin (id=14)", "subtask")
     self.do_task_number(14) # Retainer pin
 
+    self.log_to_debug_monitor("No.  8 / 14: Bearing (id=1)", "subtask")
     self.do_task_number(1)  # Bearing
+    self.log_to_debug_monitor("No.  9 / 14: Belt (id=6)", "subtask")
     self.do_task_number(6)  # Belt
-    
+
+    self.log_to_debug_monitor("No. 10 / 14: End cap (id=15)", "subtask")
     self.do_task_number(15) # end cap
+    self.log_to_debug_monitor("No. 11 / 14: M3 screw (id=13)", "subtask")
     self.do_task_number(13) # M3 screw?
+    self.log_to_debug_monitor("No. 12 / 14: M4 screw (id=12)", "subtask")
     self.do_task_number(12) # M4 screw?
 
+    self.log_to_debug_monitor("No. 13 / 14: M10 nut (id=8)", "subtask")
     self.do_task_number(8)  # M10 nut
+    self.log_to_debug_monitor("No. 14 / 14: M6 nut/bolt (id=7)", "subtask")
     self.do_task_number(7)  # M6 nut/bolt
     
 
@@ -327,7 +349,9 @@ class TaskboardClass(O2ASBaseRoutines):
     taskboard.go_to_pose_goal("b_bot", belt_tool_approach, speed=0.1, move_lin=True)
 
   def do_task_number(self, i):
-    if i == 1: 
+    self.log_to_debug_monitor("=== Subtask id {} start ===".format(i), "operation")
+
+    if i == 1:
       b_bot_dx_pick = 0.0 ## MAGIC NUMBER
       b_bot_dy_pick = 0.0 ## MAGIC NUMBER
       bearing_pick_pose_b = copy.deepcopy(self.pick_poses[i-1])
@@ -337,6 +361,7 @@ class TaskboardClass(O2ASBaseRoutines):
       self.go_to_named_pose("home","a_bot")
       self.go_to_named_pose("home","b_bot")
       self.go_to_named_pose("back","c_bot")
+      self.log_to_debug_monitor("Pick", "operation")
       self.pick("b_bot",self.pick_poses[i-1],self.item_pick_heights[i-1],
                       speed_fast = 0.5, speed_slow = 0.1, gripper_command="close",
                       approach_height = 0.07)
@@ -354,6 +379,7 @@ class TaskboardClass(O2ASBaseRoutines):
       bearing_b_place_pose_approach.pose.position.z = .15
       self.go_to_pose_goal("b_bot", bearing_b_place_pose_approach, speed=0.5, move_lin=True)
       self.go_to_pose_goal("b_bot", bearing_b_place_pose, speed=0.15, move_lin=True)
+      self.log_to_debug_monitor("Push", "operation")
       self.do_linear_push("b_bot", 5, wait = True)
       self.send_gripper_command(gripper="b_bot", command="open")
       rospy.sleep(1.0)
@@ -369,6 +395,7 @@ class TaskboardClass(O2ASBaseRoutines):
       bearing_b_place_pose.pose.position.z = 0.0
       
       z_a_bot = 0.015
+      self.log_to_debug_monitor("Place", "operation")
       self.place("a_bot", bearing_b_place_pose, z_a_bot,
                               speed_fast = 0.5, speed_slow = 0.02, gripper_command="none",
                               approach_height = 0.05, lift_up_after_place = False)
@@ -383,21 +410,23 @@ class TaskboardClass(O2ASBaseRoutines):
       
       # ### Push with b_bot
       ### Pushing with b_bot only does not work. The tool needs to be grasped beforehand.
+      self.log_to_debug_monitor("Push", "operation")
       self.go_to_pose_goal("b_bot", bearing_a_place_pose, speed=0.15, move_lin=True)
       self.send_gripper_command(gripper="b_bot", command=0.04)
+      self.log_to_debug_monitor("Push", "operation")
       self.do_linear_push("b_bot", 20, wait = True)
       self.go_to_pose_goal("b_bot", bearing_a_place_pose, speed=0.15, move_lin=True)
       self.go_to_named_pose("home","b_bot")
       rospy.loginfo("Done")
-
       # TODO: Make sure the task succeeded by pushing with b_bot and plate 3
 
-    if i == 2: #unadjusted 
+    if i == 2: #unadjusted
       ###set the tool
       tool_pickup_pose = geometry_msgs.msg.PoseStamped()
       tool_pickup_pose.header.frame_id = "retainer_pin_insertion_tool"
       tool_pickup_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
       tool_grasped_height = 0.03
+      self.log_to_debug_monitor("Pick", "operation")
       self.pick("b_bot",tool_pickup_pose, tool_grasped_height,
                           speed_fast = 1.0, speed_slow = 0.5, gripper_command="close",
                           approach_height = 0.1)
@@ -411,6 +440,7 @@ class TaskboardClass(O2ASBaseRoutines):
       self.place("b_bot",self.place_poses[i-1], tool_grasped_height + .001,
                       speed_fast = 1.0, speed_slow = 0.5, gripper_command="none",
                       approach_height = 0.05, lift_up_after_place = False)
+
       self.send_gripper_command(gripper="b_bot", command=.02, velocity = .013)
       rospy.sleep(2.0)
       self.send_gripper_command(gripper="b_bot", command="open")
@@ -460,6 +490,7 @@ class TaskboardClass(O2ASBaseRoutines):
                                 speed_fast = 1.0, speed_slow = 0.2, gripper_command="",
                                 approach_height = 0.1, special_pick = False)
         self.go_to_pose_goal("b_bot", pin_pick_approach, speed=1.0, move_lin=True)
+
 
         self.adjust_centering(go_fast=True)
 
@@ -517,7 +548,7 @@ class TaskboardClass(O2ASBaseRoutines):
                               approach_height = 0.1, lift_up_after_place = False)
       self.horizontal_spiral_motion("a_bot", .004)
       rospy.loginfo("doing spiral motion")
-    
+
     if i == 4:    # Washer
       self.pick("a_bot",self.pick_poses[i-1],self.item_pick_heights[i-1],
                               speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
@@ -527,7 +558,7 @@ class TaskboardClass(O2ASBaseRoutines):
                               speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
                               approach_height = 0.1, lift_up_after_place = False)
       self.horizontal_spiral_motion("a_bot", max_radius=.004, radius_increment=.002)
-    
+
     if i == 5:
       rospy.loginfo("Part 5 was deleted and is skipped.")
       pass
@@ -627,7 +658,6 @@ class TaskboardClass(O2ASBaseRoutines):
       self.send_gripper_command(gripper="b_bot", command="open")
       
       self.go_to_named_pose("home","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-      
       # self.place("b_bot", belt_tool_place_pose, place_height=belt_tool_grasp_height+.002, speed_fast = 0.2, speed_slow = 0.03, gripper_command="open",
       #                         approach_height = 0.03, lift_up_after_place = True)
 
@@ -734,7 +764,7 @@ class TaskboardClass(O2ASBaseRoutines):
       self.go_to_pose_goal("b_bot", screw_tool_hold_approach_high, speed=.02, move_lin = True, end_effector_link="b_bot_screw_tool_m6_tip_link")
       self.go_to_named_pose("screw_ready", "b_bot")
 
-    if i == 8:  
+    if i == 8:
       #pick up the tool
       tool_pose = geometry_msgs.msg.PoseStamped()
       tool_pose.header.frame_id = "M10nut_tool"
@@ -1080,6 +1110,8 @@ class TaskboardClass(O2ASBaseRoutines):
       self.do_linear_push("b_bot", 3, wait = True)
       self.go_to_pose_goal("b_bot", p, speed=0.2)
       self.go_to_named_pose("home", "b_bot")
+
+    self.log_to_debug_monitor("=== Subtask id {} end ===".format(i), "operation")
 
 if __name__ == '__main__':
   try:
