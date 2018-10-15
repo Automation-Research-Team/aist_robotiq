@@ -151,6 +151,7 @@ class O2ASBaseRoutines(object):
     self.fastening_tool_client = actionlib.SimpleActionClient('/o2as_fastening_tools/fastener_gripper_control_action', o2as_msgs.msg.FastenerGripperControlAction)
     self.nut_peg_tool_client = actionlib.SimpleActionClient('/nut_tools_action', o2as_msgs.msg.ToolsCommandAction)
 
+    self._feeder_srv = rospy.ServiceProxy("o2as_usb_relay/set_power", o2as_msgs.srv.SetPower)
     self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR)
     self.goToNamedPose_client = rospy.ServiceProxy('/o2as_skills/goToNamedPose', o2as_msgs.srv.goToNamedPose)
     self.publishMarker_client = rospy.ServiceProxy('/o2as_skills/publishMarker', o2as_msgs.srv.publishMarker)
@@ -164,7 +165,7 @@ class O2ASBaseRoutines(object):
     self.sub_test_mode_ = rospy.Subscriber("/test_mode", Bool, self.test_mode_callback)
     self.reduced_mode_speed_limit = .25
     
-    self.my_mutex = threading.Lock()
+    # self.my_mutex = threading.Lock()
 
     self.resetTimerForDebugMonitor_client = rospy.ServiceProxy('/o2as_debug_monitor/reset_timer', o2as_msgs.srv.ResetTimer)
     self.debugmonitor_publishers = dict() # used in log_to_debug_monitor()
@@ -174,18 +175,28 @@ class O2ASBaseRoutines(object):
     
   ############## ------ Internal functions (and convenience functions)
 
+  def confirm_to_proceed(self, next_task_name):
+    # TODO: Disable this when the real competition is on (via a rosparam/member variable)
+    rospy.loginfo("Press enter to proceed to: " + next_task_name)
+    i = raw_input()
+    if i == "":
+      if not rospy.is_shutdown():
+        return True
+    raise Exception("User caused exit!")
+    return False
+
   def run_mode_callback(self, msg):
-    self.my_mutex.acquire()
+    # self.my_mutex.acquire()
     self.run_mode_ = msg.data
-    self.my_mutex.release()
+    # self.my_mutex.release()
   def pause_mode_callback(self, msg):
-    self.my_mutex.acquire()
+    # self.my_mutex.acquire()
     self.pause_mode_ = msg.data
-    self.my_mutex.release()
+    # self.my_mutex.release()
   def test_mode_callback(self, msg):
-    self.my_mutex.acquire()
+    # self.my_mutex.acquire()
     self.test_mode_ = msg.data
-    self.my_mutex.release()
+    # self.my_mutex.release()
 
   def publish_marker(self, pose_stamped, marker_type):
     req = o2as_msgs.srv.publishMarkerRequest()
