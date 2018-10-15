@@ -13,6 +13,24 @@ import actionlib
 import o2as_msgs.msg
 from sensor_msgs.msg import Image
 
+from PIL import Image, ImageDraw
+
+
+def _draw_rect(img, x, y, w, h, color, thick=False):
+    """ Draw rectangle on numpy array.
+
+    Parameter color is given like (255, 0, 0). """
+
+    img_ = Image.fromarray(img)
+    draw = ImageDraw.Draw(img_)
+    draw.rectangle((x, y, x + w, y + h), outline=color)
+
+    if thick:
+        draw.rectangle((x - 1, y - 1, x + w + 1, y + h + 1), outline=color)
+
+    return np.asarray(img_)
+
+
 class InnerPickDetection(object):
 
     def __init__(self):
@@ -107,15 +125,21 @@ class InnerPickDetection(object):
         # plt.hist(red_ratio)
         ixs_bg = np.where(red_ratio > red_threshold)[0]
 
-        # publish input image
-        img_message = self.bridge.cv2_to_imgmsg(img0, "rgb8")
-        self.pub_input_image.publish(img_message)
-
         # compute background ratio
         bg_ratio = float(ixs_bg.shape[0]) / pixels.shape[0]
         bg_ratio_message = Float64()
         bg_ratio_message.data = bg_ratio
         self.pub_output_value.publish(bg_ratio_message)
+
+        threshold = 0.9
+        if bg_ratio > threshold:
+            img0 = _draw_rect(img0, x, y, w, h, (0, 255, 0), True)
+        else:
+            img0 = _draw_rect(img0, x, y, w, h, (255, 0, 0))
+
+        # publish input image with detection rectangle
+        img_message = self.bridge.cv2_to_imgmsg(img0, "rgb8")
+        self.pub_input_image.publish(img_message)
 
         return bg_ratio
 
