@@ -6,8 +6,14 @@ import rospy
 import rospkg
 
 rp = rospkg.RosPack()
-
-with open(os.path.join(rp.get_path("o2as_scene_description"), "urdf/templates", "taskboard_measurement.csv"), 'r') as csvfile:
+print "1. Generate taskboard with competition layout"
+print "2. Generate taskboard with test layout"
+read=raw_input("please input one of the numbers above (1 or 2):")
+if read=="1":
+    csv_file_name = "taskboard_measurement_competition.csv"
+elif read=="2":
+    csv_file_name = "taskboard_measurement_test.csv"
+with open(os.path.join(rp.get_path("o2as_scene_description"), "urdf/templates", csv_file_name), 'r') as csvfile:
     reader = csv.reader(csvfile)
     # print reader
     header = next(reader)
