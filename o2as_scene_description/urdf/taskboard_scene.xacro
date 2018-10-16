@@ -21,14 +21,14 @@
   <joint name="belt_placement_tool" type="fixed">
     <parent link="workspace_center"/>
     <child link="belt_placement_tool"/>
-    <origin rpy="0.0 0.0 0" xyz="-.2 0.3 0"/>
+    <origin rpy="0.0 0.0 0" xyz="-.2 0.37 0"/>
   </joint>
   <link name="belt_placement_tool"/>
 
   <joint name="retainer_pin_insertion_tool" type="fixed">
     <parent link="workspace_center"/>
     <child link="retainer_pin_insertion_tool"/>
-    <origin rpy="0.0 0.0 0" xyz="-0.1 0.3 0"/>
+    <origin rpy="0.0 0.0 0" xyz="-0.1 0.36 0"/>
   </joint>
   <link name="retainer_pin_insertion_tool"/>
 
