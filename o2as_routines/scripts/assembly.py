@@ -363,11 +363,6 @@ class AssemblyClass(O2ASBaseRoutines):
     ps_hold.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_multiply(
                             tf.transformations.quaternion_from_euler(0, pi/2, pi/2), 
                             tf.transformations.quaternion_from_euler(0, -pi*6/180, 0) ))
-    ps_move_away = copy.deepcopy(ps_place)
-    ps_move_away.pose.position.x -= .01
-    ps_move_away.pose.position.y -= .06
-    ps_move_away_more = copy.deepcopy(ps_move_away)
-    ps_move_away_more.pose.position.x -= .1
     
     self.move_lin("c_bot", ps_approach, 1.0)
     self.move_lin("c_bot", ps_pickup, 1.0)
@@ -416,7 +411,6 @@ class AssemblyClass(O2ASBaseRoutines):
     rospy.sleep(1.0)
     self.send_gripper_command("c_bot", "open")
     rospy.sleep(1.0)
-    # self.move_lin("c_bot", ps_move_away, 1.0)
     self.go_to_named_pose("back", "c_bot")
 
     ### --- b_bot
@@ -1086,8 +1080,14 @@ class AssemblyClass(O2ASBaseRoutines):
   def real_assembly_task(self):
     self.start_task_timer()
     self.log_to_debug_monitor(text="Assembly", category="task")
-    self.go_to_named_pose("back", "a_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
-    self.go_to_named_pose("home", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
+
+    # To prepare subtask E
+    self.pick_retainer_pin_from_tray_and_place_in_holder()
+    self.go_to_named_pose("home", "b_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
+
+    # To equip screw tool for subtasks G, F
+    self.go_to_named_pose("back", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
+    self.do_change_tool_action("b_bot", equip=True, screw_size=4)
     self.go_to_named_pose("screw_pick_ready", "b_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
 
     self.subtask_g()  # Large plate
@@ -1101,8 +1101,7 @@ class AssemblyClass(O2ASBaseRoutines):
 
     self.subtask_e() #idle pulley
 
-    self.
-
+    self.subtask_a() # motor
 
     return
 
@@ -1124,6 +1123,8 @@ if __name__ == '__main__':
       rospy.loginfo("Enter 911 to place plate 3 (but don't screw)")
       rospy.loginfo("Enter 912 to place plate 3 from the base plate and put it on the table")
       rospy.loginfo("Enter 913 to screw in plate 3 (but don't place it)")
+      rospy.loginfo("Enter 92 to place plate 2 and screw")
+      rospy.loginfo("Enter 93 to do idle pulley set")
       rospy.loginfo("Enter START to start the task.")
       rospy.loginfo("Enter x to exit.")
       i = raw_input()
@@ -1170,17 +1171,16 @@ if __name__ == '__main__':
       elif i == '93':
         assy.subtask_e()  # Idler pin
       elif i == '94':
-        assy.subtask_a()  # Motor
-      elif i == '95':
-        assy.subtask_b()  # Motor pulley
-      elif i == '96':
-        assy.subtask_c()  # Bearing + shaft
-      elif i == '97':
-        assy.subtask_d()  # Clamping pulley
-      elif i == '98':
-        assy.subtask_h()  # Belt
-      elif i == 'START' or i == 'start' or i == '5000':
-        assy.assembly_task()
+        assy.subtask_a() #
+      elif i == 'START' or i == 'start' or i == "9999":
+        for i in [1,2]:
+          rospy.loginfo("Starting set number " + str(i))
+          assy.real_assembly_task()
+          rospy.loginfo("SET NUMBER " + str(i) + " COMPLETED. PUT THE ROBOT IN PAUSE MODE AND REPLACE THE PARTS")
+          raw_input()
+          if rospy.is_shutdown():
+            rospy.loginfo("ABORTING")
+            return
       elif i == 'x':
         break
   except rospy.ROSInterruptException:
