@@ -1221,6 +1221,10 @@ class KittingClass(O2ASBaseRoutines):
         gripper_command = ""
       else:
         gripper_command = ""
+      
+      if pick_pose.pose.position.z <= 0.005 and item.ee_to_use == "suction":
+          continue
+         
       pick_pose = self.make_pose_safe_for_bin(pick_pose, item)
       
       item_picked = self.pick(robot_name, pick_pose, 0.0, speed_fast = speed_fast, speed_slow = speed_slow, 
@@ -1273,6 +1277,12 @@ class KittingClass(O2ASBaseRoutines):
         place_pose.pose.position.z += .08
         self.move_lin(robot_name, place_pose, speed = 0.3, acceleration = 0.08, end_effector_link = "b_bot_suction_tool_tip_link")
         place_pose.pose.position.z -= .08
+
+      if item.part_id == 6:
+        if pick_pose.pose.position.x > 0:
+          place_pose.pose.position.y = -0.06
+        else:
+          place_pose.pose.position.y = 0.06
       
       self.place(robot_name, place_pose,grasp_height=item.dropoff_height,
                     speed_fast = 0.5, speed_slow = 0.02, gripper_command=gripper_command, approach_height = approach_height)
