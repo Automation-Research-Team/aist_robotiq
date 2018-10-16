@@ -1502,7 +1502,7 @@ if __name__ == '__main__':
         c.screw_holder_tests(robot_name="b_bot")
       elif r == '612':
         c.screw_holder_tests(robot_name="c_bot")
-      elif r == '621':
+      elif r == '6211':
         c.go_to_named_pose("back", "c_bot")
         c.go_to_named_pose("home", "b_bot")
         c.do_change_tool_action("b_bot", equip=True, screw_size = 4)
