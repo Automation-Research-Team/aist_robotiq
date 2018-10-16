@@ -14,8 +14,11 @@
   <rosparam command="load" file="$(find o2as_routines)/config/kitting_parts_bin_list.yaml" />
   <include file="$(find graspability_estimation)/launch/o2as_graspability_estimation.launch" />
     
-  <include file="$(find o2as_debug_monitor)/launch/test.launch" />
-  
+  <!-- <include file="$(find o2as_debug_monitor)/launch/test.launch" /> -->
+  <!-- <include file="$(find o2as_debug_monitor)/launch/kitting.launch" /> -->
+  <!-- <include file="$(find o2as_debug_monitor)/launch/assembly.launch" /> -->
+  <!-- <include file="$(find o2as_debug_monitor)/launch/taskboard.launch" /> -->
+
   <!-- <group ns="o2as_skill_server"> -->
   <node name="ur_program_relay" pkg="o2as_skills" type="ur_program_relay.py" respawn="false" output="screen"/>
   <node name="o2as_skill_server" pkg="o2as_skills" type="o2as_skill_server" respawn="false" output="screen"/>
