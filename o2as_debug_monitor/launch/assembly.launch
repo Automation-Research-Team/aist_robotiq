@@ -25,10 +25,6 @@
         topic_name: /a_bot_camera/color/image_raw
         col: [0, 11]
         row: [0, 7]
-      bg_ratio_input_image:
-        topic_name: /o2as_debug_monitor/bg_ratio_input_image
-        col: [0, 11]
-        row: [8, 15]
 
     string_topics:
       task:
