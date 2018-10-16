@@ -105,10 +105,11 @@
   <joint name="nut_tool_m6_to_holder" type="fixed">
     <parent link="screw_tool_holder" />
     <child link="nut_tool_m6_link" />
-    <origin xyz="-0.05 ${tool_offset} 0.004" rpy="0.0 0.0 0.0" />
+    <origin xyz="-0.35 ${tool_offset} 0.004" rpy="0.0 0.0 0.0" />
   </joint>
 
-    <link name="suction_tool_link">
+  
+  <link name="suction_tool_link">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <mass value="1.0"/>
@@ -134,6 +135,19 @@
     <parent link="screw_tool_holder" />
     <child link="suction_tool_link" />
     <origin xyz="-0.355 ${tool_offset - .015} 0.004" rpy="0.0 0.0 0.0" />
+  </joint>
+  
+  <link name="set_screw_tool_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1.0"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+  </link>
+  <joint name="set_screw_tool_to_holder" type="fixed">
+    <parent link="screw_tool_holder" />
+    <child link="set_screw_tool_link" />
+    <origin xyz="-0.355 ${tool_offset- .015} 0.004" rpy="0.0 0.0 0.0" />
   </joint>
 
   <link name="screw_tool_m4_link">
@@ -228,6 +242,13 @@
   <joint name="suction_tool_helper_joint" type="fixed">
     <parent link="suction_tool_link" />
     <child link="suction_tool_helper_link" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-pi/2}" />
+  </joint>
+
+  <link name="set_screw_tool_helper_link"/>
+  <joint name="set_screw_tool_helper_joint" type="fixed">
+    <parent link="set_screw_tool_link" />
+    <child link="set_screw_tool_helper_link" />
     <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${-pi/2}" />
   </joint>
 

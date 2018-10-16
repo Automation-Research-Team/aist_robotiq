@@ -37,6 +37,7 @@
 # This file is based on the kinetic MoveIt tutorial for the Python movegroup interface.
 
 import sys
+import threading
 import copy
 import rospy
 import tf_conversions
@@ -150,15 +151,52 @@ class O2ASBaseRoutines(object):
     self.fastening_tool_client = actionlib.SimpleActionClient('/o2as_fastening_tools/fastener_gripper_control_action', o2as_msgs.msg.FastenerGripperControlAction)
     self.nut_peg_tool_client = actionlib.SimpleActionClient('/nut_tools_action', o2as_msgs.msg.ToolsCommandAction)
 
+    self._feeder_srv = rospy.ServiceProxy("o2as_usb_relay/set_power", o2as_msgs.srv.SetPower)
     self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR)
     self.goToNamedPose_client = rospy.ServiceProxy('/o2as_skills/goToNamedPose', o2as_msgs.srv.goToNamedPose)
     self.publishMarker_client = rospy.ServiceProxy('/o2as_skills/publishMarker', o2as_msgs.srv.publishMarker)
     self.toggleCollisions_client = rospy.ServiceProxy('/o2as_skills/toggleCollisions', std_srvs.srv.SetBool)
 
+    self.run_mode_ = False
+    self.pause_mode_ = False
+    self.test_mode_ = False
+    self.sub_run_mode_ = rospy.Subscriber("/run_mode", Bool, self.run_mode_callback)
+    self.sub_pause_mode_ = rospy.Subscriber("/pause_mode", Bool, self.pause_mode_callback)
+    self.sub_test_mode_ = rospy.Subscriber("/test_mode", Bool, self.test_mode_callback)
+    self.reduced_mode_speed_limit = .25
+    
+    # self.my_mutex = threading.Lock()
+
+    self.resetTimerForDebugMonitor_client = rospy.ServiceProxy('/o2as_debug_monitor/reset_timer', o2as_msgs.srv.ResetTimer)
+    self.debugmonitor_publishers = dict() # used in log_to_debug_monitor()
+
     rospy.sleep(.5)
     rospy.loginfo("Finished initializing class")
     
   ############## ------ Internal functions (and convenience functions)
+
+  def confirm_to_proceed(self, next_task_name):
+    # TODO: Disable this when the real competition is on (via a rosparam/member variable)
+    rospy.loginfo("Press enter to proceed to: " + next_task_name)
+    i = raw_input()
+    if i == "":
+      if not rospy.is_shutdown():
+        return True
+    raise Exception("User caused exit!")
+    return False
+
+  def run_mode_callback(self, msg):
+    # self.my_mutex.acquire()
+    self.run_mode_ = msg.data
+    # self.my_mutex.release()
+  def pause_mode_callback(self, msg):
+    # self.my_mutex.acquire()
+    self.pause_mode_ = msg.data
+    # self.my_mutex.release()
+  def test_mode_callback(self, msg):
+    # self.my_mutex.acquire()
+    self.test_mode_ = msg.data
+    # self.my_mutex.release()
 
   def publish_marker(self, pose_stamped, marker_type):
     req = o2as_msgs.srv.publishMarkerRequest()
@@ -169,9 +207,13 @@ class O2ASBaseRoutines(object):
 
   def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, high_precision = False, 
                       end_effector_link = "", move_lin = True):
+    if self.pause_mode_ or self.test_mode_:
+      if speed > self.reduced_mode_speed_limit:
+        rospy.loginfo("Reducing speed from " + str(speed) + " to " + str(self.reduced_mode_speed_limit) + " because robot is in test or pause mode")
+        speed = self.reduced_mode_speed_limit
     if move_lin:
       return self.move_lin(group_name, pose_goal_stamped, speed, acceleration, end_effector_link)
-    # self.publish_marker(pose_goal_stamped, "pose")
+    self.publish_marker(pose_goal_stamped, "pose")
     group = self.groups[group_name]
     
     if not end_effector_link:
@@ -248,7 +290,11 @@ class O2ASBaseRoutines(object):
     return ps_new
 
   def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, end_effector_link = ""):
-    # self.publish_marker(pose_goal_stamped, "pose")
+    self.publish_marker(pose_goal_stamped, "pose")
+    if self.pause_mode_ or self.test_mode_:
+      if speed > self.reduced_mode_speed_limit:
+        rospy.loginfo("Reducing speed from " + str(speed) + " to " + str(self.reduced_mode_speed_limit) + " because robot is in test or pause mode")
+        speed = self.reduced_mode_speed_limit
 
     if not end_effector_link:
       if group_name == "c_bot":
@@ -307,6 +353,10 @@ class O2ASBaseRoutines(object):
     return plan_success
 
   def move_joints(self, group_name, joint_pose_goal, speed = 1.0, acceleration = 0.0, force_ur_script=False, force_moveit=False):
+    if self.pause_mode_ or self.test_mode_:
+      if speed > self.reduced_mode_speed_limit:
+        rospy.loginfo("Reducing speed from " + str(speed) + " to " + str(self.reduced_mode_speed_limit) + " because robot is in test or pause mode")
+        speed = self.reduced_mode_speed_limit
     if force_ur_script or self.use_real_robot:
       if not force_moveit:
         rospy.logdebug("Real robot is being used. Send joint command to robot controller directly via URScript.") 
@@ -325,6 +375,10 @@ class O2ASBaseRoutines(object):
     return self.groups[group_name].go(wait=True)
 
   def move_front_bots(self, pose_goal_a_bot, pose_goal_b_bot, speed = 0.05):
+    if self.pause_mode_ or self.test_mode_:
+      if speed > .25:
+        rospy.loginfo("Reducing speed from " + str(speed) + " to .25 because robot is in test or pause mode")
+        speed = .25
     rospy.logwarn("CAUTION: Moving front bots together, but MoveIt does not do continuous collision checking.")
     group = self.groups["front_bots"]
     group.set_pose_target(pose_goal_a_bot, end_effector_link="a_bot_gripper_tip_link")
@@ -394,6 +448,10 @@ class O2ASBaseRoutines(object):
 
 
   def go_to_named_pose(self, pose_name, robot_name, speed = 0.5, acceleration = 0.0, force_ur_script=False):
+    if self.pause_mode_ or self.test_mode_:
+      if speed > self.reduced_mode_speed_limit:
+        rospy.loginfo("Reducing speed from " + str(speed) + " to " + str(self.reduced_mode_speed_limit) + " because robot is in test or pause mode")
+        speed = self.reduced_mode_speed_limit
     # pose_name should be "home", "back" etc.
     if force_ur_script and self.use_real_robot:
       # joint_pose = self.groups[robot_name].get_joint_value_target() # This works only with a_bot. Bug?
@@ -420,7 +478,8 @@ class O2ASBaseRoutines(object):
   def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False):
     #self.publish_marker(object_pose, "pick_pose")
     #initial gripper_setup
-    rospy.loginfo("Going above object to pick")
+    #rospy.loginfo("Going above object to pick")
+    self.log_to_debug_monitor("Pick", "operation")
     rospy.logdebug("Approach height 0: " + str(approach_height))
     object_pose.pose.position.z += approach_height
     rospy.logdebug("Height 1: " + str(object_pose.pose.position.z))
@@ -472,6 +531,7 @@ class O2ASBaseRoutines(object):
     #   object_pose.pose.orientation = self.downward_orientation
     rospy.sleep(1.0)
     rospy.loginfo("Going back up")
+
     object_pose.pose.position.z += approach_height
     rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
@@ -482,6 +542,7 @@ class O2ASBaseRoutines(object):
 
   def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, lift_up_after_place = True):
     #self.publish_marker(object_pose, "place_pose")
+    self.log_to_debug_monitor("Place", "operation")
     rospy.loginfo("Going above place target")
     object_pose.pose.position.z += approach_height
     self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
@@ -575,6 +636,7 @@ class O2ASBaseRoutines(object):
 
   def do_change_tool_action(self, robot_name, equip=True, 
                         screw_size = 4):
+    self.log_to_debug_monitor("Change tool", "operation")
     goal = o2as_msgs.msg.changeToolGoal()
     goal.robot_name = robot_name
     goal.equip_the_tool = equip
@@ -585,12 +647,13 @@ class O2ASBaseRoutines(object):
     return self.change_tool_client.get_result()
   
   def do_screw_action(self, robot_name, target_hole, screw_height = 0.02, 
-                        screw_size = 4):
+                        screw_size = 4, stay_put_after_screwing=False):
     goal = o2as_msgs.msg.screwGoal()
     goal.target_hole = target_hole
     goal.screw_height = screw_height
     goal.screw_size = screw_size
     goal.robot_name = robot_name
+    goal.stay_put_after_screwing = stay_put_after_screwing
     rospy.loginfo("Sending screw action goal.")
     self.screw_client.send_goal(goal)
     self.screw_client.wait_for_result()
@@ -696,6 +759,8 @@ class O2ASBaseRoutines(object):
   ################ ----- Gripper interfaces
   
   def send_gripper_command(self, gripper, command, this_action_grasps_an_object = False, force = 5.0, velocity = .1):
+    if not self.use_real_robot:
+      return True
     if gripper == "precision_gripper_outer" or gripper == "precision_gripper_inner" or gripper == "a_bot":
       goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
       if command == "stop":
@@ -716,7 +781,7 @@ class O2ASBaseRoutines(object):
       goal = robotiq_msgs.msg.CModelCommandGoal()
       action_client = self.gripper_action_clients[gripper]
       goal.velocity = velocity   # from 0.013 to 0.1
-      goal.force = force
+      goal.force = force         # from 40 to 100?
       if command == "close":
         goal.position = 0.0
       elif command == "open":
@@ -730,15 +795,8 @@ class O2ASBaseRoutines(object):
       except:
         pass
 
-    if command == "open" and gripper == "b_bot":    # This intermediate opening may fix the driver issues in b_bot
-      rospy.loginfo("Sending intermediate b_bot gripper opening")
-      goal.position = 0.06
-      action_client.send_goal(goal)
-      action_client.wait_for_result(rospy.Duration(3.0))
-      rospy.loginfo("Sending second b_bot gripper opening")
-      goal.position = 0.085
-
     action_client.send_goal(goal)
+    rospy.sleep(.5)
     rospy.loginfo("Sending command " + str(command) + " to gripper: " + gripper)
     action_client.wait_for_result(rospy.Duration(6.0))  # Default wait time: 6 s
     result = action_client.get_result()
@@ -746,6 +804,8 @@ class O2ASBaseRoutines(object):
     return 
 
   def precision_gripper_outer_close(self):
+    self.log_to_debug_monitor("Precision gripper outer close", "operation")
+
     try:
         goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
         goal.close_outer_gripper_fully = True
@@ -760,6 +820,8 @@ class O2ASBaseRoutines(object):
 
 
   def precision_gripper_outer_open(self):
+    self.log_to_debug_monitor("Precision gripper outer open", "operation")
+
     try:
         goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
         goal.open_outer_gripper_fully = True
@@ -773,6 +835,8 @@ class O2ASBaseRoutines(object):
         rospy.loginfo("program interrupted before completion", file=sys.stderr)
 
   def precision_gripper_inner_close(self, this_action_grasps_an_object = False):
+    self.log_to_debug_monitor("Precision gripper inner close", "operation")
+
     try:
         goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
         goal.close_inner_gripper_fully = True
@@ -787,6 +851,8 @@ class O2ASBaseRoutines(object):
 
 
   def precision_gripper_inner_open(self, this_action_grasps_an_object = False):
+    self.log_to_debug_monitor("Precision gripper inner open", "operation")
+
     try:
         goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
         goal.open_inner_gripper_fully = True
@@ -800,14 +866,15 @@ class O2ASBaseRoutines(object):
     except rospy.ROSInterruptException:
         rospy.loginfo("program interrupted before completion", file=sys.stderr)
   
-  def precision_gripper_inner_open_slightly(self, this_action_grasps_an_object = False, open_range = 30):
+  def precision_gripper_inner_open_slightly(self, open_range = 30):
+    self.log_to_debug_monitor("Precision gripper inner open slightly","operation")
+
     try:
       action_client = self.gripper_action_clients["a_bot"]
       goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
       goal.open_inner_gripper_slightly = True
       goal.open_inner_gripper_fully = False
       goal.close_inner_gripper_fully = False
-      goal.this_action_grasps_an_object = this_action_grasps_an_object
       goal.slight_opening_width = open_range
       self.gripper_action_clients["a_bot"].send_goal(goal)
       rospy.loginfo("Opening inner gripper slightly")
@@ -821,15 +888,17 @@ class O2ASBaseRoutines(object):
     if not screw_size in [3,4]:
       rospy.logerr("There are no feeders of size " + str(screw_size) + ". Aborting.")
       return False
-    
+
+    self.log_to_debug_monitor("Put screw in feeder", "operation")
+
     self.go_to_named_pose("above_feeder", "a_bot", speed=1.5, acceleration=1.0, force_ur_script=self.use_real_robot)
     drop_pose = geometry_msgs.msg.PoseStamped()
     drop_pose.pose.position.z = .015
-    drop_pose.pose.orientation = self.downward_orientation_2
+    drop_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
     drop_pose.header.frame_id = "m" + str(screw_size) + "_feeder_inlet_link"
 
     self.set_feeder_power(False)
-    self.move_lin(robot_name, drop_pose, speed = 1.0, acceleration = 1.0, end_effector_link = "a_bot_gripper_tip_link")
+    self.move_lin("a_bot", drop_pose, speed = 1.0, acceleration = 1.0, end_effector_link = "a_bot_gripper_tip_link")
     self.send_gripper_command(gripper= "precision_gripper_inner", command="open")
     self.set_feeder_power(True)
     return True
@@ -843,7 +912,9 @@ class O2ASBaseRoutines(object):
     if not screw_size==3 and not screw_size==4:
       rospy.logerr("Screw size needs to be 3 or 4!")
       return False
-    
+
+    self.log_to_debug_monitor("Pick screw from feeder", "operation")
+
     # Turn to the right to face the feeders
     self.go_to_named_pose("feeder_pick_ready", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
 
@@ -878,31 +949,43 @@ class O2ASBaseRoutines(object):
     """
     Picks a screw from the precision gripper.
     """
+    self.log_to_debug_monitor("Pick screw from precision gripper", "operation")
+
     if not screw_size==3 and not screw_size==4:
       rospy.logerr("Screw size needs to be 3 or 4!")
       return False
+
+    self.log_to_debug_monitor("Pick screw from precision gripper", "operation")
     
     # Turn to the right to face the feeders
-    self.go_to_named_pose("screw_ready", robot_name, force_ur_script=self.use_real_robot)
-
+    self.go_to_named_pose("back", "c_bot", force_ur_script=self.use_real_robot)
     self.go_to_named_pose("screw_handover", "a_bot", force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("screw_ready", robot_name, force_ur_script=self.use_real_robot)
+    
     # ATTENTION: MAGIC NUMBERS
-    magic_y_offset = .004
-    magic_z_offset = -.008
+    if robot_name == "c_bot":
+      magic_y_offset = .004
+      magic_z_offset = -.01
+    elif robot_name == "b_bot":
+      magic_y_offset = .004
+      magic_z_offset = -0.01
 
     pick_pose = geometry_msgs.msg.PoseStamped()
     pick_pose.header.frame_id = "a_bot_gripper_screw_pickup"
-    pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/6, 0, 0))
+    if robot_name == "b_bot":
+      pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi*5/4, 0, 0))
+    elif robot_name == "c_bot":
+      pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/6, 0, 0))
     pick_pose.pose.position.y = magic_y_offset
     pick_pose.pose.position.z = magic_z_offset
     self.publish_marker(pick_pose, "pose")
     
-    if robot_name == "b_bot":
-      pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(5*pi/6, 0, 0))
     prep_pose = copy.deepcopy(pick_pose)
     prep_pose.pose.position.x = -0.03
     prep_pose.pose.position.y = -0.06
     self.publish_marker(prep_pose, "pose")
+
+    self.toggle_collisions(False)
 
     self.move_lin(robot_name, prep_pose, .2, end_effector_link=str(robot_name)+"_screw_tool_m"+str(screw_size)+"_tip_link")
     prep_pose.pose.position.y = magic_y_offset
@@ -912,7 +995,7 @@ class O2ASBaseRoutines(object):
     attempt = 0
     screw_picked = False
     while attempt < attempts:
-      self.do_pick_action(robot_name, pick_pose, screw_size = 4, use_complex_planning = True, tool_name = "screw_tool")
+      self.do_pick_action(robot_name, pick_pose, screw_size = screw_size, use_complex_planning = True, tool_name = "screw_tool")
       bool_msg = Bool()
       try:
         bool_msg = rospy.wait_for_message("/screw_tool_m" + str(screw_size) + "/screw_suctioned", Bool, 1.0)
@@ -921,13 +1004,23 @@ class O2ASBaseRoutines(object):
       screw_picked = bool_msg.data
       if screw_picked:
         rospy.loginfo("Successfully picked the screw")
-        return True
+        break
       if not self.use_real_robot:
         rospy.loginfo("Pretending the screw is picked, because this is simulation.")
-        return True
+        break
       attempt += 1
+    
 
-    return False
+    if screw_picked:
+      self.send_gripper_command("a_bot", "open")
+      self.go_to_named_pose("screw_handover_retreat", "a_bot")
+    else: # Did not pick screw
+      pass
+      # self.send_gripper_command("a_bot", "close")
+      # self.move_lin(robot_name, prep_pose, .2, end_effector_link=str(robot_name)+"_screw_tool_m"+str(screw_size)+"_tip_link")
+
+    self.toggle_collisions(True)
+    return screw_picked
 
   def set_feeder_power(self, turn_on=True):
     if not self.use_real_robot:
@@ -940,6 +1033,7 @@ class O2ASBaseRoutines(object):
 
 
   def pick_nut_from_table(self,robot_name, object_pose, max_radius=0.005, end_effector_link="c_bot_nut_tool_m6_tip_link"):
+    self.log_to_debug_monitor("Pick nut from table", "operation")
     approach_pose = copy.deepcopy(object_pose)
     approach_pose.pose.position.z += .02  # Assumes that z points upward
     self.go_to_pose_goal(robot_name, approach_pose, speed=.1, move_lin = True, end_effector_link=end_effector_link)
@@ -954,6 +1048,8 @@ class O2ASBaseRoutines(object):
     self.go_to_pose_goal(robot_name, approach_pose, speed=.03, move_lin = True, end_effector_link=end_effector_link)
 
   def pick_nut_using_spiral_search(self,object_pose, max_radius=0.005, end_effector_link="c_bot_nut_tool_m6_tip_link"):
+    self.log_to_debug_monitor("Pick nut using spiral search", "operation")
+
     # This spiral search does not work as well as we hoped. When the nut is not perfectly picked, it falls to a completely different place
     max_radius = .005
     theta_incr = pi/3
@@ -986,6 +1082,72 @@ class O2ASBaseRoutines(object):
       r = r + radius_inc_set
       RealRadius = math.sqrt(math.pow(y,2)+math.pow(z,2))
 
+  def adjust_centering(self, robot_name = "b_bot", go_fast=False):
+
+    #rospy.loginfo("============ Adjusting the position of the pin/shaft
+    # ============")
+    self.log_to_debug_monitor("Adjust centering", "operation")
+    self.go_to_named_pose("home", robot_name)
+    self.send_gripper_command(gripper="c_bot",command = "open")
+
+    speed = .3
+    acceleration = .5
+    force_ur_script = False
+    if go_fast:
+      speed = 1.5
+      acceleration = 1.5
+      force_ur_script = True
+
+    pose1 = geometry_msgs.msg.PoseStamped()
+    pose1.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    pose1.header.frame_id = "b_bot_robotiq_85_tip_link"
+    pose1.pose.position.y = -0.15
+    pose1.pose.position.z = 0.15
+    self.go_to_pose_goal("b_bot", pose1,speed=speed, acceleration=acceleration, move_lin = True)
+
+    rospy.sleep(1)
+
+    pose2 = geometry_msgs.msg.PoseStamped()
+    pose2.header.frame_id = "b_bot_robotiq_85_tip_link"
+    pose2.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2,0,pi/2))
+    pose2.pose.position.z = 0.0  # MAGIC NUMBER!
+    pose2.pose.position.y = 0.025
+    pose2.pose.position.x = 0.015
+    self.go_to_pose_goal("c_bot", pose2, speed=speed, acceleration=acceleration, move_lin = True)
+
+    # self.send_gripper_command(gripper="b_bot",command = "close", velocity = .015, force = 1.0)
+    self.send_gripper_command(gripper="c_bot",command = "close")
+    rospy.sleep(.5)
+    self.send_gripper_command(gripper="b_bot",command = .03)
+    rospy.sleep(.5)
+    self.send_gripper_command(gripper="b_bot",command = "open")
+    rospy.sleep(1.0)
+    self.send_gripper_command(gripper="b_bot",command = "close", velocity = .05, force = 1.0)
+    # self.send_gripper_command(gripper="b_bot",command = "close", force = 1.0)
+    rospy.sleep(.5)
+    self.send_gripper_command(gripper="c_bot",command = "open")
+    rospy.sleep(.5)
+
+    pose3 = geometry_msgs.msg.PoseStamped()
+    pose3.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi/2, 0, 0))
+    pose3.header.frame_id = "b_bot_robotiq_85_tip_link"
+    pose3.pose.position.y = 0
+    pose3.pose.position.z = 0
+    self.go_to_pose_goal("b_bot", pose3, speed=speed, acceleration=acceleration, move_lin = True)
+
+    self.send_gripper_command(gripper="c_bot",command = "close")
+    rospy.sleep(1)
+    self.send_gripper_command(gripper="b_bot",command = "open")
+    # self.send_gripper_command(gripper="b_bot",command = .03)
+    rospy.sleep(2)
+    self.send_gripper_command(gripper="b_bot",command = "close")
+    rospy.sleep(2)
+    self.send_gripper_command(gripper="c_bot",command = "open")
+    rospy.sleep(1)
+
+    self.go_to_named_pose("home", "c_bot", speed=speed, acceleration=acceleration, force_ur_script=force_ur_script)
+    return
+
 ######
 
   def get_tray_placement_orientation_for_suction_in_kitting(self, set_number, tray_number):
@@ -1005,7 +1167,7 @@ class O2ASBaseRoutines(object):
         required_intermediate_pose = "joints_above_set_2_tray_2"
     elif set_number == 3:
       if tray_number == 1:  # tray 1
-        orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi)) 
+        orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi*150/180+pi)) 
       elif tray_number == 2:  # tray 2
         orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, +pi))
         required_intermediate_pose = "joints_above_set_3_tray_2"
@@ -1014,5 +1176,27 @@ class O2ASBaseRoutines(object):
       return False
     return orientation, required_intermediate_pose
     
-    
-    
+  def start_task_timer(self):
+    """Reset timer in debug monitor"""
+    _ = self.resetTimerForDebugMonitor_client.call()
+
+  def log_to_debug_monitor(self, text, category):
+    """Send message to rospy.loginfo and debug monitor.
+
+    This method create publisher on the fly. It's name is defined as "/o2as_state/{}".format(category).
+    The topic name should be included in the parameter server. See test.launch in o2as_debug_monitor.
+    """
+    rospy.loginfo(category + ": " + text)
+
+    topic_name = "/o2as_state/{}".format(category)
+
+    if topic_name not in self.debugmonitor_publishers:
+      pub = rospy.Publisher(topic_name, String, queue_size=1)
+      rospy.sleep(0.5)
+      self.debugmonitor_publishers[topic_name] = pub
+    else:
+      pub = self.debugmonitor_publishers[topic_name]
+
+    msg = String()
+    msg.data = text
+    pub.publish(msg)

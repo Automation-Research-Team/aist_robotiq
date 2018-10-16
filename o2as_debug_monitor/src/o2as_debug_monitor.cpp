@@ -16,6 +16,7 @@
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/imgproc/imgproc.hpp>
+#include "o2as_msgs/ResetTimer.h"
 
 using ImageCallback =
   boost::function<void(const sensor_msgs::ImageConstPtr&)>;
@@ -206,9 +207,8 @@ CamInfoCallback getCallbackForCameraInfo(
   };
 }
 
-//boost::function<void(const std_msgs::String::ConstPtr& msg)>
 StringCallback getCallbackForString(cv::Rect rect, XmlRpc::XmlRpcValue &params,
-                                    cv::Mat& monitor_, long start_time)
+                                    cv::Mat& monitor_, long& start_time)
 {
   // Values captured by closure
   int offset_x = params["offset"][0];
@@ -223,13 +223,13 @@ StringCallback getCallbackForString(cv::Rect rect, XmlRpc::XmlRpcValue &params,
   std::vector<int> ivec;
 
   // This function returns callback function
-  return [=](const std_msgs::String::ConstPtr& msg) mutable {
+  return [=, &start_time](const std_msgs::String::ConstPtr& msg) mutable {
     check_window();
     clear_buffer_rect(rect, monitor_);
 
     long elapsed_time = now() - start_time;
     char buf[255];
-    sprintf(buf, "%.1lfs: ", (float)elapsed_time / 1000);
+    sprintf(buf, "%6.1lfs: ", (float)elapsed_time / 1000);
     std::string text = buf + std::string(msg->data.c_str());
     messages.push_back(text);
     messages.pop_front();
@@ -276,23 +276,6 @@ KittingSetIdCallback getCallbackForKittingSetId(
               it->first);
       i++;
     }
-
-    // long elapsed_time = now() - start_time;
-    // char buf[255];
-    // sprintf(buf, "%.1lfs: ", (float)elapsed_time / 1000);
-    // std::string text = buf + std::string(msg->data.c_str());
-    // messages.push_back(text);
-    // messages.pop_front();
-
-    // for (int i = 0; i < n_history; i++)
-    // {
-    //   putText(monitor_, rect.x + offset_x, rect.y + offset_y + 32 * i,
-    //           messages[i]);
-    // }
-    
-    // // Copy the image buffer in the window
-    // cv::imshow("Monitor", monitor_);
-    // cv::waitKey(3);
   };
 }
 
@@ -340,6 +323,13 @@ SuctionSuccessCallback getCallbackForSuctionSuccess(
   };
 }
 
+
+void timerCallback(const ros::TimerEvent&)
+{
+    check_window();
+    cv::waitKey(3);
+}
+
 namespace o2as_debug_monitor
 {
   class Monitor
@@ -384,6 +374,18 @@ namespace o2as_debug_monitor
         nh.getParam("o2as_debug_monitor/suction_success_topics",
                     suction_success_topics);
         setSuctionSuccessCallbacks(nh, suction_success_topics);
+
+        // Timer callback to keep this instance alive
+        timer = nh.createTimer(ros::Duration(1), timerCallback);
+      }
+
+      bool resetTimer(o2as_msgs::ResetTimer::Request &req,
+                      o2as_msgs::ResetTimer::Response &res)
+      {
+        start_time = now();
+        res.success = true;
+        ROS_INFO("Debug monitor timer reset");
+        return true;
       }
 
     private:
@@ -394,6 +396,8 @@ namespace o2as_debug_monitor
       std::vector<StringCallback> stringcbs_;
       std::vector<KittingSetIdCallback> setidcbs_;
       std::vector<SuctionSuccessCallback> sscbs_;
+
+      ros::Timer timer;
 
       cv::Mat monitor_;
 
@@ -543,12 +547,20 @@ namespace o2as_debug_monitor
       O2asDebugMonitor() {}
       ~O2asDebugMonitor() {}
       boost::shared_ptr<Monitor> inst_;
+      Monitor *monitor;
+      ros::ServiceServer srv_resettimer;
 
     private:
       virtual void onInit()
       {
-        // cv::namedWindow("Monitor", cv::WINDOW_NORMAL);
-        inst_.reset(new Monitor(getNodeHandle()));
+        auto nh = getNodeHandle();
+        monitor = new Monitor(getNodeHandle());
+        inst_.reset(monitor);
+
+        // Add service ResetTimer
+        srv_resettimer = nh.advertiseService(
+          "/o2as_debug_monitor/reset_timer", &Monitor::resetTimer, monitor
+        );
       }
   };
 

@@ -7,9 +7,30 @@ from std_msgs.msg import Float64
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
+from cv_bridge import CvBridge
 
 import actionlib
 import o2as_msgs.msg
+from sensor_msgs.msg import Image
+
+from PIL import Image as Image_
+from PIL import ImageDraw
+
+
+def _draw_rect(img, x, y, w, h, color, thick=False):
+    """ Draw rectangle on numpy array.
+
+    Parameter color is given like (255, 0, 0). """
+
+    img_ = Image_.fromarray(img)
+    draw = ImageDraw.Draw(img_)
+    draw.rectangle((x, y, x + w, y + h), outline=color)
+
+    if thick:
+        draw.rectangle((x - 1, y - 1, x + w + 1, y + h + 1), outline=color)
+
+    return np.asarray(img_)
+
 
 class InnerPickDetection(object):
 
@@ -25,7 +46,12 @@ class InnerPickDetection(object):
         self._w = 64
         self._h = 32
         # TODO: Write an image with the ROI drawn into it
-        # TODO: Publish the input and output image to o2as_debug_monitor
+
+        # Publish input image (and output value)
+        # The image is published when bg ratio is computed
+        self.bridge = CvBridge()
+        self.pub_input_image = rospy.Publisher("/o2as_debug_monitor/bg_ratio_input_image", Image, queue_size=1)
+        #self.pub_output_value = rospy.Publisher("/o2as_debug_monitor/bg_ratio_output_value", Float64, queue_size=1)
 
         self._image_topic = "/a_bot_camera/color/image_raw"
 
@@ -78,6 +104,9 @@ class InnerPickDetection(object):
         :param int w: Width of ROI.
         :param int h: Height of ROI.
         """
+        # Input
+        img0 = img[y:(y + h), x:(x + w), :]
+
         # bright pixels
         img = img / 255.0
         img = img[y:(y + h), x:(x + w), :]
@@ -98,8 +127,22 @@ class InnerPickDetection(object):
         ixs_bg = np.where(red_ratio > red_threshold)[0]
 
         # compute background ratio
-        return float(ixs_bg.shape[0]) / pixels.shape[0]
+        bg_ratio = float(ixs_bg.shape[0]) / pixels.shape[0]
+        bg_ratio_message = Float64()
+        bg_ratio_message.data = bg_ratio
+        #self.pub_output_value.publish(bg_ratio_message)
 
+        threshold = 0.9
+        if bg_ratio > threshold:
+            img0 = _draw_rect(img0, x, y, w, h, (0, 255, 0), True)
+        else:
+            img0 = _draw_rect(img0, x, y, w, h, (255, 0, 0))
+
+        # publish input image with detection rectangle
+        img_message = self.bridge.cv2_to_imgmsg(img0, "rgb8")
+        self.pub_input_image.publish(img_message)
+
+        return bg_ratio
 
 if __name__ == "__main__":
 

@@ -112,6 +112,8 @@
     <arg name="send_cloud" value="$(arg send_cloud)"/>
   </include>
 
+  <node name="o2as_usb_relay" pkg="o2as_usb_relay" type="o2as_relay_server" respawn="false" output="screen"/>
+
   <!-- <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch">
     <arg name="sim" value="false" />
     <arg name="debug" value="false" />
