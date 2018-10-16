@@ -125,6 +125,8 @@ class O2ASBaseRoutines(object):
     self.force_ur_script_linear_motion = False
     self.force_moveit_linear_motion = False
 
+    self.competition_mode = False   # Disables confirmation dialogs etc. for full automatic motion
+
     moveit_commander.roscpp_initialize(sys.argv)
     rospy.init_node('assembly_example', anonymous=False)
 
@@ -176,6 +178,8 @@ class O2ASBaseRoutines(object):
   ############## ------ Internal functions (and convenience functions)
 
   def confirm_to_proceed(self, next_task_name):
+    if self.competition_mode:
+      return True
     # TODO: Disable this when the real competition is on (via a rosparam/member variable)
     rospy.loginfo("Press enter to proceed to: " + next_task_name)
     i = raw_input()
