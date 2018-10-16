@@ -5,7 +5,7 @@
   <!-- Task board position: .2 .1 to column-->
   <xacro:include filename="$(find o2as_scene_description)/urdf/task_board.xacro" />
   <xacro:task_board boardname="taskboard" parent="workspace_center">
-    <origin xyz="-0.35 0.2 0.0" rpy="0 0 ${-pi/2}" />   
+    <origin xyz="-0.3 0.26 0.0" rpy="0 0 ${-pi/2}" />   
     <!-- <origin xyz="-0.35 0.1 0.0" rpy="0 0 ${-pi/2}" />  -->
   </xacro:task_board>
   
@@ -13,8 +13,8 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_mat.xacro" />
   <xacro:property name="p_w" value="0.4"/>
   <xacro:property name="p_l" value="0.4"/>
-  <xacro:o2as_mat matname="mat" mat_w="${p_w}" mat_l="${p_l}" mat_h=".0001" parent="taskboard">
-    <origin xyz="0.0 0.45 0.0" rpy="0 0 0" />
+  <xacro:o2as_mat matname="mat" mat_w="${p_w}" mat_l="${p_l}" mat_h=".0001" parent="workspace_center">
+    <origin xyz="0.14 0.2 0.0" rpy="0 0 ${-pi/2}" />   
   </xacro:o2as_mat>
 
 
