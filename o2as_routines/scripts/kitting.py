@@ -320,10 +320,10 @@ class KittingClass(O2ASBaseRoutines):
       "part_12" : False, # idler spacer
       "part_13" : False, # idler pulley/bearing
       "part_14" : False, # idler pin
-      "part_15" : "left", # m6 nut
-      "part_16" : "right", # m6 washer
+      "part_15" : False, # m6 nut
+      "part_16" : False, # m6 washer
       "part_17" : False, # m4 screw
-      "part_18" : "right"} # m3 screw
+      "part_18" : False} # m3 screw
 
     # The "from_behind" orientation is slightly turned to avoid the robot locking up
     self.suction_orientation_from_behind = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi*10/180))
@@ -377,7 +377,7 @@ class KittingClass(O2ASBaseRoutines):
     kitting_list.append([])
     kitting_list.append([])
     
-    with open(os.path.join(rp.get_path("o2as_scene_description"), "config", "kitting_order_file.csv"), 'r') as f:
+    with open(os.path.join(rp.get_path("o2as_scene_description"), "config", "Part_Order_1.csv"), 'r') as f:
       reader = csv.reader(f)
       header = next(reader)
       # [0, 1, 2, 3, 4] = ["Set", "No.", "ID", "Name", "Note"]
@@ -935,7 +935,7 @@ class KittingClass(O2ASBaseRoutines):
         rospy.logerr("Failed an attempt to pick item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + "). Reattempting. Current attempts: " + str(attempts))
         continue
       
-      self.put_screw_in_feeder
+      self.put_screw_in_feeder(screw_size)
       
       item.in_feeder = True
       rospy.loginfo("Delivered screw m" + str(screw_size) + " to feeder (item nr." + str(item.number_in_set) + " from set " + str(item.set_number))
@@ -1026,7 +1026,7 @@ class KittingClass(O2ASBaseRoutines):
               *tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi - resp_search_grasp.rotipz[i]))
           poses_in_bin.append(pose_in_bin)
         self.publish_marker(pose_in_bin, "aist_vision_result")
-        rospy.loginfo("Calculated " + str(number_of_pose_candidates) + " for item nr. " + str(item.part_id) + " in bin " + str(item.bin_name))
+        rospy.loginfo("Calculated " + str(number_of_pose_candidates) + " candidates for item nr. " + str(item.part_id) + " in bin " + str(item.bin_name))
         rospy.logdebug(poses_in_bin)
         return poses_in_bin
     else:
@@ -1166,6 +1166,7 @@ class KittingClass(O2ASBaseRoutines):
 
     # Go to preparatory pose
     if item.ee_to_use == "suction":
+      rospy.loginfo("Going to preparatory pose before picking from bins")
       bin_center = geometry_msgs.msg.PoseStamped()
       bin_center.header.frame_id = item.bin_name
       bin_center.pose.orientation.w = 1.0
