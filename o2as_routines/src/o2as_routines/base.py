@@ -682,7 +682,7 @@ class O2ASBaseRoutines(object):
     if not self.use_real_robot:
       return True
     goal = o2as_msgs.msg.SuctionControlGoal()
-    goal.fastening_tool_name = motor_name
+    goal.fastening_tool_name = tool_name
     goal.turn_suction_on = turn_suction_on
     goal.eject_screw = eject_screw
     rospy.loginfo("Sending suction action goal.")
@@ -696,7 +696,8 @@ class O2ASBaseRoutines(object):
       return True
     goal = o2as_msgs.msg.ToolsCommandGoal()
     # goal.stop = stop
-    goal.peg_fasten = (item_name == "peg")
+    goal.peg_fasten = (item_name == "peg" or item_name == "m10_nut")
+    goal.setScrew_fasten = (item_name == "set_screw")
     # goal.big_nut_fasten = (item_name == "m10_nut")
     goal.big_nut_fasten = True
     goal.small_nut_fasten = (item_name == "m6_nut")
@@ -1100,7 +1101,7 @@ class O2ASBaseRoutines(object):
     force_ur_script = False
     if go_fast:
       speed = 1.5
-      acceleration = 1.5
+      acceleration = 1.2
       force_ur_script = True
 
     pose1 = geometry_msgs.msg.PoseStamped()
