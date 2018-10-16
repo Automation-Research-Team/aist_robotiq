@@ -105,7 +105,7 @@ class InnerPickDetection(object):
         :param int h: Height of ROI.
         """
         # Input
-        img0 = img[y:(y + h), x:(x + w), :]
+        img0 = img
 
         # bright pixels
         img = img / 255.0
