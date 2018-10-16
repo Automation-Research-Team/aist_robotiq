@@ -1169,11 +1169,10 @@ class KittingClass(O2ASBaseRoutines):
       grasp_candidate_from_vision = False
 
       if item.ee_to_use == "precision_gripper_from_inside" and not item.bin_is_inclined and not item.part_id in [17, 18]:
-        if grasp_candidate_from_vision:
-          res_view_bin = self.view_bin(robot_name, item.bin_name, item.part_id)    
-          if res_view_bin:
-            pick_pose = res_view_bin
-            pick_pose.pose.position.z -= .025 # MAGIC NUMBER (to compensate for the Realsense calibration)
+        res_view_bin = self.view_bin(robot_name, item.bin_name, item.part_id)    
+        # if res_view_bin:
+        #   pick_pose = res_view_bin
+        #   pick_pose.pose.position.z -= .025 # MAGIC NUMBER (to compensate for the Realsense calibration)
 
       if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
         if self.grasp_candidates[item.part_id]["positions"]:
