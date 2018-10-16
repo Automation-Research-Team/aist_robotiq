@@ -338,11 +338,12 @@ class CalibrationClass(O2ASBaseRoutines):
     pose0.pose.position.z = .002
     
     if context == "initial": 
-      for i in range(3):
+      for i in range(4):
         poses.append(copy.deepcopy(pose0))
-      poses[0].header.frame_id = "mat_part12"
-      poses[1].header.frame_id = "mat_part1"
-      poses[2].header.frame_id = "mat_part8"
+      poses[0].header.frame_id = "mat_part15"
+      poses[1].header.frame_id = "mat_part14"
+      poses[2].header.frame_id = "mat_part9"
+      poses[3].header.frame_id = "mat_part7_1"
       self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, move_lin = True)
     elif context == "full":
       pose0.pose.position.z = .005

@@ -236,12 +236,17 @@ class TaskboardClass(O2ASBaseRoutines):
     self.log_to_debug_monitor("No.  4 / 14: Spacer large (id=4)", "subtask")
     self.do_task_number(4)  # Spacer large
 
+    self.log_to_debug_monitor("No. 11 / 14: M4 screw (id=13)", "subtask")
+    self.do_task_number(131) # M4 screw 
+    self.log_to_debug_monitor("No. 12 / 14: M3 screw (id=12)", "subtask")
+    self.do_task_number(121) # M3 screw 
+
     self.log_to_debug_monitor("No.  5 / 14: Washer small (id=9)", "subtask")
     self.do_task_number(9)  # Washer small
     self.log_to_debug_monitor("No.  6 / 14: Washer large (id=10)", "subtask")
     self.do_task_number(10) # Washer large
-    self.log_to_debug_monitor("No.  7 / 14: Retainer pin (id=14)", "subtask")
-    self.do_task_number(14) # Retainer pin
+    self.log_to_debug_monitor("No.  7 / 14: Pulley (id=14)", "subtask")
+    self.do_task_number(14) # Pulley
 
     self.log_to_debug_monitor("No.  8 / 14: Bearing (id=1)", "subtask")
     self.do_task_number(1)  # Bearing
@@ -250,13 +255,14 @@ class TaskboardClass(O2ASBaseRoutines):
 
     self.log_to_debug_monitor("No. 10 / 14: End cap (id=15)", "subtask")
     self.do_task_number(15) # end cap
-    self.log_to_debug_monitor("No. 11 / 14: M3 screw (id=13)", "subtask")
-    self.do_task_number(13) # M3 screw?
-    self.log_to_debug_monitor("No. 12 / 14: M4 screw (id=12)", "subtask")
-    self.do_task_number(12) # M4 screw?
+    self.log_to_debug_monitor("No. 11 / 14: M4 screw (id=13)", "subtask")
+    self.do_task_number(132) # M4 screw?
+    self.log_to_debug_monitor("No. 12 / 14: M3 screw (id=12)", "subtask")
+    self.do_task_number(122) # M3 screw?
 
     self.log_to_debug_monitor("No. 13 / 14: M10 nut (id=8)", "subtask")
     self.do_task_number(8)  # M10 nut
+
     self.log_to_debug_monitor("No. 14 / 14: M6 nut/bolt (id=7)", "subtask")
     self.do_task_number(7)  # M6 nut/bolt
     
@@ -946,55 +952,60 @@ class TaskboardClass(O2ASBaseRoutines):
       rospy.sleep(3.0)
       self.go_to_named_pose("home", "b_bot")
     
-    if i in [12, 13]:
-      if i == 12:
+    if i in [12, 13, 121, 122, 131, 132]:
+      if i in [12, 121, 122]:
         screw_size = 3
       else:
         screw_size = 4
-      # self.go_to_named_pose("home", "a_bot")
-      # self.go_to_named_pose("home", "b_bot")
-      # self.go_to_named_pose("back", "c_bot")
-      # screw_pick_pose = copy.deepcopy(self.pick_poses[i-1])
-      # screw_pick_pose.pose.position.y += .007
-      # screw_pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*45/180, pi*90/180))
-      # self.pick("a_bot",screw_pick_pose,0.001,
-      #                         speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
-      #                         approach_height = 0.05, special_pick = False)    
       
-      # self.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
-      # # If we decide to use the feeder, there is self.place_screw_in_feeder(screw_size) and self.pick_screw_from_feeder(screw_size)
-      # self.put_screw_in_feeder(screw_size)
-      # self.go_to_named_pose("back", "a_bot")
+      if i in [12, 13, 121, 131]:
+        self.go_to_named_pose("home", "a_bot")
+        self.go_to_named_pose("home", "b_bot")
+        self.go_to_named_pose("back", "c_bot")
+        screw_pick_pose = copy.deepcopy(self.pick_poses[i-1])
+        screw_pick_pose.pose.position.y += .007
+        screw_pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*45/180, pi*90/180))
+        self.pick("a_bot",screw_pick_pose,0.001,
+                                speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
+                                approach_height = 0.05, special_pick = False)    
+        
+        self.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
+        # If we decide to use the feeder, there is self.place_screw_in_feeder(screw_size) and self.pick_screw_from_feeder(screw_size)
+        self.put_screw_in_feeder(screw_size)
+        self.go_to_named_pose("back", "a_bot")
+      if i in [12, 13, 122, 132]:
+        self.go_to_named_pose("home", "a_bot")
+        self.go_to_named_pose("home", "b_bot")
+        self.go_to_named_pose("back", "c_bot")
+        #pick up the screw tool
+        self.go_to_named_pose("tool_pick_ready", "c_bot")
+        self.confirm_to_proceed("good to pick?")
+        self.do_change_tool_action("c_bot", equip=True, screw_size = screw_size)
+        ## self.go_to_named_pose("screw_ready", "c_bot")
+        
+        #pick up the screw from feeder
+        self.pick_screw_from_feeder(screw_size)
+        self.go_to_named_pose("screw_ready_high", "c_bot")
 
-      # #pick up the screw tool
-      # self.go_to_named_pose("tool_pick_ready", "c_bot")
-      # self.confirm_to_proceed("good to pick?")
-      # self.do_change_tool_action("c_bot", equip=True, screw_size = screw_size)
-      # ## self.go_to_named_pose("screw_ready", "c_bot")
-      
-      # #pick up the screw from feeder
-      # self.pick_screw_from_feeder(screw_size)
-      self.go_to_named_pose("screw_ready_high", "c_bot")
+        #screw on the cap
+        screw_approach = copy.deepcopy(self.place_poses[i-1])
+        screw_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, 0, 0))
 
-      #screw on the cap
-      screw_approach = copy.deepcopy(self.place_poses[i-1])
-      screw_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, 0, 0))
+        if i == 12:
+          screw_approach.pose.position.z -= .002  #MAGIC NUMBER!
+          screw_approach.pose.position.y -= .001  #MAGIC NUMBER!
+        elif i == 13:
+          screw_approach.pose.position.z -= .002  #MAGIC NUMBER!
+          screw_approach.pose.position.y -= .001  #MAGIC NUMBER!
+        
+        screw_approach.pose.position.x -= 0.03
+        self.go_to_pose_goal("c_bot", screw_approach, speed=0.08, end_effector_link="c_bot_screw_tool_m" + str(screw_size) + "_tip_link", move_lin=True)
+        print(screw_approach)
+        self.confirm_to_proceed("Proceed to screw_pose?")
 
-      if i == 12:
-        screw_approach.pose.position.z -= .002  #MAGIC NUMBER!
-        screw_approach.pose.position.y -= .001  #MAGIC NUMBER!
-      elif i == 13:
-        screw_approach.pose.position.z -= .002  #MAGIC NUMBER!
-        screw_approach.pose.position.y -= .001  #MAGIC NUMBER!
-      
-      screw_approach.pose.position.x -= 0.03
-      self.go_to_pose_goal("c_bot", screw_approach, speed=0.08, end_effector_link="c_bot_screw_tool_m" + str(screw_size) + "_tip_link", move_lin=True)
-      print(screw_approach)
-      self.confirm_to_proceed("Proceed to screw_pose?")
-
-      screw_pose = copy.deepcopy(screw_approach)
-      screw_pose.pose.position.x = 0.007
-      self.do_screw_action("c_bot", screw_pose, screw_height = 0.01, screw_size = screw_size, stay_put_after_screwing=True)
+        screw_pose = copy.deepcopy(screw_approach)
+        screw_pose.pose.position.x = 0.007
+        self.do_screw_action("c_bot", screw_pose, screw_height = 0.01, screw_size = screw_size, stay_put_after_screwing=True)
 
       if screw_size == 3:
         screw_pose_manual_followup = copy.deepcopy(screw_approach)
