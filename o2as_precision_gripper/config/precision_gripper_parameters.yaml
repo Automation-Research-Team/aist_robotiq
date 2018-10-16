@@ -1,6 +1,6 @@
 publish_rate: 100
 outer_force: 10
-inner_force: 10
+inner_force: 13
 # 1123
 outer_open_position:  -21000
 outer_close_position: 36000
