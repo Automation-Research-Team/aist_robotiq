@@ -1043,6 +1043,7 @@ class CalibrationClass(O2ASBaseRoutines):
   def tray_partition_calibration(self, robot_name="b_bot", end_effector_link="", task="assembly", set_number=1, tray_number=1):
     rospy.loginfo("============ Calibrating trays. ============")
     rospy.loginfo(robot_name + " end effector should be 2 cm above tray partition.")
+    rospy.loginfo("set number: " + str(set_number) + ", tray_number: " + str(tray_number))
     if robot_name=="1_bot":
       self.go_to_named_pose("back", "b_bot")
       self.go_to_named_pose("back", "c_bot")
