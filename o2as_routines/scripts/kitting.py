@@ -1116,31 +1116,31 @@ class KittingClass(O2ASBaseRoutines):
       self.initial_phoxi_image_recorded = True
       take_new_image = True
     
-    # if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
-    if self.grasp_candidates[item.part_id]["pick_was_successful"]:
-      # If the pick was successful for an item, the scene has changed, so a new image needs to be taken
-      rospy.loginfo("Resetting grasp candidates for item " + str(item.part_id))
-      self.grasp_candidates[item.part_id]["pick_was_successful"] = False
-      self.grasp_candidates[item.part_id]["vision_was_attempted"] = False
-      self.grasp_candidates[item.part_id]["positions"] = []
-      take_new_image = True
-    if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":    
-      self.go_to_named_pose("suction_ready_back", "b_bot")
-    elif "precision_gripper" in item.ee_to_use:
-      self.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
-    if not self.grasp_candidates[item.part_id]["vision_was_attempted"]:
-      # Vision is only attempted once, unless it succeeds in picking
-      phoxi_res = self.get_grasp_candidates_from_phoxi(item, take_new_image)
-      self.grasp_candidates[item.part_id]["vision_was_attempted"] = True
-      take_new_image = False
+    if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
+      if self.grasp_candidates[item.part_id]["pick_was_successful"]:
+        # If the pick was successful for an item, the scene has changed, so a new image needs to be taken
+        rospy.loginfo("Resetting grasp candidates for item " + str(item.part_id))
+        self.grasp_candidates[item.part_id]["pick_was_successful"] = False
+        self.grasp_candidates[item.part_id]["vision_was_attempted"] = False
+        self.grasp_candidates[item.part_id]["positions"] = []
+        take_new_image = True
       if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":    
-        self.go_to_named_pose("suction_pick_ready", "b_bot")
+        self.go_to_named_pose("suction_ready_back", "b_bot")
       elif "precision_gripper" in item.ee_to_use:
-        self.go_to_named_pose("kitting_pick_ready", "a_bot")
-      if phoxi_res:
-        self.grasp_candidates[item.part_id]["positions"].extend(phoxi_res)
-        rospy.loginfo("self.grasp_candidates: ")
-        rospy.loginfo(self.grasp_candidates[item.part_id]["positions"][0])
+        self.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
+      if not self.grasp_candidates[item.part_id]["vision_was_attempted"]:
+        # Vision is only attempted once, unless it succeeds in picking
+        phoxi_res = self.get_grasp_candidates_from_phoxi(item, take_new_image)
+        self.grasp_candidates[item.part_id]["vision_was_attempted"] = True
+        take_new_image = False
+        if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":    
+          self.go_to_named_pose("suction_pick_ready", "b_bot")
+        elif "precision_gripper" in item.ee_to_use:
+          self.go_to_named_pose("kitting_pick_ready", "a_bot")
+        if phoxi_res:
+          self.grasp_candidates[item.part_id]["positions"].extend(phoxi_res)
+          rospy.loginfo("self.grasp_candidates: ")
+          rospy.loginfo(self.grasp_candidates[item.part_id]["positions"][0])
 
     # Go to preparatory pose
     if item.ee_to_use == "suction":
@@ -1168,27 +1168,27 @@ class KittingClass(O2ASBaseRoutines):
       pick_pose = self.get_random_pose_in_bin(item)
       grasp_candidate_from_vision = False
 
-      if not item.bin_is_inclined and not item.part_id in [17, 18]:
-        if self.grasp_candidates[item.part_id]["positions"]:
-          rospy.loginfo("Got pose from phoxi grasp candidates:")
-          rospy.loginfo(pick_pose.pose.position)
-          pick_pose = self.grasp_candidates[item.part_id]["positions"].pop(0)
-          pick_pose.pose.position.z += self.insert_offsets[item.part_id]
-          grasp_candidate_from_vision = True
-
-      # if item.ee_to_use == "precision_gripper_from_inside" and not item.bin_is_inclined and not item.part_id in [17, 18]:
-      #   res_view_bin = self.view_bin(robot_name, item.bin_name, item.part_id)    
-      #   if res_view_bin:
-      #     pick_pose = res_view_bin
-      #     pick_pose.pose.position.z -= .025 # MAGIC NUMBER (to compensate for the Realsense calibration)
-
-      # if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
+      # if not item.bin_is_inclined and not item.part_id in [17, 18]:
       #   if self.grasp_candidates[item.part_id]["positions"]:
+      #     pick_pose = self.grasp_candidates[item.part_id]["positions"].pop(0)
+      #     pick_pose.pose.position.z += self.insert_offsets["part_" + str(item.part_id)]
       #     rospy.loginfo("Got pose from phoxi grasp candidates:")
       #     rospy.loginfo(pick_pose.pose.position)
-      #     pick_pose = self.grasp_candidates[item.part_id]["positions"].pop(0)
-      #     pick_pose.pose.position.z += self.insert_offsets
       #     grasp_candidate_from_vision = True
+
+      if item.ee_to_use == "precision_gripper_from_inside" and not item.bin_is_inclined and not item.part_id in [17, 18]:
+        res_view_bin = self.view_bin(robot_name, item.bin_name, item.part_id)    
+        if res_view_bin:
+          pick_pose = res_view_bin
+          pick_pose.pose.position.z -= .025 # MAGIC NUMBER (to compensate for the Realsense calibration)
+
+      if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
+        if self.grasp_candidates[item.part_id]["positions"]:
+          pick_pose = self.grasp_candidates[item.part_id]["positions"].pop(0)
+          pick_pose.pose.position.z += self.insert_offsets["part_"+str(item.part_id)]
+          rospy.loginfo("Got pose from phoxi grasp candidates:")
+          rospy.loginfo(pick_pose.pose.position)
+          grasp_candidate_from_vision = True
 
         if item.ee_to_use == "robotiq_gripper":
           self.go_to_named_pose("home", "b_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
@@ -1203,11 +1203,11 @@ class KittingClass(O2ASBaseRoutines):
             pick_pose.pose.orientation = self.suction_orientation_right_bins
           else:
             pick_pose.pose.orientation = self.suction_orientation_left_bins
-      # else:   # Precision_gripper, robotiq_gripper
-      #   if not item.bin_is_inclined:
-      #     pick_pose.pose.orientation = self.downward_orientation_2
-      # if item.part_id == 6: # Belt
-      #   pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
+      else:   # Precision_gripper, robotiq_gripper
+        if not item.bin_is_inclined:
+          pick_pose.pose.orientation = self.downward_orientation_2
+      if item.part_id == 6: # Belt
+        pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
 
       approach_height = 0.1
       speed_slow = 0.1
