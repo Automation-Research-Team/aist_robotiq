@@ -678,17 +678,17 @@ class O2ASBaseRoutines(object):
       self.fastening_tool_client.wait_for_result()
     return self.fastening_tool_client.get_result()
 
-  def set_suction(self, tool_name, suction_on=False, eject=False):
+  def set_suction(self, tool_name, suction_on=False, eject=False, wait=True):
     if not self.use_real_robot:
       return True
     goal = o2as_msgs.msg.SuctionControlGoal()
     goal.fastening_tool_name = tool_name
-    goal.turn_suction_on = turn_suction_on
-    goal.eject_screw = eject_screw
+    goal.turn_suction_on = suction_on
+    goal.eject_screw = eject
     rospy.loginfo("Sending suction action goal.")
     self.suction_client.send_goal(goal)
     if wait:
-      self.suction_client.wait_for_result()
+      self.suction_client.wait_for_result(rospy.Duration(2.0))
     return self.suction_client.get_result()
 
   def do_nut_fasten_action(self, item_name, wait = False):
@@ -699,7 +699,7 @@ class O2ASBaseRoutines(object):
     goal.peg_fasten = (item_name == "peg" or item_name == "m10_nut")
     goal.setScrew_fasten = (item_name == "set_screw")
     # goal.big_nut_fasten = (item_name == "m10_nut")
-    goal.big_nut_fasten = True
+    # goal.big_nut_fasten = True
     goal.small_nut_fasten = (item_name == "m6_nut")
     rospy.loginfo("Sending nut_tool action goal.")
     self.nut_peg_tool_client.send_goal(goal)
@@ -957,7 +957,7 @@ class O2ASBaseRoutines(object):
     """
     self.log_to_debug_monitor("Pick screw from precision gripper", "operation")
 
-    if not screw_size==3 and not screw_size==4:
+    if not screw_size==3 and not screw_size==4 and not screw_size==6:
       rospy.logerr("Screw size needs to be 3 or 4!")
       return False
 
@@ -973,7 +973,7 @@ class O2ASBaseRoutines(object):
       magic_y_offset = .004
       magic_z_offset = -.01
     elif robot_name == "b_bot":
-      magic_y_offset = .004
+      magic_y_offset = .002
       magic_z_offset = -0.01
 
     pick_pose = geometry_msgs.msg.PoseStamped()

@@ -63,7 +63,7 @@ class ToolsAction:
             command_is_sent = self.small_nut_fasten(30)
         
         elif goal.setScrew_fasten:        
-            command_is_sent = self.setScrew_fasten(30)
+            command_is_sent = self.setScrew_fasten(20)
         else:
             rospy.logerr('No command is sent, service request was empty.')
             command_is_sent = False
@@ -76,11 +76,11 @@ class ToolsAction:
             elif goal.peg_fasten or goal.big_nut_fasten or goal.small_nut_fasten or goal.setScrew_fasten:  
                 if goal.peg_fasten:
                     self._feedback.motor_speed = self.p1.read_current_velocity()
-                elif goal.big_nut_fasten:
+                if goal.big_nut_fasten:
                     self._feedback.motor_speed = self.p2.read_current_velocity()
-                elif goal.small_nut_fasten:
+                if goal.small_nut_fasten:
                     self._feedback.motor_speed = self.p3.read_current_velocity()
-                elif goal.setScrew_fasten:
+                if goal.setScrew_fasten:
                     self._feedback.motor_speed = self.p75.read_current_velocity()
              
             self._feedback.countTime = 0
@@ -114,8 +114,8 @@ class ToolsAction:
         else:
             self._action_server.set_preempted()
         self.peg_disable_torque()
-        self.big_nut_disable_torque()
-        self.small_nut_disable_torque()
+        # self.big_nut_disable_torque()
+        # self.small_nut_disable_torque()
         self.setScrew_disable_torque()
   
     ######################################################
