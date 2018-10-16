@@ -971,23 +971,19 @@ class AssemblyClass(O2ASBaseRoutines):
     # impedance control may not be necessary in this case, it is not as difficult
     return
   
-  def fasten_motor_screw_1(self):#for picking up and fastening a screw. need to expand this for 6 screws. I think just make 6 different functions.
+  def fasten_motor_screw(self, screw_hole_number):#for picking up and fastening a screw. need to expand this for 6 screws. I think just make 6 different functions.
     self.log_to_debug_monitor("Fasten motor screw", "operation")
     pose1 = geometry_msgs.msg.PoseStamped()
-    pose1.header.frame_id = "assembled_assy_part_02_motor_screw_hole_1"
+    pose1.header.frame_id = "assembled_assy_part_02_motor_screw_hole_"+str(screw_hole_number)
     pose1.pose.orientation.w =   0.707
     pose1.pose.orientation.x =  -0.707
     pose1.pose.orientation.y = 0
-    pose1.pose.orientation.z = 0
-    # pose1.pose.position.y = 0.
-    # pose1.pose.position.x = 0.
-    # pose1.pose.position.z = 0.
-    
+    pose1.pose.orientation.z = 0    
     
     self.go_to_named_pose("screw_pick_ready", "b_bot")
-    # self.pick_screw("b_bot", screw_size=3, screw_number=1) # I commented this because this takes a long time in simulation
+    self.pick_screw("b_bot", screw_size=3, screw_number=screw_hole_number) # I commented this because this takes a long time in simulation
     self.go_to_named_pose("screw_ready", "b_bot")
-    self.go_to_pose_goal("b_bot", pose1, speed=0.3,end_effector_link="b_bot_screw_tool_m4_tip_link", move_lin=True)
+    self.go_to_pose_goal("b_bot", pose1, speed=0.3,end_effector_link="b_bot_screw_tool_m3_tip_link", move_lin=True)
     # todo: add fastening action
     return
 
@@ -1018,8 +1014,8 @@ class AssemblyClass(O2ASBaseRoutines):
     rospy.loginfo("todo: pick up m3 tool using b bot, replace this print with the equip function")
     self.insert_motor() # Joshua thinks this may be possible to do without impedance control, otherwise use insertion script in Y negative direction
     self.go_to_named_pose("screw_ready", "b_bot")
-    self.fasten_motor_screw_1() # please ask Felix about the pick_screw function, I am not sure how he defined it
-    rospy.loginfo("todo: copy and paste fasten_motor_screw_1 to add fasten_motor_screw_2 ~ 6")
+    for i in range(1,7):
+      self.fasten_motor_screw(screw_hole_number=i) # please ask Felix about the pick_screw function, I am not sure how he defined it
     self.log_to_debug_monitor("=== Subtask A end ===", "operation")
 
   def subtask_b(self):
@@ -1039,15 +1035,15 @@ class AssemblyClass(O2ASBaseRoutines):
     self.log_to_debug_monitor("SUBTASK E", "subtask")
     self.log_to_debug_monitor("=== Subtask E start ===", "operation")
     # ====== (This is the first thing to do in the task)
-    self.confirm_to_proceed("pick_retainer_pin_from_tray_and_place_in_holder")
-    self.pick_retainer_pin_from_tray_and_place_in_holder()
+    # self.confirm_to_proceed("pick_retainer_pin_from_tray_and_place_in_holder")
+    # self.pick_retainer_pin_from_tray_and_place_in_holder()
     # ====== 
-
     self.confirm_to_proceed("pick_retainer_pin_from_holder")
     self.pick_retainer_pin_from_holder()
+    self.go_to_named_pose("home", "b_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
     self.confirm_to_proceed("adjust_centering")
     self.adjust_centering()
-
+    self.go_to_named_pose("home", "b_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
     self.confirm_to_proceed("rotate_hand_facing_the_sky")
     self.rotate_hand_facing_the_sky()
     self.confirm_to_proceed("pick_idle_pulley")
@@ -1082,10 +1078,9 @@ class AssemblyClass(O2ASBaseRoutines):
     self.pick_retainer_pin_washer_from_table()
     self.confirm_to_proceed("place_retainer_pin_washer_final")
     self.place_retainer_pin_washer_final()
-    self.do_change_tool_action("c_bot", equip=True, screw_size=66)
     self.confirm_to_proceed("fasten_retainer_pin_nut")
     self.fasten_retainer_pin_nut()
-    # self.do_change_tool_action("c_bot", equip=False, screw_size=66)
+    self.do_change_tool_action("c_bot", equip=False, screw_size=66)
     self.log_to_debug_monitor("=== Subtask E end ===", "operation")
 
   def real_assembly_task(self):
