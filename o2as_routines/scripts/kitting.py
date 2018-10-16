@@ -132,7 +132,7 @@ class KittingClass(O2ASBaseRoutines):
     self.bin_3_length = .07
     
     self.initial_phoxi_image_recorded = False
-    self.max_candidates_from_phoxi = 10
+    self.max_candidates_from_phoxi = 3
 
     # Used to prepare the suction place poses (because the UR linear driver goes through a singularity sometimes)
     self.joints_above_set_1_tray_2 = [0.6957670450210571, -1.5090416113482874, 1.9396471977233887, -0.4243395964251917, 0.7138931751251221, -3.1503987948047083]
@@ -891,30 +891,6 @@ class KittingClass(O2ASBaseRoutines):
       screw_size = 4
     elif item.part_id == 18:
       screw_size = 3
-
-    # apply graspability using phoxi
-    take_new_image = False
-    if not self.initial_phoxi_image_recorded:
-      self.initial_phoxi_image_recorded = True
-      take_new_image = True
-    if self.grasp_candidates[item.part_id]["pick_was_successful"]:
-      # If the pick was successful for an item, the scene has changed, so a new image needs to be taken
-      rospy.loginfo("Resetting grasp candidates for item " + str(item.part_id))
-      self.grasp_candidates[item.part_id]["pick_was_successful"] = False
-      self.grasp_candidates[item.part_id]["vision_was_attempted"] = False
-      self.grasp_candidates[item.part_id]["positions"] = []
-      take_new_image = True
-    self.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
-    if not self.grasp_candidates[item.part_id]["vision_was_attempted"]:
-      # Vision is only attempted once, unless it succeeds in picking
-      phoxi_res = self.get_grasp_candidates_from_phoxi(item, take_new_image)
-      self.grasp_candidates[item.part_id]["vision_was_attempted"] = True
-      take_new_image = False
-      self.go_to_named_pose("kitting_pick_ready", "a_bot")
-      if phoxi_res:
-        self.grasp_candidates[item.part_id]["positions"].extend(phoxi_res)
-        rospy.loginfo("self.grasp_candidates: ")
-        rospy.loginfo(self.grasp_candidates[item.part_id]["positions"][0])
 
     attempts = 0
     while attempts < max_attempts:
