@@ -1001,7 +1001,7 @@ class KittingClass(O2ASBaseRoutines):
           pose_in_bin.pose.orientation = self.downward_orientation
           if item.ee_to_use in ["precision_gripper_from_outside", "robotiq_gripper"]:
             pose_in_bin.pose.orientation = geometry_msgs.msg.Quaternion(
-              *tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi - resp_search_grasp.rotipz[i]))
+              *tf_conversions.transformations.quaternion_from_euler(0, pi/2, -resp_search_grasp.rotipz[i]))
           poses_in_bin.append(pose_in_bin)
         self.publish_marker(pose_in_bin, "aist_vision_result")
         rospy.loginfo("Calculated " + str(number_of_pose_candidates) + " candidates for item nr. " + str(item.part_id) + " in bin " + str(item.bin_name))
@@ -1168,19 +1168,12 @@ class KittingClass(O2ASBaseRoutines):
       pick_pose = self.get_random_pose_in_bin(item)
       grasp_candidate_from_vision = False
 
-      # if not item.bin_is_inclined and not item.part_id in [17, 18]:
-      #   if self.grasp_candidates[item.part_id]["positions"]:
-      #     pick_pose = self.grasp_candidates[item.part_id]["positions"].pop(0)
-      #     pick_pose.pose.position.z += self.insert_offsets["part_" + str(item.part_id)]
-      #     rospy.loginfo("Got pose from phoxi grasp candidates:")
-      #     rospy.loginfo(pick_pose.pose.position)
-      #     grasp_candidate_from_vision = True
-
       if item.ee_to_use == "precision_gripper_from_inside" and not item.bin_is_inclined and not item.part_id in [17, 18]:
-        res_view_bin = self.view_bin(robot_name, item.bin_name, item.part_id)    
-        if res_view_bin:
-          pick_pose = res_view_bin
-          pick_pose.pose.position.z -= .025 # MAGIC NUMBER (to compensate for the Realsense calibration)
+        if grasp_candidate_from_vision:
+          res_view_bin = self.view_bin(robot_name, item.bin_name, item.part_id)    
+          if res_view_bin:
+            pick_pose = res_view_bin
+            pick_pose.pose.position.z -= .025 # MAGIC NUMBER (to compensate for the Realsense calibration)
 
       if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
         if self.grasp_candidates[item.part_id]["positions"]:
@@ -1323,15 +1316,15 @@ class KittingClass(O2ASBaseRoutines):
 
     # ==== 1. First, do an initial attempt on picking all items, ordered by the tool that they are picked with (screws, suction, precision_gripper, robotiq)
 
-    # self.go_to_named_pose("kitting_pick_ready", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-    # for item in self.screw_items:
-    #   if rospy.is_shutdown():
-    #     break
-    #   # item.in_feeder = True   # Used to skip the screws and enable the feeder pickup
-    #   self.pick_screw_from_bin_and_put_into_feeder(item, 10)
-    #   self.go_to_named_pose("kitting_pick_ready", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-    # self.go_to_named_pose("back", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-    # rospy.loginfo("==== Done with screw pickup pass")
+    self.go_to_named_pose("kitting_pick_ready", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    for item in self.screw_items:
+      if rospy.is_shutdown():
+        break
+      # item.in_feeder = True   # Used to skip the screws and enable the feeder pickup
+      self.pick_screw_from_bin_and_put_into_feeder(item, 10)
+      self.go_to_named_pose("kitting_pick_ready", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("back", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    rospy.loginfo("==== Done with screw pickup pass")
     self.screw_delivery_time = rospy.Time.now()
 
     # rospy.sleep(2)
