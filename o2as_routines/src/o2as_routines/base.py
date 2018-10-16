@@ -125,6 +125,8 @@ class O2ASBaseRoutines(object):
     self.force_ur_script_linear_motion = False
     self.force_moveit_linear_motion = False
 
+    self.competition_mode = False   # Disables confirmation dialogs etc. for full automatic motion
+
     moveit_commander.roscpp_initialize(sys.argv)
     rospy.init_node('assembly_example', anonymous=False)
 
@@ -176,6 +178,8 @@ class O2ASBaseRoutines(object):
   ############## ------ Internal functions (and convenience functions)
 
   def confirm_to_proceed(self, next_task_name):
+    if self.competition_mode:
+      return True
     # TODO: Disable this when the real competition is on (via a rosparam/member variable)
     rospy.loginfo("Press enter to proceed to: " + next_task_name)
     i = raw_input()
@@ -475,7 +479,7 @@ class O2ASBaseRoutines(object):
 
   ######
 
-  def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False):
+  def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False, lift_up_after_pick=True):
     #self.publish_marker(object_pose, "pick_pose")
     #initial gripper_setup
     #rospy.loginfo("Going above object to pick")
@@ -529,13 +533,14 @@ class O2ASBaseRoutines(object):
 
     # if special_pick == True:
     #   object_pose.pose.orientation = self.downward_orientation
-    rospy.sleep(1.0)
-    rospy.loginfo("Going back up")
+    if lift_up_after_pick:
+      rospy.sleep(1.0)
+      rospy.loginfo("Going back up")
 
-    object_pose.pose.position.z += approach_height
-    rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
-    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
-    object_pose.pose.position.z -= approach_height
+      object_pose.pose.position.z += approach_height
+      rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
+      self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
+      object_pose.pose.position.z -= approach_height
     return True
 
   ######
@@ -677,7 +682,7 @@ class O2ASBaseRoutines(object):
     if not self.use_real_robot:
       return True
     goal = o2as_msgs.msg.SuctionControlGoal()
-    goal.fastening_tool_name = motor_name
+    goal.fastening_tool_name = tool_name
     goal.turn_suction_on = turn_suction_on
     goal.eject_screw = eject_screw
     rospy.loginfo("Sending suction action goal.")
@@ -691,7 +696,8 @@ class O2ASBaseRoutines(object):
       return True
     goal = o2as_msgs.msg.ToolsCommandGoal()
     # goal.stop = stop
-    goal.peg_fasten = (item_name == "peg")
+    goal.peg_fasten = (item_name == "peg" or item_name == "m10_nut")
+    goal.setScrew_fasten = (item_name == "set_screw")
     # goal.big_nut_fasten = (item_name == "m10_nut")
     goal.big_nut_fasten = True
     goal.small_nut_fasten = (item_name == "m6_nut")
@@ -1095,7 +1101,7 @@ class O2ASBaseRoutines(object):
     force_ur_script = False
     if go_fast:
       speed = 1.5
-      acceleration = 1.5
+      acceleration = 1.2
       force_ur_script = True
 
     pose1 = geometry_msgs.msg.PoseStamped()

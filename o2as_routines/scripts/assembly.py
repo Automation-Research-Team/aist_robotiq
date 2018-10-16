@@ -162,8 +162,6 @@ class AssemblyClass(O2ASBaseRoutines):
       pass
     else: 
       self.send_gripper_command(gripper=robotname, command="open")
-      print("did it open?")
-      raw_input()
     
     if lift_up_after_place:
       rospy.loginfo("Moving back up")
@@ -442,7 +440,7 @@ class AssemblyClass(O2ASBaseRoutines):
     pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
     pick_pose.pose.position.z = 0.025  # MAGIC NUMBER (actually it gets ignored by pick_joshua)
 
-    self.pick_joshua("b_bot", pick_pose, grasp_height=-0.05, speed_fast=1.0, speed_slow=.1, gripper_command="", approach_height=.05)
+    self.pick_joshua("b_bot", pick_pose, grasp_height=0.015, speed_fast=1.0, speed_slow=.1, gripper_command="", approach_height=.05)
 
     if do_centering:
       self.adjust_centering("b_bot")
@@ -624,7 +622,7 @@ class AssemblyClass(O2ASBaseRoutines):
     nut_intermediate_a_bot.pose.position.y = -.20
 
     nut_intermediate_c_bot = copy.deepcopy(nut_intermediate_a_bot)
-    nut_intermediate_c_bot.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi*3/4))
+    nut_intermediate_c_bot.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/4))
 
     self.place_joshua("a_bot",nut_intermediate_a_bot,0.0,
                                 speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
@@ -634,7 +632,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_named_pose("tool_pick_ready", "c_bot")
     self.do_change_tool_action("c_bot", equip=True, screw_size=66)
     self.go_to_named_pose("screw_ready", "c_bot")
-    self.pick_nut_from_table(object_pose=nut_intermediate_c_bot,end_effector_link="c_bot_nut_tool_m6_tip_link")
+    self.pick_nut_from_table("c_bot", object_pose=nut_intermediate_c_bot,end_effector_link="c_bot_nut_tool_m6_tip_link")
     return
 
   def pick_retainer_pin_washer_2(self):
@@ -852,9 +850,6 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def fasten_retainer_pin_nut(self):
-    rospy.logerr("TODO: Fix collision of the nut tool before using this function")
-    return
-
     # self.go_to_named_pose("back", "c_bot")
     # nut_tool_prep_pose = [0.21349821984767914, -1.6296418348895472, 1.5491323471069336, -0.07698423067201787, -0.413309399281637, -1.436751667653219]
     # self.move_joints("c_bot", nut_tool_prep_pose)
@@ -862,11 +857,11 @@ class AssemblyClass(O2ASBaseRoutines):
 
     nut_approach = geometry_msgs.msg.PoseStamped()
     nut_approach.header.frame_id = "assembled_assy_part_14_screw_tip"
-    nut_approach.pose.position.x = 0.05
+    nut_approach.pose.position.x = 0.01
     # nut_approach.pose.position.y = -0.0051578  # MAGIC NUMBER
-    nut_approach.pose.position.z = 0.04
+    nut_approach.pose.position.z = 0.0
     # nut_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi, 0))  # This goes sideways, but the gripper hits the base plate
-    nut_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi, 0))
+    nut_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi*180/180, pi, 0))
 
     at_pin_tip = copy.deepcopy(nut_approach)
     at_pin_tip.pose.position.x = 0.0
@@ -1082,7 +1077,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.log_to_debug_monitor(text="Assembly", category="task")
 
     # To prepare subtask E
-    self.pick_retainer_pin_from_tray_and_place_in_holder()
+    self.pick_retainer_pin_from_tray_and_place_in_holder(do_centering=False)
     self.go_to_named_pose("home", "b_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
 
     # To equip screw tool for subtasks G, F
@@ -1180,7 +1175,7 @@ if __name__ == '__main__':
           raw_input()
           if rospy.is_shutdown():
             rospy.loginfo("ABORTING")
-            return
+            break
       elif i == 'x':
         break
   except rospy.ROSInterruptException:

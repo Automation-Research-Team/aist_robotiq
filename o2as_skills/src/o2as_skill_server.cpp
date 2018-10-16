@@ -728,7 +728,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     ps_tool_holder.pose.position.x = 0.025;
     ps_tool_holder.pose.position.z = .003;
     if (screw_tool_id == "nut_tool_m6" || screw_tool_id == "set_screw_tool") {
-      ps_tool_holder.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, M_PI*60.0/180.0, 0);
+      ps_tool_holder.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, M_PI*50.0/180.0, 0);
       ps_tool_holder.pose.position.x = 0.01;
       ps_tool_holder.pose.position.z = .015;
     }
@@ -2159,11 +2159,10 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
     success = moveToCartPoseLIN(target_tip_link_pose, goal->robot_name, true, screw_tool_link);
   }
 
-  bool_msg_pointer = ros::topic::waitForMessage<std_msgs::Bool>("/" + screw_tool_id + "/screw_suctioned", ros::Duration(1.0));
+  auto bool_msg_pointer = ros::topic::waitForMessage<std_msgs::Bool>("/" + screw_tool_id + "/screw_suctioned", ros::Duration(1.0));
+  bool screw_not_suctioned_anymore = false;
   if (bool_msg_pointer != NULL){
     screw_not_suctioned_anymore = bool_msg_pointer->data;
-    if (screw_not_suctioned_anymore)
-      break;
   }
   else if (!use_real_robot_) screw_not_suctioned_anymore = true;
 
@@ -2172,7 +2171,6 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
   acm_original.getMessage(ps_reset_collisions.allowed_collision_matrix);
   planning_scene_interface_.applyPlanningScene(ps_reset_collisions);
 
-  goal->success = screw_not_suctioned_anymore;
   if (screw_not_suctioned_anymore)
   {
     setSuctionEjection(screw_tool_id, false, false);    // Turn off both suction and ejection
