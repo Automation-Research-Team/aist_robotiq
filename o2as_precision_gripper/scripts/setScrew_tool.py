@@ -25,7 +25,6 @@ class ToolsAction:
         self._action_server = actionlib.SimpleActionServer(self._action_name, o2as_msgs.msg.ToolsCommandAction, execute_cb=self.action_callback, auto_start = False)
         self._action_server.start()
         rospy.loginfo('Action server '+ str(self._action_name)+" started.")
-
         return
 
     def action_callback(self, goal):

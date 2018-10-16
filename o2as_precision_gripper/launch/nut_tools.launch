@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
   <!-- Parameters to pass to the ROS node -->
-  <arg name="serial_port" default="/dev/for_docker/nut_tool"/>
+  <arg name="serial_port" default="/dev/for_docker/blacktool"/>
   
   <!-- This calls the ROS node we have written, using the parameters above -->
   <node name="nut_tool_server" pkg="o2as_precision_gripper" type="nut_tool_server.py" respawn="false" output="screen">
