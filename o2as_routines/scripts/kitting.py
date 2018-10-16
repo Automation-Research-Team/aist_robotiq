@@ -429,8 +429,9 @@ class KittingClass(O2ASBaseRoutines):
       # self.move_lin(robot_name, above_place_pose, speed_slow, end_effector_link="b_bot_suction_tool_tip_link")
       rospy.loginfo("Placing in tray.")
       self.move_lin(robot_name, place_pose, speed_slow, end_effector_link="b_bot_suction_tool_tip_link")
-      self.suck(False)
-      rospy.sleep(1.0)
+      self.suck(turn_suction_on=False, eject=True)
+      rospy.sleep(2.0)
+      self.suck(turn_suction_on=False, eject=False)
       self.move_lin(robot_name, above_place_pose, speed_fast, end_effector_link="b_bot_suction_tool_tip_link")
       return True
     else:
@@ -837,8 +838,9 @@ class KittingClass(O2ASBaseRoutines):
     goal = o2as_msgs.msg.innerPickDetectionGoal()
     #goal.part_id = part_id
     self.inner_pick_detection_client.send_goal(goal)
-    self.inner_pick_detection_client.wait_for_result()
+    self.inner_pick_detection_client.wait_for_result(rospy.Duration(1.5))
     result = self.inner_pick_detection_client.get_result()
+    rospy.loginfo("Result from check_pick:")
     rospy.loginfo(result)
 
     return result.picked

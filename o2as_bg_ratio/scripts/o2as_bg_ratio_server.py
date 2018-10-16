@@ -13,7 +13,8 @@ import actionlib
 import o2as_msgs.msg
 from sensor_msgs.msg import Image
 
-from PIL import Image, ImageDraw
+from PIL import Image as Image_
+from PIL import ImageDraw
 
 
 def _draw_rect(img, x, y, w, h, color, thick=False):
@@ -21,7 +22,7 @@ def _draw_rect(img, x, y, w, h, color, thick=False):
 
     Parameter color is given like (255, 0, 0). """
 
-    img_ = Image.fromarray(img)
+    img_ = Image_.fromarray(img)
     draw = ImageDraw.Draw(img_)
     draw.rectangle((x, y, x + w, y + h), outline=color)
 
