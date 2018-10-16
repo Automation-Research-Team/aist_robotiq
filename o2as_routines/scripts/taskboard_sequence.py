@@ -104,11 +104,11 @@ class TaskboardClass(O2ASBaseRoutines):
                       "M6 Nut & Bolt", "M12 nut", "6 mm washer", 
                       "10 mm washer", "M3 set screw", "M3 bolt", 
                       "M4 bolt", "Pulley", "10 mm end cap"]
-    self.item_pick_heights = [0.02, 0.02, 0.042,
+    self.item_pick_heights = [0.02, 0.02, 0.045,
                               0.047, 0.072, 0.0, 
                               0.02, 0.02, -0.002, 
                               -0.002, 0.001, 0.0,
-                              0.005, 0.007, 0.004]
+                              0.005, 0.007, 0.001]
 
     self.item_place_heights = [0.02, 0.0, 0.046,
                                0.046, 0.074, 0.04, 
@@ -145,7 +145,7 @@ class TaskboardClass(O2ASBaseRoutines):
   def belt_circle_motion(self, robot_name, speed = 0.02, go_fast = False, rotations = 1):
     self.toggle_collisions(collisions_on=False)
     if go_fast:
-      self.send_gripper_command("a_bot", "close", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      self.send_gripper_command("a_bot", "close")
       speed_fast = 1.0
       speed_slow = .01
     else:
@@ -172,7 +172,7 @@ class TaskboardClass(O2ASBaseRoutines):
     start_pose.pose.position.z = 0
 
     approach_pose = copy.deepcopy(start_pose)
-    approach_pose.pose.position.z = 0.07
+    approach_pose.pose.position.z = 0.04
     self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast, move_lin=True)
     self.go_to_pose_goal(robot_name, start_pose, speed=speed_slow, move_lin=True)
 
@@ -400,18 +400,20 @@ class TaskboardClass(O2ASBaseRoutines):
       rospy.loginfo("Moving bearing to final pose")
       self.go_to_pose_goal("a_bot", bearing_a_place_pose_final, speed=0.15, move_lin=True)
       self.horizontal_spiral_motion("a_bot", .004)
-      bearing_a_place_pose.pose.position.z += .05
-      self.go_to_pose_goal("a_bot", bearing_a_place_pose, speed=0.15, move_lin=True)
+      #TODO: BUG!!
+      bearing_a_place_pose_retreat = copy.deepcopy(bearing_a_place_pose_final)
+      bearing_a_place_pose_retreat.pose.position.z += .05
+      self.go_to_pose_goal("a_bot", bearing_a_place_pose_retreat, speed=0.15, move_lin=True)
       self.go_to_named_pose("home","a_bot")
       
       # ### Push with b_bot
       ### Pushing with b_bot only does not work. The tool needs to be grasped beforehand.
       self.log_to_debug_monitor("Push", "operation")
-      self.go_to_pose_goal("b_bot", bearing_a_place_pose, speed=0.15, move_lin=True)
+      self.go_to_pose_goal("b_bot", bearing_a_place_pose_retreat, speed=0.15, move_lin=True)
       self.send_gripper_command(gripper="b_bot", command=0.04)
       self.log_to_debug_monitor("Push", "operation")
       self.do_linear_push("b_bot", 20, wait = True)
-      self.go_to_pose_goal("b_bot", bearing_a_place_pose, speed=0.15, move_lin=True)
+      self.go_to_pose_goal("b_bot", bearing_a_place_pose_retreat, speed=0.15, move_lin=True)
       self.go_to_named_pose("home","b_bot")
       rospy.loginfo("Done")
       # TODO: Make sure the task succeeded by pushing with b_bot and plate 3
@@ -420,7 +422,7 @@ class TaskboardClass(O2ASBaseRoutines):
       ###set the tool
       tool_pickup_pose = geometry_msgs.msg.PoseStamped()
       tool_pickup_pose.header.frame_id = "retainer_pin_insertion_tool"
-      tool_pickup_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+      tool_pickup_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
       tool_grasped_height = 0.03
       self.log_to_debug_monitor("Pick", "operation")
       self.pick("b_bot",tool_pickup_pose, tool_grasped_height,
@@ -488,7 +490,7 @@ class TaskboardClass(O2ASBaseRoutines):
                                 approach_height = 0.1, special_pick = False)
         self.go_to_pose_goal("b_bot", pin_pick_approach, speed=1.0, move_lin=True)
 
-
+        self.go_to_named_pose("home", "c_bot")
         self.adjust_centering(go_fast=True)
 
         pin_place_approach = copy.deepcopy(self.place_poses[i-1])
@@ -533,10 +535,13 @@ class TaskboardClass(O2ASBaseRoutines):
       self.go_to_named_pose("home","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
     if i == 3:   # Washer
+      self.go_to_named_pose("home", "a_bot")
+      self.go_to_named_pose("home", "b_bot")
+      self.go_to_named_pose("back", "c_bot")
       self.pick("a_bot",self.pick_poses[i-1],self.item_pick_heights[i-1],
                               speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
                               approach_height = 0.07)
-      self.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
+      self.go_to_named_pose("taskboard_intermediate_pose", "a_bot", speed=0.4, acceleration=.3)
       self.place("a_bot",self.place_poses[i-1],self.item_place_heights[i-1],
                               speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
                               approach_height = 0.1, lift_up_after_place = False)
@@ -544,6 +549,9 @@ class TaskboardClass(O2ASBaseRoutines):
       rospy.loginfo("doing spiral motion")
 
     if i == 4:    # Washer
+      self.go_to_named_pose("home", "a_bot")
+      self.go_to_named_pose("home", "b_bot")
+      self.go_to_named_pose("back", "c_bot")
       self.pick("a_bot",self.pick_poses[i-1],self.item_pick_heights[i-1],
                               speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
                               approach_height = 0.07)
@@ -578,7 +586,7 @@ class TaskboardClass(O2ASBaseRoutines):
       belt_tool_place_pose.header.frame_id = "taskboard_part6_small_pulley"
       belt_tool_place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
       belt_tool_place_pose.pose.position.y = .045
-      belt_tool_place_pose.pose.position.z = belt_tool_grasp_height + .002
+      belt_tool_place_pose.pose.position.z = belt_tool_grasp_height -.005
 
       belt_tool_place_pose_approach = copy.deepcopy(belt_tool_place_pose)
       belt_tool_place_pose_approach.pose.position.z += .15
@@ -586,7 +594,7 @@ class TaskboardClass(O2ASBaseRoutines):
       self.move_lin("b_bot", belt_tool_place_pose_approach, speed=1.0)
       self.move_lin("b_bot", belt_tool_place_pose, speed=.3)
 
-      self.do_linear_push("b_bot", direction="X+", force=3, wait=True)
+      self.do_linear_push("b_bot", direction="X+", force=4, wait=True)
       self.send_gripper_command("b_bot", .01)
       rospy.sleep(1.0)
       self.send_gripper_command("b_bot", "open")
@@ -597,7 +605,7 @@ class TaskboardClass(O2ASBaseRoutines):
       # Pick up the belt
       belt_pick_pose = copy.deepcopy(self.pick_poses[5])
       belt_pick_pose.pose.position.y += .055
-      self.pick("b_bot", belt_pick_pose, grasp_height=.002,
+      self.pick("b_bot", belt_pick_pose, grasp_height=0.0,
                       speed_fast = 0.8, speed_slow = 0.04, gripper_command="close")
       self.go_to_named_pose("taskboard_center_pose", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
@@ -609,7 +617,7 @@ class TaskboardClass(O2ASBaseRoutines):
       belt_place_intermediate.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
 
       belt_place_approach = copy.deepcopy(belt_place_intermediate)
-      belt_place_approach.pose.position.z = .07
+      belt_place_approach.pose.position.z = .09
       belt_place_approach_start = copy.deepcopy(belt_place_approach)
       belt_place_approach_start.pose.position.y = .01
       belt_place_approach_high = copy.deepcopy(belt_place_approach_start)
@@ -621,7 +629,7 @@ class TaskboardClass(O2ASBaseRoutines):
       belt_place_pose_final.pose.position.z = .0085
       belt_place_pose_final.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
 
-      self.go_to_pose_goal("b_bot", belt_place_approach_high, speed=0.5)
+      self.go_to_pose_goal("b_bot", belt_place_approach_high, speed=1.0)
       self.go_to_pose_goal("b_bot", belt_place_approach_start, speed=0.3)
       self.go_to_pose_goal("b_bot", belt_place_approach, speed=0.3)
       self.go_to_pose_goal("b_bot", belt_place_intermediate, speed=0.3)
@@ -765,6 +773,9 @@ class TaskboardClass(O2ASBaseRoutines):
       self.do_change_tool_action("b_bot", equip=False, screw_size=6)
 
     if i == 8:
+      self.go_to_named_pose("home", "b_bot")
+      self.go_to_named_pose("back", "a_bot")
+      self.go_to_named_pose("back", "c_bot")
       #pick up the tool
       tool_pose = geometry_msgs.msg.PoseStamped()
       tool_pose.header.frame_id = "M10nut_tool"
@@ -772,7 +783,7 @@ class TaskboardClass(O2ASBaseRoutines):
       tool_grasped_height = 0.042
 
       tool_pose_high = copy.deepcopy(tool_pose)
-      tool_pose_high.pose.position.z += .1
+      tool_pose_high.pose.position.z += .2
 
       ## MAGIC NUMBERS!!
       b_bot_dx_pick = 0.0
@@ -791,7 +802,7 @@ class TaskboardClass(O2ASBaseRoutines):
       place_pose_low.pose.position.y += b_bot_dy_place
       place_pose_low.pose.position.z = .02 + tool_grasped_height + .01
       place_pose_high = copy.deepcopy(place_pose_low)
-      place_pose_high.pose.position.z += .1
+      place_pose_high.pose.position.z += .15
       
       self.pick("b_bot",tool_pose, tool_grasped_height,
                               speed_fast = 0.5, speed_slow = 0.2, gripper_command="close",
@@ -800,14 +811,16 @@ class TaskboardClass(O2ASBaseRoutines):
       self.go_to_pose_goal("b_bot", tool_pose_high, speed=0.5, move_lin=True)
 
       # Push into the nut to pick it up
+      self.go_to_pose_goal("b_bot", pick_pose_high, speed=0.5, move_lin=True)
       self.go_to_pose_goal("b_bot", pick_pose_low, speed=0.5, move_lin=True)
       self.do_linear_push("b_bot", 10, wait = True)
-      self.horizontal_spiral_motion("b_bot", max_radius = .006, radius_increment = .01)
+      self.horizontal_spiral_motion("b_bot", max_radius = .006, radius_increment = .008)
       self.do_linear_push("b_bot", 40, wait = True)
       rospy.sleep(2.0)
 
       self.go_to_pose_goal("b_bot", pick_pose_high, speed=0.1, move_lin=True)
       #place and fasten
+      self.go_to_pose_goal("b_bot", place_pose_high, speed=0.1, move_lin=True)        
       self.go_to_pose_goal("b_bot", place_pose_low, speed=0.1, move_lin=True)        
 
       self.do_nut_fasten_action("m10_nut", wait = False)
@@ -839,61 +852,53 @@ class TaskboardClass(O2ASBaseRoutines):
 
     
     if i == 11:      #set screw
-      # approach_insert_pose_b = geometry_msgs.msg.PoseStamped()
-      # approach_insert_pose_b.header.frame_id = "taskboard_part11"
-      # approach_insert_pose_b.pose.position.z = .035
-      # approach_insert_pose_b.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi*160/180, pi/2, 0))
-      
-      # insert_pose_b = copy.deepcopy(approach_insert_pose_b)
-      # insert_pose_b.pose.position.z = 0.002
+      self.go_to_named_pose("back", "a_bot")
+      self.go_to_named_pose("screw_ready", "b_bot")
+      self.go_to_named_pose("back", "c_bot")
 
-      # # TODO: Change to just moving downwards and then turning on the tool
-      # ### Move to insertion point
-      # self.go_to_named_pose("set_screw_insert_pose", "b_bot")
-      # self.go_to_pose_goal("b_bot", approach_insert_pose_b, speed=0.04, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
+      use_cushioned_tool = False
+      if use_cushioned_tool:
+        req = o2as_msgs.srv.sendScriptToURRequest()
+        req.program_id = "lin_move_rel"
+        req.robot_name = "b_bot"
+        req.relative_translation.y = .002
+        req.velocity = .005
+        res = self.urscript_client.call(req)
+        wait_for_UR_program("/b_bot_controller", rospy.Duration.from_sec(4.0))
+        # self.horizontal_spiral_motion("b_bot", .003, spiral_axis="Y", radius_increment = .002)
 
-      req = o2as_msgs.srv.sendScriptToURRequest()
-      req.program_id = "lin_move_rel"
-      req.robot_name = "b_bot"
-      req.relative_translation.y = .002
-      req.velocity = .005
-      res = self.urscript_client.call(req)
-      wait_for_UR_program("/b_bot_controller", rospy.Duration.from_sec(4.0))
-      # self.horizontal_spiral_motion("b_bot", .003, spiral_axis="Y", radius_increment = .002)
+        self.confirm_to_proceed("Turn on motor?")
+        
+        self.set_motor("set_screw_tool", "tighten", duration = 5.0)
+        self.do_nut_fasten_action("set_screw", wait = False)
+        rospy.sleep(5.0)
 
-      self.confirm_to_proceed("Turn on motor?")
-      
-      self.set_motor("set_screw_tool", "tighten", duration = 5.0)
-      rospy.sleep(5.0)
+        self.confirm_to_proceed("go down with motor?")
 
-      self.confirm_to_proceed("go down with motor?")
+        req = o2as_msgs.srv.sendScriptToURRequest()
+        req.program_id = "lin_move_rel"
+        req.robot_name = "b_bot"
+        req.relative_translation.y = .002
+        req.velocity = .005
+        res = self.urscript_client.call(req)
+        wait_for_UR_program("/b_bot_controller", rospy.Duration.from_sec(4.0))
 
-      req = o2as_msgs.srv.sendScriptToURRequest()
-      req.program_id = "lin_move_rel"
-      req.robot_name = "b_bot"
-      req.relative_translation.y = .002
-      req.velocity = .005
-      res = self.urscript_client.call(req)
-      wait_for_UR_program("/b_bot_controller", rospy.Duration.from_sec(4.0))
+        self.confirm_to_proceed("Go back up?")
+      else: # Use the fat motor tool
+        self.do_linear_push("b_bot", 3, direction="Y+", wait = True)
 
-      self.confirm_to_proceed("Go back up?")
+        self.confirm_to_proceed("Turn on motor?")
+        
+        self.do_nut_fasten_action("set_screw", wait = False)
+        rospy.sleep(5.0)
 
-      # ### Turn on motor, do spiral motions while descending
-      # self.go_to_pose_goal("b_bot", insert_pose_b, speed=0.02, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
-      # self.horizontal_spiral_motion("b_bot", .003, spiral_axis="Y", radius_increment = .001)
-      # insert_pose_b.pose.position.z -= .002
-      # self.go_to_pose_goal("b_bot", insert_pose_b, speed=0.02, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
-      # self.horizontal_spiral_motion("b_bot", .003, spiral_axis="Y", radius_increment = .001)
-      # self.go_to_pose_goal("b_bot", insert_pose_b, speed=0.01, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
-      # rospy.sleep(5.0)
-      
-      ### Go up, drop the tool
-      # self.go_to_pose_goal("b_bot", approach_insert_pose_b, speed=0.02, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
-      # self.go_to_named_pose("set_screw_insert_pose", "b_bot")
-      # self.go_to_named_pose("set_screw_intermediate_pose", "b_bot")
+        self.confirm_to_proceed("go down with motor?")
 
-      # Place tool
-      # self.equip_unequip_set_screw_tool(equip=False)
+        self.do_linear_push("b_bot", 3, direction="Y+", wait = True)
+        rospy.sleep(5.0)
+        self.do_nut_fasten_action("turn_all_off", wait = False)
+
+        self.confirm_to_proceed("Go back up?")
 
       req = o2as_msgs.srv.sendScriptToURRequest()
       req.program_id = "lin_move_rel"
@@ -904,27 +909,27 @@ class TaskboardClass(O2ASBaseRoutines):
       wait_for_UR_program("/b_bot_controller", rospy.Duration.from_sec(10.0))
 
       drop_tool_joint_pose = [0.178453728556633, -1.6114686171161097, 2.1463537216186523, -0.0819476286517542, 1.0472468137741089, -2.776330296193258]
-      self.move_joints("b_bot", drop_tool_joint_pose, speed=.15)
+      self.move_joints("b_bot", drop_tool_joint_pose, speed=.05)
       self.send_gripper_command("b_bot", "open")
       rospy.sleep(3.0)
       self.go_to_named_pose("home", "b_bot")
     
     if i == 12:
       screw_size = 3
-      # self.go_to_named_pose("home", "a_bot")
-      # self.go_to_named_pose("home", "b_bot")
-      # self.go_to_named_pose("back", "c_bot")
-      # screw_pick_pose = copy.deepcopy(self.pick_poses[i-1])
-      # screw_pick_pose.pose.position.y += .005
-      # screw_pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*45/180, pi*90/180))
-      # self.pick("a_bot",screw_pick_pose,0.001,
-      #                         speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
-      #                         approach_height = 0.05, special_pick = False)    
+      self.go_to_named_pose("home", "a_bot")
+      self.go_to_named_pose("home", "b_bot")
+      self.go_to_named_pose("back", "c_bot")
+      screw_pick_pose = copy.deepcopy(self.pick_poses[i-1])
+      screw_pick_pose.pose.position.y += .005
+      screw_pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*45/180, pi*90/180))
+      self.pick("a_bot",screw_pick_pose,0.001,
+                              speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
+                              approach_height = 0.05, special_pick = False)    
       
-      # self.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
-      # # If we decide to use the feeder, there is self.place_screw_in_feeder(screw_size) and self.pick_screw_from_feeder(screw_size)
-      # self.put_screw_in_feeder(screw_size)
-      # self.go_to_named_pose("back", "a_bot")
+      self.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
+      # If we decide to use the feeder, there is self.place_screw_in_feeder(screw_size) and self.pick_screw_from_feeder(screw_size)
+      self.put_screw_in_feeder(screw_size)
+      self.go_to_named_pose("back", "a_bot")
 
       #pick up the screw tool
       self.go_to_named_pose("tool_pick_ready", "c_bot")
@@ -952,6 +957,7 @@ class TaskboardClass(O2ASBaseRoutines):
 
       screw_pose_manual_followup = copy.deepcopy(screw_approach)
       screw_pose_manual_followup.pose.position.x = 0.006      
+      #BUG: "Motor_name" not defined
       self.set_motor("screw_tool_m3", direction = "tighten", wait=False, speed = 500, duration = 10)
       self.horizontal_spiral_motion("b_bot", max_radius = .002, radius_increment = .001, spiral_axis="YZ")
       rospy.sleep(5.0)
@@ -967,30 +973,34 @@ class TaskboardClass(O2ASBaseRoutines):
     if i == 13:      # M3, M4 screw
       screw_size = 4
 
-      # self.go_to_named_pose("home", "a_bot")
-      # self.go_to_named_pose("home", "b_bot")
-      # self.go_to_named_pose("back", "c_bot")
-      # screw_pick_pose = copy.deepcopy(self.pick_poses[i-1])
-      # screw_pick_pose.pose.position.y += .005
-      # screw_pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*45/180, pi*90/180))
-      # self.pick("a_bot",screw_pick_pose,0.001,
-      #                         speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
-      #                         approach_height = 0.05, special_pick = False)    
+      self.go_to_named_pose("home", "a_bot")
+      self.go_to_named_pose("home", "b_bot")
+      self.go_to_named_pose("back", "c_bot")
+      screw_pick_pose = copy.deepcopy(self.pick_poses[i-1])
+      screw_pick_pose.pose.position.y += .005
+      screw_pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*45/180, pi*90/180))
+      self.pick("a_bot",screw_pick_pose,0.001,
+                              speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_outside_only_inner",
+                              approach_height = 0.05, special_pick = False)    
       
-      # # If we decide to use the feeder, there is self.place_screw_in_feeder(screw_size) and self.pick_screw_from_feeder(screw_size)
+      # If we decide to use the feeder, there is self.place_screw_in_feeder(screw_size) and self.pick_screw_from_feeder(screw_size)
+      self.put_screw_in_feeder(screw_size)
+      self.go_to_named_pose("back", "a_bot")
 
-      # ###arrange M4 screw
+      ###arrange M4 screw
       # self.tilt_up_gripper(speed_fast=0.1, speed_slow=0.02)
 
-      # #pick up the screw tool
-      # self.go_to_named_pose("back", "c_bot")
+      #pick up the screw tool
+      self.go_to_named_pose("back", "c_bot")
       self.do_change_tool_action("b_bot", equip=True, screw_size = screw_size)
       self.go_to_named_pose("screw_ready_back", "b_bot")
       
       #pick up the screw from a_bot
-      self.pick_screw_from_precision_gripper(screw_size=screw_size, robot_name="b_bot")
-      self.go_to_named_pose("screw_ready", "b_bot")
-      self.go_to_named_pose("home", "a_bot")
+      # self.pick_screw_from_precision_gripper(screw_size=screw_size, robot_name="b_bot")
+      # self.go_to_named_pose("screw_ready", "b_bot")
+      # self.go_to_named_pose("home", "a_bot")
+      self.pick_screw_from_feeder(screw_size)
+      self.go_to_named_pose("screw_ready_high", "c_bot")
 
       #screw on the cap
       screw_approach = copy.deepcopy(self.place_poses[i-1])
@@ -1054,7 +1064,11 @@ class TaskboardClass(O2ASBaseRoutines):
       self.go_to_named_pose("home", "b_bot")
 
     if i == 15: 
-      self.pick("b_bot",self.pick_poses[i-1], 0.005,
+      self.go_to_named_pose("home", "a_bot")
+      self.go_to_named_pose("home", "b_bot")
+      self.go_to_named_pose("back", "c_bot")
+      self.send_gripper_command("b_bot", "open")
+      self.pick("b_bot",self.pick_poses[i-1], self.item_pick_heights[i-1],
                       speed_fast = 0.3, speed_slow = 0.02, gripper_command="close",
                       approach_height = 0.04)
       
@@ -1073,11 +1087,15 @@ class TaskboardClass(O2ASBaseRoutines):
       self.go_to_pose_goal("b_bot", handover_b, speed=0.2)
       self.go_to_pose_goal("a_bot", handover_a_approach, speed=0.12)
 
+      # Applied to the a_bot in workspace_center coordinates
+      magic_x_offset = .001  
+      magic_z_offset = .001
+
       handover_a  = copy.deepcopy(handover_a_approach)
       handover_a.pose.position.y += 0.05
-      handover_a.pose.position.y += 0.017
-      handover_a.pose.position.x += 0.004 # MAGIC
-      handover_a.pose.position.z -= 0.002 # MAGIC
+      handover_a.pose.position.y += 0.023  # This is how much the gripper is pushed in
+      handover_a.pose.position.x += magic_x_offset # MAGIC
+      handover_a.pose.position.z += magic_z_offset # MAGIC
 
       self.send_gripper_command(gripper="a_bot", command="close")
       self.go_to_pose_goal("a_bot", handover_a, speed=0.03, move_lin= True)
@@ -1087,8 +1105,8 @@ class TaskboardClass(O2ASBaseRoutines):
       
       handover_b_retreat = copy.deepcopy(handover_a)
       handover_b_retreat.pose.position.y -= 0.017
-      handover_b_retreat.pose.position.x -= 0.004 # MAGIC
-      handover_b_retreat.pose.position.z += 0.002 #MAGIC
+      handover_b_retreat.pose.position.x -= magic_x_offset # MAGIC
+      handover_b_retreat.pose.position.z -= magic_z_offset #MAGIC
       handover_b_retreat.pose.position.y += 0.03
       handover_b_retreat.pose.orientation = handover_b.pose.orientation
       
@@ -1101,8 +1119,8 @@ class TaskboardClass(O2ASBaseRoutines):
                               speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner",
                               approach_height = 0.05, lift_up_after_place = False)
 
-    #  self.send_gripper_command(gripper="precision_gripper_inner", command="open")
-    #  self.horizontal_spiral_motion("a_bot", .002, radius_increment = .0005)
+      #  self.send_gripper_command(gripper="precision_gripper_inner", command="open")
+      self.horizontal_spiral_motion("a_bot", .001, radius_increment = .001)
       p = copy.deepcopy(self.place_poses[i-1])
       p.pose.position.z += 0.02
       self.go_to_pose_goal("a_bot", p, speed=0.01, move_lin= True)
