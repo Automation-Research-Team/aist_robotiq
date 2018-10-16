@@ -423,7 +423,7 @@ class KittingClass(O2ASBaseRoutines):
       above_place_pose = copy.deepcopy(object_pose)
       place_pose = copy.deepcopy(object_pose)
       above_place_pose.pose.position.z += approach_height + grasp_height
-      place_pose.pose.position.z += grasp_height + .05
+      place_pose.pose.position.z += grasp_height + .03
       
       # rospy.loginfo("Going above tray.")
       # self.move_lin(robot_name, above_place_pose, speed_slow, end_effector_link="b_bot_suction_tool_tip_link")
