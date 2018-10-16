@@ -479,7 +479,7 @@ class O2ASBaseRoutines(object):
 
   ######
 
-  def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False):
+  def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False, lift_up_after_pick=True):
     #self.publish_marker(object_pose, "pick_pose")
     #initial gripper_setup
     #rospy.loginfo("Going above object to pick")
@@ -533,13 +533,14 @@ class O2ASBaseRoutines(object):
 
     # if special_pick == True:
     #   object_pose.pose.orientation = self.downward_orientation
-    rospy.sleep(1.0)
-    rospy.loginfo("Going back up")
+    if lift_up_after_pick:
+      rospy.sleep(1.0)
+      rospy.loginfo("Going back up")
 
-    object_pose.pose.position.z += approach_height
-    rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
-    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
-    object_pose.pose.position.z -= approach_height
+      object_pose.pose.position.z += approach_height
+      rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
+      self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
+      object_pose.pose.position.z -= approach_height
     return True
 
   ######

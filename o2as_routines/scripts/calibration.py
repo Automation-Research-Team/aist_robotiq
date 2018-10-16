@@ -285,7 +285,7 @@ class CalibrationClass(O2ASBaseRoutines):
     poses = []
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.pose.orientation = self.a_bot_downward_orientation
-    pose0.pose.position.z = .002
+    pose0.pose.position.z = .00
     speed = .3
     move_lin = True
 
@@ -340,11 +340,11 @@ class CalibrationClass(O2ASBaseRoutines):
     if context == "initial": 
       for i in range(3):
         poses.append(copy.deepcopy(pose0))
-      poses[0].header.frame_id = "mat_part15"
-      poses[1].header.frame_id = "mat_part7_1"
-      poses[2].header.frame_id = "mat_part3"
+      poses[0].header.frame_id = "mat_part12"
+      poses[1].header.frame_id = "mat_part1"
+      poses[2].header.frame_id = "mat_part8"
       self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, move_lin = True)
-    elif context == "complete":
+    elif context == "full":
       pose0.pose.position.z = .005
       for i in range(16):
         poses.append(copy.deepcopy(pose0))
@@ -1370,9 +1370,9 @@ if __name__ == '__main__':
       elif r == '22':
         c.taskboard_mat_calibration(robot_name = "a_bot", context="initial")
       elif r == '221':
-        c.taskboard_mat_calibration(robot_name = "a_bot", context="complete")
+        c.taskboard_mat_calibration(robot_name = "a_bot", context="full")
       elif r == '222':
-        c.taskboard_mat_calibration(robot_name = "a_bot", context="complete")
+        c.taskboard_mat_calibration(robot_name = "b_bot", context="full")
       elif r == '231':
         c.taskboard_mat_calibration(extended=True, robot_name="b_bot")
       elif r == '241':

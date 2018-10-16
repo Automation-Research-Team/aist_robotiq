@@ -304,8 +304,7 @@ class TaskboardClass(O2ASBaseRoutines):
       taskboard.send_gripper_command(gripper="b_bot", command="open")
       taskboard.go_to_pose_goal("b_bot", pick_up_set_screw_tool_pose, speed=0.06, move_lin=True)
       taskboard.send_gripper_command(gripper="b_bot", command="close")
-      print("Press enter to proceed.")
-      inp = raw_input()
+      self.confirm_to_proceed("Press enter to proceed.")
       pick_up_set_screw_tool_pose.pose.position.x -= .03
       taskboard.go_to_pose_goal("b_bot", pick_up_set_screw_tool_pose, speed=0.04, move_lin=True)
       pick_up_set_screw_tool_pose.pose.position.x += .03
@@ -341,10 +340,7 @@ class TaskboardClass(O2ASBaseRoutines):
     else:
       self.send_gripper_command("b_bot", "open")
     
-    print("Press enter to move back up.")
-    inp = raw_input()
-    if rospy.is_shutdown():
-      return
+    self.confirm_to_proceed("Press enter to move back up.")
     
     taskboard.go_to_pose_goal("b_bot", belt_tool_approach, speed=0.1, move_lin=True)
 
@@ -429,7 +425,8 @@ class TaskboardClass(O2ASBaseRoutines):
       self.log_to_debug_monitor("Pick", "operation")
       self.pick("b_bot",tool_pickup_pose, tool_grasped_height,
                           speed_fast = 1.0, speed_slow = 0.5, gripper_command="close",
-                          approach_height = 0.1)
+                          approach_height = 0.1, lift_up_after_pick=False)
+      self.confirm_to_proceed("Confirm that pin tool was picked")
       tool_pickup_pose_high = copy.deepcopy(tool_pickup_pose)
       tool_pickup_pose_high.pose.position.z += .2
       self.go_to_pose_goal("b_bot", tool_pickup_pose_high, speed=1.0, move_lin=True)
@@ -529,10 +526,7 @@ class TaskboardClass(O2ASBaseRoutines):
       b_pose.pose.position.z += 0.1
       self.go_to_pose_goal("b_bot", b_pose, speed=1.0, move_lin=True)
       
-      ### Discard the tool (TODO: Joint pose)
-      # b_pose.pose.position.x += 0.4
-      # b_pose.pose.position.y += 0.4
-      # self.go_to_pose_goal("b_bot", b_pose, speed=0.2, move_lin=True)
+      ### Discard the tool
       self.go_to_named_pose("discard_taskboard_tool","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       self.send_gripper_command(gripper="b_bot", command="open")
       
@@ -580,7 +574,6 @@ class TaskboardClass(O2ASBaseRoutines):
       # self.go_to_named_pose("home", "b_bot")
 
       # TODO: Push on the bearing?
-      
       belt_tool_place_pose = geometry_msgs.msg.PoseStamped()
       belt_tool_place_pose.header.frame_id = "taskboard_part6_small_pulley"
       belt_tool_place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
@@ -714,10 +707,7 @@ class TaskboardClass(O2ASBaseRoutines):
       # self.go_to_named_pose("taskboard_screw_tool_horizontal_approach", "b_bot")  #TODO
       self.go_to_named_pose("screw_ready", "b_bot", speed=.5)
       self.go_to_named_pose("horizontal_screw_ready", "b_bot", speed=.5)
-      rospy.logerr("Is the intermediate pose for the screw tool set up?")
-      raw_input()
-      if rospy.is_shutdown():
-        return
+      self.confirm_to_proceed("Is the intermediate pose for the screw tool set up?")
       screw_tool_hold = geometry_msgs.msg.PoseStamped()
       screw_tool_hold.header.frame_id = "taskboard_part7_1"
       screw_tool_hold.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, 0, 0))
@@ -805,7 +795,8 @@ class TaskboardClass(O2ASBaseRoutines):
       
       self.pick("b_bot",tool_pose, tool_grasped_height,
                               speed_fast = 0.5, speed_slow = 0.2, gripper_command="close",
-                              approach_height = 0.05)
+                              approach_height = 0.05, lift_up_after_pick=False)
+      self.confirm_to_proceed("Confirm that the m10 nut tool is grasped!")
       self.go_to_pose_goal("b_bot", tool_pose_high, speed=0.5, move_lin=True)
 
       # Push into the nut to pick it up
@@ -870,18 +861,12 @@ class TaskboardClass(O2ASBaseRoutines):
       wait_for_UR_program("/b_bot_controller", rospy.Duration.from_sec(4.0))
       # self.horizontal_spiral_motion("b_bot", .003, spiral_axis="Y", radius_increment = .002)
 
-      print("do motor?")
-      raw_input()
-      if rospy.is_shutdown():
-        return
+      self.confirm_to_proceed("Turn on motor?")
       
       self.set_motor("set_screw_tool", "tighten", duration = 5.0)
       rospy.sleep(5.0)
 
-      print("go down?")
-      raw_input()
-      if rospy.is_shutdown():
-        return
+      self.confirm_to_proceed("go down with motor?")
 
       req = o2as_msgs.srv.sendScriptToURRequest()
       req.program_id = "lin_move_rel"
@@ -891,10 +876,7 @@ class TaskboardClass(O2ASBaseRoutines):
       res = self.urscript_client.call(req)
       wait_for_UR_program("/b_bot_controller", rospy.Duration.from_sec(4.0))
 
-      print("return?")
-      raw_input()
-      if rospy.is_shutdown():
-        return
+      self.confirm_to_proceed("Go back up?")
 
       # ### Turn on motor, do spiral motions while descending
       # self.go_to_pose_goal("b_bot", insert_pose_b, speed=0.02, end_effector_link="b_bot_set_screw_tool_tip_link", move_lin=True)
@@ -1087,7 +1069,7 @@ class TaskboardClass(O2ASBaseRoutines):
       handover_a_approach = copy.deepcopy(handover_b)
       handover_a_approach.pose.position.y -= 0.05
       handover_a_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, pi/2))
-    #  regrasp 
+    
       self.go_to_pose_goal("b_bot", handover_b, speed=0.2)
       self.go_to_pose_goal("a_bot", handover_a_approach, speed=0.12)
 
@@ -1099,6 +1081,7 @@ class TaskboardClass(O2ASBaseRoutines):
 
       self.send_gripper_command(gripper="a_bot", command="close")
       self.go_to_pose_goal("a_bot", handover_a, speed=0.03, move_lin= True)
+      self.confirm_to_proceed("Is the gripper centered and in the end cap?")
       self.horizontal_spiral_motion("a_bot", .003, radius_increment = .001)
       self.send_gripper_command(gripper="a_bot", command="open")
       
@@ -1112,8 +1095,6 @@ class TaskboardClass(O2ASBaseRoutines):
       self.send_gripper_command(gripper="b_bot", command="open")
       rospy.sleep(1.0)
       self.go_to_pose_goal("b_bot", handover_b_retreat, speed=0.02, move_lin= True)
-      # rospy.loginfo("Press enter to confirm that b_bot moved backwards")
-      # raw_input()
       self.go_to_named_pose("back", "b_bot")
 
       self.place("a_bot", self.place_poses[i-1],self.item_place_heights[i-1],
