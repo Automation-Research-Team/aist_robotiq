@@ -1100,6 +1100,9 @@ class CalibrationClass(O2ASBaseRoutines):
           if required_intermediate_pose:
             rospy.loginfo("Going to intermediate pose")
             self.go_to_named_pose(required_intermediate_pose, "b_bot", speed=0.5)
+          else:
+            self.go_to_named_pose("suction_place_intermediate_pose_for_sets_2_and_3", "b_bot", speed=0.5)
+          
       pose0.pose.position.x = 0
       pose0.pose.position.z = 0.05
       for i in range(5):
@@ -1411,9 +1414,13 @@ if __name__ == '__main__':
       elif r == '3182':
         c.tray_screw_calibration(robot_name="a_bot", task="kitting", set_number=1)
       elif r == '3191':
-        c.tray_partition_calibration(robot_name="b_bot", set_number=2, tray_number=1)
+        c.tray_partition_calibration(robot_name="b_bot", set_number=2, tray_number=1, task="kitting")
       elif r == '3192':
-        c.tray_partition_calibration(robot_name="b_bot", set_number=3, tray_number=1)
+        c.tray_partition_calibration(robot_name="b_bot", set_number=3, tray_number=1, task="kitting")
+      elif r == '3193':
+        c.tray_partition_calibration(robot_name="b_bot", end_effector_link="b_bot_suction_tool_tip_link", set_number=2, tray_number=1, task="kitting")
+      elif r == '3194':
+        c.tray_partition_calibration(robot_name="b_bot", end_effector_link="b_bot_suction_tool_tip_link", set_number=3, tray_number=1, task="kitting")
       elif r == '321':
         c.bin_calibration(robot_name="a_bot")
       elif r == '322':

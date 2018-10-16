@@ -290,7 +290,7 @@ class O2ASBaseRoutines(object):
     return ps_new
 
   def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, end_effector_link = ""):
-    # self.publish_marker(pose_goal_stamped, "pose")
+    self.publish_marker(pose_goal_stamped, "pose")
     if self.pause_mode_ or self.test_mode_:
       if speed > self.reduced_mode_speed_limit:
         rospy.loginfo("Reducing speed from " + str(speed) + " to " + str(self.reduced_mode_speed_limit) + " because robot is in test or pause mode")
@@ -1167,7 +1167,7 @@ class O2ASBaseRoutines(object):
         required_intermediate_pose = "joints_above_set_2_tray_2"
     elif set_number == 3:
       if tray_number == 1:  # tray 1
-        orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2+pi)) 
+        orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi*150/180+pi)) 
       elif tray_number == 2:  # tray 2
         orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, +pi))
         required_intermediate_pose = "joints_above_set_3_tray_2"
