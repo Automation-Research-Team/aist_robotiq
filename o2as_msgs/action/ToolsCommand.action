@@ -1,5 +1,6 @@
 # Only one command can be set at a time. 
 bool stop
+bool setScrew_fasten
 bool peg_fasten
 bool big_nut_fasten
 bool small_nut_fasten
