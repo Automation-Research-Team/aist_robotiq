@@ -49,6 +49,8 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
 
+import o2as_msgs.msg
+
 class CalibrationClass(O2ASBaseRoutines):
   """
   These routines check the robots' calibration by moving them to
@@ -1232,6 +1234,13 @@ class CalibrationClass(O2ASBaseRoutines):
     rospy.sleep(1.0)
     
     cv2.imwrite('/root/catkin_ws/src/o2as_bg_ratio/images/empty_close_gripper.png', self._img)
+
+    client = actionlib.SimpleActionClient('inner_pick_detection_action', o2as_msgs.msg.innerPickDetectionAction)
+    client.wait_for_server()
+    goal = o2as_msgs.msg.innerPickDetectionGoal()
+    goal.saveROIImage = True
+    goal.part_id = 12
+    client.send_goal(goal)   
     return
 
   def image_callback(self, msg_in):
