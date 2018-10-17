@@ -81,28 +81,28 @@
         <joint name="${matname}_part1" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part1"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.08 0.2325 0.0"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.3355 0.163 0.0"/>
     </joint>
     <link name="${matname}_part1"/>
 
     <joint name="${matname}_part2" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part2"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.345 0.353 0.0"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.2305 0.038 0.0"/>
     </joint>
     <link name="${matname}_part2"/>
 
     <joint name="${matname}_part3" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part3"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.324 0.056 0.0"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.3075 0.252 0.0"/>
     </joint>
     <link name="${matname}_part3"/>
 
     <joint name="${matname}_part4" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part4"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.18 0.2015 0.0"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.1625 0.075 0.0"/>
     </joint>
     <link name="${matname}_part4"/>
 
@@ -116,7 +116,7 @@
     <joint name="${matname}_part6" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part6"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.301 0.176 0.0"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.098 0.263 0.0"/>
     </joint>
     <link name="${matname}_part6"/>
 
@@ -137,21 +137,21 @@
     <joint name="${matname}_part8" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part8"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.231 0.3505 0.0"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.22 0.256 0.0"/>
     </joint>
     <link name="${matname}_part8"/>
 
     <joint name="${matname}_part9" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part9"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.099 0.048 0.0"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.233 0.157 0.0"/>
     </joint>
     <link name="${matname}_part9"/>
 
     <joint name="${matname}_part10" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part10"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.1755 0.2875 0.0"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.22 0.351 0.0"/>
     </joint>
     <link name="${matname}_part10"/>
 
@@ -165,28 +165,28 @@
     <joint name="${matname}_part12" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part12"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.3015 0.2975 0.0"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.338 0.047 0.0"/>
     </joint>
     <link name="${matname}_part12"/>
 
     <joint name="${matname}_part13" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part13"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.0655 0.3105 0.0"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.332 0.327 0.0"/>
     </joint>
     <link name="${matname}_part13"/>
 
     <joint name="${matname}_part14" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part14"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.218 0.056 0.0"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.078 0.0475 0.0"/>
     </joint>
     <link name="${matname}_part14"/>
 
     <joint name="${matname}_part15" type="fixed">
       <parent link="${matname}"/>
       <child link="${matname}_part15"/>
-      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.046 0.107 0.0"/>
+      <origin rpy="0.0 0.0 ${pi/2}" xyz="0.282 0.0875 0.0"/>
     </joint>
     <link name="${matname}_part15"/>
 
