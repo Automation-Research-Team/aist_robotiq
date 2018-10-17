@@ -225,34 +225,34 @@ class TaskboardClass(O2ASBaseRoutines):
     # 
     # - Belt 6 after bearing 1. nut/bolt 7 anytime.
     
-    ### Set screw has to be first, because b_bot is right on top of it
-    # self.log_to_debug_monitor("No.  1 / 14: Set screw (id=11)", "subtask")
-    # self.confirm_to_proceed("No.  1 / 14: Set screw (id=11)")
-    # self.do_task_number(11) # set screw
-    # self.log_to_debug_monitor("No.  2 / 14: Retainer pin (id=2)", "subtask")
-    # self.confirm_to_proceed("No.  2 / 14: Retainer pin (id=2)")
-    # self.do_task_number(2)  # Retainer pin
+    ## Set screw has to be first, because b_bot is right on top of it
+    self.log_to_debug_monitor("No.  1 / 14: Set screw (id=11)", "subtask")
+    self.confirm_to_proceed("No.  1 / 14: Set screw (id=11)")
+    self.do_task_number(11) # set screw
+    self.log_to_debug_monitor("No.  2 / 14: Retainer pin (id=2)", "subtask")
+    self.confirm_to_proceed("No.  2 / 14: Retainer pin (id=2)")
+    self.do_task_number(2)  # Retainer pin
 
-    # self.log_to_debug_monitor("No.  3 / 14: Spacer small (id=3)", "subtask")
-    # self.confirm_to_proceed("No.  3 / 14: Spacer small (id=3)")
-    # self.do_task_number(3)  # Spacer small
-    # self.log_to_debug_monitor("No.  4 / 14: Spacer large (id=4)", "subtask")
-    # self.confirm_to_proceed("No.  4 / 14: Spacer large (id=4)")
-    # self.do_task_number(4)  # Spacer large
+    self.log_to_debug_monitor("No.  3 / 14: Spacer small (id=3)", "subtask")
+    self.confirm_to_proceed("No.  3 / 14: Spacer small (id=3)")
+    self.do_task_number(3)  # Spacer small
+    self.log_to_debug_monitor("No.  4 / 14: Spacer large (id=4)", "subtask")
+    self.confirm_to_proceed("No.  4 / 14: Spacer large (id=4)")
+    self.do_task_number(4)  # Spacer large
 
-    # self.log_to_debug_monitor("No. 11 / 14: M4 screw (id=13)", "subtask")
-    # self.confirm_to_proceed("No. 11 / 14: M4 screw (id=13) pick-up only")
-    # self.do_task_number(131) # M4 screw 
-    # self.log_to_debug_monitor("No. 12 / 14: M3 screw (id=12)", "subtask")
-    # self.confirm_to_proceed("No. 12 / 14: M3 screw (id=12) pick-up only")
-    # self.do_task_number(121) # M3 screw 
+    self.log_to_debug_monitor("No. 11 / 14: M4 screw (id=13)", "subtask")
+    self.confirm_to_proceed("No. 11 / 14: M4 screw (id=13) pick-up only")
+    self.do_task_number(131) # M4 screw 
+    self.log_to_debug_monitor("No. 12 / 14: M3 screw (id=12)", "subtask")
+    self.confirm_to_proceed("No. 12 / 14: M3 screw (id=12) pick-up only")
+    self.do_task_number(121) # M3 screw 
 
-    # self.log_to_debug_monitor("No.  5 / 14: Washer small (id=9)", "subtask")
-    # self.confirm_to_proceed("No.  5 / 14: Washer small (id=9)")
-    # self.do_task_number(9)  # Washer small
-    # self.log_to_debug_monitor("No.  6 / 14: Washer large (id=10)", "subtask")
-    # self.confirm_to_proceed("No.  6 / 14: Washer large (id=10)")
-    # self.do_task_number(10) # Washer large
+    self.log_to_debug_monitor("No.  5 / 14: Washer small (id=9)", "subtask")
+    self.confirm_to_proceed("No.  5 / 14: Washer small (id=9)")
+    self.do_task_number(9)  # Washer small
+    self.log_to_debug_monitor("No.  6 / 14: Washer large (id=10)", "subtask")
+    self.confirm_to_proceed("No.  6 / 14: Washer large (id=10)")
+    self.do_task_number(10) # Washer large
     # self.log_to_debug_monitor("No.  7 / 14: Pulley (id=14)", "subtask")
     # self.confirm_to_proceed("No.  7 / 14: Pulley (id=14)")
     # self.do_task_number(14) # Pulley
@@ -559,7 +559,7 @@ class TaskboardClass(O2ASBaseRoutines):
       ### Discard the tool
       self.go_to_named_pose("discard_taskboard_tool","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       self.send_gripper_command(gripper="b_bot", command="open")
-      rospy.sleep(2.0)
+      rospy.sleep(3.0)
       
       self.go_to_named_pose("home","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
@@ -694,12 +694,14 @@ class TaskboardClass(O2ASBaseRoutines):
 
       # Remove the placement aid
       self.go_to_named_pose("taskboard_center_pose", "b_bot")
+      belt_tool_place_pose.pose.position.z -= .03
       self.pick("b_bot", belt_tool_place_pose, grasp_height=belt_tool_grasp_height, speed_fast = 1.0, speed_slow = 0.1, gripper_command="close",
                               approach_height = 0.15)
       
       # Drop the tool
       self.go_to_named_pose("discard_taskboard_tool","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       self.send_gripper_command(gripper="b_bot", command="open")
+      rospy.sleep(3.0)
       
       self.go_to_named_pose("home","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       # self.place("b_bot", belt_tool_place_pose, place_height=belt_tool_grasp_height+.002, speed_fast = 0.2, speed_slow = 0.03, gripper_command="open",
@@ -886,6 +888,7 @@ class TaskboardClass(O2ASBaseRoutines):
       # Drop the tool
       self.go_to_named_pose("discard_taskboard_tool","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       self.send_gripper_command(gripper="b_bot", command="open")
+      rospy.sleep(3.0)
       
       self.go_to_named_pose("home","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 

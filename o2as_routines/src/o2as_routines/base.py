@@ -125,7 +125,7 @@ class O2ASBaseRoutines(object):
     self.force_ur_script_linear_motion = False
     self.force_moveit_linear_motion = False
 
-    self.competition_mode = False   # Disables confirmation dialogs etc. for full automatic motion
+    self.competition_mode = True   # Disables confirmation dialogs etc. for full automatic motion
 
     moveit_commander.roscpp_initialize(sys.argv)
     rospy.init_node('assembly_example', anonymous=False)
@@ -1116,7 +1116,7 @@ class O2ASBaseRoutines(object):
     pose2 = geometry_msgs.msg.PoseStamped()
     pose2.header.frame_id = "b_bot_robotiq_85_tip_link"
     pose2.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2,0,pi/2))
-    pose2.pose.position.z = 0.0  # MAGIC NUMBER!
+    pose2.pose.position.z = 0.0  # MAGIC NUMBER!  ()
     pose2.pose.position.y = 0.025
     pose2.pose.position.x = 0.015
     self.go_to_pose_goal("c_bot", pose2, speed=speed, acceleration=acceleration, move_lin = True)

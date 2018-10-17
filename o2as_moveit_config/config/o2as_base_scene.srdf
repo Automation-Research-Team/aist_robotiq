@@ -410,9 +410,9 @@
     </group_state>
     <group_state name="discard_taskboard_tool" group="b_bot">
         <joint name="b_bot_elbow_joint" value="2.1418" />
-        <joint name="b_bot_shoulder_lift_joint" value="-2.2287" />
+        <joint name="b_bot_shoulder_lift_joint" value="-2.0787" />
         <joint name="b_bot_shoulder_pan_joint" value="2.9506" />
-        <joint name="b_bot_wrist_1_joint" value="-1.4927" />
+        <joint name="b_bot_wrist_1_joint" value="-1.5927" />
         <joint name="b_bot_wrist_2_joint" value="-1.57" />
         <joint name="b_bot_wrist_3_joint" value="0" />
     </group_state>
