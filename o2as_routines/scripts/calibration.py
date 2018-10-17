@@ -48,7 +48,7 @@ from o2as_routines.base import O2ASBaseRoutines
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
-
+import actionlib
 import o2as_msgs.msg
 
 class CalibrationClass(O2ASBaseRoutines):
@@ -61,8 +61,7 @@ class CalibrationClass(O2ASBaseRoutines):
     super(CalibrationClass, self).__init__()
     
     self.a_bot_downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
-    self.bin_names = ["bin2_1", "bin2_2", "bin2_3", "bin2_4", "bin3_1", "bin1_1", 
-                      "bin1_2", "bin1_3", "bin1_4", "bin1_5"]
+    self.bin_names = ["bin2_1", "bin2_2", "bin1_3", "bin1_2", "bin1_1", "bin1_4", "bin1_5", "bin1_7", "bin1_8", "bin1_6"]
 
     self.bridge = CvBridge()
     self._img = Image()
@@ -888,7 +887,7 @@ class CalibrationClass(O2ASBaseRoutines):
 
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "set_" + str(set_number) + "_tray_2_screw_m4_1"
-    pose0.pose.position.x = -.007
+    pose0.pose.position.x = -0.007
     if robot_name=="b_bot" or robot_name=="a_bot":
       pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, 0, 0))
       if task=="kitting":

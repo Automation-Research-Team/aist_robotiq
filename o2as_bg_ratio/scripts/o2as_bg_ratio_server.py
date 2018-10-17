@@ -43,10 +43,15 @@ class InnerPickDetection(object):
         self.bridge = CvBridge()
         # Config parameters
         # TODO: read values from config file
-        self._x = 270
+        self._x = 295+(64-42)/2
         self._y = 275
-        self._w = 64
-        self._h = 32
+        self._w = 42
+        self._h = 24 + (32-24)/2
+
+        # self._x = 270
+        # self._y = 275
+        # self._w = 64
+        # self._h = 32
         # TODO: Write an image with the ROI drawn into it
 
         # Publish input image (and output value)
@@ -71,6 +76,8 @@ class InnerPickDetection(object):
         self.img_empty = np.asarray(self.img_empty)[:, :, ::-1]
         self._empty_bg_ratio = self.compute_red_ratio(self.img_empty, self._x, self._y, self._w, self._h)
         #rospy.get_param("/empty_bg_ratio", '0.7')
+
+        self.img_counter = 0
     
     # Action Callback
     def action_callback(self, goal):
@@ -84,10 +91,17 @@ class InnerPickDetection(object):
             if(goal.saveROIImage):
                 self.saveROIImage()
         except rospy.ROSInterruptException:
-            print "ROI image of calibrartion no saved"
+            print "ROI image of calibration not saved"
             print "goal.saveROIImage is not defined in the call of inner_pick_detection-action"
 
         res = self.compute_red_ratio(self._current_image, self._x, self._y, self._w, self._h) < self._empty_bg_ratio
+
+        self.img_counter += 1
+        if res:
+            res_string = "success"
+        else:
+            res_string = "failed"
+        cv2.imwrite("/root/catkin_ws/src/o2as_bg_ratio/images/" + str(self.img_counter) + "_" + res_string + ".png'", cv2.cvtColor(imageROI, cv2.COLOR_BGR2RGB))
 
         self.action_result.success = res
         self.action_result.picked = res
@@ -153,14 +167,17 @@ class InnerPickDetection(object):
         threshold = 0.9
         if bg_ratio > threshold:
             img0 = _draw_rect(img0, x, y, w, h, (0, 255, 0), True)
+            item_picked = True
         else:
             img0 = _draw_rect(img0, x, y, w, h, (255, 0, 0))
+            item_picked = False
 
         # publish input image with detection rectangle
         img_message = self.bridge.cv2_to_imgmsg(img0, "rgb8")
         self.pub_input_image.publish(img_message)
+        rospy.loginfo("bg_ratio in check_pick: " + bg_ratio)
 
-        return bg_ratio
+        return item_picked
 
 if __name__ == "__main__":
 

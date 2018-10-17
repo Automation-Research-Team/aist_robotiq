@@ -668,6 +668,10 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
     moveToJointPose(joint_group_positions_3, robot_name, true, 3.0, use_real_robot_, 3.0);
   }
+  if (robot_name == "c_bot")
+  {
+    goToNamedPose("tool_pick_ready", "c_bot");
+  }
 
   // Set up poses
   geometry_msgs::PoseStamped ps_approach, ps_tool_holder, ps_move_away, ps_high_up, ps_end;

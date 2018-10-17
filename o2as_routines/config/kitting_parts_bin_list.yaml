@@ -1,3 +1,3 @@
-part_bin_list: {part_11: bin2_3, part_12: bin1_2, part_13: bin2_4, part_16: bin1_3,
-  part_17: bin1_4, part_18: bin1_5, part_4: bin2_1, part_6: bin3_1, part_8: bin2_2,
+part_bin_list: {part_10: bin1_2, part_12: bin1_3, part_14: bin1_4, part_15: bin1_5,
+  part_16: bin1_6, part_17: bin1_7, part_18: bin1_8, part_5: bin2_1, part_8: bin2_2,
   part_9: bin1_1}
