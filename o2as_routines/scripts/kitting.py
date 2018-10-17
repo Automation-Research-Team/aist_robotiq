@@ -1182,7 +1182,7 @@ class KittingClass(O2ASBaseRoutines):
       if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
         if self.grasp_candidates[item.part_id]["positions"]:
           pick_pose = self.grasp_candidates[item.part_id]["positions"].pop(0)
-          pick_pose.pose.position.z += self.insert_offsets["part_"+str(item.part_id)]
+          # pick_pose.pose.position.z -= self.insert_offsets["part_"+str(item.part_id)]
           rospy.loginfo("Got pose from phoxi grasp candidates:")
           rospy.loginfo(pick_pose.pose.position)
           grasp_candidate_from_vision = True
