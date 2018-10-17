@@ -21,7 +21,7 @@
   <joint name="belt_placement_tool" type="fixed">
     <parent link="workspace_center"/>
     <child link="belt_placement_tool"/>
-    <origin rpy="0.0 0.0 0" xyz="-.2 0.37 0"/>
+    <origin rpy="0.0 0.0 0" xyz="-.23 0.34 0"/>
   </joint>
   <link name="belt_placement_tool"/>
 

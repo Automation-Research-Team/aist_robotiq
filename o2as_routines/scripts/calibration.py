@@ -360,15 +360,14 @@ class CalibrationClass(O2ASBaseRoutines):
       poses[9].header.frame_id = "mat_part9"
       poses[10].header.frame_id = "mat_part10"
       poses[11].header.frame_id = "mat_part11"
-      # poses[12].header.frame_id = "mat_part12"
-      # poses[13].header.frame_id = "mat_part13"
+      poses[12].header.frame_id = "mat_part12"
+      poses[13].header.frame_id = "mat_part13"
       poses[14].header.frame_id = "mat_part14"
       poses[15].header.frame_id = "mat_part15"
     elif context == "competition":
       if robot_name == "a_bot":
         for i in range(10):
           poses.append(copy.deepcopy(pose0))
-        # poses[1].header.frame_id = "mat_part2" # Retainer pin. b_bot?
         poses[0].header.frame_id = "mat_part3"
         poses[1].header.frame_id = "mat_part4"
         poses[2].header.frame_id = "mat_part7_1"
