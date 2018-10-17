@@ -226,9 +226,9 @@ class TaskboardClass(O2ASBaseRoutines):
     # - Belt 6 after bearing 1. nut/bolt 7 anytime.
     
     ## Set screw has to be first, because b_bot is right on top of it
-    self.log_to_debug_monitor("No.  1 / 14: Set screw (id=11)", "subtask")
-    self.confirm_to_proceed("No.  1 / 14: Set screw (id=11)")
-    self.do_task_number(11) # set screw
+    # self.log_to_debug_monitor("No.  1 / 14: Set screw (id=11)", "subtask")
+    # self.confirm_to_proceed("No.  1 / 14: Set screw (id=11)")
+    # self.do_task_number(11) # set screw
     self.log_to_debug_monitor("No.  2 / 14: Retainer pin (id=2)", "subtask")
     self.confirm_to_proceed("No.  2 / 14: Retainer pin (id=2)")
     self.do_task_number(2)  # Retainer pin
@@ -240,22 +240,22 @@ class TaskboardClass(O2ASBaseRoutines):
     self.confirm_to_proceed("No.  4 / 14: Spacer large (id=4)")
     self.do_task_number(4)  # Spacer large
 
-    self.log_to_debug_monitor("No. 11 / 14: M4 screw (id=13)", "subtask")
-    self.confirm_to_proceed("No. 11 / 14: M4 screw (id=13) pick-up only")
-    self.do_task_number(131) # M4 screw 
-    self.log_to_debug_monitor("No. 12 / 14: M3 screw (id=12)", "subtask")
-    self.confirm_to_proceed("No. 12 / 14: M3 screw (id=12) pick-up only")
-    self.do_task_number(121) # M3 screw 
-
     self.log_to_debug_monitor("No.  5 / 14: Washer small (id=9)", "subtask")
     self.confirm_to_proceed("No.  5 / 14: Washer small (id=9)")
     self.do_task_number(9)  # Washer small
     self.log_to_debug_monitor("No.  6 / 14: Washer large (id=10)", "subtask")
     self.confirm_to_proceed("No.  6 / 14: Washer large (id=10)")
     self.do_task_number(10) # Washer large
-    # self.log_to_debug_monitor("No.  7 / 14: Pulley (id=14)", "subtask")
-    # self.confirm_to_proceed("No.  7 / 14: Pulley (id=14)")
-    # self.do_task_number(14) # Pulley
+    self.log_to_debug_monitor("No.  7 / 14: Pulley (id=14)", "subtask")
+    self.confirm_to_proceed("No.  7 / 14: Pulley (id=14)")
+    self.do_task_number(14) # Pulley
+
+    self.log_to_debug_monitor("No. 11 / 14: M4 screw (id=13)", "subtask")
+    self.confirm_to_proceed("No. 11 / 14: M4 screw (id=13) pick-up only")
+    self.do_task_number(131) # M4 screw 
+    self.log_to_debug_monitor("No. 12 / 14: M3 screw (id=12)", "subtask")
+    self.confirm_to_proceed("No. 12 / 14: M3 screw (id=12) pick-up only")
+    self.do_task_number(121) # M3 screw 
 
     self.log_to_debug_monitor("No.  8 / 14: Bearing (id=1)", "subtask")
     self.confirm_to_proceed("No.  8 / 14: Bearing (id=1)")
@@ -276,9 +276,9 @@ class TaskboardClass(O2ASBaseRoutines):
     self.do_task_number(122) # M3 screw?
     self.set_feeder_power(False)
 
-    self.log_to_debug_monitor("No. 13 / 14: M10 nut (id=8)", "subtask")
-    self.confirm_to_proceed("No. 13 / 14: M10 nut (id=8)")
-    self.do_task_number(8)  # M10 nut
+    # self.log_to_debug_monitor("No. 13 / 14: M10 nut (id=8)", "subtask")
+    # self.confirm_to_proceed("No. 13 / 14: M10 nut (id=8)")
+    # self.do_task_number(8)  # M10 nut
 
     self.log_to_debug_monitor("No. 14 / 14: M6 nut/bolt (id=7)", "subtask")
     self.confirm_to_proceed("No. 14 / 14: M6 nut/bolt (id=7)")
@@ -655,7 +655,7 @@ class TaskboardClass(O2ASBaseRoutines):
       # Place the belt
       belt_place_intermediate = geometry_msgs.msg.PoseStamped()
       belt_place_intermediate.header.frame_id = "taskboard_part6_large_pulley"
-      belt_place_intermediate.pose.position.y = .068
+      belt_place_intermediate.pose.position.y = .055
       belt_place_intermediate.pose.position.z = .04
       belt_place_intermediate.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
 
@@ -708,9 +708,9 @@ class TaskboardClass(O2ASBaseRoutines):
       #                         approach_height = 0.03, lift_up_after_place = True)
 
     if i == 7:
-      self.go_to_named_pose("home", "a_bot")
-      self.go_to_named_pose("back", "b_bot")
-      self.go_to_named_pose("back", "c_bot")
+      self.go_to_named_pose("home", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      self.go_to_named_pose("back", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      self.go_to_named_pose("back", "c_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       # Pick up M6 screw, arrange it in the gripper, and pick it with b_bot
       partScrew = geometry_msgs.msg.PoseStamped()
       partScrew.header.frame_id = "mat_part7_1"
@@ -823,9 +823,9 @@ class TaskboardClass(O2ASBaseRoutines):
       self.do_change_tool_action("b_bot", equip=False, screw_size=6)
 
     if i == 8:
-      self.go_to_named_pose("home", "b_bot")
-      self.go_to_named_pose("back", "a_bot")
-      self.go_to_named_pose("back", "c_bot")
+      self.go_to_named_pose("home", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      self.go_to_named_pose("back", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      self.go_to_named_pose("back", "c_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       #pick up the tool
       tool_pose = geometry_msgs.msg.PoseStamped()
       tool_pose.header.frame_id = "M10nut_tool"
@@ -893,6 +893,9 @@ class TaskboardClass(O2ASBaseRoutines):
       self.go_to_named_pose("home","b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
     if i in [9, 10]:
+      self.go_to_named_pose("home", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      self.go_to_named_pose("back", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+      self.go_to_named_pose("back", "c_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       self.pick("a_bot",self.pick_poses[i-1],self.item_pick_heights[i-1], approach_height = 0.03,
                               speed_fast = 0.2, speed_slow = 0.02, gripper_command="easy_pick_only_inner")
       self.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
