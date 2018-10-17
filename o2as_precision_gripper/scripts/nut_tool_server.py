@@ -63,7 +63,7 @@ class ToolsAction:
             command_is_sent = self.small_nut_fasten(30)
         
         elif goal.setScrew_fasten:        
-            command_is_sent = self.setScrew_fasten(20)
+            command_is_sent = self.setScrew_fasten(25)
         else:
             rospy.logerr('No command is sent, service request was empty.')
             command_is_sent = False
