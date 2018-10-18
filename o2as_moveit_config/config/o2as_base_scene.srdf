@@ -408,6 +408,14 @@
         <joint name="c_bot_wrist_2_joint" value="-1.57" />
         <joint name="c_bot_wrist_3_joint" value="-3.1415" />
     </group_state>
+    <group_state name="pulley_push_ready_high" group="c_bot">
+        <joint name="c_bot_elbow_joint" value="0.5" />
+        <joint name="c_bot_shoulder_lift_joint" value="-1.6" />
+        <joint name="c_bot_shoulder_pan_joint" value="2.07" />
+        <joint name="c_bot_wrist_1_joint" value="-2.0481" />
+        <joint name="c_bot_wrist_2_joint" value="-2.07" />
+        <joint name="c_bot_wrist_3_joint" value="0" />
+    </group_state>
     <group_state name="discard_taskboard_tool" group="b_bot">
         <joint name="b_bot_elbow_joint" value="1.8310375213623047" />
         <joint name="b_bot_shoulder_lift_joint" value="-1.6923745314227503" />

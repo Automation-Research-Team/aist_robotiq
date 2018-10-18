@@ -633,6 +633,42 @@ class AssemblyClass(O2ASBaseRoutines):
     intermediate_facing_sky.pose.position.z = -0.4
     self.go_to_pose_goal("b_bot", intermediate_facing_sky,speed=self.speed_fast, move_lin = True)
     return
+  
+  def push_idler_pulley_down(self):
+    self.go_to_named_pose("pulley_push_ready_high", "c_bot")
+    self.send_gripper_command(gripper="c_bot",command = 0.01, wait=False)
+
+    b_bot_face_up_near_c = geometry_msgs.msg.PoseStamped()
+    b_bot_face_up_near_c.header.frame_id = "intermediate_assy_part_14_screw_head"
+    b_bot_face_up_near_c.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    b_bot_face_up_near_c.pose.position.x = 0.
+    b_bot_face_up_near_c.pose.position.y = 0.4
+    b_bot_face_up_near_c.pose.position.z = -0.4
+    self.go_to_pose_goal("b_bot", b_bot_face_up_near_c,speed=1.0, move_lin = True)
+
+    c_above_pin = geometry_msgs.msg.PoseStamped()
+    c_above_pin.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, 0, -pi/2))
+    c_above_pin.header.frame_id = "b_bot_robotiq_85_tip_link"
+    c_above_pin.pose.position.x = 0.05
+    c_above_pin.pose.position.y = -0.015
+    
+    c_push = copy.deepcopy(c_above_pin)
+    c_push.pose.position.x = 0.02
+
+
+    self.go_to_pose_goal("c_bot", c_above_pin,speed=0.1, move_lin = True)
+    self.confirm_to_proceed("Is the gripper positioned right for pushing down?")
+    self.go_to_pose_goal("c_bot", c_push, speed=0.01, move_lin = True)
+    self.confirm_to_proceed("Is the push deep enough?")
+    self.go_to_pose_goal("c_bot", c_above_pin,speed=1.0, move_lin = True)
+    self.confirm_to_proceed("Did the push work? c_bot will move away")
+
+    b_bot_face_sky_pose = copy.deepcopy(b_bot_face_up_near_c)
+    b_bot_face_sky_pose.pose.position.y = 0.0
+    self.go_to_pose_goal("b_bot", b_bot_face_sky_pose,speed=1.0, move_lin = True)
+
+    self.go_to_named_pose("back", "c_bot")
+
 
   def pick_retainer_pin_nut(self):
     # rospy.loginfo("============ Picking up the retainer pin nut using a_bot ============")
@@ -1300,6 +1336,8 @@ if __name__ == '__main__':
       rospy.loginfo("Enter 2 to move the robots home to starting positions.")
       rospy.loginfo("Enter 30 to pick screw m3 from tray with b_bot (31-36 for numbers 1-6).")
       rospy.loginfo("Enter 41-49 to pick screw m4 from tray with b_bot (number 1-9).")
+      rospy.loginfo("Enter 50 to face the sky with b_bot.")
+      rospy.loginfo("Enter 51 to test the pulley push motion.")
       rospy.loginfo("Enter 91-94 for subtasks (Large plate, motor plate, idler pin, motor).")
       rospy.loginfo("Enter 95-98 for subtasks (motor pulley, bearing+shaft, clamp pulley, belt).")
       rospy.loginfo("Enter 911 to place plate 3 (but don't screw)")
@@ -1348,6 +1386,10 @@ if __name__ == '__main__':
         assy.go_to_named_pose("screw_pick_ready", "b_bot")
         assy.pick_screw("b_bot", screw_size=4, screw_number=int(i)-40)
         assy.go_to_named_pose("screw_pick_ready", "b_bot")
+      elif i == '50':
+        assy.rotate_hand_facing_the_sky()
+      elif i == '51':
+        assy.push_idler_pulley_down()
       elif i == '91':
         assy.subtask_g()  # Large plate
       elif i == '911':
