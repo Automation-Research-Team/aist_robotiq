@@ -607,7 +607,7 @@ class CalibrationClass(O2ASBaseRoutines):
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "tray_2_partition_8_pickup_1"
     pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    pose0.pose.position.z = .01
+    pose0.pose.position.z = .02
 
     for i in range(6):
       poses.append(copy.deepcopy(pose0))
@@ -619,7 +619,7 @@ class CalibrationClass(O2ASBaseRoutines):
     poses[5].header.frame_id = "tray_1_partition_5_pickup"
     poses[5].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
     
-    self.cycle_through_calibration_poses(poses, "c_bot", speed=0.3, go_home=True)
+    self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3, go_home=True, move_lin=True)
     return
   
   def assembly_tray_b_bot_calibration_for_competition(self):
@@ -632,7 +632,7 @@ class CalibrationClass(O2ASBaseRoutines):
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "tray_2_partition_8_pickup_1"
     pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    pose0.pose.position.z = .01
+    pose0.pose.position.z = .02
 
     for i in range(6):
       poses.append(copy.deepcopy(pose0))
@@ -644,7 +644,7 @@ class CalibrationClass(O2ASBaseRoutines):
     poses[5].header.frame_id = "tray_1_partition_5_pickup"
     poses[5].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
     
-    self.cycle_through_calibration_poses(poses, "c_bot", speed=0.3, go_home=True)
+    self.cycle_through_calibration_poses(poses, "b_bot", speed=0.3, go_home=True, move_lin=True)
     return
 
   def kitting_tray_test(self, robot_name = "a_bot", end_effector_link = ""):
@@ -1157,7 +1157,7 @@ class CalibrationClass(O2ASBaseRoutines):
             self.go_to_named_pose("suction_place_intermediate_pose_for_sets_2_and_3", "b_bot", speed=0.5)
           
       pose0.pose.position.x = 0
-      pose0.pose.position.z = 0.05
+      pose0.pose.position.z = 0.02
       for i in range(5):
         poses.append(copy.deepcopy(pose0))
 
@@ -1180,7 +1180,7 @@ class CalibrationClass(O2ASBaseRoutines):
       poses[8].header.frame_id = "tray_2_partition_8_pickup_2"
 
     self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
-    return 
+    return
 
   
 
@@ -1336,8 +1336,7 @@ if __name__ == '__main__':
       rospy.loginfo("501-503: Assembly base plate (c_bot, b_bot, a_bot)")
       rospy.loginfo("504-507: Assembly base plate (b_bot m4, b_bot m3, c_bot nut, c_bot set_screw)")
       rospy.loginfo("511-513: Motor plate (c_bot, b_bot, b_bot m4)")
-      rospy.loginfo("53: Assembly base plate (a_bot)")
-      rospy.loginfo("54: Assembly assembled parts")
+      rospy.loginfo("52, 53: Pickup frame calibration a_bot, b_bot (competition)")
       rospy.loginfo("55: Assembly initial part locations (the plates)")
       rospy.loginfo("56: Go to tray screw positions with m4 tool for b_bot")
       rospy.loginfo("561, 562: Go to tray screw positions with b_bot, a_bot")
@@ -1365,7 +1364,6 @@ if __name__ == '__main__':
       rospy.loginfo("81: Go to tray partitions using b_bot")
       rospy.loginfo("82: Go to screws on the tray using b_bot")
       rospy.loginfo("83: Go to screws on the tray using a_bot")
-      rospy.loginfo("9991: Assembly calibration for competition")
       rospy.loginfo("x: Exit ")
       rospy.loginfo(" ")
       r = raw_input()
@@ -1526,6 +1524,10 @@ if __name__ == '__main__':
         c.assembly_calibration_base_plate("b_bot", context="motor_plate")
       elif r == '513':
         c.assembly_calibration_base_plate("b_bot", end_effector_link="b_bot_screw_tool_m4_tip_link", context="motor_plate")
+      elif r == "52":
+        c.assembly_tray_a_bot_calibration_for_competition()
+      elif r == "53":
+        c.assembly_tray_b_bot_calibration_for_competition()
       elif r == '54':
         c.assembly_calibration_assembled_parts()
       elif r == '55':
@@ -1650,8 +1652,6 @@ if __name__ == '__main__':
         c.screw_action_test(robot_name="b_bot")
       elif r == '692':
         c.screw_action_test(robot_name="c_bot")
-      elif r == "9991":
-        c.assembly_tray_a_bot_calibration_for_competition()
       elif r == 'x':
         break
       else:

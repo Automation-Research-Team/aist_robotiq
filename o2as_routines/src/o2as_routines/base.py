@@ -1047,7 +1047,6 @@ class O2ASBaseRoutines(object):
     res = self._feeder_srv.call(req)
     return res.success
 
-
   def pick_nut_from_table(self,robot_name, object_pose, max_radius=0.005, end_effector_link="c_bot_nut_tool_m6_tip_link"):
     self.log_to_debug_monitor("Pick nut from table", "operation")
     approach_pose = copy.deepcopy(object_pose)
@@ -1055,12 +1054,14 @@ class O2ASBaseRoutines(object):
     self.go_to_pose_goal(robot_name, approach_pose, speed=.1, move_lin = True, end_effector_link=end_effector_link)
     if robot_name == "c_bot":
       spiral_axis = "YZ"
+      push_direction = "c_bot_diagonal"
     else:
       spiral_axis = "Y"
-    self.do_linear_push(robot_name, 10, wait = True)
-    self.set_motor("nut_tool_m6", direction="loosen", duration=15)
+      push_direction = "Z+"
+    self.do_linear_push(robot_name, 10, direction=push_direction, wait = True)
+    self.set_motor("nut_tool_m6", direction="loosen", duration=10)
     self.horizontal_spiral_motion(robot_name, max_radius = .006, radius_increment = .02, spiral_axis=spiral_axis)
-    self.do_linear_push(robot_name, 40, wait = True)
+    self.do_linear_push(robot_name, 10, direction=push_direction, wait = True)
     self.go_to_pose_goal(robot_name, approach_pose, speed=.03, move_lin = True, end_effector_link=end_effector_link)
 
   def pick_nut_using_spiral_search(self,object_pose, max_radius=0.005, end_effector_link="c_bot_nut_tool_m6_tip_link"):
@@ -1110,8 +1111,8 @@ class O2ASBaseRoutines(object):
     acceleration = .5
     force_ur_script = False
     if go_fast:
-      speed = 1.5
-      acceleration = 1.2
+      speed = 3.0
+      acceleration = 1.5
       force_ur_script = True
 
     pose1 = geometry_msgs.msg.PoseStamped()
@@ -1126,9 +1127,9 @@ class O2ASBaseRoutines(object):
     pose2 = geometry_msgs.msg.PoseStamped()
     pose2.header.frame_id = "b_bot_robotiq_85_tip_link"
     pose2.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2,0,pi/2))
-    pose2.pose.position.z = 0.0  # MAGIC NUMBER!  ()
-    pose2.pose.position.y = 0.025
-    pose2.pose.position.x = 0.015
+    pose2.pose.position.z = -0.0015   # MAGIC NUMBER (positive moves c_bot towards ??)
+    pose2.pose.position.y = 0.025 # (positive moves c_bot forward)
+    pose2.pose.position.x = 0.015 # (positive moves c_bot down)
     self.go_to_pose_goal("c_bot", pose2, speed=speed, acceleration=acceleration, move_lin = True)
 
     # self.send_gripper_command(gripper="b_bot",command = "close", velocity = .015, force = 1.0)
