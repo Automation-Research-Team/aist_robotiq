@@ -48,7 +48,6 @@ def compute_red_ratio(img, x, y, w, h, br_threshold=0.2,
   if vis:
     import matplotlib.pyplot as plt
     plt.imshow(img, interpolation="none")
-    plt.
 
   # Ignore dark area
   brightness = norm(img, axis=2)
@@ -81,27 +80,32 @@ def compute_red_ratio(img, x, y, w, h, br_threshold=0.2,
 
 if __name__ == "__main__":
   success_files = [
-    "s_1.png",
-    "s_2.png",
+    "/root/catkin_ws/src/o2as_bg_ratio/images/20_success.png'",
+    "/root/catkin_ws/src/o2as_bg_ratio/images/27_success.png'",
+    "/root/catkin_ws/src/o2as_bg_ratio/images/37_success.png'",
+    "/root/catkin_ws/src/o2as_bg_ratio/images/3_success.png'"
   ]
 
   failure_files = [
-    "f_1.png",
-    "f_2.png",
+    "/root/catkin_ws/src/o2as_bg_ratio/images/10_failed.png'",
+    "/root/catkin_ws/src/o2as_bg_ratio/images/11_failed.png'",
+    "/root/catkin_ws/src/o2as_bg_ratio/images/12_failed.png'",
+    "/root/catkin_ws/src/o2as_bg_ratio/images/13_failed.png'",
   ]
 
   # ROI
-  x = 270
-  y = 275
-  w = 64
-  h = 32
+  x = 311
+  y = 280
+  w = 30
+  h = 27
 
   bg_ratio_s = []
   bg_ratio_f = []
 
   for i, f in enumerate(success_files):
     img = io.imread(f)
-    if i is 0:
+    if i == 0:
+      plt.figure()
       tmp = compute_red_ratio(img, x, y, w, h, vis=True)
     else:
       tmp = compute_red_ratio(img, x, y, w, h)
@@ -119,3 +123,4 @@ if __name__ == "__main__":
   data = np.vstack([np.array(bg_ratio_s), np.array(bg_ratio_f)]).T
   plt.figure()
   plt.hist(data)
+  plt.show()
