@@ -1,5 +1,5 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="assy_part_demo">
-  <xacro:include filename="$(find o2as_parts_description)/urdf/assembly_parts_macros.urdf.xacro"/>
+  <xacro:include filename="$(find o2as_new_parts_description)/urdf/assembly_parts_macros.urdf.xacro"/>
   <!-- This displays all the assembly parts in the scene for reference -->
   <xacro:property name="x_0" value="0.15"/>
   <xacro:property name="x_delta" value="0.1"/>
