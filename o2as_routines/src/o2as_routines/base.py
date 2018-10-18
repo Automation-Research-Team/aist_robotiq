@@ -1110,10 +1110,6 @@ class O2ASBaseRoutines(object):
 
     #rospy.loginfo("============ Adjusting the position of the pin/shaft
     # ============")
-    self.log_to_debug_monitor("Adjust centering", "operation")
-    self.go_to_named_pose("home", "c_bot")
-    self.send_gripper_command(gripper="c_bot",command = "open")
-
     speed = .3
     acceleration = .5
     force_ur_script = False
@@ -1121,6 +1117,11 @@ class O2ASBaseRoutines(object):
       speed = 2.0
       acceleration = 1.0
       force_ur_script = True
+    
+    self.log_to_debug_monitor("Adjust centering", "operation")
+    self.go_to_named_pose("home", "b_bot", speed=speed, acceleration=acceleration, force_ur_script=force_ur_script)
+    self.go_to_named_pose("home", "c_bot", speed=speed, acceleration=acceleration, force_ur_script=force_ur_script)
+    self.send_gripper_command(gripper="c_bot",command = "open")
 
     pose1 = geometry_msgs.msg.PoseStamped()
     pose1.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
