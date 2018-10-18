@@ -1108,10 +1108,9 @@ class O2ASBaseRoutines(object):
       RealRadius = math.sqrt(math.pow(y,2)+math.pow(z,2))
 
   def adjust_tool_centering(self, tool_end_effector_link="b_bot_screw_tool_m4_tip_link", go_fast=False):
-    self.go_to_named_pose("home", "b_bot")
-  def adjust_tool_centering(self, robot_name = "b_bot", tool_end_effector_link="b_bot_screw_tool_m4_tip_link", go_fast=False):
+    rospy.logwarn("THIS IS UNTESTED!!")
     rospy.loginfo("============ Adjusting the position of the pin/shaft ============")
-    self.go_to_named_pose("home", robot_name)
+    self.go_to_named_pose("screw_ready", "b_bot")
     self.send_gripper_command(gripper="c_bot",command = "open")
 
     speed = .3

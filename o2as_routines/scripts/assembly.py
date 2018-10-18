@@ -1258,7 +1258,6 @@ class AssemblyClass(O2ASBaseRoutines):
     self.do_change_tool_action("c_bot", equip=False, screw_size=66)
 
     self.confirm_to_proceed("Move b_bot back home")
-    # Move b_bot back
     b_bot_retreat = geometry_msgs.msg.PoseStamped()
     b_bot_retreat.header.frame_id = "assembled_assy_part_14_screw_head"
     b_bot_retreat.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
