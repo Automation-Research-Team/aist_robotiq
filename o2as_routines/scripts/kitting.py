@@ -128,13 +128,13 @@ class KittingClass(O2ASBaseRoutines):
     ### First, set up internal parameters
     ### Then, read order file and create the list to iterate through
 
-    # Used for validating grasp poses
-    self.bin_1_width = .04
-    self.bin_1_length = .04
-    self.bin_2_width = .08
-    self.bin_2_length = .04
-    self.bin_3_width = .10
-    self.bin_3_length = .07
+    # Used for validating grasp poses. This measures only the inside borders of the bin.
+    self.bin_1_width = .11
+    self.bin_1_length = .11
+    self.bin_2_width = .16
+    self.bin_2_length = .09
+    self.bin_3_width = .20
+    self.bin_3_length = .16
     
     self.initial_phoxi_image_recorded = False
     self.max_candidates_from_phoxi = 3
@@ -961,12 +961,14 @@ class KittingClass(O2ASBaseRoutines):
       rospy.loginfo("Applying position for inclined bin")
       if "bin1" in item.bin_name:
         if item.bin_is_inclined == "left":
-          pick_pose.pose.position.y = -.034
+          pick_pose.pose.position.y = -.035
         elif item.bin_is_inclined == "right":
-          pick_pose.pose.position.y = .034
+          pick_pose.pose.position.y = .035
       else: # Does not work because the width values are not strictly true (but safe for the regular random pick)
         pick_pose.pose.position.y = bin_width/2-.01  
       pick_pose.pose.position.z = .01
+      if "precision_gripper" in item.ee_to_use:
+        pick_pose.pose.position.z = self.precision_gripper_pick_heights["part_"+str(item.part_id)]
       if item.part_id in [9, 16, 17,18]:
         pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
       if item.part_id in [16, 17,18]:
@@ -1100,8 +1102,8 @@ class KittingClass(O2ASBaseRoutines):
       bin_width = self.bin_3_length
 
     safe_pose = copy.deepcopy(pick_pose)
-    safe_pose.pose.position.x = clamp(pick_pose.pose.position.x, -bin_length/2, bin_length/2)
-    safe_pose.pose.position.y = clamp(pick_pose.pose.position.y, -bin_width/2, bin_width/2)
+    safe_pose.pose.position.x = clamp(pick_pose.pose.position.x, -bin_length/2 - .02, bin_length/2 - .02)
+    safe_pose.pose.position.y = clamp(pick_pose.pose.position.y, -bin_width/2 - .02, bin_width/2 - .02)
     safe_pose.pose.position.z = clamp(pick_pose.pose.position.z, 0, 0.1)
 
     if safe_pose.pose.position.x != pick_pose.pose.position.x or safe_pose.pose.position.y != pick_pose.pose.position.y:
@@ -1265,6 +1267,12 @@ class KittingClass(O2ASBaseRoutines):
         self.log_to_debug_monitor("Picking pose result from realsense", "subtask")
       else:
         self.log_to_debug_monitor("Picking random pose", "subtask")
+
+      if "precision_gripper" in item.ee_to_use:
+        pose_above_bin = copy.deepcopy(pick_pose)
+        pose_above_bin.pose.position.z += .05
+        self.go_to_pose_goal("a_bot", pose_above_bin, speed=speed_fast, move_lin=True)
+
       item_picked = self.pick(robot_name, pick_pose, 0.0, speed_fast = speed_fast, speed_slow = .05, 
                         gripper_command=gripper_command, approach_height = approach_height)
       if not self.use_real_robot:
@@ -1388,7 +1396,7 @@ class KittingClass(O2ASBaseRoutines):
       self.treat_screws_in_feeders()
       self.attempt_item(item, 3)
     # self.do_change_tool_action("b_bot", equip=False, screw_size=50)   # 50 = suction tool
-    self.go_to_named_pose("back", "b_bot")
+    self.go_to_named_pose("suction_ready_back", "b_bot")
     rospy.loginfo("==== Done with first suction pass")
 
     self.treat_screws_in_feeders()
