@@ -70,6 +70,11 @@ class AssemblyClass(O2ASBaseRoutines):
 
     self.magic_a_bot_pick_offset_tray_2_x = -.004
 
+    # For picking screws from the tray
+    self.picked_screw_counter = dict()
+    self.picked_screw_counter["m3"] = 1
+    self.picked_screw_counter["m4"] = 1
+
     self.speed_fast = 1.0
     self.speed_fastest = 3.0
     self.acc_fastest = 3.0
@@ -185,6 +190,16 @@ class AssemblyClass(O2ASBaseRoutines):
     goal.robot_name = robot_name
     goal.tool_name = "screw_tool"
     goal.screw_size = screw_size
+
+    if screw_number == "auto":
+      screw_number = self.picked_screw_counter["m"+str(screw_size)]
+      self.picked_screw_counter["m"+str(screw_size)] += 1
+      if screw_size == 4 and self.picked_screw_counter["m"+str(screw_size)] > 9:
+        rospy.logwarn("There are no more screws to pick!")
+      if screw_size == 3 and self.picked_screw_counter["m"+str(screw_size)] > 6:
+        rospy.logwarn("There are no more screws to pick!")
+      if rospy.is_shutdown():
+        return False
     pscrew = geometry_msgs.msg.PoseStamped()
     pscrew.header.frame_id = "tray_2_screw_m" + str(screw_size) + "_" + str(screw_number)
     pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi*11/12, 0, 0))
@@ -197,6 +212,20 @@ class AssemblyClass(O2ASBaseRoutines):
     self.pick_client.wait_for_result()
     rospy.loginfo("Getting result")
     self.pick_client.get_result()
+
+    # Check the pick success again
+    rospy.sleep(.5)
+    screw_picked = self.screw_is_suctioned["m"+str(screw_size)]
+    print(screw_picked)
+    if screw_picked:
+      rospy.loginfo("Successfully picked the screw. Exiting pick_screw.")
+      return True
+    else:
+      rospy.logwarn("The screw must have gotten stuck in the tray! Retrying the next screw!")
+      return self.pick_screw(robot_name, screw_size, screw_number="auto")
+    if not self.use_real_robot:
+      rospy.loginfo("Pretending the screw is picked, because this is simulation.")
+      return True
 
 
   def place_plate_3_and_screw(self, place_plate_only=False, screw_first_only=False, reverse_placement_only=False):
@@ -257,7 +286,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.log_to_debug_monitor("Pickup screw", "operation")
     if not place_plate_only:
       self.go_to_named_pose("screw_pick_ready", "b_bot")
-      self.pick_screw("b_bot", screw_size=4, screw_number=1)
+      self.pick_screw("b_bot", screw_size=4, screw_number="auto")
       self.go_to_named_pose("screw_ready_back", "b_bot")
 
     if not screw_first_only:
@@ -314,7 +343,7 @@ class AssemblyClass(O2ASBaseRoutines):
       # Pick up screw from tray
       self.log_to_debug_monitor("Pick up screw from tray", "operation")
       self.go_to_named_pose("screw_pick_ready", "b_bot")
-      self.pick_screw("b_bot", screw_size=4, screw_number=2)
+      self.pick_screw("b_bot", screw_size=4, screw_number="auto")
       self.go_to_named_pose("screw_pick_ready", "b_bot")
       
       self.go_to_named_pose("screw_plate_ready", "b_bot")
@@ -339,7 +368,7 @@ class AssemblyClass(O2ASBaseRoutines):
     # Pick first screw with b_bot
     self.log_to_debug_monitor("Pick up screw with b_bot", "operation")
     self.go_to_named_pose("screw_pick_ready", "b_bot")
-    self.pick_screw("b_bot", screw_size=4, screw_number=3)
+    self.pick_screw("b_bot", screw_size=4, screw_number="auto")
     self.go_to_named_pose("screw_pick_ready", "b_bot")
     self.go_to_named_pose("screw_ready_back", "b_bot")
 
@@ -401,7 +430,7 @@ class AssemblyClass(O2ASBaseRoutines):
     # Pick second screw
     self.log_to_debug_monitor("Pick up second screw", "operation")
     self.go_to_named_pose("screw_pick_ready", "b_bot")
-    self.pick_screw("b_bot", screw_size=4, screw_number=4)
+    self.pick_screw("b_bot", screw_size=4, screw_number="auto")
     self.go_to_named_pose("screw_pick_ready", "b_bot")
     self.go_to_named_pose("screw_ready_back", "b_bot")
 
@@ -962,7 +991,7 @@ class AssemblyClass(O2ASBaseRoutines):
     pose1.pose.orientation.z = 0    
     
     self.go_to_named_pose("screw_pick_ready", "b_bot")
-    self.pick_screw("b_bot", screw_size=3, screw_number=screw_hole_number) # I commented this because this takes a long time in simulation
+    self.pick_screw("b_bot", screw_size=3, screw_number="auto") # I commented this because this takes a long time in simulation
     self.go_to_named_pose("screw_ready", "b_bot")
     self.go_to_pose_goal("b_bot", pose1, speed=0.3,end_effector_link="b_bot_screw_tool_m3_tip_link", move_lin=True)
     # todo: add fastening action
@@ -1313,9 +1342,17 @@ if __name__ == '__main__':
         assy.go_to_named_pose("back", "a_bot", speed=3.0, acceleration=3.0, force_ur_script=assy.use_real_robot)
         assy.go_to_named_pose("home", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=assy.use_real_robot)
         assy.go_to_named_pose("home", "b_bot", speed=3.0, acceleration=3.0, force_ur_script=assy.use_real_robot)
+      if i == '30':
+        assy.go_to_named_pose("screw_pick_ready", "b_bot")
+        assy.pick_screw("b_bot", screw_size=3, screw_number="auto")
+        assy.go_to_named_pose("screw_pick_ready", "b_bot")
       elif i in ['31', '32', '33', '34', '35', '36']:
         assy.go_to_named_pose("screw_pick_ready", "b_bot")
         assy.pick_screw("b_bot", screw_size=3, screw_number=int(i)-30)
+        assy.go_to_named_pose("screw_pick_ready", "b_bot")
+      if i == '40':
+        assy.go_to_named_pose("screw_pick_ready", "b_bot")
+        assy.pick_screw("b_bot", screw_size=4, screw_number="auto")
         assy.go_to_named_pose("screw_pick_ready", "b_bot")
       elif i in ['41', '42', '43', '44', '45', '46', '47', '48', '49']:
         assy.go_to_named_pose("screw_pick_ready", "b_bot")

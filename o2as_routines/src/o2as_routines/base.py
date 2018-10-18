@@ -165,6 +165,9 @@ class O2ASBaseRoutines(object):
     self.sub_run_mode_ = rospy.Subscriber("/run_mode", Bool, self.run_mode_callback)
     self.sub_pause_mode_ = rospy.Subscriber("/pause_mode", Bool, self.pause_mode_callback)
     self.sub_test_mode_ = rospy.Subscriber("/test_mode", Bool, self.test_mode_callback)
+    self.sub_suction_m4_ = rospy.Subscriber("/screw_tool_m4/screw_suctioned", Bool, self.suction_m4_callback)
+    self.sub_suction_m3_ = rospy.Subscriber("/screw_tool_m3/screw_suctioned", Bool, self.suction_m3_callback)
+    self.screw_is_suctioned = dict()
     self.reduced_mode_speed_limit = .25
     
     # self.my_mutex = threading.Lock()
@@ -201,6 +204,10 @@ class O2ASBaseRoutines(object):
     # self.my_mutex.acquire()
     self.test_mode_ = msg.data
     # self.my_mutex.release()
+  def suction_m4_callback(self, msg):
+    self.screw_is_suctioned["m4"] = msg.data
+  def suction_m3_callback(self, msg):
+    self.screw_is_suctioned["m3"] = msg.data
 
   def publish_marker(self, pose_stamped, marker_type):
     req = o2as_msgs.srv.publishMarkerRequest()
