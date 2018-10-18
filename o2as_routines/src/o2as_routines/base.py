@@ -1090,6 +1090,53 @@ class O2ASBaseRoutines(object):
       r = r + radius_inc_set
       RealRadius = math.sqrt(math.pow(y,2)+math.pow(z,2))
 
+  def adjust_tool_centering(self, robot_name = "b_bot", tool_end_effector_link="b_bot_screw_tool_m4_tip_link", go_fast=False):
+    rospy.loginfo("============ Adjusting the position of the pin/shaft ============")
+    self.go_to_named_pose("home", robot_name)
+    self.send_gripper_command(gripper="c_bot",command = "open")
+
+    speed = .3
+    acceleration = .5
+    force_ur_script = False
+    if go_fast:
+      speed = 1.5
+      acceleration = 1.5
+      force_ur_script = True
+
+    b_pose = geometry_msgs.msg.PoseStamped()
+    b_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+    b_pose.header.frame_id = "workspace_center"
+    b_pose.pose.position.z = 0.4
+    self.go_to_pose_goal("b_bot", b_pose, end_effector_link=tool_end_effector_link, speed=speed, acceleration=acceleration, move_lin = True)
+
+    rospy.sleep(1)
+
+    c_pose = geometry_msgs.msg.PoseStamped()
+    c_pose.header.frame_id = "b_bot_robotiq_85_tip_link"
+    c_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2,0,pi/2))
+    c_pose.pose.position.z = 0.0  # MAGIC NUMBER!
+    c_pose.pose.position.y = 0.025
+    c_pose.pose.position.x = 0.015
+    self.go_to_pose_goal("c_bot", c_pose, speed=speed, acceleration=acceleration, move_lin = True)
+
+    # self.send_gripper_command(gripper="b_bot",command = "close", velocity = .015, force = 1.0)
+    self.send_gripper_command(gripper="c_bot",command = "close")
+    rospy.sleep(.5)
+    self.send_gripper_command(gripper="b_bot",command = .01)
+    rospy.sleep(.5)
+
+    c_wiggle_1 = copy.deepcopy(c_pose)
+    c_wiggle_1.pose.position.z += 0.002
+    c_wiggle_2 = copy.deepcopy(c_pose)
+    c_wiggle_2.pose.position.z -= 0.002
+    self.go_to_pose_goal("c_bot", c_wiggle_1, speed=.03, acceleration=acceleration, move_lin = True)
+    self.go_to_pose_goal("c_bot", c_wiggle_2, speed=.03, acceleration=acceleration, move_lin = True)
+    self.go_to_pose_goal("c_bot", c_pose, speed=.03, acceleration=acceleration, move_lin = True)
+    self.send_gripper_command(gripper="c_bot",command = "open")
+
+    self.go_to_named_pose("home", "c_bot", speed=speed, acceleration=acceleration, force_ur_script=force_ur_script)
+    return
+
   def adjust_centering(self, robot_name = "b_bot", go_fast=False):
 
     #rospy.loginfo("============ Adjusting the position of the pin/shaft
