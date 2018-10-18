@@ -184,7 +184,7 @@ class KittingClass(O2ASBaseRoutines):
     self.precision_gripper_pick_heights = {
         "part_9" : 0.00, 
         "part_10": 0.00, 
-        "part_14": 0.014, 
+        "part_14": 0.00, 
         "part_15": 0.00, 
         "part_16": 0.00,
         "part_17": 0.00, 
@@ -335,9 +335,9 @@ class KittingClass(O2ASBaseRoutines):
       "part_11" : False, # output pulley
       "part_12" : False, # idler spacer
       "part_13" : False, # idler pulley/bearing
-      "part_14" : "left", # idler pin
+      "part_14" : False, # idler pin
       "part_15" : False, # m6 nut
-      "part_16" : "right", # m6 washer
+      "part_16" : False, # m6 washer
       "part_17" : False, # m4 screw
       "part_18" : False} # m3 screw
 
