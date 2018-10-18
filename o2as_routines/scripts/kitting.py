@@ -492,7 +492,7 @@ class KittingClass(O2ASBaseRoutines):
       return False
     rospy.loginfo("Pushing into the bin.")
     if self.use_real_robot:
-      self.do_linear_push("b_bot", force=5.0, wait=True, direction="Y+", max_approach_distance=.092)
+      self.do_linear_push("b_bot", force=5.0, wait=True, direction="Y+", max_approach_distance=.092, forward_speed=.04)
       self.confirm_to_proceed("Went to the target. Press enter")
       # The max_approach_distance parameter affects how far the robot goes into the bin
       res = True
@@ -1139,32 +1139,33 @@ class KittingClass(O2ASBaseRoutines):
       self.initial_phoxi_image_recorded = True
       take_new_image = True
     
-    if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
-      if self.grasp_candidates[item.part_id]["pick_was_successful"]:
-        # If the pick was successful for an item, the scene has changed, so a new image needs to be taken
-        rospy.loginfo("Resetting grasp candidates for item " + str(item.part_id))
-        self.grasp_candidates[item.part_id]["pick_was_successful"] = False
-        self.grasp_candidates[item.part_id]["vision_was_attempted"] = False
-        self.grasp_candidates[item.part_id]["positions"] = []
-        take_new_image = True
-      if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":    
-        self.go_to_named_pose("suction_ready_back", "b_bot")
-      elif "precision_gripper" in item.ee_to_use:
-        self.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
-      if not self.grasp_candidates[item.part_id]["vision_was_attempted"]:
-        # Vision is only attempted once, unless it succeeds in picking
-        phoxi_res = self.get_grasp_candidates_from_phoxi(item, take_new_image)
-        # self.grasp_candidates[item.part_id]["vision_was_attempted"] = True
-        #### Line above is uncommented to force new vision result every time
-        take_new_image = False
-        if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":    
-          self.go_to_named_pose("suction_pick_ready", "b_bot")
-        elif "precision_gripper" in item.ee_to_use:
-          self.go_to_named_pose("kitting_pick_ready", "a_bot")
-        if phoxi_res:
-          self.grasp_candidates[item.part_id]["positions"].extend(phoxi_res)
-          rospy.loginfo("self.grasp_candidates: ")
-          rospy.loginfo(self.grasp_candidates[item.part_id]["positions"][0])
+    ### Vision is skipped
+    # if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
+    #   if self.grasp_candidates[item.part_id]["pick_was_successful"]:
+    #     # If the pick was successful for an item, the scene has changed, so a new image needs to be taken
+    #     rospy.loginfo("Resetting grasp candidates for item " + str(item.part_id))
+    #     self.grasp_candidates[item.part_id]["pick_was_successful"] = False
+    #     self.grasp_candidates[item.part_id]["vision_was_attempted"] = False
+    #     self.grasp_candidates[item.part_id]["positions"] = []
+    #     take_new_image = True
+    #   if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":    
+    #     self.go_to_named_pose("suction_ready_back", "b_bot")
+    #   elif "precision_gripper" in item.ee_to_use:
+    #     self.go_to_named_pose("taskboard_intermediate_pose", "a_bot")
+    #   if not self.grasp_candidates[item.part_id]["vision_was_attempted"]:
+    #     # Vision is only attempted once, unless it succeeds in picking
+    #     phoxi_res = self.get_grasp_candidates_from_phoxi(item, take_new_image)
+    #     # self.grasp_candidates[item.part_id]["vision_was_attempted"] = True
+    #     #### Line above is uncommented to force new vision result every time
+    #     take_new_image = False
+    #     if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":    
+    #       self.go_to_named_pose("suction_pick_ready", "b_bot")
+    #     elif "precision_gripper" in item.ee_to_use:
+    #       self.go_to_named_pose("kitting_pick_ready", "a_bot")
+    #     if phoxi_res:
+    #       self.grasp_candidates[item.part_id]["positions"].extend(phoxi_res)
+    #       rospy.loginfo("self.grasp_candidates: ")
+    #       rospy.loginfo(self.grasp_candidates[item.part_id]["positions"][0])
 
     # Go to preparatory pose
     if item.ee_to_use == "suction":
@@ -1206,6 +1207,7 @@ class KittingClass(O2ASBaseRoutines):
         #   pick_pose.pose.position.z -= .025 # MAGIC NUMBER (to compensate for the Realsense calibration)
 
       if item.ee_to_use == "suction" or item.ee_to_use == "robotiq_gripper":
+        # for test run: if grasp_candidates is 0, item picking is skipped.
         while self.grasp_candidates[item.part_id]["positions"]:
           pick_pose = self.grasp_candidates[item.part_id]["positions"].pop(0)
           rospy.logwarn("ADDING A MAGIC ADJUSTMENT TO THE PHOXI RESULT")
@@ -1252,7 +1254,7 @@ class KittingClass(O2ASBaseRoutines):
         gripper_command = "suction"
         approach_height = 0.1 - pick_pose.pose.position.z
         speed_slow = 0.05
-        speed_fast = 0.1
+        speed_fast = 1.0
       elif item.ee_to_use == "robotiq_gripper":
         approach_height = .15
         speed_slow = .2
@@ -1400,8 +1402,6 @@ class KittingClass(O2ASBaseRoutines):
     self.go_to_named_pose("suction_ready_back", "b_bot")
     rospy.loginfo("==== Done with first suction pass")
 
-    self.treat_screws_in_feeders()
-
     for item in self.precision_gripper_items:
       self.log_to_debug_monitor("Pick and place item no. " + str(item.part_id), "subtask")
       if rospy.is_shutdown():
@@ -1410,6 +1410,8 @@ class KittingClass(O2ASBaseRoutines):
       self.attempt_item(item, 3)
     self.go_to_named_pose("back", "a_bot")
     rospy.loginfo("==== Done with first precision gripper pass")
+
+    self.treat_screws_in_feeders()
 
     self.treat_screws_in_feeders()
 

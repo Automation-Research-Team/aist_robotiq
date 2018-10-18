@@ -727,7 +727,7 @@ class O2ASBaseRoutines(object):
       wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
     return res.success
   
-  def do_linear_push(self, robot_name, force, wait = False, direction = "Z+", max_approach_distance=0.1):
+  def do_linear_push(self, robot_name, force, wait = False, direction = "Z+", max_approach_distance=0.1, forward_speed=0.0):
     if not self.use_real_robot:
       return True
     # Directly calls the UR service rather than the action of the skill_server
@@ -736,6 +736,7 @@ class O2ASBaseRoutines(object):
     req.max_force = force
     req.force_direction = direction
     req.max_approach_distance = max_approach_distance
+    req.forward_speed = forward_speed
     req.program_id = "linear_push"
     res = self.urscript_client.call(req)
     if wait:
