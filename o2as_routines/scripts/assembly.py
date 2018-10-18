@@ -987,7 +987,7 @@ class AssemblyClass(O2ASBaseRoutines):
     pose0.pose.position.x = 0
     pose0.pose.position.z = 0.07
     self.send_gripper_command(gripper="b_bot",command = 0.05)
-    self.pick_joshua("b_bot", pick_pose, grasp_height=0.05, speed_fast=1.0, speed_slow=.1, gripper_command="", approach_height=.05)
+    self.pick_joshua("b_bot", pose0, grasp_height=0.05, speed_fast=1.0, speed_slow=.1, gripper_command="", approach_height=.05)
     self.send_gripper_command(gripper="b_bot",command = "close")
     self.go_to_named_pose("home", "b_bot")
     return
@@ -1030,7 +1030,7 @@ class AssemblyClass(O2ASBaseRoutines):
     pose0.pose.position.x = 0
     pose0.pose.position.z = 0.07
     self.send_gripper_command(gripper="b_bot",command = 0.04)
-    self.pick_joshua("b_bot", pick_pose, grasp_height=0.02, speed_fast=1.0, speed_slow=.1, gripper_command="", approach_height=.05)
+    self.pick_joshua("b_bot", pose0, grasp_height=0.02, speed_fast=1.0, speed_slow=.1, gripper_command="", approach_height=.05)
     self.send_gripper_command(gripper="b_bot",command = "close")
     self.go_to_named_pose("home", "b_bot")
       
@@ -1102,7 +1102,7 @@ class AssemblyClass(O2ASBaseRoutines):
     pose0.pose.position.x = 0
     pose0.pose.position.z = 0.07
     self.send_gripper_command(gripper="b_bot",command = 0.05)
-    self.pick_joshua("b_bot", pick_pose, grasp_height=0.05, speed_fast=1.0, speed_slow=.1, gripper_command="", approach_height=.05)
+    self.pick_joshua("b_bot", pose0, grasp_height=0.05, speed_fast=1.0, speed_slow=.1, gripper_command="", approach_height=.05)
     self.send_gripper_command(gripper="b_bot",command = "close")
     self.go_to_named_pose("home", "b_bot")
     return
