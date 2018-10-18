@@ -10,7 +10,7 @@ rp = rospkg.RosPack()
 print("D1")
 
 # Read in the files
-filenames = os.listdir(os.path.join(rp.get_path("o2as_parts_description"), "meshes"))
+filenames = os.listdir(os.path.join(rp.get_path("o2as_new_parts_description"), "meshes"))
 filenames_strip1 = []
 filenames_no_ext = []
 for name in filenames:
@@ -19,26 +19,26 @@ for name in filenames_strip1:
     filenames_no_ext.append(os.path.splitext(name)[0])        # This removes the .vhacd from ".vhacd.dae" files
 partnames = list(sorted(set(filenames_no_ext)))   # Removes duplicates and sorts (because sets do not allow duplicate entries)
 print("D1")
-out_dir = os.path.join(rp.get_path("o2as_parts_description"), "urdf/generated")
+out_dir = os.path.join(rp.get_path("o2as_new_parts_description"), "urdf/generated")
 
 # Read in the templates
-extra_joint_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "extra_frames.csv")
-macro_template_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "macro_template.urdf.xacro")
+extra_joint_filename = os.path.join(rp.get_path("o2as_new_parts_description"), "urdf/templates", "extra_frames.csv")
+macro_template_filename = os.path.join(rp.get_path("o2as_new_parts_description"), "urdf/templates", "macro_template.urdf.xacro")
 f = open(macro_template_filename,'r')
 macro_template = f.read()
 f.close()
 
-macro_frames_only_template_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "macro_frames_only_template.urdf.xacro")
+macro_frames_only_template_filename = os.path.join(rp.get_path("o2as_new_parts_description"), "urdf/templates", "macro_frames_only_template.urdf.xacro")
 f = open(macro_frames_only_template_filename,'r')
 macro_frames_only_template = f.read()
 f.close()
 
-non_macro_template_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "non_macro_template.urdf.xacro")
+non_macro_template_filename = os.path.join(rp.get_path("o2as_new_parts_description"), "urdf/templates", "non_macro_template.urdf.xacro")
 f = open(non_macro_template_filename,'r')
 non_macro_template = f.read()
 f.close()
 
-spawn_template_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "spawn_template.urdf")
+spawn_template_filename = os.path.join(rp.get_path("o2as_new_parts_description"), "urdf/templates", "spawn_template.urdf")
 f = open(spawn_template_filename,'r')
 spawn_template = f.read()
 f.close()

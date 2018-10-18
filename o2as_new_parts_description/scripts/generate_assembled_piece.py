@@ -10,7 +10,7 @@ from math import pi
 rp = rospkg.RosPack()
 
 # Read in the assembly matings
-mating_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "frames_to_mate.csv")
+mating_filename = os.path.join(rp.get_path("o2as_new_parts_description"), "urdf/templates", "frames_to_mate.csv")
 frame_matings = []
 with open(mating_filename, 'r') as f:
     reader = csv.reader(f)
@@ -24,7 +24,7 @@ with open(mating_filename, 'r') as f:
                 row_stripped.append(el.strip())       # Removes whitespaces
             frame_matings.append(row_stripped)
 
-frames_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "extra_frames.csv")
+frames_filename = os.path.join(rp.get_path("o2as_new_parts_description"), "urdf/templates", "extra_frames.csv")
 extra_frames = []
 with open(frames_filename, 'r') as f:
     reader = csv.reader(f)
@@ -38,13 +38,13 @@ with open(frames_filename, 'r') as f:
                 row_stripped.append(el.strip())       # Removes whitespaces
             extra_frames.append(row_stripped)
 
-template_filename = os.path.join(rp.get_path("o2as_parts_description"), "urdf/templates", "assembly_template.urdf.xacro")
+template_filename = os.path.join(rp.get_path("o2as_new_parts_description"), "urdf/templates", "assembly_template.urdf.xacro")
 f = open(template_filename,'r')
 template_front = f.read()
 f.close()
 
 # Write the file containing connections between the frames in the instructions
-out_dir = os.path.join(rp.get_path("o2as_parts_description"), "urdf/generated")
+out_dir = os.path.join(rp.get_path("o2as_new_parts_description"), "urdf/generated")
 outfile = open(os.path.join(out_dir, "full_assembly.urdf.xacro"),'w+')
 content = template_front
 
@@ -135,6 +135,6 @@ content = content.replace("xacro:assy_part_", "xacro:assy_part_frames_only_")
 content = content.replace("name=\"full_assembly\"", "name=\"full_assembly_frames_only\"")
 content = content.replace("assembly_parts_macros.urdf.xacro", "assembly_parts_frame_macros.urdf.xacro")
 
-out_dir2 = os.path.join(rp.get_path("o2as_parts_description"), "urdf/generated")
+out_dir2 = os.path.join(rp.get_path("o2as_new_parts_description"), "urdf/generated")
 outfile2 = open(os.path.join(out_dir2, "full_assembly_frames_only.urdf.xacro"),'w+')
 outfile2.write(content)
