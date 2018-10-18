@@ -1185,7 +1185,10 @@ class O2ASBaseRoutines(object):
     
   def start_task_timer(self):
     """Reset timer in debug monitor"""
-    _ = self.resetTimerForDebugMonitor_client.call()
+    try:
+      _ = self.resetTimerForDebugMonitor_client.call()
+    except:
+      pass
 
   def log_to_debug_monitor(self, text, category):
     """Send message to rospy.loginfo and debug monitor.
