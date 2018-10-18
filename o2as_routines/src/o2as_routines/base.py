@@ -625,6 +625,8 @@ class O2ASBaseRoutines(object):
                         starting_offset = 0.05, max_insertion_distance=0.01, 
                         max_approach_distance = .1, max_force = 5,
                         max_radius = .001, radius_increment = .0001):
+    rospy.logerr("This is probably not implemented. Aborting")
+    return
     goal = o2as_msgs.msg.insertGoal()
     goal.active_robot_name = active_robot_name
     goal.passive_robot_name = passive_robot_name
@@ -691,7 +693,7 @@ class O2ASBaseRoutines(object):
       self.suction_client.wait_for_result(rospy.Duration(2.0))
     return self.suction_client.get_result()
 
-  def do_nut_fasten_action(self, item_name, wait = False):
+  def do_nut_fasten_action(self, item_name, wait = True):
     if not self.use_real_robot:
       return True
     goal = o2as_msgs.msg.ToolsCommandGoal()
@@ -707,27 +709,33 @@ class O2ASBaseRoutines(object):
       self.nut_peg_tool_client.wait_for_result(rospy.Duration.from_sec(30.0))
     return self.nut_peg_tool_client.get_result()
 
-  def do_insertion(self, robot_name, max_insertion_distance=0.01, 
-                        max_approach_distance = .1, max_force = 5,
-                        max_radius = .001, radius_increment = .0001,
-                        wait = False):
+  def do_insertion(self, robot_name, max_insertion_distance= 0.0, 
+                        max_approach_distance = 0.0, max_force = .0,
+                        max_radius = 0.0, radius_increment = .0,
+                        wait = True, horizontal=False):
     if not self.use_real_robot:
       return True
     # Directly calls the UR service rather than the action of the skill_server
     req = o2as_msgs.srv.sendScriptToURRequest()
     req.robot_name = robot_name
     req.program_id = "insertion"
-    # req.max_insertion_distance = max_insertion_distance
-    # req.max_approach_distance = max_approach_distance
-    # req.max_force = max_force
-    # req.max_radius = max_radius
-    # req.radius_increment = radius_increment
+    if horizontal:
+      req.program_id = "horizontal_insertion"
+
+    #  Original defaults:
+    # max_approach_distance = .1, max_force = 5,
+    #                     max_radius = .001, radius_increment = .0001,
+    req.max_insertion_distance = max_insertion_distance
+    req.max_approach_distance = max_approach_distance
+    req.max_force = max_force
+    req.max_radius = max_radius
+    req.radius_increment = radius_increment
     res = self.urscript_client.call(req)
     if wait:
       wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
     return res.success
   
-  def do_linear_push(self, robot_name, force, wait = False, direction = "Z+", max_approach_distance=0.1, forward_speed=0.0):
+  def do_linear_push(self, robot_name, force, wait = True, direction = "Z+", max_approach_distance=0.1, forward_speed=0.0):
     if not self.use_real_robot:
       return True
     # Directly calls the UR service rather than the action of the skill_server

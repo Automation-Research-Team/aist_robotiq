@@ -599,6 +599,54 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, "c_bot", speed=0.3, go_home=True)
     return
   
+  def assembly_tray_a_bot_calibration_for_competition(self):
+    rospy.loginfo("============ Going to parts tray positions with a_bot============")
+    self.go_to_named_pose("back", "c_bot")
+    self.go_to_named_pose("home", "b_bot")
+    poses = []
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.header.frame_id = "tray_2_partition_8_pickup_1"
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.position.z = .01
+
+    for i in range(6):
+      poses.append(copy.deepcopy(pose0))
+
+    poses[1].header.frame_id = "tray_2_partition_8_pickup_2"
+    poses[2].header.frame_id = "tray_2_partition_5_pickup"
+    poses[3].header.frame_id = "tray_2_partition_4_pickup"
+    poses[4].header.frame_id = "tray_2_partition_3_pickup"
+    poses[5].header.frame_id = "tray_1_partition_5_pickup"
+    poses[5].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+    
+    self.cycle_through_calibration_poses(poses, "c_bot", speed=0.3, go_home=True)
+    return
+  
+  def assembly_tray_b_bot_calibration_for_competition(self):
+    rospy.loginfo("not correctly implemented.")
+    return
+    rospy.loginfo("============ Going to parts tray positions with a_bot============")
+    self.go_to_named_pose("back", "c_bot")
+    self.go_to_named_pose("home", "a_bot")
+    poses = []
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.header.frame_id = "tray_2_partition_8_pickup_1"
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.position.z = .01
+
+    for i in range(6):
+      poses.append(copy.deepcopy(pose0))
+
+    poses[1].header.frame_id = "tray_2_partition_8_pickup_2"
+    poses[2].header.frame_id = "tray_2_partition_5_pickup"
+    poses[3].header.frame_id = "tray_2_partition_4_pickup"
+    poses[4].header.frame_id = "tray_2_partition_3_pickup"
+    poses[5].header.frame_id = "tray_1_partition_5_pickup"
+    poses[5].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+    
+    self.cycle_through_calibration_poses(poses, "c_bot", speed=0.3, go_home=True)
+    return
+
   def kitting_tray_test(self, robot_name = "a_bot", end_effector_link = ""):
     rospy.loginfo("============ Moving " + robot_name + "around the tray " + ", eef_link is " + end_effector_link + " ============")
     if robot_name=="b_bot":
@@ -1317,6 +1365,7 @@ if __name__ == '__main__':
       rospy.loginfo("81: Go to tray partitions using b_bot")
       rospy.loginfo("82: Go to screws on the tray using b_bot")
       rospy.loginfo("83: Go to screws on the tray using a_bot")
+      rospy.loginfo("9991: Assembly calibration for competition")
       rospy.loginfo("x: Exit ")
       rospy.loginfo(" ")
       r = raw_input()
@@ -1601,6 +1650,8 @@ if __name__ == '__main__':
         c.screw_action_test(robot_name="b_bot")
       elif r == '692':
         c.screw_action_test(robot_name="c_bot")
+      elif r == "9991":
+        c.assembly_tray_a_bot_calibration_for_competition()
       elif r == 'x':
         break
       else:

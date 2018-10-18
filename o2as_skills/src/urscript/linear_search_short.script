@@ -213,6 +213,9 @@ textmsg("disable external sensor")
             pos_offset_setting = p[0,0,max_distance,0,0,0]
         elif (direction == "Z-") or (direction == "z-"):
             pos_offset_setting = p[0,0,max_distance * -1,0,0,0]
+        elif (direction == "c_bot_diagonal"):
+            theta=40
+            pos_offset_setting = p[0,max_distance *cos(d2r(theta)),max_distance*sin(d2r(theta)),0,0,0]
         else:
             popup("direction parameter must be X+, X-, Y+, Y-, Z+ or Z-","ERROR rq_find")
             halt
