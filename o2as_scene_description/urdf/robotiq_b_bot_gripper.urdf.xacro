@@ -31,7 +31,7 @@
     <joint name="${prefix}robotiq_85_screw_tool_m4_tip_joint" type="fixed">
       <parent link="${prefix}robotiq_85_tip_link"/>
       <child link="${prefix}screw_tool_m4_tip_link"/>
-      <origin rpy="0.0 ${pi/2} 0.0" xyz="${dx} 0.0 -0.146 "/>
+      <origin rpy="0.0 ${pi/2} 0.0" xyz="${dx-.002} 0.0 -0.146 "/>
     </joint>
     <link name="${prefix}screw_tool_m4_tip_link"/>
 
