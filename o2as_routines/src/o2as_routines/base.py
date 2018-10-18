@@ -765,7 +765,7 @@ class O2ASBaseRoutines(object):
 
   ################ ----- Gripper interfaces
   
-  def send_gripper_command(self, gripper, command, this_action_grasps_an_object = False, force = 5.0, velocity = .1):
+  def send_gripper_command(self, gripper, command, this_action_grasps_an_object = False, force = 5.0, velocity = .1, wait=True):
     if not self.use_real_robot:
       return True
     if gripper == "precision_gripper_outer" or gripper == "precision_gripper_inner" or gripper == "a_bot":
@@ -805,7 +805,8 @@ class O2ASBaseRoutines(object):
     action_client.send_goal(goal)
     rospy.sleep(.5)
     rospy.loginfo("Sending command " + str(command) + " to gripper: " + gripper)
-    action_client.wait_for_result(rospy.Duration(6.0))  # Default wait time: 6 s
+    if wait or robot_name == "b_bot":  # b_bot uses the UR to close the gripper; it has to wait.
+      action_client.wait_for_result(rospy.Duration(6.0))  # Default wait time: 6 s
     result = action_client.get_result()
     rospy.loginfo(result)
     return 
