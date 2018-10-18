@@ -61,7 +61,7 @@ class CalibrationClass(O2ASBaseRoutines):
     super(CalibrationClass, self).__init__()
     
     self.a_bot_downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
-    self.bin_names = ["bin2_1", "bin2_2", "bin1_3", "bin1_2", "bin1_1", "bin1_4", "bin1_5", "bin1_7", "bin1_8", "bin1_6"]
+    self.bin_names = ["bin3_1", "bin2_4", "bin2_3", "bin2_2", "bin2_1", "bin1_2", "bin1_1", "bin1_4", "bin1_5", "bin1_3" ]
 
     self.bridge = CvBridge()
     self._img = Image()

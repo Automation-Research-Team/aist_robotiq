@@ -1,31 +1,31 @@
-﻿Set,No.,Part ID,Part name,Note
-1,1,5,05_MBRFA30-2P6,
-1,2,8,08_SSFHRT10-75-M4-FC55-G20,
-1,3,9,09_EDCS10,
-1,4,10,10_CLBPS10_17_4,
-1,5,12,12_CLBUS6-9-9.5,
-1,6,14,14_BGPSL6-9-L30-F7,
-1,7,15,15_SLBNR6,
-1,8,16,16_SPWF6,
-1,9,17,17_SCB4-10,
-1,10,18,18_SCB3-10,
-2,1,16,16_SPWF6,
-2,2,16,16_SPWF6,
-2,3,15,15_SLBNR6,
-2,4,12,12_CLBUS6-9-9.5,
-2,5,17,17_SCB4-10,
-2,6,17,17_SCB4-10,
-2,7,17,17_SCB4-10,
-2,8,10,10_CLBPS10_17_4,
-2,9,9,09_EDCS10,
-2,10,14,14_BGPSL6-9-L30-F7,
-3,1,18,18_SCB3-10,
-3,2,18,18_SCB3-10,
-3,3,18,18_SCB3-10,
-3,4,8,08_SSFHRT10-75-M4-FC55-G20,
-3,5,5,05_MBRFA30-2P6,
-3,6,14,14_BGPSL6-9-L30-F7,
-3,7,9,09_EDCS10,
-3,8,10,10_CLBPS10_17_4,
-3,9,12,12_CLBUS6-9-9.5,
-3,10,15,15_SLBNR6,
+﻿Set,No.,ID,Name,Note
+1,1,6,06_MBT4-400,Polyurethane round belt iwelded joint product) P.D. 4mm L=400mm
+1,2,12,12_CLBUS6-9-9.5,Bearing Spacers For Inner Ring (tension pulley)
+1,3,7,07_SBARB6200ZZ_30,Bearings with Housings (Double Bearings)
+1,4,5,05_MBRFA30-2-P6,Pulley for Round Belt (4mm) - Setscrew P.D. 30mm
+1,5,18,18_SCB3-10,10mm M3 Socket Head Cap Screw  (metric coarse thread)
+1,6,4,04_37D-GEARMOTOR-50-70,Geared motor (Gear ratio 1:70)
+1,7,9,09_EDCS10,End Cap for Shaft
+1,8,16,16_SPWF6,M6 Flat Washer  (Fixing for idler shaft)
+1,9,8,08_SSFHRT10-75-M4-FC55-G20,Drive shaft (Straight) D10h7
+1,10,16,16_SPWF6,M6 Flat Washer  (Fixing for idler shaft)
+2,1,6,06_MBT4-400,Polyurethane round belt iwelded joint product) P.D. 4mm L=400mm
+2,2,8,08_SSFHRT10-75-M4-FC55-G20,Drive shaft (Straight) D10h7
+2,3,12,12_CLBUS6-9-9.5,Bearing Spacers For Inner Ring (tension pulley)
+2,4,9,09_EDCS10,End Cap for Shaft
+2,5,7,07_SBARB6200ZZ_30,Bearings with Housings (Double Bearings)
+2,6,18,18_SCB3-10,10mm M3 Socket Head Cap Screw  (metric coarse thread)
+2,7,16,16_SPWF6,M6 Flat Washer  (Fixing for idler shaft)
+2,8,4,04_37D-GEARMOTOR-50-70,Geared motor (Gear ratio 1:70)
+2,9,17,17_SCB4-10,10mm M4 Socket Head Cap Screw  (metric coarse thread)
+2,10,5,05_MBRFA30-2-P6,Pulley for Round Belt (4mm) - Setscrew P.D. 30mm
+3,1,12,12_CLBUS6-9-9.5,Bearing Spacers For Inner Ring (tension pulley)
+3,2,16,16_SPWF6,M6 Flat Washer  (Fixing for idler shaft)
+3,3,18,18_SCB3-10,10mm M3 Socket Head Cap Screw  (metric coarse thread)
+3,4,6,06_MBT4-400,Polyurethane round belt iwelded joint product) P.D. 4mm L=400mm
+3,5,5,05_MBRFA30-2-P6,Pulley for Round Belt (4mm) - Setscrew P.D. 30mm
+3,6,17,17_SCB4-10,10mm M4 Socket Head Cap Screw  (metric coarse thread)
+3,7,4,04_37D-GEARMOTOR-50-70,Geared motor (Gear ratio 1:70)
+3,8,17,17_SCB4-10,10mm M4 Socket Head Cap Screw  (metric coarse thread)
+3,9,7,07_SBARB6200ZZ_30,Bearings with Housings (Double Bearings)
+3,10,8,08_SSFHRT10-75-M4-FC55-G20,Drive shaft (Straight) D10h7
