@@ -1106,20 +1106,20 @@ class O2ASBaseRoutines(object):
       r = r + radius_inc_set
       RealRadius = math.sqrt(math.pow(y,2)+math.pow(z,2))
 
-  def adjust_centering(self, robot_name = "b_bot", go_fast=False):
+  def adjust_centering(self, go_fast=False):
 
     #rospy.loginfo("============ Adjusting the position of the pin/shaft
     # ============")
     self.log_to_debug_monitor("Adjust centering", "operation")
-    self.go_to_named_pose("home", robot_name)
+    self.go_to_named_pose("home", "c_bot")
     self.send_gripper_command(gripper="c_bot",command = "open")
 
     speed = .3
     acceleration = .5
     force_ur_script = False
     if go_fast:
-      speed = 3.0
-      acceleration = 1.5
+      speed = 2.0
+      acceleration = 1.0
       force_ur_script = True
 
     pose1 = geometry_msgs.msg.PoseStamped()

@@ -479,7 +479,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.pick_joshua("b_bot", pick_pose, grasp_height=0.015, speed_fast=self.speed_fast, speed_slow=.1, gripper_command="", approach_height=.05)
 
     if do_centering:
-      self.adjust_centering("b_bot")
+      self.adjust_centering(go_fast=True)
 
     place_pose = geometry_msgs.msg.PoseStamped()
     place_pose.header.frame_id = "retainer_pin_holder_link"
@@ -881,7 +881,7 @@ class AssemblyClass(O2ASBaseRoutines):
     nut_approach.header.frame_id = "assembled_assy_part_14_screw_tip"
     nut_approach.pose.position.x = 0.01
     # nut_approach.pose.position.y = -0.0051578  # MAGIC NUMBER
-    nut_approach.pose.position.z = 0.005 # MAGIC NUMBER (upwards)
+    nut_approach.pose.position.z = 0.007 # MAGIC NUMBER (upwards, to allow for inclined pin)
     # nut_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, pi, 0))  # This goes sideways, but the gripper hits the base plate
     nut_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi*180/180, pi, 0))
 
@@ -911,6 +911,7 @@ class AssemblyClass(O2ASBaseRoutines):
   def pick_retainer_pin_and_place_in_holder(self):
     self.log_to_debug_monitor("Pick retainer pin and place in holder", "operation")
     self.confirm_to_proceed("pick_retainer_pin")
+    self.send_gripper_command("b_bot", "open")
     self.pick_retainer_pin()
     self.confirm_to_proceed("adjust_centering")
     self.adjust_centering()
@@ -1266,7 +1267,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.log_to_debug_monitor(text="Assembly", category="task")
 
     # To prepare subtask E
-    self.pick_retainer_pin_from_tray_and_place_in_holder(do_centering=False)
+    self.pick_retainer_pin_from_tray_and_place_in_holder(do_centering=True)
     self.confirm_to_proceed("press enter to proceed")
     self.go_to_named_pose("home", "b_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
 
