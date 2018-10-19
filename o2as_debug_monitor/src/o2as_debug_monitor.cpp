@@ -28,6 +28,8 @@ using KittingSetIdCallback =
   boost::function<void(const std_msgs::Int32::ConstPtr&)>;
 using SuctionSuccessCallback =
   boost::function<void(const std_msgs::Bool::ConstPtr&)>;
+using RunModeCallback =
+  boost::function<void(const std_msgs::Bool::ConstPtr&)>;
 using RosParam = XmlRpc::XmlRpcValue;
 
 const int font_face_ = cv::FONT_HERSHEY_DUPLEX;
@@ -323,6 +325,32 @@ SuctionSuccessCallback getCallbackForSuctionSuccess(
   };
 }
 
+RunModeCallback getCallbackForRunMode(
+  cv::Rect rect, XmlRpc::XmlRpcValue &params, cv::Mat& monitor_
+)
+{
+  // Values captured by closure
+  int offset_x = params["offset"][0];
+  int offset_y = params["offset"][1];
+  std::string str = params["str"];
+  ROS_INFO("%s", str.c_str());
+  // int r = params["color"][0];
+  // int g = params["color"][1];
+  // int b = params["color"][2];
+
+  // This function returns callback function
+  return [=](const std_msgs::Bool::ConstPtr& msg) {
+    // ROS_INFO("Debug monitor timer reset");
+    if (msg->data)
+    {
+      check_window();
+      clear_buffer_rect(rect, monitor_);
+      putText(monitor_, rect.x + offset_x, rect.y + offset_y, str);
+      cv::imshow("Monitor", monitor_);
+      cv::waitKey(3);
+    }
+  };
+}
 
 void timerCallback(const ros::TimerEvent&)
 {
@@ -375,6 +403,12 @@ namespace o2as_debug_monitor
                     suction_success_topics);
         setSuctionSuccessCallbacks(nh, suction_success_topics);
 
+        // Set callback function for run mode topics
+        XmlRpc::XmlRpcValue run_mode_topics;
+        nh.getParam("o2as_debug_monitor/run_mode_topics",
+                    run_mode_topics);
+        setRunModeCallbacks(nh, run_mode_topics);
+
         // Timer callback to keep this instance alive
         timer = nh.createTimer(ros::Duration(1), timerCallback);
       }
@@ -396,6 +430,7 @@ namespace o2as_debug_monitor
       std::vector<StringCallback> stringcbs_;
       std::vector<KittingSetIdCallback> setidcbs_;
       std::vector<SuctionSuccessCallback> sscbs_;
+      std::vector<RunModeCallback> rmcbs_;
 
       ros::Timer timer;
 
@@ -537,6 +572,26 @@ namespace o2as_debug_monitor
                                          suction_success_str)
           );
           n_sub_rs_.push_back(nh.subscribe(topic_name, 1, sscbs_.back()));
+        }
+      }
+
+      void setRunModeCallbacks(ros::NodeHandle &nh,
+                               XmlRpc::XmlRpcValue topics)
+      {
+        for (auto it = topics.begin(); it != topics.end(); it++)
+        {
+          auto params = topics[it->first];
+          std::string topic_name = params["topic_name"];
+          ROS_INFO("%s", topic_name.c_str());
+
+          // Area in the debug monitor
+          cv::Rect rect = getRect(params);
+
+          // Create, set and keep callback function
+          rmcbs_.push_back(
+            getCallbackForRunMode(rect, params, monitor_)
+          );
+          n_sub_rs_.push_back(nh.subscribe(topic_name, 1, rmcbs_.back()));
         }
       }
   };
