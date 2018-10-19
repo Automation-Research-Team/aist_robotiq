@@ -1311,6 +1311,47 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_named_pose("back", "b_bot")
     self.go_to_named_pose("home", "a_bot")
 
+  def handover_and_place_idle_pulley_in_a_safe_place(self):
+    self.go_to_named_pose("pulley_push_ready_high", "c_bot",speed=self.speed_fast, acceleration=self.acc_fast)
+    self.send_gripper_command(gripper="c_bot",command = "open", wait=False)
+
+    b_bot_face_up_near_c = geometry_msgs.msg.PoseStamped()
+    b_bot_face_up_near_c.header.frame_id = "intermediate_assy_part_14_screw_head"
+    b_bot_face_up_near_c.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, 0, 0))
+    b_bot_face_up_near_c.pose.position.x = 0.
+    b_bot_face_up_near_c.pose.position.y = 0.4
+    b_bot_face_up_near_c.pose.position.z = -0.4
+    self.go_to_pose_goal("b_bot", b_bot_face_up_near_c,speed=self.speed_fast, acceleration=self.acc_fast, move_lin = True)
+
+    c_above_pin = geometry_msgs.msg.PoseStamped()
+    c_above_pin.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, 0, -pi/2))
+    c_above_pin.header.frame_id = "b_bot_robotiq_85_tip_link"
+    c_above_pin.pose.position.x = 0.04
+    c_above_pin.pose.position.y = -0.015
+    
+    c_pick = copy.deepcopy(c_above_pin)
+    c_pick.pose.position.x = 0.005
+
+    self.go_to_pose_goal("c_bot", c_above_pin,speed=self.speed_fast, acceleration=self.acc_fast, move_lin = True)
+    self.confirm_to_proceed("Is the gripper positioned right for pushing down?")
+    self.go_to_pose_goal("c_bot", c_pick, speed=0.01, move_lin = True)
+    self.confirm_to_proceed("Is the push deep enough?")
+    # self.go_to_pose_goal("c_bot", c_above_pin,speed=self.speed_fast, acceleration=self.acc_fast, move_lin = True)
+    # self.confirm_to_proceed("Did the push work? c_bot will move away")
+
+    self.send_gripper_command(gripper="c_bot",command = "close", wait=True)
+    rospy.sleep(0.5)
+    self.send_gripper_command(gripper="b_bot",command = "open", wait=True)
+    self.send_gripper_command(gripper="b_bot",command = "open", wait=True)
+    b_bot_face_sky_pose = copy.deepcopy(b_bot_face_up_near_c)
+    b_bot_face_sky_pose.pose.position.y = 0.0
+    self.go_to_pose_goal("b_bot", b_bot_face_sky_pose,speed=self.speed_fast, acceleration=self.acc_fast, move_lin = True)
+
+    place_joint_pose = [2.053341865539551, -1.5687945524798792, 2.4622883796691895, -2.4646843115436, 1.5664359331130981, -0.486424748097555]
+    # TODO: Move to joints and open gripper
+    self.go_to_named_pose("back", "c_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+
+
   def place_end_cap(self):
     rospy.logerr("function place_end_cap is not implemented.aborting")
     return
@@ -1433,8 +1474,15 @@ class AssemblyClass(O2ASBaseRoutines):
     self.pick_retainer_pin_washer(1)
     self.confirm_to_proceed("place_retainer_pin_washer_1")
     self.place_retainer_pin_washer_1()
-    self.confirm_to_proceed("pick_retainer_pin_nut")
-    self.pick_retainer_pin_nut()
+    # self.confirm_to_proceed("pick_retainer_pin_nut")
+    # self.pick_retainer_pin_nut()
+    # nut_picked = self.check_pick()
+
+    self.handover_and_place_idle_pulley_in_a_safe_place()
+    return
+    # if not nut_picked:
+    #   self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+    #   self.handover_and_place_idle_pulley_in_a_safe_place()
     self.confirm_to_proceed("place_retainer_pin_nut_and_pick_from_table")
     self.place_retainer_pin_nut_and_pick_from_table()
     self.confirm_to_proceed("pick_retainer_pin_washer")

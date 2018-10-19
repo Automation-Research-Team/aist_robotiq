@@ -846,23 +846,7 @@ class KittingClass(O2ASBaseRoutines):
           self.img_inner_pick_pub.publish(self.current_img_w_goal)
         except CvBridgeError as e:
           print(e)
-
-  def check_pick(self, part_id):
-    #Go to check position
-    self.go_to_named_pose("check_precision_gripper_success", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-    rospy.sleep(0.2)
-
-    #check pick
-    goal = o2as_msgs.msg.innerPickDetectionGoal()
-    #goal.part_id = part_id
-    self.inner_pick_detection_client.send_goal(goal)
-    self.inner_pick_detection_client.wait_for_result(rospy.Duration(1.5))
-    result = self.inner_pick_detection_client.get_result()
-    rospy.loginfo("Result from check_pick:")
-    rospy.loginfo(result)
-
-    return result.picked
-
+          
   def place_screw_in_tray(self, screw_size, set_number, hole_number):
     """
     Places a screw in a tray. A screw needs to be carried by the screw tool!

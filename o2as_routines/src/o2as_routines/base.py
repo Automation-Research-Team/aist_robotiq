@@ -1280,6 +1280,23 @@ class O2ASBaseRoutines(object):
       _ = self.resetTimerForDebugMonitor_client.call()
     except:
       pass
+  
+  def check_pick(self, part_id):
+    #Go to check position
+    self.go_to_named_pose("check_precision_gripper_success", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    rospy.sleep(0.2)
+
+    #check pick
+    goal = o2as_msgs.msg.innerPickDetectionGoal()
+    #goal.part_id = part_id
+    self.inner_pick_detection_client.send_goal(goal)
+    self.inner_pick_detection_client.wait_for_result(rospy.Duration(1.5))
+    result = self.inner_pick_detection_client.get_result()
+    rospy.loginfo("Result from check_pick:")
+    rospy.loginfo(result)
+
+    return result.picked
+
 
   def log_to_debug_monitor(self, text, category):
     """Send message to rospy.loginfo and debug monitor.
