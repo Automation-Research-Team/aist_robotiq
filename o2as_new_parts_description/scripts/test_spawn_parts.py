@@ -14,7 +14,7 @@ urdf_files = {
     7: urdf_dir + '/07_SBARB6200ZZ_30.urdf',
     8: urdf_dir + '/08_SSFHRT10-75-M4-FC40-G35.urdf',
     9: urdf_dir + '/09_EDCS10.urdf',
-    10: urdf_dir + '/10_CLBPS10_17_4.urdf',
+    10: urdf_dir + '/10_CLBPS10-17-3.urdf',
     11: urdf_dir + '/11_MBRAC60-2-10.urdf',
     12: urdf_dir + '/12_CLBUS6-9-9.5.urdf',
     13: urdf_dir + '/13_MBGA30-2.urdf',

@@ -8,7 +8,7 @@
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/07_SBARB6200ZZ_30_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/08_SSFHRT10-75-M4-FC40-G35_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/09_EDCS10_macro.urdf.xacro"/>
-  <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/10_CLBPS10_17_4_macro.urdf.xacro"/>
+  <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/10_CLBPS10-17-3_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/11_MBRAC60-2-10_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/12_CLBUS6-9-9.5_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/13_MBGA30-2_macro.urdf.xacro"/>
