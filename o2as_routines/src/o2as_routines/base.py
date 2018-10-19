@@ -378,7 +378,7 @@ class O2ASBaseRoutines(object):
         req.velocity = speed
         req.acceleration = acceleration
         res = self.urscript_client.call(req)
-        wait_for_UR_program("/" + group_name +"_controller", rospy.Duration.from_sec(10.0))
+        wait_for_UR_program("/" + group_name +"_controller", rospy.Duration.from_sec(20.0))
         return res.success
 
     self.groups[group_name].set_joint_value_target(joint_pose_goal)

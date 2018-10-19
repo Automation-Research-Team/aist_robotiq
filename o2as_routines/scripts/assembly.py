@@ -227,6 +227,35 @@ class AssemblyClass(O2ASBaseRoutines):
       rospy.loginfo("Pretending the screw is picked, because this is simulation.")
       return True
 
+  def recenter_plate_3_on_base_plate(self):
+    # c_bot_current_pose is the pose that the gripper is at while it is holding the tool
+    # TODO!
+    # 1. Touch with c_bot, move the plate to b_bot slightly, then release and go back to recenter pose
+
+    # b_bot has to be at screw_plate_ready
+
+    intermediate_b_pose_1 = [-0.8361886183368128, -2.2852214018451136, 2.259411334991455, -0.0760872999774378, -0.7902057806598108, -3.0508933703051966]
+    intermediate_b_pose_2 = [-0.8362606207477015, -2.28513747850527, 2.2593636512756348, 0.04411733150482178, 0.9355313181877136, -3.050953213368551]
+
+    intermediate_b_pose_3 = [0.6182253360748291, -2.1539786497699183, 2.2336840629577637, -0.057644192372457326, 2.235957145690918, -3.1786747614489954]
+    before_plate_c_push = [1.61185884475708, -1.8193615118609827, 2.4348952770233154, -0.5505860487567347, 2.7279043197631836, -3.0912707487689417]
+    plate_c_pushed = [1.6026942729949951, -1.6820648352252405, 2.330822467803955, -0.5862844626056116, 2.719031572341919, -3.0942660013781946]
+
+    self.move_joints("b_bot", intermediate_b_pose_1)
+    self.move_joints("b_bot", intermediate_b_pose_2)
+    self.move_joints("b_bot", intermediate_b_pose_3)
+    self.move_joints("b_bot", before_plate_c_push)
+    self.confirm_to_proceed("move to push plate c?")
+    self.send_gripper_command("c_bot", "close")
+
+    self.move_joints("b_bot", plate_c_pushed)
+    self.move_joints("b_bot", before_plate_c_push)
+    self.move_joints("b_bot", intermediate_b_pose_3)
+    self.move_joints("b_bot", intermediate_b_pose_2)
+    self.move_joints("b_bot", intermediate_b_pose_1)
+    self.go_to_named_pose("screw_plate_ready", "b_bot")
+    return
+
 
   def place_plate_3_and_screw(self, place_plate_only=False, screw_first_only=False, reverse_placement_only=False):
     # Requires the screw tool to be equipped on b_bot
@@ -234,6 +263,11 @@ class AssemblyClass(O2ASBaseRoutines):
     self.go_to_named_pose("back", "c_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
     self.go_to_named_pose("back", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
     self.go_to_named_pose("screw_ready_back", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+
+    # Success check variables
+    first_screw_fastened = False
+    second_screw_fastened = False
+    plate_correctly_fastened = False
 
     if not screw_first_only:
       rospy.loginfo("Going to pick up plate_3 with c_bot")
@@ -1173,9 +1207,9 @@ class AssemblyClass(O2ASBaseRoutines):
     # rospy.loginfo("======== SUBTASK G (large plate) ========")
     self.log_to_debug_monitor("SUBTASK G (large plate)", "subtask")
     self.log_to_debug_monitor("=== Subtask G (large plate) start ===", "operation")
-    self.place_plate_3_and_screw()
-    rospy.loginfo("todo: add screw picking and fastening sequence for the second screw")
+    success = self.place_plate_3_and_screw()
     self.log_to_debug_monitor("=== Subtask G (large plate) end ===", "operation")
+    return success
 
   def subtask_a(self):
     # ============= SUBTASK A (picking and inserting and fastening the motor shaft) =======================
@@ -1337,6 +1371,8 @@ if __name__ == '__main__':
       rospy.loginfo("Enter 41-49 to pick screw m4 from tray with b_bot (number 1-9).")
       rospy.loginfo("Enter 50 to face the sky with b_bot.")
       rospy.loginfo("Enter 51 to test the pulley push motion.")
+      rospy.loginfo("Enter 52 to go to screw_plate_ready.")
+      rospy.loginfo("Enter 53 to recenter plate 3 (as if after a screw failure).")
       rospy.loginfo("Enter 91-94 for subtasks (Large plate, motor plate, idler pin, motor).")
       rospy.loginfo("Enter 95-98 for subtasks (motor pulley, bearing+shaft, clamp pulley, belt).")
       rospy.loginfo("Enter 911 to place plate 3 (but don't screw)")
@@ -1389,6 +1425,10 @@ if __name__ == '__main__':
         assy.rotate_hand_facing_the_sky()
       elif i == '51':
         assy.push_idler_pulley_down()
+      elif i == '52':
+        assy.go_to_named_pose("screw_plate_ready", "b_bot")
+      elif i == '53':
+        assy.recenter_plate_3_on_base_plate()
       elif i == '91':
         assy.subtask_g()  # Large plate
       elif i == '911':
