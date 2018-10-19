@@ -278,9 +278,9 @@ class AssemblyClass(O2ASBaseRoutines):
   def place_plate_3_and_screw(self, place_plate_only=False, screw_first_only=False, reverse_placement_only=False):
     # Requires the screw tool to be equipped on b_bot
     self.log_to_debug_monitor("Home position", "operation")
-    self.go_to_named_pose("back", "c_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-    self.go_to_named_pose("back", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-    self.go_to_named_pose("screw_ready_back", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("back", "c_bot", speed=3.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("back", "a_bot", speed=3.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("screw_ready_back", "b_bot", speed=3.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
     # Success check variables
     first_screw_fastened = False
@@ -410,14 +410,14 @@ class AssemblyClass(O2ASBaseRoutines):
       rospy.sleep(1.0)
 
       self.move_lin("c_bot", c_move_away, .3)
-      self.go_to_named_pose("back", "c_bot")
+      self.go_to_named_pose("back", "c_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
       ##### ========== Pick another screw with b_bot and fix the plate
       # Pick up screw from tray
       self.log_to_debug_monitor("Pick up screw from tray", "operation")
-      self.go_to_named_pose("screw_pick_ready", "b_bot")
+      self.go_to_named_pose("screw_pick_ready", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       self.pick_screw("b_bot", screw_size=4, screw_number="auto")
-      self.go_to_named_pose("screw_pick_ready", "b_bot")
+      self.go_to_named_pose("screw_pick_ready", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
       
       self.go_to_named_pose("screw_plate_ready", "b_bot")
       pscrew_2 = geometry_msgs.msg.PoseStamped()
@@ -429,21 +429,21 @@ class AssemblyClass(O2ASBaseRoutines):
       pscrew_2_approach.pose.position.x -= .03
       self.move_lin("b_bot", pscrew_2_approach, speed=0.1, acceleration=0.1, end_effector_link="b_bot_screw_tool_m4_tip_link")
       self.do_screw_action("b_bot", pscrew_2, screw_height = 0.002, screw_size = 4)
-      self.go_to_named_pose("screw_plate_ready", "b_bot")
+      self.go_to_named_pose("screw_plate_ready", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
   def place_plate_2_and_screw(self):
     # Requires the tool to be equipped on b_bot
     rospy.loginfo("Going to pick up screw with b_bot")
-    self.go_to_named_pose("back", "c_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-    self.go_to_named_pose("back", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("back", "c_bot", speed=3.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("back", "a_bot", speed=3.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
     ### --- b_bot
     # Pick first screw with b_bot
     self.log_to_debug_monitor("Pick up screw with b_bot", "operation")
-    self.go_to_named_pose("screw_pick_ready", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("screw_pick_ready", "b_bot", speed=3.0, acceleration=2.0, force_ur_script=self.use_real_robot)
     self.pick_screw("b_bot", screw_size=4, screw_number="auto")
-    self.go_to_named_pose("screw_pick_ready", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-    self.go_to_named_pose("screw_ready_back", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("screw_pick_ready", "b_bot", speed=3.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("screw_ready_back", "b_bot", speed=3.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
     ### --- c_bot
     # Place plate and hold
@@ -766,8 +766,8 @@ class AssemblyClass(O2ASBaseRoutines):
     return
 
   def place_retainer_pin_nut_and_pick_from_table(self):
-    self.go_to_named_pose("home", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
-    self.go_to_named_pose("screw_ready", "c_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("home", "a_bot", speed=3.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("screw_ready", "c_bot", speed=3.0, acceleration=2.0, force_ur_script=self.use_real_robot)
     nut_intermediate_a_bot = geometry_msgs.msg.PoseStamped()
     nut_intermediate_a_bot.header.frame_id = "workspace_center"
     nut_intermediate_a_bot.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
@@ -780,13 +780,13 @@ class AssemblyClass(O2ASBaseRoutines):
     self.place_joshua("a_bot",nut_intermediate_a_bot,0.0,
                                 speed_fast = self.speed_fast, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
                                 approach_height = 0.05,approach_axis="z", lift_up_after_place = True)
-    self.go_to_named_pose("back", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("back", "a_bot", speed=3.0, acceleration=2.0, force_ur_script=self.use_real_robot)
 
-    self.go_to_named_pose("tool_pick_ready", "c_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("tool_pick_ready", "c_bot", speed=3.0, acceleration=2.0, force_ur_script=self.use_real_robot)
     self.do_change_tool_action("c_bot", equip=True, screw_size=66)
-    self.go_to_named_pose("screw_ready", "c_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("screw_ready", "c_bot", speed=3.0, acceleration=2.0, force_ur_script=self.use_real_robot)
     self.pick_nut_from_table("c_bot", object_pose=nut_intermediate_c_bot,end_effector_link="c_bot_nut_tool_m6_tip_link")
-    self.go_to_named_pose("screw_ready", "c_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("screw_ready", "c_bot", speed=3.0, acceleration=2.0, force_ur_script=self.use_real_robot)
     return
 
   def pick_retainer_pin_washer(self, number=1):
