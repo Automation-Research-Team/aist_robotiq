@@ -9,7 +9,7 @@ from geometry_msgs.msg import *
 urdf_dir = '/root/catkin_ws/src/o2as_new_parts_description/urdf/gereated/'
 urdf_files = {
     4: urdf_dir + '/04_37D-GEARMOTOR-50-70.urdf',
-    5: urdf_dir + '/05_MBRFA30-2-P6.urdf',
+    5: urdf_dir + '/05_PTPA30P2M060-A-P6.urdf',
     6: urdf_dir + '/06_MBT4-400.urdf',
     7: urdf_dir + '/07_SBARB6200ZZ_30.urdf',
     8: urdf_dir + '/08_KZAF1075NA4WA55GA20AA0.urdf',
