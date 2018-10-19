@@ -4,7 +4,7 @@
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/03-PANEL2_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/04_37D-GEARMOTOR-50-70_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/05_PTPA30P2M060-A-P6_macro.urdf.xacro"/>
-  <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/06_MBT4-400_macro.urdf.xacro"/>
+  <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/06_PTBN340P2M-060_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/07_SBARB6200ZZ_30_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/08_KZAF1075NA4WA55GA20AA0_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/09_EDCS10_macro.urdf.xacro"/>
