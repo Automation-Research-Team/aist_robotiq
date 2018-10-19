@@ -49,7 +49,7 @@ class URScriptRelay():
             if not req.max_force:
                 req.max_force = 10.0
             if not req.force_direction:
-                req.force_direction = "Y-"
+                req.force_direction = "Y"
             if not req.forward_speed:
                 req.forward_speed = .02
             if not req.max_approach_distance:
@@ -58,8 +58,8 @@ class URScriptRelay():
                 req.max_radius = .007            # in m
             if not req.radius_increment:
                 req.radius_increment = 0.0003    # in m
-            if not req.peck_mode:
-                req.peck_mode = True
+            # if not req.peck_mode:
+            #     req.peck_mode = True
             if not req.max_insertion_distance:
                 req.max_insertion_distance = 0.035
             if not req.impedance_mass:

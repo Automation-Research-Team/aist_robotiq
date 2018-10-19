@@ -125,7 +125,12 @@ class O2ASBaseRoutines(object):
     self.force_ur_script_linear_motion = False
     self.force_moveit_linear_motion = False
 
-    self.competition_mode = True   # Disables confirmation dialogs etc. for full automatic motion
+    self.competition_mode = False   # Disables confirmation dialogs etc. for full automatic motion
+
+    self.speed_fast = 1.5
+    self.speed_fastest = 3.0
+    self.acc_fast = 1.0
+    self.acc_fastest = 2.0
 
     moveit_commander.roscpp_initialize(sys.argv)
     rospy.init_node('assembly_example', anonymous=False)
@@ -491,6 +496,11 @@ class O2ASBaseRoutines(object):
     #initial gripper_setup
     #rospy.loginfo("Going above object to pick")
     self.log_to_debug_monitor("Pick", "operation")
+    if speed_fast > 1.0:
+      acceleration=speed_fast
+    else:
+      acceleration=1.0
+
     rospy.logdebug("Approach height 0: " + str(approach_height))
     object_pose.pose.position.z += approach_height
     rospy.logdebug("Height 1: " + str(object_pose.pose.position.z))
@@ -1059,7 +1069,7 @@ class O2ASBaseRoutines(object):
     self.log_to_debug_monitor("Pick nut from table", "operation")
     approach_pose = copy.deepcopy(object_pose)
     approach_pose.pose.position.z += .02  # Assumes that z points upward
-    self.go_to_pose_goal(robot_name, approach_pose, speed=1.0, move_lin = True, end_effector_link=end_effector_link)
+    self.go_to_pose_goal(robot_name, approach_pose, speed=self.speed_fast, move_lin = True, end_effector_link=end_effector_link)
     if robot_name == "c_bot":
       spiral_axis = "YZ"
       push_direction = "c_bot_diagonal"
@@ -1163,8 +1173,8 @@ class O2ASBaseRoutines(object):
     acceleration = .5
     force_ur_script = False
     if go_fast:
-      speed = 2.0
-      acceleration = 1.0
+      speed = 3.0
+      acceleration = 2.0
       force_ur_script = True
     
     self.log_to_debug_monitor("Adjust centering", "operation")
@@ -1186,10 +1196,11 @@ class O2ASBaseRoutines(object):
     pose2.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2,0,pi/2))
     pose2.pose.position.z = -0.0015   # MAGIC NUMBER (positive moves c_bot towards ??)
     pose2.pose.position.y = 0.025 # (positive moves c_bot forward)
+    if handover_motor_to_c_bot:
+      pose2.pose.position.y = 0.015 
     pose2.pose.position.x = 0.015 # (positive moves c_bot down)
     self.go_to_pose_goal("c_bot", pose2, speed=speed, acceleration=acceleration, move_lin = True)
 
-    # self.send_gripper_command(gripper="b_bot",command = "close", velocity = .015, force = 1.0)
     self.send_gripper_command(gripper="c_bot",command = "close")
     rospy.sleep(.5)
     self.send_gripper_command(gripper="b_bot",command = .03)
@@ -1197,7 +1208,6 @@ class O2ASBaseRoutines(object):
     self.send_gripper_command(gripper="b_bot",command = "open")
     rospy.sleep(1.0)
     self.send_gripper_command(gripper="b_bot",command = "close", velocity = .05, force = 1.0)
-    # self.send_gripper_command(gripper="b_bot",command = "close", force = 1.0)
     rospy.sleep(.5)
     self.send_gripper_command(gripper="c_bot",command = "open")
     rospy.sleep(.5)
@@ -1212,18 +1222,26 @@ class O2ASBaseRoutines(object):
     self.send_gripper_command(gripper="c_bot",command = "close")
     rospy.sleep(1)
     self.send_gripper_command(gripper="b_bot",command = "open")
-    # self.send_gripper_command(gripper="b_bot",command = .03)
     rospy.sleep(2)
-    self.send_gripper_command(gripper="b_bot",command = "close")
-    rospy.sleep(2)
-    self.send_gripper_command(gripper="c_bot",command = "open")
-    rospy.sleep(1)
-
-    if handover_motor_to_c_bot:
-      self.send_gripper_command(gripper="c_bot",command = "close")
+    if not handover_motor_to_c_bot:
+      self.send_gripper_command(gripper="b_bot",command = "close")
       rospy.sleep(2)
-      self.send_gripper_command(gripper="b_bot",command = "open")
+      self.send_gripper_command(gripper="c_bot",command = "open")
       rospy.sleep(1)
+
+    ### This can be used to adjust the rotation during the handover
+    # if handover_motor_to_c_bot:
+    #   pose4 = geometry_msgs.msg.PoseStamped()
+    #   pose4.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi*(90+5)/180, 0, 0))
+    #   pose4.header.frame_id = "b_bot_robotiq_85_tip_link"
+    #   pose4.pose.position.y = 0
+    #   pose4.pose.position.z = 0
+    #   self.confirm_to_proceed("How much extra rotation from here?")
+    #   self.go_to_pose_goal("b_bot", pose4, speed=speed, acceleration=acceleration, move_lin = True)
+    #   self.send_gripper_command(gripper="c_bot",command = "close")
+    #   rospy.sleep(2)
+    #   self.send_gripper_command(gripper="b_bot",command = "open")
+    #   rospy.sleep(1)
 
     self.go_to_named_pose("home", "c_bot", speed=speed, acceleration=acceleration, force_ur_script=force_ur_script)
     return
