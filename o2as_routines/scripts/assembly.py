@@ -387,8 +387,12 @@ class AssemblyClass(O2ASBaseRoutines):
       pscrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(-pi/4, 0,0))
       pscrew_approach = copy.deepcopy(pscrew)
       pscrew_approach.pose.position.y -= .02
-      pscrew_approach.pose.position.x -= .03
+      pscrew_approach.pose.position.x -= .01
       self.move_lin("b_bot", pscrew_approach, speed=0.1, acceleration=0.1, end_effector_link="b_bot_screw_tool_m4_tip_link")
+
+      pscrew_approach_2 = copy.deepcopy(pscrew_approach) # This one moves horizontally to the plate so the approach happens from the side, not the top
+      pscrew_approach_2.pose.position.y += .02
+      self.move_lin("b_bot", pscrew_approach_2, speed=0.1, acceleration=0.1, end_effector_link="b_bot_screw_tool_m4_tip_link")
       self.do_screw_action("b_bot", pscrew, screw_height = 0.002, screw_size = 4)
       self.go_to_named_pose("screw_plate_ready", "b_bot")
 
