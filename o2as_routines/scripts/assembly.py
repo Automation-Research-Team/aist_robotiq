@@ -94,7 +94,7 @@ class AssemblyClass(O2ASBaseRoutines):
   ################ ----- Routines  
   ################ 
   ################ 
-  def pick_joshua(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command="", approach_height = 0.03, end_effector_link=""):
+  def pick_joshua(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command="", approach_height = 0.03, end_effector_link="", spiral_search_for_idle_pulley=False):
     #initial gripper_setup
     rospy.loginfo("Going above object to pick")
     object_pose.pose.position.z = approach_height
@@ -117,6 +117,9 @@ class AssemblyClass(O2ASBaseRoutines):
     object_pose.pose.position.z = grasp_height
     rospy.loginfo(grasp_height)
     self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True,end_effector_link=end_effector_link, move_lin=True)
+
+    if spiral_search_for_idle_pulley:
+      self.horizontal_spiral_motion("a_bot", .002, radius_increment=.0015)
 
     # W = raw_input("waiting for the gripper")
     #gripper open
@@ -388,12 +391,15 @@ class AssemblyClass(O2ASBaseRoutines):
       self.move_lin("b_bot", pscrew_approach, speed=0.1, acceleration=0.1, end_effector_link="b_bot_screw_tool_m4_tip_link")
       self.do_screw_action("b_bot", pscrew, screw_height = 0.002, screw_size = 4)
       self.go_to_named_pose("screw_plate_ready", "b_bot")
-      if self.screw_is_suctioned["m4"]:
-        rospy.logerr("Fastening the first screw has failed! Try again after repositioning the plate")
-        self.recenter_plate_3_on_base_plate()
-      else:
-        rospy.loginfo("Assuming that the first screw was fastened")
-        first_screw_fastened = False
+
+      # if self.screw_is_suctioned["m4"]:
+      #   rospy.logerr("Fastening the first screw has failed! Try again after repositioning the plate")
+      #   self.recenter_plate_3_on_base_plate()
+      # else:
+      #   rospy.loginfo("Assuming that the first screw was fastened")
+      #   first_screw_fastened = False
+      rospy.loginfo("Pretending that the screw is fastened")
+      first_screw_fastened = True
     self.go_to_named_pose("screw_ready_back", "b_bot")
 
     if not screw_first_only:
@@ -553,7 +559,7 @@ class AssemblyClass(O2ASBaseRoutines):
     pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
     pick_pose.pose.position.z = 0.025  # MAGIC NUMBER (actually it gets ignored by pick_joshua)
 
-    self.pick_joshua("b_bot", pick_pose, grasp_height=0.015, speed_fast=self.speed_fast, speed_slow=.1, gripper_command="", approach_height=.05)
+    self.pick_joshua("b_bot", pick_pose, grasp_height=0.015, speed_fast=self.speed_fastest, speed_slow=.1, gripper_command="", approach_height=.05)
 
     if do_centering:
       self.adjust_centering(go_fast=True)
@@ -562,7 +568,7 @@ class AssemblyClass(O2ASBaseRoutines):
     place_pose.header.frame_id = "retainer_pin_holder_link"
     place_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
     
-    self.place_joshua("b_bot", place_pose, place_height=0.01, speed_fast=self.speed_fast, speed_slow=.2, gripper_command="", approach_height=.05)
+    self.place_joshua("b_bot", place_pose, place_height=0.01, speed_fast=self.speed_fastest, speed_slow=.1, gripper_command="", approach_height=.05)
     return
 
 
@@ -654,13 +660,14 @@ class AssemblyClass(O2ASBaseRoutines):
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "tray_1_partition_5_pickup"
     pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
-    pose0.pose.position.x = 0
+    pose0.pose.position.x = -.001 # MAGIC NUMBER
+    pose0.pose.position.y = -.001 # MAGIC NUMBER
     pose0.pose.position.z = 0.02
 
     self.send_gripper_command("a_bot", "close")
     self.pick_joshua("a_bot",pose0,-0.008,
                                 speed_fast = self.speed_fast, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
-                                approach_height = 0.02)
+                                approach_height = 0.02, spiral_search_for_idle_pulley=True)
 
     self.go_to_named_pose("home", robot_name, speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
     return
@@ -819,7 +826,7 @@ class AssemblyClass(O2ASBaseRoutines):
     intermediate_retainer_pin_tip.header.frame_id = "intermediate_assy_part_14_screw_tip"
     intermediate_retainer_pin_tip.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi, 0))
     intermediate_retainer_pin_tip.pose.position.y = self.idler_pin_handover_offset_y
-    intermediate_retainer_pin_tip.pose.position.z += self.idler_pin_handover_offset_z+0.0008 #another magic number
+    intermediate_retainer_pin_tip.pose.position.z += self.idler_pin_handover_offset_z+0.002 # MAGIC NUMBER (positive towards a_bot)
 
     self.place_joshua("a_bot",intermediate_retainer_pin_tip,self.idler_pin_handover_offset_x-0.003,
                                 speed_fast = self.speed_fast, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
@@ -854,7 +861,7 @@ class AssemblyClass(O2ASBaseRoutines):
     pick_pose = geometry_msgs.msg.PoseStamped()
     pick_pose.header.frame_id = "workspace_center"
     pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
-    pick_pose.pose.position.x = -.13
+    pick_pose.pose.position.x = -.13 + 0.001  # MAGIC NUMBER!! 
     pick_pose.pose.position.y = -.21 + 0.002  # MAGIC NUMBER!! Probably depends on the gripper
     pick_pose.pose.position.z = 0
 
@@ -900,8 +907,8 @@ class AssemblyClass(O2ASBaseRoutines):
     assembled_retainer_pin_head_final=copy.deepcopy(assembled_retainer_pin_head)
     assembled_retainer_pin_head_final.pose.position.x = 0.0053 # MAGIC NUMBERS
 
-    self.move_joints("b_bot", [1.315, -1.24, 1.28, -0.00, 0.23, -1.55], speed=.31, force_ur_script=self.use_real_robot)
-    self.move_joints("b_bot", [1.924, -0.998, 1.4937, -0.496, -2.775, -3.14], speed=.31, force_ur_script=self.use_real_robot)
+    self.move_joints("b_bot", [1.315, -1.24, 1.28, -0.00, 0.23, -1.55], speed=self.speed_fast, force_ur_script=self.use_real_robot)
+    self.move_joints("b_bot", [1.924, -0.998, 1.4937, -0.496, -2.775, -3.14], speed=self.speed_fast, force_ur_script=self.use_real_robot)
 
     self.go_to_pose_goal("b_bot", assembled_retainer_pin_head,speed=.05, move_lin = True)
 
