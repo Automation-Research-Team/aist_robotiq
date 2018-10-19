@@ -41,25 +41,25 @@ class URScriptRelay():
             rospy.logerr("No program ID was defined!")
             return False
 
-        if req.program_id == "insertion":
-            program_front = self.insertion_template
+        if req.program_id == "horizontal_insertion":
+            program_front = self.horizontal_insertion_template
             program_back = ""
 
             # Assign defaults
             if not req.max_force:
-                req.max_force = 5.0
+                req.max_force = 10.0
             if not req.force_direction:
-                req.force_direction = "Z+"
+                req.force_direction = "Y-"
             if not req.forward_speed:
                 req.forward_speed = .02
             if not req.max_approach_distance:
                 req.max_approach_distance = .1
             if not req.max_radius:
-                req.max_radius = .004            # in m
+                req.max_radius = .007            # in m
             if not req.radius_increment:
                 req.radius_increment = 0.0003    # in m
             if not req.peck_mode:
-                req.peck_mode = False
+                req.peck_mode = True
             if not req.max_insertion_distance:
                 req.max_insertion_distance = 0.035
             if not req.impedance_mass:
@@ -92,25 +92,25 @@ class URScriptRelay():
             program_back += "end\n"
 
             program = program_front + "\n" + program_back
-        if req.program_id == "horizontal_insertion":
-            program_front = self.horizontal_insertion_template
+        elif req.program_id == "insertion" or req.program_id == "insert":
+            program_front = self.insertion_template
             program_back = ""
 
             # Assign defaults
             if not req.max_force:
-                req.max_force = 10.0
+                req.max_force = 5.0
             if not req.force_direction:
-                req.force_direction = "Y-"
+                req.force_direction = "Z+"
             if not req.forward_speed:
                 req.forward_speed = .02
             if not req.max_approach_distance:
                 req.max_approach_distance = .1
             if not req.max_radius:
-                req.max_radius = .007            # in m
+                req.max_radius = .004            # in m
             if not req.radius_increment:
                 req.radius_increment = 0.0003    # in m
             if not req.peck_mode:
-                req.peck_mode = True
+                req.peck_mode = False
             if not req.max_insertion_distance:
                 req.max_insertion_distance = 0.035
             if not req.impedance_mass:

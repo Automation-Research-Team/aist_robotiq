@@ -725,7 +725,7 @@ class O2ASBaseRoutines(object):
     # Directly calls the UR service rather than the action of the skill_server
     req = o2as_msgs.srv.sendScriptToURRequest()
     req.robot_name = robot_name
-    req.program_id = "insertion"
+    req.program_id = "insert"
     if horizontal:
       req.program_id = "horizontal_insertion"
 
@@ -1059,7 +1059,7 @@ class O2ASBaseRoutines(object):
     self.log_to_debug_monitor("Pick nut from table", "operation")
     approach_pose = copy.deepcopy(object_pose)
     approach_pose.pose.position.z += .02  # Assumes that z points upward
-    self.go_to_pose_goal(robot_name, approach_pose, speed=.1, move_lin = True, end_effector_link=end_effector_link)
+    self.go_to_pose_goal(robot_name, approach_pose, speed=1.0, move_lin = True, end_effector_link=end_effector_link)
     if robot_name == "c_bot":
       spiral_axis = "YZ"
       push_direction = "c_bot_diagonal"
@@ -1155,7 +1155,7 @@ class O2ASBaseRoutines(object):
     self.go_to_named_pose("home", "c_bot", speed=speed, acceleration=acceleration, force_ur_script=force_ur_script)
     return
 
-  def adjust_centering(self, go_fast=False):
+  def adjust_centering(self, go_fast=False, handover_motor_to_c_bot=False):
 
     #rospy.loginfo("============ Adjusting the position of the pin/shaft
     # ============")
@@ -1218,6 +1218,12 @@ class O2ASBaseRoutines(object):
     rospy.sleep(2)
     self.send_gripper_command(gripper="c_bot",command = "open")
     rospy.sleep(1)
+
+    if handover_motor_to_c_bot:
+      self.send_gripper_command(gripper="c_bot",command = "close")
+      rospy.sleep(2)
+      self.send_gripper_command(gripper="b_bot",command = "open")
+      rospy.sleep(1)
 
     self.go_to_named_pose("home", "c_bot", speed=speed, acceleration=acceleration, force_ur_script=force_ur_script)
     return
