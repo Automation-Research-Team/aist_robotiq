@@ -22,7 +22,8 @@ urdf_files = {
     15: urdf_dir + '/15_SLBNR6.urdf',
     16: urdf_dir + '/16_SPWF6.urdf',
     17: urdf_dir + '/17_SCB4-10.urdf',
-    18: urdf_dir + '/18_SCB3-10.urdf'
+    18: urdf_dir + '/18_SCB3-10.urdf',
+    21: urdf_dir + '/21_SCB4-6.urdf'
 }
 
 
