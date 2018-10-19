@@ -555,7 +555,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.send_gripper_command("b_bot", "open")
 
     pick_pose = geometry_msgs.msg.PoseStamped()
-    pick_pose.header.frame_id = "tray_2_partition_2"
+    pick_pose.header.frame_id = "tray_2_partition_2_pickup"
     pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi/2))
     pick_pose.pose.position.z = 0.025  # MAGIC NUMBER (actually it gets ignored by pick_joshua)
 
@@ -1342,6 +1342,8 @@ class AssemblyClass(O2ASBaseRoutines):
     self.confirm_to_proceed("fasten_retainer_pin_nut")
     self.fasten_retainer_pin_nut()
     self.confirm_to_proceed("Unequip nut tool")
+    self.go_to_named_pose("screw_ready", "c_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+    # self.go_to_named_pose("tool_pick_ready", "c_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
     self.do_change_tool_action("c_bot", equip=False, screw_size=66)
     self.go_to_named_pose("home", "c_bot", speed=3.0, acceleration=3.0, force_ur_script=self.use_real_robot)
 
@@ -1377,6 +1379,8 @@ class AssemblyClass(O2ASBaseRoutines):
   def real_assembly_task(self):
     self.start_task_timer()
     self.log_to_debug_monitor(text="Assembly", category="task")
+    self.picked_screw_counter["m4"] = 1
+    self.picked_screw_counter["m3"] = 1
 
     ## To prepare subtask E
     self.pick_retainer_pin_from_tray_and_place_in_holder(do_centering=True)

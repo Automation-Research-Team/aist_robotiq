@@ -184,7 +184,7 @@
       <origin rpy="0.0 0.0 ${-pi/4}" xyz="-.007 -.024 0"/>
     </xacro:auxiliary_frame>
     <xacro:auxiliary_frame parent="${trayname}_partition_2" framename="pickup">
-      <origin rpy="0.0 0.0 0.0" xyz="0 0 0.02"/>
+      <origin rpy="0.0 0.0 0.0" xyz="${-partition_length/2 + .0015} ${-partition_width/2 + .0015} 0"/>
     </xacro:auxiliary_frame>
     <xacro:auxiliary_frame parent="${trayname}_partition_3" framename="pickup">
       <origin rpy="0.0 0.0 0.0" xyz="${partition_length/2 - .0045} ${-partition_width/2 + .0045} 0"/>
