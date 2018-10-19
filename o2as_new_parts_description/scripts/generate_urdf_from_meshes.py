@@ -120,7 +120,7 @@ for part_num, partname in enumerate(partnames):
 # Convert xacro files to urdf (necessary for the URDF-to-msg converter)
 import subprocess
 for part_num, partname in enumerate(partnames):
-    print("Convert xacro to urdf")
+    print("Convert xacro to urdf: {}".format(partname))
     non_macrofilepath = os.path.join( out_dir, partname+"_non_macro.urdf.xacro")
     out_urdf_filepath = os.path.join( os.path.join(out_dir, "collision_object_urdfs"), partname+"_non_macro.urdf")
     cmd = 'xacro --inorder ' + non_macrofilepath + " -o " + out_urdf_filepath
