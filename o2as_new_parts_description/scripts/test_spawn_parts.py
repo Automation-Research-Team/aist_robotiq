@@ -12,7 +12,7 @@ urdf_files = {
     5: urdf_dir + '/05_PTPA30P2M060-A-P6.urdf',
     6: urdf_dir + '/06_PTBN340P2M-060.urdf',
     7: urdf_dir + '/07_SBARB6200ZZ_30.urdf',
-    8: urdf_dir + '/08_KZAF1075NA4WA55GA20AA0.urdf',
+    8: urdf_dir + '/08_SSFHRT10-75-M4-FC40-G35.urdf',
     9: urdf_dir + '/09_EDCS10.urdf',
     10: urdf_dir + '/10_CLBPS10_17_4.urdf',
     11: urdf_dir + '/11_MBRAC60-2-10.urdf',

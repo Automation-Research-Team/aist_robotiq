@@ -6,7 +6,7 @@
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/05_PTPA30P2M060-A-P6_frames_only_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/06_PTBN340P2M-060_frames_only_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/07_SBARB6200ZZ_30_frames_only_macro.urdf.xacro"/>
-  <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/08_KZAF1075NA4WA55GA20AA0_frames_only_macro.urdf.xacro"/>
+  <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/08_SSFHRT10-75-M4-FC40-G35_frames_only_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/09_EDCS10_frames_only_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/10_CLBPS10_17_4_frames_only_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/11_MBRAC60-2-10_frames_only_macro.urdf.xacro"/>
