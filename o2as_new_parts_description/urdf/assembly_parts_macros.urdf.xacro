@@ -17,4 +17,5 @@
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/16_SPWF6_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/17_SCB4-10_macro.urdf.xacro"/>
   <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/18_SCB3-10_macro.urdf.xacro"/>
+  <xacro:include filename="$(find o2as_new_parts_description)/urdf/generated/21_SCB4-6_macro.urdf.xacro"/>
 </robot>
