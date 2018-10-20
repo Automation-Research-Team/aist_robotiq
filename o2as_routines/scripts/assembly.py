@@ -91,10 +91,10 @@ class AssemblyClass(O2ASBaseRoutines):
     # This list is not exhaustive, but it's a start
     self.idler_pin_handover_offset_x = -.015
     self.idler_pin_handover_offset_y = .002   # Positive moves a_bot to c_bot
-    self.idler_pin_handover_offset_z = -.006  # Positive moves a_bot to b_bot
+    self.idler_pin_handover_offset_z = -.008  # Negative moves to b_bot
 
     self.magic_a_bot_pick_offset_tray_2_x = -.004  # negative moves towards a_bot
-    self.magic_a_bot_pick_offset_tray_2_y = -.004  # negative moves towards a_bot
+    # self.magic_a_bot_pick_offset_tray_2_y = -.004  # negative moves towards a_bot
 
     # For picking screws from the tray
     self.picked_screw_counter = dict()
@@ -667,8 +667,8 @@ class AssemblyClass(O2ASBaseRoutines):
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "tray_2_partition_3_pickup"
     pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-    pose0.pose.position.x += self.magic_a_bot_pick_offset_tray_2_x + .001  # MAGIC NUMBER (this moves the bot in +y in the workspace)
-    pose0.pose.position.y += .0005
+    pose0.pose.position.x += self.magic_a_bot_pick_offset_tray_2_x  # MAGIC NUMBER (this moves the bot in +y in the workspace)
+    pose0.pose.position.y += .002
     pose0.pose.position.z = 0.01
 
     self.pick_joshua("a_bot",pose0,-0.015,
@@ -709,7 +709,7 @@ class AssemblyClass(O2ASBaseRoutines):
   def pick_idle_pulley(self, robot_name = "a_bot", magic_offset=.001, spiral_motion_radius=.0035):
     # rospy.loginfo("============ Picking up the idle pulley using a_bot ============")
     self.log_to_debug_monitor("Picking up the idle pulley using a_bot", "operation")
-    self.go_to_named_pose("home", robot_name, speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("home", robot_name, speed=.5, acceleration=.5, force_ur_script=self.use_real_robot)
 
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "tray_1_partition_5_pickup"
@@ -723,7 +723,7 @@ class AssemblyClass(O2ASBaseRoutines):
                                 speed_fast = self.speed_fast, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
                                 approach_height = 0.02, spiral_search_for_idle_pulley=True, spiral_max_radius=spiral_motion_radius)
 
-    self.go_to_named_pose("home", robot_name, speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+    self.go_to_named_pose("home", robot_name, speed=.5, acceleration=.5, force_ur_script=self.use_real_robot)
     return
 
   def reset_idle_pulley(self):
@@ -899,7 +899,7 @@ class AssemblyClass(O2ASBaseRoutines):
     intermediate_retainer_pin_tip.header.frame_id = "intermediate_assy_part_14_screw_tip"
     intermediate_retainer_pin_tip.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi, 0))
     intermediate_retainer_pin_tip.pose.position.y = self.idler_pin_handover_offset_y
-    intermediate_retainer_pin_tip.pose.position.z += self.idler_pin_handover_offset_z # MAGIC NUMBER (positive towards a_bot)
+    intermediate_retainer_pin_tip.pose.position.z += self.idler_pin_handover_offset_z - .002 # MAGIC NUMBER (positive towards a_bot)
 
     self.place_joshua("a_bot",intermediate_retainer_pin_tip,self.idler_pin_handover_offset_x-0.003,
                                 speed_fast = self.speed_fast, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
@@ -956,9 +956,9 @@ class AssemblyClass(O2ASBaseRoutines):
     assembled_retainer_pin_tip.header.frame_id = "assembled_assy_part_14_screw_tip"
     assembled_retainer_pin_tip.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi*80/180,pi))
     assembled_retainer_pin_tip.pose.position.x = -0.005  # negative goes closer to the plate
-    assembled_retainer_pin_tip.pose.position.z = 0.01  # MAGIC NUMBER? It's the vertical axis offset
 
-    self.place_joshua("a_bot",assembled_retainer_pin_tip,0.0,
+    # GRASP_HEIGHT = MAGIC NUMBER 
+    self.place_joshua("a_bot",assembled_retainer_pin_tip,0.005,  
                                 speed_fast = self.speed_fast, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
                                 approach_height = 0.08,approach_axis="z", lift_up_after_place = False)
 
@@ -1042,8 +1042,8 @@ class AssemblyClass(O2ASBaseRoutines):
     self.send_gripper_command("b_bot", "close")
     self.send_gripper_command("b_bot", "close")
     rospy.sleep(0.5)
-    self.go_to_pose_goal("b_bot", b_bot_going_back_below, speed=.01, move_lin = True)
-    self.do_linear_push("b_bot", 3, wait = True)
+    self.go_to_pose_goal("b_bot", b_bot_going_back_below, speed=0.5, move_lin = True)
+    self.do_linear_push("b_bot", 5, wait = True)
 
     req = o2as_msgs.srv.sendScriptToURRequest()
     req.program_id = "lin_move_rel"
@@ -1265,10 +1265,17 @@ class AssemblyClass(O2ASBaseRoutines):
     pose0.header.frame_id = "tray_2_partition_6"
     pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
     pose0.pose.position.x = 0
+    pose0.pose.position.y -= 0.005
     pose0.pose.position.z = 0.07
-    self.send_gripper_command(gripper="b_bot",command = 0.05)
-    self.pick_joshua("b_bot", pose0, grasp_height=0.05, speed_fast=self.speed_fast, speed_slow=.1, gripper_command="", approach_height=.05)
+    self.send_gripper_command(gripper="b_bot",command = 0.044)
+    self.send_gripper_command(gripper="b_bot",command = 0.044)
+    self.pick_joshua("b_bot", pose0, grasp_height=-0.01, speed_fast=self.speed_fast, speed_slow=.1, gripper_command="none", approach_height=.05, lift_up_after_pick=False)
+    self.send_gripper_command(gripper="b_bot",command = 0.01)
     self.send_gripper_command(gripper="b_bot",command = "close")
+    rospy.sleep(1.0)
+
+    pose0.pose.position.z += 0.05
+    self.go_to_pose_goal("b_bot", pose0, speed=0.3,end_effector_link="", move_lin=True)
     self.go_to_named_pose("home", "b_bot")
     return
 
@@ -1495,7 +1502,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.log_to_debug_monitor("=== Subtask B (motor pulley) end ===", "operation")
     return
 
-  def subtask_e(self, pick_from_holder=False, exit_before_spacer=False, force_continue_task_to_the_end=False):
+  def subtask_e(self, pick_from_holder=False, exit_before_spacer=False, force_continue_task_to_the_end=False, exit_on_level_2=False):
     ### ======================== SUBTASK E (The idler pin) ============================================
     rospy.loginfo("======== SUBTASK E ========")
     self.log_to_debug_monitor("SUBTASK E (idler pin)", "subtask")
@@ -1503,19 +1510,22 @@ class AssemblyClass(O2ASBaseRoutines):
 
     self.go_to_named_pose("home", "b_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
     self.confirm_to_proceed("pick_retainer_pin_nut")
-    self.pick_retainer_pin_nut()
-    nut_picked = self.check_pick()
-    self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
-    if nut_picked:
-      self.confirm_to_proceed("place_retainer_pin_nut_on_table")
-      self.place_retainer_pin_nut_on_table()
+    if not exit_on_level_2:
+      self.pick_retainer_pin_nut()
+      nut_picked = self.check_pick()
+      self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+      if nut_picked:
+        self.confirm_to_proceed("place_retainer_pin_nut_on_table")
+        self.place_retainer_pin_nut_on_table()
+    
+    nut_picked = False
     
     self.confirm_to_proceed("pick_idle_pulley")
     self.pick_idle_pulley()
-    if not self.check_pick():
-      self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
-      self.reset_idle_pulley()
-      self.pick_idle_pulley()
+    # if not self.check_pick():
+    #   self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+    #   self.reset_idle_pulley()
+    #   self.pick_idle_pulley()
     if pick_from_holder:
       # ====== (This would have to be done before.)
       # self.confirm_to_proceed("pick_retainer_pin_from_tray_and_place_in_holder")
@@ -1545,7 +1555,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.pick_retainer_pin_spacer()
     spacer_picked = self.check_pick()
     self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
-    if not spacer_picked and not FORCE_CONTINUE_TASK_TO_THE_END:
+    if not spacer_picked:
       self.log_to_debug_monitor("Nut was not picked. Placing the pulley to exit the task.", "operation")
       self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
       self.handover_and_place_idle_pulley_in_a_safe_place()
@@ -1557,7 +1567,7 @@ class AssemblyClass(O2ASBaseRoutines):
     self.pick_retainer_pin_washer(1)
     washer_picked = self.check_pick()
     self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
-    if not washer_picked and not FORCE_CONTINUE_TASK_TO_THE_END:
+    if not washer_picked:
       self.log_to_debug_monitor("Nut was not picked. Placing the pulley to exit the task.", "operation")
       self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
       self.handover_and_place_idle_pulley_in_a_safe_place()
@@ -1565,7 +1575,13 @@ class AssemblyClass(O2ASBaseRoutines):
     self.confirm_to_proceed("place_retainer_pin_washer_1")
     self.place_retainer_pin_washer_1()
     
-    if not nut_picked and not FORCE_CONTINUE_TASK_TO_THE_END:
+    if not nut_picked:
+      self.log_to_debug_monitor("Nut was not picked. Placing the pulley to exit the task.", "operation")
+      self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+      self.handover_and_place_idle_pulley_in_a_safe_place()
+      return False
+    
+    if exit_on_level_2:
       self.log_to_debug_monitor("Nut was not picked. Placing the pulley to exit the task.", "operation")
       self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
       self.handover_and_place_idle_pulley_in_a_safe_place()
@@ -1686,6 +1702,7 @@ if __name__ == '__main__':
       rospy.loginfo("Enter 52 to go to screw_plate_ready.")
       rospy.loginfo("Enter 53 to recenter plate 3 (as if after a screw failure).")
       rospy.loginfo("Enter 55 to pick all subtask_e items with a_bot.")
+      rospy.loginfo("Enter 56 to pick motor pulley.")
       rospy.loginfo("Enter 91-94 for subtasks (Large plate, motor plate, idler pin, motor).")
       rospy.loginfo("Enter 95-98 for subtasks (motor pulley, bearing+shaft, clamp pulley, belt).")
       rospy.loginfo("Enter 911 to place plate 3 (but don't screw)")
@@ -1695,6 +1712,7 @@ if __name__ == '__main__':
       rospy.loginfo("Enter 93 to do idle pulley set")
       rospy.loginfo("Enter 931 to do the idle pulley set directly from the tray")
       rospy.loginfo("Enter 932 to do the idle pulley set until the spacer (completion level 1)")
+      rospy.loginfo("Enter 934 to do the idle pulley set until completion level 2")
       rospy.loginfo("Enter 94 to do the motor subtask")
       rospy.loginfo("Enter 95 to do the bearing")
       rospy.loginfo("Enter START to start the task.")
@@ -1751,6 +1769,8 @@ if __name__ == '__main__':
         assy.pick_retainer_pin_washer(2)
         assy.pick_retainer_pin_spacer()
         assy.pick_retainer_pin_nut()
+      elif i == '56':
+        assy.pick_motor_pulley()
       elif i == '91':
         assy.subtask_g()  # Large plate
       elif i == '911':
@@ -1769,6 +1789,8 @@ if __name__ == '__main__':
         assy.subtask_e(pick_from_holder=False, exit_before_spacer=True) # Idler pin without retainer pin holder
       elif i == '933':
         assy.subtask_e(pick_from_holder=False, exit_before_spacer=True, force_continue_task_to_the_end=False) # Idler pin without retainer pin holder
+      elif i == '934':
+        assy.subtask_e(pick_from_holder=False, exit_on_level_2=True, force_continue_task_to_the_end=False) # Idler pin without retainer pin holder
       elif i == '94':
         assy.subtask_a() #
       elif i == '95':
