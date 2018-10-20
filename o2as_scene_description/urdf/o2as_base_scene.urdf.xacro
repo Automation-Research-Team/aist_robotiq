@@ -189,22 +189,22 @@
   <!-- 			marker_id="26"> -->
   <!--   <origin xyz="0.063 0.0 0.0215" rpy="0 0 0"/> -->
   <!-- </xacro:o2as_ar_marker> -->
-  <!-- <xacro:o2as_ar_marker prefix="b_bot_" -->
-  <!-- 			parent="b_bot_robotiq_85_tip_link" -->
-  <!-- 			marker_id="26"> -->
-  <!--   <origin xyz="0.0 0.0 0.0185" rpy="0 0 0"/> -->
-  <!-- </xacro:o2as_ar_marker> -->
-  <!-- <xacro:o2as_ar_marker prefix="c_bot_" -->
-  <!-- 			parent="c_bot_robotiq_85_tip_link" -->
-  <!-- 			marker_id="26"> -->
-  <!--   <origin xyz="0.0 0.0 0.0185" rpy="0 0 0"/> -->
-  <!-- </xacro:o2as_ar_marker> -->
+  <xacro:o2as_ar_marker prefix="b_bot_"
+  			parent="b_bot_robotiq_85_tip_link"
+  			marker_id="26">
+    <origin xyz="0.0 0.0 0.0185" rpy="0 0 0"/>
+  </xacro:o2as_ar_marker>
+  <xacro:o2as_ar_marker prefix="c_bot_"
+  			parent="c_bot_robotiq_85_tip_link"
+  			marker_id="26">
+    <origin xyz="0.0 0.0 0.0185" rpy="0 0 0"/>
+  </xacro:o2as_ar_marker>
 
-  <!-- <xacro:o2as_ar_marker_16cm prefix="workspace_" -->
-  <!-- 			     parent="workspace_center" -->
-  <!-- 			     marker_id="32"> -->
-  <!--   <origin xyz="0.0 0.0 0.0005" rpy="0 0 0"/> -->
-  <!-- </xacro:o2as_ar_marker_16cm> -->
+  <xacro:o2as_ar_marker_16cm prefix="workspace_"
+  			     parent="workspace_center"
+  			     marker_id="32">
+    <origin xyz="0.0 0.0 0.0005" rpy="0 0 0"/>
+  </xacro:o2as_ar_marker_16cm>
 
   <!-- <xacro:o2as_ar_marker prefix="workspace_" -->
   <!-- 			parent="workspace_center" -->
