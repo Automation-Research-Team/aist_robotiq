@@ -84,7 +84,6 @@ class KittingClass(O2ASBaseRoutines):
     self.search_grasp_client = actionlib.SimpleActionClient("search_grasp_phoxi", o2as_msgs.msg.SearchGraspPhoxiAction)
     # action
     self.blob_detection_client = actionlib.SimpleActionClient('blob_detection_action', o2as_msgs.msg.blobDetectionAction)
-    self.inner_pick_detection_client = actionlib.SimpleActionClient('inner_pick_detection_action', o2as_msgs.msg.innerPickDetectionAction)
 
     # Image Subscriber for monitoring    
     self.img_blob_topic = "o2as_blob_detection/img_w_blob"    

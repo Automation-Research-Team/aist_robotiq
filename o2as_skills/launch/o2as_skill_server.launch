@@ -15,8 +15,8 @@
   <include file="$(find graspability_estimation)/launch/o2as_graspability_estimation.launch" />
     
   <!-- <include file="$(find o2as_debug_monitor)/launch/test.launch" /> -->
-  <!-- <include file="$(find o2as_debug_monitor)/launch/kitting.launch" /> -->
-  <include file="$(find o2as_debug_monitor)/launch/assembly.launch" />
+  <include file="$(find o2as_debug_monitor)/launch/kitting.launch" />
+  <!-- <include file="$(find o2as_debug_monitor)/launch/assembly.launch" /> -->
   <!-- <include file="$(find o2as_debug_monitor)/launch/taskboard.launch" /> -->
 
   <!-- <group ns="o2as_skill_server"> -->

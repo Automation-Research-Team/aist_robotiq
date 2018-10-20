@@ -158,6 +158,8 @@ class O2ASBaseRoutines(object):
     self.fastening_tool_client = actionlib.SimpleActionClient('/o2as_fastening_tools/fastener_gripper_control_action', o2as_msgs.msg.FastenerGripperControlAction)
     self.nut_peg_tool_client = actionlib.SimpleActionClient('/nut_tools_action', o2as_msgs.msg.ToolsCommandAction)
 
+    self.inner_pick_detection_client = actionlib.SimpleActionClient('inner_pick_detection_action', o2as_msgs.msg.innerPickDetectionAction)
+
     self._feeder_srv = rospy.ServiceProxy("o2as_usb_relay/set_power", o2as_msgs.srv.SetPower)
     self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR)
     self.goToNamedPose_client = rospy.ServiceProxy('/o2as_skills/goToNamedPose', o2as_msgs.srv.goToNamedPose)
@@ -729,6 +731,7 @@ class O2ASBaseRoutines(object):
   def do_insertion(self, robot_name, max_insertion_distance= 0.0, 
                         max_approach_distance = 0.0, max_force = .0,
                         max_radius = 0.0, radius_increment = .0,
+                        peck_mode=False,
                         wait = True, horizontal=False):
     if not self.use_real_robot:
       return True
@@ -745,6 +748,7 @@ class O2ASBaseRoutines(object):
     req.max_insertion_distance = max_insertion_distance
     req.max_approach_distance = max_approach_distance
     req.max_force = max_force
+    req.peck_mode = peck_mode
     req.max_radius = max_radius
     req.radius_increment = radius_increment
     res = self.urscript_client.call(req)
@@ -1281,7 +1285,7 @@ class O2ASBaseRoutines(object):
     except:
       pass
   
-  def check_pick(self, part_id):
+  def check_pick(self, part_id=0):
     #Go to check position
     self.go_to_named_pose("check_precision_gripper_success", "a_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
     rospy.sleep(0.2)
