@@ -42,13 +42,12 @@ class InnerPickDetection(object):
 
         self.bridge = CvBridge()
         # Config parameters
-        # TODO: read values from config file
-        # From before trial 1
+        # From before assembly with surprise parts trial
+        # origin is top left, x is right, y is down
         self._x = 311
-        self._y = 280
-        self._w = 30
-        self._h = 27
-        # TODO: Write an image with the ROI drawn into it
+        self._y = 285
+        self._w = 23
+        self._h = 22
 
         # Publish input image (and output value)
         # The image is published when bg ratio is computed
@@ -117,7 +116,7 @@ class InnerPickDetection(object):
         self._current_image = np.asarray(self._current_image)[:, :, ::-1]
 
     #Compute ratio
-    def compute_red_ratio(self, img, x, y, w, h, br_threshold=0.2, red_threshold=0.7, vis=False):
+    def compute_red_ratio(self, img, x, y, w, h, br_threshold=0.2, red_threshold=0.9, vis=False):
         """Compute the ratio of red area in the image.
 
         The returned value should be used to check if the precision gripper pick a

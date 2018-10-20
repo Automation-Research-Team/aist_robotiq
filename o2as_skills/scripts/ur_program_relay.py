@@ -49,7 +49,7 @@ class URScriptRelay():
             if not req.max_force:
                 req.max_force = 10.0
             if not req.force_direction:
-                req.force_direction = "Y"
+                req.force_direction = "Y-"
             if not req.forward_speed:
                 req.forward_speed = .02
             if not req.max_approach_distance:
@@ -91,6 +91,8 @@ class URScriptRelay():
             program_back += "    textmsg(\"Done. Exiting.\")\n"
             program_back += "end\n"
 
+            
+
             program = program_front + "\n" + program_back
         elif req.program_id == "insertion" or req.program_id == "insert":
             program_front = self.insertion_template
@@ -98,7 +100,7 @@ class URScriptRelay():
 
             # Assign defaults
             if not req.max_force:
-                req.max_force = 5.0
+                req.max_force = 10.0
             if not req.force_direction:
                 req.force_direction = "Z+"
             if not req.forward_speed:
@@ -286,7 +288,7 @@ class URScriptRelay():
                             "a = " + str(req.acceleration) + ", v = " + str(req.velocity) + ")\n"
             program += "    textmsg(\"Done.\")\n"
             program += "end\n"
-            rospy.loginfo(program)
+            rospy.logdebug(program)
         else:
             rospy.logerr("The program could not be recognized: " + req.program_id)
             return False

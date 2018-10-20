@@ -80,17 +80,17 @@ def compute_red_ratio(img, x, y, w, h, br_threshold=0.2,
 
 if __name__ == "__main__":
   success_files = [
-    "/root/catkin_ws/src/o2as_bg_ratio/images/20_success.png'",
-    "/root/catkin_ws/src/o2as_bg_ratio/images/27_success.png'",
-    "/root/catkin_ws/src/o2as_bg_ratio/images/37_success.png'",
-    "/root/catkin_ws/src/o2as_bg_ratio/images/3_success.png'"
+    # "/root/catkin_ws/src/o2as_bg_ratio/images/20_success.png'",
+    # "/root/catkin_ws/src/o2as_bg_ratio/images/27_success.png'",
+    # "/root/catkin_ws/src/o2as_bg_ratio/images/37_success.png'",
+    # "/root/catkin_ws/src/o2as_bg_ratio/images/3_success.png'"
   ]
 
   failure_files = [
-    "/root/catkin_ws/src/o2as_bg_ratio/images/10_failed.png'",
-    "/root/catkin_ws/src/o2as_bg_ratio/images/11_failed.png'",
-    "/root/catkin_ws/src/o2as_bg_ratio/images/12_failed.png'",
-    "/root/catkin_ws/src/o2as_bg_ratio/images/13_failed.png'",
+    "/root/catkin_ws/src/o2as_bg_ratio/images/8_failed.png'",
+    # "/root/catkin_ws/src/o2as_bg_ratio/images/11_failed.png'",
+    # "/root/catkin_ws/src/o2as_bg_ratio/images/12_failed.png'",
+    # "/root/catkin_ws/src/o2as_bg_ratio/images/13_failed.png'",
   ]
 
   # ROI
@@ -102,15 +102,15 @@ if __name__ == "__main__":
   bg_ratio_s = []
   bg_ratio_f = []
 
-  for i, f in enumerate(success_files):
-    img = io.imread(f)
-    if i == 0:
-      plt.figure()
-      tmp = compute_red_ratio(img, x, y, w, h, vis=True)
-    else:
-      tmp = compute_red_ratio(img, x, y, w, h)
-    print("{}".format(tmp))
-    bg_ratio_s.append(tmp)
+  # for i, f in enumerate(success_files):
+  #   img = io.imread(f)
+  #   if i == 0:
+  #     plt.figure()
+  #     tmp = compute_red_ratio(img, x, y, w, h, vis=True)
+  #   else:
+  #     tmp = compute_red_ratio(img, x, y, w, h)
+  #   print("{}".format(tmp))
+  #   bg_ratio_s.append(tmp)
 
   print("==========")
 

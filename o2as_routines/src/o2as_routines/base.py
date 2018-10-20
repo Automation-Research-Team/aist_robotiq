@@ -125,7 +125,7 @@ class O2ASBaseRoutines(object):
     self.force_ur_script_linear_motion = False
     self.force_moveit_linear_motion = False
 
-    self.competition_mode = False   # Disables confirmation dialogs etc. for full automatic motion
+    self.competition_mode = True   # Disables confirmation dialogs etc. for full automatic motion
 
     self.speed_fast = 1.5
     self.speed_fastest = 3.0
@@ -873,7 +873,7 @@ class O2ASBaseRoutines(object):
         rospy.loginfo("program interrupted before completion", file=sys.stderr)
 
   def precision_gripper_inner_close(self, this_action_grasps_an_object = False):
-    self.log_to_debug_monitor("Precision gripper inner close", "operation")
+    rospy.loginfo("Precision gripper inner close")
 
     try:
         goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
@@ -889,7 +889,7 @@ class O2ASBaseRoutines(object):
 
 
   def precision_gripper_inner_open(self, this_action_grasps_an_object = False):
-    self.log_to_debug_monitor("Precision gripper inner open", "operation")
+    rospy.loginfo("Precision gripper inner open")
 
     try:
         goal = o2as_msgs.msg.PrecisionGripperCommandGoal()

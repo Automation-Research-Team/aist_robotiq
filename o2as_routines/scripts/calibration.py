@@ -1494,6 +1494,8 @@ if __name__ == '__main__':
         c.bin_corner_calibration(robot_name="b_bot", end_effector_link="b_bot_suction_tool_tip_link")
       elif r == '341':
         c.check_inner_pick_calibration()
+      elif r == '342':
+        c.check_pick()
       elif r == '371':
         c.screw_feeder_calibration(robot_name="c_bot")
       elif r == '372':
