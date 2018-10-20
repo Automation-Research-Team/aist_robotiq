@@ -506,7 +506,7 @@ Simple::get_marker_transform(const aruco::Marker& marker,
     const auto	centroid = 0.25*(corners[0] + corners[1] +
 				 corners[2] + corners[3]);
 
-  // Compute marker -> reference transfrom.
+  // Compute marker -> reference transform.
   // Post-mulriply
   //   -1 0 0
   //    0 0 1
