@@ -1,0 +1,3 @@
+<launch>
+    <node name="xela_sensor_demo" pkg="o2as_xela_sensor" type="xela_robotics_sensor.py" output="screen"/>
+</launch>
