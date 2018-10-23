@@ -17,6 +17,7 @@ if __name__ == '__main__':
         client.wait_for_server()
         goal = o2as_msgs.msg.innerPickDetectionGoal()
               
+        #goal.saveROIImage = True
         goal.part_id = 12
         client.send_goal(goal)
         client.wait_for_result()

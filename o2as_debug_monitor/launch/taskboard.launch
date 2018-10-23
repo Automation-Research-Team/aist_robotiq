@@ -23,8 +23,8 @@
     image_topics:
       realsense:
         topic_name: /a_bot_camera/color/image_raw
-        col: [0, 11]
-        row: [0, 7]
+        col: [0, 23]
+        row: [0, 15]
 
     string_topics:
       task:

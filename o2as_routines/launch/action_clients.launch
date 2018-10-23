@@ -6,4 +6,8 @@
   <node name="c_bot_gripper" pkg="actionlib" type="axclient.py" respawn="false" output="screen" args="/c_bot_gripper/gripper_action_controller"/>
   <node name="b_bot_gripper" pkg="actionlib" type="axclient.py" respawn="false" output="screen" args="/b_bot_gripper/gripper_action_controller"/>
   <node name="changeTool" pkg="actionlib" type="axclient.py" respawn="false" output="screen" args="/o2as_skills/changeTool"/>
+
+  <!-- Taskboard -->
+  <node name="nutTools" pkg="actionlib" type="axclient.py" respawn="false" output="screen" args="/nut_tools_action"/>
+
 </launch>

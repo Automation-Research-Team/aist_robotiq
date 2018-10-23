@@ -668,6 +668,10 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
     moveToJointPose(joint_group_positions_3, robot_name, true, 3.0, use_real_robot_, 3.0);
   }
+  if (robot_name == "c_bot")
+  {
+    goToNamedPose("tool_pick_ready", "c_bot");
+  }
 
   // Set up poses
   geometry_msgs::PoseStamped ps_approach, ps_tool_holder, ps_move_away, ps_high_up, ps_end;
@@ -720,7 +724,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
     ps_approach.pose.position.z = .07;
     if (screw_tool_id == "nut_tool_m6" || screw_tool_id == "set_screw_tool")
       ps_approach.pose.position.z = .07;
-      ps_tool_holder.pose.position.y = -.006;  // ATTENTION: MAGIC NUMBER!  
+      ps_tool_holder.pose.position.y = -.002;  // ATTENTION: MAGIC NUMBER!  
     ps_approach.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI, M_PI/2, 0);
 
     ps_tool_holder = ps_approach;
@@ -773,7 +777,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
 
 
   ROS_INFO("Moving to screw tool approach pose LIN.");
-  bool preparation_succeeded = moveToCartPoseLIN(ps_approach, robot_name, true, robot_name + "_robotiq_85_tip_link", 1.0);
+  bool preparation_succeeded = moveToCartPoseLIN(ps_approach, robot_name, true, robot_name + "_robotiq_85_tip_link", 3.0, 3.0, use_real_robot_);
   if (!preparation_succeeded)
   {
     ROS_ERROR("Could not go to approach pose. Aborting tool pickup.");
@@ -788,7 +792,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   
   o2as_msgs::sendScriptToUR UR_srv;
   geometry_msgs::Point t_rel;
-  if (equip)        lin_speed = 0.3;
+  if (equip)        lin_speed = 0.5;
   else if (unequip) lin_speed = 0.08;  
   UR_srv.request.program_id = "lin_move_rel";
   UR_srv.request.robot_name = robot_name;  
@@ -852,7 +856,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   
   // Plan & execute linear motion away from the tool change position
   ROS_INFO("Moving back to screw tool approach pose LIN.");
-  if (equip)        lin_speed = 0.3;
+  if (equip)        lin_speed = 1.0;
   else if (unequip) lin_speed = 1.0;
 
   if ( (use_real_robot_) && (robot_name == "b_bot") )
@@ -879,7 +883,7 @@ bool SkillServer::equipUnequipScrewTool(std::string robot_name, std::string scre
   planning_scene_interface_.applyPlanningScene(planning_scene_);
 
   ROS_INFO("Moving higher up to facilitate later movements.");
-  moveToCartPoseLIN(ps_high_up, robot_name);
+  moveToCartPoseLIN(ps_high_up, robot_name, true, "", 2.0, 2.0, use_real_robot_);
   
   if (robot_name == "b_bot")
   {
