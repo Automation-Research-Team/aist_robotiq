@@ -30,7 +30,7 @@
         col: [0, 11]
         row: [8, 15]
       phoxi_depth_ueshiba:
-        topic_name: /o2as_phoxi_camera/depth_map
+        topic_name: /a_phoxi_m_camera/depth_map
         col: [12, 23]
         row: [0, 7]
         encoding: depth

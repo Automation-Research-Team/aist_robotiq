@@ -1106,7 +1106,7 @@ textmsg("disable external sensor")  # end: URCap Installation Node
                     global z=0
                     global pos=p[0,0,0,0,0,0]
                     global next_position=p[0,0,0,0,0,0]
-                    global y_Insert=p[0,-1*y_insert_distance,0,0,0,0] #Joshua changed this line
+                    global y_Insert=p[0,1*y_insert_distance,0,0,0,0] #Joshua changed this line
                     global current_pos=p[0,0,0,0,0,0]
                     global theta=0
                     global RealRadius=0
@@ -1127,6 +1127,8 @@ textmsg("disable external sensor")  # end: URCap Installation Node
                             x=sin(d2r(theta))*r #Joshua changed this line
                             pos[2] = z #Joshua changed this line
                             pos[0] = x #Joshua changed this line
+                            textmsg("pos is:")
+                            textmsg(pos)
                             r=r + radius_inc_set
                             RealRadius = sqrt(pow(norm(z),2)+pow(norm(x),2)) #Joshua changed this line
                             next_pos=pose_trans(current_pos,pos)
@@ -1136,7 +1138,7 @@ textmsg("disable external sensor")  # end: URCap Installation Node
                         else:
                             #Fragile mode, the robot rises between each new point
                             #Retreat from position
-                            pos[1]= +0.002 #Joshua changed this line
+                            pos[1]= -0.002 #Joshua changed this line
                             next_pos=pose_trans(current_pos,pos)
                             movep(next_pos, a=0.6, v=0.025, r=0.0005)
                             sleep(0.1)
@@ -1146,13 +1148,15 @@ textmsg("disable external sensor")  # end: URCap Installation Node
                             x=sin(d2r(theta))*r #Joshua changed this line
                             pos[2] = z #Joshua changed this line
                             pos[0] = x #Joshua changed this line
+                            textmsg("pos is:")
+                            textmsg(pos)
                             r=r + radius_inc_set
                             RealRadius = sqrt(pow(norm(z),2)+pow(norm(x),2)) #Joshua changed this line
                             next_pos=pose_trans(current_pos,pos)
                             movep(next_pos, a=0.6, v=0.025, r=0.0005)
                             sleep(0.1)
                             #Re-establish contact with the part
-                            pos[2]= -0.0005 #Joshua changed this line
+                            pos[1]= 0.0005 #Joshua changed this line
                             next_pos=pose_trans(current_pos,pos)
                             movep(next_pos, a=0.6, v=0.01, r=0.0)
                             sleep(0.2)
@@ -1228,10 +1232,16 @@ textmsg("disable external sensor")  # end: URCap Installation Node
             textmsg(current_pos)
             textmsg(norm(dist))
             if (norm(dist) >= stroke):
+                textmsg("done")
+                textmsg("done")
+                textmsg("done")
+                textmsg("done")
+                textmsg("done")
+                textmsg("done")
                 halt
             end
             fp = correct_force([Fx,Fy,Fz,Mx,My,Mz],force_threshold)
-            fp[1] = fp[1]- 50 # Joshua changed this from fp[2] = fp[2] + 50
+            fp[1] = fp[1] + 20 # Joshua changed this from fp[2] = fp[2] + 50
             # fp[3] = fp[3] + 5 # Joshua added this to counteract the moment, but he is kind of doubtful whether it will work.
 
             mdt2 = [0,0,0,0,0,0]
@@ -1272,6 +1282,7 @@ textmsg("disable external sensor")  # end: URCap Installation Node
             goal[5] = (fp[5]-mdt2[5]*ppmpmp[5]+cdt[5]*goalp[5])/mck[5]
 
             rel_pos = pose_sub(goal, goalp)
+            rel_pos[1] = -rel_pos[1]
             next_pos=pose_trans(current_pos,rel_pos)
             movep(next_pos, a=0.4, v=.015, r=0.0)
             goalpp[0] = goalp[0]
