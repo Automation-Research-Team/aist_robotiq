@@ -129,10 +129,10 @@
       <origin rpy="0.0 0.0 0" xyz="-.05 0 0"/>
     </xacro:auxiliary_frame>
     <xacro:auxiliary_frame parent="${trayname}_partition_4" framename="pickup">
-      <origin rpy="0.0 ${pi*80/180} ${pi*20/180}" xyz="0 0 0.02"/>
+      <origin rpy="0.0 ${pi*80/180} ${pi*20/180}" xyz="0.03 -.01 0.02"/>
     </xacro:auxiliary_frame>
     <xacro:auxiliary_frame parent="${trayname}_partition_5" framename="pickup">
-      <origin rpy="0.0 0.0 0" xyz="0 0 0"/>
+      <origin rpy="0.0 0.0 0" xyz="-.02 -.01 0"/>
     </xacro:auxiliary_frame>
   </xacro:macro>
 
@@ -184,7 +184,7 @@
       <origin rpy="0.0 0.0 ${-pi/4}" xyz="-.007 -.024 0"/>
     </xacro:auxiliary_frame>
     <xacro:auxiliary_frame parent="${trayname}_partition_2" framename="pickup">
-      <origin rpy="0.0 0.0 0.0" xyz="0 0 0.02"/>
+      <origin rpy="0.0 0.0 0.0" xyz="${-partition_length/2 + .0015} ${-partition_width/2 + .0015} 0"/>
     </xacro:auxiliary_frame>
     <xacro:auxiliary_frame parent="${trayname}_partition_3" framename="pickup">
       <origin rpy="0.0 0.0 0.0" xyz="${partition_length/2 - .0045} ${-partition_width/2 + .0045} 0"/>
@@ -212,7 +212,7 @@
     <xacro:property name="m4_x_delta" value="0.03"/>
     <xacro:property name="m4_y_0" value="0.275"/>
     <xacro:property name="m4_y_delta" value="-0.03"/>
-    <xacro:property name="m4_z_0" value="0.025"/>
+    <xacro:property name="m4_z_0" value="0.021"/>
     
     <xacro:auxiliary_frame parent="${trayname}" framename="screw_m4_1">
       <origin xyz="${m4_x_0 + m4_x_delta*0} ${m4_y_0 + m4_y_delta*0} ${m4_z_0}" rpy="0 ${pi/2} 0" />   
@@ -248,7 +248,7 @@
     <xacro:property name="m3_x_delta" value="0.03"/>
     <xacro:property name="m3_y_0" value="0.275"/>
     <xacro:property name="m3_y_delta" value="-0.03"/>
-    <xacro:property name="m3_z_0" value="0.025"/>
+    <xacro:property name="m3_z_0" value="0.021"/>
     
     <xacro:auxiliary_frame parent="${trayname}" framename="screw_m3_1">
       <origin xyz="${m3_x_0 + m3_x_delta*0} ${m3_y_0 + m3_y_delta*0} ${m3_z_0}" rpy="0 ${pi/2} 0" />   

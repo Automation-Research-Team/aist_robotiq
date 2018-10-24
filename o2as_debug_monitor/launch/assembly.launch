@@ -23,8 +23,8 @@
     image_topics:
       realsense:
         topic_name: /a_bot_camera/color/image_raw
-        col: [0, 11]
-        row: [0, 7]
+        col: [0, 23]
+        row: [0, 15]
 
     string_topics:
       task:
@@ -75,7 +75,31 @@
         row: [13, 15]
         offset: [8, 32]
         index: 3
+    
+    run_mode_topics:
+      run_mode:
+        topic_name: /run_mode
+        str: RUN MODE
+        col: [24, 31]
+        row: [11, 12]
+        offset: [8, 32]
+      test_mode:
+        topic_name: /test_mode
+        str: TEST MODE
+        col: [24, 31]
+        row: [11, 12]
+        offset: [8, 32]
+      pause_mode:
+        topic_name: /pause_mode
+        str: PAUSE MODE
+        col: [24, 31]
+        row: [11, 12]
+        offset: [8, 32]
 
   </rosparam>
+
+  <node pkg="o2as_debug_monitor" type="test_debug_monitor.py"
+        name="test_debug_monitor" output="screen">
+  </node>
 
 </launch>
