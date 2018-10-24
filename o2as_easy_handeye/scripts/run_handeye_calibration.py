@@ -201,8 +201,8 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
     #group.set_pose_reference_frame(robot_name + "_base_link")
     group.set_pose_reference_frame("workspace_center")
     #group.set_end_effector_link(robot_name + "_ee_link")
-    group.set_end_effector_link(robot_name + "_gripper_tip_link")
-    #group.set_end_effector_link(robot_name + "_ar_marker")
+    #group.set_end_effector_link(robot_name + "_gripper_tip_link")
+    group.set_end_effector_link(robot_name + "_ar_marker")
 
     # Trajectory publisher
     display_trajectory_publisher = rospy.Publisher(
