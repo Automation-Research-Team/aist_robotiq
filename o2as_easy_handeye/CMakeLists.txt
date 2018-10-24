@@ -73,20 +73,6 @@ add_dependencies(quat2rpy
   ${catkin_EXPORTED_TARGETS}
 )
 
-add_executable(transformer
-  src/transformer/main.cpp
-)
-
-target_link_libraries(transformer
-  ${catkin_LIBRARIES}
-  ${roscpp_LIBRARIES}
-)
-
-add_dependencies(transformer
-  ${PROJECT_NAME}_gencpp
-  ${catkin_EXPORTED_TARGETS}
-)
-
 add_executable(calibrator_test
   src/calibrator_test/main.cpp
   src/calibrator/aistCalibration.cpp
@@ -127,14 +113,13 @@ catkin_install_python(
   PROGRAMS
     scripts/run_handeye_calibration.py
     scripts/go_home.py
-    scripts/calibrate.py
     scripts/publish.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 install(
   TARGETS
-    calibrator quat2rpy transformer plane_detector
+    calibrator quat2rpy calibrator_test plane_detector
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
