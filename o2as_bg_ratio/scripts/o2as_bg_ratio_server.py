@@ -32,6 +32,8 @@ def _draw_rect(img, x, y, w, h, color, thick=False):
     return np.asarray(img_)
 
 
+import copy
+
 class InnerPickDetection(object):
 
     def __init__(self):
@@ -40,12 +42,12 @@ class InnerPickDetection(object):
 
         self.bridge = CvBridge()
         # Config parameters
-        # TODO: read values from config file
-        self._x = 270
-        self._y = 275
-        self._w = 64
-        self._h = 32
-        # TODO: Write an image with the ROI drawn into it
+        # From before assembly with surprise parts trial
+        # origin is top left, x is right, y is down
+        self._x = 311
+        self._y = 285
+        self._w = 23
+        self._h = 22
 
         # Publish input image (and output value)
         # The image is published when bg ratio is computed
@@ -69,6 +71,8 @@ class InnerPickDetection(object):
         self.img_empty = np.asarray(self.img_empty)[:, :, ::-1]
         self._empty_bg_ratio = self.compute_red_ratio(self.img_empty, self._x, self._y, self._w, self._h)
         #rospy.get_param("/empty_bg_ratio", '0.7')
+
+        self.img_counter = 0
     
     # Action Callback
     def action_callback(self, goal):
@@ -77,11 +81,34 @@ class InnerPickDetection(object):
         rospy.loginfo('Executing'+ str(self._action_name)+"."+"request sent:")
 
         #TODO consider the part to compare the red ratio
-        res = self.compute_red_ratio(self._current_image, self._x, self._y, self._w, self._h) < self._empty_bg_ratio
+        #Save image of with the ROI
+        try:
+            if(goal.saveROIImage):
+                self.saveROIImage()
+        except rospy.ROSInterruptException:
+            print "ROI image of calibration not saved"
+            print "goal.saveROIImage is not defined in the call of inner_pick_detection-action"
+
+        res = self.compute_red_ratio(self._current_image, self._x, self._y, self._w, self._h) #< self._empty_bg_ratio
+
+        self.img_counter += 1
+        if res:
+            res_string = "success"
+        else:
+            res_string = "failed"
+        cv2.imwrite("/root/catkin_ws/src/o2as_bg_ratio/images/" + str(self.img_counter) + "_" + res_string + ".png'", cv2.cvtColor(self._current_image, cv2.COLOR_BGR2RGB))
 
         self.action_result.success = res
         self.action_result.picked = res
         self._action_server.set_succeeded(self.action_result)
+
+    #Save Image with ROI
+    def saveROIImage(self):
+        imageROI = copy.deepcopy(self._current_image)
+
+        cv2.rectangle(imageROI, (self._x,self._y), (self._x+self._w,self._y + self._h), (255,0,0), 3, ) 
+        cv2.imwrite("/root/catkin_ws/src/o2as_bg_ratio/images/ROIempty_close_gripper.png'", cv2.cvtColor(imageROI, cv2.COLOR_BGR2RGB))
+
 
     # Image Callback
     def image_callback(self, msg_in):
@@ -89,7 +116,7 @@ class InnerPickDetection(object):
         self._current_image = np.asarray(self._current_image)[:, :, ::-1]
 
     #Compute ratio
-    def compute_red_ratio(self, img, x, y, w, h, br_threshold=0.2, red_threshold=0.7, vis=False):
+    def compute_red_ratio(self, img, x, y, w, h, br_threshold=0.2, red_threshold=0.9, vis=False):
         """Compute the ratio of red area in the image.
 
         The returned value should be used to check if the precision gripper pick a
@@ -133,16 +160,19 @@ class InnerPickDetection(object):
         #self.pub_output_value.publish(bg_ratio_message)
 
         threshold = 0.9
-        if bg_ratio > threshold:
+        if bg_ratio < threshold:
             img0 = _draw_rect(img0, x, y, w, h, (0, 255, 0), True)
+            item_picked = True
         else:
             img0 = _draw_rect(img0, x, y, w, h, (255, 0, 0))
+            item_picked = False
 
         # publish input image with detection rectangle
         img_message = self.bridge.cv2_to_imgmsg(img0, "rgb8")
         self.pub_input_image.publish(img_message)
+        rospy.loginfo("bg_ratio in check_pick: " + str(bg_ratio))
 
-        return bg_ratio
+        return item_picked
 
 if __name__ == "__main__":
 

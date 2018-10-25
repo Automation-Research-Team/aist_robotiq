@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kitting_scene">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="calibration_scene">
   <!-- spawn and attach AR markers -->
   <xacro:include filename="$(find o2as_gazebo)/urdf/o2as_ar_marker.urdf.xacro"/>
   <!-- <xacro:o2as_ar_marker prefix="a_bot_" -->

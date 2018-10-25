@@ -124,6 +124,8 @@ public:
   bool use_real_robot_;
   bool run_mode_, pause_mode_, test_mode_;
   double reduced_speed_limit_ = .25;
+  double speed_fast = 1.5, speed_fastest = 3.0;
+  double acc_fast = 1.5, acc_fastest = 2.0;
   boost::mutex mutex_;
 
   ros::Subscriber subRunMode_, subPauseMode_, subTestMode_;

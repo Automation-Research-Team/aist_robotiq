@@ -48,6 +48,8 @@ from o2as_routines.base import O2ASBaseRoutines
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
+import actionlib
+import o2as_msgs.msg
 
 class CalibrationClass(O2ASBaseRoutines):
   """
@@ -59,8 +61,7 @@ class CalibrationClass(O2ASBaseRoutines):
     super(CalibrationClass, self).__init__()
     
     self.a_bot_downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
-    self.bin_names = ["bin2_1", "bin2_2", "bin2_3", "bin2_4", "bin3_1", "bin1_1", 
-                      "bin1_2", "bin1_3", "bin1_4", "bin1_5"]
+    self.bin_names = ["bin3_1", "bin2_4", "bin2_3", "bin2_2", "bin2_1", "bin1_2", "bin1_1", "bin1_4", "bin1_5", "bin1_3" ]
 
     self.bridge = CvBridge()
     self._img = Image()
@@ -331,6 +332,7 @@ class CalibrationClass(O2ASBaseRoutines):
     rospy.loginfo("a_bot gripper tip should be 3 mm above the surface.")
     self.go_to_named_pose("home", "a_bot", speed=0.1)
     self.go_to_named_pose("home", "b_bot", speed=0.1)
+    self.send_gripper_command("a_bot", "close")
     poses = []
 
     pose0 = geometry_msgs.msg.PoseStamped()
@@ -338,36 +340,38 @@ class CalibrationClass(O2ASBaseRoutines):
     pose0.pose.position.z = .002
     
     if context == "initial": 
-      for i in range(3):
+      pose0.pose.position.z = .002
+      for i in range(4):
         poses.append(copy.deepcopy(pose0))
-      poses[0].header.frame_id = "mat_part12"
-      poses[1].header.frame_id = "mat_part1"
-      poses[2].header.frame_id = "mat_part8"
-      self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, move_lin = True)
+      poses[0].header.frame_id = "mat_part15"
+      poses[1].header.frame_id = "mat_part14"
+      poses[2].header.frame_id = "mat_part9"
+      poses[3].header.frame_id = "mat_part4"
+      self.cycle_through_calibration_poses(poses, robot_name, speed=0.3, go_home=False, move_lin = True)
     elif context == "full":
-      pose0.pose.position.z = .005
-      for i in range(16):
+      pose0.pose.position.z = .003
+      for i in range(15):
         poses.append(copy.deepcopy(pose0))
       poses[0].header.frame_id = "mat_part1"
       poses[1].header.frame_id = "mat_part2"
       poses[2].header.frame_id = "mat_part3"
       poses[3].header.frame_id = "mat_part4"
-      poses[5].header.frame_id = "mat_part6"
-      poses[6].header.frame_id = "mat_part7_1"
-      poses[7].header.frame_id = "mat_part7_2"
-      poses[8].header.frame_id = "mat_part8"
-      poses[9].header.frame_id = "mat_part9"
-      poses[10].header.frame_id = "mat_part10"
-      poses[11].header.frame_id = "mat_part11"
-      # poses[12].header.frame_id = "mat_part12"
-      # poses[13].header.frame_id = "mat_part13"
-      poses[14].header.frame_id = "mat_part14"
-      poses[15].header.frame_id = "mat_part15"
+      poses[4].header.frame_id = "mat_part6"
+      poses[5].header.frame_id = "mat_part7_1"
+      poses[6].header.frame_id = "mat_part7_2"
+      poses[7].header.frame_id = "mat_part8"
+      poses[8].header.frame_id = "mat_part9"
+      poses[9].header.frame_id = "mat_part10"
+      poses[10].header.frame_id = "mat_part11"
+      poses[11].header.frame_id = "mat_part12"
+      poses[12].header.frame_id = "mat_part13"
+      poses[13].header.frame_id = "mat_part14"
+      poses[14].header.frame_id = "mat_part15"
+      self.cycle_through_calibration_poses(poses, robot_name, speed=0.25, go_home=False, move_lin=True)
     elif context == "competition":
       if robot_name == "a_bot":
         for i in range(10):
           poses.append(copy.deepcopy(pose0))
-        # poses[1].header.frame_id = "mat_part2" # Retainer pin. b_bot?
         poses[0].header.frame_id = "mat_part3"
         poses[1].header.frame_id = "mat_part4"
         poses[2].header.frame_id = "mat_part7_1"
@@ -386,7 +390,7 @@ class CalibrationClass(O2ASBaseRoutines):
         poses[2].header.frame_id = "mat_part8"
         poses[3].header.frame_id = "mat_part15"
         # poses[4].header.frame_id = "mat_part2" # Retainer pin. b_bot?
-      self.cycle_through_calibration_poses(poses, robot_name, speed=0.05, go_home=False, move_lin=True)
+      self.cycle_through_calibration_poses(poses, robot_name, speed=0.15, go_home=False, move_lin=True)
     return 
 
   def taskboard_screw_tool_calibration(self, robot_name = "b_bot", end_effector_link=""):
@@ -595,6 +599,54 @@ class CalibrationClass(O2ASBaseRoutines):
     self.cycle_through_calibration_poses(poses, "c_bot", speed=0.3, go_home=True)
     return
   
+  def assembly_tray_a_bot_calibration_for_competition(self):
+    rospy.loginfo("============ Going to parts tray positions with a_bot============")
+    self.go_to_named_pose("back", "c_bot")
+    self.go_to_named_pose("home", "b_bot")
+    poses = []
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.header.frame_id = "tray_2_partition_8_pickup_1"
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.position.z = .02
+
+    for i in range(6):
+      poses.append(copy.deepcopy(pose0))
+
+    poses[1].header.frame_id = "tray_2_partition_8_pickup_2"
+    poses[2].header.frame_id = "tray_2_partition_5_pickup"
+    poses[3].header.frame_id = "tray_2_partition_4_pickup"
+    poses[4].header.frame_id = "tray_2_partition_3_pickup"
+    poses[5].header.frame_id = "tray_1_partition_5_pickup"
+    poses[5].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+    
+    self.cycle_through_calibration_poses(poses, "a_bot", speed=0.3, go_home=True, move_lin=True)
+    return
+  
+  def assembly_tray_b_bot_calibration_for_competition(self):
+    rospy.loginfo("not correctly implemented.")
+    return
+    rospy.loginfo("============ Going to parts tray positions with a_bot============")
+    self.go_to_named_pose("back", "c_bot")
+    self.go_to_named_pose("home", "a_bot")
+    poses = []
+    pose0 = geometry_msgs.msg.PoseStamped()
+    pose0.header.frame_id = "tray_2_partition_8_pickup_1"
+    pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+    pose0.pose.position.z = .02
+
+    for i in range(6):
+      poses.append(copy.deepcopy(pose0))
+
+    poses[1].header.frame_id = "tray_2_partition_8_pickup_2"
+    poses[2].header.frame_id = "tray_2_partition_5_pickup"
+    poses[3].header.frame_id = "tray_2_partition_4_pickup"
+    poses[4].header.frame_id = "tray_2_partition_3_pickup"
+    poses[5].header.frame_id = "tray_1_partition_5_pickup"
+    poses[5].pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+    
+    self.cycle_through_calibration_poses(poses, "b_bot", speed=0.3, go_home=True, move_lin=True)
+    return
+
   def kitting_tray_test(self, robot_name = "a_bot", end_effector_link = ""):
     rospy.loginfo("============ Moving " + robot_name + "around the tray " + ", eef_link is " + end_effector_link + " ============")
     if robot_name=="b_bot":
@@ -883,7 +935,7 @@ class CalibrationClass(O2ASBaseRoutines):
 
     pose0 = geometry_msgs.msg.PoseStamped()
     pose0.header.frame_id = "set_" + str(set_number) + "_tray_2_screw_m4_1"
-    pose0.pose.position.x = -.007
+    pose0.pose.position.x = -0.007
     if robot_name=="b_bot" or robot_name=="a_bot":
       pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2, 0, 0))
       if task=="kitting":
@@ -1105,7 +1157,7 @@ class CalibrationClass(O2ASBaseRoutines):
             self.go_to_named_pose("suction_place_intermediate_pose_for_sets_2_and_3", "b_bot", speed=0.5)
           
       pose0.pose.position.x = 0
-      pose0.pose.position.z = 0.05
+      pose0.pose.position.z = 0.02
       for i in range(5):
         poses.append(copy.deepcopy(pose0))
 
@@ -1128,7 +1180,7 @@ class CalibrationClass(O2ASBaseRoutines):
       poses[8].header.frame_id = "tray_2_partition_8_pickup_2"
 
     self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
-    return 
+    return
 
   
 
@@ -1229,6 +1281,13 @@ class CalibrationClass(O2ASBaseRoutines):
     rospy.sleep(1.0)
     
     cv2.imwrite('/root/catkin_ws/src/o2as_bg_ratio/images/empty_close_gripper.png', self._img)
+
+    client = actionlib.SimpleActionClient('inner_pick_detection_action', o2as_msgs.msg.innerPickDetectionAction)
+    client.wait_for_server()
+    goal = o2as_msgs.msg.innerPickDetectionGoal()
+    goal.saveROIImage = True
+    goal.part_id = 12
+    client.send_goal(goal)   
     return
 
   def image_callback(self, msg_in):
@@ -1277,8 +1336,7 @@ if __name__ == '__main__':
       rospy.loginfo("501-503: Assembly base plate (c_bot, b_bot, a_bot)")
       rospy.loginfo("504-507: Assembly base plate (b_bot m4, b_bot m3, c_bot nut, c_bot set_screw)")
       rospy.loginfo("511-513: Motor plate (c_bot, b_bot, b_bot m4)")
-      rospy.loginfo("53: Assembly base plate (a_bot)")
-      rospy.loginfo("54: Assembly assembled parts")
+      rospy.loginfo("52, 53: Pickup frame calibration a_bot, b_bot (competition)")
       rospy.loginfo("55: Assembly initial part locations (the plates)")
       rospy.loginfo("56: Go to tray screw positions with m4 tool for b_bot")
       rospy.loginfo("561, 562: Go to tray screw positions with b_bot, a_bot")
@@ -1436,6 +1494,8 @@ if __name__ == '__main__':
         c.bin_corner_calibration(robot_name="b_bot", end_effector_link="b_bot_suction_tool_tip_link")
       elif r == '341':
         c.check_inner_pick_calibration()
+      elif r == '342':
+        c.check_pick()
       elif r == '371':
         c.screw_feeder_calibration(robot_name="c_bot")
       elif r == '372':
@@ -1466,6 +1526,10 @@ if __name__ == '__main__':
         c.assembly_calibration_base_plate("b_bot", context="motor_plate")
       elif r == '513':
         c.assembly_calibration_base_plate("b_bot", end_effector_link="b_bot_screw_tool_m4_tip_link", context="motor_plate")
+      elif r == "52":
+        c.assembly_tray_a_bot_calibration_for_competition()
+      elif r == "53":
+        c.assembly_tray_b_bot_calibration_for_competition()
       elif r == '54':
         c.assembly_calibration_assembled_parts()
       elif r == '55':
