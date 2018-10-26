@@ -44,8 +44,8 @@
     </sensor>
   </gazebo>
 
-  <gazebo reference="b_bot_camera_depth_frame">
-    <sensor type="depth" name="b_bot_camera">       
+  <gazebo reference="c_bot_camera_depth_frame">
+    <sensor type="depth" name="c_bot_camera">       
       <always_on>true</always_on>
       <visualize>true</visualize>             
       <camera>
@@ -66,8 +66,8 @@
         <baseline>0.2</baseline>
         <alwaysOn>true</alwaysOn>
         <updateRate>10.0</updateRate>
-        <cameraName>b_bot_camera</cameraName>
-        <frameName>b_bot_camera_depth_frame</frameName>
+        <cameraName>c_bot_camera</cameraName>
+        <frameName>c_bot_camera_depth_frame</frameName>
         <imageTopicName>rgb/image_raw</imageTopicName>
         <depthImageTopicName>depth/image_raw</depthImageTopicName>
         <pointCloudTopicName>depth/points</pointCloudTopicName>

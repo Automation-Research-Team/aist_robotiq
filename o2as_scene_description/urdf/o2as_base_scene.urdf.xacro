@@ -158,15 +158,6 @@
   <xacro:sensor_d435 prefix="a_bot_" parent="a_bot_cam_holder_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:sensor_d435>
-  <link name="a_bot_camera_calibrated_frame_link" />
-  <joint name="a_bot_camera_calibrated_frame_joint" type="fixed">
-    <parent link="a_bot_wrist_2_link" />
-    <child  link="a_bot_camera_calibrated_frame_link" />
-    <origin xyz="-0.00584875065097 -0.0601140904909 0.190359410313" rpy="-1.631 -0.020 -0.016" />
-  </joint>
-  <!-- <xacro:sensor_d435 prefix="d_bot_" parent="o2as_ground">
-    <origin xyz="0 0 ${bots_z + 0.9}" rpy="0 ${pi/2} 0"/>
-  </xacro:sensor_d435> -->
   
   <!-- Add PhoXi 3D scanners -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />
