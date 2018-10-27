@@ -93,15 +93,15 @@ keyposes = {
   },
   'a_bot_camera': {
     'a_bot': [
-      [-0.05, -0.20, 0.20, radians(0), radians( 70), radians(0)],
-      [-0.05, -0.17, 0.20, radians(0), radians( 80), radians(0)],
-      [-0.05, -0.15, 0.20, radians(0), radians( 90), radians(0)],
-      [-0.05, -0.13, 0.20, radians(0), radians(100), radians(0)],
-      [-0.05, -0.10, 0.20, radians(0), radians(110), radians(0)],
-      [-0.05, -0.10, 0.20, radians(-90), radians( 70), radians(-90)],
-      [-0.05, -0.12, 0.20, radians(-90), radians( 80), radians(-90)],
-      [-0.05, -0.14, 0.20, radians(-90), radians(100), radians(-90)],
-      [-0.05, -0.16, 0.20, radians(-90), radians(110), radians(-90)],
+      [-0.05, -0.20, 0.20, radians(  0), radians( 60), radians(  0)],
+      [-0.05, -0.17, 0.20, radians(  0), radians( 75), radians(  0)],
+      [-0.05, -0.15, 0.20, radians(  0), radians( 90), radians(  0)],
+      [-0.05, -0.10, 0.20, radians(  0), radians(100), radians(  0)],
+      [-0.05, -0.05, 0.20, radians(  0), radians(110), radians(  0)],
+      [-0.05, -0.05, 0.20, radians(-90), radians( 70), radians(-90)],
+      [-0.05, -0.12, 0.20, radians(-90), radians( 85), radians(-90)],
+      [-0.05, -0.14, 0.20, radians(-90), radians(105), radians(-90)],
+      [-0.05, -0.16, 0.20, radians(-90), radians(120), radians(-90)],
     ]
   }
 }
