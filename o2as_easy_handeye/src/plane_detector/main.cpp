@@ -21,6 +21,62 @@
 namespace o2as_easy_handeye
 {
 /************************************************************************
+*  static functions							*
+************************************************************************/
+template <class POINT, class PLANE> static auto
+signed_distance(const POINT& point, const PLANE& plane)
+{
+    const auto	norm = std::sqrt(plane[0]*plane[0] +
+				 plane[1]*plane[1] + plane[2]*plane[2]);
+    return (plane[0]*point.x + plane[1]*point.y + plane[2]*point.z + plane[3])
+	 / norm;
+}
+    
+/************************************************************************
+*  class RainbowColormap						*
+************************************************************************/
+template <class T> class RainbowColormap
+{
+  public:
+    RainbowColormap(T min, T max)	;
+    
+    auto	operator ()(T val) const
+		{
+		    auto idx = uint32_t((_colors.size() - 1)*(val - _min) /
+					_range);
+		    if (idx < 0)
+			idx = 0;
+		    if (idx >= _colors.size())
+			idx = _colors.size() - 1;
+		    return _colors[idx];
+		}
+    
+  private:
+    static auto	color(uint32_t r, uint32_t g, uint32_t b)
+		{
+		    return (r << 16) | (g << 8) | b;
+		}
+    
+  private:
+    const T			_min, _range;
+    std::array<uint32_t, 255*4>	_colors;
+};
+
+template <class T>
+RainbowColormap<T>::RainbowColormap(T min, T max)
+    :_min(min), _range(max - min)
+{
+    for (size_t i = 0; i < 255; ++i)
+	_colors[i]	 = color(0, i, 255);
+    for (size_t i = 0; i < 255; ++i)
+	_colors[255 + i] = color(0, 255, 255-i);
+    for (size_t i = 0; i < 255; ++i)
+	_colors[510 + i] = color(i, 255, 0);
+    for (size_t i = 0; i < 255; ++i)
+	_colors[765 + i] = color(255, 255-i, 0);
+}
+    
+/************************************************************************
 *  class PlaneDetector							*
 ************************************************************************/
 class PlaneDetector
@@ -97,11 +153,13 @@ PlaneDetector::cloud_callback(const cloud_p& cloud_msg)
 	      << plane[0] << ' ' << plane[1] << ' '
 	      << plane[2] << ' ' << plane[3] << ')' << std::endl;
 
+    RainbowColormap<float>	colormap(-_planarity_tolerance,
+					  _planarity_tolerance);
     for (size_t i = 0; i < inliers.indices.size(); ++i)
     {
-	const uint32_t	rgb = 0xff0000;
 	auto&		point = cloud->points[inliers.indices[i]];
-	point.rgb = *reinterpret_cast<const float*>(&rgb);
+	const auto	color = colormap(signed_distance(point, plane));
+	point.rgb = *reinterpret_cast<const float*>(&color);
     }
 
     cloud_t	out_msg;

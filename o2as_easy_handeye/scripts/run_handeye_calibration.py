@@ -51,13 +51,13 @@ keyposes = {
 
     'b_bot': [
       # configulation for real
-      [0.30,  0.15, 0.18, radians( 30), radians( 25), radians(0)],
-      [0.30,  0.00, 0.18, radians( 30), radians( 25), radians(0)],
-      [0.30, -0.15, 0.18, radians( 30), radians( 25), radians(0)],
+      # [0.30,  0.15, 0.18, radians( 30), radians( 25), radians(0)],
+      # [0.30,  0.00, 0.18, radians( 30), radians( 25), radians(0)],
+      # [0.30, -0.15, 0.18, radians( 30), radians( 25), radians(0)],
 
-      [0.30, -0.10, 0.28, radians( 30), radians( 25), radians(0)],
-      [0.30,  0.00, 0.28, radians( 30), radians( 25), radians(0)],
-      [0.30,  0.10, 0.28, radians( 30), radians( 25), radians(0)],
+      # [0.30, -0.10, 0.28, radians( 30), radians( 25), radians(0)],
+      # [0.30,  0.00, 0.28, radians( 30), radians( 25), radians(0)],
+      # [0.30,  0.10, 0.28, radians( 30), radians( 25), radians(0)],
 
       # [0.20,  0.15, 0.20, radians( 30), radians( 25), radians(0)],
       # [0.20,  0.00, 0.20, radians( 30), radians( 25), radians(0)],
@@ -68,13 +68,13 @@ keyposes = {
       # [0.15,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
 
       # configulation for AIST
-      # [0.48,  0.10, 0.10, radians( 30), radians( 25), radians(0)],
-      # [0.48,  0.00, 0.10, radians( 30), radians( 25), radians(0)],
-      # [0.48, -0.10, 0.10, radians( 30), radians( 25), radians(0)],
+      [0.45,  0.10, 0.18, radians( 30), radians( 25), radians(0)],
+      [0.45,  0.00, 0.18, radians( 30), radians( 25), radians(0)],
+      [0.45, -0.10, 0.18, radians( 30), radians( 25), radians(0)],
 
-      # [0.53, -0.10, 0.15, radians( 30), radians( 25), radians(0)],
-      # [0.53,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
-      # [0.53,  0.10, 0.15, radians( 30), radians( 25), radians(0)],
+      [0.45, -0.10, 0.28, radians( 30), radians( 25), radians(0)],
+      [0.45,  0.00, 0.28, radians( 30), radians( 25), radians(0)],
+      [0.45,  0.10, 0.28, radians( 30), radians( 25), radians(0)],
 
       # [0.40,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
       # #[0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
