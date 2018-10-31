@@ -66,14 +66,14 @@ class XelaSensorDemo(XelaSensorClient):
     cv2.namedWindow('xela-sensor', cv2.WINDOW_NORMAL)
 
     while not rospy.is_shutdown():
-      # Read new data from the sensor and update z pos
-      
+      # Read new data from the sensor and update z pos      
       diff = np.array(self.data) - np.array(base)
       dx = diff.reshape((taxel_num,3))[:,0] / scale
       dy = diff.reshape((taxel_num,3))[:,1] / scale
       dz = diff.reshape((taxel_num,3))[:,2] / scale
 
       # Draw circles that represents probes of tactile sensor
+      img[:]=(0,0,0)
       k = 0
       for j in range(taxel_rows):
         for i in range(taxel_cols):
@@ -86,7 +86,6 @@ class XelaSensorDemo(XelaSensorClient):
       cv2.imshow("xela-sensor", img)
       if cv2.waitKey(1) > 0:
         break
-      img[:]=(0,0,0)
 
   def __del__(self):
     cv2.destroyAllWindows()
