@@ -63,7 +63,7 @@ class XelaSensorDemo(XelaSensorClient):
 
     # Open window to display state of taxels on the board
     img = np.zeros((height,width,3), np.uint8)
-    cv2.namedWindow('Image window', cv2.WINDOW_NORMAL)
+    cv2.namedWindow('xela-sensor', cv2.WINDOW_NORMAL)
 
     while not rospy.is_shutdown():
       # Read new data from the sensor and update z pos
@@ -83,7 +83,7 @@ class XelaSensorDemo(XelaSensorClient):
           cv2.circle(img, (int(x), int(y)), int(z), color, -1)
           k = k+1
 
-      cv2.imshow("Image window", img)
+      cv2.imshow("xela-sensor", img)
       if cv2.waitKey(1) > 0:
         break
       img[:]=(0,0,0)
