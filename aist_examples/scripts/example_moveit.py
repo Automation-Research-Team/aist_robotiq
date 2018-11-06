@@ -171,7 +171,7 @@ class MoveItExamples(object):
         pose_b.pose.position.y = .0
         pose_b.pose.position.z = .03
         rospy.loginfo("============ Going to 2 cm above the table. ============")
-        self.go_to_pose_goal("b_bot", pose_b, speed=1.0, acceleration=0.0, high_precision=False, end_effector_link="", move_lin=True)
+        self.go_to_pose_goal("b_bot", pose_b, speed=0.05, acceleration=0.0, high_precision=False, end_effector_link="", move_lin=True)
 
         rospy.loginfo("============ Press enter to go to .1 cm above the table. ============")
         i = raw_input()
