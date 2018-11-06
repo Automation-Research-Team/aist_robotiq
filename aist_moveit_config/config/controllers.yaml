@@ -1,5 +1,7 @@
 controller_list:
   - name: b_bot_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
     joints:
       - b_bot_shoulder_pan_joint
       - b_bot_shoulder_lift_joint
