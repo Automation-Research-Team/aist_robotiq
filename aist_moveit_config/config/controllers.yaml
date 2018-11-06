@@ -1,5 +1,5 @@
 controller_list:
-  - name: fake_b_bot_controller
+  - name: b_bot_controller
     joints:
       - b_bot_shoulder_pan_joint
       - b_bot_shoulder_lift_joint
@@ -7,7 +7,3 @@ controller_list:
       - b_bot_wrist_1_joint
       - b_bot_wrist_2_joint
       - b_bot_wrist_3_joint
-
-initial:
-  - group: "b_bot"
-    pose: "home"
