@@ -5,8 +5,8 @@
   <xacro:macro name="aist_base" params="boxname parent *origin">
     <!-- This creates a box with the origin in the bottom corner, fixed to the world link. -->
     
-    <xacro:property name="box_w" value=".65"/>
-    <xacro:property name="box_l" value=".65"/>
+    <xacro:property name="box_w" value=".225"/>
+    <xacro:property name="box_l" value=".225"/>
     <xacro:property name="box_h" value=".05"/>
 
     <link name="${boxname}">
