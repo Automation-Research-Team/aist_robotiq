@@ -15,8 +15,6 @@ from std_srvs.srv import Trigger
 from o2as_routines.base import O2ASBaseRoutines
 from math import radians, degrees
 
-
-
 ######################################################################
 #  class VisitRoutines                                               #
 ######################################################################
@@ -26,17 +24,19 @@ class VisitRoutines(O2ASBaseRoutines):
     super(VisitRoutines, self).__init__()
     
     cs = "/{}/".format(camera_name)
-    self.start_acquisition = rospy.ServiceProxy(cs + "start_acquisition", Trigger)
-    self.stop_acquisition  = rospy.ServiceProxy(cs + "stop_acquisition",  Trigger)
+    self.start_acquisition = rospy.ServiceProxy(cs + "start_acquisition",
+                                                Trigger)
+    self.stop_acquisition  = rospy.ServiceProxy(cs + "stop_acquisition",
+                                                Trigger)
 
     ## Initialize `moveit_commander`
-    self.robot_name = robot_name
-    group = self.groups[robot_name]
+    self.group_name = robot_name
+    group = self.groups[self.group_name]
 
     # Set `_ee_link` as end effector wrt `_base_link` of the robot
-    #group.set_pose_reference_frame(robot_name + "_base_link")
     group.set_pose_reference_frame("workspace_center")
-    group.set_end_effector_link(robot_name + "_gripper_tip_link")
+    #group.set_end_effector_link(robot_name + "_gripper_tip_link")
+    group.set_end_effector_link(robot_name + "_dual_suction_gripper_pad_link")
 
     # Trajectory publisher
     display_trajectory_publisher = rospy.Publisher(
@@ -57,8 +57,9 @@ class VisitRoutines(O2ASBaseRoutines):
     self.stop_acquisition()
 
     print("move to {}".format(position.vector))
+    group = self.groups[self.group_name]
     poseStamped = geometry_msgs.msg.PoseStamped()
-    poseStamped.header.frame_id = "workspace_center"
+    poseStamped.header.frame_id = group.get_pose_reference_frame()
     poseStamped.pose.position.x = position.vector.x
     poseStamped.pose.position.y = position.vector.y
     poseStamped.pose.position.z = position.vector.z + 0.05 # - 0.0285
@@ -66,39 +67,20 @@ class VisitRoutines(O2ASBaseRoutines):
       = geometry_msgs.msg.Quaternion(
         *tf_conversions.transformations.quaternion_from_euler(
           radians(180), radians(90), radians(90)))
-    [all_close, move_success] = self.go_to_pose_goal(self.robot_name,
-                                                     poseStamped, speed,
-                                                     move_lin=False)
+    [all_close, move_success] \
+        = self.go_to_pose_goal(self.group_name, poseStamped, speed,
+                               end_effector_link=group.get_end_effector_link(),
+                               move_lin=False)
     rospy.sleep(1)
     poseStamped.pose.position.z = position.vector.z + 0.01 # -0.0285
-    [all_close, move_success] = self.go_to_pose_goal(self.robot_name,
-                                                     poseStamped, speed,
-                                                     move_lin=False)
-
-    # corners = rospy.wait_for_message("/aruco_tracker/corners",
-    #                                  Corners, 1)
-    # for corner in enumerate(corneres):
-    #   print("move to {}".format(corner.point))
-    #   poseStamped = geometry_msgs.msg.PoseStamped()
-    #   poseStamped.pose.position.x = corner.point.x
-    #   poseStamped.pose.position.y = corner.point.y
-    #   poseStamped.pose.position.z = corner.point.z + 0.1
-    #   poseStamped.pose.orientation \
-    #     = geometry_msgs.msg.Quaternion(
-    #         *tf_conversions.transformations.quaternion_from_euler(
-    #             radians(90), radians(90), radians(90)))
-    #   [all_close, move_success] = self.go_to_pose_goal(self.robot_name,
-    #                                                    poseStamped, speed,
-    #                                                    move_lin=False)
-    #   rospy.sleep(1)
-    #   poseStamped.pose.position.z = corner.point.z
-    #   [all_close, move_success] = self.go_to_pose_goal(self.robot_name,
-    #                                                    poseStamped, speed,
-    #                                                    move_lin=False)
+    [all_close, move_success] \
+        = self.go_to_pose_goal(self.group_name, poseStamped, speed,
+                               end_effector_link=group.get_end_effector_link(),
+                               move_lin=False)
         
 
   def go_home(self):
-    self.go_to_named_pose("home", self.robot_name)
+    self.go_to_named_pose("home", self.group_name)
 
 
   def run(self, speed):
