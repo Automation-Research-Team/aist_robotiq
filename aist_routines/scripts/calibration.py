@@ -24,7 +24,7 @@ class CalibrationClass(AISTBaseRoutines):
 
         for pose in poses:
             rospy.loginfo("============ Press `Enter` to move " + robot_name + " to " + pose.header.frame_id)
-            # self.publish_marker(pose, "place_pose")
+            self.publish_marker(pose, "place_pose")
             raw_input()
             if go_home:
                 self.go_to_named_pose(home_pose, robot_name)

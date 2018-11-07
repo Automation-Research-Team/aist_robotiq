@@ -94,11 +94,11 @@ class AISTBaseRoutines(object):
                         end_effector_link = "", move_lin = True):
         if move_lin:
             return self.move_lin(group_name, pose_goal_stamped, speed, acceleration, end_effector_link)
-        # self.publish_marker(pose_goal_stamped, "pose")
+        self.publish_marker(pose_goal_stamped, "pose")
         group = self.groups[group_name]
 
         if not end_effector_link:
-            if group_name == "b_bot":
+            if group_name == "b_bot":[]
                 end_effector_link = "b_bot_suction_tool_tip_link"
         group.set_end_effector_link(end_effector_link)
 
@@ -125,7 +125,7 @@ class AISTBaseRoutines(object):
         return all_close(pose_goal_stamped.pose, current_pose, 0.01), move_success
 
     def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, end_effector_link = ""):
-        # self.publish_marker(pose_goal_stamped, "pose")
+        self.publish_marker(pose_goal_stamped, "pose")
 
         if not end_effector_link:
             if group_name == "b_bot":
