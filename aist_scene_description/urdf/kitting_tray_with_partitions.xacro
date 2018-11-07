@@ -6,6 +6,7 @@
 
   <xacro:property name="tray_width" value=".300" />
   <xacro:property name="tray_length" value=".210" />
+  <xacro:property name="tray_height" value=".023" />
   <xacro:property name="mesh_offset_x" value="-.045" />
   <xacro:property name="mesh_offset_y" value=".045" />
 
@@ -44,6 +45,34 @@
       <child link = "${trayname}" />
       <xacro:insert_block name="origin"/>
     </joint>
+
+    <joint name="${trayname}_top_front_right_corner_joint" type="fixed">
+      <parent link="${trayname}"/>
+      <child link="${trayname}_top_front_right_corner"/>
+      <origin rpy="0.0 0.0 0.0" xyz="${tray_width} ${tray_length} ${tray_height} "/>
+    </joint>
+    <link name="${trayname}_top_front_right_corner"/>
+
+    <joint name="${trayname}_top_back_right_corner_joint" type="fixed">
+      <parent link="${trayname}"/>
+      <child link="${trayname}_top_back_right_corner"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0 ${tray_length} ${tray_height} "/>
+    </joint>
+    <link name="${trayname}_top_back_right_corner"/>
+
+    <joint name="${trayname}_top_back_left_corner_joint" type="fixed">
+      <parent link="${trayname}"/>
+      <child link="${trayname}_top_back_left_corner"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0 0 ${tray_height} "/>
+    </joint>
+    <link name="${trayname}_top_back_left_corner"/>
+
+    <joint name="${trayname}_top_front_left_corner_joint" type="fixed">
+      <parent link="${trayname}"/>
+      <child link="${trayname}_top_front_left_corner"/>
+      <origin rpy="0.0 0.0 0.0" xyz="${tray_width} 0 ${tray_height} "/>
+    </joint>
+    <link name="${trayname}_top_front_left_corner"/>
   </xacro:macro>
 
   <!-- ========== -->
