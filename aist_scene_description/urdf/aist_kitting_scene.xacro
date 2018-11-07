@@ -1,6 +1,32 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kitting_scene">
-  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_tray_with_partitions.xacro" />
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="aist_kitting_scene">
+  <xacro:include filename="$(find aist_scene_description)/urdf/kitting_tray_with_partitions.xacro" />
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro" />
 
+
+  <xacro:property name="tray_width" value=".210" />
+  <xacro:property name="tray_length" value=".300" />
+  <xacro:property name="tray_rack_width" value=".210" />
+  <xacro:property name="tray_rack_length" value=".600" />
+  <xacro:property name="tray_rack_height" value=".015" />
+
+
+  <!-- add tray rack -->
+  <xacro:o2as_box boxname="rack_trays" box_w="${tray_rack_width}" box_l="${tray_rack_length}" box_h="${tray_rack_height}" parent="workspace_center">
+    <origin xyz="-.299 ${-tray_rack_length/2}  0" rpy="0 0 0" />
+  </xacro:o2as_box>
+  <link name="tray_rack_center" />
+  <joint name="tray_rack_joint" type="fixed">
+    <parent link="workspace_center" />
+    <child link="tray_rack_center"/>
+    <origin xyz="${-.299+tray_rack_width/2} 0 ${tray_rack_height}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- add trays -->
+  <xacro:kitting_tray1 trayname="set_1_tray_1" parent="tray_rack_center">
+    <origin xyz="${-tray_rack_width/2} ${-tray_rack_length/2} 0" rpy="0 0 0" />
+  </xacro:kitting_tray1>
+  <xacro:kitting_tray2 trayname="set_1_tray_2" parent="tray_rack_center">
+    <origin xyz="${-tray_rack_width/2} 0 0" rpy="0 0 0" />
+  </xacro:kitting_tray2>
 </robot>
