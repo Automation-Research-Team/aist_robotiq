@@ -56,7 +56,7 @@ class CalibrationClass(AISTBaseRoutines):
         pose_b.pose.position.y = .0
         pose_b.pose.position.z = .03
         rospy.loginfo("============ Going to 2 cm above the table. ============")
-        self.go_to_pose_goal("b_bot", pose_b, speed=1.0, acceleration=0.0, high_precision=False, end_effector_link="", move_lin=True)
+        self.go_to_pose_goal("b_bot", pose_b, speed=0.05, acceleration=0.0, high_precision=False, end_effector_link="", move_lin=True)
 
         rospy.loginfo("============ Press enter to go to .1 cm above the table. ============")
         i = raw_input()
@@ -88,7 +88,7 @@ class CalibrationClass(AISTBaseRoutines):
             pose.header.frame_id = tray_name + "_" + corner
             poses.append(pose)
 
-        self.cycle_through_calibration_poses(poses, robot_name, speed = 1.0, move_lin=True, go_home=False, end_effector_link="b_bot_suction_tool_tip_link")
+        self.cycle_through_calibration_poses(poses, robot_name, speed = 0.05, move_lin=True, go_home=False, end_effector_link="b_bot_suction_tool_tip_link")
 
 if __name__ == '__main__':
 
