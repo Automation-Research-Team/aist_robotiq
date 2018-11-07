@@ -15,6 +15,12 @@ class CalibrationClass(AISTBaseRoutines):
         super(CalibrationClass, self).__init__()
         self.use_real_robot = rospy.get_param("use_real_robot", False)
 
+
+        self.bin_names = [
+            "bin2_5","bin2_4","bin2_1","bin2_3","bin2_2",
+            "bin1_3","bin1_4","bin1_5","bin1_2","bin1_1"
+        ]
+
         rospy.loginfo("Calibration class is staring up!")
 
     def cycle_through_calibration_poses(self, poses, robot_name, speed=0.3, move_lin=False, go_home=True, end_effector_link=""):
@@ -111,6 +117,41 @@ class CalibrationClass(AISTBaseRoutines):
 
         self.cycle_through_calibration_poses(poses, robot_name, speed = 0.05, move_lin=True, go_home=False, end_effector_link="b_bot_suction_tool_tip_link")
 
+    def bin_corner_calibration(self, robot_name="b_bot", end_effector_link=""):
+        rospy.loginfo("============ Calibrating bin. ============")
+        rospy.loginfo(robot_name + " end effector should be 3 cm above each corner of each bin.")
+
+        if end_effector_link=="":
+            self.go_to_named_pose("home", robot_name)
+
+        poses = []
+
+        pose0 = geometry_msgs.msg.PoseStamped()
+        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+        pose0.pose.position.z = 0.03
+
+        for bin in self.bin_names:
+            pose0.header.frame_id = bin
+            world_pose = self.listener.transformPose("workspace_center", pose0)
+            # if robot_name == "b_bot":
+            #     if world_pose.pose.position.y < -.15:
+            #         continue
+            new_pose = copy.deepcopy(pose0)
+            new_pose.header.frame_id = bin + "_top_back_left_corner"
+            poses.append(new_pose)
+            new_pose = copy.deepcopy(pose0)
+            new_pose.header.frame_id = bin + "_top_back_right_corner"
+            poses.append(new_pose)
+            new_pose = copy.deepcopy(pose0)
+            new_pose.header.frame_id = bin + "_top_front_right_corner"
+            poses.append(new_pose)
+            new_pose = copy.deepcopy(pose0)
+            new_pose.header.frame_id = bin + "_top_front_left_corner"
+            poses.append(new_pose)
+
+        self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
+        return
+
 if __name__ == '__main__':
 
     rospy.init_node("Calibration")
@@ -118,13 +159,16 @@ if __name__ == '__main__':
     try:
         c = CalibrationClass()
 
-        while True:
-            rospy.loginfo("================ MoveIt examples ================")
-            rospy.loginfo("Enter 1 to move b_bot to home pose.")
-            rospy.loginfo("Enter 2 to touch the table (workspace_center).")
-            rospy.loginfo("Enter 31(311, 312) to calibrate tray position(set_1_tray_1/set_1_tray_2).")
-            rospy.loginfo("Enter 4 to calibrate bin rack position (without bins).")
-            rospy.loginfo("Enter x to exit.")
+        while not rospy.is_shutdown():
+            rospy.loginfo("============ Calibration procedures ============ ")
+            rospy.loginfo("1: Go home with b_bot")
+            rospy.loginfo("2: Touch the table (workspace_center)")
+            rospy.loginfo("31: Go to tray corners")
+            rospy.loginfo("311: Go to set_1_tray_1 corners")
+            rospy.loginfo("322: Go to set_1_tray_2 corners")
+            rospy.loginfo("4: Bin-rack calibration")
+            rospy.loginfo("5: Bin corners with b_bot")
+            rospy.loginfo("x: Exit")
 
             i = raw_input()
             if i == '1':
@@ -141,6 +185,8 @@ if __name__ == '__main__':
                     c.check_calibration_tray_position("b_bot", "set_1_tray_2")
             elif i == '4':
                 c.check_calibration_bin_rack("b_bot")
+            elif i == '5':
+                c.bin_corner_calibration("b_bot")
             if i == 'x':
                 break
         print("================ done!!")
