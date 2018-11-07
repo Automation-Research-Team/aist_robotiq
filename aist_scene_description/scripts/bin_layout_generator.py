@@ -67,30 +67,30 @@ def write_head(outfile,directory):
 # write bin information
 def write_bin_definition(outfile,directory,bin_definition):
     # write bin definition to the file in xml format
-    outfile.write(" <!-- space for bin -->\n\n")
+    outfile.write("  <!-- space for bin -->\n\n")
 
     for i in range(len(bin_definition)):
-        outfile.write(" <!-- bin"+str(i+1)+"_definition -->\n")
-        outfile.write(" <xacro:property name=\""+str(bin_definition[i].bin_type)+"_width\" value=\""+str(bin_definition[i].width)+"\"/>\n")
-        outfile.write(" <xacro:property name=\""+str(bin_definition[i].bin_type)+"_length\" value=\""+str(bin_definition[i].length)+"\"/>\n")
-        outfile.write(" <xacro:property name=\"z_origin_offset_"+str(i+1)+"\" value=\""+str(bin_definition[i].z_origin_offset)+"\" />\n\n")
+        outfile.write("  <!-- bin"+str(i+1)+"_definition -->\n")
+        outfile.write("  <xacro:property name=\""+str(bin_definition[i].bin_type)+"_width\" value=\""+str(bin_definition[i].width)+"\"/>\n")
+        outfile.write("  <xacro:property name=\""+str(bin_definition[i].bin_type)+"_length\" value=\""+str(bin_definition[i].length)+"\"/>\n")
+        outfile.write("  <xacro:property name=\"z_origin_offset_"+str(i+1)+"\" value=\""+str(bin_definition[i].z_origin_offset)+"\" />\n\n")
 
 def write_bin_set_origin(outfile,directory,set_list):
     for i in range(len(set_list)):
-        outfile.write(" <!-- A row of bin"+str(i+1)+" -->\n")
+        outfile.write("  <!-- A row of bin"+str(i+1)+" -->\n")
 
-        outfile.write(" <xacro:property name=\"set"+str(i+1)+"_x\" value=\""+str(set_list[i].origin_x)+"\"/>\n")
-        outfile.write(" <xacro:property name=\"set"+str(i+1)+"_y\" value=\""+str(set_list[i].origin_y)+"\"/>\n")
-        outfile.write(" <xacro:property name=\"set"+str(i+1)+"_z\" value=\""+str(set_list[i].origin_z)+"\"/>\n")
+        outfile.write("  <xacro:property name=\"set"+str(i+1)+"_x\" value=\""+str(set_list[i].origin_x)+"\"/>\n")
+        outfile.write("  <xacro:property name=\"set"+str(i+1)+"_y\" value=\""+str(set_list[i].origin_y)+"\"/>\n")
+        outfile.write("  <xacro:property name=\"set"+str(i+1)+"_z\" value=\""+str(set_list[i].origin_z)+"\"/>\n")
 
 def write_bin_layout(outfile,directory,set_list):
     for s in set_list:
 
         for i in range(len(s.bins)):
-            outfile.write(" <!--"+str(s.bins[i].bin_name)+"_-->\n ")
-            outfile.write(" <xacro:kitting_bin_"+str(s.bins[i].bin_type[3])+" binname=\""+str(s.bins[i].bin_name)+"\" parent=\"workspace_center\" z_origin_offset=\""+str(s.bins[i].definition.z_origin_offset)+"\">\n ")
-            outfile.write("     <origin xyz=\""+str(s.bins[i].pos_x)+" "+str(s.bins[i].pos_y)+" "+str(s.bins[i].pos_z)+"\" rpy=\"0 0 0\" />\n ")
-            outfile.write(" </xacro:kitting_bin_"+str(s.bins[i].bin_type[3])+">\n ")
+            outfile.write("  <!--"+str(s.bins[i].bin_name)+"_-->\n")
+            outfile.write("  <xacro:kitting_bin_"+str(s.bins[i].bin_type[3])+" binname=\""+str(s.bins[i].bin_name)+"\" parent=\"bin_rack_center\" z_origin_offset=\""+str(s.bins[i].definition.z_origin_offset)+"\">\n")
+            outfile.write("    <origin xyz=\""+str(s.bins[i].pos_x)+" "+str(s.bins[i].pos_y)+" "+str(s.bins[i].pos_z)+"\" rpy=\"0 0 0\" />\n")
+            outfile.write("  </xacro:kitting_bin_"+str(s.bins[i].bin_type[3])+">\n")
 
 # write tail
 def write_tail(outfile,directory):
