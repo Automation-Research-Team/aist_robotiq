@@ -46,6 +46,8 @@ import moveit_commander
 import geometry_msgs.msg
 from moveit_commander.conversions import pose_to_list
 
+import o2as_msgs.msg
+import o2as_msgs.srv
 
 def all_close(goal, actual, tolerance):
     """
@@ -78,6 +80,7 @@ class AISTBaseRoutines(object):
             "b_bot": moveit_commander.MoveGroupCommander("b_bot")
         }
         self.listener = tf.TransformListener()
+        self.publishMarker_client = rospy.ServiceProxy('/aist_skills/publishMarker', o2as_msgs.srv.publishMarker)
 
     def go_to_named_pose(self, pose_name, robot_name, speed = 1.0, acceleration = 0.0):
         # pose_name should be "home", "back" etc.
@@ -98,7 +101,7 @@ class AISTBaseRoutines(object):
         group = self.groups[group_name]
 
         if not end_effector_link:
-            if group_name == "b_bot":[]
+            if group_name == "b_bot":
                 end_effector_link = "b_bot_suction_tool_tip_link"
         group.set_end_effector_link(end_effector_link)
 
@@ -155,3 +158,10 @@ class AISTBaseRoutines(object):
 
         current_pose = group.get_current_pose().pose
         return plan_success
+
+    def publish_marker(self, pose_stamped, marker_type):
+        req = o2as_msgs.srv.publishMarkerRequest()
+        req.marker_pose = pose_stamped
+        req.marker_type = marker_type
+        self.publishMarker_client.call(req)
+        return True
