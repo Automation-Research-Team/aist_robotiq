@@ -90,6 +90,27 @@ class CalibrationClass(AISTBaseRoutines):
 
         self.cycle_through_calibration_poses(poses, robot_name, speed = 0.05, move_lin=True, go_home=False, end_effector_link="b_bot_suction_tool_tip_link")
 
+    def check_calibration_bin_rack(self, robot_name):
+        rospy.loginfo("Calibrating bin rack position")
+
+        corners = [
+            # "bin_rack_top_front_left_corner",
+            "bin_rack_top_back_left_corner",
+            "bin_rack_top_front_right_corner",
+            "bin_rack_top_back_right_corner"
+        ]
+
+        pose0 = geometry_msgs.msg.PoseStamped()
+        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+        pose0.pose.position.z = 0.01
+        poses = []
+        for corner in corners:
+            pose = copy.deepcopy(pose0)
+            pose.header.frame_id = corner
+            poses.append(pose)
+
+        self.cycle_through_calibration_poses(poses, robot_name, speed = 0.05, move_lin=True, go_home=False, end_effector_link="b_bot_suction_tool_tip_link")
+
 if __name__ == '__main__':
 
     rospy.init_node("Calibration")
@@ -102,6 +123,7 @@ if __name__ == '__main__':
             rospy.loginfo("Enter 1 to move b_bot to home pose.")
             rospy.loginfo("Enter 2 to touch the table (workspace_center).")
             rospy.loginfo("Enter 31(311, 312) to calibrate tray position(set_1_tray_1/set_1_tray_2).")
+            rospy.loginfo("Enter 4 to calibrate bin rack position (without bins).")
             rospy.loginfo("Enter x to exit.")
 
             i = raw_input()
@@ -117,6 +139,8 @@ if __name__ == '__main__':
                 else:
                     c.check_calibration_tray_position("b_bot", "set_1_tray_1")
                     c.check_calibration_tray_position("b_bot", "set_1_tray_2")
+            elif i == '4':
+                c.check_calibration_bin_rack("b_bot")
             if i == 'x':
                 break
         print("================ done!!")
