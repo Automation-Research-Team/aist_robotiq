@@ -4,7 +4,6 @@ from math import pi
 import random
 
 import rospy
-import actionlib
 import tf_conversions
 import std_msgs.msg
 import geometry_msgs.msg
@@ -27,7 +26,6 @@ class KittingClass(AISTBaseRoutines):
         """Initialize class object."""
         super(KittingClass, self).__init__()
         self.initialize_parameters()
-        self.setup_suction_tool()
         rospy.loginfo("Kitting class is staring up!")
 
     def initialize_parameters(self):
@@ -45,10 +43,7 @@ class KittingClass(AISTBaseRoutines):
         self.bin_3_width = 0.285
         self.bin_3_length = 0.192
 
-    def setup_suction_tool(self):
-        self._suction = actionlib.SimpleActionClient('o2as_fastening_tools/suction_control', SuctionControlAction)
-        self._suctioned = False
-        self._suction_state = rospy.Subscriber("suction_tool/screw_suctioned", std_msgs.msg.Bool, self._suction_state_callback)
+        self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
 
 
     def pick(self, robot_name, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False):
@@ -99,26 +94,6 @@ class KittingClass(AISTBaseRoutines):
         pick_pose.pose.position.y += -bin_length/2 + random.random()*bin_length
 
         return pick_pose
-
-    def suck(self, turn_suction_on=False, eject=False, timeout=2.0):
-        """Judge success or fail using pressure status."""
-        if not self.use_real_robot:
-            return True
-
-        if turn_suction_on and eject:
-            rospy.logwarn("Warning: Unexpected action might occur because suction and blow is both on.")
-            return False
-
-        goal = SuctionControlGoal()
-        goal.fastening_tool_name = "suction_tool"
-        goal.turn_suction_on = turn_suction_on
-        goal.eject_screw = eject
-        self._suction.send_goal(goal)
-        self._suction.wait_for_result(rospy.Duration(timeout))
-        return self._suction.get_result()
-
-    def _suction_state_callback(self, msg):
-        self._suctioned = msg.data
 
 if __name__ == '__main__':
 
