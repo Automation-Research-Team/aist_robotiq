@@ -142,6 +142,7 @@ class KittingClass(AISTBaseRoutines):
 
         self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
 
+
     def attempt_item(self, item, max_attempts = 5):
         """
         This function attempts to pick an item.
@@ -234,13 +235,13 @@ class KittingClass(AISTBaseRoutines):
         pick_pose = geometry_msgs.msg.PoseStamped()
         pick_pose.header.frame_id = item.bin_name
 
-        if "bin1" in item.bin_name:
+        if "bin_1" in item.bin_name:
             bin_width = self.bin_1_width
             bin_length = self.bin_1_length
-        elif "bin2" in item.bin_name:
+        elif "bin_2" in item.bin_name:
             bin_width = self.bin_2_width
             bin_length = self.bin_2_length
-        elif "bin3" in item.bin_name:
+        elif "bin_3" in item.bin_name:
             bin_width = self.bin_3_width
             bin_length = self.bin_3_length
 
@@ -249,6 +250,16 @@ class KittingClass(AISTBaseRoutines):
         pick_pose.pose.position.y += -bin_length/2 + random.random()*bin_length
 
         return pick_pose
+
+    ###----- main procedure
+    def kitting_task(self):
+        self.order_list_raw, self.ordered_items = self.read_order_file()
+        rospy.loginfo("Received order list:")
+        rospy.loginfo(self.order_list_raw)
+
+        pick_pose = self.get_random_pose_in_bin(self.ordered_items[1])
+        rospy.loginfo(pick_pose)
+
 
 if __name__ == '__main__':
 
@@ -259,6 +270,7 @@ if __name__ == '__main__':
 
         while True:
             rospy.loginfo("Enter 1 to read order file.")
+            rospy.loginfo("Enter START to start the task.")
             rospy.loginfo("Enter x to exit.")
 
             i = raw_input()
@@ -266,6 +278,8 @@ if __name__ == '__main__':
                 order_list_raw, ordered_items = kit.read_order_file()
                 rospy.loginfo("Received order list:")
                 rospy.loginfo(order_list_raw)
+            elif i == 'START' or i == 'start':
+                kit.kitting_task()
             elif i == 'x':
                 break
         print("================ Done!")
