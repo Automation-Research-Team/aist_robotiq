@@ -142,6 +142,93 @@ class KittingClass(AISTBaseRoutines):
 
         self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
 
+    def attempt_item(self, item, max_attempts = 5):
+        """
+        This function attempts to pick an item.
+
+        It increases the item.attempts counter each time it does,
+        and sets item.fulfilled to True if item is delivered.
+        """
+        if item.ee_to_use == "suction":
+            robot_name = "b_bot"
+
+        if item.fulfilled:
+            rospy.logerr("This item is already fulfilled. Something is going wrong.")
+            return False
+
+        # Go to preparatory pose
+        if item.ee_to_use == "suction":
+            rospy.loginfo("Going to preparatory pose before picking from bins")
+            bin_center = geometry_msgs.msg.PoseStamped()
+            bin_center.header.frame_id = item.bin_name
+            bin_center.pose.orientation.w = 1.0
+            bin_center_on_table = self.listener.transformPose("workspace_center", bin_center).pose.position
+            if bin_center_on_table.y > .1:
+                self.go_to_named_pose("suction_ready_right_bins", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+            else:
+                self.go_to_named_pose("suction_ready_left_bins", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+
+        attempts = 0
+        while attempts < max_attempts and not rospy.is_shutdown():
+            attempts += 1
+            item.attempts += 1
+            rospy.loginfo("=== Attempting item nr." + str(item.number_in_set) +
+                          " from set " + str(item.set_number) +
+                          " (part ID:" + str(item.part_id) + "). Attempt nr. " + str(item.attempts))
+            # Get the pick_pose for the item, either random or from vision
+            pick_pose = self.get_random_pose_in_bin(item)
+            pick_pose.pose.orientation = self.downward_orientation
+            approach_height = 0.1
+            speed_slow = 0.1
+            speed_fast = 1.0
+            if item.ee_to_use == "suction":
+                gripper_command = "suction"
+                approach_height = .15
+                speed_slow = 0.05
+                speed_fast = 1.0
+            else:
+                gripper_command = ""
+            pick_pose = self.make_pose_safe_for_bin(pick_pose, item)
+            item_picked = self.pick(robot_name, pick_pose, 0.0, speed_fast = speed_fast, speed_slow = .05,
+                                                gripper_command=gripper_command, approach_height = approach_height)
+            if not self.use_real_robot:
+                item_picked = True
+            if not item_picked:
+                rospy.logerr("Failed an attempt to pick item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + "). Reattempting. Current attempts: " + str(attempts))
+                if item.ee_to_use == "suction":
+                    self.suck(False)
+                continue
+
+            # Attempt to place the item
+            place_pose = geometry_msgs.msg.PoseStamped()
+            place_pose.header.frame_id = item.target_frame
+            required_intermediate_pose = []
+            if item.ee_to_use == "suction":
+                # This is inconvenient to set up because the trays are rotated. tray_2s are rotated 180 degrees relative to set_1_tray_1
+                # SUCTION_PREP_POSES
+                place_pose.pose.orientation, required_intermediate_pose = self.get_tray_placement_orientation_for_suction_in_kitting(
+                                                                                                    set_number=item.set_number,
+                                                                                                    tray_number=int(place_pose.header.frame_id[11]))
+                if not place_pose.pose.orientation.w and not place_pose.pose.orientation.x and not place_pose.pose.orientation.y:
+                    rospy.logerr("SOMETHING WENT WRONG, ORIENTATION IS NOT ASSIGNED")
+            approach_height = .05
+            if item.ee_to_use == "suction":
+                if required_intermediate_pose:
+                    rospy.loginfo("Going to intermediate pose")
+                    self.go_to_named_pose(required_intermediate_pose, "b_bot", speed=1.5, acceleration=1.0, force_ur_script=self.use_real_robot)
+            self.place(robot_name, place_pose,grasp_height=item.dropoff_height,
+                                        speed_fast = 0.5, speed_slow = 0.02, gripper_command=gripper_command, approach_height = approach_height)
+            if item.ee_to_use == "suction":
+                self.force_moveit_linear_motion = False
+            # If successful
+            self.fulfilled_items += 1
+            item.fulfilled = True
+            rospy.loginfo("Delivered item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + ")! Total items delivered: " + str(self.fulfilled_items))
+            return True
+
+        rospy.logerr("Was not able to pick item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + ")! Total attempts: " + str(item.attempts))
+        return False
+
     def get_random_pose_in_bin(self, item):
         """Get item's random pose in parts bin."""
         pick_pose = geometry_msgs.msg.PoseStamped()
