@@ -18,6 +18,7 @@
 #include <tf/transform_listener.h>
 #include <visualization_msgs/Marker.h>
 #include <dynamic_reconfigure/server.h>
+#include <o2as_aruco_ros/Corners.h>
 
 #include <aruco/aruco.h>
 #include <aruco/cvdrawingutils.h>
@@ -144,7 +145,10 @@ class Simple
     const ros::Publisher		_position_pub;
     const ros::Publisher		_marker_pub;
     const ros::Publisher		_pixel_pub;
+    const ros::Publisher		_corners_pub;
 
+    Corners				_corners;
+    
     dynamic_reconfigure::Server<aruco_ros::ArucoThresholdConfig>
 					_dyn_rec_server;
 
@@ -176,6 +180,7 @@ Simple::Simple()
 		       "position", 100)),
      _marker_pub(_nh.advertise<visualization_msgs::Marker>("marker", 10)),
      _pixel_pub(_nh.advertise<geometry_msgs::PointStamped>("pixel", 10)),
+     _corners_pub(_nh.advertise<Corners>("corners", 10)),
      _marker_id(0),
      _planarityTolerance(0.001)
 {
@@ -294,18 +299,6 @@ Simple::cloud_callback(const cloud_p& cloud_msg)
 void
 Simple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 {
-    if ((_image_pub.getNumSubscribers()	    == 0) &&
-	(_debug_pub.getNumSubscribers()	    == 0) &&
-	(_pose_pub.getNumSubscribers()	    == 0) &&
-	(_transform_pub.getNumSubscribers() == 0) &&
-	(_position_pub.getNumSubscribers()  == 0) &&
-	(_marker_pub.getNumSubscribers()    == 0) &&
-	(_pixel_pub.getNumSubscribers()	    == 0))
-    {
-	ROS_DEBUG_STREAM("No subscribers, not looking for aruco markers");
-	return;
-    }
-
     if (!_camParam.isValid())
 	return;
 
@@ -316,54 +309,49 @@ Simple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 					sensor_msgs::image_encodings::RGB8)
 			        ->image;
 	const auto	curr_stamp = ros::Time::now();
-      //const auto	curr_stamp = image_msg.header.stamp;
 
-	try
-	{
-	  //detection results will go into "markers"
-	    std::vector<aruco::Marker>	markers;
-	    _mDetector.detect(inImage,
-			      markers, _camParam, _marker_size, false);
+      //detection results will go into "markers"
+	std::vector<aruco::Marker>	markers;
+	_mDetector.detect(inImage, markers, _camParam, _marker_size, false);
 
-	    if (markers.size() == 0)
-		throw std::runtime_error("No markers detected!");
+	if (markers.size() == 0)
+	    throw std::runtime_error("No markers detected!");
 	
-	  //for each marker, draw info and its boundaries in the image
-	    _bins.clear();
-	    for (const auto& marker : markers)
+      //for each marker, draw info and its boundaries in the image
+	_bins.clear();
+	for (const auto& marker : markers)
+	{
+	    try
 	    {
-	      // only publishing the selected marker
 		if (_marker_id == 0)
 		    _bins.emplace_back(marker.id,
 				       get_marker_transform(marker,
 							    cloud_msg));
 		else if (marker.id == _marker_id)
 		    publish_marker_info(marker, cloud_msg, curr_stamp);
-
-	      // but drawing all the detected markers
-		marker.draw(inImage, cv::Scalar(0,0,255), 2);
+	    }
+	    catch (const std::runtime_error& e)
+	    {
+		ROS_WARN_STREAM(e.what());
 	    }
 
-	    if (_marker_size != -1)
-		for (auto& marker : markers)
-		    aruco::CvDrawingUtils::draw3dAxis(inImage,
-						      marker, _camParam);
+	  // but drawing all the detected markers
+	    marker.draw(inImage, cv::Scalar(0, 0, 255), 2);
 	}
-	catch (const std::runtime_error& e)
-	{
-	    ROS_WARN_STREAM(e.what());
-	}
+
+	if (_marker_size != -1)
+	    for (auto& marker : markers)
+		aruco::CvDrawingUtils::draw3dAxis(inImage, marker, _camParam);
 	
 	publish_image_info(inImage, curr_stamp);
+    }
+    catch (const std::runtime_error& e)
+    {
+	ROS_WARN_STREAM(e.what());
     }
     catch (const cv_bridge::Exception& e)
     {
 	ROS_ERROR_STREAM("cv_bridge exception: " << e.what());
-	return;
-    }
-    catch (...)
-    {
-	ROS_ERROR_STREAM("Unknown error");
     }
 }
 
@@ -407,6 +395,9 @@ Simple::get_marker_transform(const aruco::Marker& marker,
     using point_t	= cv::Vec<value_t, 3>;
     using plane_t	= o2as::Plane<value_t, 3>;
 
+    if (marker.size() < 4)
+	throw std::runtime_error("Detected not all four corners!");
+    
   // Compute initial marker plane.
     std::vector<point_t>	points;
     for (const auto& corner : marker)
@@ -480,20 +471,34 @@ Simple::get_marker_transform(const aruco::Marker& marker,
 	}
     }
 
+  // Fit a plane to seleceted inliers and then publish.
     plane.fit(points.cbegin(), points.cend());
 
     _cloud_pub.publish(cloud_msg);
 
-  // Compute 3D coordinates of marker corners.
+  // Compute 3D coordinates of marker corners and then publish.
     point_t	corners[4];
     for (int i = 0; i < 4; ++i)
 	corners[i] = plane.cross_point(view_vector(marker[i].x, marker[i].y));
 
+    Corners	corners_msg;
+    for (const auto& corner: corners)
+    {
+	geometry_msgs::PointStamped	pointStamped;
+	pointStamped.header = cloud_msg.header;
+	pointStamped.point.x = corner(0);
+	pointStamped.point.y = corner(1);
+	pointStamped.point.z = corner(2);
+	
+	corners_msg.corners.push_back(pointStamped);
+    }
+    _corners_pub.publish(corners_msg);
+    
   // Compute p and q, i.e. marker's local x-axis and y-axis respectively.
     const auto&	n = plane.normal();
     const auto	c = (corners[2] + corners[3] - corners[0] - corners[1])
-		  + (corners[1] + corners[2] - corners[3] - corners[0])
-			.cross(n);
+		  + (corners[1] + corners[2] -
+		     corners[3] - corners[0]).cross(n);
     const auto	p = c / cv::norm(c);
     const auto	q = n.cross(p);
 
@@ -501,10 +506,15 @@ Simple::get_marker_transform(const aruco::Marker& marker,
     const auto	centroid = 0.25*(corners[0] + corners[1] +
 				 corners[2] + corners[3]);
 
-  // Compute marker -> reference transfrom.
-    const tf::Transform		transform(tf::Matrix3x3(p(0), q(0), n(0),
-							p(1), q(1), n(1),
-							p(2), q(2), n(2)),
+  // Compute marker -> reference transform.
+  // Post-mulriply
+  //   -1 0 0
+  //    0 0 1
+  //    0 1 0
+  // according to ROS convensions.
+    const tf::Transform		transform(tf::Matrix3x3(-p(0), n(0), q(0),
+							-p(1), n(1), q(1),
+							-p(2), n(2), q(2)),
 					  tf::Vector3(centroid(0),
 						      centroid(1),
 						      centroid(2)));
@@ -531,6 +541,19 @@ void
 Simple::publish_marker_info(const aruco::Marker& marker,
 			    const cloud_t& cloud_msg, const ros::Time& stamp)
 {
+#ifdef DEBUG
+    {
+	tf::Transform		transform = aruco_ros::arucoMarker2Tf(marker);
+	tf::StampedTransform	cameraToReference;
+	tf::StampedTransform	stampedTransform(transform, stamp,
+						 _reference_frame,
+						 _marker_frame);
+	_tfBroadcaster.sendTransform(stampedTransform);
+	geometry_msgs::TransformStamped transformMsg;
+	tf::transformStampedTFToMsg(stampedTransform, transformMsg);
+	_transform_pub.publish(transformMsg);
+    }
+#endif
     const tf::StampedTransform	stampedTransform(
 				    get_marker_transform(marker, cloud_msg),
 				    stamp, _reference_frame, _marker_frame);
@@ -623,7 +646,7 @@ main(int argc, char** argv)
     }
     catch (...)
     {
-	ROS_ERROR_STREAM("Unknown error.");
+	ROS_ERROR_STREAM("Unknon error.");
     }
     
     return 0;
