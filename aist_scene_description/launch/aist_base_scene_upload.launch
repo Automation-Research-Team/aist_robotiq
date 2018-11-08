@@ -1,4 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find aist_scene_description)/urdf/aist_base_scene.urdf.xacro'" />
-</launch>
