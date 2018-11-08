@@ -15,12 +15,19 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   visp_bridge
   message_generation
+  pcl_ros
+  pcl_conversions
+)
+
+catkin_python_setup()
+
+generate_dynamic_reconfigure_options(
+  cfg/o2as_easy_handeye.cfg
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
-catkin_python_setup()
 catkin_package()
 
 ###########
@@ -29,8 +36,8 @@ catkin_package()
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
+  src/calibrator
 )
-
 add_executable(calibrator
   src/calibrator/calibrator.cpp
   src/calibrator/calibrator.h
@@ -66,17 +73,36 @@ add_dependencies(quat2rpy
   ${catkin_EXPORTED_TARGETS}
 )
 
-add_executable(transformer
-  src/transformer/main.cpp
+add_executable(calibrator_test
+  src/calibrator_test/main.cpp
+  src/calibrator/aistCalibration.cpp
+  src/calibrator/vpMatrix.cpp
 )
 
-target_link_libraries(transformer
+target_link_libraries(calibrator_test
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
+  gsl
 )
 
-add_dependencies(transformer
+add_dependencies(calibrator_test
   ${PROJECT_NAME}_gencpp
+  ${catkin_EXPORTED_TARGETS}
+)
+
+add_executable(plane_detector
+  src/plane_detector/main.cpp
+)
+
+target_link_libraries(plane_detector
+  ${catkin_LIBRARIES}
+  ${roscpp_LIBRARIES}
+  ${pcl_LIBRARIES}
+)
+
+add_dependencies(plane_detector
+  ${PROJECT_NAME}_gencpp
+  ${PROJECT_NAME}_gencfg
   ${catkin_EXPORTED_TARGETS}
 )
 
@@ -87,14 +113,13 @@ catkin_install_python(
   PROGRAMS
     scripts/run_handeye_calibration.py
     scripts/go_home.py
-    scripts/calibrate.py
     scripts/publish.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 install(
   TARGETS
-    calibrator quat2rpy transformer
+    calibrator quat2rpy calibrator_test plane_detector
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
