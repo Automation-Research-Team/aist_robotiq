@@ -12,11 +12,12 @@ from aist_routines.base import AISTBaseRoutines
 import o2as_msgs.msg
 
 
-class Item(object):
+class kitting_order_entry(object):
     """Definition class of target item"""
-    def __init__(self, part_id, bin_name):
+    def __init__(self, part_id, bin_name, ee_to_use):
         self.part_id = part_id
         self.bin_name = bin_name
+        self.ee_to_use = ee_to_use
 
 
 class KittingClass(AISTBaseRoutines):
