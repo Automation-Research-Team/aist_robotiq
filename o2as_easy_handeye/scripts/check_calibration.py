@@ -72,7 +72,7 @@ class VisitRoutines(O2ASBaseRoutines):
                                end_effector_link=group.get_end_effector_link(),
                                move_lin=False)
     rospy.sleep(1)
-    poseStamped.pose.position.z = position.vector.z + 0.01 # -0.0285
+    poseStamped.pose.position.z = position.vector.z # -0.0285
     [all_close, move_success] \
         = self.go_to_pose_goal(self.group_name, poseStamped, speed,
                                end_effector_link=group.get_end_effector_link(),
