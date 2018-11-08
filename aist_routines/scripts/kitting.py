@@ -51,6 +51,33 @@ class KittingClass(AISTBaseRoutines):
         self._suction_state = rospy.Subscriber("suction_tool/screw_suctioned", std_msgs.msg.Bool, self._suction_state_callback)
 
 
+    def pick(self, robot_name, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False):
+        # If the pick uses suction, pass it to the local function. Otherwise to the parent class.
+        if gripper_command == "suction":
+            object_pose.pose.position.z += approach_height
+            self.move_lin(robot_name, object_pose, speed_fast, end_effector_link="b_bot_suction_tool_tip_link")
+            object_pose.pose.position.z -= approach_height
+            rospy.loginfo("Try picking up by suction.")
+            res = self.suck(turn_suction_on=True, eject=False, timeout=2.0)
+            if not res:
+                return False
+            rospy.loginfo("Pushing into the bin.")
+            if self.use_real_robot:
+                self.do_linear_push("b_bot", force=5.0, wait=True, max_approach_distance=.092, forward_speed=.04)
+                self.confirm_to_proceed("Went to the target. Press enter")
+            else:
+                self.move_lin(group_name, pose_goal_stamped, speed, end_effector_link=end_effector_link)
+            object_pose.pose.position.z += approach_height
+            self.move_lin(robot_name, object_pose, speed_slow, end_effector_link="b_bot_suction_tool_tip_link")
+            object_pose.pose.position.z -= approach_height
+            if self._suctioned:
+                object_pose.pose.position.z += approach_height + .05
+                self.move_lin(robot_name, object_pose, speed_slow, end_effector_link="b_bot_suction_tool_tip_link")
+                object_pose.pose.position.z -= approach_height + .05
+            return self._suctioned
+        else:
+            pass
+            # return super(KittingClass, self).pick(robot_name, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height, special_pick)
 
     def get_random_pose_in_bin(self, item):
         """Get item's random pose in parts bin."""
