@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+
+<launch>
+    <node pkg="aist_skills" type="aist_skill_server.py" name="aist_skills" />
+</launch>
