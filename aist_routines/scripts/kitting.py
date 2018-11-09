@@ -202,9 +202,9 @@ class KittingClass(AISTBaseRoutines):
             bin_center.pose.orientation.w = 1.0
             bin_center_on_table = self.listener.transformPose("workspace_center", bin_center).pose.position
             if bin_center_on_table.y > .1:
-                self.go_to_named_pose("suction_ready_right_bins", "b_bot", speed=0.1, acceleration=1.0)
+                self.go_to_named_pose("suction_ready_right_bins", "b_bot", speed=1.0, acceleration=1.0)
             else:
-                self.go_to_named_pose("suction_ready_left_bins", "b_bot", speed=0.1, acceleration=1.0)
+                self.go_to_named_pose("suction_ready_left_bins", "b_bot", speed=1.0, acceleration=1.0)
 
         attempts = 0
         while attempts < max_attempts and not rospy.is_shutdown():
@@ -225,7 +225,7 @@ class KittingClass(AISTBaseRoutines):
             else:
                 gripper_command = ""
             pick_pose = self.make_pose_safe_for_bin(pick_pose, item)
-            item_picked = self.pick(robot_name, pick_pose, 0.0, speed_fast=0.1, speed_slow=.05,
+            item_picked = self.pick(robot_name, pick_pose, 0.0, speed_fast=1.0, speed_slow=.05,
                                                 gripper_command=gripper_command, approach_height = approach_height)
             if not self.use_real_robot:
                 item_picked = True
@@ -245,9 +245,9 @@ class KittingClass(AISTBaseRoutines):
             place_pose.pose.orientation = self.downward_orientation2
             approach_height = .05
             if item.ee_to_use == "suction":
-                self.go_to_named_pose("suction_ready_above_place_bin", "b_bot", speed=0.5)
+                self.go_to_named_pose("suction_ready_above_place_bin", "b_bot", speed=1.0, acceleration=1.0)
             self.place(robot_name, place_pose,item.dropoff_height,
-                                        speed_fast=0.1, speed_slow=0.02, gripper_command=gripper_command, approach_height=approach_height)
+                                        speed_fast=1.0, speed_slow=0.05, gripper_command=gripper_command, approach_height=approach_height)
             # If successful
             self.fulfilled_items += 1
             item.fulfilled = True
@@ -272,9 +272,9 @@ class KittingClass(AISTBaseRoutines):
             bin_width = self.bin_3_width
             bin_length = self.bin_3_length
 
-        pick_pose.pose.position.x += -bin_width/2 + random.random()*bin_width
+        pick_pose.pose.position.x = -bin_width/2 + random.random()*bin_width
+        pick_pose.pose.position.y = -bin_length/2 + random.random()*bin_length
         pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
-        pick_pose.pose.position.y += -bin_length/2 + random.random()*bin_length
 
         return pick_pose
 
@@ -283,16 +283,24 @@ class KittingClass(AISTBaseRoutines):
         if "bin_1" in item.bin_name:
             bin_width = self.bin_1_width
             bin_length = self.bin_1_length
+            thresh_x = .020
+            thresh_y = .020
         elif "bin_2" in item.bin_name:
             bin_width = self.bin_2_width
             bin_length = self.bin_2_length
+            thresh_x = .025
+            thresh_y = .030
         elif "bin_3" in item.bin_name:
             bin_width = self.bin_3_width
             bin_length = self.bin_3_length
+            thresh_x = .020
+            thresh_y = .020
+
+        rospy.loginfo("threshould: " + str(thresh_x) + ", " + str(thresh_y))
 
         safe_pose = copy.deepcopy(pick_pose)
-        safe_pose.pose.position.x = clamp(pick_pose.pose.position.x, -bin_width/2 + .025, bin_width/2 - .025)
-        safe_pose.pose.position.y = clamp(pick_pose.pose.position.y, -bin_length/2 + .025, bin_length/2 - .025)
+        safe_pose.pose.position.x = clamp(pick_pose.pose.position.x, -bin_width/2 + thresh_x, bin_width/2 - thresh_x)
+        safe_pose.pose.position.y = clamp(pick_pose.pose.position.y, -bin_length/2 + thresh_y, bin_length/2 - thresh_y)
         safe_pose.pose.position.z = clamp(pick_pose.pose.position.z, 0, 0.1)
 
         if safe_pose.pose.position.x != pick_pose.pose.position.x or safe_pose.pose.position.y != pick_pose.pose.position.y:
@@ -314,7 +322,7 @@ class KittingClass(AISTBaseRoutines):
         for item in self.suction_items:
             if rospy.is_shutdown():
                 break
-            self.attempt_item(item, 3)
+            self.attempt_item(item, 1)
         self.go_to_named_pose("home", "b_bot")
         rospy.loginfo("==== Done with first suction pass")
 
@@ -327,17 +335,12 @@ if __name__ == '__main__':
         kit = KittingClass()
 
         while True:
-            rospy.loginfo("Enter 1 to read order file.")
-            rospy.loginfo("Enter 2 to go to home all robots.")
+            rospy.loginfo("Enter 1 to go to home all robots.")
             rospy.loginfo("Enter START to start the task.")
             rospy.loginfo("Enter x to exit.")
 
             i = raw_input()
             if i == '1':
-                order_list_raw, ordered_items = kit.read_order_file()
-                rospy.loginfo("Received order list:")
-                rospy.loginfo(order_list_raw)
-            elif i == '2':
                 kit.go_to_named_pose("home", "b_bot")
             elif i == 'START' or i == 'start':
                 kit.kitting_task()
