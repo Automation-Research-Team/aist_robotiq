@@ -149,20 +149,20 @@ class KittingClass(AISTBaseRoutines):
 
         # How high the end effector should hover over the tray when delivering the item
         self.dropoff_heights = {
-            "part_4" : 0.03, 
-            "part_5" : 0.02, 
-            "part_6" : 0.01, 
+            "part_4" : 0.03,
+            "part_5" : 0.02,
+            "part_6" : 0.01,
             "part_7" : 0.04,
-            "part_8" : 0.01, 
-            "part_9" : 0.005, 
-            "part_10": 0.005, 
+            "part_8" : 0.01,
+            "part_9" : 0.005,
+            "part_10": 0.005,
             "part_11": 0.01,
             "part_12": 0.01,
             "part_13": 0.01,
-            "part_14": 0.005, 
-            "part_15": 0.005, 
-            "part_16": 0.005, 
-            "part_17": 0.005, 
+            "part_14": 0.005,
+            "part_15": 0.005,
+            "part_16": 0.005,
+            "part_17": 0.005,
             "part_18": 0.005
         }
 
@@ -202,9 +202,9 @@ class KittingClass(AISTBaseRoutines):
             bin_center.pose.orientation.w = 1.0
             bin_center_on_table = self.listener.transformPose("workspace_center", bin_center).pose.position
             if bin_center_on_table.y > .1:
-                self.go_to_named_pose("suction_ready_right_bins", "b_bot", speed=2.0, acceleration=2.0)
+                self.go_to_named_pose("suction_ready_right_bins", "b_bot", speed=0.1, acceleration=1.0)
             else:
-                self.go_to_named_pose("suction_ready_left_bins", "b_bot", speed=2.0, acceleration=2.0)
+                self.go_to_named_pose("suction_ready_left_bins", "b_bot", speed=0.1, acceleration=1.0)
 
         attempts = 0
         while attempts < max_attempts and not rospy.is_shutdown():
@@ -217,8 +217,6 @@ class KittingClass(AISTBaseRoutines):
             pick_pose = self.get_random_pose_in_bin(item)
             pick_pose.pose.orientation = self.downward_orientation
             approach_height = 0.1
-            speed_slow = 0.1
-            speed_fast = 1.0
             if item.ee_to_use == "suction":
                 gripper_command = "suction"
                 approach_height = .15
@@ -227,14 +225,15 @@ class KittingClass(AISTBaseRoutines):
             else:
                 gripper_command = ""
             pick_pose = self.make_pose_safe_for_bin(pick_pose, item)
-            item_picked = self.pick(robot_name, pick_pose, 0.0, speed_fast = speed_fast, speed_slow = .05,
+            item_picked = self.pick(robot_name, pick_pose, 0.0, speed_fast=0.1, speed_slow=.05,
                                                 gripper_command=gripper_command, approach_height = approach_height)
             if not self.use_real_robot:
                 item_picked = True
             if not item_picked:
                 rospy.logerr("Failed an attempt to pick item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + "). Reattempting. Current attempts: " + str(attempts))
                 if item.ee_to_use == "suction":
-                    self.suck(False)
+                    # self.suck(False)
+                    pass
                 continue
 
             # Attempt to place the item
@@ -248,7 +247,7 @@ class KittingClass(AISTBaseRoutines):
             if item.ee_to_use == "suction":
                 self.go_to_named_pose("suction_ready_above_place_bin", "b_bot", speed=0.5)
             self.place(robot_name, place_pose,item.dropoff_height,
-                                        speed_fast = 0.5, speed_slow = 0.02, gripper_command=gripper_command, approach_height = approach_height)
+                                        speed_fast=0.1, speed_slow=0.02, gripper_command=gripper_command, approach_height=approach_height)
             # If successful
             self.fulfilled_items += 1
             item.fulfilled = True
@@ -297,14 +296,14 @@ class KittingClass(AISTBaseRoutines):
         safe_pose.pose.position.z = clamp(pick_pose.pose.position.z, 0, 0.1)
 
         if safe_pose.pose.position.x != pick_pose.pose.position.x or safe_pose.pose.position.y != pick_pose.pose.position.y:
-            rospy.loginfo("Pose was adjusted in make_pose_safe_for_bin. Before: " + 
-                                        str(pick_pose.pose.position.x) + ", " + 
-                                        str(pick_pose.pose.position.y) + ", " + 
-                                        str(pick_pose.pose.position.z) + ". After: " + 
-                                        str(safe_pose.pose.position.x) + ", " + 
-                                        str(safe_pose.pose.position.y) + ", " + 
+            rospy.loginfo("Pose was adjusted in make_pose_safe_for_bin. Before: " +
+                                        str(pick_pose.pose.position.x) + ", " +
+                                        str(pick_pose.pose.position.y) + ", " +
+                                        str(pick_pose.pose.position.z) + ". After: " +
+                                        str(safe_pose.pose.position.x) + ", " +
+                                        str(safe_pose.pose.position.y) + ", " +
                                         str(safe_pose.pose.position.z) + ".")
-        
+
         #TODO: Adjust the gripper orientation when close to the border
         return safe_pose
 

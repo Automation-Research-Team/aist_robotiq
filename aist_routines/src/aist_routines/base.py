@@ -117,7 +117,8 @@ class AISTBaseRoutines(object):
         elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
             self.precision_gripper_inner_open()
         elif gripper_command=="suction":
-            self.suck(True, False)
+            pass
+            # self.suck(True, False)
         elif gripper_command=="none":
             pass
         else:
@@ -181,8 +182,9 @@ class AISTBaseRoutines(object):
         elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
             self.precision_gripper_inner_open()
         elif gripper_command=="suction":
-            self.suck(turn_suction_on=False, eject=True)
-            self.suck(turn_suction_on=False, eject=False)
+            pass
+            # self.suck(turn_suction_on=False, eject=True)
+            # self.suck(turn_suction_on=False, eject=False)
         elif gripper_command=="none":
             pass
         else:
@@ -282,7 +284,7 @@ class AISTBaseRoutines(object):
             rospy.logwarn("Warning: Unexpected action might occur because suction and blow is both on.")
             return False
 
-        goal = SuctionControlGoal()
+        goal = o2as_msgs.msg.SuctionControlActionGoal()
         goal.fastening_tool_name = "suction_tool"
         goal.turn_suction_on = turn_suction_on
         goal.eject_screw = eject
