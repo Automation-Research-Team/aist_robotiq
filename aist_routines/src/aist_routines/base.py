@@ -159,7 +159,6 @@ class AISTBaseRoutines(object):
 
     def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, lift_up_after_place = True):
         self.publish_marker(object_pose, "place_pose")
-        self.log_to_debug_monitor("Place", "operation")
         rospy.loginfo("Going above place target")
         object_pose.pose.position.z += approach_height
         self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
