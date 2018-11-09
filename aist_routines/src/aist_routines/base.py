@@ -158,16 +158,21 @@ class AISTBaseRoutines(object):
             object_pose.pose.position.z -= approach_height
         return True
 
-    def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, lift_up_after_place = True):
+    def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height=0.05, lift_up_after_place=True):
+        if speed_fast > 1.0:
+            acceleration=speed_fast
+        else:
+            acceleration=1.0
+
         self.publish_marker(object_pose, "place_pose")
         rospy.loginfo("Going above place target")
         object_pose.pose.position.z += approach_height
-        self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
+        self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, acceleration=acceleration, move_lin=True)
         object_pose.pose.position.z -= approach_height
 
         rospy.loginfo("Moving to place target")
         object_pose.pose.position.z += place_height
-        self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, move_lin=True)
+        self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, acceleration=acceleration, move_lin=True)
         object_pose.pose.position.z -= place_height
 
         #gripper open
@@ -194,7 +199,7 @@ class AISTBaseRoutines(object):
         if lift_up_after_place:
             rospy.loginfo("Moving back up")
             object_pose.pose.position.z += approach_height
-            self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
+            self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, acceleration=acceleration, move_lin=True)
             object_pose.pose.position.z -= approach_height
         return True
 

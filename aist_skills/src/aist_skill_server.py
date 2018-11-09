@@ -52,8 +52,8 @@ class SkillServer(object):
         rospy.loginfo("o2as_skills server starting up!")
 
     def publishMarkerCallback(self, req):
-      rospy.loginfo("Received publishMarker callback.")
-      return self.publishMarker(req.marker_pose, req.marker_type)
+        rospy.loginfo("Received publishMarker callback.")
+        return self.publishMarker(req.marker_pose, req.marker_type)
 
     def publishMarker(self, marker_pose, marker_type):
         marker = visualization_msgs.msg.Marker()
@@ -68,6 +68,25 @@ class SkillServer(object):
         marker.action = visualization_msgs.msg.Marker.ADD
 
         if marker_type == "pose":
+            self.publishPoseMarker(marker_pose)
+            # Add a flat sphere
+            marker.type = visualization_msgs.msg.Marker.SPHERE
+            marker.scale.x = .01
+            marker.scale.y = .05
+            marker.scale.z = .05
+            marker.color.g = 1.0
+            marker.color.a = 0.8
+        elif marker_type == "pick_pose":
+            self.publishPoseMarker(marker_pose)
+            # Add a flat sphere
+            marker.type = visualization_msgs.msg.Marker.SPHERE
+            marker.scale.x = .01
+            marker.scale.y = .05
+            marker.scale.z = .05
+            marker.color.r = 0.8
+            marker.color.g = 0.4
+            marker.color.a = 0.8
+        elif marker_type == "place_pose":
             self.publishPoseMarker(marker_pose)
             # Add a flat sphere
             marker.type = visualization_msgs.msg.Marker.SPHERE
@@ -133,9 +152,9 @@ class SkillServer(object):
         self.pubMarker_.publish(arrow_x)
         self.pubMarker_.publish(arrow_y)
         self.pubMarker_.publish(arrow_z)
-        
+
         return True
-            
+
 
 if __name__ == '__main__':
     rospy.init_node("aist_skills", anonymous=True)
