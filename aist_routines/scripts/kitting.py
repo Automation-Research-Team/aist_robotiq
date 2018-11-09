@@ -4,6 +4,7 @@ from math import pi
 import random
 import os
 import csv
+import copy
 
 import rospy
 import rospkg
@@ -21,7 +22,7 @@ class kitting_order_entry():
     """
     Object that tracks if its order was fulfilled, and the number of attempts spent on it.
     """
-    def __init__(self, part_id, set_number, number_in_set, bin_name, target_frame, ee_to_use, item_name):
+    def __init__(self, part_id, set_number, number_in_set, bin_name, target_frame, ee_to_use, item_name, dropoff_height):
         self.part_id = part_id  # The part id
         self.set_number = set_number
         self.number_in_set = number_in_set
@@ -29,11 +30,15 @@ class kitting_order_entry():
         self.target_frame = target_frame
         self.ee_to_use = ee_to_use
         self.item_name = item_name
+        self.dropoff_height = dropoff_height
 
         self.attempts = 0
         self.fulfilled = False
         self.in_feeder = False
 
+def clamp(n, minn, maxn):
+    """Constrain a number n to the interval [minn, maxn]"""
+    return min(max(n, minn), maxn)
 
 class KittingClass(AISTBaseRoutines):
     """Implements kitting routines for aist robot system."""
@@ -68,13 +73,14 @@ class KittingClass(AISTBaseRoutines):
                                                             bin_name=self.part_bin_list["part_" + data[2]],
                                                             target_frame="set_" + data[0] + "_" + self.part_position_in_tray["part_" + data[2]],
                                                             ee_to_use=self.grasp_strategy["part_" + data[2]],
-                                                            item_name=data[4]))
+                                                            item_name=data[4],
+                                                            dropoff_height=self.dropoff_heights["part_" + data[2]]))
         return kitting_list, order_entry_list
 
     def initial_setup(self):
         """Initialize class parameters."""
         self.use_real_robot = rospy.get_param("use_real_robot", False)
-        self.is_aist_experiment = rospy.get_param("is_aist_experiment", False)
+        self.is_aist_experiment = rospy.get_param("is_aist_experiment", True)
 
         # Bin sizes to use random picking.
         # `width` is defined as the size in the x-axis direction.
@@ -141,7 +147,37 @@ class KittingClass(AISTBaseRoutines):
             "part_18": "precision_gripper_from_outside"
         }
 
-        self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+        # How high the end effector should hover over the tray when delivering the item
+        self.dropoff_heights = {
+            "part_4" : 0.03, 
+            "part_5" : 0.02, 
+            "part_6" : 0.01, 
+            "part_7" : 0.04,
+            "part_8" : 0.01, 
+            "part_9" : 0.005, 
+            "part_10": 0.005, 
+            "part_11": 0.01,
+            "part_12": 0.01,
+            "part_13": 0.01,
+            "part_14": 0.005, 
+            "part_15": 0.005, 
+            "part_16": 0.005, 
+            "part_17": 0.005, 
+            "part_18": 0.005
+        }
+
+        self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+        self.downward_orientation2 = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+
+        self.order_list_raw, self.ordered_items = self.read_order_file()
+        rospy.loginfo("Received order list:")
+        rospy.loginfo(self.order_list_raw)
+        self.suction_items = []
+        for order_item in self.ordered_items:
+            if order_item.ee_to_use == "suction":
+                rospy.loginfo("Appended item nr." + str(order_item.number_in_set) + " from set " + str(order_item.set_number) + " (part ID:" + str(order_item.part_id) + ") to list of suction items")
+                self.suction_items.append(order_item)
+
 
 
     def attempt_item(self, item, max_attempts = 5):
@@ -166,9 +202,9 @@ class KittingClass(AISTBaseRoutines):
             bin_center.pose.orientation.w = 1.0
             bin_center_on_table = self.listener.transformPose("workspace_center", bin_center).pose.position
             if bin_center_on_table.y > .1:
-                self.go_to_named_pose("suction_ready_right_bins", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+                self.go_to_named_pose("suction_ready_right_bins", "b_bot", speed=2.0, acceleration=2.0)
             else:
-                self.go_to_named_pose("suction_ready_left_bins", "b_bot", speed=2.0, acceleration=2.0, force_ur_script=self.use_real_robot)
+                self.go_to_named_pose("suction_ready_left_bins", "b_bot", speed=2.0, acceleration=2.0)
 
         attempts = 0
         while attempts < max_attempts and not rospy.is_shutdown():
@@ -207,8 +243,11 @@ class KittingClass(AISTBaseRoutines):
                 place_pose.header.frame_id = "place_bin"
             else:
                 place_pose.header.frame_id = item.target_frame
+            place_pose.pose.orientation = self.downward_orientation2
             approach_height = .05
-            self.place(robot_name, place_pose,grasp_height=item.dropoff_height,
+            if item.ee_to_use == "suction":
+                self.go_to_named_pose("suction_ready_above_place_bin", "b_bot", speed=0.5)
+            self.place(robot_name, place_pose,item.dropoff_height,
                                         speed_fast = 0.5, speed_slow = 0.02, gripper_command=gripper_command, approach_height = approach_height)
             # If successful
             self.fulfilled_items += 1
@@ -240,14 +279,45 @@ class KittingClass(AISTBaseRoutines):
 
         return pick_pose
 
+    def make_pose_safe_for_bin(self, pick_pose, item):
+        """ This makes sure that the pick_pose is not outside the bin or would cause a collision."""
+        if "bin_1" in item.bin_name:
+            bin_length = self.bin_1_width
+            bin_width = self.bin_1_length
+        elif "bin_2" in item.bin_name:
+            bin_length = self.bin_2_width
+            bin_width = self.bin_2_length
+        elif "bin_3" in item.bin_name:
+            bin_length = self.bin_3_width
+            bin_width = self.bin_3_length
+
+        safe_pose = copy.deepcopy(pick_pose)
+        safe_pose.pose.position.x = clamp(pick_pose.pose.position.x, -bin_width/2 - .02, bin_width/2 - .02)
+        safe_pose.pose.position.y = clamp(pick_pose.pose.position.y, -bin_length/2 - .02, bin_length/2 - .02)
+        safe_pose.pose.position.z = clamp(pick_pose.pose.position.z, 0, 0.1)
+
+        if safe_pose.pose.position.x != pick_pose.pose.position.x or safe_pose.pose.position.y != pick_pose.pose.position.y:
+            rospy.loginfo("Pose was adjusted in make_pose_safe_for_bin. Before: " + 
+                                        str(pick_pose.pose.position.x) + ", " + 
+                                        str(pick_pose.pose.position.y) + ", " + 
+                                        str(pick_pose.pose.position.z) + ". After: " + 
+                                        str(safe_pose.pose.position.x) + ", " + 
+                                        str(safe_pose.pose.position.y) + ", " + 
+                                        str(safe_pose.pose.position.z) + ".")
+        
+        #TODO: Adjust the gripper orientation when close to the border
+        return safe_pose
+
     ###----- main procedure
     def kitting_task(self):
-        self.order_list_raw, self.ordered_items = self.read_order_file()
-        rospy.loginfo("Received order list:")
-        rospy.loginfo(self.order_list_raw)
 
-        pick_pose = self.get_random_pose_in_bin(self.ordered_items[1])
-        rospy.loginfo(pick_pose)
+        self.fulfilled_items = 0
+        for item in self.suction_items:
+            if rospy.is_shutdown():
+                break
+            self.attempt_item(item, 3)
+        self.go_to_named_pose("home", "b_bot")
+        rospy.loginfo("==== Done with first suction pass")
 
 
 if __name__ == '__main__':
@@ -259,6 +329,7 @@ if __name__ == '__main__':
 
         while True:
             rospy.loginfo("Enter 1 to read order file.")
+            rospy.loginfo("Enter 2 to go to home all robots.")
             rospy.loginfo("Enter START to start the task.")
             rospy.loginfo("Enter x to exit.")
 
@@ -267,6 +338,8 @@ if __name__ == '__main__':
                 order_list_raw, ordered_items = kit.read_order_file()
                 rospy.loginfo("Received order list:")
                 rospy.loginfo(order_list_raw)
+            elif i == '2':
+                kit.go_to_named_pose("home", "b_bot")
             elif i == 'START' or i == 'start':
                 kit.kitting_task()
             elif i == 'x':
