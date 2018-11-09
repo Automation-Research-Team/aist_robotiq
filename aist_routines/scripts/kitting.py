@@ -203,24 +203,9 @@ class KittingClass(AISTBaseRoutines):
             # Attempt to place the item
             place_pose = geometry_msgs.msg.PoseStamped()
             place_pose.header.frame_id = item.target_frame
-            required_intermediate_pose = []
-            if item.ee_to_use == "suction":
-                # This is inconvenient to set up because the trays are rotated. tray_2s are rotated 180 degrees relative to set_1_tray_1
-                # SUCTION_PREP_POSES
-                place_pose.pose.orientation, required_intermediate_pose = self.get_tray_placement_orientation_for_suction_in_kitting(
-                                                                                                    set_number=item.set_number,
-                                                                                                    tray_number=int(place_pose.header.frame_id[11]))
-                if not place_pose.pose.orientation.w and not place_pose.pose.orientation.x and not place_pose.pose.orientation.y:
-                    rospy.logerr("SOMETHING WENT WRONG, ORIENTATION IS NOT ASSIGNED")
             approach_height = .05
-            if item.ee_to_use == "suction":
-                if required_intermediate_pose:
-                    rospy.loginfo("Going to intermediate pose")
-                    self.go_to_named_pose(required_intermediate_pose, "b_bot", speed=1.5, acceleration=1.0, force_ur_script=self.use_real_robot)
             self.place(robot_name, place_pose,grasp_height=item.dropoff_height,
                                         speed_fast = 0.5, speed_slow = 0.02, gripper_command=gripper_command, approach_height = approach_height)
-            if item.ee_to_use == "suction":
-                self.force_moveit_linear_motion = False
             # If successful
             self.fulfilled_items += 1
             item.fulfilled = True
