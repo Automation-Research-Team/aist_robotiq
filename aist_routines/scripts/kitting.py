@@ -281,18 +281,18 @@ class KittingClass(AISTBaseRoutines):
     def make_pose_safe_for_bin(self, pick_pose, item):
         """ This makes sure that the pick_pose is not outside the bin or would cause a collision."""
         if "bin_1" in item.bin_name:
-            bin_length = self.bin_1_width
-            bin_width = self.bin_1_length
+            bin_width = self.bin_1_width
+            bin_length = self.bin_1_length
         elif "bin_2" in item.bin_name:
-            bin_length = self.bin_2_width
-            bin_width = self.bin_2_length
+            bin_width = self.bin_2_width
+            bin_length = self.bin_2_length
         elif "bin_3" in item.bin_name:
-            bin_length = self.bin_3_width
-            bin_width = self.bin_3_length
+            bin_width = self.bin_3_width
+            bin_length = self.bin_3_length
 
         safe_pose = copy.deepcopy(pick_pose)
-        safe_pose.pose.position.x = clamp(pick_pose.pose.position.x, -bin_width/2 - .02, bin_width/2 - .02)
-        safe_pose.pose.position.y = clamp(pick_pose.pose.position.y, -bin_length/2 - .02, bin_length/2 - .02)
+        safe_pose.pose.position.x = clamp(pick_pose.pose.position.x, -bin_width/2 + .025, bin_width/2 - .025)
+        safe_pose.pose.position.y = clamp(pick_pose.pose.position.y, -bin_length/2 + .025, bin_length/2 - .025)
         safe_pose.pose.position.z = clamp(pick_pose.pose.position.z, 0, 0.1)
 
         if safe_pose.pose.position.x != pick_pose.pose.position.x or safe_pose.pose.position.y != pick_pose.pose.position.y:
