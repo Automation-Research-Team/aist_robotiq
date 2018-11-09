@@ -135,6 +135,8 @@ PlaneDetector::cloud_callback(const cloud_p& cloud_msg)
     seg.setModelType(pcl::SACMODEL_PLANE);
     seg.setMethodType(pcl::SAC_RANSAC);
     seg.setDistanceThreshold(_planarity_tolerance);
+    seg.setMaxIterations(100);
+    seg.setProbability(0.7);
 
     pcl::ModelCoefficients	coefficients;
     pcl::PointIndices		inliers;
