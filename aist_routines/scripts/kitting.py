@@ -74,6 +74,7 @@ class KittingClass(AISTBaseRoutines):
     def initial_setup(self):
         """Initialize class parameters."""
         self.use_real_robot = rospy.get_param("use_real_robot", False)
+        self.is_aist_experiment = rospy.get_param("is_aist_experiment", False)
 
         # Bin sizes to use random picking.
         # `width` is defined as the size in the x-axis direction.
@@ -202,7 +203,10 @@ class KittingClass(AISTBaseRoutines):
 
             # Attempt to place the item
             place_pose = geometry_msgs.msg.PoseStamped()
-            place_pose.header.frame_id = item.target_frame
+            if self.is_aist_experiment:
+                place_pose.header.frame_id = "place_bin"
+            else:
+                place_pose.header.frame_id = item.target_frame
             approach_height = .05
             self.place(robot_name, place_pose,grasp_height=item.dropoff_height,
                                         speed_fast = 0.5, speed_slow = 0.02, gripper_command=gripper_command, approach_height = approach_height)
