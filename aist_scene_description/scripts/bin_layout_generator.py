@@ -88,9 +88,9 @@ def write_bin_layout(outfile,directory,set_list):
 
         for i in range(len(s.bins)):
             outfile.write("  <!--"+str(s.bins[i].bin_name)+"_-->\n")
-            outfile.write("  <xacro:kitting_bin_"+str(s.bins[i].bin_type[3])+" binname=\""+str(s.bins[i].bin_name)+"\" parent=\"bin_rack_center\" z_origin_offset=\""+str(s.bins[i].definition.z_origin_offset)+"\">\n")
+            outfile.write("  <xacro:kitting_"+str(s.bins[i].bin_type)+" binname=\""+str(s.bins[i].bin_name)+"\" parent=\"bin_rack_center\" z_origin_offset=\""+str(s.bins[i].definition.z_origin_offset)+"\">\n")
             outfile.write("    <origin xyz=\""+str(s.bins[i].pos_x)+" "+str(s.bins[i].pos_y)+" "+str(s.bins[i].pos_z)+"\" rpy=\"0 0 0\" />\n")
-            outfile.write("  </xacro:kitting_bin_"+str(s.bins[i].bin_type[3])+">\n")
+            outfile.write("  </xacro:kitting_"+str(s.bins[i].bin_type)+">\n")
 
 # write tail
 def write_tail(outfile,directory):
@@ -108,7 +108,6 @@ def calc_bin_pos_z(bin,origin_z):
     return float(origin_z) - float(bin.definition.z_origin_offset)
 
 def find_bin_definition(bin_definition,bin):
-    pass
     for j in range(len(bin_definition)):
         if bin_definition[j].bin_type==bin.bin_type:
             definition=bin_definition[j]
