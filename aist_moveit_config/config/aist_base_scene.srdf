@@ -27,6 +27,30 @@
         <joint name="b_bot_wrist_2_joint" value="-1.57" />
         <joint name="b_bot_wrist_3_joint" value="0" />
     </group_state>
+    <group_state name="suction_ready_left_bins" group="b_bot">
+        <joint name="b_bot_elbow_joint" value="1.18015" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.20711" />
+        <joint name="b_bot_shoulder_pan_joint" value="1.71169" />
+        <joint name="b_bot_wrist_1_joint" value="-1.52342" />
+        <joint name="b_bot_wrist_2_joint" value="-1.56702" />
+        <joint name="b_bot_wrist_3_joint" value="1.74819" />
+    </group_state>
+    <group_state name="suction_ready_right_bins" group="b_bot">
+        <joint name="b_bot_elbow_joint" value="1.861" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.88" />
+        <joint name="b_bot_shoulder_pan_joint" value="1.87" />
+        <joint name="b_bot_wrist_1_joint" value="-1.524" />
+        <joint name="b_bot_wrist_2_joint" value="-1.563" />
+        <joint name="b_bot_wrist_3_joint" value="1.907" />
+    </group_state>
+    <group_state name="suction_ready_above_place_bin" group="b_bot">
+        <joint name="b_bot_elbow_joint" value="1.63148" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.468525" />
+        <joint name="b_bot_shoulder_pan_joint" value="0.994135" />
+        <joint name="b_bot_wrist_1_joint" value="-1.73375" />
+        <joint name="b_bot_wrist_2_joint" value="-1.570796" />
+        <joint name="b_bot_wrist_3_joint" value="0.995728" />
+    </group_state>
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
     <virtual_joint name="world_to_o2as" type="fixed" parent_frame="o2as_ground" child_link="world" />
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->

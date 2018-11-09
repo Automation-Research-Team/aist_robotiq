@@ -4,6 +4,7 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro" />
 
   <xacro:include filename="$(find aist_scene_description)/urdf/kitting_bins.xacro" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_bin_macros.xacro" />
 
   <xacro:property name="tray_width" value=".210" />
   <xacro:property name="tray_length" value=".300" />
@@ -94,10 +95,13 @@
   <link name="tray_rack_top_front_left_corner"/>
 
   <!-- add trays -->
-  <xacro:kitting_tray1 trayname="set_1_tray_1" parent="tray_rack_center">
+  <!-- <xacro:kitting_tray1 trayname="set_1_tray_1" parent="tray_rack_center">
     <origin xyz="${-tray_rack_width/2} ${-tray_rack_length/2} 0" rpy="0 0 0" />
   </xacro:kitting_tray1>
   <xacro:kitting_tray2 trayname="set_1_tray_2" parent="tray_rack_center">
     <origin xyz="${-tray_rack_width/2} 0 0" rpy="0 0 0" />
-  </xacro:kitting_tray2>
+  </xacro:kitting_tray2> -->
+  <xacro:kitting_bin_3 binname="place_bin" parent="tray_rack_center" z_origin_offset="-.004">
+    <origin xyz="0 0 0.004" rpy="0 0 -${pi/2}" />
+  </xacro:kitting_bin_3>
 </robot>
