@@ -469,12 +469,17 @@ if __name__ == '__main__':
 
         while True:
             rospy.loginfo("Enter 1 to go to home all robots.")
+            rospy.loginfo("Enter 71, 72... to test phoxi on item 1, 2...")
             rospy.loginfo("Enter START to start the task.")
             rospy.loginfo("Enter x to exit.")
 
             i = raw_input()
             if i == '1':
                 kit.go_to_named_pose("home", "b_bot")
+            elif i in ["71", "72", "73", "74", "75", "76", "77", "78", "79"]:
+                item = kit.ordered_items[int(i)-71]
+                rospy.loginfo("Checking for item id " + str(item.part_id) + " in " + item.bin_name)
+                obj_pose = kit.get_grasp_candidates_from_phoxi(item, True)
             elif i == 'START' or i == 'start':
                 kit.kitting_task()
             elif i == 'x':
