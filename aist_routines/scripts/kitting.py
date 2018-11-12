@@ -11,6 +11,7 @@ import rospkg
 import tf_conversions
 import std_msgs.msg
 import geometry_msgs.msg
+import actionlib
 
 from aist_routines.base import AISTBaseRoutines
 import o2as_msgs.msg
@@ -81,6 +82,8 @@ class KittingClass(AISTBaseRoutines):
         """Initialize class parameters."""
         self.use_real_robot = rospy.get_param("use_real_robot", False)
         self.is_aist_experiment = rospy.get_param("is_aist_experiment", True)
+
+        self.search_grasp_client = actionlib.SimpleActionClient("search_grasp_phoxi", o2as_msgs.msg.SearchGraspPhoxiAction)
 
         # Bin sizes to use random picking.
         # `width` is defined as the size in the x-axis direction.
@@ -164,6 +167,84 @@ class KittingClass(AISTBaseRoutines):
             "part_16": 0.005,
             "part_17": 0.005,
             "part_18": 0.005
+        }
+
+        self.grasp_candidates = {
+                4 : {
+                    "pick_was_successful": False,
+                    "vision_was_attempted": False,
+                    "positions": []
+                },
+                5 : {
+                    "pick_was_successful": False,
+                    "vision_was_attempted": False,
+                    "positions": []
+                }, 
+                6 : {
+                    "pick_was_successful": False,
+                    "vision_was_attempted": False,
+                    "positions": []
+                }, 
+                7 : {
+                    "pick_was_successful": False,
+                    "vision_was_attempted": False,
+                    "positions": []
+                },
+                8 : {
+                    "pick_was_successful": False,
+                    "vision_was_attempted": False,
+                    "positions": []
+                }, 
+                9 : {
+                    "pick_was_successful": False,
+                    "vision_was_attempted": False,
+                    "positions": []
+                }, 
+                10: {
+                    "pick_was_successful": False,
+                    "vision_was_attempted": False,
+                    "positions": []
+                }, 
+                11: {
+                    "pick_was_successful": False,
+                    "vision_was_attempted": False,
+                    "positions": []
+                },
+                12: {
+                    "pick_was_successful": False,
+                    "vision_was_attempted": False,
+                    "positions": []
+                },
+                13: {
+                    "pick_was_successful": False,
+                    "vision_was_attempted": False,
+                    "positions": []
+                },
+                14: {
+                    "pick_was_successful": False,
+                    "vision_was_attempted": False,
+                    "positions": []
+                }, 
+                15: {
+                    "pick_was_successful": False,
+                    "vision_was_attempted": False,
+                    "positions": []
+                }, 
+                16: {
+                    "pick_was_successful": False,
+                    "vision_was_attempted": False,
+                    "positions": []
+                }, 
+                17: {
+                    "pick_was_successful": False,
+                    "vision_was_attempted": False,
+                    "positions": []
+                }, 
+                18: {
+                    "pick_was_successful": False,
+                    "vision_was_attempted": False,
+                    "positions": []
+                }
         }
 
         self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
@@ -314,6 +395,58 @@ class KittingClass(AISTBaseRoutines):
 
         #TODO: Adjust the gripper orientation when close to the border
         return safe_pose
+
+    def get_grasp_candidates_from_phoxi(self, item, take_new_image=False):
+        """This requests a list of grasp positions and takes a new image with the phoxi if take_new_image is True."""
+        goal = o2as_msgs.msg.SearchGraspPhoxiGoal()
+        goal.part_id = item.part_id
+        goal.bin_name = item.bin_name
+        goal.gripper_type = item.ee_to_use
+        goal.update_image = take_new_image
+        try:
+            self.search_grasp_client.send_goal(goal)
+            self.search_grasp_client.wait_for_result(rospy.Duration(7.0))
+            resp_search_grasp = self.search_grasp_client.get_result()
+        except:
+            rospy.logerr("Could not get grasp from Phoxi")
+            return False
+        if resp_search_grasp:
+            if resp_search_grasp.success:
+                poses_in_bin = list()
+                pose0 = geometry_msgs.msg.PointStamped()
+                pose0.header.frame_id = "a_phoxi_m_sensor"
+                number_of_pose_candidates = min(self.max_candidates_from_phoxi, resp_search_grasp.result_num)
+                for i in range(number_of_pose_candidates):
+                    object_position = copy.deepcopy(pose0)
+                    object_position.point = geometry_msgs.msg.Point(
+                    resp_search_grasp.pos3D[i].x,
+                    resp_search_grasp.pos3D[i].y, 
+                    resp_search_grasp.pos3D[i].z)
+                    # TODO We should talk about how to use rotiqz which the two_finger approaches.
+                    rospy.logdebug("\nGrasp point in %s: (x, y, z) = (%f, %f, %f)", 
+                    object_position.header.frame_id, 
+                    object_position.point.x, 
+                    object_position.point.y, 
+                    object_position.point.z)
+                    obj_pose_in_camera = geometry_msgs.msg.PoseStamped()
+                    obj_pose_in_camera.header = object_position.header
+                    obj_pose_in_camera.pose.position = object_position.point
+                    obj_pose_in_camera.pose.orientation.w = 1.0
+                    # pose_in_bin = geometry_msgs.msg.PoseStamped()
+                    # pose_in_bin.header.frame_id = item.bin_name
+                    pose_in_bin = self.listener.transformPose(item.bin_name, obj_pose_in_camera)
+                    pose_in_bin.pose.orientation = self.downward_orientation
+                    if item.ee_to_use in ["precision_gripper_from_outside", "robotiq_gripper"]:
+                        pose_in_bin.pose.orientation = geometry_msgs.msg.Quaternion(
+                            *tf_conversions.transformations.quaternion_from_euler(0, pi/2, -resp_search_grasp.rotipz[i]))
+                    poses_in_bin.append(pose_in_bin)
+                self.publish_marker(pose_in_bin, "aist_vision_result")
+                rospy.loginfo("Calculated " + str(number_of_pose_candidates) + " candidates for item nr. " + str(item.part_id) + " in bin " + str(item.bin_name))
+                rospy.logdebug(poses_in_bin)
+                return poses_in_bin
+        else:
+            rospy.loginfo("Could not find a pose via phoxi.")
+            return False
 
     ###----- main procedure
     def kitting_task(self):
