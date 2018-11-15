@@ -70,8 +70,7 @@
   <!-- Add PhoXi 3D scanners -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />
   <xacro:phoxi_m_camera prefix="a_" parent="o2as_ground">
-  <!-- This is the setting for challenge, so we need to re-calibration before stating experiments in aist. (2018/11/06 Yuma Hijioka) -->
-  <origin xyz="0.652663578768 -0.0142895785849 1.50687788672" rpy="${-161.381811856*pi/180} ${2.99567722105*pi/180} ${90.8962573459*pi/180}"/>
+  <origin xyz="0.63885382925 0.00793354972549 1.45431467674" rpy="${-144.009037015*pi/180} ${0.0354016148982*pi/180} ${85.0410662353*pi/180}"/>
   </xacro:phoxi_m_camera>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
