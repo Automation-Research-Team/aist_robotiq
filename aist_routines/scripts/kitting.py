@@ -11,9 +11,11 @@ import rospkg
 import tf_conversions
 import std_msgs.msg
 import geometry_msgs.msg
+import actionlib
 
 from aist_routines.base import AISTBaseRoutines
 import o2as_msgs.msg
+import aist_graspability.msg
 
 
 rp = rospkg.RosPack()
@@ -81,6 +83,11 @@ class KittingClass(AISTBaseRoutines):
         """Initialize class parameters."""
         self.use_real_robot = rospy.get_param("use_real_robot", False)
         self.is_aist_experiment = rospy.get_param("is_aist_experiment", True)
+
+        self._search_grasp_from_phoxi_client = actionlib.SimpleActionClient(
+                                                    "/aist_graspability/search_grasp_from_phoxi",
+                                                    aist_graspability.msg.SearchGraspFromPhoxiAction
+                                                )
 
         # Bin sizes to use random picking.
         # `width` is defined as the size in the x-axis direction.
