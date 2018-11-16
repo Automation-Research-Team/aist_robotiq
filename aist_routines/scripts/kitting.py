@@ -264,6 +264,10 @@ class KittingClass(AISTBaseRoutines):
         rospy.logerr("Was not able to pick item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + ")! Total attempts: " + str(item.attempts))
         return False
 
+    def get_grasp_candidates_from_phoxi(self, item):
+        """Get item's pose in parts bin using phoxi."""
+        pass
+
     def get_random_pose_in_bin(self, item):
         """Get item's random pose in parts bin."""
         pick_pose = geometry_msgs.msg.PoseStamped()
@@ -343,12 +347,17 @@ if __name__ == '__main__':
 
         while True:
             rospy.loginfo("Enter 1 to go to home all robots.")
+            rospy.loginfo("Enter 71, 72... to test phoxi on item 1, 2...")
             rospy.loginfo("Enter START to start the task.")
             rospy.loginfo("Enter x to exit.")
 
             i = raw_input()
             if i == '1':
                 kit.go_to_named_pose("home", "b_bot")
+            elif i in ["71", "72", "73", "74", "75", "76", "77", "78", "79"]:
+                item = kit.ordered_items[int(i)-71]
+                rospy.loginfo("Checking for item id " + str(item.part_id) + " in " + item.bin_name)
+                obj_pose = kit.get_grasp_candidates_from_phoxi(item, True)
             elif i == 'START' or i == 'start':
                 kit.kitting_task()
             elif i == 'x':
