@@ -264,8 +264,35 @@ class KittingClass(AISTBaseRoutines):
         rospy.logerr("Was not able to pick item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + ")! Total attempts: " + str(item.attempts))
         return False
 
-    def get_grasp_candidates_from_phoxi(self, item):
+    def get_grasp_candidates_from_phoxi(self, item, take_new_image):
         """Get item's pose in parts bin using phoxi."""
+
+        # string scene_path
+        # string mask_path
+        # int8 part_id
+        # string bin_name
+        # string gripper_type
+        # bool take_new_image
+
+        goal = aist_graspability.msg.SearchGraspFromPhoxiActionGoal()
+        goal.take_new_image = take_new_image
+        goal.part_id = item.part_id
+        goal.bin_name = item.bin_name
+        goal.scene_path = os.path.join(rp.get_path("aist_graspability"), "data", "scene_image.tif")
+        goal.mask_path = os.path.join(rp.get_path("aist_graspability"), "data", "mask_image.png")
+
+        if ["precition_gripper"] in item.ee_to_use:
+            if ["inside"] in item.ee_to_use:
+                goal.gripper_type == "inner"
+            elif ["outside"] in item.ee_to_use:
+                goal.gripper_type == "two_finger"
+        elif ["suction"] in item.ee_to_use:
+            goal.gripper_type == "suction"
+        elif ["robotiq"]:
+            goal.gripper_type == "two_finger"
+        else:
+            rospy.logerr("gripeer_type:" )
+
         pass
 
     def get_random_pose_in_bin(self, item):
