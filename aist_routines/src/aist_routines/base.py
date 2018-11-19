@@ -214,8 +214,8 @@ class AISTBaseRoutines(object):
         self.groups[robot_name].clear_pose_targets()
         return True
 
-    def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, high_precision = False,
-                        end_effector_link = "", move_lin = True):
+    def go_to_pose_goal(self, group_name, pose_goal_stamped, speed=1.0, acceleration=0.0, high_precision=False,
+                        end_effector_link="", move_lin=True):
         if move_lin:
             return self.move_lin(group_name, pose_goal_stamped, speed, acceleration, end_effector_link)
         self.publish_marker(pose_goal_stamped, "pose")
@@ -223,7 +223,7 @@ class AISTBaseRoutines(object):
 
         if not end_effector_link:
             if group_name == "b_bot":
-                end_effector_link = "b_bot_suction_tool_tip_link"
+                end_effector_link = "b_bot_dual_suction_gripper_pad_link"
         group.set_end_effector_link(end_effector_link)
 
         group.set_pose_target(pose_goal_stamped)
@@ -253,7 +253,7 @@ class AISTBaseRoutines(object):
 
         if not end_effector_link:
             if group_name == "b_bot":
-                end_effector_link = "b_bot_suction_tool_tip_link"
+                end_effector_link = "b_bot_dual_suction_gripper_pad_link"
 
         group = self.groups[group_name]
 
