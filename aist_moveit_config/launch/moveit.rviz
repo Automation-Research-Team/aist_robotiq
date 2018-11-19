@@ -115,6 +115,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          b_bot_ft300_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           b_bot_shoulder_link:
             Alpha: 1
             Show Axes: false
@@ -260,6 +265,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          b_bot_ft300_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           b_bot_shoulder_link:
             Alpha: 1
             Show Axes: false
@@ -341,6 +351,8 @@ Visualization Manager:
           Value: true
         b_bot_forearm_link:
           Value: true
+        b_bot_ft300_link:
+          Value: true
         b_bot_shoulder_link:
           Value: true
         b_bot_suction_tool_tip_link:
@@ -391,6 +403,8 @@ Visualization Manager:
                               b_bot_dual_suction_gripper_pad_link:
                                 b_bot_suction_tool_tip_link:
                                   {}
+                            b_bot_ft300_link:
+                              {}
                           b_bot_tool0:
                             {}
             b_bot_base_smfl:
@@ -406,8 +420,20 @@ Visualization Manager:
       Marker Topic: visualization_marker
       Name: Marker
       Namespaces:
-        {}
+        markers: true
       Queue Size: 100
+      Value: true
+    - Class: rviz/Image
+      Enabled: true
+      Image Topic: /a_phoxi_m_camera/depth_map
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: Image
+      Normalize Range: true
+      Queue Size: 2
+      Transport Hint: raw
+      Unreliable: false
       Value: true
   Enabled: true
   Global Options:
