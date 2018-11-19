@@ -2,5 +2,5 @@
 
 <launch>
     <node pkg="aist_skills" type="aist_skill_server.py" name="aist_skills" />
-    <include file="$(find graspability_estimation)/launch/o2as_graspability_estimation.launch" />
+    <include file="$(find aist_graspability)/launch/aist_graspability.launch" />
 </launch>
