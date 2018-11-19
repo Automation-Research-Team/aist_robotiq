@@ -38,6 +38,7 @@
 
 from math import pi
 import sys
+import copy
 
 import rospy
 import actionlib
@@ -84,6 +85,7 @@ class AISTBaseRoutines(object):
         self.listener = tf.TransformListener()
         self.publishMarker_client = rospy.ServiceProxy('/aist_skills/publishMarker', o2as_msgs.srv.publishMarker)
         self.setup_suction_tool()
+        self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
 
     def setup_suction_tool(self):
         """Enable to use suction tool."""
@@ -98,15 +100,11 @@ class AISTBaseRoutines(object):
         else:
             acceleration=1.0
 
+        approach_pose = copy.deepcopy(object_pose)
         rospy.logdebug("Approach height 0: " + str(approach_height))
-        object_pose.pose.position.z += approach_height
-        rospy.logdebug("Height 1: " + str(object_pose.pose.position.z))
-        if special_pick == True:
-            object_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*45/180, pi/2))
-        rospy.logdebug("Going to height " + str(object_pose.pose.position.z))
-        self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
-        object_pose.pose.position.z -= approach_height
-        rospy.logdebug("Height 2: " + str(object_pose.pose.position.z))
+        approach_pose.pose.position.z = approach_height
+        rospy.logdebug("Going to height " + str(approach_pose.pose.position.z))
+        self.go_to_pose_goal(robotname, approach_pose, speed=speed_fast, move_lin=True)
 
         if gripper_command=="complex_pick_from_inside":
             self.precision_gripper_inner_close()
@@ -117,8 +115,7 @@ class AISTBaseRoutines(object):
         elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
             self.precision_gripper_inner_open()
         elif gripper_command=="suction":
-            pass
-            # self.suck(True, False)
+            self.suck(True, False, timeout=10.0)
         elif gripper_command=="none":
             pass
         else:
@@ -128,7 +125,6 @@ class AISTBaseRoutines(object):
         object_pose.pose.position.z += grasp_height
         rospy.logdebug("Going to height " + str(object_pose.pose.position.z))
         self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
-        object_pose.pose.position.z -= grasp_height
 
         #gripper close
         if gripper_command=="complex_pick_from_inside":
@@ -152,28 +148,27 @@ class AISTBaseRoutines(object):
             rospy.sleep(1.0)
             rospy.loginfo("Going back up")
 
-            object_pose.pose.position.z += approach_height
-            rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
-            self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
-            object_pose.pose.position.z -= approach_height
+
+            rospy.loginfo("Going to height " + str(approach_pose.pose.position.z))
+            self.go_to_pose_goal(robotname, approach_pose, speed=speed_fast, move_lin=True)
         return True
 
-    def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height=0.05, lift_up_after_place=True):
+    def place(self,robotname, object_pose, place_height=None, speed_fast=1.0, speed_slow=0.05, gripper_command="", approach_height=0.05, lift_up_after_place=True):
         if speed_fast > 1.0:
             acceleration=speed_fast
         else:
             acceleration=1.0
 
+        approach_pose = copy.deepcopy(object_pose)
+        approach_pose.pose.position.z = approach_height
         self.publish_marker(object_pose, "place_pose")
         rospy.loginfo("Going above place target")
-        object_pose.pose.position.z += approach_height
-        self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, acceleration=acceleration, move_lin=True)
-        object_pose.pose.position.z -= approach_height
+        self.go_to_pose_goal(robotname, approach_pose, speed=speed_fast, acceleration=acceleration, move_lin=True)
 
+        if place_height is not None:
+            object_pose.pose.position.z = place_height
         rospy.loginfo("Moving to place target")
-        object_pose.pose.position.z += place_height
         self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, acceleration=acceleration, move_lin=True)
-        object_pose.pose.position.z -= place_height
 
         #gripper open
         if gripper_command=="complex_pick_from_inside":
@@ -187,9 +182,8 @@ class AISTBaseRoutines(object):
         elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
             self.precision_gripper_inner_open()
         elif gripper_command=="suction":
-            pass
-            # self.suck(turn_suction_on=False, eject=True)
-            # self.suck(turn_suction_on=False, eject=False)
+            self.suck(turn_suction_on=False, eject=True)
+            self.suck(turn_suction_on=False, eject=False)
         elif gripper_command=="none":
             pass
         else:
@@ -198,9 +192,7 @@ class AISTBaseRoutines(object):
 
         if lift_up_after_place:
             rospy.loginfo("Moving back up")
-            object_pose.pose.position.z += approach_height
-            self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, acceleration=acceleration, move_lin=True)
-            object_pose.pose.position.z -= approach_height
+            self.go_to_pose_goal(robotname, approach_pose, speed=speed_fast, acceleration=acceleration, move_lin=True)
         return True
 
     def go_to_named_pose(self, pose_name, robot_name, speed = 1.0, acceleration = 0.0):
@@ -289,10 +281,11 @@ class AISTBaseRoutines(object):
             rospy.logwarn("Warning: Unexpected action might occur because suction and blow is both on.")
             return False
 
-        goal = o2as_msgs.msg.SuctionControlActionGoal()
+        goal = o2as_msgs.msg.SuctionControlGoal()
         goal.fastening_tool_name = "suction_tool"
         goal.turn_suction_on = turn_suction_on
-        goal.eject_screw = eject
+        # goal.eject_screw = eject
+        goal.eject_screw = False
         self._suction.send_goal(goal)
         self._suction.wait_for_result(rospy.Duration(timeout))
         return self._suction.get_result()

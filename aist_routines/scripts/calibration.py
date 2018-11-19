@@ -163,6 +163,16 @@ class CalibrationClass(AISTBaseRoutines):
         self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
         return
 
+    def go_to_above_tf_frame(self, robot_name, frame_id="workspace_center", height=0.2,  speed=0.05, end_effector_link="", move_lin=True):
+
+        goal_pose = geometry_msgs.msg.PoseStamped()
+        goal_pose.header.frame_id = frame_id
+        goal_pose.pose.position.z = height
+        goal_pose.pose.orientation = self.downward_orientation
+
+        self.go_to_pose_goal(robot_name, goal_pose, speed=speed, acceleration=1.0)
+
+
 if __name__ == '__main__':
 
     rospy.init_node("Calibration")
@@ -181,6 +191,7 @@ if __name__ == '__main__':
             rospy.loginfo("411: Bin-rack calibration")
             rospy.loginfo("412: Tray-rack calibration")
             rospy.loginfo("5: Bin corners with b_bot")
+            rospy.loginfo("6: Create new named pose")
             rospy.loginfo("x: Exit")
 
             i = raw_input()
@@ -204,6 +215,8 @@ if __name__ == '__main__':
                 c.check_calibration_bin_rack("b_bot", "tray_rack")
             elif i == '5':
                 c.bin_corner_calibration("b_bot")
+            elif i == '6':
+                c.go_to_above_tf_frame("b_bot", "workspace_center", .15)
             if i == 'x':
                 break
         print("================ done!!")
