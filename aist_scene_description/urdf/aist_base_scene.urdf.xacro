@@ -27,7 +27,7 @@
   <!-- There are some instabilities when the box is big, for some reason. -->
   <xacro:include filename="$(find aist_scene_description)/urdf/aist_base.xacro" />
   <xacro:aist_base boxname="b_bot_base_smfl" parent="o2as_ground">
-    <origin xyz="${b_bot_x-0.225/2} ${b_bot_y-0.225/2} 0.72" rpy="0 0 0" />   
+    <origin xyz="${b_bot_x-0.225/2} ${b_bot_y-0.225/2} 0.72" rpy="0 0 0" />
   </xacro:aist_base>
 
   <!-- Main workspace -->
@@ -36,7 +36,7 @@
   <xacro:property name="plate_w" value="0.598"/>
   <xacro:property name="plate_l" value="0.899"/>
   <xacro:o2as_box boxname="workbox" box_w="${plate_w}" box_l="${plate_l}" box_h=".01" parent="o2as_ground">
-    <origin xyz="${-plate_w/2} ${-plate_l/2-0.062} ${bots_z}" rpy="0 0 0" />   
+    <origin xyz="${-plate_w/2} ${-plate_l/2-0.062} ${bots_z}" rpy="0 0 0" />
   </xacro:o2as_box>
   <link name="workspace_center" />
   <joint name="world_to_workspace" type="fixed">
@@ -44,8 +44,8 @@
     <child link="workspace_center" />
     <origin xyz="0.0 0.0 ${bots_z+.01}" rpy="0.0 0.0 0.0" />
   </joint>
-  
-  <!-- robot arms -->    
+
+  <!-- robot arms -->
   <xacro:ur5_robot prefix="b_bot_" joint_limited="false"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
@@ -62,10 +62,8 @@
   </joint>
 
   <!-- spawn and attach dual suction grippers -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro" />
-  <xacro:dual_suction_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link">
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-  </xacro:dual_suction_gripper_o2as>
+  <xacro:include filename="$(find aist_scene_description)/urdf/dual_suction_gripper_with_ft300.urdf.xacro" />
+  <xacro:dual_suction_gripper_with_ft300 prefix="b_bot_" parent = "b_bot_ee_link" />
 
   <!-- Add PhoXi 3D scanners -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />

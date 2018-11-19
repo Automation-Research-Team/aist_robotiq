@@ -14,11 +14,22 @@ class CalibrationClass(AISTBaseRoutines):
     def __init__(self):
         super(CalibrationClass, self).__init__()
         self.use_real_robot = rospy.get_param("use_real_robot", False)
-
+        if self.use_real_robot:
+            self.acceleration = 1.0
+        else:
+            self.acceleration = 0.0
 
         self.bin_names = [
-            "bin2_5","bin2_4","bin2_1","bin2_3","bin2_2",
-            "bin1_3","bin1_4","bin1_5","bin1_2","bin1_1"
+            "bin_2_part_11",
+            "bin_2_part_7",
+            "bin_2_part_4",
+            "bin_2_part_8",
+            "bin_2_part_5",
+            "bin_1_part_17",
+            "bin_1_part_13",
+            "bin_1_part_18",
+            "bin_1_part_15",
+            "bin_1_part_10"
         ]
 
         rospy.loginfo("Calibration class is staring up!")
@@ -37,7 +48,7 @@ class CalibrationClass(AISTBaseRoutines):
             if rospy.is_shutdown():
                 break
             else:
-                self.go_to_pose_goal(robot_name, pose,speed=speed,end_effector_link=end_effector_link, move_lin = move_lin)
+                self.go_to_pose_goal(robot_name, pose,speed=speed, acceleration=self.acceleration, end_effector_link=end_effector_link, move_lin = move_lin)
 
             rospy.loginfo("============ Press `Enter` to proceed ")
             raw_input()
@@ -57,18 +68,18 @@ class CalibrationClass(AISTBaseRoutines):
         poses = []
         pose_b = geometry_msgs.msg.PoseStamped()
         pose_b.header.frame_id = "workspace_center"
-        pose_b.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+        pose_b.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
         pose_b.pose.position.x = .0
         pose_b.pose.position.y = .0
         pose_b.pose.position.z = .03
         rospy.loginfo("============ Going to 2 cm above the table. ============")
-        self.go_to_pose_goal("b_bot", pose_b, speed=0.05, acceleration=0.0, high_precision=False, end_effector_link="", move_lin=True)
+        self.go_to_pose_goal("b_bot", pose_b, speed=0.5, acceleration=self.acceleration, high_precision=False, end_effector_link="", move_lin=True)
 
-        rospy.loginfo("============ Press enter to go to .1 cm above the table. ============")
+        rospy.loginfo("============ Press enter to go to 1 cm above the table. ============")
         i = raw_input()
         if not rospy.is_shutdown():
-            pose_b.pose.position.z = .001
-            self.go_to_pose_goal("b_bot", pose_b, speed=0.01, acceleration=0.0, high_precision=False, end_effector_link="", move_lin=True)
+            pose_b.pose.position.z = .01
+            self.go_to_pose_goal("b_bot", pose_b, speed=0.01, acceleration=self.acceleration, high_precision=False, end_effector_link="", move_lin=True)
 
         rospy.loginfo("============ Press enter to go home. ============")
         raw_input()
@@ -81,12 +92,12 @@ class CalibrationClass(AISTBaseRoutines):
         corners = [
             "top_front_left_corner",
             "top_back_left_corner",
-            "top_front_right_corner",
-            "top_back_right_corner"
+            "top_back_right_corner",
+            "top_front_right_corner"
         ]
 
         pose0 = geometry_msgs.msg.PoseStamped()
-        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
         pose0.pose.position.z = 0.01
         poses = []
         for corner in corners:
@@ -94,28 +105,28 @@ class CalibrationClass(AISTBaseRoutines):
             pose.header.frame_id = tray_name + "_" + corner
             poses.append(pose)
 
-        self.cycle_through_calibration_poses(poses, robot_name, speed = 0.05, move_lin=True, go_home=False, end_effector_link="b_bot_suction_tool_tip_link")
+        self.cycle_through_calibration_poses(poses, robot_name, speed=0.05, move_lin=True, go_home=False, end_effector_link="b_bot_dual_suction_gripper_pad_link")
 
-    def check_calibration_bin_rack(self, robot_name):
+    def check_calibration_bin_rack(self, robot_name, rack_name):
         rospy.loginfo("Calibrating bin rack position")
 
         corners = [
-            # "bin_rack_top_front_left_corner",
-            "bin_rack_top_back_left_corner",
-            "bin_rack_top_front_right_corner",
-            "bin_rack_top_back_right_corner"
+            "top_front_left_corner",
+            "top_back_left_corner",
+            "top_back_right_corner",
+            "top_front_right_corner"
         ]
 
         pose0 = geometry_msgs.msg.PoseStamped()
-        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
         pose0.pose.position.z = 0.01
         poses = []
         for corner in corners:
             pose = copy.deepcopy(pose0)
-            pose.header.frame_id = corner
+            pose.header.frame_id = rack_name + corner
             poses.append(pose)
 
-        self.cycle_through_calibration_poses(poses, robot_name, speed = 0.05, move_lin=True, go_home=False, end_effector_link="b_bot_suction_tool_tip_link")
+        self.cycle_through_calibration_poses(poses, robot_name, speed = 0.1, move_lin=True, go_home=False, end_effector_link="b_bot_dual_suction_gripper_pad_link")
 
     def bin_corner_calibration(self, robot_name="b_bot", end_effector_link=""):
         rospy.loginfo("============ Calibrating bin. ============")
@@ -127,7 +138,7 @@ class CalibrationClass(AISTBaseRoutines):
         poses = []
 
         pose0 = geometry_msgs.msg.PoseStamped()
-        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
         pose0.pose.position.z = 0.03
 
         for bin in self.bin_names:
@@ -166,7 +177,9 @@ if __name__ == '__main__':
             rospy.loginfo("31: Go to tray corners")
             rospy.loginfo("311: Go to set_1_tray_1 corners")
             rospy.loginfo("322: Go to set_1_tray_2 corners")
-            rospy.loginfo("4: Bin-rack calibration")
+            rospy.loginfo("39: Go to place_bin corners")
+            rospy.loginfo("411: Bin-rack calibration")
+            rospy.loginfo("412: Tray-rack calibration")
             rospy.loginfo("5: Bin corners with b_bot")
             rospy.loginfo("x: Exit")
 
@@ -183,8 +196,12 @@ if __name__ == '__main__':
                 else:
                     c.check_calibration_tray_position("b_bot", "set_1_tray_1")
                     c.check_calibration_tray_position("b_bot", "set_1_tray_2")
-            elif i == '4':
-                c.check_calibration_bin_rack("b_bot")
+            elif i == '39':
+                c.check_calibration_tray_position("b_bot", "place_bin")
+            elif i == '411':
+                c.check_calibration_bin_rack("b_bot", "bin_rack")
+            elif i == '412':
+                c.check_calibration_bin_rack("b_bot", "tray_rack")
             elif i == '5':
                 c.bin_corner_calibration("b_bot")
             if i == 'x':
