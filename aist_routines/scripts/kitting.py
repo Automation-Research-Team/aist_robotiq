@@ -5,6 +5,8 @@ import random
 import os
 import csv
 import copy
+import time
+import datetime
 
 import rospy
 import rospkg
@@ -19,6 +21,10 @@ import aist_graspability.msg
 
 
 rp = rospkg.RosPack()
+
+ts = time.time()
+start_date_time = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d_%H:%M:%S')
+number_of_attempted = 0
 
 class kitting_order_entry():
     """
@@ -156,21 +162,21 @@ class KittingClass(AISTBaseRoutines):
 
         # How high the end effector should hover over the tray when delivering the item
         self.dropoff_heights = {
-            "part_4" : 0.03,
-            "part_5" : 0.02,
-            "part_6" : 0.01,
-            "part_7" : 0.04,
-            "part_8" : 0.01,
-            "part_9" : 0.005,
-            "part_10": 0.005,
-            "part_11": 0.01,
-            "part_12": 0.01,
-            "part_13": 0.01,
-            "part_14": 0.005,
-            "part_15": 0.005,
-            "part_16": 0.005,
-            "part_17": 0.005,
-            "part_18": 0.005
+            "part_4" : 0.15,
+            "part_5" : 0.15,
+            "part_6" : 0.15,
+            "part_7" : 0.15,
+            "part_8" : 0.15,
+            "part_9" : 0.15,
+            "part_10": 0.15,
+            "part_11": 0.15,
+            "part_12": 0.15,
+            "part_13": 0.15,
+            "part_14": 0.15,
+            "part_15": 0.15,
+            "part_16": 0.15,
+            "part_17": 0.15,
+            "part_18": 0.15
         }
 
         # How many candidates should we get from phoxi.
@@ -273,18 +279,19 @@ class KittingClass(AISTBaseRoutines):
             if self.grasp_candidates[item.part_id]["position"]:
                 rospy.loginfo("Use candidate pose estimating by vision.")
                 pick_pose = self.grasp_candidates[item.part_id]["position"].pop(0)
+            # Magic offset go more down 3mm (since 2018/11/19) TODO: We need force sensor to get high accuracy.
+            pick_pose.pose.position.z -= 0.003
             pick_pose.pose.orientation = self.downward_orientation
-            approach_height = 0.1
+            approach_height = 0.15
             if item.ee_to_use == "suction":
                 gripper_command = "suction"
                 approach_height = .15
-                speed_slow = 0.05
-                speed_fast = 1.0
             else:
                 gripper_command = ""
-            pick_pose = self.make_pose_safe_for_bin(pick_pose, item)
-            item_picked = self.pick(robot_name, pick_pose, 0.0, speed_fast=1.0, speed_slow=.05,
-                                                gripper_command=gripper_command, approach_height = approach_height)
+            # pick_pose = self.make_pose_safe_for_bin(pick_pose, item)
+            self.publish_marker(pick_pose, "aist_vision_result")
+            item_picked = self.pick(robot_name, pick_pose, 0.0, speed_fast=.05, speed_slow=.01,
+                                                gripper_command=gripper_command, approach_height=approach_height)
             if not self.use_real_robot:
                 item_picked = True
             if not item_picked:
@@ -322,7 +329,7 @@ class KittingClass(AISTBaseRoutines):
         goal.take_new_image = take_new_image
         goal.part_id = item.part_id
         goal.bin_name = item.bin_name
-        goal.scene_path = os.path.join(rp.get_path("aist_graspability"), "data", "scene_image.tif")
+        goal.scene_path = os.path.join(rp.get_path("aist_graspability"), "data", start_date_time + "_part_" + str(item.part_id) + "_attempt_" + str(number_of_attempted) + ".tif")
         goal.mask_path = os.path.join(rp.get_path("aist_graspability"), "data", "imr3.png")
 
         if "precition_gripper" in item.ee_to_use:
@@ -375,7 +382,6 @@ class KittingClass(AISTBaseRoutines):
                 pose_in_bin.pose.orientation = geometry_msgs.msg.Quaternion(
                     *tf_conversions.transformations.quaternion_from_euler(0, pi/2, -resp_search_grasp.rotipz[i]))
             poses_in_bin.append(pose_in_bin)
-        self.publish_marker(pose_in_bin, "aist_vision_result")
         rospy.loginfo("Calculated " + str(number_of_pose_candidates) + " candidates for item nr. " + str(item.part_id) + " in bin " + str(item.bin_name))
         rospy.logdebug(poses_in_bin)
 
@@ -443,6 +449,7 @@ class KittingClass(AISTBaseRoutines):
 
     ###----- main procedure
     def kitting_task(self):
+        global number_of_attempted
 
         self.fulfilled_items = 0
         for item in self.suction_items:
@@ -451,6 +458,7 @@ class KittingClass(AISTBaseRoutines):
             self.get_grasp_candidates_from_phoxi(item, True)
             self.attempt_item(item, 1)
             self.grasp_candidates[item.part_id]["position"] = []
+            number_of_attempted += 1
         self.go_to_named_pose("home", "b_bot")
         rospy.loginfo("==== Done with first suction pass")
 
@@ -477,6 +485,7 @@ if __name__ == '__main__':
                 kit.get_grasp_candidates_from_phoxi(item, True)
                 rospy.loginfo("Grasp candidates of item " + str(item.part_id))
                 rospy.loginfo(kit.grasp_candidates[item.part_id]["position"])
+                kit.publish_marker(kit.grasp_candidates[item.part_id]["position"][0], "aist_vision_result")
             elif i == 'START' or i == 'start':
                 kit.kitting_task()
             elif i == 'x':
