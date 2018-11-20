@@ -298,8 +298,18 @@ class KittingClass(AISTBaseRoutines):
                 rospy.logerr("Failed an attempt to pick item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + "). Reattempting. Current attempts: " + str(attempts))
                 if item.ee_to_use == "suction":
                     self.suck(turn_suction_on=False, eject=False)
-                    pass
                 continue
+
+            if item.ee_to_use == "suction":
+                rospy.loginfo("Going to circumstantial pose after picking from bins")
+                bin_center = geometry_msgs.msg.PoseStamped()
+                bin_center.header.frame_id = item.bin_name
+                bin_center.pose.orientation.w = 1.0
+                bin_center_on_table = self.listener.transformPose("workspace_center", bin_center).pose.position
+                if bin_center_on_table.y > .1:
+                    self.go_to_named_pose("suction_ready_right_bins", "b_bot", speed=1.0, acceleration=1.0)
+                else:
+                    self.go_to_named_pose("suction_ready_left_bins", "b_bot", speed=1.0, acceleration=1.0)
 
             # Attempt to place the item
             place_pose = geometry_msgs.msg.PoseStamped()
@@ -311,9 +321,10 @@ class KittingClass(AISTBaseRoutines):
             approach_height = .20
             if item.ee_to_use == "suction":
                 self.go_to_named_pose("suction_ready_above_place_bin", "b_bot", speed=1.0, acceleration=1.0)
-            self.place(robot_name, place_pose,item.dropoff_height,
             self.place(robot_name, place_pose, place_height=item.dropoff_height,
                                         speed_fast=1.0, speed_slow=0.05, gripper_command=gripper_command, approach_height=approach_height)
+            if item.ee_to_use == "suction":
+                self.go_to_named_pose("suction_ready_above_place_bin", "b_bot", speed=1.0, acceleration=1.0)
             # If successful
             self.fulfilled_items += 1
             item.fulfilled = True
