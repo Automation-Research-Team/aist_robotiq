@@ -354,7 +354,7 @@ class KittingClass(AISTBaseRoutines):
             rospy.logerr("Could not get grasp from Phoxi with action client exception.")
             return False
 
-        if not resp_search_grasp.success:
+        if resp_search_grasp is None or not resp_search_grasp.success:
             rospy.logerr("Could not get grasp from Phoxi with no candidates.")
             return False
 
