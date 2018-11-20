@@ -241,7 +241,7 @@ class AISTBaseRoutines(object):
     def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, end_effector_link = ""):
         self.publish_marker(pose_goal_stamped, "pose")
 
-        if not end_effector_link:
+        if end_effector_link == "":
             if group_name == "b_bot":
                 end_effector_link = "b_bot_dual_suction_gripper_pad_link"
 
