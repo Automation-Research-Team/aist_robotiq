@@ -290,14 +290,14 @@ class KittingClass(AISTBaseRoutines):
                 gripper_command = ""
             # pick_pose = self.make_pose_safe_for_bin(pick_pose, item)
             self.publish_marker(pick_pose, "aist_vision_result")
-            item_picked = self.pick(robot_name, pick_pose, 0.0, speed_fast=.05, speed_slow=.01,
+            item_picked = self.pick(robot_name, pick_pose, grasp_height=0.0, speed_fast=.05, speed_slow=.05,
                                                 gripper_command=gripper_command, approach_height=approach_height)
             if not self.use_real_robot:
                 item_picked = True
             if not item_picked:
                 rospy.logerr("Failed an attempt to pick item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + "). Reattempting. Current attempts: " + str(attempts))
                 if item.ee_to_use == "suction":
-                    # self.suck(False)
+                    self.suck(turn_suction_on=False, eject=False)
                     pass
                 continue
 
@@ -308,10 +308,11 @@ class KittingClass(AISTBaseRoutines):
             else:
                 place_pose.header.frame_id = item.target_frame
             place_pose.pose.orientation = self.downward_orientation2
-            approach_height = .05
+            approach_height = .20
             if item.ee_to_use == "suction":
                 self.go_to_named_pose("suction_ready_above_place_bin", "b_bot", speed=1.0, acceleration=1.0)
             self.place(robot_name, place_pose,item.dropoff_height,
+            self.place(robot_name, place_pose, place_height=item.dropoff_height,
                                         speed_fast=1.0, speed_slow=0.05, gripper_command=gripper_command, approach_height=approach_height)
             # If successful
             self.fulfilled_items += 1
