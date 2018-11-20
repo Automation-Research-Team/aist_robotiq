@@ -151,7 +151,7 @@ class AISTBaseRoutines(object):
             self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast, move_lin=True)
         return True
 
-    def place(self,robotname, object_pose, place_height=None, speed_fast=1.0, speed_slow=0.05, gripper_command="", approach_height=0.05, lift_up_after_place=True):
+    def place(self,robot_name, object_pose, place_height=None, speed_fast=1.0, speed_slow=0.05, gripper_command="", approach_height=0.05, lift_up_after_place=True):
         if speed_fast > 1.0:
             acceleration=speed_fast
         else:
@@ -161,12 +161,12 @@ class AISTBaseRoutines(object):
         approach_pose.pose.position.z = approach_height
         self.publish_marker(object_pose, "place_pose")
         rospy.loginfo("Going above place target")
-        self.go_to_pose_goal(robotname, approach_pose, speed=speed_fast, acceleration=acceleration, move_lin=True)
+        self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast, acceleration=acceleration, move_lin=True)
 
         if place_height is not None:
             object_pose.pose.position.z = place_height
         rospy.loginfo("Moving to place target")
-        self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, acceleration=acceleration, move_lin=True)
+        self.go_to_pose_goal(robot_name, object_pose, speed=speed_slow, acceleration=acceleration, move_lin=True)
 
         #gripper open
         if gripper_command=="complex_pick_from_inside":
@@ -185,12 +185,12 @@ class AISTBaseRoutines(object):
         elif gripper_command=="none":
             pass
         else:
-            self.send_gripper_command(gripper=robotname, command="open")
+            self.send_gripper_command(gripper=robot_name, command="open")
 
 
         if lift_up_after_place:
             rospy.loginfo("Moving back up")
-            self.go_to_pose_goal(robotname, approach_pose, speed=speed_fast, acceleration=acceleration, move_lin=True)
+            self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast, acceleration=acceleration, move_lin=True)
         return True
 
     def go_to_named_pose(self, pose_name, robot_name, speed = 1.0, acceleration = 0.0):
