@@ -93,7 +93,7 @@ class AISTBaseRoutines(object):
         self._suctioned = False
         self._suction_state = rospy.Subscriber("suction_tool/screw_suctioned", std_msgs.msg.Bool, self._suction_state_callback)
 
-    def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False, lift_up_after_pick=True):
+    def pick(self, robot_name, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False, lift_up_after_pick=True):
         self.publish_marker(object_pose, "pick_pose")
         if speed_fast > 1.0:
             acceleration=speed_fast
@@ -104,7 +104,7 @@ class AISTBaseRoutines(object):
         rospy.logdebug("Approach height 0: " + str(approach_height))
         approach_pose.pose.position.z = approach_height
         rospy.logdebug("Going to height " + str(approach_pose.pose.position.z))
-        self.go_to_pose_goal(robotname, approach_pose, speed=speed_fast, move_lin=True)
+        self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast, move_lin=True)
 
         if gripper_command=="complex_pick_from_inside":
             self.precision_gripper_inner_close()
@@ -119,12 +119,12 @@ class AISTBaseRoutines(object):
         elif gripper_command=="none":
             pass
         else:
-            self.send_gripper_command(gripper=robotname, command="open")
+            self.send_gripper_command(gripper=robot_name, command="open")
 
         rospy.loginfo("Moving down to object")
         object_pose.pose.position.z += grasp_height
         rospy.logdebug("Going to height " + str(object_pose.pose.position.z))
-        self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
+        self.go_to_pose_goal(robot_name, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
 
         #gripper close
         if gripper_command=="complex_pick_from_inside":
@@ -142,15 +142,13 @@ class AISTBaseRoutines(object):
         elif gripper_command=="none":
             pass
         else:
-            self.send_gripper_command(gripper=robotname, command="close")
+            self.send_gripper_command(gripper=robot_name, command="close")
 
         if lift_up_after_pick:
             rospy.sleep(1.0)
             rospy.loginfo("Going back up")
-
-
             rospy.loginfo("Going to height " + str(approach_pose.pose.position.z))
-            self.go_to_pose_goal(robotname, approach_pose, speed=speed_fast, move_lin=True)
+            self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast, move_lin=True)
         return True
 
     def place(self,robotname, object_pose, place_height=None, speed_fast=1.0, speed_slow=0.05, gripper_command="", approach_height=0.05, lift_up_after_place=True):
