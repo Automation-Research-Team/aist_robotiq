@@ -51,9 +51,10 @@ def clamp(n, minn, maxn):
 class KittingClass(AISTBaseRoutines):
     """Implements kitting routines for aist robot system."""
 
-    def __init__(self):
+    def __init__(self, vision_algo="fge"):
         """Initialize class object."""
         super(KittingClass, self).__init__()
+        self.vision_algo = vision_algo
         self.initial_setup()
         rospy.loginfo("Kitting class is staring up!")
 
@@ -343,6 +344,7 @@ class KittingClass(AISTBaseRoutines):
         goal.bin_name = item.bin_name
         goal.scene_path = os.path.join(rp.get_path("aist_graspability"), "data", start_date_time + "_part_" + str(item.part_id) + "_attempt_" + str(number_of_attempted) + ".tif")
         goal.mask_path = os.path.join(rp.get_path("aist_graspability"), "data", "imr3.png")
+        goal.algorithm = self.vision_algo
 
         if "precition_gripper" in item.ee_to_use:
             if "inside" in item.ee_to_use:
@@ -480,7 +482,7 @@ if __name__ == '__main__':
     rospy.init_node("Kitting")
 
     try:
-        kit = KittingClass()
+        kit = KittingClass(vision_algo="fge")
 
         while True:
             rospy.loginfo("Enter 1 to go to home all robots.")
