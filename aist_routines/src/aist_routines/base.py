@@ -93,7 +93,7 @@ class AISTBaseRoutines(object):
         self._suctioned = False
         self._suction_state = rospy.Subscriber("suction_tool/screw_suctioned", std_msgs.msg.Bool, self._suction_state_callback)
 
-    def pick(self, robot_name, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False, lift_up_after_pick=True):
+    def pick(self, robot_name, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False, lift_up_after_pick=True, timeout=3.0):
         self.publish_marker(object_pose, "pick_pose")
         if speed_fast > 1.0:
             acceleration=speed_fast
@@ -115,7 +115,7 @@ class AISTBaseRoutines(object):
         elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
             self.precision_gripper_inner_open()
         elif gripper_command=="suction":
-            self.suck(True, False, timeout=10.0)
+            suck_res = self.suck(True, False, timeout=timeout)
         elif gripper_command=="none":
             pass
         else:
@@ -139,6 +139,8 @@ class AISTBaseRoutines(object):
             self.precision_gripper_inner_close(this_action_grasps_an_object = True)
         elif gripper_command=="suction":
             pass
+            # if suck_res.success and not self._suctioned:
+            #     return False
         elif gripper_command=="none":
             pass
         else:
