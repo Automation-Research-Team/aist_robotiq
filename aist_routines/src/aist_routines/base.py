@@ -223,7 +223,11 @@ class AISTBaseRoutines(object):
 
         if not end_effector_link:
             if group_name == "b_bot":
+<<<<<<< Updated upstream
                 end_effector_link = "b_bot_suction_tool_tip_link"
+=======
+                end_effector_link = "b_bot_dual_suction_gripper_pad_link"
+>>>>>>> Stashed changes
         group.set_end_effector_link(end_effector_link)
 
         group.set_pose_target(pose_goal_stamped)
@@ -253,7 +257,11 @@ class AISTBaseRoutines(object):
 
         if not end_effector_link:
             if group_name == "b_bot":
+<<<<<<< Updated upstream
                 end_effector_link = "b_bot_suction_tool_tip_link"
+=======
+                end_effector_link = "b_bot_dual_suction_gripper_pad_link"
+>>>>>>> Stashed changes
 
         group = self.groups[group_name]
 
