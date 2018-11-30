@@ -72,7 +72,7 @@ class CalibrationClass(AISTBaseRoutines):
         pose_b.pose.position.x = .0
         pose_b.pose.position.y = .0
         pose_b.pose.position.z = .03
-        rospy.loginfo("============ Going to 2 cm above the table. ============")
+        rospy.loginfo("============ Going to 3 cm above the table. ============")
         self.go_to_pose_goal("b_bot", pose_b, speed=0.5, acceleration=self.acceleration, high_precision=False, end_effector_link="", move_lin=True)
 
         rospy.loginfo("============ Press enter to go to 1 cm above the table. ============")
@@ -90,10 +90,10 @@ class CalibrationClass(AISTBaseRoutines):
         rospy.loginfo("Calibrating tray_position")
 
         corners = [
-            "top_front_left_corner",
-            "top_back_left_corner",
-            "top_back_right_corner",
-            "top_front_right_corner"
+            "_top_front_left_corner",
+            "_top_back_left_corner",
+            "_top_back_right_corner",
+            "_top_front_right_corner"
         ]
 
         pose0 = geometry_msgs.msg.PoseStamped()
@@ -102,19 +102,19 @@ class CalibrationClass(AISTBaseRoutines):
         poses = []
         for corner in corners:
             pose = copy.deepcopy(pose0)
-            pose.header.frame_id = tray_name + "_" + corner
+            pose.header.frame_id = tray_name + corner
             poses.append(pose)
 
-        self.cycle_through_calibration_poses(poses, robot_name, speed=0.05, move_lin=True, go_home=False, end_effector_link="b_bot_dual_suction_gripper_pad_link")
+        self.cycle_through_calibration_poses(poses, robot_name, speed=0.05, move_lin=True, go_home=False, end_effector_link="b_bot_single_suction_gripper_pad_link")
 
-    def check_calibration_bin_rack(self, robot_name, rack_name):
+    def check_calibration_rack(self, robot_name, rack_name):
         rospy.loginfo("Calibrating bin rack position")
 
         corners = [
-            "top_front_left_corner",
-            "top_back_left_corner",
-            "top_back_right_corner",
-            "top_front_right_corner"
+            "_top_front_left_corner",
+            "_top_back_left_corner",
+            "_top_back_right_corner",
+            "_top_front_right_corner"
         ]
 
         pose0 = geometry_msgs.msg.PoseStamped()
@@ -126,7 +126,7 @@ class CalibrationClass(AISTBaseRoutines):
             pose.header.frame_id = rack_name + corner
             poses.append(pose)
 
-        self.cycle_through_calibration_poses(poses, robot_name, speed = 0.1, move_lin=True, go_home=False, end_effector_link="b_bot_dual_suction_gripper_pad_link")
+        self.cycle_through_calibration_poses(poses, robot_name, speed = 0.1, move_lin=True, go_home=False, end_effector_link="b_bot_single_suction_gripper_pad_link")
 
     def bin_corner_calibration(self, robot_name="b_bot", end_effector_link=""):
         rospy.loginfo("============ Calibrating bin. ============")
@@ -244,9 +244,9 @@ if __name__ == '__main__':
             elif i == '39':
                 c.check_calibration_tray_position("b_bot", "place_bin")
             elif i == '411':
-                c.check_calibration_bin_rack("b_bot", "bin_rack")
+                c.check_calibration_rack("b_bot", "bin_rack")
             elif i == '412':
-                c.check_calibration_bin_rack("b_bot", "tray_rack")
+                c.check_calibration_rack("b_bot", "tray_rack")
             elif i == '51':
                 c.bin_corner_calibration("b_bot")
             elif i == '52':
