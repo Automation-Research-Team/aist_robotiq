@@ -24,7 +24,7 @@ rp = rospkg.RosPack()
 
 ts = time.time()
 start_date_time = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d_%H:%M:%S')
-number_of_attempted = 0
+number_of_attempted = 1
 
 class kitting_order_entry():
     """
@@ -108,21 +108,16 @@ class KittingClass(AISTBaseRoutines):
         self.bin_3_length = 0.192
 
         self.part_bin_list = {
-            "part_4" : "bin_2_part_4",
-            "part_5" : "bin_2_part_5",
-            "part_6" : "bin_3_part_6",
-            "part_7" : "bin_3_part_7",
-            "part_8" : "bin_2_part_8",
-            "part_9" : "bin_1_part_9",
-            "part_10" : "bin_1_part_10",
-            "part_11" : "bin_2_part_11",
-            "part_12" : "bin_1_part_12",
-            "part_13" : "bin_2_part_13",
-            "part_14" : "bin_1_part_14",
-            "part_15" : "bin_1_part_15",
-            "part_16" : "bin_1_part_16",
-            "part_17" : "bin_1_part_17",
-            "part_18" : "bin_1_part_18"
+            "part_a" :"bin_2_part_a",
+            "part_4" :"bin_2_part_4",
+            "part_7" :"bin_2_part_7",
+            "part_11":"bin_2_part_11",
+            "part_b" :"bin_2_part_b",
+            "part_13":"bin_1_part_13",
+            "part_8" :"bin_1_part_8",
+            "part_12":"bin_1_part_12",
+            "part_5" :"bin_1_part_5",
+            "part_c" :"bin_1_part_c",
         }
 
         self.part_position_in_tray = {
@@ -280,8 +275,8 @@ class KittingClass(AISTBaseRoutines):
             if self.grasp_candidates[item.part_id]["position"]:
                 rospy.loginfo("Use candidate pose estimating by vision.")
                 pick_pose = self.grasp_candidates[item.part_id]["position"].pop(0)
-            # Magic offset go more down 3mm (since 2018/11/19) TODO: We need force sensor to get high accuracy.
-            pick_pose.pose.position.z -= 0.003
+            # Magic offset go more down 5mm (since 2018/11/19) TODO: We need force sensor to get high accuracy.
+            pick_pose.pose.position.z -= 0.005
             pick_pose.pose.orientation = self.downward_orientation
             approach_height = 0.15
             if item.ee_to_use == "suction":
@@ -292,7 +287,7 @@ class KittingClass(AISTBaseRoutines):
             # pick_pose = self.make_pose_safe_for_bin(pick_pose, item)
             self.publish_marker(pick_pose, "aist_vision_result")
             item_picked = self.pick(robot_name, pick_pose, grasp_height=0.0, speed_fast=.05, speed_slow=.05,
-                                                gripper_command=gripper_command, approach_height=approach_height)
+                                                gripper_command=gripper_command, approach_height=approach_height, timeout=10.0)
             if not self.use_real_robot:
                 item_picked = True
             if not item_picked:
@@ -319,7 +314,7 @@ class KittingClass(AISTBaseRoutines):
             else:
                 place_pose.header.frame_id = item.target_frame
             place_pose.pose.orientation = self.downward_orientation2
-            approach_height = .20
+            approach_height = .15
             if item.ee_to_use == "suction":
                 self.go_to_named_pose("suction_ready_above_place_bin", "b_bot", speed=1.0, acceleration=1.0)
             self.place(robot_name, place_pose, place_height=item.dropoff_height,
@@ -333,6 +328,8 @@ class KittingClass(AISTBaseRoutines):
             return True
 
         rospy.logerr("Was not able to pick item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + ")! Total attempts: " + str(item.attempts))
+        if item.ee_to_use == "suction":
+            self.go_to_named_pose("home", "b_bot")
         return False
 
     def get_grasp_candidates_from_phoxi(self, item, take_new_image):
@@ -361,7 +358,8 @@ class KittingClass(AISTBaseRoutines):
 
         try:
             self._search_grasp_from_phoxi_client.send_goal(goal)
-            self._search_grasp_from_phoxi_client.wait_for_result(rospy.Duration(10.0))
+            self._search_grasp_from_phoxi_client.wait_for_result() # Not recommended because it may take too long time to get vision result.
+            # self._search_grasp_from_phoxi_client.wait_for_result(rospy.Duration(10.0))
             resp_search_grasp = self._search_grasp_from_phoxi_client.get_result()
         except:
             rospy.logerr("Could not get grasp from Phoxi with action client exception.")
