@@ -142,9 +142,9 @@ def read_bin_layout(directory,set_origin):
         for line in reader:
             token=line
             if len(token) == 3:
-                parts_name = token[0].strip()
-                bin_type = token[1].strip()
-                bin_name = token[2].strip()
+                parts_name = token[0]
+                bin_type = token[1]
+                bin_name = token[2]
                 bin = Bin(parts_name, bin_type, bin_name)
                 set_list[set_number].add_bin(bin)
 
@@ -159,9 +159,9 @@ def read_bins_origin(directory):
         header = next(reader)
         set_list = []
         for row in reader:
-            origin_x = row[1].strip()
-            origin_y = row[2].strip()
-            origin_z = row[3].strip()
+            origin_x = row[1]
+            origin_y = row[2]
+            origin_z = row[3]
             set_list.append(Sets(origin_x,origin_y,origin_z))
         return set_list
 
@@ -172,11 +172,11 @@ def read_bin_definition(directory):
         header = next(reader)
         bin_definition=[]
         for row in reader:
-            bin_type = row[0].strip()
-            width = row[1].strip()
-            length = row[2].strip()
-            height = row[3].strip()
-            z_origin_offset=row[4].strip()
+            bin_type = row[0]
+            width = row[1]
+            length = row[2]
+            height = row[3]
+            z_origin_offset=row[4]
             bin_definition.append(BinDefinition(bin_type,width,length,height,z_origin_offset))
         return bin_definition
 
