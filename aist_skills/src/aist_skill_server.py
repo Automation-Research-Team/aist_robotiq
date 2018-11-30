@@ -64,7 +64,7 @@ class SkillServer(object):
         marker.ns = "markers"
         marker.id = self.marker_id_count
         self.marker_id_count += 1
-        marker.lifetime = rospy.Duration(60.0)
+        marker.lifetime = rospy.Duration(10.0)
         marker.action = visualization_msgs.msg.Marker.ADD
 
         if marker_type == "pose":
