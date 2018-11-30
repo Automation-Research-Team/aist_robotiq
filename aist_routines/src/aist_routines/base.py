@@ -94,7 +94,7 @@ class AISTBaseRoutines(object):
         self._suction_state = rospy.Subscriber("suction_tool/screw_suctioned", std_msgs.msg.Bool, self._suction_state_callback)
 
     def pick(self, robot_name, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False, lift_up_after_pick=True, timeout=3.0):
-        self.publish_marker(object_pose, "pick_pose")
+        # self.publish_marker(object_pose, "pick_pose")
         if speed_fast > 1.0:
             acceleration=speed_fast
         else:
@@ -241,7 +241,7 @@ class AISTBaseRoutines(object):
         return all_close(pose_goal_stamped.pose, current_pose, 0.01), move_success
 
     def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, end_effector_link = ""):
-        self.publish_marker(pose_goal_stamped, "pose")
+        # self.publish_marker(pose_goal_stamped, "pose")
 
         if end_effector_link == "":
             if group_name == "b_bot":

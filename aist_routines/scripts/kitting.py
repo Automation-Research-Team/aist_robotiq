@@ -357,7 +357,8 @@ class KittingClass(AISTBaseRoutines):
 
         try:
             self._search_grasp_from_phoxi_client.send_goal(goal)
-            self._search_grasp_from_phoxi_client.wait_for_result(rospy.Duration(10.0))
+            self._search_grasp_from_phoxi_client.wait_for_result() # Not recommended because it may take too long time to get vision result.
+            # self._search_grasp_from_phoxi_client.wait_for_result(rospy.Duration(10.0))
             resp_search_grasp = self._search_grasp_from_phoxi_client.get_result()
         except:
             rospy.logerr("Could not get grasp from Phoxi with action client exception.")
