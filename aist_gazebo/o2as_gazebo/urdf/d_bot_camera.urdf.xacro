@@ -6,7 +6,7 @@
     <static>true</static>
   </gazebo>
 
-  <xacro:include filename="$(find o2as_gazebo)/urdf/d_bot_camera.gazebo" />
+  <xacro:include filename="$(find aist_gazebo)/urdf/d_bot_camera.gazebo" />
   <xacro:include filename="$(find realsense2_camera)/urdf/_d435.urdf.xacro" />
 
   <link name="world" />
