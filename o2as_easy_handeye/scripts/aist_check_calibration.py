@@ -12,13 +12,13 @@ import tf_conversions
 from o2as_aruco_ros.msg import Corners
 from std_srvs.srv import Trigger
 
-from o2as_routines.base import O2ASBaseRoutines
+from aist_routines.base import AISTBaseRoutines
 from math import radians, degrees
 
 ######################################################################
 #  class VisitRoutines                                               #
 ######################################################################
-class VisitRoutines(O2ASBaseRoutines):
+class VisitRoutines(AISTBaseRoutines):
   """Wrapper of MoveGroupCommander specific for this script"""
   def __init__(self, camera_name, robot_name):
     super(VisitRoutines, self).__init__()
@@ -36,7 +36,7 @@ class VisitRoutines(O2ASBaseRoutines):
     # Set `_ee_link` as end effector wrt `_base_link` of the robot
     group.set_pose_reference_frame("workspace_center")
     if robot_name == 'b_bot':
-      group.set_end_effector_link(robot_name + "_dual_suction_gripper_pad_link")
+      group.set_end_effector_link(robot_name + "_single_suction_gripper_pad_link")
     else:
       group.set_end_effector_link(robot_name + "_gripper_tip_link")
 

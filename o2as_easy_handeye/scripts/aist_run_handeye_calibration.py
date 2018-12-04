@@ -16,7 +16,7 @@ from std_srvs.srv import Trigger
 from o2as_phoxi_camera.srv import GetFrame
 from easy_handeye.srv import TakeSample, RemoveSample, ComputeCalibration
 
-from o2as_routines.base import O2ASBaseRoutines
+from aist_routines.base import AISTBaseRoutines
 
 import sensor_msgs.msg
 import cv2
@@ -110,7 +110,7 @@ keyposes = {
 ######################################################################
 #  class HandEyeCalibrationRoutines                                  #
 ######################################################################
-class HandEyeCalibrationRoutines(O2ASBaseRoutines):
+class HandEyeCalibrationRoutines(AISTBaseRoutines):
   def __init__(self, camera_name, robot_name,
                speed, sleep_time, needs_trigger, needs_calib):
     super(HandEyeCalibrationRoutines, self).__init__()
