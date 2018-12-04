@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <package>
-  <name>o2as_gazebo</name>
+  <name>aist_gazebo</name>
   <version>0.0.1</version>
   <description>
       Gazebo files, based on the Universal UR5/10 robot arm gazebo module.
   </description>
 
-  <author>Felix von Drigalski</author>
-  <author email="FvDrigalski@gmail.com">Felix von Drigalski</author>
-  <maintainer email="FvDrigalski@gmail.com">Felix von Drigalski</maintainer>
+  <author>Yuma Hijioka</author>
+  <author email="yuma.hijioka@aist.go.jp">Yuma Hijioka</author>
+  <maintainer email="yuma.hijioka@aist.go.jp">Yuma Hijioka</maintainer>
 
   <license>BSD</license>
 

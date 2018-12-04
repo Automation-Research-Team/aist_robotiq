@@ -16,7 +16,7 @@
   <arg name="shutdown_on_disconnect" default="true" />
   <!-- require_activation defines when the service /ur_driver/robot_enable needs to be called. -->
   <arg name="require_activation" default="Never" /> <!-- Never, Always, OnStartup -->
-    
+
   <!-- The max_velocity parameter is only used for debugging in the ur_driver. It's not related to actual velocity limits -->
   <arg name="max_velocity" default="10.0"/> <!-- [rad/s] -->
 
@@ -32,11 +32,11 @@
   <!-- <include file="$(find o2as_scene_description)/launch/o2as_base_scene_upload.launch" /> -->
   <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" /> -->
 
-  <!-- Drivers for the robots -->  
+  <!-- Drivers for the robots -->
   <node name="b_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen" ns="b_bot_controller">
     <param name="prefix" type="str" value="b_bot_" />
     <param name="robot_ip_address" type="str" value="$(arg robot_ip_b)" />
-    <param name="reverse_port" type="int" value="50002" /> 
+    <param name="reverse_port" type="int" value="50002" />
     <param name="min_payload" type="double" value="$(arg min_payload)" />
     <param name="max_payload" type="double" value="$(arg max_payload)" />
     <param name="max_velocity" type="double" value="$(arg max_velocity)" />
@@ -48,10 +48,10 @@
     <remap from="joint_states" to="/joint_states"/>
   </node>
 
-  <include file="$(find aist_moveit_config)/launch/aist_moveit_planning_execution.launch">
+  <!-- <include file="$(find aist_moveit_config)/launch/aist_moveit_planning_execution.launch">
     <arg name="sim" value="false" />
     <arg name="debug" value="false" />
     <arg name="config" value="true" />
-  </include>
+  </include> -->
 
 </launch>
