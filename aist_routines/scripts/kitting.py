@@ -275,8 +275,11 @@ class KittingClass(AISTBaseRoutines):
             if self.grasp_candidates[item.part_id]["position"]:
                 rospy.loginfo("Use candidate pose estimating by vision.")
                 pick_pose = self.grasp_candidates[item.part_id]["position"].pop(0)
+                rospy.loginfo("Pick pose in bin:")
+                rospy.loginfo(pick_pose)
+            raw_input("Press `Enter` to pick item.")
             # Magic offset go more down 5mm (since 2018/11/19) TODO: We need force sensor to get high accuracy.
-            pick_pose.pose.position.z -= 0.005
+            pick_pose.pose.position.z -= 0.003
             pick_pose.pose.orientation = self.downward_orientation
             approach_height = 0.15
             if item.ee_to_use == "suction":
@@ -295,6 +298,8 @@ class KittingClass(AISTBaseRoutines):
                 if item.ee_to_use == "suction":
                     self.suck(turn_suction_on=False, eject=False)
                 continue
+
+            raw_input("Press `Enter` to place item.")
 
             if item.ee_to_use == "suction":
                 rospy.loginfo("Going to circumstantial pose after picking from bins")

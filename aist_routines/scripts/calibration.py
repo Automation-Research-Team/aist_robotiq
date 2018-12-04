@@ -20,16 +20,16 @@ class CalibrationClass(AISTBaseRoutines):
             self.acceleration = 0.0
 
         self.bin_names = [
-            "bin_2_part_0",
-            "bin_2_part_11",
-            "bin_2_part_8",
-            "bin_2_part_7",
+            "bin_2_part_a",
             "bin_2_part_4",
-            "bin_1_part_1",
-            "bin_1_part_5",
-            "bin_1_part_12",
+            "bin_2_part_7",
+            "bin_2_part_11",
+            "bin_2_part_b",
             "bin_1_part_13",
-            "bin_1_part_2",
+            "bin_1_part_8",
+            "bin_1_part_12",
+            "bin_1_part_5",
+            "bin_1_part_c",
         ]
 
         rospy.loginfo("Calibration class is staring up!")
