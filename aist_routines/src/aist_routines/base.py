@@ -143,7 +143,7 @@ class AISTBaseRoutines(object):
         elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
             self.precision_gripper_inner_open()
         elif gripper_command=="suction":
-            suck_res = self.suck(True, False, timeout=timeout)
+            suck_res = self.suck(turn_suction_on=True, timeout=timeout)
         elif gripper_command=="none":
             pass
         else:
@@ -152,7 +152,10 @@ class AISTBaseRoutines(object):
         rospy.loginfo("Moving down to object")
         object_pose.pose.position.z += grasp_height
         rospy.logdebug("Going to height " + str(object_pose.pose.position.z))
-        self.go_to_pose_goal(robot_name, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
+        if gripper_command=="suction":
+            self.do_linear_push(robot_name, force=5.0, wait=True, direction='Z+', max_approach_distance=0.92, forward_speed=0.4)
+        else:
+            self.go_to_pose_goal(robot_name, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
 
         #gripper close
         if gripper_command=="complex_pick_from_inside":
@@ -167,8 +170,6 @@ class AISTBaseRoutines(object):
             self.precision_gripper_inner_close(this_action_grasps_an_object = True)
         elif gripper_command=="suction":
             pass
-            # if suck_res.success and not self._suctioned:
-            #     return False
         elif gripper_command=="none":
             pass
         else:
@@ -210,8 +211,7 @@ class AISTBaseRoutines(object):
         elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
             self.precision_gripper_inner_open()
         elif gripper_command=="suction":
-            self.suck(turn_suction_on=False, eject=True)
-            self.suck(turn_suction_on=False, eject=False)
+            self.suck(turn_suction_on=False)
         elif gripper_command=="none":
             pass
         else:
