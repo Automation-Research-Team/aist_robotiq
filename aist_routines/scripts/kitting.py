@@ -488,6 +488,7 @@ if __name__ == '__main__':
         kit = KittingClass(vision_algo="fge")
 
         while True:
+            rospy.loginfo("")
             rospy.loginfo("Enter 1 to go to home all robots.")
             rospy.loginfo("Enter 71, 72... to test phoxi on item 1, 2...")
             rospy.loginfo("Enter START to start the task.")
@@ -496,6 +497,9 @@ if __name__ == '__main__':
             i = raw_input()
             if i == '1':
                 kit.go_to_named_pose("home", "b_bot")
+            elif i == '001':
+                kit.do_linear_push("b_bot",
+                    force=2.5, wait=True, direction="Z+", max_approach_distance=.092, forward_speed=.04)
             elif i in ["71", "72", "73", "74", "75", "76", "77", "78", "79"]:
                 item = kit.ordered_items[int(i)-71]
                 rospy.loginfo("Checking for item id " + str(item.part_id) + " in " + item.bin_name)
