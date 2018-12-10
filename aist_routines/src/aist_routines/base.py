@@ -48,9 +48,34 @@ import tf
 import tf_conversions
 import moveit_commander
 from moveit_commander.conversions import pose_to_list
+import ur_modern_driver.msg
 
 import o2as_msgs.msg
 import o2as_msgs.srv
+
+def is_program_running(topic_namespace = ""):
+    """Checks if a program is running on the UR"""
+    msg = rospy.wait_for_message(topic_namespace + "/ur_driver/robot_mode_state", ur_modern_driver.msg.RobotModeDataMsg)
+    if msg:
+        return msg.is_program_running
+    else:
+        rospy.logerr("No message received from the robot. Is everything running? Is the namespace entered correctly with a leading slash?")
+        return False
+
+def wait_for_UR_program(topic_namespace = "", timeout_duration = rospy.Duration.from_sec(20.0)):
+    rospy.logdebug("Waiting for UR program to finish.")
+    # Only run this after sending custom URScripts and not the regular motion commands, or this call will not terminate before the timeout.
+    rospy.sleep(1.0)
+    t_start = rospy.Time.now()
+    time_passed = rospy.Time.now() - t_start
+    while is_program_running(topic_namespace):
+        rospy.sleep(.05)
+        time_passed = rospy.Time.now() - t_start
+        if time_passed > timeout_duration:
+            rospy.loginfo("Timeout reached.")
+        return False
+    rospy.logdebug("UR Program has terminated.")
+    return True
 
 def all_close(goal, actual, tolerance):
     """
@@ -84,8 +109,11 @@ class AISTBaseRoutines(object):
         }
         self.listener = tf.TransformListener()
         self.publishMarker_client = rospy.ServiceProxy('/aist_skills/publishMarker', o2as_msgs.srv.publishMarker)
+        self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR)
         self.setup_suction_tool()
+
         self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+
 
     def setup_suction_tool(self):
         """Enable to use suction tool."""
@@ -293,6 +321,24 @@ class AISTBaseRoutines(object):
     def _suction_state_callback(self, msg):
         self._suctioned = msg.data
 
+    def do_linear_push(self, robot_name, force, wait=True, direction="Z+", max_approach_distance=0.1, forward_speed=0.0):
+        if not self.use_real_robot:
+            return True
+        # Directly calls the UR service rather than the action of the skill_server
+        req = o2as_msgs.srv.sendScriptToURRequest()
+        req.robot_name = robot_name
+        req.max_force = force
+        req.force_direction = direction
+        req.max_approach_distance = max_approach_distance
+        req.forward_speed = forward_speed
+        req.program_id = "linear_push"
+        res = self.urscript_client.call(req)
+        if wait:
+            rospy.sleep(2.0)    # This program seems to take some time
+            wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
+        return res.success
+
+    # FIXME: May move this function to aist_skills. Please check.
     def publish_marker(self, pose_stamped, marker_type):
         req = o2as_msgs.srv.publishMarkerRequest()
         req.marker_pose = pose_stamped
