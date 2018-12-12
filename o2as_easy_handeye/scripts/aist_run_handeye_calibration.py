@@ -221,13 +221,13 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
 
     rospy.sleep(self.sleep_time)
 
+    success = True
     if self.take_sample:
       try:
         self.take_sample()
         sample_list = self.get_sample_list()
         n = len(sample_list.samples.hand_world_samples.transforms)
         print("  took {} (hand-world, camera-marker) samples").format(n)
-        success = True
       except rospy.ServiceException as e:
         print "Service call failed: %s"%e
         success = False
@@ -324,6 +324,8 @@ def main():
     
     assert(camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
     assert(robot_name  in {"a_bot", "b_bot", "c_bot"})
+
+    rospy.init_node("aist_run_handeye_calibration")
 
     speed      = 1
     sleep_time = 1
