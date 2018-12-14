@@ -18,10 +18,10 @@ from math import radians, degrees
 ######################################################################
 #  class VisitRoutines                                               #
 ######################################################################
-class VisitRoutines(O2ASBaseRoutines):
+class VisitRoutines:
   """Wrapper of MoveGroupCommander specific for this script"""
-  def __init__(self, camera_name, robot_name):
-    super(VisitRoutines, self).__init__()
+  def __init__(self, routines, camera_name, robot_name):
+    self.routines = routines
     
     cs = "/{}/".format(camera_name)
     self.start_acquisition = rospy.ServiceProxy(cs + "start_acquisition",
@@ -31,12 +31,12 @@ class VisitRoutines(O2ASBaseRoutines):
 
     ## Initialize `moveit_commander`
     self.group_name = robot_name
-    group = self.groups[self.group_name]
+    group = self.routines.groups[self.group_name]
 
     # Set `_ee_link` as end effector wrt `_base_link` of the robot
     group.set_pose_reference_frame("workspace_center")
     if robot_name == 'b_bot':
-      group.set_end_effector_link(robot_name + "_dual_suction_gripper_pad_link")
+      group.set_end_effector_link(robot_name + "_single_suction_gripper_pad_link")
     else:
       group.set_end_effector_link(robot_name + "_gripper_tip_link")
 
@@ -76,13 +76,14 @@ class VisitRoutines(O2ASBaseRoutines):
     rospy.sleep(1)
     poseStamped.pose.position.z = position.vector.z # -0.0285
     [all_close, move_success] \
-        = self.go_to_pose_goal(self.group_name, poseStamped, speed,
-                               end_effector_link=group.get_end_effector_link(),
-                               move_lin=False)
+        = self.routines.go_to_pose_goal(
+              self.group_name, poseStamped, speed,
+              end_effector_link=group.get_end_effector_link(),
+              move_lin=False)
         
 
   def go_home(self):
-    self.go_to_named_pose("home", self.group_name)
+    self.routines.go_to_named_pose("home", self.group_name)
 
 
   def run(self, speed):
@@ -109,13 +110,34 @@ class VisitRoutines(O2ASBaseRoutines):
 #  global functions                                                  #
 ######################################################################
 if __name__ == '__main__':
-  camera_name = sys.argv[1]
-  robot_name  = sys.argv[2]
+  parser = argparse.ArgumentParser(description='Check hand-eye calibration')
+  parser.add_argument('-C', '--config',
+                      action='store', nargs='?',
+                      default='aist', type=str, choices=None,
+                      help='configuration name', metavar=None)
+  parser.add_argument('-c', '--camera_name',
+                      action='store', nargs='?',
+                      default='a_phoxi_m_camera', type=str, choices=None,
+                      help='camera name', metavar=None)
+  parser.add_argument('-r', '--robot_name',
+                      action='store', nargs='?',
+                      default='b_bot', type=str, choices=None,
+                      help='robot name', metavar=None)
+                        
+  args = parser.parse_args()
+  print(args)
+
+  if args.config == 'aist':
+    base_routines = AISTBaseRoutines()
+  else:
+    base_routines = O2ASBaseRoutines()
+  camera_name   = args.camera_name
+  robot_name    = args.robot_name
     
   assert(camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
   assert(robot_name  in {"a_bot", "b_bot", "c_bot"})
 
-  routines = VisitRoutines(camera_name, robot_name)
+  routines = VisitRoutines(base_routines, camera_name, robot_name)
   speed = 0.05
   routines.run(speed)
 

@@ -62,13 +62,10 @@
 	   if="$(eval arg('config') == 'aist')">
   </include>
 
-  <include file="$(find aist_moveit_config)/launch/aist_moveit_planning_execution.launch"
-	   unless="$(eval arg('config') == 'aist')">
-    <arg name="sim" value="true"  if    ="$(eval arg('config') == 'sim')"/>
-    <arg name="sim" value="false" unless="$(eval arg('config') == 'sim')"/>
+  <include file="$(find aist_moveit_config)/launch/aist_moveit_planning_execution.launch">
+    <arg name="sim" value="$(eval arg('config') == 'sim')"/>
   </include>
-  <include file="$(find aist_skills)/launch/aist_skills.launch"
-	   unless="$(eval arg('config') == 'aist')"/>
+  <include file="$(find aist_skills)/launch/aist_skills.launch"/>
 
   <!-- Start easy_handeye calibrator -->
   <include file="$(find o2as_easy_handeye)/launch/calibrate.launch">
