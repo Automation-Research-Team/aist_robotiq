@@ -64,7 +64,7 @@ class SkillServer(object):
         marker.ns = "markers"
         marker.id = self.marker_id_count
         self.marker_id_count += 1
-        marker.lifetime = rospy.Duration(10.0)
+        marker.lifetime = rospy.Duration(60.0)
         marker.action = visualization_msgs.msg.Marker.ADD
 
         if marker_type == "pose":
@@ -94,16 +94,6 @@ class SkillServer(object):
             marker.scale.y = .05
             marker.scale.z = .05
             marker.color.g = 1.0
-            marker.color.a = 0.8
-        elif marker_type == "aist_vision_result":
-            # Add a sphere
-            marker.type = visualization_msgs.msg.Marker.SPHERE
-            marker.scale.x = .01
-            marker.scale.y = .01
-            marker.scale.z = .01
-            marker.color.r = 0.8
-            marker.color.g = 0.4
-            marker.color.b = 0.0
             marker.color.a = 0.8
         elif marker_type == "":
             marker.type = visualization_msgs.msg.Marker.SPHERE

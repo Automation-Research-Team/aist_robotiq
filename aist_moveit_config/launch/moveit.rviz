@@ -93,12 +93,16 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          b_bot_single_suction_gripper_base_link:
+          b_bot_dual_suction_gripper_base_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          b_bot_single_suction_gripper_pad_link:
+          b_bot_dual_suction_gripper_coanda_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_bot_dual_suction_gripper_pad_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -122,6 +126,14 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          b_bot_suction_tool_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_bot_tool0:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_bot_upper_arm_link:
             Alpha: 1
             Show Axes: false
@@ -231,12 +243,16 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          b_bot_single_suction_gripper_base_link:
+          b_bot_dual_suction_gripper_base_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          b_bot_single_suction_gripper_pad_link:
+          b_bot_dual_suction_gripper_coanda_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_bot_dual_suction_gripper_pad_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -260,6 +276,14 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          b_bot_suction_tool_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_bot_tool0:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_bot_upper_arm_link:
             Alpha: 1
             Show Axes: false
@@ -318,9 +342,11 @@ Visualization Manager:
           Value: true
         b_bot_base_smfl:
           Value: true
-        b_bot_single_suction_gripper_base_link:
+        b_bot_dual_suction_gripper_base_link:
           Value: true
-        b_bot_single_suction_gripper_pad_link:
+        b_bot_dual_suction_gripper_coanda_link:
+          Value: true
+        b_bot_dual_suction_gripper_pad_link:
           Value: true
         b_bot_ee_link:
           Value: true
@@ -329,6 +355,10 @@ Visualization Manager:
         b_bot_ft300_link:
           Value: true
         b_bot_shoulder_link:
+          Value: true
+        b_bot_suction_tool_tip_link:
+          Value: true
+        b_bot_tool0:
           Value: true
         b_bot_upper_arm_link:
           Value: true
@@ -368,10 +398,16 @@ Visualization Manager:
                       b_bot_wrist_2_link:
                         b_bot_wrist_3_link:
                           b_bot_ee_link:
-                            b_bot_single_suction_gripper_base_link:
-                              b_bot_single_suction_gripper_pad_link:
+                            b_bot_dual_suction_gripper_base_link:
+                              b_bot_dual_suction_gripper_coanda_link:
+                                {}
+                              b_bot_dual_suction_gripper_pad_link:
+                                b_bot_suction_tool_tip_link:
+                                  {}
                             b_bot_ft300_link:
                               {}
+                          b_bot_tool0:
+                            {}
             b_bot_base_smfl:
               {}
             workbox:
