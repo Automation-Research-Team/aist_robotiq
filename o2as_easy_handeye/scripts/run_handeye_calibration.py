@@ -4,6 +4,7 @@ import sys
 import os
 import copy
 import rospy
+import argparse
 import moveit_msgs.msg
 import geometry_msgs.msg
 import tf_conversions
@@ -17,6 +18,7 @@ from o2as_phoxi_camera.srv import GetFrame
 from easy_handeye.srv import TakeSample, RemoveSample, ComputeCalibration
 
 from o2as_routines.base import O2ASBaseRoutines
+from aist_routines.base import AISTBaseRoutines
 
 import sensor_msgs.msg
 import cv2
@@ -68,13 +70,13 @@ keyposes = {
       # [0.15,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
 
       # configulation for AIST
-      [0.15,  0.25, 0.15, radians( 30), radians( 25), radians(0)],
-      [0.15,  0.10, 0.15, radians( 30), radians( 25), radians(0)],
-      [0.15, -0.05, 0.15, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.25, 0.17, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.10, 0.17, radians( 30), radians( 25), radians(0)],
+      [0.15, -0.05, 0.17, radians( 30), radians( 25), radians(0)],
 
-      [0.15, -0.05, 0.22, radians( 30), radians( 25), radians(0)],
-      [0.15,  0.10, 0.22, radians( 30), radians( 25), radians(0)],
-      [0.15,  0.25, 0.22, radians( 30), radians( 25), radians(0)],
+      [0.15, -0.05, 0.25, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.25, 0.25, radians( 30), radians( 25), radians(0)],
 
       # [0.40,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
       # #[0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
@@ -110,11 +112,10 @@ keyposes = {
 ######################################################################
 #  class HandEyeCalibrationRoutines                                  #
 ######################################################################
-class HandEyeCalibrationRoutines(O2ASBaseRoutines):
-  def __init__(self, camera_name, robot_name,
+class HandEyeCalibrationRoutines:
+  def __init__(self, routines, camera_name, robot_name,
                speed, sleep_time, needs_trigger, needs_calib):
-    super(HandEyeCalibrationRoutines, self).__init__()
-
+    self.routines    = routines
     self.camera_name = camera_name
     self.speed       = speed
     self.sleep_time  = sleep_time
@@ -153,7 +154,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
 
     ## Initialize `moveit_commander`
     self.group_name = robot_name
-    group = self.groups[self.group_name]
+    group = self.routines.groups[self.group_name]
 
     # Set `_ee_link` as end effector wrt `_base_link` of the robot
     group.set_pose_reference_frame("workspace_center")
@@ -175,7 +176,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
 
     
   def go_home(self):
-    self.go_to_named_pose("home", self.group_name)
+    self.routines.go_to_named_pose("home", self.group_name)
 
 
   def save_image(self, file_name):
@@ -187,7 +188,7 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
 
   def move(self, pose):
     print("move to {}".format(pose))
-    group = self.groups[self.group_name]
+    group = self.routines.groups[self.group_name]
     poseStamped                 = geometry_msgs.msg.PoseStamped()
     poseStamped.header.frame_id = group.get_pose_reference_frame()
     poseStamped.pose.position.x = pose[0]
@@ -198,9 +199,10 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
         *tf_conversions.transformations.quaternion_from_euler(
           pose[3], pose[4], pose[5]))
     [all_close, move_success] \
-      = self.go_to_pose_goal(self.group_name, poseStamped, self.speed,
-                             end_effector_link=group.get_end_effector_link(),
-                             move_lin=False)
+      = self.routines.go_to_pose_goal(
+                            self.group_name, poseStamped, self.speed,
+                            end_effector_link=group.get_end_effector_link(),
+                            move_lin=False)
     return move_success
 
 
@@ -317,9 +319,32 @@ class HandEyeCalibrationRoutines(O2ASBaseRoutines):
 ######################################################################
 def main():
   try:
-    camera_name   = sys.argv[1]
-    robot_name    = sys.argv[2]
-    needs_trigger = (True if (sys.argv[3] == "trigger") else False)
+    parser = argparse.ArgumentParser(description='Do hand-eye calibration')
+    parser.add_argument('-C', '--config',
+                        action='store', nargs='?',
+                        default='aist', type=str, choices=None,
+                        help='configuration name', metavar=None)
+    parser.add_argument('-c', '--camera_name',
+                        action='store', nargs='?',
+                        default='a_phoxi_m_camera', type=str, choices=None,
+                        help='camera name', metavar=None)
+    parser.add_argument('-r', '--robot_name',
+                        action='store', nargs='?',
+                        default='b_bot', type=str, choices=None,
+                        help='robot name', metavar=None)
+    parser.add_argument('-t', '--trigger', type=bool, default=False)
+                        
+    args = parser.parse_args()
+    print(args)
+
+    if args.config == 'aist':
+      base_routines = AISTBaseRoutines()
+    else:
+      base_routines = O2ASBaseRoutines()
+    camera_name   = args.camera_name
+    robot_name    = args.robot_name
+    needs_trigger = args.trigger
+
     needs_calib   = (True if (os.path.basename(sys.argv[0]) == "run_handeye_calibration.py") else False)
     
     assert(camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
@@ -327,7 +352,8 @@ def main():
 
     speed      = 1
     sleep_time = 1
-    routines   = HandEyeCalibrationRoutines(camera_name, robot_name,
+    routines   = HandEyeCalibrationRoutines(base_routines,
+                                            camera_name, robot_name,
                                             speed, sleep_time,
                                             needs_trigger, needs_calib)
 

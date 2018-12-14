@@ -115,6 +115,7 @@ if __name__ == '__main__':
   assert(camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
   assert(robot_name  in {"a_bot", "b_bot", "c_bot"})
 
+  rospy.init_node("aist_check_calibration")
   routines = VisitRoutines(camera_name, robot_name)
   speed = 0.05
   routines.run(speed)

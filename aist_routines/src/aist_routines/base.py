@@ -77,6 +77,8 @@ def all_close(goal, actual, tolerance):
 class AISTBaseRoutines(object):
     def __init__(self):
         moveit_commander.roscpp_initialize(sys.argv)
+        rospy.init_node('suction_example', anonymous=False)
+        
         self.robots = moveit_commander.RobotCommander()
         self.planning_scene = moveit_commander.PlanningSceneInterface()
         self.groups = {

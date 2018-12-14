@@ -1,13 +1,27 @@
 #!/usr/bin/env python
 
-import sys
+import rospy
+import argparse
 from o2as_routines.base import O2ASBaseRoutines
+from aist_routines.base import AISTBaseRoutines
 
 
 if __name__ == '__main__':
-    
-    robot_name   = sys.argv[1]
-    assert(robot_name in {"a_bot", "b_bot", "c_bot"})
+    parser = argparse.ArgumentParser(description='Move a robot to home')
+    parser.add_argument('-C', '--config',
+                        action='store', nargs='?',
+                        default='aist', type=str, choices=None,
+                        help='configuration name', metavar=None)
+    parser.add_argument('-r', '--robot_name',
+                        action='store', nargs='?',
+                        default='b_bot', type=str, choices=None,
+                        help='robot name', metavar=None)
 
-    baseRoutines = O2ASBaseRoutines()
-    baseRoutines.go_to_named_pose("home", robot_name)
+    args = parser.parse_args()
+
+    if (args.config == "aist"):
+        baseRoutines = AISTBaseRoutines()
+    else:
+        baseRoutines = O2ASBaseRoutines()
+
+    baseRoutines.go_to_named_pose("home", args.robot_name)
