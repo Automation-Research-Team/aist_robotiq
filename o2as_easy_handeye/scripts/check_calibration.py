@@ -13,6 +13,7 @@ from o2as_aruco_ros.msg import Corners
 from std_srvs.srv import Trigger
 
 from o2as_routines.base import O2ASBaseRoutines
+from aist_routines.base import AISTBaseRoutines
 from math import radians, degrees
 
 ######################################################################
