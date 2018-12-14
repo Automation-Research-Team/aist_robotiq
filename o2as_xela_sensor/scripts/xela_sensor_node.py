@@ -35,9 +35,6 @@ class XelaSensorNode(object):
     rospy.loginfo('Action server {} started.'.format(self._calibrate_action_name))
     self._calibrate_action_result = CalibrateResult()
 
-    # Get baseline
-    self._get_baseline = rospy.Service("~get_baseline", GetBaseline, self.get_baseline)
-
   def calibrate_action_callback(self, goal):
     rospy.loginfo('Executing {}. request sent:'.format(self._calibrate_action_name))
     rospy.loginfo(goal)
@@ -46,12 +43,6 @@ class XelaSensorNode(object):
     self._calibrate_action_result.base = self._sensor.base
     self._calibrate_action_server.set_succeeded(self._calibrate_action_result)
     rospy.loginfo('Action server {} finished.'.format(self._calibrate_action_name))
-
-  def get_baseline(self, req):
-    res = GetBaselineResponse()
-    res.data = self._sensor.base
-    res.success = True
-    return res   
 
   def free_run(self):
     while not rospy.is_shutdown():
