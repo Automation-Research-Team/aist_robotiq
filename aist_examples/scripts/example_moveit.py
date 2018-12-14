@@ -102,7 +102,7 @@ class MoveItExamples(object):
         
         if not end_effector_link:
             if group_name == "b_bot":
-                end_effector_link = "b_bot_single_suction_gripper_pad_link"
+                end_effector_link = "b_bot_suction_tool_tip_link"
         group.set_end_effector_link(end_effector_link)
         
         group.set_pose_target(pose_goal_stamped)
@@ -132,7 +132,7 @@ class MoveItExamples(object):
         
         if not end_effector_link:
             if group_name == "b_bot":
-                end_effector_link = "b_bot_single_suction_gripper_pad_link"
+                end_effector_link = "b_bot_suction_tool_tip_link"
 
         group = self.groups[group_name]
             

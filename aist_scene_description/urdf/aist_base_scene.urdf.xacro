@@ -61,9 +61,9 @@
     <origin xyz="${b_bot_x} ${b_bot_y} ${bots_z}" rpy="0.0 0.0 ${b_bot_theta}" />
   </joint>
 
-  <!-- spawn and attach single suction grippers -->
-  <xacro:include filename="$(find aist_scene_description)/urdf/single_suction_gripper_with_ft300.urdf.xacro" />
-  <xacro:single_suction_gripper_with_ft300 prefix="b_bot_" parent = "b_bot_ee_link" />
+  <!-- spawn and attach dual suction grippers -->
+  <xacro:include filename="$(find aist_scene_description)/urdf/dual_suction_gripper_with_ft300.urdf.xacro" />
+  <xacro:dual_suction_gripper_with_ft300 prefix="b_bot_" parent = "b_bot_ee_link" />
 
   <!-- Add PhoXi 3D scanners -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />
