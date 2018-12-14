@@ -67,21 +67,20 @@ broad     = TransformBroadcaster()
 rate      = rospy.Rate(50)
 baseEst   = rospy.get_param('camera_body_frame')
 
-try:
-    while not rospy.is_shutdown():
-        now = rospy.Time.now()
-        broad.sendTransform(trns, rot, now, optEst, bot)  # ..., child, parent
-        broad.sendTransform(opt_base[0], opt_base[1], now, baseEst, optEst)
-        rate.sleep()
-except rospy.ROSInterruptException:
-    transformer = TransformerROS()
-    mat = transformer.fromTranslationRotation(trns, rot)
-    print "\n=== Estimated camera -> robot(effector or base_link) transformation ==="
-    print_mat(mat)
 
-    if not calib.eye_on_hand:
-        mat = tfs.concatenate_matrices( \
+while not rospy.is_shutdown():
+    now = rospy.Time.now()
+    broad.sendTransform(trns, rot, now, optEst, bot)  # ..., child, parent
+    broad.sendTransform(opt_base[0], opt_base[1], now, baseEst, optEst)
+    rate.sleep()
+transformer = TransformerROS()
+mat = transformer.fromTranslationRotation(trns, rot)
+print "\n=== Estimated camera -> robot(effector or base_link) transformation ==="
+print_mat(mat)
+
+if not calib.eye_on_hand:
+    mat = tfs.concatenate_matrices( \
                 transformer.fromTranslationRotation(*grnd_bot), mat,
                 transformer.fromTranslationRotation(*opt_base))
-        print "\n=== Estimated camera_base -> ground transformation ==="
-        print_mat(mat)
+    print "\n=== Estimated camera_base -> ground transformation ==="
+    print_mat(mat)
