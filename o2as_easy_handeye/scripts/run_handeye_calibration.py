@@ -20,11 +20,10 @@ from easy_handeye.srv import TakeSample, RemoveSample, ComputeCalibration
 from o2as_routines.base import O2ASBaseRoutines
 from aist_routines.base import AISTBaseRoutines
 
+# http://wiki.ros.org/cv_bridge/Tutorials/ConvertingBetweenROSImagesAndOpenCVImagesPython
 import sensor_msgs.msg
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
-
-# http://wiki.ros.org/cv_bridge/Tutorials/ConvertingBetweenROSImagesAndOpenCVImagesPython
 
 
 initposes = {
@@ -39,7 +38,7 @@ initposes = {
 }
 
 # Poses taken during handeye calibration
-keyposes = {
+aist_keyposes = {
   'a_phoxi_m_camera': {
     'a_bot': [
       [0.55, -0.10, 0.13, radians(-60), radians( 25), radians(0)],
@@ -52,24 +51,6 @@ keyposes = {
     ],
 
     'b_bot': [
-      # configulation for real
-      # [0.30,  0.15, 0.18, radians( 30), radians( 25), radians(0)],
-      # [0.30,  0.00, 0.18, radians( 30), radians( 25), radians(0)],
-      # [0.30, -0.15, 0.18, radians( 30), radians( 25), radians(0)],
-
-      # [0.30, -0.10, 0.28, radians( 30), radians( 25), radians(0)],
-      # [0.30,  0.00, 0.28, radians( 30), radians( 25), radians(0)],
-      # [0.30,  0.10, 0.28, radians( 30), radians( 25), radians(0)],
-
-      # [0.20,  0.15, 0.20, radians( 30), radians( 25), radians(0)],
-      # [0.20,  0.00, 0.20, radians( 30), radians( 25), radians(0)],
-      # [0.20, -0.15, 0.20, radians(  0), radians( 25), radians(0)],
-
-      # [0.15, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
-      # [0.15,  0.05, 0.10, radians( 30), radians( 25), radians(0)],
-      # [0.15,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
-
-      # configulation for AIST
       [0.15,  0.25, 0.17, radians( 30), radians( 25), radians(0)],
       [0.15,  0.10, 0.17, radians( 30), radians( 25), radians(0)],
       [0.15, -0.05, 0.17, radians( 30), radians( 25), radians(0)],
@@ -85,6 +66,52 @@ keyposes = {
       # [0.35, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
       # [0.35,  0.05, 0.10, radians( 30), radians( 25), radians(0)],
       # #[0.35,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
+    ]
+  },
+  'a_bot_camera': {
+    'a_bot': [
+      [-0.05, -0.20, 0.20, radians(  0), radians( 60), radians(  0)],
+      [-0.05, -0.17, 0.20, radians(  0), radians( 75), radians(  0)],
+      [-0.05, -0.15, 0.20, radians(  0), radians( 90), radians(  0)],
+      [-0.05, -0.10, 0.20, radians(  0), radians(100), radians(  0)],
+      [-0.05, -0.05, 0.20, radians(  0), radians(110), radians(  0)],
+      [-0.05, -0.05, 0.20, radians(-90), radians( 70), radians(-90)],
+      [-0.05, -0.12, 0.20, radians(-90), radians( 85), radians(-90)],
+      [-0.05, -0.14, 0.20, radians(-90), radians(105), radians(-90)],
+      [-0.05, -0.16, 0.20, radians(-90), radians(120), radians(-90)],
+    ]
+  }
+}
+
+o2as_keyposes = {
+  'a_phoxi_m_camera': {
+    'a_bot': [
+      [0.55, -0.10, 0.13, radians(-60), radians( 25), radians(0)],
+      [0.55,  0.00, 0.13, radians(-60), radians( 25), radians(0)],
+      [0.55,  0.10, 0.13, radians(-60), radians( 25), radians(0)],
+
+      [0.50,  0.10, 0.23, radians(-60), radians( 25), radians(0)],
+      [0.50,  0.00, 0.23, radians(-60), radians( 25), radians(0)],
+      [0.50, -0.10, 0.23, radians(-60), radians( 25), radians(0)],
+    ],
+
+    'b_bot': [
+      # configulation for real
+      [0.30,  0.15, 0.18, radians( 30), radians( 25), radians(0)],
+      [0.30,  0.00, 0.18, radians( 30), radians( 25), radians(0)],
+      [0.30, -0.15, 0.18, radians( 30), radians( 25), radians(0)],
+
+      [0.30, -0.10, 0.28, radians( 30), radians( 25), radians(0)],
+      [0.30,  0.00, 0.28, radians( 30), radians( 25), radians(0)],
+      [0.30,  0.10, 0.28, radians( 30), radians( 25), radians(0)],
+
+      # [0.20,  0.15, 0.20, radians( 30), radians( 25), radians(0)],
+      # [0.20,  0.00, 0.20, radians( 30), radians( 25), radians(0)],
+      # [0.20, -0.15, 0.20, radians(  0), radians( 25), radians(0)],
+
+      # [0.15, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
+      # [0.15,  0.05, 0.10, radians( 30), radians( 25), radians(0)],
+      # [0.15,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
     ],
 
     'c_bot': [
@@ -332,7 +359,10 @@ def main():
                         action='store', nargs='?',
                         default='b_bot', type=str, choices=None,
                         help='robot name', metavar=None)
-    parser.add_argument('-t', '--trigger', type=bool, default=False)
+    parser.add_argument('-t', '--trigger', action='store_true',
+                        help='triggered input')
+    parser.add_argument('-v', '--visit', action='store_true',
+                        help='only visit calibration points')
                         
     args = parser.parse_args()
     print(args)
@@ -344,8 +374,7 @@ def main():
     camera_name   = args.camera_name
     robot_name    = args.robot_name
     needs_trigger = args.trigger
-
-    needs_calib   = (True if (os.path.basename(sys.argv[0]) == "run_handeye_calibration.py") else False)
+    needs_calib   = not args.visit
     
     assert(camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
     assert(robot_name  in {"a_bot", "b_bot", "c_bot"})
@@ -359,6 +388,9 @@ def main():
 
     print("=== Calibration started for {} + {} ===".format(camera_name,
                                                            robot_name))
+
+    keyposes = aist_keyposes if args.config == 'aist' else o2as_keyposes
+    
     routines.run(initposes[camera_name][robot_name],
                  keyposes[camera_name][robot_name])
     print("=== Calibration completed for {} + {} ===".format(camera_name,
