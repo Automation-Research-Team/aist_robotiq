@@ -31,7 +31,7 @@
 
   <group ns="$(arg namespace)">
     <param name ="tracking_base_frame"
-	   value="$(arg camera_optical_frame)_estimated"/>
+	   value="$(arg camera_name)_from_$(arg robot_name)"/>
 
     <param name="robot_base_frame"	value="$(arg robot_name)_base_link"/>
     <param name="robot_effector_frame"	value="$(arg robot_name)_ee_link"
