@@ -4,7 +4,7 @@
   <arg name="sim" type="bool"	default="false"/>
 
   <param name="use_real_robot"	value="$(eval not arg('sim'))"/>
-    
+
   <!-- Launch real robots if "sim" == "false" -->
   <include file="$(find o2as_examples)/launch/connect_real_robots.launch"
 	   if="$(eval arg('config') == 'o2as' and not arg('sim'))"/>

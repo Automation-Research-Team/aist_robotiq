@@ -4,6 +4,7 @@ import sys
 import os
 import copy
 import rospy
+import argparse
 
 import moveit_msgs.msg
 import geometry_msgs.msg
@@ -23,7 +24,7 @@ class VisitRoutines:
   """Wrapper of MoveGroupCommander specific for this script"""
   def __init__(self, routines, camera_name, robot_name):
     self.routines = routines
-    
+
     cs = "/{}/".format(camera_name)
     self.start_acquisition = rospy.ServiceProxy(cs + "start_acquisition",
                                                 Trigger)
@@ -52,7 +53,7 @@ class VisitRoutines:
     print("============ Reference frame: %s" % group.get_planning_frame())
     print("============ End effector: %s"    % group.get_end_effector_link())
 
-    
+
   def move(self, speed):
     self.start_acquisition()
     position = rospy.wait_for_message("/aruco_tracker/position",
@@ -81,7 +82,7 @@ class VisitRoutines:
               self.group_name, poseStamped, speed,
               end_effector_link=group.get_end_effector_link(),
               move_lin=False)
-        
+
 
   def go_home(self):
     self.routines.go_to_named_pose("home", self.group_name)
@@ -106,7 +107,7 @@ class VisitRoutines:
 
     self.go_home()
 
-    
+
 ######################################################################
 #  global functions                                                  #
 ######################################################################
@@ -124,7 +125,7 @@ if __name__ == '__main__':
                       action='store', nargs='?',
                       default='b_bot', type=str, choices=None,
                       help='robot name', metavar=None)
-                        
+
   args = parser.parse_args()
   print(args)
 
@@ -134,11 +135,10 @@ if __name__ == '__main__':
     base_routines = O2ASBaseRoutines()
   camera_name   = args.camera_name
   robot_name    = args.robot_name
-    
+
   assert(camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
   assert(robot_name  in {"a_bot", "b_bot", "c_bot"})
 
   routines = VisitRoutines(base_routines, camera_name, robot_name)
   speed = 0.05
   routines.run(speed)
-

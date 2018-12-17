@@ -78,7 +78,7 @@ if __name__ == '__main__':
     broad = TransformBroadcaster()
     rate  = rospy.Rate(50)
 
-    while not rospy.is_shutdown():
+    while True
       now = rospy.Time.now()                           # child -> # parent
       broad.sendTransform(bot_opt[0], bot_opt[1], now, opt_frame, bot_frame)
       rate.sleep()
