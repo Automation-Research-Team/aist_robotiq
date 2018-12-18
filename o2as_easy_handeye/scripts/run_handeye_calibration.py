@@ -146,7 +146,7 @@ class HandEyeCalibrationRoutines:
     self.camera_name = camera_name
     self.speed       = speed
     self.sleep_time  = sleep_time
-    
+
     if needs_trigger:
       cs = "/{}/".format(camera_name)
       self.start_acquisition = rospy.ServiceProxy(cs + "start_acquisition",
@@ -201,7 +201,7 @@ class HandEyeCalibrationRoutines:
     print("============ Reference frame: %s" % group.get_planning_frame())
     print("============ End effector: %s"    % group.get_end_effector_link())
 
-    
+
   def go_home(self):
     self.routines.go_to_named_pose("home", self.group_name)
 
@@ -211,7 +211,7 @@ class HandEyeCalibrationRoutines:
                                      sensor_msgs.msg.Image, timeout=10.0)
     bridge = CvBridge()
     cv2.imwrite(file_name, bridge.imgmsg_to_cv2(img_msg, "bgr8"))
-    
+
 
   def move(self, pose):
     print("move to {}".format(pose))
@@ -263,9 +263,9 @@ class HandEyeCalibrationRoutines:
 
     if self.stop_acquisition:
       self.stop_acquisition()
-        
+
     return success
-  
+
 
   def move_to_subposes(self, pose, keypose_num):
     roll = pose[3]
@@ -312,7 +312,7 @@ class HandEyeCalibrationRoutines:
   def run(self, initpose, keyposes):
     if self.stop_acquisition:
       self.stop_acquisition()
-    
+
     if self.get_sample_list:
       n_samples = len(self.get_sample_list().samples.hand_world_samples.transforms)
       if 0 < n_samples:
@@ -340,7 +340,7 @@ class HandEyeCalibrationRoutines:
     # Reset pose
     self.go_home()
 
-    
+
 ######################################################################
 #  global functions                                                  #
 ######################################################################
@@ -359,11 +359,11 @@ def main():
                         action='store', nargs='?',
                         default='b_bot', type=str, choices=None,
                         help='robot name', metavar=None)
-    parser.add_argument('-t', '--trigger', action='store_true',
-                        help='triggered input')
+    parser.add_argument('-s', '--sim', action='store_true',
+                        help='simulation mode')
     parser.add_argument('-v', '--visit', action='store_true',
                         help='only visit calibration points')
-                        
+
     args = parser.parse_args()
     print(args)
 
@@ -373,9 +373,9 @@ def main():
       base_routines = O2ASBaseRoutines()
     camera_name   = args.camera_name
     robot_name    = args.robot_name
-    needs_trigger = args.trigger
+    needs_trigger = not args.sim
     needs_calib   = not args.visit
-    
+
     assert(camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
     assert(robot_name  in {"a_bot", "b_bot", "c_bot"})
 
@@ -390,12 +390,12 @@ def main():
                                                            robot_name))
 
     keyposes = aist_keyposes if args.config == 'aist' else o2as_keyposes
-    
+
     routines.run(initposes[camera_name][robot_name],
                  keyposes[camera_name][robot_name])
     print("=== Calibration completed for {} + {} ===".format(camera_name,
                                                              robot_name))
-    
+
   except rospy.ROSInterruptException:
     return
 
