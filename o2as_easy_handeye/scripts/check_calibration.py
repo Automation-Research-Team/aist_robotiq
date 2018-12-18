@@ -61,7 +61,7 @@ class VisitRoutines:
     self.stop_acquisition()
 
     print("move to {}".format(position.vector))
-    group = self.groups[self.group_name]
+    group = self.routines.groups[self.group_name]
     poseStamped = geometry_msgs.msg.PoseStamped()
     poseStamped.header.frame_id = group.get_pose_reference_frame()
     poseStamped.pose.position.x = position.vector.x
@@ -72,9 +72,10 @@ class VisitRoutines:
         *tf_conversions.transformations.quaternion_from_euler(
           radians(180), radians(90), radians(90)))
     [all_close, move_success] \
-        = self.go_to_pose_goal(self.group_name, poseStamped, speed,
-                               end_effector_link=group.get_end_effector_link(),
-                               move_lin=False)
+        = self.routines.go_to_pose_goal(
+              self.group_name, poseStamped, speed,
+              end_effector_link=group.get_end_effector_link(),
+              move_lin=False)
     rospy.sleep(1)
     poseStamped.pose.position.z = position.vector.z # -0.0285
     [all_close, move_success] \

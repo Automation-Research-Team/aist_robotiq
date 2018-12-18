@@ -45,6 +45,16 @@ def print_mat(mat):
   q   = tfs.quaternion_from_matrix(mat)
   print xyz, q
 
+def print_camera_pose(root_bot, bot_opt, opt_body):
+  transformer = TransformerROS()
+
+  # Print ground/effector <- camera(body) transformation
+  mat = tfs.concatenate_matrices(
+            transformer.fromTranslationRotation(*root_bot),
+            transformer.fromTranslationRotation(*bot_opt),
+            transformer.fromTranslationRotation(*opt_body))
+  print "\n=== Estimated ground/effector <- camera(body) transformation ==="
+  print_mat(mat)
 
 #########################################################################
 #  main part                                                            #
@@ -78,18 +88,12 @@ if __name__ == '__main__':
     broad = TransformBroadcaster()
     rate  = rospy.Rate(50)
 
-    while True
+    while not rospy.is_shutdown():
       now = rospy.Time.now()                           # child -> # parent
       broad.sendTransform(bot_opt[0], bot_opt[1], now, opt_frame, bot_frame)
       rate.sleep()
 
-  except rospy.ROSInterruptException:
-    transformer = TransformerROS()
+    print_camera_pose(root_bot, bot_opt, opt_body)
 
-    # Print ground/effector <- camera(body) transformation
-    mat = tfs.concatenate_matrices( \
-            transformer.fromTranslationRotation(*root_bot),
-            transformer.fromTranslationRotation(*bot_opt),
-            transformer.fromTranslationRotation(*opt_body))
-    print "\n=== Estimated ground/effector <- camera(body) transformation ==="
-    print_mat(mat)
+  except rospy.ROSInterruptException:
+    print_camera_pose(root_bot, bot_opt, opt_body)
