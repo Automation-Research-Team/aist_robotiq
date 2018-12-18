@@ -120,6 +120,9 @@ class O2ASBaseRoutines(object):
   def __init__(self):
     # super(O2ASBaseRoutines, self).__init__()
     
+    moveit_commander.roscpp_initialize(sys.argv)
+    rospy.init_node('assembly_example', anonymous=False)
+
     self.listener = tf.TransformListener()
     self.use_real_robot = rospy.get_param("use_real_robot")
     self.force_ur_script_linear_motion = False
@@ -131,9 +134,6 @@ class O2ASBaseRoutines(object):
     self.speed_fastest = 3.0
     self.acc_fast = 1.0
     self.acc_fastest = 2.0
-
-    moveit_commander.roscpp_initialize(sys.argv)
-    rospy.init_node('assembly_example', anonymous=False)
 
     self.robots = moveit_commander.RobotCommander()
     self.planning_scene_interface = moveit_commander.PlanningSceneInterface()

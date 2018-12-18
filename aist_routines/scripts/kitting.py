@@ -482,7 +482,6 @@ class KittingClass(AISTBaseRoutines):
 
 if __name__ == '__main__':
 
-    rospy.init_node("Kitting")
 
     try:
         kit = KittingClass(vision_algo="fge")
