@@ -24,7 +24,7 @@
   </include>
 
   <!-- Launch skill server -->
-  <include file="$(find aist_skills)/launch/aist_skills.launch"
+  <include file="$(find aist_skills)/launch/aist_skill_server.launch"
 	   if="$(eval arg('config') == 'aist')"/>
   <include file="$(find o2as_skills)/launch/o2as_skill_server.launch"
 	   unless="$(eval arg('config') == 'aist')"/>
