@@ -97,9 +97,9 @@ o2as_keyposes = {
 
     'b_bot': [
       # configulation for real
-      [0.30,  0.15, 0.18, radians( 30), radians( 25), radians(0)],
+      [0.30,  0.10, 0.18, radians( 30), radians( 25), radians(0)],
       [0.30,  0.00, 0.18, radians( 30), radians( 25), radians(0)],
-      [0.30, -0.15, 0.18, radians( 30), radians( 25), radians(0)],
+      [0.30, -0.10, 0.18, radians( 30), radians( 25), radians(0)],
 
       [0.30, -0.10, 0.28, radians( 30), radians( 25), radians(0)],
       [0.30,  0.00, 0.28, radians( 30), radians( 25), radians(0)],
