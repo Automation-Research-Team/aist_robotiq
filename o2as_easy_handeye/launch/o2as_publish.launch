@@ -6,7 +6,7 @@
   <arg name="eye_on_hand"
        value="$(eval arg('camera_name') == arg('robot_name') + '_camera')"/>
 
-  <!-- Set base/optical frame of the camera -->
+  <!-- Set body/optical frame of the camera -->
   <arg name ="camera_body_frame"
        value="a_phoxi_m_camera"
        if   ="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
@@ -23,7 +23,7 @@
 
   <!-- Publish hand-eye calibration -->
   <arg name   ="namespace_prefix"
-       default="o2as_easy_handeye_$(arg robot_name)"/>
+       default="$(arg camera_name)_from_$(arg robot_name)"/>
   <arg name="namespace"		value="$(arg namespace_prefix)_eye_on_hand"
        if="$(arg eye_on_hand)"/>
   <arg name="namespace"		value="$(arg namespace_prefix)_eye_on_base"
@@ -31,7 +31,7 @@
 
   <group ns="$(arg namespace)">
     <param name ="tracking_base_frame"
-	   value="$(arg camera_name)_from_$(arg robot_name)"/>
+	       value="$(arg camera_name)_from_$(arg robot_name)"/>
 
     <param name="robot_base_frame"	value="$(arg robot_name)_base_link"/>
     <param name="robot_effector_frame"	value="$(arg robot_name)_ee_link"
