@@ -7,7 +7,7 @@ import rospy
 import argparse
 import moveit_msgs.msg
 import geometry_msgs.msg
-import tf_conversions
+import tf
 
 from math import radians, degrees
 
@@ -51,13 +51,13 @@ aist_keyposes = {
     ],
 
     'b_bot': [
-      [0.15,  0.25, 0.17, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.20, 0.17, radians( 30), radians( 25), radians(0)],
       [0.15,  0.10, 0.17, radians( 30), radians( 25), radians(0)],
-      [0.15, -0.05, 0.17, radians( 30), radians( 25), radians(0)],
+      [0.15, -0.00, 0.17, radians( 30), radians( 25), radians(0)],
 
-      [0.15, -0.05, 0.25, radians( 30), radians( 25), radians(0)],
+      [0.15, -0.00, 0.25, radians( 30), radians( 25), radians(0)],
       [0.15,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
-      [0.15,  0.25, 0.25, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.20, 0.25, radians( 30), radians( 25), radians(0)],
 
       # [0.40,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
       # #[0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
@@ -97,9 +97,9 @@ o2as_keyposes = {
 
     'b_bot': [
       # configulation for real
-      [0.30,  0.10, 0.18, radians( 30), radians( 25), radians(0)],
+      [0.30,  0.15, 0.18, radians( 30), radians( 25), radians(0)],
       [0.30,  0.00, 0.18, radians( 30), radians( 25), radians(0)],
-      [0.30, -0.10, 0.18, radians( 30), radians( 25), radians(0)],
+      [0.30, -0.15, 0.18, radians( 30), radians( 25), radians(0)],
 
       [0.30, -0.10, 0.28, radians( 30), radians( 25), radians(0)],
       [0.30,  0.00, 0.28, radians( 30), radians( 25), radians(0)],
@@ -158,10 +158,10 @@ class HandEyeCalibrationRoutines:
       self.stop_acquisition  = False
 
     if needs_calib:
-      if camera_name == "a_bot_camera":
-        ns = "/o2as_easy_handeye_{}_eye_on_hand/".format(robot_name)
+      if camera_name == robot_name + "_camera":
+        ns = "/{}_from_{}_eye_on_hand/".format(camera_name, robot_name)
       else:
-        ns = "/o2as_easy_handeye_{}_eye_on_base/".format(robot_name)
+        ns = "/{}_from_{}_eye_on_base/".format(camera_name, robot_name)
       self.take_sample         = rospy.ServiceProxy(ns + "take_sample",
                                                     TakeSample)
       self.get_sample_list     = rospy.ServiceProxy(ns + "get_sample_list",
@@ -223,8 +223,7 @@ class HandEyeCalibrationRoutines:
     poseStamped.pose.position.z = pose[2]
     poseStamped.pose.orientation \
       = geometry_msgs.msg.Quaternion(
-        *tf_conversions.transformations.quaternion_from_euler(
-          pose[3], pose[4], pose[5]))
+        *tf.transformations.quaternion_from_euler(pose[3], pose[4], pose[5]))
     [all_close, move_success] \
       = self.routines.go_to_pose_goal(
                             self.group_name, poseStamped, self.speed,

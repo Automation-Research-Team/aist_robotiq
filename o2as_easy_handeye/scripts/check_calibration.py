@@ -8,7 +8,7 @@ import argparse
 
 import moveit_msgs.msg
 import geometry_msgs.msg
-import tf_conversions
+import tf
 
 from o2as_aruco_ros.msg import Corners
 from std_srvs.srv import Trigger
@@ -66,18 +66,18 @@ class VisitRoutines:
     poseStamped.header.frame_id = group.get_pose_reference_frame()
     poseStamped.pose.position.x = position.vector.x
     poseStamped.pose.position.y = position.vector.y
-    poseStamped.pose.position.z = position.vector.z + 0.05 # - 0.0285
+    poseStamped.pose.position.z = position.vector.z + 0.05
     poseStamped.pose.orientation \
       = geometry_msgs.msg.Quaternion(
-        *tf_conversions.transformations.quaternion_from_euler(
-          radians(180), radians(90), radians(90)))
+        *tf.transformations.quaternion_from_euler(
+          radians(0), radians(90), radians(-90)))
     [all_close, move_success] \
         = self.routines.go_to_pose_goal(
               self.group_name, poseStamped, speed,
               end_effector_link=group.get_end_effector_link(),
               move_lin=False)
     rospy.sleep(1)
-    poseStamped.pose.position.z = position.vector.z # -0.0285
+    poseStamped.pose.position.z = position.vector.z
     [all_close, move_success] \
         = self.routines.go_to_pose_goal(
               self.group_name, poseStamped, speed,

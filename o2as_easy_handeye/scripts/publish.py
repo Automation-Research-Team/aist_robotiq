@@ -20,10 +20,10 @@ def get_estimated_transformation():
   calib = HandeyeCalibration()
   calib.from_file()
 
-  # Set frame ID of camera(optical)
+  # Set ID of optical frame of the camera.
   calib.transformation.child_frame_id = rospy.get_param('tracking_base_frame')
 
-  # Set frame ID of robot(effector/base)
+  # Set ID of effector/base frame of the robot.
   calib.transformation.header.frame_id = \
     rospy.get_param('robot_effector_frame') if calib.eye_on_hand else \
     rospy.get_param('robot_base_frame')

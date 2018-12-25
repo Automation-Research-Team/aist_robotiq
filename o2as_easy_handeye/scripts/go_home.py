@@ -16,12 +16,16 @@ if __name__ == '__main__':
                         action='store', nargs='?',
                         default='b_bot', type=str, choices=None,
                         help='robot name', metavar=None)
+    parser.add_argument('-p', '--pose',
+                        action='store', nargs='?',
+                        default='home', type=str, choices=None,
+                        help='pose name', metavar=None)
 
     args = parser.parse_args()
 
-    if (args.config == "aist"):
+    if args.config == "aist":
         baseRoutines = AISTBaseRoutines()
     else:
         baseRoutines = O2ASBaseRoutines()
 
-    baseRoutines.go_to_named_pose("home", args.robot_name)
+    baseRoutines.go_to_named_pose(args.pose, args.robot_name)
