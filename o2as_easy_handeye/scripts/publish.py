@@ -41,7 +41,7 @@ def get_estimated_transformation():
 def print_mat(mat):
   xyz = tfs.translation_from_matrix(mat)
   rpy = map(degrees, tfs.euler_from_matrix(mat))
-  print "<origin xyz=\"{0[0]} {0[1]} {0[2]}\" rpy=\"${{{1[0]}*pi/180}} ${{{1[1]}*pi/180}} ${{{1[2]}*pi/180}}\"/>".format(xyz, rpy)
+  print '<origin xyz="{0[0]} {0[1]} {0[2]}" rpy="${{{1[0]}*pi/180}} ${{{1[1]}*pi/180}} ${{{1[2]}*pi/180}}"/>'.format(xyz, rpy)
   q   = tfs.quaternion_from_matrix(mat)
   print xyz, q
 
@@ -53,7 +53,7 @@ def print_camera_pose(root_bot, bot_opt, opt_body):
             transformer.fromTranslationRotation(*root_bot),
             transformer.fromTranslationRotation(*bot_opt),
             transformer.fromTranslationRotation(*opt_body))
-  print "\n=== Estimated ground/effector <- camera(body) transformation ==="
+  print '\n=== Estimated ground/effector <- camera(body) transformation ==='
   print_mat(mat)
 
 #########################################################################
