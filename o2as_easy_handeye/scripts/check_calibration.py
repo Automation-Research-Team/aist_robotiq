@@ -100,6 +100,7 @@ class VisitRoutines:
           break
         self.move(speed)
       except Exception as ex:
+        self.stop_acquisition()
         print ex.message
       except rospy.ROSInterruptException:
         return

@@ -68,7 +68,8 @@
   <!-- Add PhoXi 3D scanner -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />
   <xacro:phoxi_m_camera prefix="a_" parent="o2as_ground">
-  <origin xyz="0.64685382925 0.00793354972549 1.47431467674" rpy="${-144.009037015*pi/180} ${0.0354016148982*pi/180} ${85.0410662353*pi/180}"/>
+    <origin xyz="0.645496196414 0.0871790100695 1.47122882444"
+	    rpy="${-143.980928467*pi/180} ${0.224942781411*pi/180} ${85.683086361*pi/180}"/>>
   </xacro:phoxi_m_camera>
 
   <!-- Add AR markers -->
