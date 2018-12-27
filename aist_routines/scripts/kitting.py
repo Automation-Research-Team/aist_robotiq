@@ -108,16 +108,7 @@ class KittingClass(AISTBaseRoutines):
         self.bin_3_length = 0.192
 
         self.part_bin_list = {
-            "part_a" :"bin_2_part_a",
-            "part_4" :"bin_2_part_4",
-            "part_7" :"bin_2_part_7",
-            "part_11":"bin_2_part_11",
-            "part_b" :"bin_2_part_b",
-            "part_13":"bin_1_part_13",
-            "part_8" :"bin_1_part_8",
-            "part_12":"bin_1_part_12",
-            "part_5" :"bin_1_part_5",
-            "part_c" :"bin_1_part_c",
+            "part_5": "bin_3_part_5"
         }
 
         self.part_position_in_tray = {
