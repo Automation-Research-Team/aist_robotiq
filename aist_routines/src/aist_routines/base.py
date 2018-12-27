@@ -123,6 +123,35 @@ class AISTBaseRoutines(object):
         self._suctioned = False
         self._suction_state = rospy.Subscriber("suction_tool/screw_suctioned", std_msgs.msg.Bool, self._suction_state_callback)
 
+
+    def cycle_through_calibration_poses(self, poses, robot_name, speed=0.3, move_lin=False, go_home=True, end_effector_link=""):
+        home_pose = "home"
+        if "screw" in end_effector_link:
+            home_pose = "screw_ready"
+
+        for pose in poses:
+            rospy.loginfo("============ Press `Enter` to move " + robot_name + " to " + pose.header.frame_id)
+            self.publish_marker(pose, "place_pose")
+            raw_input()
+            if go_home:
+                self.go_to_named_pose(home_pose, robot_name)
+            if rospy.is_shutdown():
+                break
+            else:
+                self.go_to_pose_goal(robot_name, pose,speed=speed, end_effector_link=end_effector_link, move_lin = move_lin)
+
+            rospy.loginfo("============ Press `Enter` to proceed ")
+            raw_input()
+
+            if go_home:
+                self.go_to_named_pose(home_pose, robot_name, force_ur_script=move_lin)
+
+        if go_home:
+            rospy.loginfo("Moving all robots home again.")
+            self.go_to_named_pose("home", "b_bot")
+        return
+
+
     def pick(self, robot_name, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False, lift_up_after_pick=True, timeout=3.0):
         # self.publish_marker(object_pose, "pick_pose")
         if speed_fast > 1.0:
@@ -152,10 +181,10 @@ class AISTBaseRoutines(object):
             self.send_gripper_command(gripper=robot_name, command="open")
 
         rospy.loginfo("Moving down to object")
-        object_pose.pose.position.z += grasp_height
+        # object_pose.pose.position.z += grasp_height
         rospy.logdebug("Going to height " + str(object_pose.pose.position.z))
         if gripper_command=="suction":
-            self.do_linear_push(robot_name, force=5.0, wait=True, direction='Z+', max_approach_distance=0.92, forward_speed=0.4)
+            self.do_linear_push(robot_name, force=5.0, wait=True, direction='Z+', max_approach_distance=0.92, forward_speed=0.1)
         else:
             self.go_to_pose_goal(robot_name, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
 

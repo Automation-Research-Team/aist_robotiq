@@ -24,32 +24,6 @@ class CalibrationClass(AISTBaseRoutines):
 
         rospy.loginfo("Calibration class is staring up!")
 
-    def cycle_through_calibration_poses(self, poses, robot_name, speed=0.3, move_lin=False, go_home=True, end_effector_link=""):
-        home_pose = "home"
-        if "screw" in end_effector_link:
-            home_pose = "screw_ready"
-
-        for pose in poses:
-            rospy.loginfo("============ Press `Enter` to move " + robot_name + " to " + pose.header.frame_id)
-            self.publish_marker(pose, "place_pose")
-            raw_input()
-            if go_home:
-                self.go_to_named_pose(home_pose, robot_name)
-            if rospy.is_shutdown():
-                break
-            else:
-                self.go_to_pose_goal(robot_name, pose,speed=speed, acceleration=self.acceleration, end_effector_link=end_effector_link, move_lin = move_lin)
-
-            rospy.loginfo("============ Press `Enter` to proceed ")
-            raw_input()
-
-            if go_home:
-                self.go_to_named_pose(home_pose, robot_name, force_ur_script=move_lin)
-
-        if go_home:
-            rospy.loginfo("Moving all robots home again.")
-            self.go_to_named_pose("home", "b_bot")
-        return
 
     def touch_the_table(self):
         rospy.loginfo("Calibrating between robot and table.")
