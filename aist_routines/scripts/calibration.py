@@ -19,18 +19,8 @@ class CalibrationClass(AISTBaseRoutines):
         else:
             self.acceleration = 0.0
 
-        self.bin_names = [
-            "bin_2_part_a",
-            "bin_2_part_4",
-            "bin_2_part_7",
-            "bin_2_part_11",
-            "bin_2_part_b",
-            "bin_1_part_13",
-            "bin_1_part_8",
-            "bin_1_part_12",
-            "bin_1_part_5",
-            "bin_1_part_c",
-        ]
+        self.bin_names = ['bin_3_part_5']
+        
 
         rospy.loginfo("Calibration class is staring up!")
 
@@ -68,7 +58,7 @@ class CalibrationClass(AISTBaseRoutines):
         poses = []
         pose_b = geometry_msgs.msg.PoseStamped()
         pose_b.header.frame_id = "workspace_center"
-        pose_b.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+        pose_b.pose.orientation = self.downward_orientation
         pose_b.pose.position.x = .0
         pose_b.pose.position.y = .0
         pose_b.pose.position.z = .03
@@ -86,67 +76,22 @@ class CalibrationClass(AISTBaseRoutines):
         self.go_to_named_pose("home", "b_bot")
         return
 
-    def check_calibration_tray_position(self, robot_name, tray_name):
-        rospy.loginfo("Calibrating tray_position")
-
-        corners = [
-            "_top_front_left_corner",
-            "_top_back_left_corner",
-            "_top_back_right_corner",
-            "_top_front_right_corner"
-        ]
-
-        pose0 = geometry_msgs.msg.PoseStamped()
-        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-        pose0.pose.position.z = 0.01
-        poses = []
-        for corner in corners:
-            pose = copy.deepcopy(pose0)
-            pose.header.frame_id = tray_name + corner
-            poses.append(pose)
-
-        self.cycle_through_calibration_poses(poses, robot_name, speed=0.05, move_lin=True, go_home=False, end_effector_link="b_bot_single_suction_gripper_pad_link")
-
-    def check_calibration_rack(self, robot_name, rack_name):
-        rospy.loginfo("Calibrating bin rack position")
-
-        corners = [
-            "_top_front_left_corner",
-            "_top_back_left_corner",
-            "_top_back_right_corner",
-            "_top_front_right_corner"
-        ]
-
-        pose0 = geometry_msgs.msg.PoseStamped()
-        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-        pose0.pose.position.z = 0.01
-        poses = []
-        for corner in corners:
-            pose = copy.deepcopy(pose0)
-            pose.header.frame_id = rack_name + corner
-            poses.append(pose)
-
-        self.cycle_through_calibration_poses(poses, robot_name, speed = 0.1, move_lin=True, go_home=False, end_effector_link="b_bot_single_suction_gripper_pad_link")
-
     def bin_corner_calibration(self, robot_name="b_bot", end_effector_link=""):
         rospy.loginfo("============ Calibrating bin. ============")
         rospy.loginfo(robot_name + " end effector should be 3 cm above each corner of each bin.")
-
-        if end_effector_link=="":
+        
+        if end_effector_link == "":
             self.go_to_named_pose("home", robot_name)
 
         poses = []
 
         pose0 = geometry_msgs.msg.PoseStamped()
-        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
         pose0.pose.position.z = 0.03
+        pose0.pose.orientation = self.downward_orientation
 
         for bin in self.bin_names:
             pose0.header.frame_id = bin
             world_pose = self.listener.transformPose("workspace_center", pose0)
-            # if robot_name == "b_bot":
-            #     if world_pose.pose.position.y < -.15:
-            #         continue
             new_pose = copy.deepcopy(pose0)
             new_pose.header.frame_id = bin + "_top_back_left_corner"
             poses.append(new_pose)
@@ -163,51 +108,8 @@ class CalibrationClass(AISTBaseRoutines):
         self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
         return
 
-    def bin_center_above_calibration(self, robot_name="b_bot", end_effector_link=""):
-        rospy.loginfo("============ Calibrating bin. ============")
-        rospy.loginfo(robot_name + " end effector should be 3 cm above each corner of each bin.")
-
-        if end_effector_link=="":
-            self.go_to_named_pose("home", robot_name)
-
-        poses = []
-
-        pose0 = geometry_msgs.msg.PoseStamped()
-        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-        pose0.pose.position.z = 0.03
-
-        for bin_name in self.bin_names:
-            pose0.header.frame_id = bin_name
-            world_pose = self.listener.transformPose("workspace_center", pose0)
-            # if robot_name == "b_bot":
-            #     if world_pose.pose.position.y < -.15:
-            #         continue
-            new_pose = copy.deepcopy(pose0)
-            new_pose.pose.position.z = 0.1
-            poses.append(new_pose)
-            new_pose = copy.deepcopy(pose0)
-            new_pose.pose.position.z = 0.03
-            poses.append(new_pose)
-            new_pose = copy.deepcopy(pose0)
-            new_pose.pose.position.z = 0.1
-            poses.append(new_pose)
-
-        self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
-        return
-
-    def go_to_above_tf_frame(self, robot_name, frame_id="workspace_center", height=0.2,  speed=0.05, end_effector_link="", move_lin=True):
-
-        goal_pose = geometry_msgs.msg.PoseStamped()
-        goal_pose.header.frame_id = frame_id
-        goal_pose.pose.position.z = height
-        goal_pose.pose.orientation = self.downward_orientation
-
-        self.go_to_pose_goal(robot_name, goal_pose, speed=speed, acceleration=1.0)
-
 
 if __name__ == '__main__':
-
-    rospy.init_node("Calibration")
 
     try:
         c = CalibrationClass()
@@ -216,16 +118,7 @@ if __name__ == '__main__':
             rospy.loginfo("============ Calibration procedures ============ ")
             rospy.loginfo("1: Go home with b_bot")
             rospy.loginfo("2: Touch the table (workspace_center)")
-            rospy.loginfo("31: Go to tray corners")
-            rospy.loginfo("311: Go to set_1_tray_1 corners")
-            rospy.loginfo("322: Go to set_1_tray_2 corners")
-            rospy.loginfo("39: Go to place_bin corners")
-            rospy.loginfo("411: Bin-rack calibration")
-            rospy.loginfo("412: Tray-rack calibration")
-            rospy.loginfo("5: Bin calibration(no action)")
-            rospy.loginfo("51: Bin corners with b_bot")
-            rospy.loginfo("52: Bin center above with b_bot")
-            rospy.loginfo("6: Create new named pose")
+            rospy.loginfo("332: Bin corners with b_bot")
             rospy.loginfo("x: Exit")
 
             i = raw_input()
@@ -233,26 +126,8 @@ if __name__ == '__main__':
                 c.go_to_named_pose("home", "b_bot")
             elif i == '2':
                 c.touch_the_table()
-            elif '31' in i:
-                if i == '311':
-                    c.check_calibration_tray_position("b_bot", "set_1_tray_1")
-                elif i == '312':
-                    c.check_calibration_tray_position("b_bot", "set_1_tray_2")
-                else:
-                    c.check_calibration_tray_position("b_bot", "set_1_tray_1")
-                    c.check_calibration_tray_position("b_bot", "set_1_tray_2")
-            elif i == '39':
-                c.check_calibration_tray_position("b_bot", "place_bin")
-            elif i == '411':
-                c.check_calibration_rack("b_bot", "bin_rack")
-            elif i == '412':
-                c.check_calibration_rack("b_bot", "tray_rack")
-            elif i == '51':
-                c.bin_corner_calibration("b_bot")
-            elif i == '52':
-                c.bin_center_above_calibration("b_bot")
-            elif i == '6':
-                c.go_to_above_tf_frame("b_bot", "workspace_center", .15)
+            elif i == '332':
+                c.bin_corner_calibration(robot_name="b_bot")
             if i == 'x':
                 break
         print("================ done!!")
