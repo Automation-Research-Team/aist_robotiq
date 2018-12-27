@@ -265,7 +265,6 @@ class KittingClass(AISTBaseRoutines):
                 pick_pose = self.grasp_candidates[item.part_id]["position"].pop(0)
                 rospy.loginfo("Pick pose in bin:")
                 rospy.loginfo(pick_pose)
-            raw_input("Press `Enter` to pick item.")
             pick_pose.pose.orientation = self.downward_orientation
             approach_height = 0.15
             if item.ee_to_use == "suction":
@@ -284,8 +283,6 @@ class KittingClass(AISTBaseRoutines):
                 if item.ee_to_use == "suction":
                     self.suck(turn_suction_on=False, eject=False)
                 continue
-
-            raw_input("Press `Enter` to place item.")
 
             if item.ee_to_use == "suction":
                 rospy.loginfo("Going to circumstantial pose after picking from bins")
