@@ -114,7 +114,7 @@ class AISTBaseRoutines(object):
         self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR)
         self.setup_suction_tool()
 
-        self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
+        self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
 
 
     def setup_suction_tool(self):
@@ -243,7 +243,7 @@ class AISTBaseRoutines(object):
         self.publish_marker(pose_goal_stamped, "pose")
         group = self.groups[group_name]
 
-        if not end_effector_link:
+        if end_effector_link == "":
             if group_name == "b_bot":
                 end_effector_link = "b_bot_single_suction_gripper_pad_link"
         group.set_end_effector_link(end_effector_link)
