@@ -343,29 +343,28 @@ class HandEyeCalibrationRoutines:
 ######################################################################
 #  global functions                                                  #
 ######################################################################
-def main():
+if __name__ == '__main__':
+  parser = argparse.ArgumentParser(description='Do hand-eye calibration')
+  parser.add_argument('-C', '--config',
+                      action='store', nargs='?',
+                      default='aist', type=str, choices=None,
+                      help='configuration name', metavar=None)
+  parser.add_argument('-c', '--camera_name',
+                      action='store', nargs='?',
+                      default='a_phoxi_m_camera', type=str, choices=None,
+                      help='camera name', metavar=None)
+  parser.add_argument('-r', '--robot_name',
+                      action='store', nargs='?',
+                      default='b_bot', type=str, choices=None,
+                      help='robot name', metavar=None)
+  parser.add_argument('-s', '--sim', action='store_true',
+                      help='simulation mode')
+  parser.add_argument('-v', '--visit', action='store_true',
+                      help='only visit calibration points')
+
+  args = parser.parse_args()
+
   try:
-    parser = argparse.ArgumentParser(description='Do hand-eye calibration')
-    parser.add_argument('-C', '--config',
-                        action='store', nargs='?',
-                        default='aist', type=str, choices=None,
-                        help='configuration name', metavar=None)
-    parser.add_argument('-c', '--camera_name',
-                        action='store', nargs='?',
-                        default='a_phoxi_m_camera', type=str, choices=None,
-                        help='camera name', metavar=None)
-    parser.add_argument('-r', '--robot_name',
-                        action='store', nargs='?',
-                        default='b_bot', type=str, choices=None,
-                        help='robot name', metavar=None)
-    parser.add_argument('-s', '--sim', action='store_true',
-                        help='simulation mode')
-    parser.add_argument('-v', '--visit', action='store_true',
-                        help='only visit calibration points')
-
-    args = parser.parse_args()
-    print(args)
-
     if args.config == 'aist':
       base_routines = AISTBaseRoutines()
     else:
@@ -395,12 +394,5 @@ def main():
     print("=== Calibration completed for {} + {} ===".format(camera_name,
                                                              robot_name))
 
-  except rospy.ROSInterruptException:
-    return
-
-  except KeyboardInterrupt:
-    return
-
-
-if __name__ == '__main__':
-  main()
+  except Exception as ex:
+    print(ex.message)

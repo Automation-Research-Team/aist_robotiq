@@ -172,36 +172,29 @@ class ToolCalibrationRoutines:
     self.move(self.refpose)
 
     while True:
-      try:
-        key = raw_input('>> ')
-        if key == 'q':
-          break
-        elif key == 'r':
-          self.rolling_motion()
-        elif key == 'p':
-          self.pitching_motion()
-        elif key == 'y':
-          self.yawing_motion()
-        elif key == 't':
-          self.rolling_motion()
-          self.pitching_motion()
-          self.yawing_motion()
-        elif key == '+':
-          self.dp += radians(0.5)
-        elif key == '-':
-          self.dp -= radians(0.5)
-        elif key == '>':
-          self.dy += radians(0.5)
-        elif key == '<':
-          self.dy -= radians(0.5)
-        elif key == 'd':
-          self.print_tip_link()
-      except Exception as ex:
-        print ex.message
-      except rospy.ROSInterruptException:
-        return
-      except KeyboardInterrupt:
+      key = raw_input('>> ')
+      if key == 'q':
         break
+      elif key == 'r':
+        self.rolling_motion()
+      elif key == 'p':
+        self.pitching_motion()
+      elif key == 'y':
+        self.yawing_motion()
+      elif key == 't':
+        self.rolling_motion()
+        self.pitching_motion()
+        self.yawing_motion()
+      elif key == '+':
+        self.dp += radians(0.5)
+      elif key == '-':
+        self.dp -= radians(0.5)
+      elif key == '>':
+        self.dy += radians(0.5)
+      elif key == '<':
+        self.dy -= radians(0.5)
+      elif key == 'd':
+        self.print_tip_link()
 
     # Reset pose
     self.go_home()
@@ -211,21 +204,21 @@ class ToolCalibrationRoutines:
 ######################################################################
 #  global functions                                                  #
 ######################################################################
-def main():
+if __name__ == '__main__':
+  parser = argparse.ArgumentParser(description='Do hand-eye calibration')
+  parser.add_argument('-C', '--config',
+                      action='store', nargs='?',
+                      default='aist', type=str, choices=None,
+                      help='configuration name', metavar=None)
+  parser.add_argument('-r', '--robot_name',
+                      action='store', nargs='?',
+                      default='b_bot', type=str, choices=None,
+                      help='robot name', metavar=None)
+
+  args = parser.parse_args()
+  print(args)
+
   try:
-    parser = argparse.ArgumentParser(description='Do hand-eye calibration')
-    parser.add_argument('-C', '--config',
-                        action='store', nargs='?',
-                        default='aist', type=str, choices=None,
-                        help='configuration name', metavar=None)
-    parser.add_argument('-r', '--robot_name',
-                        action='store', nargs='?',
-                        default='b_bot', type=str, choices=None,
-                        help='robot name', metavar=None)
-
-    args = parser.parse_args()
-    print(args)
-
     if args.config == 'aist':
       base_routines = AISTBaseRoutines()
     else:
@@ -239,12 +232,5 @@ def main():
 
     routines.run()
 
-  except rospy.ROSInterruptException:
-    return
-
-  except KeyboardInterrupt:
-    return
-
-
-if __name__ == '__main__':
-  main()
+  except Exception as ex:
+    print(ex.message)
