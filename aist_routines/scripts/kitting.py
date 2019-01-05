@@ -108,16 +108,7 @@ class KittingClass(AISTBaseRoutines):
         self.bin_3_length = 0.192
 
         self.part_bin_list = {
-            "part_a" :"bin_2_part_a",
-            "part_4" :"bin_2_part_4",
-            "part_7" :"bin_2_part_7",
-            "part_11":"bin_2_part_11",
-            "part_b" :"bin_2_part_b",
-            "part_13":"bin_1_part_13",
-            "part_8" :"bin_1_part_8",
-            "part_12":"bin_1_part_12",
-            "part_5" :"bin_1_part_5",
-            "part_c" :"bin_1_part_c",
+            "part_5": "bin_3_part_5"
         }
 
         self.part_position_in_tray = {
@@ -225,9 +216,6 @@ class KittingClass(AISTBaseRoutines):
             }
         }
 
-        self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi))
-        self.downward_orientation2 = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
-
         self.order_list_raw, self.ordered_items = self.read_order_file()
         rospy.loginfo("Received order list:")
         rospy.loginfo(self.order_list_raw)
@@ -277,9 +265,6 @@ class KittingClass(AISTBaseRoutines):
                 pick_pose = self.grasp_candidates[item.part_id]["position"].pop(0)
                 rospy.loginfo("Pick pose in bin:")
                 rospy.loginfo(pick_pose)
-            raw_input("Press `Enter` to pick item.")
-            # Magic offset go more down 5mm (since 2018/11/19) TODO: We need force sensor to get high accuracy.
-            pick_pose.pose.position.z -= 0.003
             pick_pose.pose.orientation = self.downward_orientation
             approach_height = 0.15
             if item.ee_to_use == "suction":
@@ -299,8 +284,6 @@ class KittingClass(AISTBaseRoutines):
                     self.suck(turn_suction_on=False, eject=False)
                 continue
 
-            raw_input("Press `Enter` to place item.")
-
             if item.ee_to_use == "suction":
                 rospy.loginfo("Going to circumstantial pose after picking from bins")
                 bin_center = geometry_msgs.msg.PoseStamped()
@@ -318,7 +301,7 @@ class KittingClass(AISTBaseRoutines):
                 place_pose.header.frame_id = "place_bin"
             else:
                 place_pose.header.frame_id = item.target_frame
-            place_pose.pose.orientation = self.downward_orientation2
+            place_pose.pose.orientation = self.downward_orientation
             approach_height = .15
             if item.ee_to_use == "suction":
                 self.go_to_named_pose("suction_ready_above_place_bin", "b_bot", speed=1.0, acceleration=1.0)
@@ -464,6 +447,39 @@ class KittingClass(AISTBaseRoutines):
         #TODO: Adjust the gripper orientation when close to the border
         return safe_pose
 
+    ###----- calibration for kitting
+    def bin_corner_calibration(self, robot_name="b_bot", end_effector_link=""):
+        rospy.loginfo("============ Calibrating bin. ============")
+        rospy.loginfo(robot_name + " end effector should be 3 cm above each corner of each bin.")
+        
+        if end_effector_link == "":
+            self.go_to_named_pose("home", robot_name)
+
+        poses = []
+
+        pose0 = geometry_msgs.msg.PoseStamped()
+        pose0.pose.position.z = 0.03
+        pose0.pose.orientation = self.downward_orientation
+
+        for bin in self.part_bin_list.values():
+            pose0.header.frame_id = bin
+            world_pose = self.listener.transformPose("workspace_center", pose0)
+            new_pose = copy.deepcopy(pose0)
+            new_pose.header.frame_id = bin + "_top_back_left_corner"
+            poses.append(new_pose)
+            new_pose = copy.deepcopy(pose0)
+            new_pose.header.frame_id = bin + "_top_back_right_corner"
+            poses.append(new_pose)
+            new_pose = copy.deepcopy(pose0)
+            new_pose.header.frame_id = bin + "_top_front_right_corner"
+            poses.append(new_pose)
+            new_pose = copy.deepcopy(pose0)
+            new_pose.header.frame_id = bin + "_top_front_left_corner"
+            poses.append(new_pose)
+
+        self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
+        return
+
     ###----- main procedure
     def kitting_task(self):
         global number_of_attempted
@@ -489,6 +505,7 @@ if __name__ == '__main__':
         while True:
             rospy.loginfo("")
             rospy.loginfo("Enter 1 to go to home all robots.")
+            rospy.loginfo("332: Bin corners with b_bot")
             rospy.loginfo("Enter 71, 72... to test phoxi on item 1, 2...")
             rospy.loginfo("Enter START to start the task.")
             rospy.loginfo("Enter x to exit.")
@@ -496,9 +513,8 @@ if __name__ == '__main__':
             i = raw_input()
             if i == '1':
                 kit.go_to_named_pose("home", "b_bot")
-            elif i == '001':
-                kit.do_linear_push("b_bot",
-                    force=2.5, wait=True, direction="Z+", max_approach_distance=.092, forward_speed=.04)
+            elif i == '332':
+                kit.bin_corner_calibration(robot_name="b_bot")
             elif i in ["71", "72", "73", "74", "75", "76", "77", "78", "79"]:
                 item = kit.ordered_items[int(i)-71]
                 rospy.loginfo("Checking for item id " + str(item.part_id) + " in " + item.bin_name)
