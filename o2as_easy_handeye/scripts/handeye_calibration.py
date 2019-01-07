@@ -190,16 +190,10 @@ class HandEyeCalibrationRoutines:
     else:
       group.set_end_effector_link(robot_name + "_ee_link")
 
-    # Trajectory publisher
-    display_trajectory_publisher = rospy.Publisher(
-      '/move_group/display_planned_path',
-      moveit_msgs.msg.DisplayTrajectory,
-      queue_size=20
-    )
-
     # Logging
-    print("============ Reference frame: %s" % group.get_planning_frame())
-    print("============ End effector: %s"    % group.get_end_effector_link())
+    print("==== Planning frame:       %s" % group.get_planning_frame())
+    print("==== Pose reference frame: %s" % group.get_pose_reference_frame())
+    print("==== End effector link:    %s" % group.get_end_effector_link())
 
 
   def go_home(self):
