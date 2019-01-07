@@ -20,7 +20,7 @@ class CalibrationClass(AISTBaseRoutines):
             self.acceleration = 0.0
 
         self.bin_names = ['bin_3_part_5']
-        
+
 
         rospy.loginfo("Calibration class is staring up!")
 
@@ -50,11 +50,13 @@ class CalibrationClass(AISTBaseRoutines):
         self.go_to_named_pose("home", "b_bot")
         return
 
+
     def bin_corner_calibration(self, robot_name="b_bot", end_effector_link=""):
         rospy.loginfo("============ Calibrating bin. ============")
         rospy.loginfo(robot_name + " end effector should be 3 cm above each corner of each bin.")
-        
+
         if end_effector_link == "":
+            # FIXME: What does it mean? I think it is a bug.
             self.go_to_named_pose("home", robot_name)
 
         poses = []
@@ -83,6 +85,43 @@ class CalibrationClass(AISTBaseRoutines):
         return
 
 
+    def workspace_calibration(self, robot_name="b_bot", end_effector_link=""):
+        rospy.loginfo("================ Calibrating workspace. ================")
+        rospy.loginfo(robot_name + " end effector should be 3 cm above the table.")
+
+        if end_effector_link == "":
+            if robot_name == "b_bot":
+                end_effector_link = "b_bot_single_suction_gripper_pad_link"
+
+        pose0 = geometry_msgs.msg.PoseStamped()
+        pose0.header.frame_id = "workspace_center"
+        pose0.pose.position.z = 0.01
+        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+        poses = []
+        for i in xrange(9):
+            poses.append(copy.deepcopy(pose0))
+        poses[0].pose.position.x = 0.00
+        poses[0].pose.position.y = 0.00
+        poses[1].pose.position.x = -0.25
+        poses[1].pose.position.y = 0.00
+        poses[2].pose.position.x = -0.25
+        poses[2].pose.position.y = 0.25
+        poses[3].pose.position.x = 0.00
+        poses[3].pose.position.y = 0.25
+        poses[4].pose.position.x = 0.25
+        poses[4].pose.position.y = 0.25
+        poses[5].pose.position.x = 0.25
+        poses[5].pose.position.y = 0.00
+        poses[6].pose.position.x = 0.25
+        poses[6].pose.position.y = -0.25
+        poses[7].pose.position.x = 0.00
+        poses[7].pose.position.y = -0.25
+        poses[8].pose.position.x = -0.25
+        poses[8].pose.position.y = -0.25
+        c.cycle_through_calibration_poses(poses, robot_name, speed=.05, end_effector_link=end_effector_link, move_lin=True, go_home=False)
+        return
+
+
 if __name__ == '__main__':
 
     try:
@@ -92,6 +131,7 @@ if __name__ == '__main__':
             rospy.loginfo("============ Calibration procedures ============ ")
             rospy.loginfo("1: Go home with b_bot")
             rospy.loginfo("2: Touch the table (workspace_center)")
+            rospy.loginfo("22: Workspace calibration with b_bot")
             rospy.loginfo("332: Bin corners with b_bot")
             rospy.loginfo("x: Exit")
 
@@ -100,6 +140,8 @@ if __name__ == '__main__':
                 c.go_to_named_pose("home", "b_bot")
             elif i == '2':
                 c.touch_the_table()
+            elif i == '22':
+                c.workspace_calibration("b_bot")
             elif i == '332':
                 c.bin_corner_calibration(robot_name="b_bot")
             if i == 'x':
