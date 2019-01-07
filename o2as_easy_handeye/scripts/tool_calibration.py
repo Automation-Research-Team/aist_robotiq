@@ -46,16 +46,10 @@ class ToolCalibrationRoutines:
     self.gripper_base_link = gripper_base_link
     group.set_end_effector_link(gripper_tip_link)
 
-    # Trajectory publisher
-    # display_trajectory_publisher = rospy.Publisher(
-    #   '/move_group/display_planned_path',
-    #   moveit_msgs.msg.DisplayTrajectory,
-    #   queue_size=20
-    # )
-
     # Logging
-    print('============ Reference frame: %s' % group.get_planning_frame())
-    print('============ End effector: %s'    % group.get_end_effector_link())
+    print("==== Planning frame:       %s" % group.get_planning_frame())
+    print("==== Pose reference frame: %s" % group.get_pose_reference_frame())
+    print("==== End effector link:    %s" % group.get_end_effector_link())
 
     self.listener = TransformListener()
     now = rospy.Time.now()
@@ -64,8 +58,8 @@ class ToolCalibrationRoutines:
     self.D0 = self.listener.fromTranslationRotation(
                 *self.listener.lookupTransform(gripper_base_link,
                                                gripper_tip_link, now))
-    self.dp = 0.0
-    self.dy = 0.0
+    self.pitch = 0.0
+    self.yaw   = 0.0
 
 
   def go_home(self):
@@ -75,7 +69,7 @@ class ToolCalibrationRoutines:
   def correct_end_effector_link(self):
     D = tfs.concatenate_matrices(
           self.listener.fromTranslationRotation(
-            (0, 0, 0), tfs.quaternion_from_euler(0, self.dp, self.dy)),
+            (0, 0, 0), tfs.quaternion_from_euler(0, self.pitch, self.yaw)),
           self.D0)
     group = self.routines.groups[self.group_name]
     print('  trns = {}, rot = {}'.format(tfs.translation_from_matrix(D),
@@ -89,11 +83,8 @@ class ToolCalibrationRoutines:
 
 
   def move(self, pose):
-    print('move to {}'.format(pose))
-    print('  dp = {}, dy = {}'.format(self.dp, self.dy))
-
     R = self.listener.fromTranslationRotation(
-            (0, 0, 0), tfs.quaternion_from_euler(0, self.dp, self.dy))
+            (0, 0, 0), tfs.quaternion_from_euler(0, self.pitch, self.yaw))
     T = tfs.concatenate_matrices(
           self.listener.fromTranslationRotation((pose[0], pose[1], pose[2]),
                                                 tfs.quaternion_from_euler(
@@ -157,12 +148,12 @@ class ToolCalibrationRoutines:
 
   def print_tip_link(self):
     R   = self.listener.fromTranslationRotation(
-            (0, 0, 0), tfs.quaternion_from_euler(0, self.dp, self.dy))
+            (0, 0, 0), tfs.quaternion_from_euler(0, self.pitch, self.yaw))
     D   = tfs.concatenate_matrices(R, self.D0)
     xyz = tfs.translation_from_matrix(D)
     q   = tfs.quaternion_from_matrix(D)
     rpy = map(degrees, tfs.euler_from_quaternion(q))
-    print '<origin xyz="{0[0]} {0[1]} {0[2]}" rpy="${{{1[0]}*pi/180}} ${{{1[1]}*pi/180}} ${{{1[2]}*pi/180}}"/>'.format(xyz, rpy)
+    print('<origin xyz="{0[0]} {0[1]} {0[2]}" rpy="${{{1[0]}*pi/180}} ${{{1[1]}*pi/180}} ${{{1[2]}*pi/180}}"/>'.format(xyz, rpy))
 
 
   def run(self):
@@ -171,8 +162,12 @@ class ToolCalibrationRoutines:
 
     self.move(self.refpose)
 
+    axis = 'Pitch'
+
     while True:
-      key = raw_input('>> ')
+      prompt = axis + '[p=' + str(degrees(self.pitch)) + \
+                      ',y=' + str(degrees(self.yaw)) + '] >> '
+      key = raw_input(prompt)
       if key == 'q':
         break
       elif key == 'r':
@@ -185,16 +180,30 @@ class ToolCalibrationRoutines:
         self.rolling_motion()
         self.pitching_motion()
         self.yawing_motion()
+      elif key == 'P':
+        axis = 'Pitch'
+      elif key == 'Y':
+        axis = 'Yaw  '
       elif key == '+':
-        self.dp += radians(0.5)
+        if axis == 'Pitch':
+          self.pitch += radians(0.5)
+        else:
+          self.yaw   += radians(0.5)
+        self.move(self.refpose)
       elif key == '-':
-        self.dp -= radians(0.5)
-      elif key == '>':
-        self.dy += radians(0.5)
-      elif key == '<':
-        self.dy -= radians(0.5)
+        if axis == 'Pitch':
+          self.pitch -= radians(0.5)
+        else:
+          self.yaw   -= radians(0.5)
+        self.move(self.refpose)
       elif key == 'd':
         self.print_tip_link()
+      else:
+        if axis == 'Pitch':
+          self.pitch = radians(float(key))
+        else:
+          self.yaw   = radians(float(key))
+        self.move(self.refpose)
 
     # Reset pose
     self.go_home()
@@ -214,21 +223,18 @@ if __name__ == '__main__':
                       action='store', nargs='?',
                       default='b_bot', type=str, choices=None,
                       help='robot name', metavar=None)
-
   args = parser.parse_args()
-  print(args)
 
   try:
+    assert(args.robot_name  in {'a_bot', 'b_bot', 'c_bot'})
+
     if args.config == 'aist':
       base_routines = AISTBaseRoutines()
     else:
       base_routines = O2ASBaseRoutines()
-    robot_name = args.robot_name
-
-    assert(robot_name  in {'a_bot', 'b_bot', 'c_bot'})
 
     speed    = 1
-    routines = ToolCalibrationRoutines(base_routines, robot_name, speed)
+    routines = ToolCalibrationRoutines(base_routines, args.robot_name, speed)
 
     routines.run()
 
