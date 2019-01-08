@@ -283,14 +283,6 @@ class KittingClass(AISTBaseRoutines):
                     self.suck(turn_suction_on=False, eject=False)
                 continue
 
-            if item.ee_to_use == "suction":
-                rospy.loginfo("Going to circumstantial pose after picking from bins")
-                bin_center = geometry_msgs.msg.PoseStamped()
-                bin_center.header.frame_id = item.bin_name
-                bin_center.pose.orientation.w = 1.0
-                bin_center_on_table = self.listener.transformPose("workspace_center", bin_center).pose.position
-                self.go_to_named_pose("above_center_parts_bin", "b_bot", speed=1.0, acceleration=1.0)
-
             # Attempt to place the item
             place_pose = geometry_msgs.msg.PoseStamped()
             if self.is_aist_experiment:
@@ -447,7 +439,7 @@ class KittingClass(AISTBaseRoutines):
     def bin_corner_calibration(self, robot_name="b_bot", end_effector_link=""):
         rospy.loginfo("============ Calibrating bin. ============")
         rospy.loginfo(robot_name + " end effector should be 3 cm above each corner of each bin.")
-        
+
         if end_effector_link == "":
             self.go_to_named_pose("home", robot_name)
 
@@ -482,7 +474,7 @@ class KittingClass(AISTBaseRoutines):
 
         if end_effector_link=="":
             self.go_to_named_pose("home", robot_name)
-        
+
         poses = []
 
         pose0 = geometry_msgs.msg.PoseStamped()
@@ -501,7 +493,7 @@ class KittingClass(AISTBaseRoutines):
             poses.append(copy.deepcopy(pose_above_the_bin))
 
         self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
-        return 
+        return
 
     ###----- main procedure
     def kitting_task(self):
