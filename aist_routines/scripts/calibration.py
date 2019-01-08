@@ -19,7 +19,7 @@ class CalibrationClass(AISTBaseRoutines):
         else:
             self.acceleration = 0.0
 
-        self.bin_names = ['place_bin']
+        self.bin_names = ['bin_3_part_8']
 
 
         rospy.loginfo("Calibration class is staring up!")
