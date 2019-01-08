@@ -19,7 +19,7 @@ class CalibrationClass(AISTBaseRoutines):
         else:
             self.acceleration = 0.0
 
-        self.bin_names = ['bin_3_part_5']
+        self.bin_names = ['place_bin']
 
 
         rospy.loginfo("Calibration class is staring up!")
@@ -95,29 +95,20 @@ class CalibrationClass(AISTBaseRoutines):
 
         pose0 = geometry_msgs.msg.PoseStamped()
         pose0.header.frame_id = "workspace_center"
+        pose0.pose.position.y = 0.2
         pose0.pose.position.z = 0.01
         pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
         poses = []
-        for i in xrange(9):
+        for i in xrange(7):
             poses.append(copy.deepcopy(pose0))
         poses[0].pose.position.x = 0.00
-        poses[0].pose.position.y = 0.00
-        poses[1].pose.position.x = -0.25
-        poses[1].pose.position.y = 0.00
-        poses[2].pose.position.x = -0.25
-        poses[2].pose.position.y = 0.25
-        poses[3].pose.position.x = 0.00
-        poses[3].pose.position.y = 0.25
-        poses[4].pose.position.x = 0.25
-        poses[4].pose.position.y = 0.25
-        poses[5].pose.position.x = 0.25
-        poses[5].pose.position.y = 0.00
+        poses[1].pose.position.x = -0.10
+        poses[2].pose.position.x = -0.20
+        poses[3].pose.position.x = -0.25
+        poses[4].pose.position.x = 0.10
+        poses[5].pose.position.x = 0.20
         poses[6].pose.position.x = 0.25
-        poses[6].pose.position.y = -0.25
-        poses[7].pose.position.x = 0.00
-        poses[7].pose.position.y = -0.25
-        poses[8].pose.position.x = -0.25
-        poses[8].pose.position.y = -0.25
+
         c.cycle_through_calibration_poses(poses, robot_name, speed=.05, end_effector_link=end_effector_link, move_lin=True, go_home=False)
         return
 

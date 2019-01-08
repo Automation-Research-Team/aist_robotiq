@@ -28,10 +28,10 @@
   <xacro:property name="set1_y" value="0.096"/>
   <xacro:property name="set1_z" value="0"/>
   <!--bin_3_part_5_-->
-  <xacro:kitting_bin_3 binname="bin_3_part_5" parent="bin_rack_center" z_origin_offset="-.004">
-    <origin xyz="0 0.0 0.004" rpy="0 0 0" />
+  <xacro:kitting_bin_3 binname="bin_3_part_12" parent="workspace_center" z_origin_offset="-.004">
+    <origin xyz=".15 0.0 0.004" rpy="0 0 0" />
   </xacro:kitting_bin_3>
 
 
-  
+
 </robot>
