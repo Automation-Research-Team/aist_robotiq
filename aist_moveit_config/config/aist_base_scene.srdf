@@ -27,29 +27,21 @@
         <joint name="b_bot_wrist_2_joint" value="-1.57" />
         <joint name="b_bot_wrist_3_joint" value="0" />
     </group_state>
-    <group_state name="suction_ready_left_bins" group="b_bot">
-        <joint name="b_bot_elbow_joint" value="1.18015" />
-        <joint name="b_bot_shoulder_lift_joint" value="-1.20711" />
-        <joint name="b_bot_shoulder_pan_joint" value="1.71169" />
-        <joint name="b_bot_wrist_1_joint" value="-1.52342" />
-        <joint name="b_bot_wrist_2_joint" value="-1.56702" />
-        <joint name="b_bot_wrist_3_joint" value="1.74819" />
+    <group_state name="above_center_parts_bin" group="b_bot">
+        <joint name="b_bot_elbow_joint" value="1.5333127975463867" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.4623740355121058" />
+        <joint name="b_bot_shoulder_pan_joint" value="1.7658782005310059" />
+        <joint name="b_bot_wrist_1_joint" value="-1.6417954603778284" />
+        <joint name="b_bot_wrist_2_joint" value="-1.5708830992328089" />
+        <joint name="b_bot_wrist_3_joint" value="0.19509382545948029" />
     </group_state>
-    <group_state name="suction_ready_right_bins" group="b_bot">
-        <joint name="b_bot_elbow_joint" value="1.861" />
-        <joint name="b_bot_shoulder_lift_joint" value="-1.88" />
-        <joint name="b_bot_shoulder_pan_joint" value="1.87" />
-        <joint name="b_bot_wrist_1_joint" value="-1.524" />
-        <joint name="b_bot_wrist_2_joint" value="-1.563" />
-        <joint name="b_bot_wrist_3_joint" value="1.907" />
-    </group_state>
-    <group_state name="suction_ready_above_place_bin" group="b_bot">
-        <joint name="b_bot_elbow_joint" value="1.46087" />
-        <joint name="b_bot_shoulder_lift_joint" value="-1.4810" />
-        <joint name="b_bot_shoulder_pan_joint" value="0.99350" />
-        <joint name="b_bot_wrist_1_joint" value="-1.54929" />
-        <joint name="b_bot_wrist_2_joint" value="-1.57075" />
-        <joint name="b_bot_wrist_3_joint" value="0.99489" />
+    <group_state name="above_center_tray_bin" group="b_bot">
+        <joint name="b_bot_elbow_joint" value="1.549178123474121" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.4769509474383753" />
+        <joint name="b_bot_shoulder_pan_joint" value="0.9954947829246521" />
+        <joint name="b_bot_wrist_1_joint" value="-1.643090550099508" />
+        <joint name="b_bot_wrist_2_joint" value="-1.5708592573748987" />
+        <joint name="b_bot_wrist_3_joint" value="0.19509382545948029" />
     </group_state>
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
     <virtual_joint name="world_to_o2as" type="fixed" parent_frame="o2as_ground" child_link="world" />

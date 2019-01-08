@@ -108,7 +108,8 @@ class KittingClass(AISTBaseRoutines):
         self.bin_3_length = 0.192
 
         self.part_bin_list = {
-            "part_5": "bin_3_part_5"
+            "part_5": "bin_3_part_5",
+            "part_12": "bin_3_part_12",
         }
 
         self.part_position_in_tray = {
@@ -246,10 +247,7 @@ class KittingClass(AISTBaseRoutines):
             bin_center.header.frame_id = item.bin_name
             bin_center.pose.orientation.w = 1.0
             bin_center_on_table = self.listener.transformPose("workspace_center", bin_center).pose.position
-            if bin_center_on_table.y > .1:
-                self.go_to_named_pose("suction_ready_right_bins", "b_bot", speed=1.0, acceleration=1.0)
-            else:
-                self.go_to_named_pose("suction_ready_left_bins", "b_bot", speed=1.0, acceleration=1.0)
+            self.go_to_named_pose("above_center_parts_bin", "b_bot", speed=1.0, acceleration=1.0)
 
         attempts = 0
         while attempts < max_attempts and not rospy.is_shutdown():
@@ -274,7 +272,7 @@ class KittingClass(AISTBaseRoutines):
                 gripper_command = ""
             # pick_pose = self.make_pose_safe_for_bin(pick_pose, item)
             self.publish_marker(pick_pose, "aist_vision_result")
-            item_picked = self.pick(robot_name, pick_pose, grasp_height=0.0, speed_fast=.05, speed_slow=.05,
+            item_picked = self.pick(robot_name, pick_pose, grasp_height=0.0, speed_fast=.1, speed_slow=.05,
                                                 gripper_command=gripper_command, approach_height=approach_height, timeout=10.0)
             if not self.use_real_robot:
                 item_picked = True
@@ -290,10 +288,7 @@ class KittingClass(AISTBaseRoutines):
                 bin_center.header.frame_id = item.bin_name
                 bin_center.pose.orientation.w = 1.0
                 bin_center_on_table = self.listener.transformPose("workspace_center", bin_center).pose.position
-                if bin_center_on_table.y > .1:
-                    self.go_to_named_pose("suction_ready_right_bins", "b_bot", speed=1.0, acceleration=1.0)
-                else:
-                    self.go_to_named_pose("suction_ready_left_bins", "b_bot", speed=1.0, acceleration=1.0)
+                self.go_to_named_pose("above_center_parts_bin", "b_bot", speed=1.0, acceleration=1.0)
 
             # Attempt to place the item
             place_pose = geometry_msgs.msg.PoseStamped()
@@ -304,11 +299,11 @@ class KittingClass(AISTBaseRoutines):
             place_pose.pose.orientation = self.downward_orientation
             approach_height = .15
             if item.ee_to_use == "suction":
-                self.go_to_named_pose("suction_ready_above_place_bin", "b_bot", speed=1.0, acceleration=1.0)
+                self.go_to_named_pose("above_center_tray_bin", "b_bot", speed=1.0, acceleration=1.0)
             self.place(robot_name, place_pose, place_height=item.dropoff_height,
                                         speed_fast=1.0, speed_slow=0.05, gripper_command=gripper_command, approach_height=approach_height)
             if item.ee_to_use == "suction":
-                self.go_to_named_pose("suction_ready_above_place_bin", "b_bot", speed=1.0, acceleration=1.0)
+                self.go_to_named_pose("above_center_tray_bin", "b_bot", speed=1.0, acceleration=1.0)
             # If successful
             self.fulfilled_items += 1
             item.fulfilled = True
@@ -480,6 +475,33 @@ class KittingClass(AISTBaseRoutines):
         self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
         return
 
+    def bin_calibration(self, robot_name="b_bot", end_effector_link=""):
+        rospy.loginfo("============ Calibrating bins. ============")
+        rospy.loginfo(robot_name + " end effector should be 3 cm above center of bin.")
+
+        if end_effector_link=="":
+            self.go_to_named_pose("home", robot_name)
+        
+        poses = []
+
+        pose0 = geometry_msgs.msg.PoseStamped()
+        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+        pose0.pose.position.z = 0.03
+        pose_above_the_bin = geometry_msgs.msg.PoseStamped()
+        pose_above_the_bin.pose.orientation = copy.deepcopy(pose0.pose.orientation)
+        pose_above_the_bin.pose.position.z = 0.15
+
+        for bin in self.part_bin_list.values():
+            pose_above_the_bin.header.frame_id = bin
+            poses.append(copy.deepcopy(pose_above_the_bin))
+            pose0.header.frame_id = bin
+            world_pose = self.listener.transformPose("workspace_center", pose0)
+            poses.append(copy.deepcopy(pose0))
+            poses.append(copy.deepcopy(pose_above_the_bin))
+
+        self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
+        return 
+
     ###----- main procedure
     def kitting_task(self):
         global number_of_attempted
@@ -504,7 +526,8 @@ if __name__ == '__main__':
 
         while True:
             rospy.loginfo("")
-            rospy.loginfo("Enter 1 to go to home all robots.")
+            rospy.loginfo("1: to go to home all robots.")
+            rospy.loginfo("322: Bins with b_bot")
             rospy.loginfo("332: Bin corners with b_bot")
             rospy.loginfo("Enter 71, 72... to test phoxi on item 1, 2...")
             rospy.loginfo("Enter START to start the task.")
@@ -513,6 +536,8 @@ if __name__ == '__main__':
             i = raw_input()
             if i == '1':
                 kit.go_to_named_pose("home", "b_bot")
+            elif i == '322':
+                kit.bin_calibration(robot_name="b_bot")
             elif i == '332':
                 kit.bin_corner_calibration(robot_name="b_bot")
             elif i in ["71", "72", "73", "74", "75", "76", "77", "78", "79"]:
@@ -521,7 +546,10 @@ if __name__ == '__main__':
                 kit.get_grasp_candidates_from_phoxi(item, True)
                 rospy.loginfo("Grasp candidates of item " + str(item.part_id))
                 rospy.loginfo(kit.grasp_candidates[item.part_id]["position"])
-                kit.publish_marker(kit.grasp_candidates[item.part_id]["position"][0], "aist_vision_result")
+                try:
+                    kit.publish_marker(kit.grasp_candidates[item.part_id]["position"].pop(0), "aist_vision_result")
+                except IndexError:
+                    pass
             elif i == 'START' or i == 'start':
                 kit.kitting_task()
             elif i == 'x':
