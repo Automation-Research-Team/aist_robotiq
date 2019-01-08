@@ -28,20 +28,20 @@
         <joint name="b_bot_wrist_3_joint" value="0" />
     </group_state>
     <group_state name="above_center_parts_bin" group="b_bot">
-        <joint name="b_bot_elbow_joint" value="1.5333127975463867" />
-        <joint name="b_bot_shoulder_lift_joint" value="-1.4623740355121058" />
-        <joint name="b_bot_shoulder_pan_joint" value="1.7658782005310059" />
-        <joint name="b_bot_wrist_1_joint" value="-1.6417954603778284" />
-        <joint name="b_bot_wrist_2_joint" value="-1.5708830992328089" />
-        <joint name="b_bot_wrist_3_joint" value="0.19509382545948029" />
+        <joint name="b_bot_elbow_joint" value="1.6498773097991943" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.5144270102130335" />
+        <joint name="b_bot_shoulder_pan_joint" value="1.6318087577819824" />
+        <joint name="b_bot_wrist_1_joint" value="-1.7062271277057093" />
+        <joint name="b_bot_wrist_2_joint" value="-1.5635340849505823" />
+        <joint name="b_bot_wrist_3_joint" value="0.07934980094432831" />
     </group_state>
     <group_state name="above_center_tray_bin" group="b_bot">
-        <joint name="b_bot_elbow_joint" value="1.549178123474121" />
-        <joint name="b_bot_shoulder_lift_joint" value="-1.4769509474383753" />
-        <joint name="b_bot_shoulder_pan_joint" value="0.9954947829246521" />
-        <joint name="b_bot_wrist_1_joint" value="-1.643090550099508" />
-        <joint name="b_bot_wrist_2_joint" value="-1.5708592573748987" />
-        <joint name="b_bot_wrist_3_joint" value="0.19509382545948029" />
+        <joint name="b_bot_elbow_joint" value="1.583388328552246" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.4698541800128382" />
+        <joint name="b_bot_shoulder_pan_joint" value="0.9818634390830994" />
+        <joint name="b_bot_wrist_1_joint" value="-1.6941035429583948" />
+        <joint name="b_bot_wrist_2_joint" value="-1.5538113752948206" />
+        <joint name="b_bot_wrist_3_joint" value="-0.5889728705035608" />
     </group_state>
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
     <virtual_joint name="world_to_o2as" type="fixed" parent_frame="o2as_ground" child_link="world" />

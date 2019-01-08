@@ -181,7 +181,6 @@ class AISTBaseRoutines(object):
             self.send_gripper_command(gripper=robot_name, command="open")
 
         rospy.loginfo("Moving down to object")
-        # object_pose.pose.position.z += grasp_height
         rospy.logdebug("Going to height " + str(object_pose.pose.position.z))
         # if gripper_command=="suction":
         #     self.do_linear_push(robot_name, force=5.0, wait=True, direction='Z+', max_approach_distance=0.92, forward_speed=0.1)
