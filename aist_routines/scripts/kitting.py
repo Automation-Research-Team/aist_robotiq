@@ -58,6 +58,8 @@ class KittingClass(AISTBaseRoutines):
         self.initial_setup()
         rospy.loginfo("Kitting class is staring up!")
 
+        self.downward_orientation2 = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+
     def read_order_file(self):
         """
         Read in the order file, return kitting_list and order_entry_list.
@@ -289,7 +291,7 @@ class KittingClass(AISTBaseRoutines):
                 place_pose.header.frame_id = "place_bin"
             else:
                 place_pose.header.frame_id = item.target_frame
-            place_pose.pose.orientation = self.downward_orientation
+            place_pose.pose.orientation = self.downward_orientation2
             approach_height = .15
             if item.ee_to_use == "suction":
                 self.go_to_named_pose("above_center_tray_bin", "b_bot", speed=1.0, acceleration=1.0)
