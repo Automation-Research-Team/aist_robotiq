@@ -43,6 +43,14 @@
         <joint name="b_bot_wrist_2_joint" value="-1.5538113752948206" />
         <joint name="b_bot_wrist_3_joint" value="-0.5889728705035608" />
     </group_state>
+    <group_state name="intermediate_pose_to_place_item" group="b_bot">
+        <joint name="b_bot_elbow_joint" value="1.5202279090881348" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.5674756209002894" />
+        <joint name="b_bot_shoulder_pan_joint" value="1.278049111366272" />
+        <joint name="b_bot_wrist_1_joint" value="-1.5380256811725062" />
+        <joint name="b_bot_wrist_2_joint" value="-1.5573714415179651" />
+        <joint name="b_bot_wrist_3_joint" value="-0.29286128679384404" />
+    </group_state>
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
     <virtual_joint name="world_to_o2as" type="fixed" parent_frame="o2as_ground" child_link="world" />
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
