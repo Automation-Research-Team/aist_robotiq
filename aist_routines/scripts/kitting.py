@@ -153,21 +153,21 @@ class KittingClass(AISTBaseRoutines):
 
         # How high the end effector should hover over the tray when delivering the item
         self.dropoff_heights = {
-            "part_4" : 0.15,
-            "part_5" : 0.15,
-            "part_6" : 0.15,
-            "part_7" : 0.15,
-            "part_8" : 0.15,
-            "part_9" : 0.15,
-            "part_10": 0.15,
-            "part_11": 0.15,
-            "part_12": 0.15,
-            "part_13": 0.15,
-            "part_14": 0.15,
-            "part_15": 0.15,
-            "part_16": 0.15,
-            "part_17": 0.15,
-            "part_18": 0.15
+            "part_4" : 0.05,
+            "part_5" : 0.05,
+            "part_6" : 0.05,
+            "part_7" : 0.05,
+            "part_8" : 0.05,
+            "part_9" : 0.05,
+            "part_10": 0.05,
+            "part_11": 0.05,
+            "part_12": 0.05,
+            "part_13": 0.05,
+            "part_14": 0.05,
+            "part_15": 0.05,
+            "part_16": 0.05,
+            "part_17": 0.05,
+            "part_18": 0.05
         }
 
         # How many candidates should we get from phoxi.
