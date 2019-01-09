@@ -294,7 +294,7 @@ class KittingClass(AISTBaseRoutines):
             place_pose.pose.orientation = self.downward_orientation2
             approach_height = .15
             if item.ee_to_use == "suction":
-                self.go_to_named_pose("above_center_tray_bin", "b_bot", speed=1.0, acceleration=1.0)
+                self.go_to_named_pose("intermediate_pose_to_place_item", "b_bot", speed=1.0, acceleration=1.0)
             self.place(robot_name, place_pose, place_height=item.dropoff_height,
                                         speed_fast=1.0, speed_slow=0.05, gripper_command=gripper_command, approach_height=approach_height)
             # If successful
