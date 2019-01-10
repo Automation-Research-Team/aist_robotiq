@@ -51,6 +51,28 @@ class CalibrationClass(AISTBaseRoutines):
         return
 
 
+    def bin_calibration(self, robot_name="b_bot", end_effector_link=""):
+        rospy.loginfo("============ Calibrating bins. ============")
+        rospy.loginfo(robot_name + " end effector should be 3 cm above center of bin.")
+
+        if end_effector_link=="":
+            self.go_to_named_pose("home", robot_name)
+
+        poses = []
+
+        pose0 = geometry_msgs.msg.PoseStamped()
+        pose0.pose.orientation = self.downward_orientation
+        pose0.pose.position.z = 0.03
+
+        for bin in self.bin_names:
+            pose0.header.frame_id = bin
+            world_pose = self.listener.transformPose("workspace_center", pose0)
+            poses.append(copy.deepcopy(pose0))
+
+        self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
+        return
+
+
     def bin_corner_calibration(self, robot_name="b_bot", end_effector_link=""):
         rospy.loginfo("============ Calibrating bin. ============")
         rospy.loginfo(robot_name + " end effector should be 3 cm above each corner of each bin.")
@@ -123,6 +145,7 @@ if __name__ == '__main__':
             rospy.loginfo("1: Go home with b_bot")
             rospy.loginfo("2: Touch the table (workspace_center)")
             rospy.loginfo("22: Workspace calibration with b_bot")
+            rospy.loginfo("322: Bins with b_bot")
             rospy.loginfo("332: Bin corners with b_bot")
             rospy.loginfo("x: Exit")
 
@@ -133,6 +156,8 @@ if __name__ == '__main__':
                 c.touch_the_table()
             elif i == '22':
                 c.workspace_calibration("b_bot")
+            elif i == '322':
+                c.bin_calibration(robot_name="b_bot")
             elif i == '332':
                 c.bin_corner_calibration(robot_name="b_bot")
             if i == 'x':
