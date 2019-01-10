@@ -43,7 +43,7 @@ at(const sensor_msgs::PointCloud2& cloud_msg, int u, int v)
     xyz += (cloud_msg.width * v + u);
 
     return {xyz[0], xyz[1], xyz[2]};
-	
+
 }
 
 template <class T> cv::Vec<T, 3>
@@ -60,7 +60,7 @@ at(const sensor_msgs::PointCloud2& cloud_msg, T u, T v)
     {
 	iterator_t	xyz(cloud_msg, "x");
 	xyz += (cloud_msg.width * vv + u0);
-	
+
 	for (auto uu = u0; uu <= u1; ++uu)
 	{
 	    if (!std::isnan(xyz[2]))
@@ -68,7 +68,7 @@ at(const sensor_msgs::PointCloud2& cloud_msg, T u, T v)
 	    ++xyz;
 	}
     }
-    
+
     return {NaN, NaN, NaN};
 }
 
@@ -87,7 +87,7 @@ class Simple
     Simple();
 
     std::ostream&	print_bins(std::ostream& out)		const	;
-    
+
   private:
     void	cam_info_callback(const sensor_msgs::CameraInfo& msg)	;
     void	reconf_callback(aruco_ros::ArucoThresholdConfig& config,
@@ -111,7 +111,7 @@ class Simple
 				    const ros::Time& stamp)		;
     void	publish_image_info(const cv::Mat& image,
 				   const ros::Time& stamp)		;
-    
+
   private:
     ros::NodeHandle			_nh;
 
@@ -141,14 +141,14 @@ class Simple
     cloud_t				_cloud_msg;
 
     const ros::Publisher		_pose_pub;
-    const ros::Publisher		_transform_pub; 
+    const ros::Publisher		_transform_pub;
     const ros::Publisher		_position_pub;
     const ros::Publisher		_marker_pub;
     const ros::Publisher		_pixel_pub;
     const ros::Publisher		_corners_pub;
 
     Corners				_corners;
-    
+
     dynamic_reconfigure::Server<aruco_ros::ArucoThresholdConfig>
 					_dyn_rec_server;
 
@@ -157,10 +157,10 @@ class Simple
     int					_marker_id;
 
     std::vector<o2as::BinDescription>	_bins;
-    
+
     float				_planarityTolerance;
 };
-    
+
 Simple::Simple()
     :_nh("~"),
      _cam_info_sub(_nh.subscribe("/camera_info", 1,
@@ -185,7 +185,7 @@ Simple::Simple()
      _planarityTolerance(0.001)
 {
     using	aruco::MarkerDetector;
-	
+
     std::string refinementMethod;
     _nh.param("corner_refinement", refinementMethod, std::string("LINES"));
     if (refinementMethod == "SUBPIX")
@@ -193,8 +193,8 @@ Simple::Simple()
     else if (refinementMethod == "HARRIS")
 	_mDetector.setCornerRefinementMethod(MarkerDetector::HARRIS);
     else if (refinementMethod == "NONE")
-	_mDetector.setCornerRefinementMethod(MarkerDetector::NONE); 
-    else      
+	_mDetector.setCornerRefinementMethod(MarkerDetector::NONE);
+    else
 	_mDetector.setCornerRefinementMethod(MarkerDetector::LINES);
 
   //Print parameters of aruco marker detector:
@@ -209,7 +209,7 @@ Simple::Simple()
     _mDetector.getMinMaxSize(mins, maxs);
     ROS_INFO_STREAM("Marker size min: " << mins << "  max: " << maxs);
     ROS_INFO_STREAM("Desired speed: " << _mDetector.getDesiredSpeed());
-    
+
     _nh.param("marker_size",	    _marker_size,	 0.05);
     _nh.param("marker_id",	    _marker_id,		 300);
     _nh.param("reference_frame",    _reference_frame,    std::string(""));
@@ -243,22 +243,27 @@ Simple::print_bins(std::ostream& out) const
 
     for (const auto& bin : _bins)
 	bin.print_pose(out) << std::endl;
-    
+
     out << "</robot>" << std::endl;
 
     for (const auto& bin : _bins)
 	bin.print_part(out) << std::endl;
-    
+
     return out;
 }
-    
+
 void
 Simple::cam_info_callback(const sensor_msgs::CameraInfo& msg)
 {
-  // wait for one camerainfo, then shut down that subscriber
-    _camParam = aruco_ros::rosCameraInfo2ArucoCamParams(msg,
+  // Truncate distortion coefficiens because aruco_ros accepts only
+  // first four parameters.
+    auto	msg_tmp = msg;
+    msg_tmp.D.resize(4);
+    std::copy_n(std::begin(msg.D), msg_tmp.D.size(), std::begin(msg_tmp.D));
+    _camParam = aruco_ros::rosCameraInfo2ArucoCamParams(msg_tmp,
 							_useRectifiedImages);
 
+  // wait for one camerainfo, then shut down that subscriber
   // handle cartesian offset between stereo pairs
   // see the sensor_msgs/CamaraInfo documentation for details
     _rightToLeft.setIdentity();
@@ -286,7 +291,7 @@ Simple::image_callback(const image_p& image_msg)
     else
 	_image_msg = *image_msg;
 }
-    
+
 void
 Simple::cloud_callback(const cloud_p& cloud_msg)
 {
@@ -316,7 +321,7 @@ Simple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 
 	if (markers.size() == 0)
 	    throw std::runtime_error("No markers detected!");
-	
+
       //for each marker, draw info and its boundaries in the image
 	_bins.clear();
 	for (const auto& marker : markers)
@@ -342,7 +347,7 @@ Simple::detect_marker(const image_t& image_msg, const cloud_t& cloud_msg)
 	if (_marker_size != -1)
 	    for (auto& marker : markers)
 		aruco::CvDrawingUtils::draw3dAxis(inImage, marker, _camParam);
-	
+
 	publish_image_info(inImage, curr_stamp);
     }
     catch (const std::runtime_error& e)
@@ -397,7 +402,7 @@ Simple::get_marker_transform(const aruco::Marker& marker,
 
     if (marker.size() < 4)
 	throw std::runtime_error("Detected not all four corners!");
-    
+
   // Compute initial marker plane.
     std::vector<point_t>	points;
     for (const auto& corner : marker)
@@ -425,7 +430,7 @@ Simple::get_marker_transform(const aruco::Marker& marker,
     try
     {
 	rgbiterator_t	rgb(const_cast<cloud_t&>(cloud_msg), "rgb");
-	
+
 	for (auto v = v0; v <= v1; ++v)
 	{
 	    iterator_t		xyz(cloud_msg, "x");
@@ -433,18 +438,18 @@ Simple::get_marker_transform(const aruco::Marker& marker,
 	    const auto		idx = cloud_msg.width * v + u0;
 	    xyz += idx;
 	    rgb += idx;
-	
+
 	    for (auto u = u0; u <= u1; ++u)
 	    {
 		const auto	point = at<value_t>(cloud_msg, u, v);
-	    
+
 		if (!std::isnan(point(2)) && plane.distance(point) <
 		    _planarityTolerance)
 		{
 		    points.push_back(point);
 		    *rgb = 0xff0000;
 		}
-		
+
 		++xyz;
 		++rgb;
 	    }
@@ -457,15 +462,15 @@ Simple::get_marker_transform(const aruco::Marker& marker,
 	    iterator_t	xyz(cloud_msg, "x");
 	    const auto	idx = cloud_msg.width * v + u0;
 	    xyz += idx;
-	
+
 	    for (auto u = u0; u <= u1; ++u)
 	    {
 		const auto	point = at<value_t>(cloud_msg, u, v);
-	    
+
 		if (!std::isnan(point(2)) && plane.distance(point) <
 		    _planarityTolerance)
 		    points.push_back(point);
-		
+
 		++xyz;
 	    }
 	}
@@ -489,11 +494,11 @@ Simple::get_marker_transform(const aruco::Marker& marker,
 	pointStamped.point.x = corner(0);
 	pointStamped.point.y = corner(1);
 	pointStamped.point.z = corner(2);
-	
+
 	corners_msg.corners.push_back(pointStamped);
     }
     _corners_pub.publish(corners_msg);
-    
+
   // Compute p and q, i.e. marker's local x-axis and y-axis respectively.
     const auto&	n = plane.normal();
     const auto	c = (corners[2] + corners[3] - corners[0] - corners[1])
@@ -523,18 +528,18 @@ Simple::get_marker_transform(const aruco::Marker& marker,
     if (_reference_frame != _camera_frame)
 	get_transform(_reference_frame, _camera_frame, cameraToReference);
 
-    return static_cast<tf::Transform>(cameraToReference) 
-	 * static_cast<tf::Transform>(_rightToLeft) 
+    return static_cast<tf::Transform>(cameraToReference)
+	 * static_cast<tf::Transform>(_rightToLeft)
 	 * transform;
 }
 
 template <class T> cv::Vec<T, 3>
 Simple::view_vector(T u, T v) const
 {
-    const auto&	K = _camParam.CameraMatrix;
-    const auto	y = (v - K.at<T>(1, 2))/K.at<T>(1, 1);
-    
-    return {(u - K.at<T>(0, 2) - y*K.at<T>(0, 1))/K.at<T>(0, 0), y, T(1)};
+    std::vector<cv::Vec<T, 2> >	uv{{u, v}}, xy;
+    cv::undistortPoints(uv, xy, _camParam.CameraMatrix, _camParam.Distorsion);
+
+    return {xy[0][0], xy[0][1], T(1)};
 }
 
 void
@@ -648,6 +653,6 @@ main(int argc, char** argv)
     {
 	ROS_ERROR_STREAM("Unknon error.");
     }
-    
+
     return 0;
 }
