@@ -22,12 +22,8 @@
        unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
 
   <!-- Publish hand-eye calibration -->
-  <arg name   ="namespace_prefix"
+  <arg name   ="namespace"
        default="$(arg camera_name)_from_$(arg robot_name)"/>
-  <arg name="namespace"		value="$(arg namespace_prefix)_eye_on_hand"
-       if="$(arg eye_on_hand)"/>
-  <arg name="namespace"		value="$(arg namespace_prefix)_eye_on_base"
-       unless="$(arg eye_on_hand)"/>
 
   <group ns="$(arg namespace)">
     <param name ="tracking_base_frame"

@@ -51,9 +51,9 @@ aist_keyposes = {
     ],
 
     'b_bot': [
-      [0.15,  0.20, 0.17, radians( 30), radians( 25), radians(0)],
-      [0.15,  0.10, 0.17, radians( 30), radians( 25), radians(0)],
-      [0.15, -0.00, 0.17, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.20, 0.16, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
+      [0.15, -0.00, 0.16, radians( 30), radians( 25), radians(0)],
 
       [0.15, -0.00, 0.25, radians( 30), radians( 25), radians(0)],
       [0.15,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
@@ -158,10 +158,7 @@ class HandEyeCalibrationRoutines:
       self.stop_acquisition  = False
 
     if needs_calib:
-      if camera_name == robot_name + "_camera":
-        ns = "/{}_from_{}_eye_on_hand/".format(camera_name, robot_name)
-      else:
-        ns = "/{}_from_{}_eye_on_base/".format(camera_name, robot_name)
+      ns = "/{}_from_{}/".format(camera_name, robot_name)
       self.take_sample         = rospy.ServiceProxy(ns + "take_sample",
                                                     TakeSample)
       self.get_sample_list     = rospy.ServiceProxy(ns + "get_sample_list",

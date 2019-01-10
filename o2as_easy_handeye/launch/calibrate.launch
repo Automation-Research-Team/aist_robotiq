@@ -3,27 +3,21 @@
   <!-- Setting calibration namespace -->
   <arg name   ="eye_on_hand"
        doc    ="if true, eye-on-hand instead of eye-on-base" />
-  <arg name   ="namespace_prefix"
+  <arg name   ="namespace"
        default="easy_handeye"
-       doc    ="the prefix of the namespace the node will run in, and of the folder in which the result will be saved" />
-  <arg if="$(arg eye_on_hand)"
-       name="namespace" value="$(arg namespace_prefix)_eye_on_hand"
-       doc="the namespace the node will run in, and the folder in which the result will be saved" />
-  <arg unless="$(arg eye_on_hand)"
-       name="namespace" value="$(arg namespace_prefix)_eye_on_base"
-       doc="the namespace the node will run in, and the folder in which the result will be saved" />
+       doc    ="the namespace the node will run in, and of the folder in which the result will be saved" />
 
   <!-- The input reference frames -->
   <arg name="robot_base_frame"		default="base_link" />
   <arg name="robot_effector_frame"	default="tool0" />
   <arg name="tracking_base_frame"	default="tracking_origin" />
   <arg name="tracking_marker_frame"	default="tracking_target" />
-  
+
   <!-- Publish dummy frames while calibrating -->
   <arg name   ="publish_dummy"
        default="true"
        doc    ="if true, a dummy calibration will be published to keep all frames in a single tf tree, hence visualized in RViz" />
-  
+
   <!-- GUI arguments -->
   <arg name   ="start_rviz"
        default="true"
@@ -36,7 +30,7 @@
        doc    ="if true, rqt will be started with the provided perspective" />
   <arg name   ="rqt_perspective_file"
        default="$(find easy_handeye)/launch/rqt_easy_handeye.perspective" doc="the path to the rqt perspective file to be opened" />
-  
+
   <arg name   ="freehand_robot_movement"
        default="false"
        doc    ="if false, the rqt plugin for the automatic robot motion with MoveIt! will be started" />
@@ -55,7 +49,7 @@
   <arg name   ="robot_acceleration_scaling"
        default="0.2"
        doc    ="the maximum acceleration the robot should reach, as a factor of the acceleration declared in the joint_limits.yaml" />
-  
+
   <!-- Dummy calibration to have a fully connected TF tree and see all frames -->
   <group if="$(arg publish_dummy)">
     <node unless="$(arg eye_on_hand)"
@@ -86,7 +80,7 @@
   <!-- Connect the tracker to the solver -->
   <node name="hand_eye_connector" pkg="easy_handeye" type="calibrate.py"
         ns="$(arg namespace)" output="screen" />
-    
+
   <!-- start GUI (Rviz and rqt_easy_handeye) -->
   <node unless="$(arg freehand_robot_movement)"
 	name="calibration_mover"

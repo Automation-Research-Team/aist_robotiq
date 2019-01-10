@@ -47,7 +47,6 @@ def print_mat(mat):
 
 def print_camera_pose(root_bot, bot_opt, opt_body):
   transformer = TransformerROS()
-  D = transformer.fromTranslationRotaiton()
 
   # Print ground/effector <- camera(body) transformation
   mat = tfs.concatenate_matrices(
