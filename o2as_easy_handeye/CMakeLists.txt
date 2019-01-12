@@ -111,7 +111,9 @@ add_dependencies(plane_detector
 #############
 catkin_install_python(
   PROGRAMS
-    scripts/run_handeye_calibration.py
+    scripts/handeye_calibration.py
+    scripts/check_calibration.py
+    scripts/tool_calibration.py
     scripts/go_home.py
     scripts/publish.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
