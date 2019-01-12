@@ -22,7 +22,7 @@
 
   <!-- Start easy_handeye calibrator -->
   <include file="$(find o2as_easy_handeye)/launch/calibrate.launch">
-    <arg name="namespace_prefix"
+    <arg name="namespace"
          value="$(arg camera_name)_from_$(arg robot_name)"/>
     <arg name="eye_on_hand"		value="$(arg eye_on_hand)"/>
 

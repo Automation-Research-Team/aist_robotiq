@@ -42,8 +42,8 @@
       <parent link="${prefix}single_suction_gripper_base_link"/>
       <child  link="${prefix}single_suction_gripper_pad_link"/>
       <!-- <origin xyz="0.187 0 0" rpy="0 0 0"/> -->
-      <origin xyz="0.186964399692 -0.00163161359769 -0.00326360000377"
-	      rpy="${0.0*pi/180} ${1.0*pi/180} ${-0.5*pi/180}"/>>
+      <origin xyz="0.186976645492 -0.000326336140176 -0.00293726833731"
+	      rpy="${0.0*pi/180} ${0.9*pi/180} ${-0.1*pi/180}"/>
     </joint>
 
   </xacro:macro>
