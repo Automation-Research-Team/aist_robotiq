@@ -60,6 +60,9 @@ class KittingClass(AISTBaseRoutines):
 
         self.downward_orientation2 = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
 
+        self._grasp_candidates_in_camera_pub = rospy.Publisher("aist_kitting/grasp_candidate_poses_in_camera", geometry_msgs.msg.PoseStamped, queue_size=5)
+        self._grasp_candidates_in_bin_pub = rospy.Publisher("aist_kitting/grasp_candidate_poses_in_bin", geometry_msgs.msg.PoseStamped, queue_size=5)
+
     def read_order_file(self):
         """
         Read in the order file, return kitting_list and order_entry_list.
@@ -113,6 +116,7 @@ class KittingClass(AISTBaseRoutines):
             "part_5": "bin_3_part_5",
             "part_12": "bin_3_part_12",
             "part_8": "bin_3_part_8",
+            "part_7": "bin_3_part_7",
         }
 
         self.part_position_in_tray = {
@@ -156,7 +160,7 @@ class KittingClass(AISTBaseRoutines):
             "part_4" : 0.05,
             "part_5" : 0.05,
             "part_6" : 0.05,
-            "part_7" : 0.05,
+            "part_7" : 0.10,
             "part_8" : 0.05,
             "part_9" : 0.05,
             "part_10": 0.05,
@@ -364,12 +368,14 @@ class KittingClass(AISTBaseRoutines):
             obj_pose_in_camera.header = object_position.header
             obj_pose_in_camera.pose.position = object_position.point
             obj_pose_in_camera.pose.orientation.w = 1.0
+            self._grasp_candidates_in_camera_pub.publish(obj_pose_in_camera)
             pose_in_bin = self.listener.transformPose(item.bin_name, obj_pose_in_camera)
             pose_in_bin.pose.orientation = self.downward_orientation
             if item.ee_to_use in ["precision_gripper_from_outside", "robotiq_gripper"]:
                 pose_in_bin.pose.orientation = geometry_msgs.msg.Quaternion(
                     *tf_conversions.transformations.quaternion_from_euler(0, pi/2, -resp_search_grasp.rotipz[i]))
             poses_in_bin.append(pose_in_bin)
+            self._grasp_candidates_in_bin_pub.publish(pose_in_bin)
         rospy.loginfo("Calculated " + str(number_of_pose_candidates) + " candidates for item nr. " + str(item.part_id) + " in bin " + str(item.bin_name))
         rospy.logdebug(poses_in_bin)
 
