@@ -13,5 +13,7 @@
     <param name="suction_control" type="string" value="$(arg suction_control)"/>
     <param name="operation_mode" type="string" value="$(arg operation_mode)"/>
   </node>
+  <rosparam command="delete" param="fge_bin_id" />
+  <rosparam command="load" file="$(find aist_graspability)/config/fge_bin_id.yaml" />
   <include file="$(find aist_graspability)/launch/aist_graspability.launch" />
 </launch>
