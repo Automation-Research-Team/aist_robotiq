@@ -112,12 +112,13 @@ class KittingClass(AISTBaseRoutines):
         self.bin_3_width = 0.285
         self.bin_3_length = 0.192
 
-        self.part_bin_list = {
-            "part_5": "bin_3_part_5",
-            "part_12": "bin_3_part_12",
-            "part_8": "bin_3_part_8",
-            "part_7": "bin_3_part_7",
-        }
+        # self.part_bin_list = {
+        #     "part_5": "bin_3_part_5",
+        #     "part_12": "bin_3_part_12",
+        #     "part_8": "bin_3_part_8",
+        #     "part_7": "bin_3_part_7",
+        # }
+        self.part_bin_list = rospy.get_param("part_bin_list")
 
         self.part_position_in_tray = {
             "part_4" : "tray_1_partition_4",
