@@ -158,21 +158,21 @@ class KittingClass(AISTBaseRoutines):
 
         # How high the end effector should hover over the tray when delivering the item
         self.dropoff_heights = {
-            "part_4" : 0.05,
-            "part_5" : 0.05,
-            "part_6" : 0.05,
-            "part_7" : 0.10,
-            "part_8" : 0.05,
-            "part_9" : 0.05,
-            "part_10": 0.05,
-            "part_11": 0.05,
-            "part_12": 0.05,
-            "part_13": 0.05,
-            "part_14": 0.05,
-            "part_15": 0.05,
-            "part_16": 0.05,
-            "part_17": 0.05,
-            "part_18": 0.05
+            "part_4" : .15,
+            "part_5" : .15,
+            "part_6" : .15,
+            "part_7" : .15,
+            "part_8" : .15,
+            "part_9" : .15,
+            "part_10": .15,
+            "part_11": .15,
+            "part_12": .15,
+            "part_13": .15,
+            "part_14": .15,
+            "part_15": .15,
+            "part_16": .15,
+            "part_17": .15,
+            "part_18": .15
         }
 
         # How many candidates should we get from phoxi.
@@ -443,6 +443,27 @@ class KittingClass(AISTBaseRoutines):
         return safe_pose
 
     ###----- calibration for kitting
+    def bin_calibration(self, robot_name="b_bot", end_effector_link=""):
+        rospy.loginfo("============ Calibrating bins. ============")
+        rospy.loginfo(robot_name + " end effector should be 3 cm above center of bin.")
+
+        if end_effector_link=="":
+            self.go_to_named_pose("home", robot_name)
+
+        poses = []
+
+        pose0 = geometry_msgs.msg.PoseStamped()
+        pose0.pose.orientation = self.downward_orientation
+        pose0.pose.position.z = 0.03
+
+        for bin in ["bin_3_part_13"]:
+            pose0.header.frame_id = bin
+            world_pose = self.listener.transformPose("workspace_center", pose0)
+            poses.append(copy.deepcopy(pose0))
+
+        self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
+        return
+
     def bin_corner_calibration(self, robot_name="b_bot", end_effector_link=""):
         rospy.loginfo("============ Calibrating bin. ============")
         rospy.loginfo(robot_name + " end effector should be 3 cm above each corner of each bin.")
@@ -453,10 +474,10 @@ class KittingClass(AISTBaseRoutines):
         poses = []
 
         pose0 = geometry_msgs.msg.PoseStamped()
-        pose0.pose.position.z = 0.03
+        pose0.pose.position.z = 0.005
         pose0.pose.orientation = self.downward_orientation
 
-        for bin in self.part_bin_list.values():
+        for bin in ["bin_3_part_13"]:
             pose0.header.frame_id = bin
             world_pose = self.listener.transformPose("workspace_center", pose0)
             new_pose = copy.deepcopy(pose0)
