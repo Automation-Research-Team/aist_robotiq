@@ -151,6 +151,10 @@ class CalibrationClass(AISTBaseRoutines):
         self.go_to_pose_goal(robot_name, pose, speed=0.5, acceleration=self.acceleration, high_precision=False, end_effector_link=end_effector_link, move_lin=True)
 
         rospy.loginfo("Target position: " + str(pose))
+        current_pose_in_world = self.groups[robot_name].get_current_pose()
+        current_pose_in_workspace = self.listener.transformPose('workspace_center', current_pose_in_world)
+        rospy.loginfo("Current position: " + str())
+        rospy.loginfo(current_pose_in_workspace)
 
         return
 
