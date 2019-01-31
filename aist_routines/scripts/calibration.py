@@ -134,6 +134,26 @@ class CalibrationClass(AISTBaseRoutines):
         c.cycle_through_calibration_poses(poses, robot_name, speed=.05, end_effector_link=end_effector_link, move_lin=True, go_home=False)
         return
 
+    def workspace_calibration_interactive(self, robot_name="b_bot", end_effector_link=""):
+        rospy.loginfo("================ Calibrating workspace. ================")
+        rospy.loginfo(robot_name + " end effector should be 3 cm above the table.")
+
+        if end_effector_link == "":
+            if robot_name == "b_bot":
+                end_effector_link = "b_bot_single_suction_gripper_pad_link"
+
+        pose = geometry_msgs.msg.PoseStamped()
+        pose.header.frame_id = "workspace_center"
+        pose.pose.orientation = self.downward_orientation
+        pose.pose.position.x = float(raw_input("x >> "))
+        pose.pose.position.y = float(raw_input("y >> "))
+        pose.pose.position.z = float(raw_input("z >> "))
+        self.go_to_pose_goal(robot_name, pose, speed=0.5, acceleration=self.acceleration, high_precision=False, end_effector_link=end_effector_link, move_lin=True)
+
+        rospy.loginfo("Target position: " + str(pose))
+
+        return
+
 
 if __name__ == '__main__':
 
@@ -145,6 +165,7 @@ if __name__ == '__main__':
             rospy.loginfo("1: Go home with b_bot")
             rospy.loginfo("2: Touch the table (workspace_center)")
             rospy.loginfo("22: Workspace calibration with b_bot")
+            rospy.loginfo("222: Interactive workspace calibration with b_bot")
             rospy.loginfo("322: Bins with b_bot")
             rospy.loginfo("332: Bin corners with b_bot")
             rospy.loginfo("x: Exit")
@@ -156,6 +177,8 @@ if __name__ == '__main__':
                 c.touch_the_table()
             elif i == '22':
                 c.workspace_calibration("b_bot")
+            elif i == '222':
+                c.workspace_calibration_interactive("b_bot")
             elif i == '322':
                 c.bin_calibration(robot_name="b_bot")
             elif i == '332':
