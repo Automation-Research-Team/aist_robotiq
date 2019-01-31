@@ -23,7 +23,7 @@ import aist_graspability.msg
 rp = rospkg.RosPack()
 
 ts = time.time()
-start_date_time = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d_%H:%M:%S')
+start_date_time = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d_%H-%M-%S')
 number_of_attempted = 1
 
 class kitting_order_entry():
@@ -268,7 +268,9 @@ class KittingClass(AISTBaseRoutines):
             pick_pose = self.get_random_pose_in_bin(item)
             if self.grasp_candidates[item.part_id]["position"]:
                 rospy.loginfo("Use candidate pose estimating by vision.")
-                pick_pose = self.grasp_candidates[item.part_id]["position"].pop(0)
+                pick_number = random.randint(0, len(self.grasp_candidates[item.part_id]["position"]) - 1)
+                pick_pose = self.grasp_candidates[item.part_id]["position"].pop(pick_number)
+                # pick_pose = self.grasp_candidates[item.part_id]["position"].pop(0)
                 rospy.loginfo("Pick pose in bin:")
                 rospy.loginfo(pick_pose)
             pick_pose.pose.orientation = self.downward_orientation
@@ -276,6 +278,7 @@ class KittingClass(AISTBaseRoutines):
             if item.ee_to_use == "suction":
                 gripper_command = "suction"
                 approach_height = .15
+                pick_pose.pose.position.z -= .003
             else:
                 gripper_command = ""
             # pick_pose = self.make_pose_safe_for_bin(pick_pose, item)
