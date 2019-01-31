@@ -320,7 +320,7 @@ class AISTBaseRoutines(object):
         pose_goal_world = self.listener.transformPose("world", pose_goal_stamped).pose
         waypoints.append(pose_goal_world)
         (plan, fraction) = group.compute_cartesian_path(waypoints,  # waypoints to follow
-                                                        0.01,       # eef_step
+                                                        0.0005,       # eef_step
                                                         0.0)        # jump_threshold
         rospy.loginfo("Compute cartesian path succeeded with " + str(fraction*100) + "%")
         plan = group.retime_trajectory(self.robots.get_current_state(), plan, speed)
