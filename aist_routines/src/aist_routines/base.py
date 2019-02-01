@@ -143,8 +143,8 @@ class AISTBaseRoutines(object):
             rospy.loginfo("============ Press `Enter` to proceed ")
             raw_input()
 
-            if go_home:
-                self.go_to_named_pose(home_pose, robot_name, force_ur_script=move_lin)
+            # if go_home:
+            #     self.go_to_named_pose(home_pose, robot_name, force_ur_script=move_lin)
 
         if go_home:
             rospy.loginfo("Moving all robots home again.")
@@ -329,7 +329,14 @@ class AISTBaseRoutines(object):
         group.stop()
         group.clear_pose_targets()
 
-        current_pose = group.get_current_pose().pose
+        # current_pose = group.get_current_pose().pose
+
+        current_pose_in_world = group.get_current_pose()
+        current_pose_in_workspace = self.listener.transformPose('workspace_center', current_pose_in_world)
+        rospy.loginfo("Target position: ")
+        rospy.loginfo(pose_goal_stamped)
+        rospy.loginfo("Current position: ")
+        rospy.loginfo(current_pose_in_workspace)
         return plan_success
 
     def suck(self, turn_suction_on=False, eject=False, timeout=2.0):
