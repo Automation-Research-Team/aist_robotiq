@@ -116,6 +116,9 @@ class AISTBaseRoutines(object):
 
         self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
 
+        # For debugging of move_lin
+        self.actual_pose_pub = rospy.Publisher('actual_pose', geometry_msgs.msg.Pose, queue_size=10)
+
 
     def setup_suction_tool(self):
         """Enable to use suction tool."""
@@ -333,6 +336,7 @@ class AISTBaseRoutines(object):
 
         current_pose_in_world = group.get_current_pose()
         current_pose_in_workspace = self.listener.transformPose('workspace_center', current_pose_in_world)
+        self.actual_pose_pub.publish(current_pose_in_workspace.pose)
         rospy.loginfo("Target position: ")
         rospy.loginfo(pose_goal_stamped)
         rospy.loginfo("Current position: ")
