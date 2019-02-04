@@ -35,15 +35,15 @@ class LinearMotionCheckClass(AISTBaseRoutines):
             poses[8].pose.position.x = .0
         elif axis == 'y':
             rospy.loginfo(robot_name + 'do round trip on y-axis at intervals of 0.1 meter.')
-            poses[0].pose.position.x = .0
-            poses[1].pose.position.x = -.1
-            poses[2].pose.position.x = -.2
-            poses[3].pose.position.x = -.1
-            poses[4].pose.position.x = .0
-            poses[5].pose.position.x = .1
-            poses[6].pose.position.x = .2
-            poses[7].pose.position.x = .1
-            poses[8].pose.position.x = .0
+            poses[0].pose.position.y = .0
+            poses[1].pose.position.y = -.1
+            poses[2].pose.position.y = -.2
+            poses[3].pose.position.y = -.1
+            poses[4].pose.position.y = .0
+            poses[5].pose.position.y = .1
+            poses[6].pose.position.y = .2
+            poses[7].pose.position.y = .1
+            poses[8].pose.position.y = .0
         elif axis == 'z':
             rospy.loginfo(robot_name + 'do round trip on x-axis at intervals of 0.05 meter.')
             poses[0].pose.position.z = .005
