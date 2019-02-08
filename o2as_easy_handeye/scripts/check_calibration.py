@@ -31,9 +31,12 @@ class VisitRoutines:
     self.stop_acquisition  = rospy.ServiceProxy(cs + "stop_acquisition",
                                                 Trigger)
 
-    ## Initialize `moveit_commander`
+    # Initialize `moveit_commander`
     self.group_name = robot_name
     group = self.routines.groups[self.group_name]
+
+    # Initilaize tf listener
+    self.listener = tf.TransformListener()
 
     # Set `_ee_link` as end effector wrt `_base_link` of the robot
     group.set_pose_reference_frame("workspace_center")
@@ -77,6 +80,14 @@ class VisitRoutines:
               self.group_name, poseStamped, speed,
               end_effector_link=group.get_end_effector_link(),
               move_lin=False)
+    time = rospy.Time.now()
+    self.listener.waitForTransform(group.get_pose_reference_frame(),
+                                   group.get_end_effector_link(),
+                                   time, rospy.Duration(10))
+    poseReturned = self.listener.lookupTransform(
+                        group.get_pose_reference_frame(),
+                        group.get_end_effector_link(), time)
+    print("arrived at {}".format(poseReturned[0]))
 
 
   def go_home(self):
@@ -129,12 +140,12 @@ if __name__ == '__main__':
     base_routines = AISTBaseRoutines()
   else:
     base_routines = O2ASBaseRoutines()
-  camera_name   = args.camera_name
-  robot_name    = args.robot_name
+  camera_name = args.camera_name
+  robot_name  = args.robot_name
 
   assert(camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
   assert(robot_name  in {"a_bot", "b_bot", "c_bot"})
 
   routines = VisitRoutines(base_routines, camera_name, robot_name)
-  speed = 0.05
+  speed    = 0.05
   routines.run(speed)
