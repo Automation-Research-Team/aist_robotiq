@@ -57,7 +57,7 @@ class VisitRoutines:
                                       geometry_msgs.msg.Vector3Stamped, 10)
     self.stop_acquisition()
 
-    print("move to {}".format(position.vector))
+    print("*move to*\n{}".format(position.vector))
     group = self.routines.groups[self.group_name]
     poseStamped = geometry_msgs.msg.PoseStamped()
     poseStamped.header.frame_id = group.get_pose_reference_frame()
@@ -74,20 +74,17 @@ class VisitRoutines:
               end_effector_link=group.get_end_effector_link(),
               move_lin=False)
     rospy.sleep(1)
+
     poseStamped.pose.position.z = position.vector.z
     [all_close, move_success] \
         = self.routines.go_to_pose_goal(
               self.group_name, poseStamped, speed,
               end_effector_link=group.get_end_effector_link(),
               move_lin=False)
-    time = rospy.Time.now()
-    self.listener.waitForTransform(group.get_pose_reference_frame(),
-                                   group.get_end_effector_link(),
-                                   time, rospy.Duration(10))
-    poseReturned = self.listener.lookupTransform(
-                        group.get_pose_reference_frame(),
-                        group.get_end_effector_link(), time)
-    print("arrived at {}".format(poseReturned[0]))
+
+    poseReached = self.listener.transformPose(group.get_pose_reference_frame(),
+                                              group.get_current_pose())
+    print("*reached*\n{}".format(poseReached.pose.position))
 
 
   def go_home(self):
