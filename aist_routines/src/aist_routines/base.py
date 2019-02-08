@@ -170,15 +170,7 @@ class AISTBaseRoutines(object):
         rospy.logdebug("Going to height " + str(approach_pose.pose.position.z))
         self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast, move_lin=True)
 
-        if gripper_command=="complex_pick_from_inside":
-            self.precision_gripper_inner_close()
-        elif gripper_command=="complex_pick_from_outside":
-            self.precision_gripper_inner_open()
-        elif gripper_command=="easy_pick_only_inner" or gripper_command=="inner_gripper_from_inside":
-            self.precision_gripper_inner_close()
-        elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
-            self.precision_gripper_inner_open()
-        elif gripper_command=="suction":
+        if gripper_command=="suction":
             suck_res = self.suck(turn_suction_on=True, timeout=timeout)
         elif gripper_command=="none":
             pass
@@ -195,17 +187,7 @@ class AISTBaseRoutines(object):
 
 
         #gripper close
-        if gripper_command=="complex_pick_from_inside":
-            self.precision_gripper_inner_open(this_action_grasps_an_object = True)
-            self.precision_gripper_outer_close()
-        elif gripper_command=="complex_pick_from_outside":
-            self.precision_gripper_inner_close(this_action_grasps_an_object = True)
-            self.precision_gripper_outer_close()
-        elif gripper_command=="easy_pick_only_inner" or gripper_command=="inner_gripper_from_inside":
-            self.precision_gripper_inner_open(this_action_grasps_an_object = True)
-        elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
-            self.precision_gripper_inner_close(this_action_grasps_an_object = True)
-        elif gripper_command=="suction":
+        if gripper_command=="suction":
             pass
         elif gripper_command=="none":
             pass
@@ -237,17 +219,7 @@ class AISTBaseRoutines(object):
         self.go_to_pose_goal(robot_name, object_pose, speed=speed_slow, acceleration=acceleration, move_lin=True)
 
         #gripper open
-        if gripper_command=="complex_pick_from_inside":
-            self.precision_gripper_outer_open()
-            self.precision_gripper_inner_close()
-        elif gripper_command=="complex_pick_from_outside":
-            self.precision_gripper_outer_open()
-            self.precision_gripper_inner_open()
-        elif gripper_command=="easy_pick_only_inner" or gripper_command=="inner_gripper_from_inside":
-            self.precision_gripper_inner_close()
-        elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
-            self.precision_gripper_inner_open()
-        elif gripper_command=="suction":
+        if gripper_command=="suction":
             self.suck(turn_suction_on=False)
         elif gripper_command=="none":
             pass
