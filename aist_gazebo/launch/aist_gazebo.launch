@@ -23,10 +23,10 @@
   <!-- Do not change this without updating the home pose in aist_base_scene.srdf accordingly. -->
   <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model"
         args="-urdf -param robot_description -model aist_bots
-        -J a_bot_elbow_joint 1.57618 -J a_bot_shoulder_lift_joint -2.36605 -J a_bot_shoulder_pan_joint 1.57138
-        -J a_bot_wrist_1_joint -0.780539 -J a_bot_wrist_2_joint -1.57082 -J a_bot_wrist_3_joint 0
-        -J b_bot_elbow_joint 1.4      -J b_bot_shoulder_lift_joint -2.1  -J b_bot_shoulder_pan_joint 1.57
-        -J b_bot_wrist_1_joint -0.85  -J b_bot_wrist_2_joint -1.57       -J b_bot_wrist_3_joint 0
+        -J a_bot_elbow_joint 1.57618     -J a_bot_shoulder_lift_joint -2.36605 -J a_bot_shoulder_pan_joint 1.57138
+        -J a_bot_wrist_1_joint -0.780539 -J a_bot_wrist_2_joint -1.57082       -J a_bot_wrist_3_joint 0
+        -J b_bot_elbow_joint 1.57618     -J b_bot_shoulder_lift_joint -2.36605 -J b_bot_shoulder_pan_joint 1.57138
+        -J b_bot_wrist_1_joint -0.780539 -J b_bot_wrist_2_joint -1.57082       -J b_bot_wrist_3_joint 0
         -unpause" respawn="false" output="screen" />
   <include file="$(find aist_gazebo)/launch/controller_utils.launch"/>
 
