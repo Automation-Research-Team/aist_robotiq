@@ -25,29 +25,32 @@ class CalibrationClass(AISTBaseRoutines):
         rospy.loginfo("Calibration class is staring up!")
 
 
-    def touch_the_table(self):
+    def touch_the_table(self, robot_name):
         rospy.loginfo("Calibrating between robot and table.")
-        self.go_to_named_pose("home", "b_bot")
+        self.go_to_named_pose("home", robot_name)
 
         poses = []
         pose_b = geometry_msgs.msg.PoseStamped()
         pose_b.header.frame_id = "workspace_center"
-        pose_b.pose.orientation = self.downward_orientation
+        if robot_name == 'a_bot':
+            pose_b.pose.orientation = self.downward_orientation_a_bot
+        elif robot_name == 'b_bot':
+            pose_b.pose.orientation = self.downward_orientation
         pose_b.pose.position.x = .0
         pose_b.pose.position.y = .0
         pose_b.pose.position.z = .03
         rospy.loginfo("============ Going to 3 cm above the table. ============")
-        self.go_to_pose_goal("b_bot", pose_b, speed=0.5, acceleration=self.acceleration, high_precision=False, end_effector_link="", move_lin=True)
+        self.go_to_pose_goal(robot_name, pose_b, speed=0.5, acceleration=self.acceleration, high_precision=False, end_effector_link="", move_lin=True)
 
         rospy.loginfo("============ Press enter to go to 1 cm above the table. ============")
         i = raw_input()
         if not rospy.is_shutdown():
             pose_b.pose.position.z = .01
-            self.go_to_pose_goal("b_bot", pose_b, speed=0.01, acceleration=self.acceleration, high_precision=False, end_effector_link="", move_lin=True)
+            self.go_to_pose_goal(robot_name, pose_b, speed=0.01, acceleration=self.acceleration, high_precision=False, end_effector_link="", move_lin=True)
 
         rospy.loginfo("============ Press enter to go home. ============")
         raw_input()
-        self.go_to_named_pose("home", "b_bot")
+        self.go_to_named_pose("home", robot_name)
         return
 
 
@@ -61,7 +64,10 @@ class CalibrationClass(AISTBaseRoutines):
         poses = []
 
         pose0 = geometry_msgs.msg.PoseStamped()
-        pose0.pose.orientation = self.downward_orientation
+        if robot_name == 'a_bot':
+            pose0.pose.orientation = self.downward_orientation_a_bot
+        elif robot_name == 'b_bot':
+            pose0.pose.orientation = self.downward_orientation
         pose0.pose.position.z = 0.03
 
         for bin in self.bin_names:
@@ -85,7 +91,10 @@ class CalibrationClass(AISTBaseRoutines):
 
         pose0 = geometry_msgs.msg.PoseStamped()
         pose0.pose.position.z = 0.03
-        pose0.pose.orientation = self.downward_orientation
+        if robot_name == 'a_bot':
+            pose0.pose.orientation = self.downward_orientation_a_bot
+        elif robot_name == 'b_bot':
+            pose0.pose.orientation = self.downward_orientation
 
         for bin in self.bin_names:
             pose0.header.frame_id = bin
@@ -144,7 +153,10 @@ class CalibrationClass(AISTBaseRoutines):
 
         pose = geometry_msgs.msg.PoseStamped()
         pose.header.frame_id = "workspace_center"
-        pose.pose.orientation = self.downward_orientation
+        if robot_name == 'a_bot':
+            pose.pose.orientation = self.downward_orientation_a_bot
+        elif robot_name == 'b_bot':
+            pose.pose.orientation = self.downward_orientation
         pose.pose.position.x = float(raw_input("x >> "))
         pose.pose.position.y = float(raw_input("y >> "))
         pose.pose.position.z = float(raw_input("z >> "))
@@ -166,8 +178,9 @@ if __name__ == '__main__':
 
         while not rospy.is_shutdown():
             rospy.loginfo("============ Calibration procedures ============ ")
-            rospy.loginfo("1: Go home with b_bot")
-            rospy.loginfo("2: Touch the table (workspace_center)")
+            rospy.loginfo("1: Go home with all_bot (not implemented)")
+            rospy.loginfo("11, 12: Go home with a_bot, b_bot")
+            rospy.loginfo("211, 212: Touch the table (workspace_center) with a_bot, b_bot")
             rospy.loginfo("22: Workspace calibration with b_bot")
             rospy.loginfo("222: Interactive workspace calibration with b_bot")
             rospy.loginfo("322: Bins with b_bot")
@@ -175,10 +188,14 @@ if __name__ == '__main__':
             rospy.loginfo("x: Exit")
 
             i = raw_input()
-            if i == '1':
+            if i == '11':
+                c.go_to_named_pose("home", "a_bot")
+            elif i == '12':
                 c.go_to_named_pose("home", "b_bot")
-            elif i == '2':
-                c.touch_the_table()
+            elif i == '211':
+                c.touch_the_table('a_bot')
+            elif i == '212':
+                c.touch_the_table('b_bot')
             elif i == '22':
                 c.workspace_calibration("b_bot")
             elif i == '222':
