@@ -116,7 +116,7 @@ class AISTBaseRoutines(object):
         self.setup_suction_tool()
 
         self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
-        self.downward_orientation_a_bot = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/2,pi/2,0))
+        self.downward_orientation_a_bot = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0,pi/2,0))
 
         # For debugging of move_lin
         self.actual_pose_pub = rospy.Publisher('actual_pose', geometry_msgs.msg.Pose, queue_size=10)
