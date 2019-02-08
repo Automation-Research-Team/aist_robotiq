@@ -10,6 +10,13 @@ aist_base_scene:
 # Settings for ros_control hardware interface
   hardware_interface:
     joints:
+      - a_bot_shoulder_pan_joint
+      - a_bot_shoulder_lift_joint
+      - a_bot_elbow_joint
+      - a_bot_wrist_1_joint
+      - a_bot_wrist_2_joint
+      - a_bot_wrist_3_joint
+      - a_bot_robotiq_85_left_knuckle_joint
       - b_bot_shoulder_pan_joint
       - b_bot_shoulder_lift_joint
       - b_bot_elbow_joint
