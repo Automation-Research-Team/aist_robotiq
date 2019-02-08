@@ -121,14 +121,19 @@ class CalibrationClass(AISTBaseRoutines):
         rospy.loginfo(robot_name + " end effector should be 3 cm above the table.")
 
         if end_effector_link == "":
-            if robot_name == "b_bot":
+            if robot_name == "a_bot":
+                end_effector_link = "a_bot_robotiq_85_tip_link"
+            elif robot_name == "b_bot":
                 end_effector_link = "b_bot_single_suction_gripper_pad_link"
 
         pose0 = geometry_msgs.msg.PoseStamped()
         pose0.header.frame_id = "workspace_center"
         pose0.pose.position.y = 0.2
         pose0.pose.position.z = 0.01
-        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+        if robot_name == 'a_bot':
+            pose0.pose.orientation = self.downward_orientation_a_bot
+        elif robot_name == 'b_bot':
+            pose0.pose.orientation = self.downward_orientation
         poses = []
         for i in xrange(7):
             poses.append(copy.deepcopy(pose0))
@@ -148,7 +153,9 @@ class CalibrationClass(AISTBaseRoutines):
         rospy.loginfo(robot_name + " end effector should be 3 cm above the table.")
 
         if end_effector_link == "":
-            if robot_name == "b_bot":
+            if robot_name == "a_bot":
+                end_effector_link = "a_bot_robotiq_85_tip_link"
+            elif robot_name == "b_bot":
                 end_effector_link = "b_bot_single_suction_gripper_pad_link"
 
         pose = geometry_msgs.msg.PoseStamped()
@@ -181,8 +188,8 @@ if __name__ == '__main__':
             rospy.loginfo("1: Go home with all_bot (not implemented)")
             rospy.loginfo("11, 12: Go home with a_bot, b_bot")
             rospy.loginfo("211, 212: Touch the table (workspace_center) with a_bot, b_bot")
-            rospy.loginfo("22: Workspace calibration with b_bot")
-            rospy.loginfo("222: Interactive workspace calibration with b_bot")
+            rospy.loginfo("221, 222: Workspace calibration with a_bot, b_bot")
+            rospy.loginfo("231, 232: Interactive workspace calibration with b_bot")
             rospy.loginfo("322: Bins with b_bot")
             rospy.loginfo("332: Bin corners with b_bot")
             rospy.loginfo("x: Exit")
@@ -196,9 +203,13 @@ if __name__ == '__main__':
                 c.touch_the_table('a_bot')
             elif i == '212':
                 c.touch_the_table('b_bot')
-            elif i == '22':
-                c.workspace_calibration("b_bot")
+            elif i == '221':
+                c.workspace_calibration("a_bot")
             elif i == '222':
+                c.workspace_calibration("b_bot")
+            elif i == '231':
+                c.workspace_calibration_interactive("a_bot")
+            elif i == '232':
                 c.workspace_calibration_interactive("b_bot")
             elif i == '322':
                 c.bin_calibration(robot_name="b_bot")
