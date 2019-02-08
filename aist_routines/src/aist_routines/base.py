@@ -153,7 +153,7 @@ class AISTBaseRoutines(object):
 
         if go_home:
             rospy.loginfo("Moving all robots home again.")
-            self.go_to_named_pose("home", "b_bot")
+            self.go_to_named_pose("home", robot_name)
         return
 
 
