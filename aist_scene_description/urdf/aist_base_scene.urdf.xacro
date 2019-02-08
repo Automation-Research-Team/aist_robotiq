@@ -4,6 +4,9 @@
 
 
   <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
+  <xacro:property name="a_bot_x" value="0"/>
+  <xacro:property name="a_bot_y" value="-0.60"/>
+  <!-- <xacro:property name="a_bot_theta" value="${pi}"/> -->
   <xacro:property name="b_bot_x" value="0"/>
   <xacro:property name="b_bot_y" value="0.50"/>
   <xacro:property name="b_bot_theta" value="${pi}"/>
@@ -26,6 +29,9 @@
   <!-- Putting these at height 0.0 makes them intersect with the ground, so they are elevated. -->
   <!-- There are some instabilities when the box is big, for some reason. -->
   <xacro:include filename="$(find aist_scene_description)/urdf/aist_base.xacro" />
+  <xacro:aist_base boxname="a_bot_base_smfl" parent="o2as_ground">
+    <origin xyz="${a_bot_x-0.225/2} ${a_bot_y-0.225/2} 0.72" rpy="0 0 0" />
+  </xacro:aist_base>
   <xacro:aist_base boxname="b_bot_base_smfl" parent="o2as_ground">
     <origin xyz="${b_bot_x-0.225/2} ${b_bot_y-0.225/2} 0.72" rpy="0 0 0" />
   </xacro:aist_base>
@@ -46,6 +52,14 @@
   </joint>
 
   <!-- robot arms -->
+  <xacro:ur5_robot prefix="a_bot_" joint_limited="false"
+    shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
+    shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
+    elbow_joint_lower_limit="0.0" elbow_joint_upper_limit="${pi}"
+    wrist_1_lower_limit="${-pi}" wrist_1_upper_limit="${pi}"
+    wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
+    wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
+
   <xacro:ur5_robot prefix="b_bot_" joint_limited="false"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
@@ -55,13 +69,23 @@
     wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
 
   <link name="o2as_ground" />
+
+  <joint name="world_a_bot_joint" type="fixed">
+    <parent link="o2as_ground" />
+    <child link = "a_bot_base_link" />
+    <origin xyz="${a_bot_x} ${a_bot_y} ${bots_z}" rpy="0.0 0.0 0.0" />
+  </joint>
+
   <joint name="world_b_bot_joint" type="fixed">
     <parent link="o2as_ground" />
     <child link = "b_bot_base_link" />
     <origin xyz="${b_bot_x} ${b_bot_y} ${bots_z}" rpy="0.0 0.0 ${b_bot_theta}" />
   </joint>
 
-  <!-- Spawn and attach single suction gripper -->
+  <!-- Spawn and attach gripper -->
+  <xacro:include filename="$(find aist_scene_description)/urdf/robotiq_85_gripper_with_ft300.urdf.xacro" />
+  <xacro:robotiq_85_gripper_with_ft300 prefix="a_bot_" parent="a_bot_ee_link" />
+
   <xacro:include filename="$(find aist_scene_description)/urdf/single_suction_gripper_with_ft300.urdf.xacro" />
   <xacro:single_suction_gripper_with_ft300 prefix="b_bot_" parent = "b_bot_ee_link" />
 
