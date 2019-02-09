@@ -6,6 +6,7 @@ import copy
 import rospy
 import argparse
 import moveit_msgs.msg
+
 from geometry_msgs import msg as msg
 from tf import TransformBroadcaster, TransformListener, \
                TransformerROS, transformations as tfs
@@ -65,7 +66,6 @@ class ToolCalibrationRoutines:
   def go_home(self):
     self.routines.go_to_named_pose('home', self.group_name)
 
-
   def correct_end_effector_link(self):
     D = tfs.concatenate_matrices(
           self.listener.fromTranslationRotation(
@@ -80,6 +80,9 @@ class ToolCalibrationRoutines:
       rospy.Time.now(),
       group.get_end_effector_link() + '_corrected', self.gripper_base_link)
     rate.sleep()
+
+
+  def print_propmt():
 
 
   def move(self, pose):
@@ -97,11 +100,17 @@ class ToolCalibrationRoutines:
     poseStamped.header.frame_id = group.get_pose_reference_frame()
     poseStamped.pose = msg.Pose(msg.Point(*tfs.translation_from_matrix(T)),
                                 msg.Quaternion(*tfs.quaternion_from_matrix(T)))
+    print("*move to*\n{}".format(poseStamped.pose.position))
     [all_close, move_success] \
       = self.routines.go_to_pose_goal(
                             self.group_name, poseStamped, self.speed,
                             end_effector_link=group.get_end_effector_link(),
                             move_lin=False)
+    rospy.sleep(1)
+    poseReached = self.listener.transformPose(group.get_pose_reference_frame(),
+                                              group.get_current_pose())
+    print("*reached*\n{}\n".format(poseReached.pose.position))
+
     return move_success
 
 
@@ -180,18 +189,36 @@ class ToolCalibrationRoutines:
         self.rolling_motion()
         self.pitching_motion()
         self.yawing_motion()
+      elif key == 'X':
+        axis = 'X    '
+      elif key == 'Y':
+        axis = 'Y    '
+      elif key == 'Z':
+        axis = 'Z    '
       elif key == 'P':
         axis = 'Pitch'
       elif key == 'Y':
         axis = 'Yaw  '
       elif key == '+':
-        if axis == 'Pitch':
+        if axis == 'X    ':
+          self.refpose[0] += 0.01
+        elif axis == 'Y    ':
+          self.refpose[1] += 0.01
+        elif axis == 'Z    ':
+          self.refpose[2] += 0.01
+        elif axis == 'Pitch':
           self.pitch += radians(0.5)
         else:
           self.yaw   += radians(0.5)
         self.move(self.refpose)
       elif key == '-':
-        if axis == 'Pitch':
+        if axis == 'X    ':
+          self.refpose[0] -= 0.01
+        elif axis == 'Y    ':
+          self.refpose[1] -= 0.01
+        elif axis == 'Z    ':
+          self.refpose[2] -= 0.01
+        elif axis == 'Pitch':
           self.pitch -= radians(0.5)
         else:
           self.yaw   -= radians(0.5)
@@ -199,7 +226,13 @@ class ToolCalibrationRoutines:
       elif key == 'd':
         self.print_tip_link()
       else:
-        if axis == 'Pitch':
+        if axis == 'X    ':
+          self.refpose[0] = float(key)
+        elif axis == 'Y    ':
+          self.refpose[1] = float(key)
+        elif axis == 'Z    ':
+          self.refpose[2] = float(key)
+        elif axis == 'Pitch':
           self.pitch = radians(float(key))
         else:
           self.yaw   = radians(float(key))

@@ -1,12 +1,18 @@
+<?xml version="1.0" ?>
 <launch>
-
   <arg name="marker_size"	default="0.070"/>    <!-- in m -->
-  <arg name="reference_frame"	default="workspace_center"/> 
-  <arg name="camera_frame"	default="a_phoxi_m_sensor"/>
-  <arg name="marker_frame"	default="camera_marker"/>
-  <arg name="corner_refinement"	default="LINES"/>
+  <arg name="robot_name"	default="b_bot"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
 
+  <arg name="eye_on_hand" type="bool"
+       value="$(eval arg('camera_name') == arg('robot_name') + '_camera')"/>
+
+  <!-- <include file="$(find o2as_easy_handeye)/launch/o2as_publish.launch"> -->
+  <!--   <arg name="robot_name"	value="$(arg robot_name)" /> -->
+  <!--   <arg name="camera_name"	value="$(arg camera_name)" /> -->
+  <!-- </include> -->
+
+  <!-- Start ArUco -->
   <node name="aruco_tracker" pkg="o2as_aruco_ros" type="o2as_single"
 	output="screen">
     <remap from="/camera_info"	to="/$(arg camera_name)/camera_info"
@@ -15,6 +21,7 @@
 	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/pointcloud"	to="/$(arg camera_name)/pointcloud"
 	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
+
     <remap from="/camera_info"	to="/$(arg camera_name)/rgb/camera_info"
 	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/image"	to="/$(arg camera_name)/rgb/image_raw"
@@ -24,12 +31,11 @@
 
     <!-- Other parameters -->
     <param name="image_is_rectified"	value="false"/>
-    <param name="marker_id"		value="0"/>
     <param name="marker_size"		value="$(arg marker_size)"/>
-    <param name="reference_frame"	value="$(arg reference_frame)"/>
-    <param name="camera_frame"		value="$(arg camera_frame)"/>
-    <param name="marker_frame"		value="$(arg marker_frame)"/>
-    <param name="corner_refinement"	value="$(arg corner_refinement)"/>
+    <param name="marker_id"		value="0"/>
+    <param name="reference_frame"   	value="workspace_center"/>
+    <param name="camera_frame"
+	   value="$(arg camera_name)_from_$(arg robot_name)"/>
   </node>
 
   <arg name="command_args"
@@ -40,4 +46,3 @@
   <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
 
 </launch>
-
