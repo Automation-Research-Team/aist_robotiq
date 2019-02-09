@@ -5,7 +5,7 @@
   <arg name="reference_frame"			default=""/>
   <arg name="camera_frame"			default="camera_link"/>
 
-  <arg name="marker_id"		value="26"	unless="$(arg eye_on_hand)"/>
+  <arg name="marker_id"		default="26"	unless="$(arg eye_on_hand)"/>
   <arg name="marker_id"		value="32"	if    ="$(arg eye_on_hand)"/>
 
   <arg name="marker_size"	value="0.07"	unless="$(arg eye_on_hand)"/>

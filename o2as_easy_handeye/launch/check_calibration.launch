@@ -2,6 +2,7 @@
 <launch>
   <arg name="robot_name"	default="b_bot"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
+  <arg name="marker_id"		default="26"/>
   <arg name="config"		default="aist"/>
 
   <arg name="eye_on_hand" type="bool"
@@ -19,6 +20,7 @@
     <arg name="reference_frame"	value="workspace_center"/>
     <arg name="camera_frame"
 	 value="$(arg camera_name)_from_$(arg robot_name)"/>
+    <arg name="marker_id"	value="$(arg marker_id)"/>
   </include>
 
   <!-- Start robot controller -->
