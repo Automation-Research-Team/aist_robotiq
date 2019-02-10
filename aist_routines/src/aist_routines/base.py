@@ -107,6 +107,7 @@ class AISTBaseRoutines(object):
         self.robots = moveit_commander.RobotCommander()
         self.planning_scene = moveit_commander.PlanningSceneInterface()
         self.groups = {
+            "a_bot": moveit_commander.MoveGroupCommander("a_bot"),
             "b_bot": moveit_commander.MoveGroupCommander("b_bot")
         }
         self.listener = tf.TransformListener()
@@ -115,6 +116,7 @@ class AISTBaseRoutines(object):
         self.setup_suction_tool()
 
         self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+        self.downward_orientation_a_bot = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0,pi/2,0))
 
         # For debugging of move_lin
         self.actual_pose_pub = rospy.Publisher('actual_pose', geometry_msgs.msg.Pose, queue_size=10)
@@ -151,7 +153,7 @@ class AISTBaseRoutines(object):
 
         if go_home:
             rospy.loginfo("Moving all robots home again.")
-            self.go_to_named_pose("home", "b_bot")
+            self.go_to_named_pose("home", robot_name)
         return
 
 
@@ -277,7 +279,9 @@ class AISTBaseRoutines(object):
         group = self.groups[group_name]
 
         if end_effector_link == "":
-            if group_name == "b_bot":
+            if group_name == 'a_bot':
+                end_effector_link = 'a_bot_robotiq_85_tip_link'
+            elif group_name == "b_bot":
                 end_effector_link = "b_bot_single_suction_gripper_pad_link"
         group.set_end_effector_link(end_effector_link)
 
@@ -307,7 +311,9 @@ class AISTBaseRoutines(object):
         # self.publish_marker(pose_goal_stamped, "pose")
 
         if end_effector_link == "":
-            if group_name == "b_bot":
+            if group_name == 'a_bot':
+                end_effector_link = 'a_bot_robotiq_85_tip_link'
+            elif group_name == "b_bot":
                 end_effector_link = "b_bot_single_suction_gripper_pad_link"
 
         group = self.groups[group_name]
