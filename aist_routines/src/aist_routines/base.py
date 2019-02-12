@@ -189,7 +189,7 @@ class AISTBaseRoutines(object):
         rospy.loginfo(result)
         return
 
-    def pick(self, robot_name, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False, lift_up_after_pick=True, timeout=3.0):
+    def pick(self, robot_name, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height, special_pick = False, lift_up_after_pick=True, timeout=3.0):
         self.publish_marker(object_pose, "pick_pose")
         if speed_fast > 1.0:
             acceleration=speed_fast
@@ -208,15 +208,9 @@ class AISTBaseRoutines(object):
             pass
         else:
             self.send_gripper_command(gripper=robot_name, command="open")
-
         rospy.loginfo("Moving down to object")
         rospy.logdebug("Going to height " + str(object_pose.pose.position.z))
-        # if gripper_command=="suction":
-        #     self.do_linear_push(robot_name, force=5.0, wait=True, direction='Z+', max_approach_distance=0.92, forward_speed=0.1)
-        # else:
-        #     self.go_to_pose_goal(robot_name, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
         self.go_to_pose_goal(robot_name, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
-
 
         #gripper close
         if gripper_command=="suction":
