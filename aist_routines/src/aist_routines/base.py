@@ -49,6 +49,7 @@ import tf_conversions
 import moveit_commander
 from moveit_commander.conversions import pose_to_list
 import ur_modern_driver.msg
+import robotiq_msgs.msg
 
 import o2as_msgs.msg
 import o2as_msgs.srv
@@ -103,12 +104,15 @@ class AISTBaseRoutines(object):
     def __init__(self):
         moveit_commander.roscpp_initialize(sys.argv)
         rospy.init_node("kitting_task", anonymous=True)
-
+        self.use_real_robot = rospy.get_param('use_real_robot', False)
         self.robots = moveit_commander.RobotCommander()
         self.planning_scene = moveit_commander.PlanningSceneInterface()
         self.groups = {
             "a_bot": moveit_commander.MoveGroupCommander("a_bot"),
             "b_bot": moveit_commander.MoveGroupCommander("b_bot")
+        }
+        self.gripper_action_clients = {
+            'a_bot': actionlib.SimpleActionClient('/a_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction)
         }
         self.listener = tf.TransformListener()
         self.publishMarker_client = rospy.ServiceProxy('/aist_skills/publishMarker', o2as_msgs.srv.publishMarker)
@@ -156,6 +160,34 @@ class AISTBaseRoutines(object):
             self.go_to_named_pose("home", robot_name)
         return
 
+    def send_gripper_command(self, gripper, command, force = 5.0, velocity = .1, wait=True):
+        if not self.use_real_robot:
+            return True
+        if gripper == 'a_bot':
+            goal = robotiq_msgs.msg.CModelCommandGoal()
+            action_client = self.gripper_action_clients[gripper]
+            goal.velocity = velocity
+            goal.force = force
+            if command == 'close':
+                goal.position = 0.0
+            elif command == 'open':
+                goal.position = 0.085
+            else:
+                goal.position = command
+                rospy.loginfo('Gripper open ' + str(command) + 'mm.')
+        else:
+            try:
+                rospy.logerr('Could not parse gripper command: ' + str(command) + ' for gripper ' + str(gripper))
+            except:
+                pass
+        action_client.send_goal(goal)
+        rospy.sleep(.5)  # This sleep is necessary for robotiq gripper to work just as intended.
+        rospy.loginfo('Sending command ' + str(command) + 'to gripper: ' + gripper)
+        if wait:
+            action_client.wait_for_result(rospy.Duration(6.0))
+        result = action_client.get_result()
+        rospy.loginfo(result)
+        return
 
     def pick(self, robot_name, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False, lift_up_after_pick=True, timeout=3.0):
         self.publish_marker(object_pose, "pick_pose")
