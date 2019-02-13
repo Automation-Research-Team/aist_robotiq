@@ -172,9 +172,11 @@ class AISTBaseRoutines(object):
                 goal.position = 0.0
             elif command == 'open':
                 goal.position = 0.085
-            else:
+            elif command >= 0.0 and command <= 0.085:
                 goal.position = command
                 rospy.loginfo('Gripper open ' + str(command) + 'mm.')
+            else:
+                rospy.logerr('Gripper command is invalid. (command: ' + str(command) + ')')
         else:
             try:
                 rospy.logerr('Could not parse gripper command: ' + str(command) + ' for gripper ' + str(gripper))
