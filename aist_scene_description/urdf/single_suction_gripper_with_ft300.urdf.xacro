@@ -31,7 +31,9 @@
     <xacro:include filename="$(find o2as_scene_description)/urdf/single_suction_gripper.urdf.xacro" />
 
     <xacro:single_suction_gripper_o2as prefix="${prefix}" parent="${parent}">
-        <origin rpy="0.0 0.0 0.0" xyz="${ft300_length} 0.0 0.0"/>
+      <origin rpy="0.0 0.0 0.0" xyz="${ft300_length} 0.0 0.0"/>
+      <!-- <oeigin rpy="${0.0*pi/180} ${1.5*pi/180} ${-0.3*pi/180}" -->
+      <!-- 	      xyz="${ft300_length} 0.0 0.0"/> -->
     </xacro:single_suction_gripper_o2as>
 
   </xacro:macro>

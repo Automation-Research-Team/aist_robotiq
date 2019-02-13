@@ -111,6 +111,7 @@ class AISTBaseRoutines(object):
             "b_bot": moveit_commander.MoveGroupCommander("b_bot")
         }
         self.listener = tf.TransformListener()
+        self.use_real_robot = rospy.get_param("use_real_robot")
         self.publishMarker_client = rospy.ServiceProxy('/aist_skills/publishMarker', o2as_msgs.srv.publishMarker)
         self.urscript_client = rospy.ServiceProxy('/o2as_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR)
         self.setup_suction_tool()

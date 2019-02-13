@@ -7,9 +7,9 @@ import rospy
 import argparse
 import moveit_msgs.msg
 import geometry_msgs.msg
-import tf
 
 from math import radians, degrees
+from tf   import transformations as tfs
 
 from std_msgs.msg import String
 from std_srvs.srv import Empty
@@ -29,7 +29,7 @@ from cv_bridge import CvBridge, CvBridgeError
 initposes = {
   'a_phoxi_m_camera': {
     'a_bot':[ 0.10, -0.10, 0.20, radians(-90), radians( 90), radians(0)],
-    'b_bot':[ 0.20,  0.15, 0.30, radians(  0), radians( 90), radians(0)],
+    'b_bot':[ 0.16,  0.12, 0.45, radians(  0), radians( 90), radians(0)],
     'c_bot':[-0.30,  0.00, 0.35, radians(  0), radians( 90), radians(0)],
   },
   'a_bot_camera': {
@@ -41,23 +41,23 @@ initposes = {
 aist_keyposes = {
   'a_phoxi_m_camera': {
     'a_bot': [
-      [0.55, -0.10, 0.13, radians(-60), radians( 25), radians(0)],
-      [0.55,  0.00, 0.13, radians(-60), radians( 25), radians(0)],
-      [0.55,  0.10, 0.13, radians(-60), radians( 25), radians(0)],
+      [0.15, -0.10, 0.13, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.00, 0.13, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.10, 0.13, radians( 30), radians( 25), radians(0)],
 
-      [0.50,  0.10, 0.23, radians(-60), radians( 25), radians(0)],
-      [0.50,  0.00, 0.23, radians(-60), radians( 25), radians(0)],
-      [0.50, -0.10, 0.23, radians(-60), radians( 25), radians(0)],
+      [0.15,  0.10, 0.23, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.00, 0.23, radians( 30), radians( 25), radians(0)],
+      [0.15, -0.10, 0.23, radians( 30), radians( 25), radians(0)],
     ],
 
     'b_bot': [
-      [0.15,  0.20, 0.16, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.25, 0.16, radians( 30), radians( 25), radians(0)],
       [0.15,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
-      [0.15, -0.00, 0.16, radians( 30), radians( 25), radians(0)],
+      [0.15, -0.05, 0.16, radians( 30), radians( 25), radians(0)],
 
-      [0.15, -0.00, 0.25, radians( 30), radians( 25), radians(0)],
+      [0.15, -0.05, 0.25, radians( 30), radians( 25), radians(0)],
       [0.15,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
-      [0.15,  0.20, 0.25, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.25, 0.25, radians( 30), radians( 25), radians(0)],
 
       # [0.40,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
       # #[0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
@@ -137,17 +137,28 @@ o2as_keyposes = {
 
 
 ######################################################################
+#  global functions                                                  #
+######################################################################
+def format_pose(pose):
+  rpy = map(degrees, tfs.euler_from_quaternion(
+                        [pose.orientation.w, pose.orientation.x,
+                         pose.orientation.y, pose.orientation.z]))
+  return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
+    pose.position.x, pose.position.y, pose.position.z, rpy[0], rpy[1], rpy[2])
+
+
+######################################################################
 #  class HandEyeCalibrationRoutines                                  #
 ######################################################################
 class HandEyeCalibrationRoutines:
   def __init__(self, routines, camera_name, robot_name,
-               speed, sleep_time, needs_trigger, needs_calib):
+               speed, sleep_time, needs_calib):
     self.routines    = routines
     self.camera_name = camera_name
     self.speed       = speed
     self.sleep_time  = sleep_time
 
-    if needs_trigger:
+    if self.routines.use_real_robot:
       cs = "/{}/".format(camera_name)
       self.start_acquisition = rospy.ServiceProxy(cs + "start_acquisition",
                                                   Trigger)
@@ -181,11 +192,9 @@ class HandEyeCalibrationRoutines:
     group = self.routines.groups[self.group_name]
 
     # Set `_ee_link` as end effector wrt `_base_link` of the robot
+    #group.set_planning_frame("workspace_center")
     group.set_pose_reference_frame("workspace_center")
-    if robot_name == "a_bot":
-      group.set_end_effector_link(robot_name + "_gripper_tip_link")
-    else:
-      group.set_end_effector_link(robot_name + "_ee_link")
+    group.set_end_effector_link(robot_name + "_ee_link")
 
     # Logging
     print("==== Planning frame:       %s" % group.get_planning_frame())
@@ -205,21 +214,25 @@ class HandEyeCalibrationRoutines:
 
 
   def move(self, pose):
-    print("move to {}".format(pose))
     group = self.routines.groups[self.group_name]
-    poseStamped                 = geometry_msgs.msg.PoseStamped()
-    poseStamped.header.frame_id = group.get_pose_reference_frame()
-    poseStamped.pose.position.x = pose[0]
-    poseStamped.pose.position.y = pose[1]
-    poseStamped.pose.position.z = pose[2]
-    poseStamped.pose.orientation \
-      = geometry_msgs.msg.Quaternion(
-        *tf.transformations.quaternion_from_euler(pose[3], pose[4], pose[5]))
+    poseStamped                  = geometry_msgs.msg.PoseStamped()
+    poseStamped.header.frame_id  = group.get_pose_reference_frame()
+    poseStamped.pose.position.x  = pose[0]
+    poseStamped.pose.position.y  = pose[1]
+    poseStamped.pose.position.z  = pose[2]
+    poseStamped.pose.orientation = geometry_msgs.msg.Quaternion(
+                                     *tfs.quaternion_from_euler(
+                                       pose[3], pose[4], pose[5]))
+    print("     move to " + format_pose(poseStamped.pose))
     [all_close, move_success] \
       = self.routines.go_to_pose_goal(
                             self.group_name, poseStamped, self.speed,
                             end_effector_link=group.get_end_effector_link(),
                             move_lin=False)
+    poseReached = self.routines.listener.transformPose(
+                        group.get_pose_reference_frame(),
+                        group.get_current_pose())
+    print("  reached to " + format_pose(poseReached.pose))
     return move_success
 
 
@@ -348,8 +361,6 @@ if __name__ == '__main__':
                       action='store', nargs='?',
                       default='b_bot', type=str, choices=None,
                       help='robot name', metavar=None)
-  parser.add_argument('-s', '--sim', action='store_true',
-                      help='simulation mode')
   parser.add_argument('-v', '--visit', action='store_true',
                       help='only visit calibration points')
 
@@ -362,7 +373,6 @@ if __name__ == '__main__':
       base_routines = O2ASBaseRoutines()
     camera_name   = args.camera_name
     robot_name    = args.robot_name
-    needs_trigger = not args.sim
     needs_calib   = not args.visit
 
     assert(camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
@@ -373,7 +383,7 @@ if __name__ == '__main__':
     routines   = HandEyeCalibrationRoutines(base_routines,
                                             camera_name, robot_name,
                                             speed, sleep_time,
-                                            needs_trigger, needs_calib)
+                                            needs_calib)
 
     print("=== Calibration started for {} + {} ===".format(camera_name,
                                                            robot_name))
