@@ -16,11 +16,22 @@ from aist_routines.base import AISTBaseRoutines
 
 
 refposes = {
-  'a_bot':[ 0.10, -0.10, 0.20, radians(-90), radians( 90), radians(0)],
+  'a_bot':[-0.10, -0.10, 0.20, radians(-90), radians( 90), radians(0)],
   # 'b_bot':[ 0.20,  0.10, 0.081, radians(  0), radians( 90), radians(-90)],
-  'b_bot':[ 0.0,  0.0, 0.01, radians(  0), radians( 90), radians(-90)],
+  'b_bot':[ 0.1,  0.0, 0.1, radians(  0), radians( 90), radians(-90)],
   'c_bot':[-0.30,  0.00, 0.35, radians(  0), radians( 90), radians(0)],
 }
+
+
+######################################################################
+#  global functions                                                  #
+######################################################################
+def format_pose(pose):
+  rpy = map(degrees, tfs.euler_from_quaternion(
+                        [pose.orientation.w, pose.orientation.x,
+                         pose.orientation.y, pose.orientation.z]))
+  return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
+    pose.position.x, pose.position.y, pose.position.z, rpy[0], rpy[1], rpy[2])
 
 
 ######################################################################
@@ -42,8 +53,8 @@ class ToolCalibrationRoutines:
       gripper_base_link = robot_name + '_single_suction_gripper_base_link'
       gripper_tip_link  = robot_name + '_single_suction_gripper_pad_link'
     else:
-      gripper_base_link = robot_name + '_gripper_base_link'
-      gripper_tip_link  = robot_name + '_gripper_tip_link'
+      gripper_base_link = robot_name + '_robotiq_85_base_link'
+      gripper_tip_link  = robot_name + '_robotiq_85_tip_link'
     self.gripper_base_link = gripper_base_link
     group.set_end_effector_link(gripper_tip_link)
 
@@ -52,13 +63,13 @@ class ToolCalibrationRoutines:
     print("==== Pose reference frame: %s" % group.get_pose_reference_frame())
     print("==== End effector link:    %s" % group.get_end_effector_link())
 
-    self.listener = TransformListener()
     now = rospy.Time.now()
-    self.listener.waitForTransform(gripper_base_link, gripper_tip_link,
-                                   now, rospy.Duration(10))
-    self.D0 = self.listener.fromTranslationRotation(
-                *self.listener.lookupTransform(gripper_base_link,
-                                               gripper_tip_link, now))
+    self.routines.listener.waitForTransform(gripper_base_link,
+                                            gripper_tip_link,
+                                            now, rospy.Duration(10))
+    self.D0 = self.routines.listener.fromTranslationRotation(
+                *self.routines.listener.lookupTransform(gripper_base_link,
+                                                        gripper_tip_link, now))
     self.pitch = 0.0
     self.yaw   = 0.0
 
@@ -66,9 +77,10 @@ class ToolCalibrationRoutines:
   def go_home(self):
     self.routines.go_to_named_pose('home', self.group_name)
 
+
   def correct_end_effector_link(self):
     D = tfs.concatenate_matrices(
-          self.listener.fromTranslationRotation(
+          self.routines.listener.fromTranslationRotation(
             (0, 0, 0), tfs.quaternion_from_euler(0, self.pitch, self.yaw)),
           self.D0)
     group = self.routines.groups[self.group_name]
@@ -82,16 +94,13 @@ class ToolCalibrationRoutines:
     rate.sleep()
 
 
-  def print_propmt():
-
-
   def move(self, pose):
-    R = self.listener.fromTranslationRotation(
+    R = self.routines.listener.fromTranslationRotation(
             (0, 0, 0), tfs.quaternion_from_euler(0, self.pitch, self.yaw))
     T = tfs.concatenate_matrices(
-          self.listener.fromTranslationRotation((pose[0], pose[1], pose[2]),
-                                                tfs.quaternion_from_euler(
-                                                  pose[3], pose[4], pose[5])),
+          self.routines.listener.fromTranslationRotation(
+            (pose[0], pose[1], pose[2]),
+            tfs.quaternion_from_euler(pose[3], pose[4], pose[5])),
           tfs.inverse_matrix(self.D0),
           tfs.inverse_matrix(R),
           self.D0)
@@ -100,17 +109,17 @@ class ToolCalibrationRoutines:
     poseStamped.header.frame_id = group.get_pose_reference_frame()
     poseStamped.pose = msg.Pose(msg.Point(*tfs.translation_from_matrix(T)),
                                 msg.Quaternion(*tfs.quaternion_from_matrix(T)))
-    print("*move to*\n{}".format(poseStamped.pose.position))
+    print("     move to " + format_pose(poseStamped.pose))
     [all_close, move_success] \
       = self.routines.go_to_pose_goal(
                             self.group_name, poseStamped, self.speed,
                             end_effector_link=group.get_end_effector_link(),
                             move_lin=False)
     rospy.sleep(1)
-    poseReached = self.listener.transformPose(group.get_pose_reference_frame(),
-                                              group.get_current_pose())
-    print("*reached*\n{}\n".format(poseReached.pose.position))
-
+    poseReached = self.routines.listener.transformPose(
+                        group.get_pose_reference_frame(),
+                        group.get_current_pose())
+    print("  reached to " + format_pose(poseReached.pose))
     return move_success
 
 
@@ -156,7 +165,7 @@ class ToolCalibrationRoutines:
 
 
   def print_tip_link(self):
-    R   = self.listener.fromTranslationRotation(
+    R   = self.routines.listener.fromTranslationRotation(
             (0, 0, 0), tfs.quaternion_from_euler(0, self.pitch, self.yaw))
     D   = tfs.concatenate_matrices(R, self.D0)
     xyz = tfs.translation_from_matrix(D)
@@ -266,7 +275,7 @@ if __name__ == '__main__':
     else:
       base_routines = O2ASBaseRoutines()
 
-    speed    = 1
+    speed    = 0.05
     routines = ToolCalibrationRoutines(base_routines, args.robot_name, speed)
 
     routines.run()

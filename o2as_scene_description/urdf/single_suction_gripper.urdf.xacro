@@ -17,8 +17,8 @@
       </visual>
       <collision>
       <!-- avoid collision -->
-        <origin xyz="0.188 -0.035 -0.035" rpy="0 0 ${pi/2}"/>
-	<!-- <origin xyz="0.187 -0.035 -0.035" rpy="0 0 ${pi/2}"/> -->
+        <!-- <origin xyz="0.188 -0.035 -0.035" rpy="0 0 ${pi/2}"/> -->
+	<origin xyz="0.187 -0.035 -0.035" rpy="0 0 ${pi/2}"/>
 	<geometry>
 	  <mesh filename="package://o2as_scene_description/meshes/single_suction_gripper.vhacd.dae" scale="0.001 0.001 0.001"/>
 	</geometry>
@@ -32,7 +32,7 @@
     <joint name="${prefix}single_suction_gripper_joint" type="fixed">
       <parent link="${parent}"/>
       <child  link="${prefix}single_suction_gripper_base_link"/>
-       <xacro:insert_block name="origin"/>
+      <xacro:insert_block name="origin"/>
     </joint>
 
     <!-- A link representing the tip of the pad and a joint attaching
@@ -41,10 +41,7 @@
     <joint name="${prefix}single_suction_gripper_pad_joint" type="fixed">
       <parent link="${prefix}single_suction_gripper_base_link"/>
       <child  link="${prefix}single_suction_gripper_pad_link"/>
-      <!-- <origin xyz="0.187 0 0" rpy="0 0 0"/> -->
-      <origin xyz="0.186933357299 -0.000978789714711
-		   -0.00489508933357"
-	      rpy="${0.0*pi/180} ${1.5*pi/180} ${-0.3*pi/180}"/>>
+      <origin xyz="0.187 0 0" rpy="0 0 0"/>
     </joint>
 
   </xacro:macro>
