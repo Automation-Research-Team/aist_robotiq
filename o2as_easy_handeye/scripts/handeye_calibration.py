@@ -40,7 +40,7 @@ initposes = {
 termposes = {
   'a_phoxi_m_camera': {
     'a_bot':[ 0.10, -0.10, 0.20, radians(-90), radians( 90), radians(0)],
-    'b_bot':[ 0.15,  0.20, 0.30, radians(  0), radians( 90), radians(0)],
+    'b_bot':[ 0.1,   0.06, 0.535, radians(  0), radians( 90), radians(0)],
     'c_bot':[-0.30,  0.00, 0.35, radians(  0), radians( 90), radians(0)],
   },
   'a_bot_camera': {

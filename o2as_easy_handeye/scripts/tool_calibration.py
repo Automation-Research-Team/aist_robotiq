@@ -18,7 +18,7 @@ from aist_routines.base import AISTBaseRoutines
 refposes = {
   'a_bot':[-0.10, -0.10, 0.20, radians(-90), radians( 90), radians(0)],
   # 'b_bot':[ 0.20,  0.10, 0.081, radians(  0), radians( 90), radians(-90)],
-  'b_bot':[ 0.1,  0.0, 0.1, radians(  0), radians( 90), radians(-90)],
+  'b_bot':[ 0.05,  0.19, 0.17, radians(  0), radians( 90), radians(-90)],
   'c_bot':[-0.30,  0.00, 0.35, radians(  0), radians( 90), radians(0)],
 }
 
