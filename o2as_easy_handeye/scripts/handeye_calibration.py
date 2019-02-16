@@ -29,7 +29,18 @@ from cv_bridge import CvBridge, CvBridgeError
 initposes = {
   'a_phoxi_m_camera': {
     'a_bot':[ 0.10, -0.10, 0.20, radians(-90), radians( 90), radians(0)],
-    'b_bot':[ 0.16,  0.12, 0.45, radians(  0), radians( 90), radians(0)],
+    'b_bot':[ 0.10,  0.10, 0.35, radians(  0), radians( 90), radians(0)],
+    'c_bot':[-0.30,  0.00, 0.35, radians(  0), radians( 90), radians(0)],
+  },
+  'a_bot_camera': {
+    'a_bot':[ 0.00, -0.20, 0.20, radians(0), radians( 90), radians(0)],
+  }
+}
+
+termposes = {
+  'a_phoxi_m_camera': {
+    'a_bot':[ 0.10, -0.10, 0.20, radians(-90), radians( 90), radians(0)],
+    'b_bot':[ 0.15,  0.20, 0.30, radians(  0), radians( 90), radians(0)],
     'c_bot':[-0.30,  0.00, 0.35, radians(  0), radians( 90), radians(0)],
   },
   'a_bot_camera': {
@@ -51,13 +62,13 @@ aist_keyposes = {
     ],
 
     'b_bot': [
-      [0.15,  0.25, 0.16, radians( 30), radians( 25), radians(0)],
-      [0.15,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
-      [0.15, -0.05, 0.16, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.20, 0.16, radians( 30), radians( 25), radians(0)],
+      # [0.15,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
+      # [0.15, -0.00, 0.16, radians( 30), radians( 25), radians(0)],
 
-      [0.15, -0.05, 0.25, radians( 30), radians( 25), radians(0)],
-      [0.15,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
-      [0.15,  0.25, 0.25, radians( 30), radians( 25), radians(0)],
+      # [0.15, -0.00, 0.25, radians( 30), radians( 25), radians(0)],
+      # [0.15,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
+      [0.15,  0.20, 0.25, radians( 30), radians( 25), radians(0)],
 
       # [0.40,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
       # #[0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
@@ -312,7 +323,7 @@ class HandEyeCalibrationRoutines:
     # q_rotated = tf_conversions.transformations.quaternion_multiply(quaternion_0, q_rotate_30_in_y)
     # poseStamped.pose.orientation = geometry_msgs.msg.Quaternion(*q_rotated)
 
-  def run(self, initpose, keyposes):
+  def run(self, initpose, keyposes, termpose):
     if self.stop_acquisition:
       self.stop_acquisition()
 
@@ -324,7 +335,6 @@ class HandEyeCalibrationRoutines:
 
     # Reset pose
     self.go_home()
-
     self.move(initpose)
 
     # Collect samples over pre-defined poses
@@ -341,6 +351,7 @@ class HandEyeCalibrationRoutines:
       self.save_calibration()
 
     # Reset pose
+    self.move(termpose)
     self.go_home()
 
 
@@ -391,7 +402,8 @@ if __name__ == '__main__':
     keyposes = aist_keyposes if args.config == 'aist' else o2as_keyposes
 
     routines.run(initposes[camera_name][robot_name],
-                 keyposes[camera_name][robot_name])
+                 keyposes[camera_name][robot_name],
+                 termposes[camera_name][robot_name])
     print("=== Calibration completed for {} + {} ===".format(camera_name,
                                                              robot_name))
 
