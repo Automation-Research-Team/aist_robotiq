@@ -49,6 +49,7 @@ import tf_conversions
 import moveit_commander
 from moveit_commander.conversions import pose_to_list
 import ur_modern_driver.msg
+import robotiq_msgs.msg
 
 import o2as_msgs.msg
 import o2as_msgs.srv
@@ -103,11 +104,15 @@ class AISTBaseRoutines(object):
     def __init__(self):
         moveit_commander.roscpp_initialize(sys.argv)
         rospy.init_node("kitting_task", anonymous=True)
-
+        self.use_real_robot = rospy.get_param('use_real_robot', False)
         self.robots = moveit_commander.RobotCommander()
         self.planning_scene = moveit_commander.PlanningSceneInterface()
         self.groups = {
+            "a_bot": moveit_commander.MoveGroupCommander("a_bot"),
             "b_bot": moveit_commander.MoveGroupCommander("b_bot")
+        }
+        self.gripper_action_clients = {
+            'a_bot': actionlib.SimpleActionClient('/a_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction)
         }
         self.listener = tf.TransformListener()
         self.publishMarker_client = rospy.ServiceProxy('/aist_skills/publishMarker', o2as_msgs.srv.publishMarker)
@@ -115,6 +120,7 @@ class AISTBaseRoutines(object):
         self.setup_suction_tool()
 
         self.downward_orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+        self.downward_orientation_a_bot = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0,pi/2,0))
 
         # For debugging of move_lin
         self.actual_pose_pub = rospy.Publisher('actual_pose', geometry_msgs.msg.Pose, queue_size=10)
@@ -151,11 +157,41 @@ class AISTBaseRoutines(object):
 
         if go_home:
             rospy.loginfo("Moving all robots home again.")
-            self.go_to_named_pose("home", "b_bot")
+            self.go_to_named_pose("home", robot_name)
         return
 
+    def send_gripper_command(self, gripper, command, force = 5.0, velocity = .1, wait=True):
+        if not self.use_real_robot:
+            return True
+        if gripper == 'a_bot':
+            goal = robotiq_msgs.msg.CModelCommandGoal()
+            action_client = self.gripper_action_clients[gripper]
+            goal.velocity = velocity
+            goal.force = force
+            if command == 'close':
+                goal.position = 0.0
+            elif command == 'open':
+                goal.position = 0.085
+            elif command >= 0.0 and command <= 0.085:
+                goal.position = command
+                rospy.loginfo('Gripper open ' + str(command) + 'mm.')
+            else:
+                rospy.logerr('Gripper command is invalid. (command: ' + str(command) + ')')
+        else:
+            try:
+                rospy.logerr('Could not parse gripper command: ' + str(command) + ' for gripper ' + str(gripper))
+            except:
+                pass
+        action_client.send_goal(goal)
+        rospy.sleep(.5)  # This sleep is necessary for robotiq gripper to work just as intended.
+        rospy.loginfo('Sending command ' + str(command) + 'to gripper: ' + gripper)
+        if wait:
+            action_client.wait_for_result(rospy.Duration(6.0))
+        result = action_client.get_result()
+        rospy.loginfo(result)
+        return
 
-    def pick(self, robot_name, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False, lift_up_after_pick=True, timeout=3.0):
+    def pick(self, robot_name, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height, special_pick = False, lift_up_after_pick=True, timeout=3.0):
         self.publish_marker(object_pose, "pick_pose")
         if speed_fast > 1.0:
             acceleration=speed_fast
@@ -168,42 +204,18 @@ class AISTBaseRoutines(object):
         rospy.logdebug("Going to height " + str(approach_pose.pose.position.z))
         self.go_to_pose_goal(robot_name, approach_pose, speed=speed_fast, move_lin=True)
 
-        if gripper_command=="complex_pick_from_inside":
-            self.precision_gripper_inner_close()
-        elif gripper_command=="complex_pick_from_outside":
-            self.precision_gripper_inner_open()
-        elif gripper_command=="easy_pick_only_inner" or gripper_command=="inner_gripper_from_inside":
-            self.precision_gripper_inner_close()
-        elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
-            self.precision_gripper_inner_open()
-        elif gripper_command=="suction":
+        if gripper_command=="suction":
             suck_res = self.suck(turn_suction_on=True, timeout=timeout)
         elif gripper_command=="none":
             pass
         else:
             self.send_gripper_command(gripper=robot_name, command="open")
-
         rospy.loginfo("Moving down to object")
         rospy.logdebug("Going to height " + str(object_pose.pose.position.z))
-        # if gripper_command=="suction":
-        #     self.do_linear_push(robot_name, force=5.0, wait=True, direction='Z+', max_approach_distance=0.92, forward_speed=0.1)
-        # else:
-        #     self.go_to_pose_goal(robot_name, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
         self.go_to_pose_goal(robot_name, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
 
-
         #gripper close
-        if gripper_command=="complex_pick_from_inside":
-            self.precision_gripper_inner_open(this_action_grasps_an_object = True)
-            self.precision_gripper_outer_close()
-        elif gripper_command=="complex_pick_from_outside":
-            self.precision_gripper_inner_close(this_action_grasps_an_object = True)
-            self.precision_gripper_outer_close()
-        elif gripper_command=="easy_pick_only_inner" or gripper_command=="inner_gripper_from_inside":
-            self.precision_gripper_inner_open(this_action_grasps_an_object = True)
-        elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
-            self.precision_gripper_inner_close(this_action_grasps_an_object = True)
-        elif gripper_command=="suction":
+        if gripper_command=="suction":
             pass
         elif gripper_command=="none":
             pass
@@ -235,17 +247,7 @@ class AISTBaseRoutines(object):
         self.go_to_pose_goal(robot_name, object_pose, speed=speed_slow, acceleration=acceleration, move_lin=True)
 
         #gripper open
-        if gripper_command=="complex_pick_from_inside":
-            self.precision_gripper_outer_open()
-            self.precision_gripper_inner_close()
-        elif gripper_command=="complex_pick_from_outside":
-            self.precision_gripper_outer_open()
-            self.precision_gripper_inner_open()
-        elif gripper_command=="easy_pick_only_inner" or gripper_command=="inner_gripper_from_inside":
-            self.precision_gripper_inner_close()
-        elif gripper_command=="easy_pick_outside_only_inner" or gripper_command=="inner_gripper_from_outside":
-            self.precision_gripper_inner_open()
-        elif gripper_command=="suction":
+        if gripper_command=="suction":
             self.suck(turn_suction_on=False)
         elif gripper_command=="none":
             pass
@@ -277,7 +279,9 @@ class AISTBaseRoutines(object):
         group = self.groups[group_name]
 
         if end_effector_link == "":
-            if group_name == "b_bot":
+            if group_name == 'a_bot':
+                end_effector_link = 'a_bot_robotiq_85_tip_link'
+            elif group_name == "b_bot":
                 end_effector_link = "b_bot_single_suction_gripper_pad_link"
         group.set_end_effector_link(end_effector_link)
 
@@ -307,7 +311,9 @@ class AISTBaseRoutines(object):
         # self.publish_marker(pose_goal_stamped, "pose")
 
         if end_effector_link == "":
-            if group_name == "b_bot":
+            if group_name == 'a_bot':
+                end_effector_link = 'a_bot_robotiq_85_tip_link'
+            elif group_name == "b_bot":
                 end_effector_link = "b_bot_single_suction_gripper_pad_link"
 
         group = self.groups[group_name]
@@ -323,7 +329,7 @@ class AISTBaseRoutines(object):
         pose_goal_world = self.listener.transformPose("world", pose_goal_stamped).pose
         waypoints.append(pose_goal_world)
         (plan, fraction) = group.compute_cartesian_path(waypoints,  # waypoints to follow
-                                                        0.01,       # eef_step
+                                                        0.0005,       # eef_step
                                                         0.0)        # jump_threshold
         rospy.loginfo("Compute cartesian path succeeded with " + str(fraction*100) + "%")
         plan = group.retime_trajectory(self.robots.get_current_state(), plan, speed)

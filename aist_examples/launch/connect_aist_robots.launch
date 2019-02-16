@@ -8,6 +8,7 @@
   <param name="use_real_robot" type="bool" value="true" />
 
   <!-- robot_ip: IP-address of the robot's socket-messaging server -->
+  <arg name="robot_ip_a" default="10.66.171.52"/>
   <arg name="robot_ip_b" default="10.66.171.51"/>
   <arg name="limited" default="false"/>
   <arg name="min_payload"  default="0.0"/>
@@ -33,6 +34,21 @@
   <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" /> -->
 
   <!-- Drivers for the robots -->
+  <node name="a_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen" ns="a_bot_controller">
+    <param name="prefix" type="str" value="a_bot_" />
+    <param name="robot_ip_address" type="str" value="$(arg robot_ip_a)" />
+    <param name="reverse_port" type="int" value="50003" />
+    <param name="min_payload" type="double" value="$(arg min_payload)" />
+    <param name="max_payload" type="double" value="$(arg max_payload)" />
+    <param name="max_velocity" type="double" value="$(arg max_velocity)" />
+    <param name="servoj_time" type="double" value="$(arg servoj_time)" />
+    <param name="base_frame" type="str" value="a_bot_base" />
+    <param name="tool_frame" type="str" value="a_bot_tool0_controller" />
+    <param name="require_activation" type="str" value="$(arg require_activation)" />
+    <param name="shutdown_on_disconnect" type="bool" value="$(arg shutdown_on_disconnect)"/>
+    <remap from="joint_states" to="/joint_states"/>
+  </node>
+
   <node name="b_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen" ns="b_bot_controller">
     <param name="prefix" type="str" value="b_bot_" />
     <param name="robot_ip_address" type="str" value="$(arg robot_ip_b)" />
@@ -47,6 +63,13 @@
     <param name="shutdown_on_disconnect" type="bool" value="$(arg shutdown_on_disconnect)"/>
     <remap from="joint_states" to="/joint_states"/>
   </node>
+
+  <!-- Drivers for the grippers -->
+  <include file="$(find robotiq_control)/launch/ur_cmodel_action_controller.launch">
+    <arg name="namespace" value="a_bot_gripper" />
+    <arg name="gripper_prefix" value="a_bot_" />
+    <arg name="topic" value="/a_bot_controller/ur_driver/URScript" />
+  </include>
 
   <!-- <include file="$(find aist_moveit_config)/launch/aist_moveit_planning_execution.launch">
     <arg name="sim" value="false" />
