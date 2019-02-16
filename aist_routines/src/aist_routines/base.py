@@ -173,9 +173,11 @@ class AISTBaseRoutines(object):
                 goal.position = 0.0
             elif command == 'open':
                 goal.position = 0.085
-            else:
+            elif command >= 0.0 and command <= 0.085:
                 goal.position = command
                 rospy.loginfo('Gripper open ' + str(command) + 'mm.')
+            else:
+                rospy.logerr('Gripper command is invalid. (command: ' + str(command) + ')')
         else:
             try:
                 rospy.logerr('Could not parse gripper command: ' + str(command) + ' for gripper ' + str(gripper))
@@ -328,7 +330,7 @@ class AISTBaseRoutines(object):
         pose_goal_world = self.listener.transformPose("world", pose_goal_stamped).pose
         waypoints.append(pose_goal_world)
         (plan, fraction) = group.compute_cartesian_path(waypoints,  # waypoints to follow
-                                                        0.01,       # eef_step
+                                                        0.0005,       # eef_step
                                                         0.0)        # jump_threshold
         rospy.loginfo("Compute cartesian path succeeded with " + str(fraction*100) + "%")
         plan = group.retime_trajectory(self.robots.get_current_state(), plan, speed)
