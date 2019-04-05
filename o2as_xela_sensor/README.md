@@ -28,4 +28,8 @@ The "calibrate" action is available to re-zero the sensor.
 
     ```
     roslaunch o2as_xela_sensor demo.launch
+
+    roslaunch o2as_xela_sensor sensor.launch:
+    In order to start the XELA sensor without visualization and set sensor values to zero, sensor.launch needs to be executed as in the example below.
+    Example: roslaunch o2as_xela_sensor sensor.launch defect_sensor:="4,7,9,10,15"
     ```

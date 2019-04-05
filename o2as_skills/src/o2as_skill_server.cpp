@@ -2166,7 +2166,7 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
   auto bool_msg_pointer = ros::topic::waitForMessage<std_msgs::Bool>("/" + screw_tool_id + "/screw_suctioned", ros::Duration(1.0));
   bool screw_not_suctioned_anymore = false;
   if (bool_msg_pointer != NULL){
-    screw_not_suctioned_anymore = bool_msg_pointer->data;
+    screw_not_suctioned_anymore = !bool_msg_pointer->data;
   }
   else if (!use_real_robot_) screw_not_suctioned_anymore = true;
 

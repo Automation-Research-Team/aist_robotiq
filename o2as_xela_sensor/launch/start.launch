@@ -10,12 +10,4 @@
     <!-- <arg name="frequency" value="$(arg sensor_node)"/> -->
   </include>
 
-  <!-- demo node -->
-  <node name="xela_sensor_demo" pkg="o2as_xela_sensor" type="demo.py" output="screen">
-    <remap from="data" to="$(arg sensor_node)/data"/>
-    <remap from="base" to="$(arg sensor_node)/base"/>
-    <remap from="calibrate" to="$(arg sensor_node)/calibrate"/>
-    <remap from="get_baseline" to="$(arg sensor_node)/get_baseline"/>
-  </node>
-
 </launch>

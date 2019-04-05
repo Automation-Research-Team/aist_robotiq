@@ -81,11 +81,11 @@ class XelaSensorDemo(XelaSensorClient):
       x_s = 800
       y_s = 160
       # Init normal force
-      F_N = 0
+      f_n = 0
       # Init tangential force
-      F_T = np.zeros(2)
+      f_t = np.zeros(2)
       # Init center of pressure array and help variables
-      COP = np.zeros(2)
+      center_of_pressure = np.zeros(2)
       Cij = np.zeros(2)
       SUM_zC = np.zeros(2)
       # Init variables for pressure and pressure area
@@ -104,11 +104,11 @@ class XelaSensorDemo(XelaSensorClient):
           k = k+1
           #Help variable for sensor x-Coordinate
           x_s = x_s-160
-          # Add up tangential vector coordinates to F_T
-          F_T[0] += (x-x_s)
-          F_T[1] += (y-y_s)
+          # Add up tangential vector coordinates to f_t
+          f_t[0] += (x-x_s)
+          f_t[1] += (y-y_s)
           #Add all normal forces together
-          F_N += z
+          f_n += z
           # Add up all areas of pressure if that area receives a normal force
           if z >= 12:
             pressure_area += 0.0047*0.0047
@@ -120,15 +120,15 @@ class XelaSensorDemo(XelaSensorClient):
         x_s = 800
         y_s = 160 + ((j+1)*160)
       # Calculate center of pressure
-      COP = SUM_zC/F_N
+      center_of_pressure = SUM_zC/f_n
       # Visualize center of pressure as a white circle
-      cv2.circle(img, (int(COP[0]), int(COP[1])), 10, (255,255,255,255), -1)
+      cv2.circle(img, (int(center_of_pressure[0]), int(center_of_pressure[1])), 10, (255,255,255,255), -1)
       #Visualize total tangential force with an arrow
-      cv2.arrowedLine(img, (int(COP[0]), int(COP[1])), (int(F_T[0]+COP[0]), int(F_T[1]+COP[1])), (0,255,255,255), 15)
+      cv2.arrowedLine(img, (int(center_of_pressure[0]), int(center_of_pressure[1])), (int(f_t[0]+center_of_pressure[0]), int(f_t[1]+center_of_pressure[1])), (0,255,255,255), 15)
       # Display sensor image
       cv2.imshow("xela-sensor", img)
       # Publish sensor data
-      self._pub.publish(F_N, F_T, COP)
+      self._pub.publish(f_n, f_t, center_of_pressure)
       #Stop criteria
       if cv2.waitKey(1) > 0:
         break
