@@ -6,7 +6,7 @@ part no.,x[mm],y[mm],z[mm] (DO NOT CHANGE),"Rotation (in degree, positive is cou
 5,70,260,4.5,0,DO NOT CHANGE z and rotation
 15,70,260,51.5,0,5 and 15 shares the same frame (same x y z and rotation)
 6_small_pulley,60,60,8.5,0,
-7_1,360,56,50,0,7_1 is the side from which the robot  inserts the bolt
+7_1,358,56,55,0,7_1 is the side from which the robot  inserts the bolt
 8,320,250,12,0,DO NOT CHANGE z and rotation
 9,260,150,9,0,DO NOT CHANGE z and rotation
 10,160,360,51.5,0,DO NOT CHANGE z and rotation

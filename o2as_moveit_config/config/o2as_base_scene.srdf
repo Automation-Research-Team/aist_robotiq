@@ -145,12 +145,12 @@
         <joint name="a_bot_wrist_3_joint" value="-1.61999" />
     </group_state>
     <group_state name="check_precision_gripper_success" group="a_bot">
-        <joint name="a_bot_elbow_joint" value="1.820612907409668" />
-        <joint name="a_bot_shoulder_lift_joint" value="-1.696838680897848" />
-        <joint name="a_bot_shoulder_pan_joint" value="0.2572803497314453" />
-        <joint name="a_bot_wrist_1_joint" value="-2.4995535055743616" />
-        <joint name="a_bot_wrist_2_joint" value="-1.655201260243551" />
-        <joint name="a_bot_wrist_3_joint" value="-1.4297660032855433" />
+        <joint name="a_bot_elbow_joint" value="1.82061" />
+        <joint name="a_bot_shoulder_lift_joint" value="-1.69684" />
+        <joint name="a_bot_shoulder_pan_joint" value="0.25728" />
+        <joint name="a_bot_wrist_1_joint" value="-2.49955" />
+        <joint name="a_bot_wrist_2_joint" value="-1.6552" />
+        <joint name="a_bot_wrist_3_joint" value="-1.42977" />
     </group_state>
     <group_state name="screw_handover" group="a_bot">
         <joint name="a_bot_elbow_joint" value="2.2176" />
@@ -239,6 +239,14 @@
         <joint name="b_bot_wrist_1_joint" value="-1.267" />
         <joint name="b_bot_wrist_2_joint" value="-1.57" />
         <joint name="b_bot_wrist_3_joint" value="0" />
+    </group_state>
+    <group_state name="201901_experiment_neutral" group="b_bot">
+        <joint name="b_bot_elbow_joint" value="1.1903" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.1009" />
+        <joint name="b_bot_shoulder_pan_joint" value="1.687" />
+        <joint name="b_bot_wrist_1_joint" value="-1.6518" />
+        <joint name="b_bot_wrist_2_joint" value="-1.5445" />
+        <joint name="b_bot_wrist_3_joint" value="0.0878" />
     </group_state>
     <group_state name="regrasp_ready" group="b_bot">
         <joint name="b_bot_elbow_joint" value="1.6725" />
@@ -382,7 +390,7 @@
         <joint name="c_bot_shoulder_pan_joint" value="3.14" />
         <joint name="c_bot_wrist_1_joint" value="-1.6141" />
         <joint name="c_bot_wrist_2_joint" value="-1.57" />
-        <joint name="c_bot_wrist_3_joint" value="-3.1415" />
+        <joint name="c_bot_wrist_3_joint" value="0" />
     </group_state>
     <group_state name="back" group="c_bot">
         <joint name="c_bot_elbow_joint" value="1.1108" />
@@ -417,12 +425,12 @@
         <joint name="c_bot_wrist_3_joint" value="0" />
     </group_state>
     <group_state name="discard_taskboard_tool" group="b_bot">
-        <joint name="b_bot_elbow_joint" value="1.8310375213623047" />
-        <joint name="b_bot_shoulder_lift_joint" value="-1.6923745314227503" />
-        <joint name="b_bot_shoulder_pan_joint" value="3.378859758377075" />
-        <joint name="b_bot_wrist_1_joint" value="-1.7302964369403284" />
-        <joint name="b_bot_wrist_2_joint" value="-1.5010722319232386" />
-        <joint name="b_bot_wrist_3_joint" value="0.08025311678647995" />
+        <joint name="b_bot_elbow_joint" value="1.83104" />
+        <joint name="b_bot_shoulder_lift_joint" value="-1.69237" />
+        <joint name="b_bot_shoulder_pan_joint" value="3.37886" />
+        <joint name="b_bot_wrist_1_joint" value="-1.7303" />
+        <joint name="b_bot_wrist_2_joint" value="-1.50107" />
+        <joint name="b_bot_wrist_3_joint" value="0.0802531" />
     </group_state>
     <group_state name="screw_handover_retreat" group="a_bot">
         <joint name="a_bot_elbow_joint" value="2.482" />
@@ -444,6 +452,8 @@
     <disable_collisions link1="a_bot_base_link" link2="b_bot_base_smfl" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_link" link2="b_bot_ee_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="b_bot_forearm_link" reason="Never" />
+    <disable_collisions link1="a_bot_base_link" link2="b_bot_ft300_link" reason="Never" />
+    <disable_collisions link1="a_bot_base_link" link2="b_bot_robotiq_85_base_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="b_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="b_bot_robotiq_85_left_finger_tip_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="b_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
@@ -455,12 +465,12 @@
     <disable_collisions link1="a_bot_base_link" link2="b_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="b_bot_upper_arm_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="b_bot_wrist_1_link" reason="Never" />
-    <disable_collisions link1="a_bot_base_link" link2="b_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="c_bot_base_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_link" link2="c_bot_base_smfl" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_link" link2="c_bot_ee_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="c_bot_forearm_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="c_bot_ft300_link" reason="Never" />
+    <disable_collisions link1="a_bot_base_link" link2="c_bot_robotiq_85_base_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
@@ -470,23 +480,21 @@
     <disable_collisions link1="a_bot_base_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="c_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="a_bot_base_link" link2="dummyassy_part_01" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="a_bot_base_link" link2="mat" reason="Never" />
+    <disable_collisions link1="a_bot_base_link" link2="retainer_pin_holder_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_link" link2="screw_tool_holder" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="a_bot_base_link" link2="taskboard" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="a_bot_base_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="a_bot_base_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="a_bot_base_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="a_bot_base_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="a_bot_base_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="a_bot_base_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="a_bot_base_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="a_bot_base_link" link2="tray_1" reason="Adjacent" />
+    <disable_collisions link1="a_bot_base_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="a_bot_base_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="a_bot_base_link" link2="tray_2" reason="Adjacent" />
+    <disable_collisions link1="a_bot_base_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="a_bot_base_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="workbox1" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_link" link2="workbox2" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_smfl" link2="a_bot_shoulder_link" reason="Never" />
@@ -498,23 +506,21 @@
     <disable_collisions link1="a_bot_base_smfl" link2="c_bot_base_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_smfl" link2="c_bot_base_smfl" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_smfl" link2="c_bot_shoulder_link" reason="Never" />
+    <disable_collisions link1="a_bot_base_smfl" link2="dummyassy_part_01" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_smfl" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="a_bot_base_smfl" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="a_bot_base_smfl" link2="mat" reason="Never" />
+    <disable_collisions link1="a_bot_base_smfl" link2="retainer_pin_holder_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_smfl" link2="screw_tool_holder" reason="Never" />
     <disable_collisions link1="a_bot_base_smfl" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="a_bot_base_smfl" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="a_bot_base_smfl" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="a_bot_base_smfl" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="a_bot_base_smfl" link2="taskboard" reason="Adjacent" />
-    <disable_collisions link1="a_bot_base_smfl" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="a_bot_base_smfl" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="a_bot_base_smfl" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="a_bot_base_smfl" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="a_bot_base_smfl" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="a_bot_base_smfl" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="a_bot_base_smfl" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="a_bot_base_smfl" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="a_bot_base_smfl" link2="tray_1" reason="Adjacent" />
+    <disable_collisions link1="a_bot_base_smfl" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="a_bot_base_smfl" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="a_bot_base_smfl" link2="tray_2" reason="Adjacent" />
+    <disable_collisions link1="a_bot_base_smfl" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="a_bot_base_smfl" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="a_bot_base_smfl" link2="workbox1" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_smfl" link2="workbox2" reason="Adjacent" />
     <disable_collisions link1="a_bot_camera_link" link2="a_bot_ee_link" reason="Never" />
@@ -522,32 +528,29 @@
     <disable_collisions link1="a_bot_camera_link" link2="a_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="a_bot_camera_link" link2="a_bot_wrist_2_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_camera_link" link2="a_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="a_bot_camera_link" link2="b_bot_base_link" reason="Never" />
     <disable_collisions link1="a_bot_camera_link" link2="b_bot_ee_link" reason="Never" />
+    <disable_collisions link1="a_bot_camera_link" link2="b_bot_ft300_link" reason="Never" />
     <disable_collisions link1="a_bot_camera_link" link2="b_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="a_bot_camera_link" link2="b_bot_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_bot_camera_link" link2="b_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="a_bot_camera_link" link2="b_bot_robotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_bot_camera_link" link2="b_bot_robotiq_85_right_finger_link" reason="Never" />
     <disable_collisions link1="a_bot_camera_link" link2="b_bot_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_bot_camera_link" link2="b_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_bot_camera_link" link2="b_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="a_bot_camera_link" link2="b_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="a_bot_camera_link" link2="c_bot_ee_link" reason="Never" />
-    <disable_collisions link1="a_bot_camera_link" link2="c_bot_robotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_bot_camera_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="a_bot_camera_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_bot_camera_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_bot_camera_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_bot_camera_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_bot_camera_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_bot_camera_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_bot_camera_link" link2="c_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="a_bot_camera_link" link2="screw_tool_m3_link" reason="Never" />
+    <disable_collisions link1="a_bot_camera_link" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="a_bot_camera_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="a_bot_camera_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="a_bot_camera_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="a_bot_camera_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="a_bot_camera_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="a_bot_camera_link" link2="taskboard_part9" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="a_bot_gripper" reason="Default" />
     <disable_collisions link1="a_bot_ee_link" link2="a_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="a_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="a_bot_wrist_3_link" reason="Adjacent" />
+    <disable_collisions link1="a_bot_ee_link" link2="a_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="b_bot_base_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="b_bot_ee_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="b_bot_ft300_link" reason="Never" />
@@ -566,79 +569,79 @@
     <disable_collisions link1="a_bot_ee_link" link2="c_bot_camera_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="c_bot_ee_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="c_bot_ft300_link" reason="Never" />
-    <disable_collisions link1="a_bot_ee_link" link2="c_bot_robotiq_85_base_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_bot_ee_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_bot_ee_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="c_bot_wrist_1_link" reason="Never" />
-    <disable_collisions link1="a_bot_ee_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="c_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="screw_tool_holder" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="a_bot_ee_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="a_bot_ee_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="a_bot_ee_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="a_bot_ee_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="a_bot_ee_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="a_bot_ee_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="a_bot_ee_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="a_bot_ee_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="a_bot_ee_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="a_bot_forearm_link" link2="a_bot_upper_arm_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_forearm_link" link2="a_bot_wrist_1_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_forearm_link" link2="a_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_bot_forearm_link" link2="b_bot_base_link" reason="Never" />
+    <disable_collisions link1="a_bot_forearm_link" link2="b_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_bot_forearm_link" link2="b_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="a_bot_forearm_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="a_bot_forearm_link" link2="screw_tool_m4_link" reason="Never" />
+    <disable_collisions link1="a_bot_forearm_link" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="a_bot_forearm_link" link2="suction_tool_link" reason="Never" />
     <disable_collisions link1="a_bot_gripper" link2="a_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="a_bot_gripper" link2="a_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="a_bot_gripper" link2="a_bot_wrist_3_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_gripper" link2="b_bot_ee_link" reason="Never" />
-    <disable_collisions link1="a_bot_gripper" link2="b_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="a_bot_gripper" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="a_bot_gripper" link2="taskboard_part9" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="a_bot_upper_arm_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_shoulder_link" link2="a_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="b_bot_base_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="b_bot_base_smfl" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="b_bot_ee_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="b_bot_forearm_link" reason="Never" />
+    <disable_collisions link1="a_bot_shoulder_link" link2="b_bot_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_bot_shoulder_link" link2="b_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_bot_shoulder_link" link2="b_bot_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_bot_shoulder_link" link2="b_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="b_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="b_bot_upper_arm_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="b_bot_wrist_1_link" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="b_bot_wrist_2_link" reason="Never" />
+    <disable_collisions link1="a_bot_shoulder_link" link2="b_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="c_bot_base_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="c_bot_base_smfl" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="c_bot_ee_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="c_bot_forearm_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="c_bot_ft300_link" reason="Never" />
+    <disable_collisions link1="a_bot_shoulder_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="c_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="c_bot_upper_arm_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="c_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="a_bot_shoulder_link" link2="dummyassy_part_01" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="mat" reason="Never" />
+    <disable_collisions link1="a_bot_shoulder_link" link2="retainer_pin_holder_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="screw_tool_holder" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="taskboard" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="a_bot_shoulder_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="a_bot_shoulder_link" link2="tray_1" reason="Never" />
+    <disable_collisions link1="a_bot_shoulder_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="a_bot_shoulder_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="a_bot_shoulder_link" link2="tray_2" reason="Never" />
+    <disable_collisions link1="a_bot_shoulder_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="a_bot_shoulder_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="workbox1" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="workbox2" reason="Never" />
     <disable_collisions link1="a_bot_upper_arm_link" link2="a_phoxi_m_camera" reason="Never" />
@@ -653,16 +656,14 @@
     <disable_collisions link1="a_bot_upper_arm_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="a_bot_upper_arm_link" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="a_bot_upper_arm_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="a_bot_upper_arm_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="a_bot_upper_arm_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="a_bot_upper_arm_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="a_bot_upper_arm_link" link2="taskboard_part6_small_pulley" reason="Never" />
+    <disable_collisions link1="a_bot_upper_arm_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="a_bot_upper_arm_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="a_bot_upper_arm_link" link2="workbox2" reason="Never" />
     <disable_collisions link1="a_bot_wrist_1_link" link2="a_bot_wrist_2_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_wrist_1_link" link2="a_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_1_link" link2="a_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_bot_wrist_1_link" link2="b_bot_base_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_1_link" link2="b_bot_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_bot_wrist_1_link" link2="b_bot_ee_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_1_link" link2="b_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_1_link" link2="b_bot_robotiq_85_left_finger_tip_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_1_link" link2="b_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
@@ -676,50 +677,44 @@
     <disable_collisions link1="a_bot_wrist_1_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_1_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_1_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_1_link" link2="taskboard_part6_small_pulley" reason="Never" />
     <disable_collisions link1="a_bot_wrist_2_link" link2="a_bot_wrist_3_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_wrist_2_link" link2="b_bot_base_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_2_link" link2="b_bot_ee_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_2_link" link2="b_bot_robotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_2_link" link2="b_bot_robotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_2_link" link2="b_bot_robotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_2_link" link2="b_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_2_link" link2="b_bot_robotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_2_link" link2="b_bot_robotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_2_link" link2="b_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_2_link" link2="b_bot_shoulder_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_2_link" link2="c_bot_ee_link" reason="Never" />
+    <disable_collisions link1="a_bot_wrist_2_link" link2="b_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_2_link" link2="screw_tool_m3_link" reason="Never" />
+    <disable_collisions link1="a_bot_wrist_2_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_2_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_2_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_2_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="a_bot_wrist_3_link" link2="a_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_base_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_ee_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_ft300_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_robotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_robotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_robotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_robotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_wrist_2_link" reason="Never" />
+    <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_3_link" link2="c_bot_camera_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_3_link" link2="c_bot_ee_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_3_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_3_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_3_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_bot_wrist_3_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_3_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_3_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_3_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_3_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_3_link" link2="taskboard_part9" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_base_link" reason="Adjacent" />
     <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_base_smfl" reason="Adjacent" />
     <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_ee_link" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_forearm_link" reason="Never" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_ft300_link" reason="Never" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_upper_arm_link" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_wrist_1_link" reason="Never" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="c_bot_base_link" reason="Adjacent" />
     <disable_collisions link1="a_phoxi_m_camera" link2="c_bot_base_smfl" reason="Adjacent" />
     <disable_collisions link1="a_phoxi_m_camera" link2="c_bot_camera_link" reason="Never" />
@@ -740,23 +735,21 @@
     <disable_collisions link1="a_phoxi_m_camera" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="c_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="dummyassy_part_01" reason="Adjacent" />
     <disable_collisions link1="a_phoxi_m_camera" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="mat" reason="Never" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="retainer_pin_holder_link" reason="Adjacent" />
     <disable_collisions link1="a_phoxi_m_camera" link2="screw_tool_holder" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="taskboard" reason="Adjacent" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="a_phoxi_m_camera" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="tray_1" reason="Adjacent" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="tray_2" reason="Adjacent" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="a_phoxi_m_camera" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="workbox1" reason="Adjacent" />
     <disable_collisions link1="a_phoxi_m_camera" link2="workbox2" reason="Adjacent" />
     <disable_collisions link1="assembled_assy_part_01" link2="assembled_assy_part_02" reason="Adjacent" />
@@ -886,58 +879,47 @@
     <disable_collisions link1="b_bot_base_link" link2="c_bot_ee_link" reason="Never" />
     <disable_collisions link1="b_bot_base_link" link2="c_bot_forearm_link" reason="Never" />
     <disable_collisions link1="b_bot_base_link" link2="c_bot_ft300_link" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="c_bot_robotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_base_link" link2="c_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="b_bot_base_link" link2="c_bot_upper_arm_link" reason="Never" />
     <disable_collisions link1="b_bot_base_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="b_bot_base_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="b_bot_base_link" link2="c_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="b_bot_base_link" link2="dummyassy_part_01" reason="Adjacent" />
     <disable_collisions link1="b_bot_base_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_base_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="mat" reason="Never" />
+    <disable_collisions link1="b_bot_base_link" link2="retainer_pin_holder_link" reason="Adjacent" />
     <disable_collisions link1="b_bot_base_link" link2="screw_tool_holder" reason="Never" />
     <disable_collisions link1="b_bot_base_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="b_bot_base_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="b_bot_base_link" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="b_bot_base_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="taskboard" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="b_bot_base_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="b_bot_base_link" link2="tray_1" reason="Adjacent" />
+    <disable_collisions link1="b_bot_base_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="b_bot_base_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="b_bot_base_link" link2="tray_2" reason="Adjacent" />
+    <disable_collisions link1="b_bot_base_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="b_bot_base_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="b_bot_base_link" link2="workbox1" reason="Adjacent" />
     <disable_collisions link1="b_bot_base_link" link2="workbox2" reason="Adjacent" />
     <disable_collisions link1="b_bot_base_smfl" link2="b_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="b_bot_base_smfl" link2="c_bot_base_link" reason="Adjacent" />
     <disable_collisions link1="b_bot_base_smfl" link2="c_bot_base_smfl" reason="Adjacent" />
     <disable_collisions link1="b_bot_base_smfl" link2="c_bot_shoulder_link" reason="Never" />
+    <disable_collisions link1="b_bot_base_smfl" link2="dummyassy_part_01" reason="Adjacent" />
     <disable_collisions link1="b_bot_base_smfl" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_base_smfl" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_base_smfl" link2="mat" reason="Never" />
+    <disable_collisions link1="b_bot_base_smfl" link2="retainer_pin_holder_link" reason="Adjacent" />
     <disable_collisions link1="b_bot_base_smfl" link2="screw_tool_holder" reason="Never" />
     <disable_collisions link1="b_bot_base_smfl" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="b_bot_base_smfl" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="b_bot_base_smfl" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="b_bot_base_smfl" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="b_bot_base_smfl" link2="taskboard" reason="Adjacent" />
-    <disable_collisions link1="b_bot_base_smfl" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="b_bot_base_smfl" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="b_bot_base_smfl" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="b_bot_base_smfl" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_base_smfl" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_base_smfl" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="b_bot_base_smfl" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="b_bot_base_smfl" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="b_bot_base_smfl" link2="tray_1" reason="Adjacent" />
+    <disable_collisions link1="b_bot_base_smfl" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="b_bot_base_smfl" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="b_bot_base_smfl" link2="tray_2" reason="Adjacent" />
+    <disable_collisions link1="b_bot_base_smfl" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="b_bot_base_smfl" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="b_bot_base_smfl" link2="workbox1" reason="Adjacent" />
     <disable_collisions link1="b_bot_base_smfl" link2="workbox2" reason="Adjacent" />
     <disable_collisions link1="b_bot_ee_link" link2="b_bot_ft300_link" reason="Adjacent" />
@@ -954,32 +936,26 @@
     <disable_collisions link1="b_bot_ee_link" link2="b_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="b_bot_wrist_3_link" reason="Adjacent" />
     <disable_collisions link1="b_bot_ee_link" link2="c_bot_ee_link" reason="Never" />
+    <disable_collisions link1="b_bot_ee_link" link2="c_bot_forearm_link" reason="Never" />
+    <disable_collisions link1="b_bot_ee_link" link2="c_bot_ft300_link" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="c_bot_robotiq_85_base_link" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="b_bot_ee_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_bot_ee_link" link2="c_bot_shoulder_link" reason="Never" />
-    <disable_collisions link1="b_bot_ee_link" link2="c_bot_wrist_2_link" reason="Never" />
-    <disable_collisions link1="b_bot_ee_link" link2="c_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="b_bot_ee_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_ee_link" link2="screw_tool_holder" reason="Never" />
+    <disable_collisions link1="b_bot_ee_link" link2="retainer_pin_holder_link" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="screw_tool_m3_link" reason="Never" />
-    <disable_collisions link1="b_bot_ee_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="b_bot_ee_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="b_bot_ee_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="b_bot_ee_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="b_bot_ee_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="b_bot_ee_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_ee_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_ee_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="b_bot_ee_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="b_bot_ee_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="b_bot_ee_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="b_bot_ee_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="b_bot_forearm_link" link2="b_bot_upper_arm_link" reason="Adjacent" />
     <disable_collisions link1="b_bot_forearm_link" link2="b_bot_wrist_1_link" reason="Adjacent" />
     <disable_collisions link1="b_bot_forearm_link" link2="m3_feeder_link" reason="Never" />
@@ -997,11 +973,18 @@
     <disable_collisions link1="b_bot_ft300_link" link2="b_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="b_bot_ft300_link" link2="b_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="b_bot_ft300_link" link2="c_bot_ee_link" reason="Never" />
+    <disable_collisions link1="b_bot_ft300_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="b_bot_ft300_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_bot_ft300_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_bot_ft300_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_bot_ft300_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_bot_ft300_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_bot_ft300_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_bot_ft300_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_ft300_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_ft300_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_ft300_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_ft300_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_ft300_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="b_bot_ft300_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="b_bot_ft300_link" link2="suction_tool_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_base_link" link2="b_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_base_link" link2="b_bot_robotiq_85_left_finger_tip_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_base_link" link2="b_bot_robotiq_85_left_inner_knuckle_link" reason="Adjacent" />
@@ -1014,15 +997,13 @@
     <disable_collisions link1="b_bot_robotiq_85_base_link" link2="b_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_base_link" link2="b_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_base_link" link2="c_bot_base_smfl" reason="Default" />
-    <disable_collisions link1="b_bot_robotiq_85_base_link" link2="c_bot_ee_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_base_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_base_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_base_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_base_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_base_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_base_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_base_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_base_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_base_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_base_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_base_link" link2="retainer_pin_holder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="b_bot_robotiq_85_left_finger_tip_link" reason="Default" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="b_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="b_bot_robotiq_85_left_knuckle_link" reason="Adjacent" />
@@ -1038,19 +1019,16 @@
     <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="c_bot_ee_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="screw_tool_m4_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="screw_tool_m6_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="suction_tool_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_finger_link" link2="tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="b_bot_robotiq_85_left_inner_knuckle_link" reason="Adjacent" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="b_bot_robotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="b_bot_robotiq_85_right_finger_link" reason="Never" />
@@ -1063,20 +1041,21 @@
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="c_bot_base_smfl" reason="Default" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="c_bot_camera_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="c_bot_ee_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="c_bot_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="c_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="screw_tool_m4_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="screw_tool_m6_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_finger_tip_link" link2="suction_tool_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="b_bot_robotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="b_bot_robotiq_85_right_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="b_bot_robotiq_85_right_finger_tip_link" reason="Never" />
@@ -1088,7 +1067,6 @@
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_base_smfl" reason="Default" />
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_camera_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_ee_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_ft300_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
@@ -1096,15 +1074,14 @@
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="screw_tool_m4_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="screw_tool_m6_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="suction_tool_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_inner_knuckle_link" link2="tray_1_divider1_2" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="b_bot_robotiq_85_right_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="b_bot_robotiq_85_right_finger_tip_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="b_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
@@ -1117,22 +1094,17 @@
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="c_bot_ee_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="c_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="screw_tool_m4_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="retainer_pin_holder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="suction_tool_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_left_knuckle_link" link2="tray_1_divider1_2" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="b_bot_robotiq_85_right_finger_tip_link" reason="Default" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="b_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="b_bot_robotiq_85_right_knuckle_link" reason="Adjacent" />
@@ -1143,67 +1115,65 @@
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="c_bot_ee_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="c_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="m4_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="screw_tool_m3_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="screw_tool_m4_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_link" link2="tray_1_divider1_2" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="b_bot_robotiq_85_right_inner_knuckle_link" reason="Adjacent" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="b_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="b_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="b_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="b_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="c_bot_base_smfl" reason="Default" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="c_bot_ee_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="c_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="screw_tool_m3_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="screw_tool_m4_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="suction_tool_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_finger_tip_link" link2="tray_1_divider1_2" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="b_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="b_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="b_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="b_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_base_smfl" reason="Default" />
-    <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_ee_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="screw_tool_m6_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_inner_knuckle_link" link2="taskboard_part9" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="b_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="b_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="b_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="c_bot_base_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="c_bot_base_smfl" reason="Default" />
+    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="c_bot_camera_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="c_bot_ee_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
@@ -1211,127 +1181,104 @@
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="c_bot_shoulder_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="c_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="m4_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="screw_tool_m3_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="screw_tool_m4_link" reason="Never" />
+    <disable_collisions link1="b_bot_robotiq_85_right_knuckle_link" link2="tray_1_divider1_2" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="b_bot_upper_arm_link" reason="Adjacent" />
     <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_base_link" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_base_smfl" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_ee_link" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_forearm_link" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_ft300_link" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_robotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_upper_arm_link" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="c_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="b_bot_shoulder_link" link2="dummyassy_part_01" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="mat" reason="Never" />
+    <disable_collisions link1="b_bot_shoulder_link" link2="retainer_pin_holder_link" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="screw_tool_holder" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="taskboard" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="b_bot_shoulder_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="b_bot_shoulder_link" link2="tray_1" reason="Never" />
+    <disable_collisions link1="b_bot_shoulder_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="b_bot_shoulder_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="b_bot_shoulder_link" link2="tray_2" reason="Never" />
+    <disable_collisions link1="b_bot_shoulder_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="b_bot_shoulder_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="workbox1" reason="Never" />
     <disable_collisions link1="b_bot_shoulder_link" link2="workbox2" reason="Never" />
     <disable_collisions link1="b_bot_upper_arm_link" link2="c_bot_base_link" reason="Never" />
     <disable_collisions link1="b_bot_upper_arm_link" link2="c_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="b_bot_upper_arm_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_upper_arm_link" link2="m4_feeder_link" reason="Never" />
+    <disable_collisions link1="b_bot_upper_arm_link" link2="retainer_pin_holder_link" reason="Never" />
     <disable_collisions link1="b_bot_upper_arm_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="b_bot_upper_arm_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="b_bot_upper_arm_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="b_bot_upper_arm_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="b_bot_upper_arm_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="b_bot_upper_arm_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="b_bot_upper_arm_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="b_bot_upper_arm_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="b_bot_upper_arm_link" link2="tray_1" reason="Never" />
+    <disable_collisions link1="b_bot_upper_arm_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="b_bot_upper_arm_link" link2="tray_1_divider1_2" reason="Never" />
     <disable_collisions link1="b_bot_wrist_1_link" link2="b_bot_wrist_2_link" reason="Adjacent" />
     <disable_collisions link1="b_bot_wrist_1_link" link2="b_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="b_bot_wrist_1_link" link2="c_bot_ee_link" reason="Never" />
     <disable_collisions link1="b_bot_wrist_1_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_wrist_1_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_wrist_1_link" link2="taskboard_part9" reason="Never" />
     <disable_collisions link1="b_bot_wrist_2_link" link2="b_bot_wrist_3_link" reason="Adjacent" />
-    <disable_collisions link1="b_bot_wrist_2_link" link2="c_bot_ee_link" reason="Never" />
+    <disable_collisions link1="b_bot_wrist_2_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="b_bot_wrist_2_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_wrist_2_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_wrist_2_link" link2="taskboard_part9" reason="Never" />
-    <disable_collisions link1="b_bot_wrist_3_link" link2="c_bot_ee_link" reason="Never" />
-    <disable_collisions link1="b_bot_wrist_3_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_bot_wrist_2_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="b_bot_wrist_3_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="b_bot_wrist_3_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_bot_wrist_3_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_bot_wrist_3_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
     <disable_collisions link1="b_bot_wrist_3_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_bot_wrist_3_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="b_bot_wrist_3_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="b_bot_wrist_3_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="b_bot_wrist_3_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="b_bot_wrist_3_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="b_bot_wrist_3_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="b_bot_wrist_3_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="b_bot_wrist_3_link" link2="retainer_pin_holder_link" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="c_bot_base_smfl" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_link" link2="c_bot_shoulder_link" reason="Adjacent" />
+    <disable_collisions link1="c_bot_base_link" link2="dummyassy_part_01" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="c_bot_base_link" link2="mat" reason="Never" />
+    <disable_collisions link1="c_bot_base_link" link2="retainer_pin_holder_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_link" link2="screw_tool_holder" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="c_bot_base_link" link2="taskboard" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="c_bot_base_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="c_bot_base_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="c_bot_base_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="c_bot_base_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="c_bot_base_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="c_bot_base_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="c_bot_base_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="c_bot_base_link" link2="tray_1" reason="Adjacent" />
+    <disable_collisions link1="c_bot_base_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_base_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="c_bot_base_link" link2="tray_2" reason="Adjacent" />
+    <disable_collisions link1="c_bot_base_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="c_bot_base_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="workbox1" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_link" link2="workbox2" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_smfl" link2="c_bot_shoulder_link" reason="Never" />
+    <disable_collisions link1="c_bot_base_smfl" link2="dummyassy_part_01" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_smfl" link2="m3_feeder_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_smfl" link2="m4_feeder_link" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_smfl" link2="mat" reason="Never" />
+    <disable_collisions link1="c_bot_base_smfl" link2="retainer_pin_holder_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_smfl" link2="screw_tool_holder" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_smfl" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="c_bot_base_smfl" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="c_bot_base_smfl" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="c_bot_base_smfl" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="c_bot_base_smfl" link2="taskboard" reason="Adjacent" />
-    <disable_collisions link1="c_bot_base_smfl" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="c_bot_base_smfl" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="c_bot_base_smfl" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="c_bot_base_smfl" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="c_bot_base_smfl" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="c_bot_base_smfl" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="c_bot_base_smfl" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="c_bot_base_smfl" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="c_bot_base_smfl" link2="tray_1" reason="Adjacent" />
+    <disable_collisions link1="c_bot_base_smfl" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_base_smfl" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="c_bot_base_smfl" link2="tray_2" reason="Adjacent" />
+    <disable_collisions link1="c_bot_base_smfl" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="c_bot_base_smfl" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="c_bot_base_smfl" link2="workbox1" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_smfl" link2="workbox2" reason="Adjacent" />
     <disable_collisions link1="c_bot_camera_link" link2="c_bot_ee_link" reason="Never" />
@@ -1348,8 +1295,8 @@
     <disable_collisions link1="c_bot_camera_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_camera_link" link2="c_bot_wrist_2_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_camera_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_camera_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="c_bot_camera_link" link2="taskboard_part8" reason="Never" />
+    <disable_collisions link1="c_bot_camera_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="c_bot_camera_link" link2="tray_1_divider1_1" reason="Never" />
     <disable_collisions link1="c_bot_ee_link" link2="c_bot_ft300_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_ee_link" link2="c_bot_robotiq_85_base_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_ee_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
@@ -1363,16 +1310,25 @@
     <disable_collisions link1="c_bot_ee_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_ee_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_ee_link" link2="c_bot_wrist_3_link" reason="Adjacent" />
-    <disable_collisions link1="c_bot_ee_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="c_bot_ee_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="c_bot_ee_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="c_bot_ee_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="c_bot_ee_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="c_bot_ee_link" link2="tray_1" reason="Never" />
+    <disable_collisions link1="c_bot_ee_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_ee_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="c_bot_ee_link" link2="tray_2" reason="Never" />
+    <disable_collisions link1="c_bot_ee_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="c_bot_ee_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="c_bot_forearm_link" link2="c_bot_upper_arm_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_forearm_link" link2="c_bot_wrist_1_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_forearm_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_forearm_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="c_bot_forearm_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="c_bot_forearm_link" link2="taskboard_part10" reason="Never" />
+    <disable_collisions link1="c_bot_forearm_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="c_bot_forearm_link" link2="tray_1" reason="Never" />
+    <disable_collisions link1="c_bot_forearm_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_forearm_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="c_bot_forearm_link" link2="tray_2" reason="Never" />
+    <disable_collisions link1="c_bot_forearm_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="c_bot_forearm_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="c_bot_ft300_link" link2="c_bot_robotiq_85_base_link" reason="Default" />
     <disable_collisions link1="c_bot_ft300_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="c_bot_ft300_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
@@ -1385,7 +1341,9 @@
     <disable_collisions link1="c_bot_ft300_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_ft300_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_ft300_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_ft300_link" link2="taskboard_part10" reason="Never" />
+    <disable_collisions link1="c_bot_ft300_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="c_bot_ft300_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_ft300_link" link2="tray_2_divider2" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_base_link" link2="c_bot_robotiq_85_left_finger_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_base_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_base_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Adjacent" />
@@ -1397,6 +1355,9 @@
     <disable_collisions link1="c_bot_robotiq_85_base_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_base_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_base_link" link2="c_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_base_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_base_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_base_link" link2="tray_2_divider2" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Default" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Adjacent" />
@@ -1407,9 +1368,10 @@
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="tray_2_divider2" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
@@ -1419,7 +1381,10 @@
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="taskboard_part10" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="tray_2_divider2" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
@@ -1428,9 +1393,10 @@
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="taskboard_part8" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="tray_2_divider2" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
@@ -1438,243 +1404,232 @@
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="taskboard_part8" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="tray_2" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="tray_2_divider2" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Default" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="tray_2_divider2" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="taskboard_part10" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="tray_2_divider2" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="taskboard_part10" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="tray_2_divider2" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="tray_2_divider2" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="c_bot_upper_arm_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_shoulder_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="c_bot_wrist_2_link" reason="Never" />
+    <disable_collisions link1="c_bot_shoulder_link" link2="dummyassy_part_01" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="mat" reason="Never" />
+    <disable_collisions link1="c_bot_shoulder_link" link2="retainer_pin_holder_link" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="screw_tool_holder" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="taskboard" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="c_bot_shoulder_link" link2="tray_1" reason="Never" />
+    <disable_collisions link1="c_bot_shoulder_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_shoulder_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="c_bot_shoulder_link" link2="tray_2" reason="Never" />
+    <disable_collisions link1="c_bot_shoulder_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="c_bot_shoulder_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="workbox1" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="workbox2" reason="Never" />
+    <disable_collisions link1="c_bot_upper_arm_link" link2="dummyassy_part_01" reason="Never" />
     <disable_collisions link1="c_bot_upper_arm_link" link2="m3_feeder_link" reason="Never" />
     <disable_collisions link1="c_bot_upper_arm_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="c_bot_upper_arm_link" link2="mat" reason="Never" />
+    <disable_collisions link1="c_bot_upper_arm_link" link2="retainer_pin_holder_link" reason="Never" />
     <disable_collisions link1="c_bot_upper_arm_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="c_bot_upper_arm_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="c_bot_upper_arm_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="c_bot_upper_arm_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="c_bot_upper_arm_link" link2="taskboard_part8" reason="Never" />
+    <disable_collisions link1="c_bot_upper_arm_link" link2="tray_1" reason="Never" />
+    <disable_collisions link1="c_bot_upper_arm_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_upper_arm_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="c_bot_upper_arm_link" link2="tray_2" reason="Never" />
+    <disable_collisions link1="c_bot_upper_arm_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="c_bot_upper_arm_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="c_bot_wrist_1_link" link2="c_bot_wrist_2_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_wrist_1_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="taskboard_part10" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_1_link" link2="m3_feeder_link" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_1_link" link2="m4_feeder_link" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_1_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_1_link" link2="tray_1" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_1_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_1_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_1_link" link2="tray_2" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_1_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_1_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="c_bot_wrist_2_link" link2="c_bot_wrist_3_link" reason="Adjacent" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="m3_feeder_link" reason="Default" />
-    <disable_collisions link1="c_bot_wrist_3_link" link2="m3_feeder_link" reason="Default" />
-    <disable_collisions link1="c_bot_wrist_3_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_3_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_2_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_2_link" link2="tray_1" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_2_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_2_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_2_link" link2="tray_2" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_2_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_2_link" link2="tray_2_screw_holder" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_3_link" link2="retainer_pin_holder_link" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_3_link" link2="tray_1" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_3_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_3_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_3_link" link2="tray_2" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_3_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_3_link" link2="tray_2_screw_holder" reason="Never" />
+    <disable_collisions link1="dummyassy_part_01" link2="m3_feeder_link" reason="Never" />
+    <disable_collisions link1="dummyassy_part_01" link2="m4_feeder_link" reason="Never" />
+    <disable_collisions link1="dummyassy_part_01" link2="retainer_pin_holder_link" reason="Adjacent" />
+    <disable_collisions link1="dummyassy_part_01" link2="screw_tool_holder" reason="Never" />
+    <disable_collisions link1="dummyassy_part_01" link2="screw_tool_m3_link" reason="Never" />
+    <disable_collisions link1="dummyassy_part_01" link2="screw_tool_m4_link" reason="Never" />
+    <disable_collisions link1="dummyassy_part_01" link2="screw_tool_m6_link" reason="Never" />
+    <disable_collisions link1="dummyassy_part_01" link2="suction_tool_link" reason="Never" />
+    <disable_collisions link1="dummyassy_part_01" link2="tray_1" reason="Adjacent" />
+    <disable_collisions link1="dummyassy_part_01" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="dummyassy_part_01" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="dummyassy_part_01" link2="tray_2" reason="Adjacent" />
+    <disable_collisions link1="dummyassy_part_01" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="dummyassy_part_01" link2="tray_2_screw_holder" reason="Never" />
+    <disable_collisions link1="dummyassy_part_01" link2="workbox1" reason="Adjacent" />
+    <disable_collisions link1="dummyassy_part_01" link2="workbox2" reason="Adjacent" />
     <disable_collisions link1="m3_feeder_link" link2="m4_feeder_link" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="mat" reason="Never" />
+    <disable_collisions link1="m3_feeder_link" link2="retainer_pin_holder_link" reason="Never" />
     <disable_collisions link1="m3_feeder_link" link2="screw_tool_holder" reason="Never" />
     <disable_collisions link1="m3_feeder_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="m3_feeder_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="m3_feeder_link" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="m3_feeder_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="taskboard" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="m3_feeder_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="m3_feeder_link" link2="tray_1" reason="Never" />
+    <disable_collisions link1="m3_feeder_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="m3_feeder_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="m3_feeder_link" link2="tray_2" reason="Never" />
+    <disable_collisions link1="m3_feeder_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="m3_feeder_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="m3_feeder_link" link2="workbox1" reason="Never" />
     <disable_collisions link1="m3_feeder_link" link2="workbox2" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="mat" reason="Never" />
+    <disable_collisions link1="m4_feeder_link" link2="retainer_pin_holder_link" reason="Never" />
     <disable_collisions link1="m4_feeder_link" link2="screw_tool_holder" reason="Never" />
     <disable_collisions link1="m4_feeder_link" link2="screw_tool_m3_link" reason="Never" />
     <disable_collisions link1="m4_feeder_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="m4_feeder_link" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="m4_feeder_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="taskboard" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="m4_feeder_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="m4_feeder_link" link2="tray_1" reason="Never" />
+    <disable_collisions link1="m4_feeder_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="m4_feeder_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="m4_feeder_link" link2="tray_2" reason="Never" />
+    <disable_collisions link1="m4_feeder_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="m4_feeder_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="m4_feeder_link" link2="workbox1" reason="Never" />
     <disable_collisions link1="m4_feeder_link" link2="workbox2" reason="Never" />
-    <disable_collisions link1="mat" link2="screw_tool_holder" reason="Never" />
-    <disable_collisions link1="mat" link2="screw_tool_m3_link" reason="Never" />
-    <disable_collisions link1="mat" link2="screw_tool_m4_link" reason="Never" />
-    <disable_collisions link1="mat" link2="screw_tool_m6_link" reason="Never" />
-    <disable_collisions link1="mat" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="mat" link2="taskboard" reason="Adjacent" />
-    <disable_collisions link1="mat" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="mat" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="mat" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="mat" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="mat" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="mat" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="mat" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="mat" link2="taskboard_part9" reason="Never" />
-    <disable_collisions link1="mat" link2="workbox1" reason="Default" />
-    <disable_collisions link1="mat" link2="workbox2" reason="Default" />
+    <disable_collisions link1="retainer_pin_holder_link" link2="screw_tool_holder" reason="Never" />
+    <disable_collisions link1="retainer_pin_holder_link" link2="screw_tool_m3_link" reason="Never" />
+    <disable_collisions link1="retainer_pin_holder_link" link2="screw_tool_m4_link" reason="Never" />
+    <disable_collisions link1="retainer_pin_holder_link" link2="screw_tool_m6_link" reason="Never" />
+    <disable_collisions link1="retainer_pin_holder_link" link2="suction_tool_link" reason="Never" />
+    <disable_collisions link1="retainer_pin_holder_link" link2="tray_1" reason="Adjacent" />
+    <disable_collisions link1="retainer_pin_holder_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="retainer_pin_holder_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="retainer_pin_holder_link" link2="tray_2" reason="Adjacent" />
+    <disable_collisions link1="retainer_pin_holder_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="retainer_pin_holder_link" link2="tray_2_screw_holder" reason="Never" />
+    <disable_collisions link1="retainer_pin_holder_link" link2="workbox1" reason="Adjacent" />
+    <disable_collisions link1="retainer_pin_holder_link" link2="workbox2" reason="Adjacent" />
     <disable_collisions link1="screw_tool_holder" link2="screw_tool_m3_link" reason="Adjacent" />
     <disable_collisions link1="screw_tool_holder" link2="screw_tool_m4_link" reason="Adjacent" />
     <disable_collisions link1="screw_tool_holder" link2="screw_tool_m6_link" reason="Adjacent" />
     <disable_collisions link1="screw_tool_holder" link2="suction_tool_link" reason="Adjacent" />
-    <disable_collisions link1="screw_tool_holder" link2="taskboard" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="screw_tool_holder" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="screw_tool_holder" link2="tray_1" reason="Never" />
+    <disable_collisions link1="screw_tool_holder" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="screw_tool_holder" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="screw_tool_holder" link2="tray_2" reason="Never" />
+    <disable_collisions link1="screw_tool_holder" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="screw_tool_holder" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="screw_tool_holder" link2="workbox1" reason="Never" />
     <disable_collisions link1="screw_tool_holder" link2="workbox2" reason="Never" />
     <disable_collisions link1="screw_tool_m3_link" link2="screw_tool_m4_link" reason="Never" />
     <disable_collisions link1="screw_tool_m3_link" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="screw_tool_m3_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="taskboard" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="screw_tool_m3_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="screw_tool_m3_link" link2="tray_1" reason="Never" />
+    <disable_collisions link1="screw_tool_m3_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="screw_tool_m3_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="screw_tool_m3_link" link2="tray_2" reason="Never" />
+    <disable_collisions link1="screw_tool_m3_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="screw_tool_m3_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="screw_tool_m3_link" link2="workbox1" reason="Never" />
     <disable_collisions link1="screw_tool_m3_link" link2="workbox2" reason="Never" />
     <disable_collisions link1="screw_tool_m4_link" link2="screw_tool_m6_link" reason="Never" />
     <disable_collisions link1="screw_tool_m4_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="taskboard" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="screw_tool_m4_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="screw_tool_m4_link" link2="tray_1" reason="Never" />
+    <disable_collisions link1="screw_tool_m4_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="screw_tool_m4_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="screw_tool_m4_link" link2="tray_2" reason="Never" />
+    <disable_collisions link1="screw_tool_m4_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="screw_tool_m4_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="screw_tool_m4_link" link2="workbox1" reason="Never" />
     <disable_collisions link1="screw_tool_m4_link" link2="workbox2" reason="Never" />
     <disable_collisions link1="screw_tool_m6_link" link2="suction_tool_link" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="taskboard" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="screw_tool_m6_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="screw_tool_m6_link" link2="tray_1" reason="Never" />
+    <disable_collisions link1="screw_tool_m6_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="screw_tool_m6_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="screw_tool_m6_link" link2="tray_2" reason="Never" />
+    <disable_collisions link1="screw_tool_m6_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="screw_tool_m6_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="screw_tool_m6_link" link2="workbox1" reason="Never" />
     <disable_collisions link1="screw_tool_m6_link" link2="workbox2" reason="Never" />
-    <disable_collisions link1="suction_tool_link" link2="taskboard" reason="Never" />
-    <disable_collisions link1="suction_tool_link" link2="taskboard_part10" reason="Never" />
-    <disable_collisions link1="suction_tool_link" link2="taskboard_part14" reason="Never" />
-    <disable_collisions link1="suction_tool_link" link2="taskboard_part5" reason="Never" />
-    <disable_collisions link1="suction_tool_link" link2="taskboard_part6_large_pulley" reason="Never" />
-    <disable_collisions link1="suction_tool_link" link2="taskboard_part6_small_pulley" reason="Never" />
-    <disable_collisions link1="suction_tool_link" link2="taskboard_part7_2" reason="Never" />
-    <disable_collisions link1="suction_tool_link" link2="taskboard_part8" reason="Never" />
-    <disable_collisions link1="suction_tool_link" link2="taskboard_part9" reason="Never" />
+    <disable_collisions link1="suction_tool_link" link2="tray_1" reason="Never" />
+    <disable_collisions link1="suction_tool_link" link2="tray_1_divider1_1" reason="Never" />
+    <disable_collisions link1="suction_tool_link" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="suction_tool_link" link2="tray_2" reason="Never" />
+    <disable_collisions link1="suction_tool_link" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="suction_tool_link" link2="tray_2_screw_holder" reason="Never" />
     <disable_collisions link1="suction_tool_link" link2="workbox1" reason="Never" />
     <disable_collisions link1="suction_tool_link" link2="workbox2" reason="Never" />
-    <disable_collisions link1="taskboard" link2="taskboard_part10" reason="Adjacent" />
-    <disable_collisions link1="taskboard" link2="taskboard_part14" reason="Adjacent" />
-    <disable_collisions link1="taskboard" link2="taskboard_part5" reason="Adjacent" />
-    <disable_collisions link1="taskboard" link2="taskboard_part6_large_pulley" reason="Adjacent" />
-    <disable_collisions link1="taskboard" link2="taskboard_part6_small_pulley" reason="Adjacent" />
-    <disable_collisions link1="taskboard" link2="taskboard_part7_2" reason="Adjacent" />
-    <disable_collisions link1="taskboard" link2="taskboard_part8" reason="Adjacent" />
-    <disable_collisions link1="taskboard" link2="taskboard_part9" reason="Adjacent" />
-    <disable_collisions link1="taskboard" link2="workbox1" reason="Adjacent" />
-    <disable_collisions link1="taskboard" link2="workbox2" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part10" link2="taskboard_part14" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part10" link2="taskboard_part5" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part10" link2="taskboard_part6_large_pulley" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part10" link2="taskboard_part6_small_pulley" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part10" link2="taskboard_part7_2" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part10" link2="taskboard_part8" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part10" link2="taskboard_part9" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part10" link2="workbox1" reason="Never" />
-    <disable_collisions link1="taskboard_part10" link2="workbox2" reason="Never" />
-    <disable_collisions link1="taskboard_part14" link2="taskboard_part5" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part14" link2="taskboard_part6_large_pulley" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part14" link2="taskboard_part6_small_pulley" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part14" link2="taskboard_part7_2" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part14" link2="taskboard_part8" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part14" link2="taskboard_part9" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part14" link2="workbox1" reason="Never" />
-    <disable_collisions link1="taskboard_part14" link2="workbox2" reason="Never" />
-    <disable_collisions link1="taskboard_part5" link2="taskboard_part6_large_pulley" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part5" link2="taskboard_part6_small_pulley" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part5" link2="taskboard_part7_2" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part5" link2="taskboard_part8" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part5" link2="taskboard_part9" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part5" link2="workbox1" reason="Never" />
-    <disable_collisions link1="taskboard_part5" link2="workbox2" reason="Never" />
-    <disable_collisions link1="taskboard_part6_large_pulley" link2="taskboard_part6_small_pulley" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part6_large_pulley" link2="taskboard_part7_2" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part6_large_pulley" link2="taskboard_part8" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part6_large_pulley" link2="taskboard_part9" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part6_large_pulley" link2="workbox1" reason="Never" />
-    <disable_collisions link1="taskboard_part6_large_pulley" link2="workbox2" reason="Never" />
-    <disable_collisions link1="taskboard_part6_small_pulley" link2="taskboard_part7_2" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part6_small_pulley" link2="taskboard_part8" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part6_small_pulley" link2="taskboard_part9" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part6_small_pulley" link2="workbox1" reason="Never" />
-    <disable_collisions link1="taskboard_part6_small_pulley" link2="workbox2" reason="Never" />
-    <disable_collisions link1="taskboard_part7_2" link2="taskboard_part8" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part7_2" link2="taskboard_part9" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part7_2" link2="workbox1" reason="Never" />
-    <disable_collisions link1="taskboard_part7_2" link2="workbox2" reason="Never" />
-    <disable_collisions link1="taskboard_part8" link2="taskboard_part9" reason="Adjacent" />
-    <disable_collisions link1="taskboard_part8" link2="workbox1" reason="Never" />
-    <disable_collisions link1="taskboard_part8" link2="workbox2" reason="Never" />
-    <disable_collisions link1="taskboard_part9" link2="workbox1" reason="Never" />
-    <disable_collisions link1="taskboard_part9" link2="workbox2" reason="Never" />
+    <disable_collisions link1="tray_1" link2="tray_1_divider1_1" reason="Adjacent" />
+    <disable_collisions link1="tray_1" link2="tray_1_divider1_2" reason="Adjacent" />
+    <disable_collisions link1="tray_1" link2="tray_2" reason="Adjacent" />
+    <disable_collisions link1="tray_1" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="tray_1" link2="tray_2_screw_holder" reason="Never" />
+    <disable_collisions link1="tray_1" link2="workbox1" reason="Adjacent" />
+    <disable_collisions link1="tray_1" link2="workbox2" reason="Adjacent" />
+    <disable_collisions link1="tray_1_divider1_1" link2="tray_1_divider1_2" reason="Never" />
+    <disable_collisions link1="tray_1_divider1_1" link2="tray_2" reason="Never" />
+    <disable_collisions link1="tray_1_divider1_1" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="tray_1_divider1_1" link2="tray_2_screw_holder" reason="Never" />
+    <disable_collisions link1="tray_1_divider1_1" link2="workbox1" reason="Default" />
+    <disable_collisions link1="tray_1_divider1_1" link2="workbox2" reason="Never" />
+    <disable_collisions link1="tray_1_divider1_2" link2="tray_2" reason="Never" />
+    <disable_collisions link1="tray_1_divider1_2" link2="tray_2_divider2" reason="Never" />
+    <disable_collisions link1="tray_1_divider1_2" link2="tray_2_screw_holder" reason="Never" />
+    <disable_collisions link1="tray_1_divider1_2" link2="workbox1" reason="Default" />
+    <disable_collisions link1="tray_1_divider1_2" link2="workbox2" reason="Never" />
+    <disable_collisions link1="tray_2" link2="tray_2_divider2" reason="Adjacent" />
+    <disable_collisions link1="tray_2" link2="tray_2_screw_holder" reason="Adjacent" />
+    <disable_collisions link1="tray_2" link2="workbox1" reason="Adjacent" />
+    <disable_collisions link1="tray_2" link2="workbox2" reason="Adjacent" />
+    <disable_collisions link1="tray_2_divider2" link2="tray_2_screw_holder" reason="Default" />
+    <disable_collisions link1="tray_2_divider2" link2="workbox1" reason="Never" />
+    <disable_collisions link1="tray_2_divider2" link2="workbox2" reason="Never" />
+    <disable_collisions link1="tray_2_screw_holder" link2="workbox1" reason="Default" />
+    <disable_collisions link1="tray_2_screw_holder" link2="workbox2" reason="Never" />
     <disable_collisions link1="workbox1" link2="workbox2" reason="Adjacent" />
 </robot>

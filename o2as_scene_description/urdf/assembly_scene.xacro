@@ -33,7 +33,7 @@
   <!-- <xacro:include filename="$(find o2as_parts_description)/urdf/display_all_parts.urdf.xacro"/> -->
 
 
-  <xacro:property name="assy_dx" value="-.01" />
+  <xacro:property name="assy_dx" value="-.008" />
 
   <!-- <xacro:include filename="$(find o2as_parts_description)/urdf/generated/full_assembly.urdf.xacro"/>
   <xacro:full_assembly prefix="assembled_" parent="workspace_center">

@@ -66,7 +66,12 @@ import ur_modern_driver.msg
 
 def is_program_running(topic_namespace = ""):
   """Checks if a program is running on the UR"""
-  msg = rospy.wait_for_message(topic_namespace + "/ur_driver/robot_mode_state", ur_modern_driver.msg.RobotModeDataMsg)
+  msg = []
+  try:
+    msg = rospy.wait_for_message(topic_namespace + "/ur_driver/robot_mode_state", ur_modern_driver.msg.RobotModeDataMsg, 1.0)
+  except:
+    pass
+
   if msg:
     return msg.is_program_running
   else:
@@ -119,21 +124,20 @@ class O2ASBaseRoutines(object):
   """
   def __init__(self):
     # super(O2ASBaseRoutines, self).__init__()
-    
+    rospy.init_node('o2as_routines', anonymous=False)
+    moveit_commander.roscpp_initialize(sys.argv)
+
     self.listener = tf.TransformListener()
     self.use_real_robot = rospy.get_param("use_real_robot")
-    self.force_ur_script_linear_motion = False
+    self.force_ur_script_linear_motion = True
     self.force_moveit_linear_motion = False
 
-    self.competition_mode = True   # Disables confirmation dialogs etc. for full automatic motion
+    self.competition_mode = False   # Setting this to True disables confirmation dialogs etc., thus enabling uninterrupted automatic motion
 
     self.speed_fast = 1.5
     self.speed_fastest = 3.0
     self.acc_fast = 1.0
     self.acc_fastest = 2.0
-
-    moveit_commander.roscpp_initialize(sys.argv)
-    rospy.init_node('assembly_example', anonymous=False)
 
     self.robots = moveit_commander.RobotCommander()
     self.planning_scene_interface = moveit_commander.PlanningSceneInterface()
@@ -166,7 +170,7 @@ class O2ASBaseRoutines(object):
     self.publishMarker_client = rospy.ServiceProxy('/o2as_skills/publishMarker', o2as_msgs.srv.publishMarker)
     self.toggleCollisions_client = rospy.ServiceProxy('/o2as_skills/toggleCollisions', std_srvs.srv.SetBool)
 
-    self.run_mode_ = False
+    self.run_mode_ = True     # The modes limit the maximum speed of motions. Used with the safety system @WRS2018
     self.pause_mode_ = False
     self.test_mode_ = False
     self.sub_run_mode_ = rospy.Subscriber("/run_mode", Bool, self.run_mode_callback)
@@ -190,7 +194,6 @@ class O2ASBaseRoutines(object):
   def confirm_to_proceed(self, next_task_name):
     if self.competition_mode:
       return True
-    # TODO: Disable this when the real competition is on (via a rosparam/member variable)
     rospy.loginfo("Press enter to proceed to: " + next_task_name)
     i = raw_input()
     if i == "":
@@ -222,6 +225,17 @@ class O2ASBaseRoutines(object):
     req.marker_type = marker_type
     self.publishMarker_client.call(req)
     return True
+
+  def get_current_pose_stamped(self, group_name):
+    group = self.groups[group_name]
+    return group.get_current_pose()
+
+  def get_current_pose(self, group_name):
+    group = self.groups[group_name]
+    return group.get_current_pose().pose
+  
+  def lookup_transform(self, robot_name, end_effector_link):
+    return self.listener.lookupTransform(end_effector_link, robot_name, rospy.Time())
 
   def go_to_pose_goal(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, high_precision = False, 
                       end_effector_link = "", move_lin = True):
@@ -493,7 +507,8 @@ class O2ASBaseRoutines(object):
 
   ######
 
-  def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, special_pick = False, lift_up_after_pick=True):
+  def pick(self, robotname, object_pose, grasp_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, 
+          special_pick = False, lift_up_after_pick=True, force_ur_script=False, acc_fast=1.0, acc_slow=.5):
     #self.publish_marker(object_pose, "pick_pose")
     #initial gripper_setup
     #rospy.loginfo("Going above object to pick")
@@ -509,7 +524,7 @@ class O2ASBaseRoutines(object):
     if special_pick == True:
       object_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*45/180, pi/2))
     rospy.logdebug("Going to height " + str(object_pose.pose.position.z))
-    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, acceleration=acc_fast, move_lin=True)
     object_pose.pose.position.z -= approach_height
     rospy.logdebug("Height 2: " + str(object_pose.pose.position.z))
     # self.publish_marker(object_pose, "place_pose")
@@ -530,7 +545,7 @@ class O2ASBaseRoutines(object):
     rospy.loginfo("Moving down to object")
     object_pose.pose.position.z += grasp_height
     rospy.logdebug("Going to height " + str(object_pose.pose.position.z))
-    self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, high_precision=True, move_lin=True)
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, acceleration=acc_slow, high_precision=True, move_lin=True)
     object_pose.pose.position.z -= grasp_height
 
     # W = raw_input("waiting for the gripper")
@@ -558,23 +573,23 @@ class O2ASBaseRoutines(object):
 
       object_pose.pose.position.z += approach_height
       rospy.loginfo("Going to height " + str(object_pose.pose.position.z))
-      self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
+      self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, acceleration=acc_fast, move_lin=True)
       object_pose.pose.position.z -= approach_height
     return True
 
   ######
 
-  def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, lift_up_after_place = True):
+  def place(self,robotname, object_pose, place_height, speed_fast, speed_slow, gripper_command, approach_height = 0.05, lift_up_after_place = True, acc_fast=1.0, acc_slow=.5):
     #self.publish_marker(object_pose, "place_pose")
     self.log_to_debug_monitor("Place", "operation")
     rospy.loginfo("Going above place target")
     object_pose.pose.position.z += approach_height
-    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, move_lin=True)
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_fast, acceleration=acc_fast, move_lin=True)
     object_pose.pose.position.z -= approach_height
 
     rospy.loginfo("Moving to place target")
     object_pose.pose.position.z += place_height
-    self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, move_lin=True)
+    self.go_to_pose_goal(robotname, object_pose, speed=speed_slow, acceleration=acc_slow, move_lin=True)
     object_pose.pose.position.z -= place_height
 
     # print "============ Stopping at the placement height. Press `Enter` to keep moving moving the robot ..."
@@ -753,8 +768,140 @@ class O2ASBaseRoutines(object):
     req.radius_increment = radius_increment
     res = self.urscript_client.call(req)
     if wait:
+      rospy.sleep(2.0)
       wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
     return res.success
+
+  def do_spiral_search(self, robot_name, max_insertion_distance= 0.0, 
+                        max_approach_distance = 0.0, max_force = .0,
+                        max_radius = 0.0, radius_increment = .0,
+                        peck_mode=False, wait = True):
+    if not self.use_real_robot:
+      return True
+    # Directly calls the UR service rather than the action of the skill_server
+    req = o2as_msgs.srv.sendScriptToURRequest()
+    req.robot_name = robot_name
+    req.program_id = "spiral"
+
+    #  Original defaults:
+    # max_approach_distance = .1, max_force = 5,
+    #                     max_radius = .001, radius_increment = .0001,
+    req.max_insertion_distance = max_insertion_distance
+    req.max_approach_distance = max_approach_distance
+    req.max_force = max_force
+    req.peck_mode = peck_mode
+    req.max_radius = max_radius
+    req.radius_increment = radius_increment
+    res = self.urscript_client.call(req)
+    if wait:
+      rospy.sleep(2.0)
+      wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
+    return res.success
+
+  def adaptive_insertion(self, robot_name, max_force = .0, 
+                        wait = True, goal_force = [0,0,0,0,0,0], desired_twist = [0,0,0,0,0,0],
+                        goal_pose = [0,0,0,0,0,0], goal_speed = [0.1,0.1,0.1,0.05,0.05,0.05], 
+                        compliant_axis = "X", use_relative_pos = True):
+    if not self.use_real_robot:
+      return True
+    # Directly calls the UR service rather than the action of the skill_server
+    req = o2as_msgs.srv.sendScriptToURRequest()
+    req.robot_name = robot_name
+    req.program_id = "adaptive_insert"
+    req.goal_force = goal_force
+    req.desired_twist = desired_twist
+    req.goal_pose = goal_pose
+    req.goal_speed = goal_speed
+    req.compliant_axis = compliant_axis
+    req.max_force = max_force
+    req.use_relative_pos = use_relative_pos
+    res = self.urscript_client.call(req)
+    if wait:
+      rospy.sleep(2.0)
+      wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
+    return res.success
+
+  # Prints a textmsg to the UR controller log of the current speed
+  def get_current_urscript_speed(self, robot_name, wait = True):
+    if not self.use_real_robot:
+      return True
+    # Directly calls the UR service rather than the action of the skill_server
+    req = o2as_msgs.srv.sendScriptToURRequest()
+    req.robot_name = robot_name
+    req.program_id = "current_robot_speed"
+    res = self.urscript_client.call(req)
+    if wait:
+      rospy.sleep(2.0)
+      wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
+    return res.success
+
+  def move_tcp(self, robot_name, tcp_pose = [0.0,0.0,0.0,0.0,0.0,0.0]):
+    if not self.use_real_robot:
+      return True
+    # Directly calls the UR service rather than the action of the skill_server
+    req = o2as_msgs.srv.sendScriptToURRequest()
+    req.robot_name = robot_name
+    req.program_id = "tool_center_point"
+    req.tcp_pose = tcp_pose
+    res = self.urscript_client.call(req)
+
+  def teach_insertion(self, robot_name, max_insertion_distance= 0.0, 
+                        max_approach_distance = 0.0, max_force = .0,
+                        max_radius = 0.0, radius_increment = .0,
+                        peck_mode=False,
+                        wait = True, horizontal=False):
+    if not self.use_real_robot:
+      return True
+    # Directly calls the UR service rather than the action of the skill_server
+    req = o2as_msgs.srv.sendScriptToURRequest()
+    req.robot_name = robot_name
+    req.program_id = "teach_insert"
+    if horizontal:
+      req.program_id = "horizontal_insertion"
+
+    #  Original defaults:
+    # max_approach_distance = .1, max_force = 5,
+    #                     max_radius = .001, radius_increment = .0001,
+    req.max_insertion_distance = max_insertion_distance
+    req.max_approach_distance = max_approach_distance
+    req.max_force = max_force
+    req.peck_mode = peck_mode
+    req.max_radius = max_radius
+    req.radius_increment = radius_increment
+    res = self.urscript_client.call(req)
+    if wait:
+      rospy.sleep(2.0)
+      wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
+    return res.success
+  
+  # def do_insertion_advanced(self, robot_name, max_insertion_distance= 0.0, 
+  #                       max_approach_distance = 0.0, max_force = .0,
+  #                       max_radius = 0.0, radius_increment = .0,
+  #                       peck_mode=False,
+  #                       wait = True, horizontal=False):
+  #   if not self.use_real_robot:
+  #     return True
+  #   # Directly calls the UR service rather than the action of the skill_server
+  #   req = o2as_msgs.srv.sendScriptToURRequest()
+  #   req.robot_name = robot_name
+  #   req.program_id = "insert_advanced"
+  #   if horizontal:
+  #     req.program_id = "horizontal_insertion"
+
+  #   #  Original defaults:
+  #   # max_approach_distance = .1, max_force = 5,
+  #   #                     max_radius = .001, radius_increment = .0001,
+  #   req.max_insertion_distance = max_insertion_distance
+  #   req.max_approach_distance = max_approach_distance
+  #   req.max_force = max_force
+  #   req.peck_mode = peck_mode
+  #   req.max_radius = max_radius
+  #   req.radius_increment = radius_increment
+  #   res = self.urscript_client.call(req)
+  #   if wait:
+  #     rospy.sleep(2.0)
+  #     wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
+  #   return res.success
   
   def do_linear_push(self, robot_name, force, wait = True, direction = "Z+", max_approach_distance=0.1, forward_speed=0.0):
     if not self.use_real_robot:
@@ -795,7 +942,7 @@ class O2ASBaseRoutines(object):
 
   ################ ----- Gripper interfaces
   
-  def send_gripper_command(self, gripper, command, this_action_grasps_an_object = False, force = 5.0, velocity = .1, wait=True):
+  def send_gripper_command(self, gripper, command, this_action_grasps_an_object = False, force = 40.0, velocity = .1, wait=True):
     if not self.use_real_robot:
       return True
     if gripper == "precision_gripper_outer" or gripper == "precision_gripper_inner" or gripper == "a_bot":
@@ -1001,12 +1148,15 @@ class O2ASBaseRoutines(object):
     self.go_to_named_pose("screw_ready", robot_name, force_ur_script=self.use_real_robot)
     
     # ATTENTION: MAGIC NUMBERS
+    magic_x_offset = 0.0
     if robot_name == "c_bot":
       magic_y_offset = .004
       magic_z_offset = -.01
     elif robot_name == "b_bot":
       magic_y_offset = .002
       magic_z_offset = -0.01
+      if screw_size == 6:
+        magic_x_offset = .002
 
     pick_pose = geometry_msgs.msg.PoseStamped()
     pick_pose.header.frame_id = "a_bot_gripper_screw_pickup"
@@ -1014,6 +1164,7 @@ class O2ASBaseRoutines(object):
       pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi*5/4, 0, 0))
     elif robot_name == "c_bot":
       pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(-pi/6, 0, 0))
+    pick_pose.pose.position.x = magic_x_offset
     pick_pose.pose.position.y = magic_y_offset
     pick_pose.pose.position.z = magic_z_offset
     self.publish_marker(pick_pose, "pose")
