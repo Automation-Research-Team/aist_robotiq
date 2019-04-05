@@ -51,7 +51,7 @@ class Plane
 template <class T, size_t N> template <class ITER> void
 Plane<T, N>::fit(ITER begin, ITER end)
 {
-    using matrix_type	= cv::Matx<T, N, N>;
+    using matrix_type = cv::Matx<T, N, N>;
 
     const auto	ext   =	[](const auto& x)
 			{
@@ -63,7 +63,7 @@ Plane<T, N>::fit(ITER begin, ITER end)
 			};
 
   // Check #points.
-    const auto	npoints  = std::distance(begin, end);
+    const auto	npoints = std::distance(begin, end);
     if (npoints < 3)
 	throw std::runtime_error("Failed to fit a plane: three or more points required!");
     
