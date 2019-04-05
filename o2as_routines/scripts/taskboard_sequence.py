@@ -231,55 +231,55 @@ class TaskboardClass(O2ASBaseRoutines):
     # - Belt 6 after bearing 1. nut/bolt 7 anytime.
     
     # Set screw has to be first, because b_bot is right on top of it
-    # self.log_to_debug_monitor("No.  1 / 14: Set screw (id=11)", "subtask")
-    # self.confirm_to_proceed("No.  1 / 14: Set screw (id=11)")
-    # self.do_task_number(11) # set screw
-    # self.log_to_debug_monitor("No.  2 / 14: Retainer pin (id=2)", "subtask")
-    # self.confirm_to_proceed("No.  2 / 14: Retainer pin (id=2)")
-    # self.do_task_number(2)  # Retainer pin
+    self.log_to_debug_monitor("No.  1 / 14: Set screw (id=11)", "subtask")
+    self.confirm_to_proceed("No.  1 / 14: Set screw (id=11)")
+    self.do_task_number(11) # set screw
+    self.log_to_debug_monitor("No.  2 / 14: Retainer pin (id=2)", "subtask")
+    self.confirm_to_proceed("No.  2 / 14: Retainer pin (id=2)")
+    self.do_task_number(2)  # Retainer pin
 
-    # self.log_to_debug_monitor("No.  3 / 14: Spacer small (id=3)", "subtask")
-    # self.confirm_to_proceed("No.  3 / 14: Spacer small (id=3)")
-    # self.do_task_number(3)  # Spacer small
-    # self.log_to_debug_monitor("No.  4 / 14: Spacer large (id=4)", "subtask")
-    # self.confirm_to_proceed("No.  4 / 14: Spacer large (id=4)")
-    # self.do_task_number(4)  # Spacer large
+    self.log_to_debug_monitor("No.  3 / 14: Spacer small (id=3)", "subtask")
+    self.confirm_to_proceed("No.  3 / 14: Spacer small (id=3)")
+    self.do_task_number(3)  # Spacer small
+    self.log_to_debug_monitor("No.  4 / 14: Spacer large (id=4)", "subtask")
+    self.confirm_to_proceed("No.  4 / 14: Spacer large (id=4)")
+    self.do_task_number(4)  # Spacer large
 
-    # self.log_to_debug_monitor("No.  5 / 14: Washer small (id=9)", "subtask")
-    # self.confirm_to_proceed("No.  5 / 14: Washer small (id=9)")
-    # self.do_task_number(9)  # Washer small
-    # self.log_to_debug_monitor("No.  6 / 14: Washer large (id=10)", "subtask")
-    # self.confirm_to_proceed("No.  6 / 14: Washer large (id=10)")
-    # self.do_task_number(10) # Washer large
-    # self.log_to_debug_monitor("No.  7 / 14: Pulley (id=14)", "subtask")
-    # self.confirm_to_proceed("No.  7 / 14: Pulley (id=14)")
-    # self.do_task_number(14) # Pulley
+    self.log_to_debug_monitor("No.  5 / 14: Washer small (id=9)", "subtask")
+    self.confirm_to_proceed("No.  5 / 14: Washer small (id=9)")
+    self.do_task_number(9)  # Washer small
+    self.log_to_debug_monitor("No.  6 / 14: Washer large (id=10)", "subtask")
+    self.confirm_to_proceed("No.  6 / 14: Washer large (id=10)")
+    self.do_task_number(10) # Washer large
+    self.log_to_debug_monitor("No.  7 / 14: Pulley (id=14)", "subtask")
+    self.confirm_to_proceed("No.  7 / 14: Pulley (id=14)")
+    self.do_task_number(14) # Pulley
 
-    # self.log_to_debug_monitor("No. 11 / 14: M4 screw (id=13)", "subtask")
-    # self.confirm_to_proceed("No. 11 / 14: M4 screw (id=13) pick-up only")
-    # self.do_task_number(131) # M4 screw 
-    # self.log_to_debug_monitor("No. 12 / 14: M3 screw (id=12)", "subtask")
-    # self.confirm_to_proceed("No. 12 / 14: M3 screw (id=12) pick-up only")
-    # self.do_task_number(121) # M3 screw 
+    self.log_to_debug_monitor("No. 11 / 14: M4 screw (id=13)", "subtask")
+    self.confirm_to_proceed("No. 11 / 14: M4 screw (id=13) pick-up only")
+    self.do_task_number(131) # M4 screw 
+    self.log_to_debug_monitor("No. 12 / 14: M3 screw (id=12)", "subtask")
+    self.confirm_to_proceed("No. 12 / 14: M3 screw (id=12) pick-up only")
+    self.do_task_number(121) # M3 screw 
 
-    # self.log_to_debug_monitor("No.  8 / 14: Bearing (id=1)", "subtask")
-    # self.confirm_to_proceed("No.  8 / 14: Bearing (id=1)")
-    # self.do_task_number(1)  # Bearing
-    # self.log_to_debug_monitor("No.  9 / 14: Belt (id=6)", "subtask")
-    # self.confirm_to_proceed("No.  9 / 14: Belt (id=6)")
-    # self.do_task_number(6)  # Belt
+    self.log_to_debug_monitor("No.  8 / 14: Bearing (id=1)", "subtask")
+    self.confirm_to_proceed("No.  8 / 14: Bearing (id=1)")
+    self.do_task_number(1)  # Bearing
+    self.log_to_debug_monitor("No.  9 / 14: Belt (id=6)", "subtask")
+    self.confirm_to_proceed("No.  9 / 14: Belt (id=6)")
+    self.do_task_number(6)  # Belt
 
-    # self.log_to_debug_monitor("No. 13 / 14: M10 nut (id=8)", "subtask")
-    # self.confirm_to_proceed("No. 13 / 14: M10 nut (id=8)")
-    # self.do_task_number(8)  # M10 nut
+    self.log_to_debug_monitor("No. 13 / 14: M10 nut (id=8)", "subtask")
+    self.confirm_to_proceed("No. 13 / 14: M10 nut (id=8)")
+    self.do_task_number(8)  # M10 nut
 
-    # ### End cap has to be before M4 screw
-    # self.log_to_debug_monitor("No. 10 / 14: End cap (id=15)", "subtask")
-    # self.confirm_to_proceed("No. 10 / 14: End cap (id=15)")
-    # self.do_task_number(15) # end cap
-    # self.log_to_debug_monitor("No. 11 / 14: M4 screw (id=13)", "subtask")
-    # self.confirm_to_proceed("No. 11 / 14: M4 screw (id=13)")
-    # self.do_task_number(132) # M4 screw?
+    ### End cap has to be before M4 screw
+    self.log_to_debug_monitor("No. 10 / 14: End cap (id=15)", "subtask")
+    self.confirm_to_proceed("No. 10 / 14: End cap (id=15)")
+    self.do_task_number(15) # end cap
+    self.log_to_debug_monitor("No. 11 / 14: M4 screw (id=13)", "subtask")
+    self.confirm_to_proceed("No. 11 / 14: M4 screw (id=13)")
+    self.do_task_number(132) # M4 screw?
     self.log_to_debug_monitor("No. 12 / 14: M3 screw (id=12)", "subtask")
     self.confirm_to_proceed("No. 12 / 14: M3 screw (id=12)")
     self.do_task_number(122) # M3 screw?
@@ -717,60 +717,60 @@ class TaskboardClass(O2ASBaseRoutines):
       #                         approach_height = 0.03, lift_up_after_place = True)
 
     if i == 7:
-      # self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
-      # self.go_to_named_pose("back", "b_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
-      # self.go_to_named_pose("back", "c_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+      self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+      self.go_to_named_pose("back", "b_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+      self.go_to_named_pose("back", "c_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
       
-      # # Pick up M6 screw, arrange it in the gripper, and pick it with b_bot
-      # partScrew = geometry_msgs.msg.PoseStamped()
-      # partScrew.header.frame_id = "mat_part7_1"
-      # partScrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*30/180, +pi/2))
-      # partScrew.pose.position.y += .013  # KIND OF MAGIC NUMBER (increasing it moves a_bot forward)
-      # self.pick("a_bot",partScrew, grasp_height=.01,
-      #                 speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
-      #                 approach_height = 0.05)
-      # self.tilt_up_gripper(speed_fast=0.1, speed_slow=0.02, screw_size = 6)
-      # self.confirm_to_proceed("did the tilt work?")
+      # Pick up M6 screw, arrange it in the gripper, and pick it with b_bot
+      partScrew = geometry_msgs.msg.PoseStamped()
+      partScrew.header.frame_id = "mat_part7_1"
+      partScrew.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(pi, pi*30/180, +pi/2))
+      partScrew.pose.position.y += .013  # KIND OF MAGIC NUMBER (increasing it moves a_bot forward)
+      self.pick("a_bot",partScrew, grasp_height=.01,
+                      speed_fast = 0.2, speed_slow = 0.02, gripper_command="close",
+                      approach_height = 0.05)
+      self.tilt_up_gripper(speed_fast=0.1, speed_slow=0.02, screw_size = 6)
+      self.confirm_to_proceed("did the tilt work?")
 
-      # self.do_change_tool_action("b_bot", equip=True, screw_size = 6)        
-      # self.confirm_to_proceed("Pick screw from gripper?")
-      # self.pick_screw_from_precision_gripper(screw_size=6, robot_name="b_bot")
-      # self.confirm_to_proceed("Screw picked?")
-      # self.go_to_named_pose("screw_ready_back", "b_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
-      # self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+      self.do_change_tool_action("b_bot", equip=True, screw_size = 6)        
+      self.confirm_to_proceed("Pick screw from gripper?")
+      self.pick_screw_from_precision_gripper(screw_size=6, robot_name="b_bot")
+      self.confirm_to_proceed("Screw picked?")
+      self.go_to_named_pose("screw_ready_back", "b_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+      self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
 
-      # # Pick the nut with a_bot, place it near c_bot
-      # self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
-      # nut_pick_pose = geometry_msgs.msg.PoseStamped()
-      # nut_pick_pose.header.frame_id = "mat_part7_2"
-      # nut_pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-      # self.confirm_to_proceed("Pick the nut with a_bot now?")
-      # self.pick("a_bot",nut_pick_pose, 0.0,
-      #                             speed_fast = 0.31, speed_slow = 0.05, gripper_command="inner_gripper_from_inside",
-      #                             approach_height = 0.05)
-      # self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+      # Pick the nut with a_bot, place it near c_bot
+      self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+      nut_pick_pose = geometry_msgs.msg.PoseStamped()
+      nut_pick_pose.header.frame_id = "mat_part7_2"
+      nut_pick_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
+      self.confirm_to_proceed("Pick the nut with a_bot now?")
+      self.pick("a_bot",nut_pick_pose, 0.0,
+                                  speed_fast = 0.31, speed_slow = 0.05, gripper_command="inner_gripper_from_inside",
+                                  approach_height = 0.05)
+      self.go_to_named_pose("home", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
 
-      # nut_place_a_bot = geometry_msgs.msg.PoseStamped()
-      # nut_place_a_bot.header.frame_id = "workspace_center"
-      # nut_place_a_bot.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
-      # nut_place_a_bot.pose.position.x = -.25
-      # nut_place_a_bot.pose.position.y = -.32
+      nut_place_a_bot = geometry_msgs.msg.PoseStamped()
+      nut_place_a_bot.header.frame_id = "workspace_center"
+      nut_place_a_bot.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
+      nut_place_a_bot.pose.position.x = -.25
+      nut_place_a_bot.pose.position.y = -.32
 
-      # nut_pick_c_bot = copy.deepcopy(nut_place_a_bot)
-      # nut_pick_c_bot.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi*3/4))
+      nut_pick_c_bot = copy.deepcopy(nut_place_a_bot)
+      nut_pick_c_bot.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, pi*3/4))
 
-      # self.place("a_bot",nut_place_a_bot,0.0,
-      #                             speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
-      #                             approach_height = 0.05,lift_up_after_place = True)
-      # self.go_to_named_pose("back", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+      self.place("a_bot",nut_place_a_bot,0.0,
+                                  speed_fast = 0.31, speed_slow = 0.05, gripper_command="easy_pick_only_inner",
+                                  approach_height = 0.05,lift_up_after_place = True)
+      self.go_to_named_pose("back", "a_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
 
-      # self.confirm_to_proceed("Pick the nut with c_bot now?")
-      # # Pick up the nut with c_bot
-      # self.go_to_named_pose("tool_pick_ready", "c_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
-      # self.do_change_tool_action("c_bot", equip=True, screw_size=66)  #66 = nut tool m6
-      # self.go_to_named_pose("feeder_pick_ready", "c_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
-      # self.pick_nut_from_table("c_bot", object_pose=nut_pick_c_bot,end_effector_link="c_bot_nut_tool_m6_tip_link")
-      # self.go_to_named_pose("back", "c_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+      self.confirm_to_proceed("Pick the nut with c_bot now?")
+      # Pick up the nut with c_bot
+      self.go_to_named_pose("tool_pick_ready", "c_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+      self.do_change_tool_action("c_bot", equip=True, screw_size=66)  #66 = nut tool m6
+      self.go_to_named_pose("feeder_pick_ready", "c_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
+      self.pick_nut_from_table("c_bot", object_pose=nut_pick_c_bot,end_effector_link="c_bot_nut_tool_m6_tip_link")
+      self.go_to_named_pose("back", "c_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
 
       # Position b_bot screw tool (via intermediate pose?)
       # self.go_to_named_pose("taskboard_screw_tool_horizontal_approach", "b_bot")  #TODO
@@ -997,8 +997,6 @@ class TaskboardClass(O2ASBaseRoutines):
       self.go_to_pose_goal("c_bot", push_pose_c, speed=1.0, move_lin=True)
       self.go_to_named_pose("home", "c_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
 
-      # drop_tool_joint_pose = [0.178453728556633, -1.6114686171161097, 2.1463537216186523, -0.0819476286517542, 1.0472468137741089, -2.776330296193258]
-      # self.move_joints("b_bot", drop_tool_joint_pose, speed=.05)
       self.go_to_named_pose("discard_taskboard_tool","b_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
       self.send_gripper_command("b_bot", .06)
       self.send_gripper_command("b_bot", "open")
@@ -1218,7 +1216,6 @@ if __name__ == '__main__':
       if i == "start":
         taskboard.full_taskboard_task()
       if i == "11":
-        # taskboard.equip_unequip_set_screw_tool(equip=True)
         taskboard.do_change_tool_action("c_bot", equip=True, screw_size = 66)
       if i == "12":
         taskboard.do_change_tool_action("c_bot", equip=False, screw_size = 66)
@@ -1232,10 +1229,6 @@ if __name__ == '__main__':
         tool_pickup_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
         tool_pickup_pose.pose.position.z = 0.03
         taskboard.go_to_pose_goal("b_bot", tool_pickup_pose, speed=.1)
-        # tool_grasped_height = 0.03
-        # self.pick("b_bot",tool_pickup_pose, tool_grasped_height,
-        #                     speed_fast = 1.0, speed_slow = 0.5, gripper_command="close",
-        #                     approach_height = 0.1)
       if i == "191":
         taskboard.do_change_tool_action("b_bot", equip=True, screw_size = 4)
       if i == "192":
