@@ -11,7 +11,7 @@
     <origin xyz="0.35 0 0" rpy="0 0 ${pi/2}" />
   </xacro:kitting_tray2>
 
-  <!-- Retainer pin jig -->
+  <!-- Retainer pin jig (used to hold the retainer pin for resetting during the task) -->
   <joint name="retainer_pin_holder_joint" type="fixed">
     <parent link="workspace_center"/>
     <child link="retainer_pin_holder_link"/>
@@ -33,7 +33,7 @@
   <!-- <xacro:include filename="$(find o2as_parts_description)/urdf/display_all_parts.urdf.xacro"/> -->
 
 
-  <xacro:property name="assy_dx" value="-.01" />
+  <xacro:property name="assy_dx" value="-.008" />
 
   <!-- <xacro:include filename="$(find o2as_parts_description)/urdf/generated/full_assembly.urdf.xacro"/>
   <xacro:full_assembly prefix="assembled_" parent="workspace_center">

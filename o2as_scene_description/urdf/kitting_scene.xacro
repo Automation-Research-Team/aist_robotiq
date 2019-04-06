@@ -16,8 +16,7 @@
     <origin xyz=".52 -0.25 .065" rpy="0 0 ${pi/2}" />   
   </xacro:screw_feeder> -->
 
-
-  <!-- spawn and attach dual suction grippers -->
+  <!-- spawn and attach dual suction grippers (used for testing at AIST) -->
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro" />
   <xacro:dual_suction_gripper_o2as prefix="b_bot_" parent = "b_bot_ee_link">
     <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
@@ -58,14 +57,5 @@
   <xacro:kitting_tray1 trayname="set_3_tray_1" parent="b_bot_base">
     <origin xyz=".55 ${tray_length-.1} 0.01" rpy="0 0 ${pi/2}" />
   </xacro:kitting_tray1>
-
-  <!-- <xacro:property name="tray_x" value="${-tray_length+.01}" />
-  <xacro:property name="tray_y" value="0" />
-  <xacro:kitting_tray1 trayname="tray_1" parent="rack_trays_center">
-    <origin xyz="${tray_x} ${tray_y} 0" rpy="0 0 0" />
-  </xacro:kitting_tray1>
-  <xacro:kitting_tray2 trayname="tray_2" parent="rack_trays_center">
-    <origin xyz="+.01 0 0" rpy="0 0 ${pi}" />
-  </xacro:kitting_tray2> -->
   
 </robot>

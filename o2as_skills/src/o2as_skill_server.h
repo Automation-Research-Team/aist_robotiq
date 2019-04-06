@@ -12,7 +12,7 @@
 #include <tf/transform_listener.h>    // Includes the TF conversions
 #include <tf/transform_broadcaster.h>
 
-//#include "ur_modern_driver/wait_for_program.h"
+#include "wait_for_ur_program.h"
 #include "o2as_helper_functions.h"
 
 #include <chrono>
