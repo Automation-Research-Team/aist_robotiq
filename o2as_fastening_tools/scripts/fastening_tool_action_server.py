@@ -108,75 +108,60 @@ class FasteningToolController(object):
         if goal.direction == "loosen" and not goal.duration:
             rospy.logwarn("Loosen command was sent, but without a duration. Setting to 2 seconds.")
             goal.duration = 2
-            return
+        elif goal.direction == "tighten" and not goal.duration:
+            rospy.logwarn("Tighten command was sent, but without a maximum duration. Setting to 10 seconds.")
+            goal.duration = 10
 
         # Turn the motor for the specified number of seconds.
-        if goal.duration:
-            target_duration = goal.duration
-            start_time = rospy.get_rostime()
-            while ((rospy.get_rostime().secs - start_time.secs) <= target_duration):
-                if self._as.is_preempt_requested():
-                    self._as.set_preempted()
-                    break
-            
-            if self.set_moving_speed(motor_id, 0):
-                self.set_torque_enable(motor_id, 0)
-                self._result.control_result = True
-                self._as.set_succeeded(self._result)
-            else:
-                self.set_torque_enable(motor_id, 0)
-                self._result.control_result = False
-                self._as.set_aborted(self._result)
-            return
-        
-        # process for tighten
-        # Rotate until the motor is loaded and stops.
+        # Rotate the motor until goal.duration is reached is loaded and stops.
         success_flag = True
-        rospy.sleep(1)   # As speed may be read immediately after setting speed, the value may be near 0.
-        while self._feedback.motor_speed > 10:
+        start_time = rospy.get_rostime()
+        rospy.sleep(1)   # Wait for motor to start up (and avoid reading wrong speed values)
+        while not rospy.is_shutdown():
             if self._as.is_preempt_requested():
                 self._as.set_preempted()
                 success_flag = False
                 break
 
-            # Even though the motor is spinning, it can occasionally acquire the value near 0, so read twice to prevent it.
-            first_speed = self.get_present_speed(motor_id)
-
-            # Acquire value in the correct range
-            while first_speed > 1023 :
-                first_speed = self.get_present_speed(motor_id)
-
-            if first_speed == -1 :
-                success_flag = False
+            if (rospy.get_rostime().secs - start_time.secs) > goal.duration:
+                rospy.loginfo("Stopping motor due to timeout")
+                if goal.direction == "loosen":
+                    success_flag = True
+                elif goal.direction == "tighten": # If motor does not stall before timeout, tightening was not successful
+                    success_flag = False
                 break
             
-            current_speed = first_speed
-
-            rospy.sleep(0.1)
-
-            second_speed = 9999
-            while second_speed > 1023 :
-                second_speed = self.get_present_speed(motor_id)
-
-            if second_speed == -1 :
-                success_flag = False
+            if self._feedback.motor_speed == 0:
+                rospy.loginfo("Stopping motor because it has stalled (the screw is tightened)")
+                success_flag = True
                 break
-
+            
+            # Read motor speed. To avoid erroneous readouts, it is read twice. This is not an ideal workaround.
+            first_speed = self.get_present_speed(motor_id)
+            rospy.sleep(0.1)
+            second_speed = self.get_present_speed(motor_id)
+            if first_speed == -1 or second_speed == -1:
+                success_flag = False
+                rospy.logwarn("Error in motor readout. Stopping.")
+                break
+                
+            # If both readings are below a threshold, the motor has stalled
             if first_speed <= 10 and second_speed <= 10:
-                current_speed = 0
-            elif second_speed > 10 :
-                current_speed = second_speed
+                self._feedback.motor_speed = 0
+            else:
+                self._feedback.motor_speed = max(first_speed, second_speed)
 
-            self._feedback.motor_speed = current_speed
+            rospy.logdebug("first_speed, second_speed = " + str(first_speed) + ", " + str(second_speed))
             self._as.publish_feedback(self._feedback)
         
-        if self.set_moving_speed(motor_id, 0) and success_flag:
+        motor_stopped = self.set_moving_speed(motor_id, 0)
+        if motor_stopped and success_flag:
             self.set_torque_enable(motor_id, 0)
-            self._result.control_result  = True
+            self._result.control_result = True
             self._as.set_succeeded(self._result)
         else:
             self.set_torque_enable(motor_id, 0)
-            self._result.control_result  = False
+            self._result.control_result = False
             self._as.set_aborted(self._result)
 
         

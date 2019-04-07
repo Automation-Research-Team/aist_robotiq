@@ -52,6 +52,8 @@ target_link_libraries(calibrator
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
   gsl
+  lapack
+  blas
 )
 
 add_dependencies(calibrator
@@ -83,6 +85,8 @@ target_link_libraries(calibrator_test
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
   gsl
+  lapack
+  blas
 )
 
 add_dependencies(calibrator_test
