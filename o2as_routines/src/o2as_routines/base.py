@@ -61,14 +61,14 @@ from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
 
-import ur_modern_driver.msg
+import ur_msgs.msg
 
 
 def is_program_running(topic_namespace = ""):
   """Checks if a program is running on the UR"""
   msg = []
   try:
-    msg = rospy.wait_for_message(topic_namespace + "/ur_driver/robot_mode_state", ur_modern_driver.msg.RobotModeDataMsg, 1.0)
+    msg = rospy.wait_for_message(topic_namespace + "/ur_driver/robot_mode_state", ur_msgs.msg.RobotModeDataMsg, 1.0)
   except:
     pass
 

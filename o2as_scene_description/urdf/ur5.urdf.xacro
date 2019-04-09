@@ -82,7 +82,8 @@
      elbow_joint_lower_limit:=${-pi}    elbow_joint_upper_limit:=${pi}
      wrist_1_lower_limit:=${-pi}    wrist_1_upper_limit:=${pi}
      wrist_2_lower_limit:=${-pi}    wrist_2_upper_limit:=${pi}
-     wrist_3_lower_limit:=${-pi}    wrist_3_upper_limit:=${pi}">
+     wrist_3_lower_limit:=${-pi}    wrist_3_upper_limit:=${pi}
+     transmission_hw_interface:=hardware_interface/PositionJointInterface">
 
     <link name="${prefix}base_link" >
       <visual>
@@ -316,7 +317,7 @@
       </collision>
     </link>
 
-    <xacro:ur_arm_transmission prefix="${prefix}" />
+    <xacro:ur_arm_transmission prefix="${prefix}" hw_interface="hardware_interface/PositionJointInterface" />
     <xacro:ur_arm_gazebo prefix="${prefix}" />
 
     <!-- ROS base_link to UR 'Base' Coordinates transform -->
