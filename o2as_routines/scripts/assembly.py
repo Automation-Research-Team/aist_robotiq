@@ -54,7 +54,12 @@ from o2as_routines.base import O2ASBaseRoutines
 import ur_modern_driver.msg
 def is_program_running(topic_namespace = ""):
   """Checks if a program is running on the UR"""
-  msg = rospy.wait_for_message(topic_namespace + "/ur_driver/robot_mode_state", ur_modern_driver.msg.RobotModeDataMsg)
+  msg = []
+  try:
+    msg = rospy.wait_for_message(topic_namespace + "/ur_driver/robot_mode_state", ur_modern_driver.msg.RobotModeDataMsg, 1.0)
+  except:
+    pass
+
   if msg:
     return msg.is_program_running
   else:
@@ -233,9 +238,11 @@ class AssemblyClass(O2ASBaseRoutines):
       screw_number = self.picked_screw_counter["m"+str(screw_size)]
       self.picked_screw_counter["m"+str(screw_size)] += 1
       if screw_size == 4 and self.picked_screw_counter["m"+str(screw_size)] > 9:
-        rospy.logwarn("There are no more screws to pick!")
+        rospy.logwarn("There are no more screws to pick! Resetting counter")
+        picked_screw_counter["m"+str(screw_size)] = 1
       if screw_size == 3 and self.picked_screw_counter["m"+str(screw_size)] > 6:
-        rospy.logwarn("There are no more screws to pick!")
+        rospy.logwarn("There are no more screws to pick! Resetting counter")
+        picked_screw_counter["m"+str(screw_size)] = 1
       if rospy.is_shutdown():
         return False
     pscrew = geometry_msgs.msg.PoseStamped()
@@ -333,7 +340,7 @@ class AssemblyClass(O2ASBaseRoutines):
       c_approach = geometry_msgs.msg.PoseStamped()
       c_approach.header.frame_id = "initial_assy_part_03_pulley_ridge_bottom" # The top corner of the big plate
       c_approach.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(0, pi/2, -pi/2))
-      c_approach.pose.position.x = 0.0025
+      c_approach.pose.position.x = 0.0025  # Offset by half the plate thickness, so pose is in the center of the material
       c_approach.pose.position.y = -0.02
       c_approach.pose.position.z = 0.05
       c_pickup = copy.deepcopy(c_approach)
@@ -343,7 +350,7 @@ class AssemblyClass(O2ASBaseRoutines):
       c_place = copy.deepcopy(c_pickup)
       c_place.header.frame_id = "assembled_assy_part_03_pulley_ridge_bottom"
       c_place.pose.position.z += .001
-      c_place.pose.position.x += .001 # MAGIC NUMBER!!  positive points towards c_bot
+      # c_place.pose.position.x += .00 # MAGIC NUMBER!!  positive points towards c_bot
       c_shake_off = copy.deepcopy(c_place)
       c_shake_off.pose.position.z -= .002
       c_move_away = copy.deepcopy(c_place)
@@ -385,7 +392,7 @@ class AssemblyClass(O2ASBaseRoutines):
       self.move_lin("c_bot", c_high, self.speed_fast, acceleration=self.acc_fast)
       self.move_lin("c_bot", c_place, .2)
       self.send_gripper_command("c_bot", 0.008)
-      rospy.sleep(1.0)
+      rospy.sleep(1.0)  # After opening, the gripper surface is often stuck to the object. This gives it time to detach.
       self.move_lin("c_bot", c_shake_off, .1)
       self.send_gripper_command("c_bot", 0.015)
       # Move to the side for the screw tool to pass
@@ -445,14 +452,12 @@ class AssemblyClass(O2ASBaseRoutines):
       ###### ========== 
       # Recenter the plate with c_bot and then move away
       self.log_to_debug_monitor("Recenter the plate with c_bot and then move away", "operation")
-      self.send_gripper_command("c_bot", "open")
-      rospy.sleep(1.0)
-      self.send_gripper_command("c_bot", "close")
-      rospy.sleep(1.0)
-      self.send_gripper_command("c_bot", 0.008)
+      self.send_gripper_command("c_bot", "close", force = 10.0, velocity=.013)
+      rospy.sleep(0.2)
+      self.send_gripper_command("c_bot", 0.008, velocity=.013)
       rospy.sleep(1.0)
       self.send_gripper_command("c_bot", "open")
-      rospy.sleep(1.0)
+      rospy.sleep(0.5)
 
       self.move_lin("c_bot", c_move_away, self.speed_fast, acceleration=self.acc_fast)
       self.go_to_named_pose("back", "c_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
@@ -471,7 +476,7 @@ class AssemblyClass(O2ASBaseRoutines):
       pscrew_2.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(-pi/4, 0,0))
       pscrew_2_approach = copy.deepcopy(pscrew_2)
       pscrew_2_approach.pose.position.y -= .02
-      pscrew_2_approach.pose.position.x -= .03
+      pscrew_2_approach.pose.position.x -= .01
       self.move_lin("b_bot", pscrew_2_approach, speed=self.speed_fast, acceleration=self.acc_fast, end_effector_link="b_bot_screw_tool_m4_tip_link")
       self.do_screw_action("b_bot", pscrew_2, screw_height = 0.002, screw_size = 4)
       self.go_to_named_pose("screw_plate_ready", "b_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
@@ -509,7 +514,7 @@ class AssemblyClass(O2ASBaseRoutines):
     ps_place = copy.deepcopy(ps_pickup)
     ps_place.header.frame_id = "assembled_assy_part_02_back_hole"
     ps_place.pose.position.z += .001
-    ps_place.pose.position.x += .000   # MAGIC NUMBER
+    # ps_place.pose.position.x += .000   # MAGIC NUMBER
     ps_hold = copy.deepcopy(ps_place)
     ps_hold.pose.position.y -= .035
     ps_hold.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_multiply(
@@ -524,7 +529,7 @@ class AssemblyClass(O2ASBaseRoutines):
     # Go to the same pose at the assembly position
     self.move_lin("c_bot", ps_place, self.speed_fast, acceleration=self.acc_fast)
     self.send_gripper_command("c_bot", 0.008)
-    rospy.sleep(1.0)
+    rospy.sleep(1.0)  # After opening, the gripper surface is often stuck to the object. This gives it time to detach.
     self.send_gripper_command("c_bot", 0.08)
     self.move_lin("c_bot", ps_hold, self.speed_fast, acceleration=self.acc_fast)
     self.send_gripper_command("c_bot", 0.008)
@@ -557,14 +562,13 @@ class AssemblyClass(O2ASBaseRoutines):
     self.log_to_debug_monitor("Recenter motor plate", "operation")
     ps_recenter = copy.deepcopy(ps_place)
     ps_recenter.pose.position.y -= .03
-    self.send_gripper_command("c_bot", "open")
     self.move_lin("c_bot", ps_recenter, 0.2)
-    self.send_gripper_command("c_bot", "close")
-    rospy.sleep(1.0)
-    self.send_gripper_command("c_bot", .008)
+    self.send_gripper_command("c_bot", "close", force = 10.0, velocity=0.013)
+    rospy.sleep(0.2)
+    self.send_gripper_command("c_bot", .008, velocity=0.013)
     rospy.sleep(1.0)
     self.send_gripper_command("c_bot", "open")
-    rospy.sleep(1.0)
+    rospy.sleep(0.5)
     self.go_to_named_pose("back", "c_bot", speed=self.speed_fastest, acceleration=self.acc_fastest, force_ur_script=self.use_real_robot)
 
     ### --- b_bot

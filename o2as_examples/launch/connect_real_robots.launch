@@ -35,7 +35,7 @@
   <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" /> -->
 
   <!-- Drivers for the robots -->
-  <node name="a_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen" ns="a_bot_controller">
+  <!-- <node name="a_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen" ns="a_bot_controller">
     <param name="prefix" type="str" value="a_bot_" />
     <param name="robot_ip_address" type="str" value="$(arg robot_ip_a)" />
     <param name="reverse_port" type="int" value="50003" /> 
@@ -48,7 +48,7 @@
     <param name="require_activation" type="str" value="$(arg require_activation)" />
     <param name="shutdown_on_disconnect" type="bool" value="$(arg shutdown_on_disconnect)"/>
     <remap from="joint_states" to="/joint_states"/>
-  </node>
+  </node> -->
   
   <node name="b_bot_ur_driver" pkg="ur_modern_driver" type="ur_driver" output="screen" ns="b_bot_controller">
     <param name="prefix" type="str" value="b_bot_" />
@@ -93,16 +93,16 @@
     <arg name="namespace" value="c_bot_gripper" />
   </include>
 
-  <include file="$(find o2as_precision_gripper)/launch/precision_gripper.launch">
+  <!-- <include file="$(find o2as_precision_gripper)/launch/precision_gripper.launch">
     <arg name="serial_port" default="/dev/for_docker/gripper" />
-  </include>
+  </include> -->
 
   <include file="$(find o2as_fastening_tools)/launch/fastening_tools.launch">
     <arg name="serial_port_1" default="/dev/for_docker/screw" />
   </include>
 
   <!-- a_bot camera -->
-  <include file="$(find o2as_realsense_camera)/launch/camera.launch">
+  <!-- <include file="$(find o2as_realsense_camera)/launch/camera.launch">
     <arg name="camera_name" default="a_bot_camera"/>
     <arg name="camera_frame" default="a_bot_camera"/>
     <arg name="serial_number" value="627201001218"/> 
@@ -110,9 +110,9 @@
     <arg name="send_color" value="$(arg send_color)"/>
     <arg name="send_depth" value="$(arg send_depth)"/>
     <arg name="send_cloud" value="$(arg send_cloud)"/>
-  </include>
+  </include> -->
 
-  <node name="o2as_usb_relay" pkg="o2as_usb_relay" type="o2as_relay_server" respawn="false" output="screen"/>
+  <!-- <node name="o2as_usb_relay" pkg="o2as_usb_relay" type="o2as_relay_server" respawn="false" output="screen"/> -->
 
   <!-- For TASKBOARD -->
   <!-- <include file="$(find o2as_precision_gripper)/launch/nut_tools.launch"/> -->

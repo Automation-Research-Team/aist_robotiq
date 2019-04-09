@@ -139,7 +139,7 @@
   <joint name="${boardname}_part7_1" type="fixed">
     <parent link="${boardname}_surface"/>
     <child link="${boardname}_part7_1"/>
-    <origin rpy="0.0 0.0 ${pi*-0.5}" xyz="0.056 0.049 0.0505"/>
+    <origin rpy="0.0 0.0 ${pi*-0.5}" xyz="0.058 0.049 0.054"/>
   </joint>
   <link name="${boardname}_part7_1"/>
 
@@ -164,7 +164,7 @@
   <joint name="${boardname}_part9" type="fixed">
     <parent link="${boardname}_surface"/>
     <child link="${boardname}_part9"/>
-    <origin rpy="0.0 0.0 ${pi*0.5}" xyz="0.13 0.12 0.007"/>
+    <origin rpy="0.0 0.0 ${pi*0.5}" xyz="0.129 0.121 0.007"/>
   </joint>
   <link name="${boardname}_part9">
     <visual>

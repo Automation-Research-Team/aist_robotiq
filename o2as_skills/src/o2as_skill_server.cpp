@@ -113,10 +113,10 @@ SkillServer::SkillServer() :
   screw_tool_m6.operation = screw_tool_m6.ADD;
 
   // The tool tip
-  screw_tool_m6.frame_poses.resize(1);
+  screw_tool_m6.named_frame_poses.resize(1);
   screw_tool_m6.frame_names.resize(1);
-  screw_tool_m6.frame_poses[0].position.z = -.11;
-  screw_tool_m6.frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
+  screw_tool_m6.named_frame_poses[0].position.z = -.11;
+  screw_tool_m6.named_frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
   screw_tool_m6.frame_names[0] = "screw_tool_m6_tip";
   
 
@@ -157,10 +157,10 @@ SkillServer::SkillServer() :
   screw_tool_m4.operation = screw_tool_m4.ADD;
 
   // The tool tip
-  screw_tool_m4.frame_poses.resize(1);
+  screw_tool_m4.named_frame_poses.resize(1);
   screw_tool_m4.frame_names.resize(1);
-  screw_tool_m4.frame_poses[0].position.z = -.12;
-  screw_tool_m4.frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
+  screw_tool_m4.named_frame_poses[0].position.z = -.12;
+  screw_tool_m4.named_frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
   screw_tool_m4.frame_names[0] = "screw_tool_m4_tip";
 
 
@@ -201,10 +201,10 @@ SkillServer::SkillServer() :
   screw_tool_m3.operation = screw_tool_m3.ADD;
 
   // The tool tip
-  screw_tool_m3.frame_poses.resize(1);
+  screw_tool_m3.named_frame_poses.resize(1);
   screw_tool_m3.frame_names.resize(1);
-  screw_tool_m3.frame_poses[0].position.z = -.11;
-  screw_tool_m3.frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
+  screw_tool_m3.named_frame_poses[0].position.z = -.11;
+  screw_tool_m3.named_frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
   screw_tool_m3.frame_names[0] = "screw_tool_m3_tip";
 
   //Suction tool
@@ -234,10 +234,10 @@ SkillServer::SkillServer() :
   suction_tool.operation = suction_tool.ADD;
 
   // The tool tip
-  suction_tool.frame_poses.resize(1);
+  suction_tool.named_frame_poses.resize(1);
   suction_tool.frame_names.resize(1);
-  suction_tool.frame_poses[0].position.z = -.1;
-  suction_tool.frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
+  suction_tool.named_frame_poses[0].position.z = -.1;
+  suction_tool.named_frame_poses[0].orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 90.0/180.0 *M_PI, -M_PI/2);
   suction_tool.frame_names[0] = "suction_tool_tip";
 
 
@@ -2166,7 +2166,7 @@ void SkillServer::executeScrew(const o2as_msgs::screwGoalConstPtr& goal)
   auto bool_msg_pointer = ros::topic::waitForMessage<std_msgs::Bool>("/" + screw_tool_id + "/screw_suctioned", ros::Duration(1.0));
   bool screw_not_suctioned_anymore = false;
   if (bool_msg_pointer != NULL){
-    screw_not_suctioned_anymore = bool_msg_pointer->data;
+    screw_not_suctioned_anymore = !bool_msg_pointer->data;
   }
   else if (!use_real_robot_) screw_not_suctioned_anymore = true;
 
