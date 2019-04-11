@@ -109,10 +109,13 @@ class AISTBaseRoutines(object):
         self.planning_scene = moveit_commander.PlanningSceneInterface()
         self.groups = {
             "a_bot": moveit_commander.MoveGroupCommander("a_bot"),
-            "b_bot": moveit_commander.MoveGroupCommander("b_bot")
+            "b_bot": moveit_commander.MoveGroupCommander("b_bot"),
+            "a_bot": moveit_commander.MoveGroupCommander("c_bot"),
+            "b_bot": moveit_commander.MoveGroupCommander("d_bot")
         }
         self.gripper_action_clients = {
-            'a_bot': actionlib.SimpleActionClient('/a_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction)
+            'a_bot': actionlib.SimpleActionClient('/a_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction),
+            'c_bot': actionlib.SimpleActionClient('/c_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction)
         }
         self.listener = tf.TransformListener()
         self.use_real_robot = rospy.get_param("use_real_robot")
@@ -164,7 +167,7 @@ class AISTBaseRoutines(object):
     def send_gripper_command(self, gripper, command, force = 5.0, velocity = .1, wait=True):
         if not self.use_real_robot:
             return True
-        if gripper == 'a_bot':
+        if gripper == 'a_bot' or gripper == 'c_bot':
             goal = robotiq_msgs.msg.CModelCommandGoal()
             action_client = self.gripper_action_clients[gripper]
             goal.velocity = velocity
@@ -284,6 +287,10 @@ class AISTBaseRoutines(object):
                 end_effector_link = 'a_bot_robotiq_85_tip_link'
             elif group_name == "b_bot":
                 end_effector_link = "b_bot_single_suction_gripper_pad_link"
+            elif group_name == "c_bot":
+                end_effector_link = "c_bot_robotiq_85_tip_link"
+            elif group_name == "d_bot":
+                end_effector_link = "d_bot_dual_suction_griupper_pad_link"
         group.set_end_effector_link(end_effector_link)
 
         group.set_pose_target(pose_goal_stamped)
@@ -316,6 +323,10 @@ class AISTBaseRoutines(object):
                 end_effector_link = 'a_bot_robotiq_85_tip_link'
             elif group_name == "b_bot":
                 end_effector_link = "b_bot_single_suction_gripper_pad_link"
+            elif group_name == 'c_bot':
+                end_effector_link = 'c_bot_robotiq_85_tip_link'
+            elif group_name == "d_bot":
+                end_effector_link = "d_bot_dual_suction_gripper_pad_link"
 
         group = self.groups[group_name]
 
