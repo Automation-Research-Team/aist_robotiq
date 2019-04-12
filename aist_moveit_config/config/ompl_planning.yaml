@@ -176,3 +176,59 @@ a_bot:
     - SPARStwo
   projection_evaluator: joints(a_bot_shoulder_pan_joint,a_bot_shoulder_lift_joint)
   longest_valid_segment_fraction: 0.005
+c_bot:
+  default_planner_config: ""
+  planner_configs:
+    - SBL
+    - EST
+    - LBKPIECE
+    - BKPIECE
+    - KPIECE
+    - RRT
+    - RRTConnect
+    - RRTstar
+    - TRRT
+    - PRM
+    - PRMstar
+    - FMT
+    - BFMT
+    - PDST
+    - STRIDE
+    - BiTRRT
+    - LBTRRT
+    - BiEST
+    - ProjEST
+    - LazyPRM
+    - LazyPRMstar
+    - SPARS
+    - SPARStwo
+  projection_evaluator: joints(a_bot_shoulder_pan_joint,a_bot_shoulder_lift_joint)
+  longest_valid_segment_fraction: 0.005
+d_bot:
+  default_planner_config: ""
+  planner_configs:
+    - SBL
+    - EST
+    - LBKPIECE
+    - BKPIECE
+    - KPIECE
+    - RRT
+    - RRTConnect
+    - RRTstar
+    - TRRT
+    - PRM
+    - PRMstar
+    - FMT
+    - BFMT
+    - PDST
+    - STRIDE
+    - BiTRRT
+    - LBTRRT
+    - BiEST
+    - ProjEST
+    - LazyPRM
+    - LazyPRMstar
+    - SPARS
+    - SPARStwo
+  projection_evaluator: joints(a_bot_shoulder_pan_joint,a_bot_shoulder_lift_joint)
+  longest_valid_segment_fraction: 0.005
