@@ -48,7 +48,7 @@ import tf
 import tf_conversions
 import moveit_commander
 from moveit_commander.conversions import pose_to_list
-import ur_modern_driver.msg
+#import ur_modern_driver.msg
 import robotiq_msgs.msg
 
 import o2as_msgs.msg
@@ -110,12 +110,12 @@ class AISTBaseRoutines(object):
         self.groups = {
             "a_bot": moveit_commander.MoveGroupCommander("a_bot"),
             "b_bot": moveit_commander.MoveGroupCommander("b_bot"),
-            "a_bot": moveit_commander.MoveGroupCommander("c_bot"),
-            "b_bot": moveit_commander.MoveGroupCommander("d_bot")
+            # "c_bot": moveit_commander.MoveGroupCommander("c_bot"),
+            # "d_bot": moveit_commander.MoveGroupCommander("d_bot")
         }
         self.gripper_action_clients = {
             'a_bot': actionlib.SimpleActionClient('/a_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction),
-            'c_bot': actionlib.SimpleActionClient('/c_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction)
+            # 'c_bot': actionlib.SimpleActionClient('/c_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction)
         }
         self.listener = tf.TransformListener()
         self.use_real_robot = rospy.get_param("use_real_robot")

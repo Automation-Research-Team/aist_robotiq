@@ -61,7 +61,7 @@ from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
 
-import ur_modern_driver.msg
+#import ur_modern_driver.msg
 
 
 def is_program_running(topic_namespace = ""):

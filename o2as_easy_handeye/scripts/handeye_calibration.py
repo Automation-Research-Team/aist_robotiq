@@ -169,7 +169,7 @@ class HandEyeCalibrationRoutines:
     self.speed       = speed
     self.sleep_time  = sleep_time
 
-    if self.routines.use_real_robot:
+    if self.routines.use_real_robot and needs_calib:
       cs = "/{}/".format(camera_name)
       self.start_acquisition = rospy.ServiceProxy(cs + "start_acquisition",
                                                   Trigger)
@@ -254,15 +254,17 @@ class HandEyeCalibrationRoutines:
     if self.start_acquisition:
       self.start_acquisition()
 
-    try:
-      self.save_image("aruco_result-{:0=2}-{:0=2}.jpeg".format(keypose_num,
-                                                               subpose_num))
-    except CvBridgeError, e:
-      print(e)
-    except rospy.ROSException, e:
-      print(e)
+      try:
+        self.save_image("aruco_result-{:0=2}-{:0=2}.jpeg".format(keypose_num,
+                                                                 subpose_num))
+      except CvBridgeError, e:
+        print(e)
+      except rospy.ROSException, e:
+        print(e)
 
     rospy.sleep(self.sleep_time)
+
+    success = True
 
     if self.take_sample:
       try:
@@ -270,7 +272,6 @@ class HandEyeCalibrationRoutines:
         sample_list = self.get_sample_list()
         n = len(sample_list.samples.hand_world_samples.transforms)
         print("  took {} (hand-world, camera-marker) samples").format(n)
-        success = True
       except rospy.ServiceException as e:
         print "Service call failed: %s"%e
         success = False
