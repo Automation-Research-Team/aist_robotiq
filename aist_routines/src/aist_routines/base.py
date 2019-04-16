@@ -101,21 +101,18 @@ def all_close(goal, actual, tolerance):
     return True
 
 class AISTBaseRoutines(object):
-    def __init__(self):
+    def __init__(self, group_names={"a_bot", "b_bot"}):
         moveit_commander.roscpp_initialize(sys.argv)
         rospy.init_node("kitting_task", anonymous=True)
         self.use_real_robot = rospy.get_param('use_real_robot', False)
         self.robots = moveit_commander.RobotCommander()
         self.planning_scene = moveit_commander.PlanningSceneInterface()
-        self.groups = {
-            "a_bot": moveit_commander.MoveGroupCommander("a_bot"),
-            "b_bot": moveit_commander.MoveGroupCommander("b_bot"),
-            # "c_bot": moveit_commander.MoveGroupCommander("c_bot"),
-            # "d_bot": moveit_commander.MoveGroupCommander("d_bot")
-        }
+        self.groups = dict()
+        for group_name in group_names:
+            self.groups[group_name] = moveit_commander.MoveGroupCommander(group_name)
         self.gripper_action_clients = {
             'a_bot': actionlib.SimpleActionClient('/a_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction),
-            # 'c_bot': actionlib.SimpleActionClient('/c_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction)
+            'c_bot': actionlib.SimpleActionClient('/c_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction)
         }
         self.listener = tf.TransformListener()
         self.use_real_robot = rospy.get_param("use_real_robot")
