@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_srvs
   cv_bridge
   visp_bridge
+  visp_hand2eye_calibration
   message_generation
   pcl_ros
   pcl_conversions
