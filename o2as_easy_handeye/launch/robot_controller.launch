@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <launch>
   <arg name="config"		default="aist"/>
+  <arg name="scene"/>
   <arg name="sim" type="bool"	default="false"/>
 
   <param name="use_real_robot"	value="$(eval not arg('sim'))"/>
@@ -10,22 +11,25 @@
 	   if="$(eval arg('config') == 'o2as' and not arg('sim'))"/>
   <include file="$(find aist_examples)/launch/connect_aist_robots.launch"
 	   if="$(eval arg('config') == 'aist' and not arg('sim'))"/>
+  <include file="$(find aist_examples)/launch/connect_ur5e_robots.launch"
+	   if="$(eval arg('config') == 'ur5e' and not arg('sim'))"/>
   <include file="$(find o2as_examples)/launch/connect_osaka_robots.launch"
 	   if="$(eval arg('config') == 'osaka' and not arg('sim'))"/>
 
   <!-- Launch planner -->
-  <include file="$(find aist_moveit_config)/launch/aist_moveit_planning_execution.launch"
-	   if="$(eval arg('config') == 'aist')">
+  <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch"
+	   if="$(eval arg('config') == 'o2as')">
     <arg name="sim" value="$(arg sim)"/>
   </include>
-  <include file="$(find o2as_moveit_config)/launch/o2as_moveit_planning_execution.launch"
-	   unless="$(eval arg('config') == 'aist')">
-    <arg name="sim" value="$(arg sim)"/>
+  <include file="$(find aist_moveit_config)/launch/aist_moveit_planning_execution.launch"
+	   unless="$(eval arg('config') == 'o2as')">
+    <arg name="scene" value="$(arg scene)"/>
+    <arg name="sim"   value="$(arg sim)"/>
   </include>
 
   <!-- Launch skill server -->
+  <include file="$(find aist_skills)/launch/o2as_skill_server.launch"
+	   if="$(eval arg('config') == 'o2as')"/>
   <include file="$(find aist_skills)/launch/aist_skill_server.launch"
-	   if="$(eval arg('config') == 'aist')"/>
-  <include file="$(find o2as_skills)/launch/o2as_skill_server.launch"
 	   unless="$(eval arg('config') == 'aist')"/>
 </launch>
