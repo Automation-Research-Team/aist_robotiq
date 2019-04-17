@@ -23,9 +23,9 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if args.config == "aist":
-        baseRoutines = AISTBaseRoutines({args.robot_name})
-    else:
+    if args.config == "o2as":
         baseRoutines = O2ASBaseRoutines()
+    else:
+        baseRoutines = AISTBaseRoutines({args.robot_name})
 
     baseRoutines.go_to_named_pose(args.pose, args.robot_name)

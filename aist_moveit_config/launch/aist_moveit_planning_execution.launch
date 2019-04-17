@@ -1,7 +1,7 @@
 <launch>
   <arg name="sim"    default="false"/>
   <arg name="debug"  default="false"/>
-  <arg name="config" default="true"/>
+  <arg name="config" default="aist"/>
   <arg name="scene"  default="aist_base_scene"/>
   <!-- The two lines below are taken from connect_real_robots.launch and need to be commented out when running Gazebo -->
   <!-- <include file="$(find aist_scene_description)/launch/scene_upload.launch"> -->
@@ -20,12 +20,13 @@
   <include file="$(find aist_moveit_config)/launch/move_group.launch">
     <arg name="debug"			value="$(arg debug)"/>
     <arg name="load_robot_description"	value="true"/>
+    <arg name="config"			value="$(arg config)"/>
     <arg name="scene"			value="$(arg scene)"/>
   </include>
 
   <!-- Launch moveit with rviz -->
   <include file="$(find aist_moveit_config)/launch/moveit_rviz.launch">
     <arg name="debug"  value="$(arg debug)"/>
-    <arg name="config" value="$(arg config)"/>
+    <arg name="config" value="true"/>
   </include>
 </launch>
