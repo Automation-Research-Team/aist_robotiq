@@ -1,31 +1,32 @@
 <launch>
   <arg name="load_robot_description"	default="false"/>
-  <arg name="scene"/>
+  <arg name="config"			default="aist"/>
+  <arg name="scene"			default="aist_base_scene"/>
   <include file="$(find aist_moveit_config)/launch/planning_context.launch">
     <arg name="load_robot_description"	value="$(arg load_robot_description)"/>
     <arg name="scene"			value="$(arg scene)"/>
   </include>
 
   <!-- GDB Debug Option -->
-  <arg name="debug" default="false" />
-  <arg unless="$(arg debug)" name="launch_prefix" value="" />
+  <arg name="debug" default="false"/>
+  <arg unless="$(arg debug)" name="launch_prefix" value=""/>
   <arg     if="$(arg debug)" name="launch_prefix"
-	   value="gdb -x $(find aist_moveit_config)/launch/gdb_settings.gdb --ex run --args" />
+	   value="gdb -x $(find aist_moveit_config)/launch/gdb_settings.gdb --ex run --args"/>
 
   <!-- Verbose Mode Option -->
-  <arg name="info" default="$(arg debug)" />
-  <arg unless="$(arg info)" name="command_args" value="" />
-  <arg     if="$(arg info)" name="command_args" value="--debug" />
+  <arg name="info" default="$(arg debug)"/>
+  <arg unless="$(arg info)" name="command_args" value=""/>
+  <arg     if="$(arg info)" name="command_args" value="--debug"/>
 
   <!-- move_group settings -->
-  <arg name="allow_trajectory_execution" default="true"/>
-  <arg name="fake_execution" default="false"/>
-  <arg name="max_safe_path_cost" default="1"/>
-  <arg name="jiggle_fraction" default="0.05" />
-  <arg name="publish_monitored_planning_scene" default="true"/>
+  <arg name="allow_trajectory_execution"	default="true"/>
+  <arg name="fake_execution"			default="false"/>
+  <arg name="max_safe_path_cost"		default="1"/>
+  <arg name="jiggle_fraction"			default="0.05"/>
+  <arg name="publish_monitored_planning_scene"	default="true"/>
 
-  <arg name="capabilities" default=""/>
-  <arg name="disable_capabilities" default=""/>
+  <arg name="capabilities"			default=""/>
+  <arg name="disable_capabilities"		default=""/>
   <!-- load these non-default MoveGroup capabilities (space seperated) -->
   <!--
   <arg name="capabilities" value="
@@ -46,7 +47,7 @@
   <include ns  ="move_group"
 	   file="$(find
 		 aist_moveit_config)/launch/planning_pipeline.launch.xml">
-    <arg name="pipeline" value="ompl" />
+    <arg name="pipeline" value="ompl"/>
   </include>
 
   <!-- Trajectory Execution Functionality -->
@@ -54,20 +55,16 @@
 	   file="$(find
 		 aist_moveit_config)/launch/trajectory_execution.launch.xml"
 	   if  ="$(arg allow_trajectory_execution)">
-    <arg name  ="moveit_manage_controllers" value="true" />
-    <arg name  ="moveit_controller_manager"
-	 value ="aist_base_scene"
-	 unless="$(arg fake_execution)"/>
-    <arg name  ="moveit_controller_manager"
-	 value ="fake"
-	 if    ="$(arg fake_execution)"/>
+    <arg name="moveit_manage_controllers" value="true"/>
+    <arg name="config" value ="$(arg config)" unless="$(arg fake_execution)"/>
+    <arg name="config" value ="fake"	      if    ="$(arg fake_execution)"/>
   </include>
 
   <!-- Sensors Functionality -->
   <include ns  ="move_group"
 	   file="$(find aist_moveit_config)/launch/sensor_manager.launch.xml"
 	   if  ="$(arg allow_trajectory_execution)">
-    <arg name="moveit_sensor_manager" value="aist_base_scene" />
+    <arg name="config" value="$(arg config)"/>
   </include>
 
   <!-- Start the actual move_group node/action server -->

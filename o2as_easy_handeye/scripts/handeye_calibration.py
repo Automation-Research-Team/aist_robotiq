@@ -72,13 +72,13 @@ aist_keyposes = {
       [0.15,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
       [0.15,  0.20, 0.25, radians( 30), radians( 25), radians(0)],
 
-      [0.40,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
-      [0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
-      [0.40, -0.15, 0.15, radians(  0), radians( 25), radians(0)],
+      # [0.40,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
+      # [0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
+      # [0.40, -0.15, 0.15, radians(  0), radians( 25), radians(0)],
 
-      [0.35, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
-      [0.35,  0.05, 0.10, radians( 30), radians( 25), radians(0)],
-      [0.35,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
+      # [0.35, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
+      # [0.35,  0.05, 0.10, radians( 30), radians( 25), radians(0)],
+      # [0.35,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
     ],
 
     'c_bot': [
@@ -90,13 +90,13 @@ aist_keyposes = {
       [0.15, -0.10, 0.25, radians( 30), radians( 25), radians(0)],
       [0.15, -0.20, 0.25, radians( 30), radians( 25), radians(0)],
 
-      [0.40, -0.20, 0.15, radians( 30), radians( 25), radians(0)],
-      [0.40, -0.10, 0.15, radians( 30), radians( 25), radians(0)],
-      [0.40,  0.00, 0.15, radians(  0), radians( 25), radians(0)],
+      # [0.40, -0.20, 0.15, radians( 30), radians( 25), radians(0)],
+      # [0.40, -0.10, 0.15, radians( 30), radians( 25), radians(0)],
+      # [0.40,  0.00, 0.15, radians(  0), radians( 25), radians(0)],
 
-      [0.35,  0.00, 0.10, radians(  0), radians( 25), radians(0)],
-      [0.35, -0.10, 0.10, radians( 30), radians( 25), radians(0)],
-      [0.35, -0.20, 0.10, radians( 30), radians( 25), radians(0)],
+      # [0.35,  0.00, 0.10, radians(  0), radians( 25), radians(0)],
+      # [0.35, -0.10, 0.10, radians( 30), radians( 25), radians(0)],
+      # [0.35, -0.20, 0.10, radians( 30), radians( 25), radians(0)],
     ],
 
     'd_bot': [
@@ -108,13 +108,13 @@ aist_keyposes = {
       [0.15,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
       [0.15,  0.20, 0.25, radians( 30), radians( 25), radians(0)],
 
-      [0.40,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
-      [0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
-      [0.40, -0.15, 0.15, radians(  0), radians( 25), radians(0)],
+      # [0.40,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
+      # [0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
+      # [0.40, -0.15, 0.15, radians(  0), radians( 25), radians(0)],
 
-      [0.35, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
-      [0.35,  0.05, 0.10, radians( 30), radians( 25), radians(0)],
-      [0.35,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
+      # [0.35, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
+      # [0.35,  0.05, 0.10, radians( 30), radians( 25), radians(0)],
+      # [0.35,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
     ],
   },
   'a_bot_camera': {
@@ -420,10 +420,10 @@ if __name__ == '__main__':
     camera_name   = args.camera_name
     robot_name    = args.robot_name
     needs_calib   = not args.visit
-    if args.config == 'aist':
-      base_routines = AISTBaseRoutines({robot_name})
-    else:
+    if args.config == 'o2as':
       base_routines = O2ASBaseRoutines()
+    else:
+      base_routines = AISTBaseRoutines({robot_name})
 
     assert(camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
     assert(robot_name  in {"a_bot", "b_bot", "c_bot", "d_bot"})

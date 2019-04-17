@@ -270,10 +270,10 @@ if __name__ == '__main__':
   try:
     assert(args.robot_name  in {'a_bot', 'b_bot', 'c_bot'})
 
-    if args.config == 'aist':
-      base_routines = AISTBaseRoutines({args.robot_name})
-    else:
+    if args.config == 'o2as':
       base_routines = O2ASBaseRoutines()
+    else:
+      base_routines = AISTBaseRoutines({args.robot_name})
 
     speed    = 0.05
     routines = ToolCalibrationRoutines(base_routines, args.robot_name, speed)

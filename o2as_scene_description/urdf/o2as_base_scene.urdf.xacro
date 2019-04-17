@@ -29,7 +29,7 @@
   <!-- Scene items (trays, bins...) -->
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/taskboard_scene.xacro" /> -->
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/kitting_scene.xacro" /> -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/assembly_scene.xacro" />
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/assembly_scene.xacro" /> -->
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/calibration_scene.xacro" /> -->
   <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/assembly_new_parts_scene.xacro" /> -->
 
@@ -171,6 +171,15 @@
   <origin xyz="0.652663578768 -0.0142895785849 1.50687788672" rpy="${-161.381811856*pi/180} ${2.99567722105*pi/180} ${90.8962573459*pi/180}"/>
   </xacro:phoxi_m_camera>
   
+  <!-- Add AR markers -->
+  <xacro:include filename="$(find o2as_gazebo)/urdf/o2as_ar_marker.urdf.xacro"/>
+
+  <xacro:o2as_ar_marker prefix="b_bot_"
+			parent="b_bot_robotiq_85_tip_link"
+			marker_id="26">
+    <origin xyz="0.0 0.0 0.0185" rpy="0 0 0"/>
+  </xacro:o2as_ar_marker>
+
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world" />
   <joint name="world_o2as_joint" type="fixed">

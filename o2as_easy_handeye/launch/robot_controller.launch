@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <launch>
   <arg name="config"		default="aist"/>
-  <arg name="scene"/>
+  <arg name="scene"		default="aist_base_scene"/>
   <arg name="sim" type="bool"	default="false"/>
 
   <param name="use_real_robot"	value="$(eval not arg('sim'))"/>
@@ -23,13 +23,14 @@
   </include>
   <include file="$(find aist_moveit_config)/launch/aist_moveit_planning_execution.launch"
 	   unless="$(eval arg('config') == 'o2as')">
-    <arg name="scene" value="$(arg scene)"/>
-    <arg name="sim"   value="$(arg sim)"/>
+    <arg name="config" value="$(arg config)"/>
+    <arg name="scene"  value="$(arg scene)"/>
+    <arg name="sim"    value="$(arg sim)"/>
   </include>
 
   <!-- Launch skill server -->
-  <include file="$(find aist_skills)/launch/o2as_skill_server.launch"
+  <include file="$(find o2as_skills)/launch/o2as_skill_server.launch"
 	   if="$(eval arg('config') == 'o2as')"/>
   <include file="$(find aist_skills)/launch/aist_skill_server.launch"
-	   unless="$(eval arg('config') == 'aist')"/>
+	   unless="$(eval arg('config') == 'o2as')"/>
 </launch>
