@@ -2,7 +2,7 @@
   <arg name="sim"    default="false"/>
   <arg name="debug"  default="false"/>
   <arg name="config" default="aist"/>
-  <arg name="scene"  default="aist_base_scene"/>
+  <arg name="scene"  default="$(arg config)_base_scene"/>
   <!-- The two lines below are taken from connect_real_robots.launch and need to be commented out when running Gazebo -->
   <!-- <include file="$(find aist_scene_description)/launch/scene_upload.launch"> -->
   <!--   <arg name="scene" value="$(arg scene)"/> -->
