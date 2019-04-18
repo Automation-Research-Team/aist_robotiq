@@ -20,9 +20,14 @@
   <!-- Load the robot specific controller manager; this sets the
        moveit_controller_manager ROS parameter -->
   <arg name="config"/>
-  <include file="$(find
-		 aist_moveit_config)/launch/controller_manager.launch.xml">
-    <arg name ="config" value="$(arg config)"/>
-  </include>
+  <param name  ="moveit_controller_manager"
+  	 value ="moveit_fake_controller_manager/MoveItFakeControllerManager"
+  	 if    ="$(eval arg('config') == 'fake')"/>
+  <param name  ="moveit_controller_manager"
+  	 value ="moveit_simple_controller_manager/MoveItSimpleControllerManager"
+  	 unless="$(eval arg('config') == 'fake')"/>
+
+  <!-- load controller_list -->
+  <rosparam file="$(find aist_moveit_config)/config/$(arg config)_controllers.yaml"/>
 
 </launch>

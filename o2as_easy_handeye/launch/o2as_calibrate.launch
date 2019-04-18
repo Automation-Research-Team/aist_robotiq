@@ -1,13 +1,13 @@
 <?xml version="1.0" ?>
 <launch>
-  <arg name="robot_name"	default="b_bot"/>
-  <arg name="camera_name"	default="a_phoxi_m_camera"/>
   <arg name="config"		default="aist"/>
-  <arg name="scene"		default="aist_base_scene"
-       if="$(eval arg('config') == 'aist')"/>
-  <arg name="scene"		default="o2as_base_scene"
-       unless="$(eval arg('config') == 'aist')"/>
+  <arg name="scene"		default="$(arg config)_base_scene"/>
   <arg name="sim" type="bool"	default="false"/>
+  <arg name="robot_name"	default="b_bot"
+       unless="$(eval arg('config') == 'ur5e')"/>
+  <arg name="robot_name"	default="d_bot"
+       if="$(eval arg('config') == 'ur5e')"/>
+  <arg name="camera_name"	default="a_phoxi_m_camera"/>
 
   <arg name="eye_on_hand" type="bool"
        value="$(eval arg('camera_name') == arg('robot_name') + '_camera')"/>

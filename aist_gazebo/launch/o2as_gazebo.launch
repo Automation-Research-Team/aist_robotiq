@@ -3,7 +3,7 @@
   <arg name="limited" default="false"/>
   <arg name="paused"  default="true"/>
   <arg name="gui"     default="true"/>
-  <arg name="scene"   default="aist_base_scene"/>
+  <arg name="scene"   default="o2as_base_scene"/>
   <!-- Gazebo needs to start up paused in order for us to be able to set the initial joint configurations.
        This is a known bug as of July 2018. -->
 
@@ -25,7 +25,7 @@
   <!-- Initial pose modified on 9 July 2018 -->
   <!-- Do not change this without updating the home pose in o2as_base_scene.srdf accordingly. -->
   <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model"
-        args="-urdf -param robot_description -model aist_bots
+        args="-urdf -param robot_description -model o2as_bots
 	      -J a_bot_shoulder_pan_joint 1.5708
 	      -J a_bot_shoulder_lift_joint -2.1
 	      -J a_bot_elbow_joint 1.4
@@ -38,6 +38,12 @@
 	      -J b_bot_wrist_1_joint -0.85
 	      -J b_bot_wrist_2_joint -1.5708
 	      -J b_bot_wrist_3_joint 0.0
+	      -J c_bot_shoulder_pan_joint 1.5708
+	      -J c_bot_shoulder_lift_joint -2.1
+	      -J c_bot_elbow_joint 1.4
+	      -J c_bot_wrist_1_joint -0.85
+	      -J c_bot_wrist_2_joint -1.5708
+	      -J c_bot_wrist_3_joint 0.0
 	      -unpause"
 	respawn="false"
 	output="screen"/>
@@ -58,6 +64,14 @@
 	pkg    ="controller_manager"
 	type   ="controller_manager"
 	args   ="spawn b_bot_controller"
+	respawn="false"
+	output ="screen"/>
+  <rosparam file="$(find aist_gazebo)/controller/c_bot_controller.yaml"
+	    command="load"/>
+  <node name   ="c_bot_controller_spawner"
+	pkg    ="controller_manager"
+	type   ="controller_manager"
+	args   ="spawn c_bot_controller"
 	respawn="false"
 	output ="screen"/>
 
