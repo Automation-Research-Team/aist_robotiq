@@ -39,7 +39,7 @@
 	output="screen" ns="c_bot_controller">
     <param name="prefix"	   type="str" value="c_bot_" />
     <param name="robot_ip_address" type="str"    value="$(arg robot_ip_c)" />
-    <param name="reverse_port"     type="int"    value="50003" />
+    <param name="reverse_port"     type="int"    value="50004" />
     <param name="min_payload"      type="double" value="$(arg min_payload)" />
     <param name="max_payload"      type="double" value="$(arg max_payload)" />
     <param name="max_velocity"     type="double" value="$(arg max_velocity)" />
@@ -56,7 +56,7 @@
 	output="screen" ns="d_bot_controller">
     <param name="prefix"	   type="str"    value="d_bot_" />
     <param name="robot_ip_address" type="str"    value="$(arg robot_ip_d)" />
-    <param name="reverse_port"     type="int"    value="50002" />
+    <param name="reverse_port"     type="int"    value="50005" />
     <param name="min_payload"      type="double" value="$(arg min_payload)" />
     <param name="max_payload"      type="double" value="$(arg max_payload)" />
     <param name="max_velocity"     type="double" value="$(arg max_velocity)" />
