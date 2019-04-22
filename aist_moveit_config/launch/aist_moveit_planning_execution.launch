@@ -3,19 +3,21 @@
   <arg name="debug"  default="false"/>
   <arg name="config" default="aist"/>
   <arg name="scene"  default="$(arg config)_base_scene"/>
+  <arg name="rviz_config"
+       default="$(find aist_moveit_config)/launch/moveit.rviz"/>
   <!-- The two lines below are taken from connect_real_robots.launch and need to be commented out when running Gazebo -->
   <!-- <include file="$(find aist_scene_description)/launch/scene_upload.launch"> -->
   <!--   <arg name="scene" value="$(arg scene)"/> -->
   <!-- </include> -->
-    
+
   <node name="robot_state_publisher"
 	pkg ="robot_state_publisher" type="robot_state_publisher" />
-    
+
   <!-- Remap follow_joint_trajectory -->
   <remap if  ="$(arg sim)"
 	 from="/follow_joint_trajectory"
 	 to  ="/arm_controller/follow_joint_trajectory"/>
-  
+
   <!-- Launch moveit -->
   <include file="$(find aist_moveit_config)/launch/move_group.launch">
     <arg name="debug"			value="$(arg debug)"/>
@@ -26,7 +28,7 @@
 
   <!-- Launch moveit with rviz -->
   <include file="$(find aist_moveit_config)/launch/moveit_rviz.launch">
-    <arg name="debug"  value="$(arg debug)"/>
-    <arg name="config" value="true"/>
+    <arg name="debug"		value="$(arg debug)"/>
+    <arg name="rviz_config"	value="$(arg rviz_config)"/>
   </include>
 </launch>
