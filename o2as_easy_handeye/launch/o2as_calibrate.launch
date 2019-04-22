@@ -9,7 +9,7 @@
        if="$(eval arg('config') == 'ur5e')"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
 
-  <arg name="eye_on_hand" type="bool"
+  <arg name="eye_on_hand"
        value="$(eval arg('camera_name') == arg('robot_name') + '_camera')"/>
 
   <!-- Start ArUco -->
@@ -23,6 +23,8 @@
     <arg name="config"	value="$(arg config)"/>
     <arg name="scene"	value="$(arg scene)"/>
     <arg name="sim"	value="$(arg sim)"/>
+    <!-- <arg name="rviz_config" -->
+    <!-- 	 value="$(find o2as_easy_handeye)/launch/o2as_easy_handeye.rviz"/> -->
   </include>
 
   <!-- Start easy_handeye calibrator -->

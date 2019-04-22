@@ -13,7 +13,13 @@ doJob(bool aist)
 
     std::vector<Transform>	cMo(nposes), wMe(nposes);
     for (size_t n = 0; n < nposes; ++n)
+    {
 	std::cin >> cMo[n] >> wMe[n];
+
+	cMo[n].print();
+	wMe[n].print();
+	std::cout << std::endl;
+    }
 
     Transform	eMc;
     if (aist)
@@ -40,7 +46,7 @@ doJob(bool aist)
     const auto	wMo = objectToWorld(cMo, wMe, eMc);
     evaluateAccuracy(std::cout, cMo, wMe, eMc, wMo);
 }
-    
+
 }	// namespace aistCalibration
 
 int
@@ -55,7 +61,7 @@ main(int argc, char* argv[])
 	    aist = true;
 	    break;
 	}
-    
+
     aistCalibration::doJob(aist);
-    
+
 }
