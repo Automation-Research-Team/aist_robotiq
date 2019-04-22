@@ -7,7 +7,7 @@
 
   <!-- By default, we are not in debug mode -->
   <arg name="debug" default="false" />
-
+  <arg name="config" default="aist"/>
   <arg name="scene" default="aist_base_scene"/>
   
   <!--
@@ -23,6 +23,7 @@
   <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
   <include file="$(find aist_moveit_config)/launch/planning_context.launch">
     <arg name="load_robot_description"	value="true"/>
+    <arg name="config"  value="$(arg config)"/>
     <arg name="scene"			value="$(arg scene)"/>
   </include>
 
