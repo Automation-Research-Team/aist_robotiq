@@ -20,7 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_conversions
 )
 
-catkin_python_setup()
+#catkin_python_setup()
 
 generate_dynamic_reconfigure_options(
   cfg/o2as_easy_handeye.cfg

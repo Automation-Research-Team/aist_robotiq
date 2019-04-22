@@ -15,7 +15,7 @@ from std_msgs.msg import String
 from std_srvs.srv import Empty
 from std_srvs.srv import Trigger
 from o2as_phoxi_camera.srv import GetFrame
-from easy_handeye.srv import TakeSample, RemoveSample, ComputeCalibration
+from o2as_easy_handeye.srv import TakeSample, RemoveSample, ComputeCalibration
 
 from o2as_routines.base import O2ASBaseRoutines
 from aist_routines.base import AISTBaseRoutines
@@ -44,7 +44,7 @@ initposes = {
     'aist': {
         'a_phoxi_m_camera': {
             'a_bot': [
-                0.10, -0.20, 0.35, radians(  0), radians( 90), radians(0)],
+                0.10,  0.00, 0.35, radians(  0), radians( 90), radians(0)],
             'b_bot': [
                 0.10,  0.10, 0.35, radians(  0), radians( 90), radians(0)],
         },
@@ -118,21 +118,21 @@ keyposes = {
     'aist': {
         'a_phoxi_m_camera': {
             'a_bot': [
-                [0.15, -0.20, 0.16, radians( 30), radians( 25), radians(0)],
-                [0.15, -0.10, 0.16, radians( 30), radians( 25), radians(0)],
                 [0.15,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.20, 0.16, radians( 30), radians( 25), radians(0)],
 
-                [0.15,  0.00, 0.25, radians( 30), radians( 25), radians(0)],
-                [0.15, -0.10, 0.25, radians( 30), radians( 25), radians(0)],
-                [0.15, -0.20, 0.25, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.20, 0.30, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.10, 0.30, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.00, 0.30, radians( 30), radians( 25), radians(0)],
             ],
 
             'b_bot': [
                 [0.15,  0.20, 0.16, radians( 30), radians( 25), radians(0)],
                 [0.15,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
-                [0.15,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.00, 0.16, radians(  0), radians( 25), radians(0)],
 
-                [0.15,  0.00, 0.25, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.00, 0.25, radians(  0), radians( 25), radians(0)],
                 [0.15,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
                 [0.15,  0.20, 0.25, radians( 30), radians( 25), radians(0)],
 
@@ -150,7 +150,7 @@ keyposes = {
     'ur5e': {
         'a_phoxi_m_camera': {
             'c_bot': [
-                [0.15, -0.15, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
                 [0.15, -0.05, 0.16, radians( 30), radians( 25), radians(0)],
                 [0.15,  0.05, 0.16, radians( 30), radians( 25), radians(0)],
 
@@ -287,8 +287,8 @@ class HandEyeCalibrationRoutines:
         print("  reached to " + format_pose(poseReached.pose))
         return move_success
 
-    def move_to(self, pose, keypose_num, subpose_num):
-        if not self.move(pose):
+    def move_to_subpose(self, subpose, keypose_num, subpose_num):
+        if not self.move(subpose):
             return False
 
         if self.start_acquisition:
@@ -323,25 +323,26 @@ class HandEyeCalibrationRoutines:
         return success
 
     def move_to_subposes(self, pose, keypose_num):
-        roll = pose[3]
+        subpose = copy.deepcopy(pose)
+        roll = subpose[3]
         for i in range(3):
             print("\n--- Subpose [{}/5]: Try! ---".format(i + 1))
-            if self.move_to(pose, keypose_num, i + 1):
+            if self.move_to_subpose(subpose, keypose_num, i + 1):
                 print("--- Subpose [{}/5]: Succeeded. ---".format(i + 1))
             else:
                 print("--- Subpose [{}/5]: Failed. ---".format(i + 1))
-            pose[3] -= radians(30)
+            subpose[3] -= radians(30)
 
-        pose[3] = roll - radians(30)
-        pose[4] += radians(15)
+        subpose[3] = roll - radians(30)
+        subpose[4] += radians(15)
 
         for i in range(2):
             print("\n--- Subpose [{}/5]: Try! ---".format(i + 4))
-            if self.move_to(pose, keypose_num, i + 4):
+            if self.move_to_subpose(subpose, keypose_num, i + 4):
                 print("--- Subpose [{}/5]: Succeeded. ---".format(i + 4))
             else:
                 print("--- Subpose [{}/5]: Failed. ---".format(i + 4))
-            pose[4] -= radians(30)
+            subpose[4] -= radians(30)
 
         # ### How to define poses/positions for calibration
         # # 1. From rostopic echo /joint_states (careful with the order of the joints)

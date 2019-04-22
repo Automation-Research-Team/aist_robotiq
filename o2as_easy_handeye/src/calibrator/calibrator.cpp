@@ -94,7 +94,7 @@ Calibrator::Calibrator()
 Calibrator::~Calibrator()
 {
 }
-    
+
 void
 Calibrator::spin()
 {
@@ -212,7 +212,7 @@ Calibrator::computeEffectorCameraQuickCallback(
     out << cMo.size() << std::endl;
     for (size_t n = 0; n < cMo.size(); ++n)
 	out << cMo[n] << std::endl
-	    << wMe[n] << std::endl << std::endl;
+	    << wMe[n].inverse() << std::endl << std::endl;
 
     const auto	wMo = objectToWorld(cMo, wMe, eMc);
     evaluateAccuracy(out, cMo, wMe, eMc, wMo);
