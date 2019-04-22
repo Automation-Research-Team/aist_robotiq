@@ -4,6 +4,7 @@
   <arg name="scene"			default="aist_base_scene"/>
   <include file="$(find aist_moveit_config)/launch/planning_context.launch">
     <arg name="load_robot_description"	value="$(arg load_robot_description)"/>
+    <arg name="config" value="$(arg config)"/>
     <arg name="scene"			value="$(arg scene)"/>
   </include>
 
