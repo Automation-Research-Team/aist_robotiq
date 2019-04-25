@@ -8,6 +8,9 @@
   <arg name="robot_name"	default="d_bot"
        if="$(eval arg('config') == 'ur5e')"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
+  <arg name="camera_frame"	default="camera_link"/>
+  <arg name="marker_frame"	default="camera_marker"/>
+  <arg name="reference_frame"	default=""/>
 
   <arg name="eye_on_hand"
        value="$(eval arg('camera_name') == arg('robot_name') + '_camera')"/>
@@ -16,6 +19,8 @@
   <include file="$(find o2as_easy_handeye)/launch/aruco_tracker.launch">
     <arg name="eye_on_hand"	value="$(arg eye_on_hand)"/>
     <arg name="camera_name"	value="$(arg camera_name)"/>
+    <arg name="reference_frame"	value="$(arg reference_frame)"/>
+    <arg name="camera_frame"	value="$(arg camera_frame)"/>
   </include>
 
   <!-- Start robot controller -->
@@ -33,8 +38,8 @@
          value="$(arg camera_name)_from_$(arg robot_name)"/>
     <arg name="eye_on_hand"		value="$(arg eye_on_hand)"/>
 
-    <arg name="tracking_base_frame"	value="camera_link"/>
-    <arg name="tracking_marker_frame"	value="camera_marker"/>
+    <arg name="tracking_base_frame"	value="$(arg camera_frame)"/>
+    <arg name="tracking_marker_frame"	value="$(arg marker_frame)"/>
     <arg name="robot_base_frame"	value="$(arg robot_name)_base_link"/>
     <arg name="robot_effector_frame"	value="$(arg robot_name)_ee_link"
          unless="$(arg eye_on_hand)"/>
