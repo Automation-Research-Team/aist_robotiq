@@ -15,7 +15,7 @@ from std_msgs.msg import String
 from std_srvs.srv import Empty
 from std_srvs.srv import Trigger
 from o2as_phoxi_camera.srv import GetFrame
-from o2as_easy_handeye.srv import TakeSample, RemoveSample, ComputeCalibration
+from easy_handeye.srv import TakeSample, RemoveSample, ComputeCalibration
 
 from o2as_routines.base import O2ASBaseRoutines
 from aist_routines.base import AISTBaseRoutines
@@ -136,13 +136,13 @@ keyposes = {
                 [0.15,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
                 [0.15,  0.20, 0.25, radians( 30), radians( 25), radians(0)],
 
-                # [0.40,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
-                # [0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
-                # [0.40, -0.15, 0.15, radians(  0), radians( 25), radians(0)],
+                [0.25,  0.20, 0.25, radians( 30), radians( 25), radians(0)],
+                [0.25,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
+                [0.25,  0.00, 0.25, radians(  0), radians( 25), radians(0)],
 
-                # [0.35, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
-                # [0.35,  0.05, 0.10, radians( 30), radians( 25), radians(0)],
-                # [0.35,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
+                [0.25,  0.00, 0.16, radians(  0), radians( 25), radians(0)],
+                [0.25,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.25,  0.20, 0.16, radians( 30), radians( 25), radians(0)],
             ],
         },
     },
@@ -193,10 +193,10 @@ keyposes = {
 def format_pose(pose):
     rpy = map(
         degrees,
-        tfs.euler_from_quaternion([
-            pose.orientation.w, pose.orientation.x, pose.orientation.y,
-            pose.orientation.z
-        ]))
+        tfs.euler_from_quaternion((
+            pose.orientation.x, pose.orientation.y, pose.orientation.z,
+            pose.orientation.w
+        )))
     return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
         pose.position.x, pose.position.y, pose.position.z, rpy[0], rpy[1],
         rpy[2])

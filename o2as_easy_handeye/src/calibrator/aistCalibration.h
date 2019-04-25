@@ -62,11 +62,11 @@ class Transform
     const auto&	q()		const	{ return _q;    }
     auto	q(size_t i)	const	{ return _q[i]; }
     auto	R()		const	{ return vpRotationMatrix(_q);}
-    
+
     Transform	inverse() const
 		{
 		    Transform	ret;
-		    ret._q = _q.inverse();
+		    ret._q = _q.inverse();	// Sign of _q[3] is preserved.
 		    ret._t = -(vpRotationMatrix(ret._q)*_t);
 
 		    return ret;
@@ -74,7 +74,10 @@ class Transform
 
     Transform	operator *(const Transform& trans) const
 		{
-		    return {_t + vpRotationMatrix(_q)*trans._t, _q * trans._q};
+		    auto	p = _q * trans._q;
+		    if (p[3] < 0)
+		    	p = -p;
+		    return {_t + vpRotationMatrix(_q)*trans._t, p};
 		}
 
 
@@ -92,20 +95,21 @@ class Transform
 
     void	print() const
 		{
-		    constexpr double	degree = 180.0/M_PI;
-		    
 		    std::cout << "xyz(m)    = "
 			      << _t[0] << ' ' << _t[1] << ' ' << _t[2]
 			      << std::endl;
-		    std::cout << "rot(deg.) = ";
-		    vpRotationMatrix	rpy(_q);
-		    rpy *= degree;
-		    rpy.printVector();
+
+		    constexpr double	degree = 180.0/M_PI;
+		    vpRzyxVector	rpy(R());
+		    std::cout << "rot(deg.) = "
+			      << rpy[2]*degree << ' '		// X-axis(roll)
+			      << rpy[1]*degree << ' '		// Y-axis(pitch)
+			      << rpy[0]*degree << std::endl;	// Z-axis(yaw)
 		}
-		
+
     friend std::istream&
     operator >>(std::istream& in, Transform& trans)	;
-    
+
   private:
     vpTranslationVector	_t;
     vpQuaternionVector	_q;
@@ -118,7 +122,7 @@ operator <<(std::ostream& out, const Transform& trans)
 	       << trans.q(0) << ' ' << trans.q(1) << ' '
 	       << trans.q(2) << ' ' << trans.q(3);
 }
-    
+
 inline std::istream&
 operator >>(std::istream& in, Transform& trans)
 {
@@ -126,12 +130,12 @@ operator >>(std::istream& in, Transform& trans)
     in >> trans._t[0] >> trans._t[1] >> trans._t[2] >> c
        >> trans._q[0] >> trans._q[1] >> trans._q[2] >> trans._q[3];
     if (trans._q[3] < 0)
-	    trans._q = -trans._q;
+	trans._q = -trans._q;
     trans._q.normalize();
 
     return in;
 }
-    
+
 Transform	calibrationAIST(const std::vector<Transform>& cMo,
 				const std::vector<Transform>& wMe)	;
 void		calibrationTsai(const std::vector<vpHomogeneousMatrix>& cMo,

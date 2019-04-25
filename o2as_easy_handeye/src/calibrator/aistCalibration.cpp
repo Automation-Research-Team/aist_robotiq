@@ -3,8 +3,6 @@
   \brief Tools for camera calibration.
 */
 
-#include <visp3/core/vpImage.h>
-#include <visp3/core/vpMath.h>
 #include <visp3/core/vpMatrix.h>
 #include <visp3/core/vpColVector.h>
 #include <visp3/vision/vpCalibrationException.h>
@@ -34,6 +32,8 @@ calibrationAIST(const std::vector<Transform>& cMo,
 	    const auto			a3  = A.q(3);
 	    const auto			b3  = B.q(3);
 
+	    std::cout << "a3 = " << a3 << ", b3 = " << b3 << std::endl;
+
 	    for (size_t r = 0; r < 3; ++r)
 	    {
 		C[r][r] += (1 + ab - a3*b3);
@@ -56,7 +56,7 @@ calibrationAIST(const std::vector<Transform>& cMo,
 
   // Compute translation.
     vpMatrix	D(3, 3);	// 3x3 matrix initialized with zeros.
-    vpColVector	d(3, 0);	// 3x1 vector initialized with zeros.
+    vpColVector	d(3, 0.0);	// 3x1 vector initialized with zeros.
     for (size_t i = 0; i < nposes; ++i)
 	for (size_t j = i + 1; j < nposes; ++j)
 	{
@@ -72,7 +72,7 @@ calibrationAIST(const std::vector<Transform>& cMo,
 	    const auto	m = vpRotationMatrix(qx)*B.t() - A.t();
 	    d += (M.t() * m);
 	}
-    
+
     const vpTranslationVector	tx(D.inverseByCholesky() * d);
 
     return Transform(tx, qx);
@@ -111,7 +111,7 @@ objectToWorld(const std::vector<Transform>& cMo,
 
     return Transform(vpTranslationVector(ty), qy);
 }
-    
+
 void
 evaluateAccuracy(std::ostream& out,
 		 const std::vector<Transform>& cMo,
@@ -125,7 +125,7 @@ evaluateAccuracy(std::ostream& out,
     double	tdiff_max  = 0;	// max. translational difference
     double	adiff_mean = 0;	// mean angular difference
     double	adiff_max  = 0;	// max. angular difference
-    
+
     for (size_t i = 0; i < nposes; ++i)
     {
 	const auto	AX    = wMe[i] * eMc;
@@ -160,8 +160,8 @@ evaluateAccuracy(std::ostream& out,
     wMo.print();
     std::cout << std::endl;
 }
-    
-    
+
+
 void
 calibrationTsai(const std::vector<vpHomogeneousMatrix>& cMo,
 		const std::vector<vpHomogeneousMatrix>& wMe,
@@ -172,7 +172,7 @@ calibrationTsai(const std::vector<vpHomogeneousMatrix>& cMo,
     if (cMo.size() != wMe.size())
 	throw vpCalibrationException(vpCalibrationException::dimensionError,
 				     "cMo and wMe have different sizes");
-    
+
     vpMatrix		A;
     vpColVector		B;
     unsigned int	k = 0;
@@ -336,6 +336,5 @@ calibrationTsai(const std::vector<vpHomogeneousMatrix>& cMo,
     eMc.insert(eTc);
     eMc.insert(eRc);
 }
-    
-}	// namespace aistCalibration
 
+}	// namespace aistCalibration

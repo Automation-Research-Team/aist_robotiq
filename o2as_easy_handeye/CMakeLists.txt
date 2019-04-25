@@ -40,9 +40,9 @@ include_directories(
   src/calibrator
 )
 add_executable(calibrator
-  src/calibrator/calibrator.cpp
-  src/calibrator/calibrator.h
-  src/calibrator/calibrator_main.cpp
+  src/calibrator/Calibrator.cpp
+  src/calibrator/Calibrator.h
+  src/calibrator/main.cpp
   src/calibrator/aistCalibration.cpp
   src/calibrator/vpMatrix.cpp
   src/calibrator/names.cpp

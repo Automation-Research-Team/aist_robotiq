@@ -100,24 +100,24 @@
   				     parent="b_bot_ft300_frange_link">
     <origin xyz="0 0 0" rpy="0 ${0*pi/180} 0"/>
   </xacro:single_suction_gripper_o2as>
-  <!-- <xacro:include filename="$(find aist_scene_description)/urdf/single_suction_gripper_with_ft300.urdf.xacro" /> -->
-  <!-- <xacro:single_suction_gripper_with_ft300 prefix="b_bot_" -->
-  <!-- 				     parent="b_bot_ee_link"/> -->
 
   <!-- Add PhoXi 3D scanner -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />
   <xacro:phoxi_m_camera prefix="a_" parent="o2as_ground">
+    <!-- <origin xyz="0.679997723974 0.0866831188148 1.46958049634" -->
+    <!-- 	    rpy="${-143.76356757*pi/180} -->
+    <!-- 		 ${0.312453823638*pi/180} ${85.5565266354*pi/180}"/> -->
     <origin xyz="0.679997723974 0.0866831188148 1.46958049634"
-	    rpy="${-143.76356757*pi/180}
-		 ${0.312453823638*pi/180} ${85.5565266354*pi/180}"/>
+	    rpy="${-145.0*pi/180}
+		 ${0.0*pi/180} ${90.0*pi/180}"/>
   </xacro:phoxi_m_camera>
 
   <!-- Add AR markers -->
   <xacro:include filename="$(find aist_gazebo)/urdf/aist_ar_marker.urdf.xacro"/>
 
   <xacro:aist_ar_marker prefix="a_bot_"
-			parent="a_bot_robotiq_85_tip_link"
-			marker_id="26">
+  			parent="a_bot_robotiq_85_tip_link"
+  			marker_id="26">
     <origin xyz="0.0 0.0 0.0185" rpy="0 0 0"/>
   </xacro:aist_ar_marker>
 

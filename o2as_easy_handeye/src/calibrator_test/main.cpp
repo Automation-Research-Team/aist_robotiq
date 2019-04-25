@@ -10,6 +10,7 @@ doJob(bool aist)
 {
     size_t	nposes;
     std::cin >> nposes;
+    std::cout << nposes << " poses." << std::endl;
 
     std::vector<Transform>	cMo(nposes), wMe(nposes);
     for (size_t n = 0; n < nposes; ++n)
@@ -17,7 +18,7 @@ doJob(bool aist)
 	std::cin >> cMo[n] >> wMe[n];
 
 	cMo[n].print();
-	wMe[n].print();
+	wMe[n].inverse().print();
 	std::cout << std::endl;
     }
 
@@ -25,6 +26,8 @@ doJob(bool aist)
     if (aist)
     {
 	eMc = calibrationAIST(cMo, wMe);
+	std::cout << "==== Camera pose from base_link ===" << std::endl;
+	eMc.print();
     }
     else
     {

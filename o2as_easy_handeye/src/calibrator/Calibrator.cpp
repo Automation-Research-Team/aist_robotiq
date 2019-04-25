@@ -47,7 +47,7 @@
   \brief Calibrator node implementing a quick compute service, a compute service and 2 subscribers to world_effector_topic and camera_object_topic.
 */
 
-#include "calibrator.h"
+#include "Calibrator.h"
 #include <visp_bridge/3dpose.h>
 #include "names.h"
 #include "aistCalibration.h"
@@ -212,7 +212,7 @@ Calibrator::computeEffectorCameraQuickCallback(
     out << cMo.size() << std::endl;
     for (size_t n = 0; n < cMo.size(); ++n)
 	out << cMo[n] << std::endl
-	    << wMe[n].inverse() << std::endl << std::endl;
+	    << wMe[n] << std::endl << std::endl;
 
     const auto	wMo = objectToWorld(cMo, wMe, eMc);
     evaluateAccuracy(out, cMo, wMe, eMc, wMo);
