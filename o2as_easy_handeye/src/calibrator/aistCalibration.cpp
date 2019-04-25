@@ -32,8 +32,6 @@ calibrationAIST(const std::vector<Transform>& cMo,
 	    const auto			a3  = A.q(3);
 	    const auto			b3  = B.q(3);
 
-	    std::cout << "a3 = " << a3 << ", b3 = " << b3 << std::endl;
-
 	    for (size_t r = 0; r < 3; ++r)
 	    {
 		C[r][r] += (1 + ab - a3*b3);
