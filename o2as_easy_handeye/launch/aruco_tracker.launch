@@ -1,9 +1,9 @@
 <?xml version="1.0" ?>
 <launch>
-  <arg name="eye_on_hand"	type="bool" 	default="false"/>
-  <arg name="camera_name"			default="a_phoxi_m_camera"/>
-  <arg name="reference_frame"			default=""/>
-  <arg name="camera_frame"			default="camera_link"/>
+  <arg name="eye_on_hand"	default="false"/>
+  <arg name="camera_name"	default="a_phoxi_m_camera"/>
+  <arg name="reference_frame"	default=""/>
+  <arg name="camera_frame"	default="camera_link"/>
 
   <arg name="marker_id"		default="26"	unless="$(arg eye_on_hand)"/>
   <arg name="marker_id"		value="32"	if    ="$(arg eye_on_hand)"/>
