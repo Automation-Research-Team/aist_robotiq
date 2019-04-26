@@ -93,18 +93,19 @@ class Transform
 			.euclideanNorm();
 		}
 
-    void	print() const
+    std::ostream&
+		print(std::ostream& out) const
 		{
-		    std::cout << "xyz(m)    = "
-			      << _t[0] << ' ' << _t[1] << ' ' << _t[2]
-			      << std::endl;
+		    out << "xyz(m)    = "
+			<< _t[0] << ' ' << _t[1] << ' ' << _t[2]
+			<< std::endl;
 
 		    constexpr double	degree = 180.0/M_PI;
 		    vpRzyxVector	rpy(R());
-		    std::cout << "rot(deg.) = "
-			      << rpy[2]*degree << ' '		// X-axis(roll)
-			      << rpy[1]*degree << ' '		// Y-axis(pitch)
-			      << rpy[0]*degree << std::endl;	// Z-axis(yaw)
+		    return out << "rot(deg.) = "
+			       << rpy[2]*degree << ' '		// X-axis(roll)
+			       << rpy[1]*degree << ' '		// Y-axis(pitch)
+			       << rpy[0]*degree << std::endl;	// Z-axis(yaw)
 		}
 
     friend std::istream&

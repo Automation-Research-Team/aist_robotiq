@@ -152,11 +152,9 @@ evaluateAccuracy(std::ostream& out,
 	<< "estimated wMo:\n" << wMo << std::endl << std::endl;
 
     std::cout << "=== estimated eMc: ====\n";
-    eMc.print();
-    std::cout << std::endl;
+    eMc.print(std::cout) << std::endl;
     std::cout << "=== estimated wMo: ===\n";
-    wMo.print();
-    std::cout << std::endl;
+    wMo.print(std::cout) << std::endl;
 }
 
 
