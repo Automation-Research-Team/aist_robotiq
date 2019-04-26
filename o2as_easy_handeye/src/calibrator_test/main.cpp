@@ -17,9 +17,8 @@ doJob(bool aist)
     {
 	std::cin >> cMo[n] >> wMe[n];
 
-	cMo[n].print();
-	wMe[n].inverse().print();
-	std::cout << std::endl;
+	cMo[n].print(std::cout);
+	wMe[n].inverse().print(std::cout) << std::endl;
     }
 
     Transform	eMc;
@@ -27,7 +26,7 @@ doJob(bool aist)
     {
 	eMc = calibrationAIST(cMo, wMe);
 	std::cout << "==== Camera pose from base_link ===" << std::endl;
-	eMc.print();
+	eMc.print(std::cout);
     }
     else
     {
