@@ -1,16 +1,20 @@
 #!/usr/bin/env python
 
-from math import pi
+import sys
+from math import pi, radians
 import copy
-import numpy as np
 
+import numpy as np
 import rospy
 import geometry_msgs.msg
 import visualization_msgs.msg
 import tf
 import tf_conversions
+import actionlib
+import moveit_commander
 
 import o2as_msgs.srv
+import aist_skills.msg
 
 def quaternion_msg_to_tf(orientation):
     """Convert quaternion geometry_msgs.msg.Quaternion to tf quaternion (as numpy.ndarray).
@@ -40,12 +44,21 @@ def rotatePoseByRPY(roll, pitch, yaw, inpose):
 class SkillServer(object):
     def __init__(self):
         super(SkillServer, self).__init__()
+        moveit_commander.roscpp_initialize(sys.argv)
+        self.listener = tf.TransformListener()
 
         # Topics to publish
         self.pubMarker_ = rospy.Publisher("visualization_marker", visualization_msgs.msg.Marker, queue_size=10)
 
         # Services to advertise
         self.publishMarkerService_ = rospy.Service("aist_skills/publishMarker", o2as_msgs.srv.publishMarker, self.publishMarkerCallback)
+
+        # Actions
+        self.move_lin_action = actionlib.SimpleActionServer('aist_skills/move_lin', 
+                                                            aist_skills.msg.MoveLinAction,
+                                                            execute_cb=self.move_lin_action_callback,
+                                                            auto_start=False)
+        self.move_lin_action.start()
 
         self.marker_id_count = 0
 
@@ -164,6 +177,60 @@ class SkillServer(object):
         self.pubMarker_.publish(arrow_z)
 
         return True
+
+    def move_lin_action_callback(self, goal):
+        pose_goal = geometry_msgs.msg.PoseStamped()
+        pose_goal.header.frame_id = goal.frame_id
+        pose_goal.pose.position = goal.position
+        pose_goal.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(radians(goal.orientation.x), radians(goal.orientation.y), radians(goal.orientation.z)))
+        goal_res = aist_skills.msg.MoveLinResult()
+        try:
+            success, success_rate = self.move_lin(goal.group_name, pose_goal, goal.speed)
+        except rospy.ROSException:
+            self.move_lin_action.set_aborted()
+        goal_res.success = success
+        goal_res.success_rate = success_rate*100
+        self.move_lin_action.set_succeeded(goal_res)
+
+    def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, end_effector_link = ""):
+        robots = moveit_commander.RobotCommander()
+        planning_scene = moveit_commander.PlanningSceneInterface()
+        
+        self.publishMarker(pose_goal_stamped, "pose")
+
+        if end_effector_link == "":
+            if group_name == 'a_bot':
+                end_effector_link = 'a_bot_robotiq_85_tip_link'
+            elif group_name == "b_bot":
+                end_effector_link = "b_bot_single_suction_gripper_pad_link"
+            elif group_name == 'c_bot':
+                end_effector_link = 'c_bot_robotiq_85_tip_link'
+            elif group_name == "d_bot":
+                end_effector_link = "d_bot_dual_suction_gripper_pad_link"
+
+        group = moveit_commander.MoveGroupCommander(group_name)
+
+        group.set_end_effector_link(end_effector_link)
+        group.set_pose_target(pose_goal_stamped)
+        rospy.logdebug("Setting velocity scaling to " + str(speed))
+        group.set_max_velocity_scaling_factor(speed)
+
+        # FIXME: At the start of the program, get_current_pose() did not return the correct value. Should be a bug report.
+        waypoints = []
+        # waypoints.append(group.get_current_pose().pose)
+        pose_goal_world = self.listener.transformPose("o2as_ground", pose_goal_stamped).pose
+        waypoints.append(pose_goal_world)
+        (plan, fraction) = group.compute_cartesian_path(waypoints,  # waypoints to follow
+                                                        0.0005,       # eef_step
+                                                        0.0)        # jump_threshold
+        rospy.loginfo("Compute cartesian path succeeded with " + str(fraction*100) + "%")
+        plan = group.retime_trajectory(robots.get_current_state(), plan, speed)
+
+        plan_success = group.execute(plan, wait=True)
+        group.stop()
+        group.clear_pose_targets()
+        current_pose = group.get_current_pose().pose
+        return plan_success, fraction
 
 
 if __name__ == '__main__':
