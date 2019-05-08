@@ -8,6 +8,7 @@ float32 speed
 # Result
 bool success
 float32 success_rate
+geometry_msgs/PoseStamped current_pose
 ---
 # Feedback (Not yet)
 bool is_running

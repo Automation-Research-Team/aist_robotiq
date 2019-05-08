@@ -185,11 +185,12 @@ class SkillServer(object):
         pose_goal.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(radians(goal.orientation.x), radians(goal.orientation.y), radians(goal.orientation.z)))
         goal_res = aist_skills.msg.MoveLinResult()
         try:
-            success, success_rate = self.move_lin(goal.group_name, pose_goal, goal.speed)
+            success, success_rate, current_pose = self.move_lin(goal.group_name, pose_goal, goal.speed)
         except rospy.ROSException:
             self.move_lin_action.set_aborted()
         goal_res.success = success
         goal_res.success_rate = success_rate*100
+        goal_res.current_pose = current_pose
         self.move_lin_action.set_succeeded(goal_res)
 
     def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, end_effector_link = ""):
@@ -218,7 +219,7 @@ class SkillServer(object):
         # FIXME: At the start of the program, get_current_pose() did not return the correct value. Should be a bug report.
         waypoints = []
         # waypoints.append(group.get_current_pose().pose)
-        pose_goal_world = self.listener.transformPose("o2as_ground", pose_goal_stamped).pose
+        pose_goal_world = self.listener.transformPose("world", pose_goal_stamped).pose
         waypoints.append(pose_goal_world)
         (plan, fraction) = group.compute_cartesian_path(waypoints,  # waypoints to follow
                                                         0.0005,       # eef_step
@@ -229,8 +230,9 @@ class SkillServer(object):
         plan_success = group.execute(plan, wait=True)
         group.stop()
         group.clear_pose_targets()
-        current_pose = group.get_current_pose().pose
-        return plan_success, fraction
+        current_pose = group.get_current_pose()
+        current_pose_world = self.listener.transformPose('o2as_ground', current_pose)
+        return plan_success, fraction, current_pose_world
 
 
 if __name__ == '__main__':
