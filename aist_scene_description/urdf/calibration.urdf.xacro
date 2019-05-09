@@ -15,12 +15,6 @@
     <origin xyz="0.063 0.0 0.0215" rpy="0 0 0"/>
   </xacro:aist_ar_marker> -->
 
-  <link name="workspace_center"/>
-  <joint name="a_bot_to_workspace_joint" type="fixed">
-    <parent link="a_bot_base_link"/>
-    <child link="workspace_center"/>
-    <origin xyz="0 0.5 0" rpy="0 0 0"/>
-  </joint>
   <xacro:aist_ar_marker_16cm prefix="workspace_" parent="workspace_center" marker_id="32">
     <origin xyz="0.0 0.0 0.0005" rpy="0 0 0"/>
   </xacro:aist_ar_marker_16cm>

@@ -39,7 +39,7 @@
 
   <!-- Main workspace -->
   <!-- The surface is 0.01 m below the robot bases and the "workspace_center" frame. -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro" />
+  <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro"/>
   <!-- <xacro:property name="plate_w" value="0.598"/> -->
   <!-- <xacro:property name="plate_l" value="0.899"/> -->
   <!-- <xacro:o2as_box boxname="workbox" box_w="${plate_w}" box_l="${plate_l}" box_h=".01" parent="o2as_ground"> -->
@@ -108,18 +108,26 @@
   <xacro:o2as_box boxname="vtable" box_w="2" box_l="2" box_h="0.01" parent="world">
     <origin xyz="-1 0 0" rpy="0 0 0"/>
   </xacro:o2as_box>
-  <xacro:o2as_box boxname="vwall1" box_w="0.01" box_l="0.5" box_h="1.5" parent="o2as_ground">
-    <origin xyz="0.5 -0.25 0" rpy="0 0 0"/>
+  <xacro:o2as_box boxname="vwall1" box_w="0.01" box_l="0.5" box_h="0.6" parent="o2as_ground">
+    <origin xyz="0.67 0.25 0" rpy="0 0 0"/>
   </xacro:o2as_box>
 
   <!-- Add PhoXi 3D scanner -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />
   <xacro:phoxi_m_camera prefix="a_" parent="o2as_ground">
-    <origin xyz="0.679997723974 0.5866831188148 1.46958049634"
-	    rpy="${-143.76356757*pi/180}
-		 ${0.312453823638*pi/180} ${85.5565266354*pi/180}"/>
+    <origin xyz="0.533753808105 0.512093727977 0.904786289459"
+	    rpy="${-152.051675662*pi/180} ${1.32492983016*pi/180} ${88.0374935002*pi/180}"/>
+    <!-- <origin xyz="0.679997723974 0.5 0.7" -->
+    <!-- 	    rpy="${-143.76356757*pi/180} -->
+    <!-- 		 ${0.312453823638*pi/180} ${85.5565266354*pi/180}"/> -->
   </xacro:phoxi_m_camera>
 
+  <link name="workspace_center"/>
+  <joint name="a_bot_to_workspace_joint" type="fixed">
+    <parent link="o2as_ground"/>
+    <child link="workspace_center"/>
+    <origin xyz="0 0.5 0" rpy="0 0 0"/>
+  </joint>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world" />
