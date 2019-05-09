@@ -4,6 +4,7 @@
 
   <!-- The name of the parameter under which the URDF is loaded -->
   <arg name="robot_description" default="robot_description"/>
+  <arg name="config"/>
   <arg name="scene"/>
   <!-- Load universal robot description format (URDF) -->
   <param if="$(arg load_robot_description)"
@@ -12,7 +13,7 @@
 
   <!-- The semantic description that corresponds to the URDF -->
   <param name="$(arg robot_description)_semantic"
-	 textfile="$(find aist_moveit_config)/config/$(arg scene).srdf" />
+	 textfile="$(find aist_moveit_config)/config/$(arg config)_base_scene.srdf" />
 
   <!-- Load updated joint limits (override information from URDF) -->
   <group ns="$(arg robot_description)_planning">

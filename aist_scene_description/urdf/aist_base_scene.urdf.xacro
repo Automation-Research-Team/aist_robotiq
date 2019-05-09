@@ -120,26 +120,6 @@
 		 ${0.312453823638*pi/180} ${85.5565266354*pi/180}"/>
   </xacro:phoxi_m_camera>
 
-  <!-- Add AR markers -->
-  <!-- <xacro:include filename="$(find aist_gazebo)/urdf/aist_ar_marker.urdf.xacro"/> -->
-
-  <!-- <xacro:aist_ar_marker prefix="a_bot_"
-			parent="a_bot_robotiq_85_tip_link"
-			marker_id="26">
-    <origin xyz="0.0 0.0 0.0185" rpy="0 0 0"/>
-  </xacro:aist_ar_marker> -->
-
-  <!-- <xacro:aist_ar_marker prefix="b_bot_"
-      parent="b_bot_single_suction_gripper_base_link"
-      marker_id="26">
-    <origin xyz="0.063 0.0 0.0215" rpy="0 0 0"/>
-  </xacro:aist_ar_marker> -->
-
-  <!-- <xacro:aist_ar_marker_16cm prefix="workspace_"
-      parent="workspace_center"
-      marker_id="32">
-    <origin xyz="0.0 0.0 0.0005" rpy="0 0 0"/>
-  </xacro:aist_ar_marker_16cm> -->
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world" />
