@@ -72,7 +72,7 @@ find_package(catkin REQUIRED
 ## Generate actions in the 'action' folder
 add_action_files(
 	DIRECTORY action
-    FILES MoveLin.action
+    FILES MoveLin.action Pick.action Place.action
 )
 
 ## Generate added messages and services with any dependencies listed here
