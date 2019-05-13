@@ -284,11 +284,10 @@ class SkillServer(object):
         goal_pose.header.frame_id = target_point_world.header.frame_id
         goal_pose.pose.position = copy.deepcopy(target_point_world.point)
         goal_pose.pose.position.z -= goal.grasp_offset
-        # if goal.orientation.x > 90:
-        #     goal.orientation.x = -180 + goal.orientation.x
-        # elif goal.orientation.x > -90:
-        #     goal.orientation.x = 180 - goal.orientation.x
-        goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(radians(goal.orientation.x), radians(goal.orientation.y), radians(goal.orientation.z)))
+        # NOTE: Sometimes below pose move unexpected direction.
+        # For example, we expect rotating to -135 deg. in x-axis, but flange rotates to 45 deg. in x-axis.
+        # Gimbals rock? encoder's error? I don't understand... Needs to check more details.
+        goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(radians(-goal.orientation.x), radians(goal.orientation.y), radians(goal.orientation.z)))
         speed = goal.speed_slow
         plan_success, _, current_pose = self.move_lin(goal.group_name, goal_pose, speed=speed)
         feedback.is_running = True
