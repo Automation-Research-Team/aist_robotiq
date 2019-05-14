@@ -1,69 +1,52 @@
 #include <cstdlib>
-#include <visp_bridge/3dpose.h>
-#include <visp/vpHomogeneousMatrix.h>
-#include "aistCalibration.h"
+#include "HandeyeCalibration.h"
 
-namespace aistCalibration
+namespace TU
 {
-void
-doJob(bool aist)
+template <class T> void
+doJob(bool single, bool eye_on_hand)
 {
     size_t	nposes;
     std::cin >> nposes;
-    std::cout << nposes << " poses." << std::endl;
-
-    std::vector<Transform>	cMo(nposes), wMe(nposes);
+    std::vector<Transform<T> >	cMo(nposes), wMe(nposes);
     for (size_t n = 0; n < nposes; ++n)
     {
 	std::cin >> cMo[n] >> wMe[n];
-
+	std::cout << "=== cMo[" << n << "] ===" << std::endl;
 	cMo[n].print(std::cout);
-	wMe[n].inverse().print(std::cout) << std::endl;
+	
+	std::cout << "=== wMe[" << n << "] ===" << std::endl;
+	if (eye_on_hand)
+	    wMe[n].print(std::cout) << std::endl;
+	else
+	    wMe[n].inverse().print(std::cout) << std::endl;
     }
+    
 
-    Transform	eMc;
-    if (aist)
-    {
-	eMc = calibrationAIST(cMo, wMe);
-	std::cout << "==== Camera pose from base_link ===" << std::endl;
-	eMc.print(std::cout);
-    }
-    else
-    {
-	std::vector<vpHomogeneousMatrix>	cMo_vp;
-	std::vector<vpHomogeneousMatrix>	wMe_vp;
-	for (unsigned int i = 0; i < cMo.size(); i++)
-	{
-	    cMo_vp.push_back(visp_bridge::toVispHomogeneousMatrix(
-				 geometry_msgs::Transform(cMo[i])));
-	    wMe_vp.push_back(visp_bridge::toVispHomogeneousMatrix(
-				 geometry_msgs::Transform(wMe[i])));
-	}
-
-	vpHomogeneousMatrix		eMc_vp;
-	aistCalibration::calibrationTsai(cMo_vp, wMe_vp, eMc_vp);
-	eMc = Transform(visp_bridge::toGeometryMsgsTransform(eMc_vp));
-    }
-
+    const auto	eMc = (single ? calibrationSingle(cMo, wMe)
+			      : calibrationDual(cMo, wMe));
     const auto	wMo = objectToWorld(cMo, wMe, eMc);
     evaluateAccuracy(std::cout, cMo, wMe, eMc, wMo);
 }
 
-}	// namespace aistCalibration
+}	// namespace TU
 
 int
 main(int argc, char* argv[])
 {
-    bool		aist = false;
-    extern char*	optarg;
-    for (int c; (c = getopt(argc, argv, "a")) !=EOF; )
+    bool	single = false, eye_on_hand = false;
+    for (int c; (c = getopt(argc, argv, "se")) !=EOF; )
 	switch (c)
 	{
-	  case 'a':
-	    aist = true;
+	  case 's':
+	    single = true;
+	    break;
+	  case 'e':
+	    eye_on_hand = true;
 	    break;
 	}
 
-    aistCalibration::doJob(aist);
+    TU::doJob<double>(single, eye_on_hand);
 
+    return 0;
 }

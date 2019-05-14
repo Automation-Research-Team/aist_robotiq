@@ -43,15 +43,16 @@
  *****************************************************************************/
 
 /*!
-  \file calibrator.h
-  \brief Calibrator node implementing a quick compute service, a compute service and 2 subscribers to world_effector_topic and camera_object_topic.
+  \file		Calibrator.h
+  \brief	Calibrator node implementing a quick compute service, a compute service and 2 subscribers to world_effector_topic and camera_object_topic.
 */
 
-#ifndef __visp_hand2eye_calibration_CALIBRATOR_H__
-#define __visp_hand2eye_calibration_CALIBRATOR_H__
+#ifndef CALIBRATOR_H
+#define CALIBRATOR_H
+
 #include "ros/ros.h"
 
-#include "geometry_msgs/Transform.h"
+#include "Transform.h"
 #include "visp_hand2eye_calibration/TransformArray.h"
 #include "visp_hand2eye_calibration/compute_effector_camera_quick.h"
 #include "visp_hand2eye_calibration/compute_effector_camera.h"
@@ -60,12 +61,16 @@
 
 #include <vector>
 
-class vpHomogeneousMatrix;
-
 namespace visp_hand2eye_calibration
 {
+/************************************************************************
+*  class Calibrator							*
+************************************************************************/
 class Calibrator
 {
+  public:
+    using transform_t	= TU::Transform<double>;
+    
   public:
   //! advertises services and subscribes to topics
 		Calibrator();
@@ -102,8 +107,8 @@ class Calibrator
     If it is not equal, the service fails.
   */
     bool	computeEffectorCameraCallback(
-		    compute_effector_camera::Request  &req,
-		    compute_effector_camera::Response &res );
+		    compute_effector_camera::Request&  req,
+		    compute_effector_camera::Response& res)		;
 
   /*!
     \brief service computing world->effector transformation
@@ -113,28 +118,29 @@ class Calibrator
     If it is not equal, the service fails.
   */
     bool	computeEffectorCameraQuickCallback(
-		    compute_effector_camera_quick::Request  &req,
-		    compute_effector_camera_quick::Response &res );
+		    compute_effector_camera_quick::Request&  req,
+		    compute_effector_camera_quick::Response& res)	;
   /*!
     \brief service reseting the acumulated data
   */
-    bool	resetCallback(reset::Request  &req, reset::Response &res );
+    bool	resetCallback(reset::Request& req, reset::Response& res);
     
   private:    
   //subscribers. Must be class-persistant
-    ros::NodeHandle			n_;
+    ros::NodeHandle			_node;
     
-    const ros::ServiceServer		compute_effector_camera_service_;
-    const ros::ServiceServer		compute_effector_camera_quick_service_;
-    const ros::ServiceServer		reset_service_;
-    ros::Subscriber			camera_object_subscriber_;
-    ros::Subscriber			world_effector_subscriber_;
-    image_proc::AdvertisementChecker	check_inputs_;
+    const ros::ServiceServer		_computeEffectorCamera;
+    const ros::ServiceServer		_computeEffectorCameraQuick;
+    const ros::ServiceServer		_reset;
+    ros::Subscriber			_cMo_subscriber;
+    ros::Subscriber			_wMe_subscriber;
+    image_proc::AdvertisementChecker	_check_inputs;
 
-    std::vector<vpHomogeneousMatrix>	cMo_vec_;
-    std::vector<vpHomogeneousMatrix>	wMe_vec_;
+    std::vector<transform_t>		_cMo;
+    std::vector<transform_t>		_wMe;
 
-    unsigned int			queue_size_;
+    size_t				_queue_size;
 };
-}
-#endif
+}	// namespace visp_hnad2eye_calibration
+#endif	// !CALIBRATOR_H
+
