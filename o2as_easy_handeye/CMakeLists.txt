@@ -13,7 +13,6 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   std_srvs
   cv_bridge
-  visp_bridge
   visp_hand2eye_calibration
   message_generation
   pcl_ros
@@ -40,11 +39,11 @@ include_directories(
   src/calibrator
 )
 add_executable(calibrator
+  src/calibrator/main.cpp
   src/calibrator/Calibrator.cpp
   src/calibrator/Calibrator.h
-  src/calibrator/main.cpp
-  src/calibrator/aistCalibration.cpp
-  src/calibrator/vpMatrix.cpp
+  src/calibrator/Transform.h
+  src/calibrator/HandeyeCalibration.h
   src/calibrator/names.cpp
   src/calibrator/names.h
 )
@@ -52,9 +51,6 @@ add_executable(calibrator
 target_link_libraries(calibrator
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
-  gsl
-  lapack
-  blas
 )
 
 add_dependencies(calibrator
@@ -78,16 +74,13 @@ add_dependencies(quat2rpy
 
 add_executable(calibrator_test
   src/calibrator_test/main.cpp
-  src/calibrator/aistCalibration.cpp
-  src/calibrator/vpMatrix.cpp
+  src/calibrator/Transform.h
+  src/calibrator/HandeyeCalibration.h
 )
 
 target_link_libraries(calibrator_test
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
-  gsl
-  lapack
-  blas
 )
 
 add_dependencies(calibrator_test
