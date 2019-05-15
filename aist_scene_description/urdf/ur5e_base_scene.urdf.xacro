@@ -4,15 +4,15 @@
 
 
   <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
-  <xacro:property name="c_bot_x" value="-0.006"/>
-  <xacro:property name="c_bot_y" value="-0.625"/>
-  <xacro:property name="c_bot_z" value="0.78" />
+  <xacro:property name="c_bot_x" value="0"/>
+  <xacro:property name="c_bot_y" value="0"/>
+  <xacro:property name="c_bot_z" value="0" />
   <!-- <xacro:property name="c_bot_theta" value="${pi}"/> -->
   <xacro:property name="d_bot_x" value="0"/>
   <xacro:property name="d_bot_y" value="0.50"/>
   <xacro:property name="d_bot_theta" value="${pi}"/>
 
-  <xacro:property name="bots_z" value="0.77"/>
+  <xacro:property name="bots_z" value="0"/>
 
   <!-- This is the main file defining our robot arrangement and physical environment. -->
 
@@ -29,28 +29,28 @@
   <!-- Robot bases -->
   <!-- Putting these at height 0.0 makes them intersect with the ground, so they are elevated. -->
   <!-- There are some instabilities when the box is big, for some reason. -->
-  <xacro:include filename="$(find aist_scene_description)/urdf/aist_base.xacro" />
-  <xacro:aist_base boxname="c_bot_base_smfl" parent="o2as_ground">
+  <!-- <xacro:include filename="$(find aist_scene_description)/urdf/aist_base.xacro" /> -->
+  <!-- <xacro:aist_base boxname="c_bot_base_smfl" parent="o2as_ground">
     <origin xyz="${c_bot_x-0.225/2} ${c_bot_y-0.225/2} 0.72" rpy="0 0 0" />
-  </xacro:aist_base>
-  <xacro:aist_base boxname="d_bot_base_smfl" parent="o2as_ground">
+  </xacro:aist_base> -->
+  <!-- <xacro:aist_base boxname="d_bot_base_smfl" parent="o2as_ground">
     <origin xyz="${d_bot_x-0.225/2} ${d_bot_y-0.225/2} 0.72" rpy="0 0 0" />
-  </xacro:aist_base>
+  </xacro:aist_base> -->
 
   <!-- Main workspace -->
   <!-- The surface is 0.01 m below the robot bases and the "workspace_center" frame. -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro" />
-  <xacro:property name="plate_w" value="0.598"/>
-  <xacro:property name="plate_l" value="0.899"/>
-  <xacro:o2as_box boxname="workbox" box_w="${plate_w}" box_l="${plate_l}" box_h=".01" parent="o2as_ground">
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro" /> -->
+  <!-- <xacro:property name="plate_w" value="0.598"/> -->
+  <!-- <xacro:property name="plate_l" value="0.899"/> -->
+  <!-- <xacro:o2as_box boxname="workbox" box_w="${plate_w}" box_l="${plate_l}" box_h=".01" parent="o2as_ground">
     <origin xyz="${-plate_w/2} ${-plate_l/2-0.062} ${bots_z}" rpy="0 0 0" />
-  </xacro:o2as_box>
-  <link name="workspace_center" />
+  </xacro:o2as_box> -->
+  <!-- <link name="workspace_center" />
   <joint name="world_to_workspace" type="fixed">
     <parent link="o2as_ground" />
     <child link="workspace_center" />
     <origin xyz="0 0 ${bots_z+.01}" rpy="0 0 0" />
-  </joint>
+  </joint> -->
 
   <!-- robot arms -->
   <xacro:ur5e_robot prefix="c_bot_" joint_limited="false"
@@ -61,13 +61,13 @@
     wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
     wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
 
-  <xacro:ur5e_robot prefix="d_bot_" joint_limited="false"
+  <!-- <xacro:ur5e_robot prefix="d_bot_" joint_limited="false"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
     elbow_joint_lower_limit="0" elbow_joint_upper_limit="${pi}"
     wrist_1_lower_limit="${-pi}" wrist_1_upper_limit="${pi}"
     wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
-    wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
+    wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/> -->
 
   <link name="o2as_ground" />
 
@@ -77,12 +77,12 @@
     <origin xyz="${c_bot_x} ${c_bot_y} ${c_bot_z}" rpy="0 0 0" />
   </joint>
 
-  <joint name="world_d_bot_joint" type="fixed">
+  <!-- <joint name="world_d_bot_joint" type="fixed">
     <parent link="o2as_ground" />
     <child  link="d_bot_base_link" />
     <origin xyz="${d_bot_x} ${d_bot_y} ${bots_z}"
 	    rpy="0 0 ${d_bot_theta}" />
-  </joint>
+  </joint> -->
 
   <!-- Spawn and attach gripper -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_85_gripper_with_tip_link.urdf.xacro" />
@@ -91,11 +91,20 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:robotiq_85_gripper_with_tip_link>
 
-  <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro" />
-  <xacro:dual_suction_gripper_o2as prefix="d_bot_"
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro" /> -->
+  <!-- <xacro:dual_suction_gripper_o2as prefix="d_bot_"
   				   parent="d_bot_ee_link">
     <origin xyz="0 0 0" rpy="0 ${0*pi/180} 0"/>
-  </xacro:dual_suction_gripper_o2as>
+  </xacro:dual_suction_gripper_o2as> -->
+
+  <!-- Add virtual wall to avoid collisions-->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro" />
+  <xacro:o2as_box boxname="vtable" box_w="2" box_l="2" box_h="0.01" parent="world">
+    <origin xyz="-1 0 0" rpy="0 0 0"/>
+  </xacro:o2as_box>
+  <xacro:o2as_box boxname="vwall1" box_w="0.01" box_l="0.5" box_h="1.5" parent="o2as_ground">
+    <origin xyz="0.5 -0.25 0" rpy="0 0 0"/>
+  </xacro:o2as_box>
 
   <!-- Add PhoXi 3D scanner -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro" />
@@ -106,32 +115,32 @@
   </xacro:phoxi_m_camera>
 
   <!-- Add AR markers -->
-  <xacro:include filename="$(find aist_gazebo)/urdf/aist_ar_marker.urdf.xacro"/>
+  <!-- <xacro:include filename="$(find aist_gazebo)/urdf/aist_ar_marker.urdf.xacro"/> -->
 
-  <xacro:aist_ar_marker prefix="c_bot_"
+  <!-- <xacro:aist_ar_marker prefix="c_bot_"
 			parent="c_bot_robotiq_85_tip_link"
 			marker_id="26">
     <origin xyz="0 0 0.0185" rpy="0 0 0"/>
-  </xacro:aist_ar_marker>
+  </xacro:aist_ar_marker> -->
 
-  <xacro:aist_ar_marker prefix="d_bot_"
+  <!-- <xacro:aist_ar_marker prefix="d_bot_"
 			parent="d_bot_dual_suction_gripper_base_link"
 			marker_id="26">
     <origin xyz="0.063 0 0.0215" rpy="0 0 0"/>
-  </xacro:aist_ar_marker>
+  </xacro:aist_ar_marker> -->
 
-  <xacro:aist_ar_marker_16cm prefix="workspace_"
+  <!-- <xacro:aist_ar_marker_16cm prefix="workspace_"
 			     parent="workspace_center"
 			     marker_id="32">
     <origin xyz="0 0 0.0005" rpy="0 0 0"/>
-  </xacro:aist_ar_marker_16cm>
+  </xacro:aist_ar_marker_16cm> -->
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world" />
   <joint name="world_o2as_joint" type="fixed">
     <parent link="world" />
     <child link="o2as_ground" />
-    <origin xyz="0 0 0" rpy="0 0 0" />
+    <origin xyz="0 0 0.01" rpy="0 0 0" />
   </joint>
 
 </robot>

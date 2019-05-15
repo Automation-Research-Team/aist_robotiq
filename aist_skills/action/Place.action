@@ -1,0 +1,18 @@
+# Goal
+string group_name
+string frame_id
+geometry_msgs/Point position
+geometry_msgs/Point orientation
+float32 approach_height
+float32 release_height
+float32 speed_fast
+float32 speed_slow
+---
+# Result
+geometry_msgs/PoseStamped current_pose
+bool success
+---
+# Feedback
+bool is_running
+string message
+geometry_msgs/PoseStamped current_pose
