@@ -44,7 +44,7 @@ initposes = {
     'aist': {
         'a_phoxi_m_camera': {
             'a_bot': [
-                0.10,  0.00, 0.35, radians(  0), radians( 90), radians(0)],
+                0.10, -0.20, 0.35, radians(  0), radians( 90), radians(0)],
             'b_bot': [
                 0.10,  0.10, 0.35, radians(  0), radians( 90), radians(0)],
         },
@@ -76,13 +76,13 @@ keyposes = {
 
             'b_bot': [
                 # configulation for real
-                [0.30,  0.15, 0.18, radians( 30), radians( 25), radians(0)],
-                [0.30,  0.00, 0.18, radians( 30), radians( 25), radians(0)],
-                [0.30, -0.15, 0.18, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.15, 0.18, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.00, 0.18, radians( 30), radians( 25), radians(0)],
+                [0.15, -0.15, 0.18, radians( 30), radians( 25), radians(0)],
 
-                [0.30, -0.10, 0.28, radians( 30), radians( 25), radians(0)],
-                [0.30,  0.00, 0.28, radians( 30), radians( 25), radians(0)],
-                [0.30,  0.10, 0.28, radians( 30), radians( 25), radians(0)],
+                [0.15, -0.10, 0.28, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.00, 0.28, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.10, 0.28, radians( 30), radians( 25), radians(0)],
 
                 # [0.20,  0.15, 0.20, radians( 30), radians( 25), radians(0)],
                 # [0.20,  0.00, 0.20, radians( 30), radians( 25), radians(0)],
@@ -118,31 +118,31 @@ keyposes = {
     'aist': {
         'a_phoxi_m_camera': {
             'a_bot': [
-                [0.15,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
-                [0.15,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
-                [0.15,  0.20, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.05, -0.10, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.05,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.05,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
 
-                [0.15,  0.20, 0.30, radians( 30), radians( 25), radians(0)],
-                [0.15,  0.10, 0.30, radians( 30), radians( 25), radians(0)],
-                [0.15,  0.00, 0.30, radians( 30), radians( 25), radians(0)],
+                [0.05,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
+                [0.05,  0.00, 0.25, radians( 30), radians( 25), radians(0)],
+                [0.05, -0.10, 0.25, radians( 30), radians( 25), radians(0)],
             ],
 
             'b_bot': [
                 [0.15,  0.20, 0.16, radians( 30), radians( 25), radians(0)],
                 [0.15,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
-                [0.15,  0.00, 0.16, radians(  0), radians( 25), radians(0)],
+                [0.15,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
 
-                [0.15,  0.00, 0.25, radians(  0), radians( 25), radians(0)],
+                [0.15,  0.00, 0.25, radians( 30), radians( 25), radians(0)],
                 [0.15,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
                 [0.15,  0.20, 0.25, radians( 30), radians( 25), radians(0)],
 
-                # [0.25,  0.20, 0.25, radians( 30), radians( 25), radians(0)],
-                # [0.25,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
-                # [0.25,  0.00, 0.25, radians(  0), radians( 25), radians(0)],
+                # [0.40,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
+                # [0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
+                # [0.40, -0.15, 0.15, radians(  0), radians( 25), radians(0)],
 
-                # [0.25,  0.00, 0.16, radians(  0), radians( 25), radians(0)],
-                # [0.25,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
-                # [0.25,  0.20, 0.16, radians( 30), radians( 25), radians(0)],
+                # [0.35, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
+                # [0.35,  0.05, 0.10, radians( 30), radians( 25), radians(0)],
+                # [0.35,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
             ],
         },
     },
@@ -150,7 +150,7 @@ keyposes = {
     'ur5e': {
         'a_phoxi_m_camera': {
             'c_bot': [
-                [0.15,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.15, -0.15, 0.16, radians( 30), radians( 25), radians(0)],
                 [0.15, -0.05, 0.16, radians( 30), radians( 25), radians(0)],
                 [0.15,  0.05, 0.16, radians( 30), radians( 25), radians(0)],
 
@@ -193,10 +193,10 @@ keyposes = {
 def format_pose(pose):
     rpy = map(
         degrees,
-        tfs.euler_from_quaternion((
-            pose.orientation.x, pose.orientation.y, pose.orientation.z,
-            pose.orientation.w
-        )))
+        tfs.euler_from_quaternion([
+            pose.orientation.w, pose.orientation.x, pose.orientation.y,
+            pose.orientation.z
+        ]))
     return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
         pose.position.x, pose.position.y, pose.position.z, rpy[0], rpy[1],
         rpy[2])
@@ -287,8 +287,8 @@ class HandEyeCalibrationRoutines:
         print("  reached to " + format_pose(poseReached.pose))
         return move_success
 
-    def move_to_subpose(self, subpose, keypose_num, subpose_num):
-        if not self.move(subpose):
+    def move_to(self, pose, keypose_num, subpose_num):
+        if not self.move(pose):
             return False
 
         if self.start_acquisition:
@@ -323,26 +323,25 @@ class HandEyeCalibrationRoutines:
         return success
 
     def move_to_subposes(self, pose, keypose_num):
-        subpose = copy.deepcopy(pose)
-        roll = subpose[3]
+        roll = pose[3]
         for i in range(3):
             print("\n--- Subpose [{}/5]: Try! ---".format(i + 1))
-            if self.move_to_subpose(subpose, keypose_num, i + 1):
+            if self.move_to(pose, keypose_num, i + 1):
                 print("--- Subpose [{}/5]: Succeeded. ---".format(i + 1))
             else:
                 print("--- Subpose [{}/5]: Failed. ---".format(i + 1))
-            subpose[3] -= radians(30)
+            pose[3] -= radians(30)
 
-        subpose[3] = roll - radians(30)
-        subpose[4] += radians(15)
+        pose[3] = roll - radians(30)
+        pose[4] += radians(15)
 
         for i in range(2):
             print("\n--- Subpose [{}/5]: Try! ---".format(i + 4))
-            if self.move_to_subpose(subpose, keypose_num, i + 4):
+            if self.move_to(pose, keypose_num, i + 4):
                 print("--- Subpose [{}/5]: Succeeded. ---".format(i + 4))
             else:
                 print("--- Subpose [{}/5]: Failed. ---".format(i + 4))
-            subpose[4] -= radians(30)
+            pose[4] -= radians(30)
 
         # ### How to define poses/positions for calibration
         # # 1. From rostopic echo /joint_states (careful with the order of the joints)
