@@ -47,15 +47,14 @@
   \brief Entry point for calibrator node
 */
 
-#include "calibrator.h"
+#include "Calibrator.h"
 #include "ros/ros.h"
 
 int
 main(int argc, char **argv)
 {
     ros::init(argc, argv, "calibrator");
-    visp_hand2eye_calibration::Calibrator().spin();  
+    visp_hand2eye_calibration::Calibrator().spin();
 
     return 0;
 }
-

@@ -1,11 +1,12 @@
 <?xml version="1.0" ?>
 <launch>
-  <arg name="eye_on_hand"	type="bool" 	default="false"/>
-  <arg name="camera_name"			default="a_phoxi_m_camera"/>
-  <arg name="reference_frame"			default=""/>
-  <arg name="camera_frame"			default="camera_link"/>
+  <arg name="eye_on_hand"	default="false"/>
+  <arg name="camera_name"	default="a_phoxi_m_camera"/>
+  <arg name="camera_frame"	default="camera_link"/>
+  <arg name="marker_frame"	default="camera_marker"/>
+  <arg name="reference_frame"	default=""/>
 
-  <arg name="marker_id"		default="26"	unless="$(arg eye_on_hand)"/>
+  <arg name="marker_id"		value="26"	unless="$(arg eye_on_hand)"/>
   <arg name="marker_id"		value="32"	if    ="$(arg eye_on_hand)"/>
 
   <arg name="marker_size"	value="0.07"	unless="$(arg eye_on_hand)"/>
@@ -32,8 +33,8 @@
     <param name="image_is_rectified" value="false"/>
     <param name="marker_size"        value="$(arg marker_size)"/>
     <param name="marker_id"          value="$(arg marker_id)"/>
-    <param name="reference_frame"    value="$(arg reference_frame)"/>
     <param name="camera_frame"       value="$(arg camera_frame)"/>
-    <param name="marker_frame"       value="camera_marker"/>
+    <param name="marker_frame"       value="$(arg marker_frame)"/>
+    <param name="reference_frame"    value="$(arg reference_frame)"/>
   </node>
 </launch>

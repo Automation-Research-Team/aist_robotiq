@@ -76,13 +76,13 @@ keyposes = {
 
             'b_bot': [
                 # configulation for real
-                [0.30,  0.15, 0.18, radians( 30), radians( 25), radians(0)],
-                [0.30,  0.00, 0.18, radians( 30), radians( 25), radians(0)],
-                [0.30, -0.15, 0.18, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.15, 0.18, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.00, 0.18, radians( 30), radians( 25), radians(0)],
+                [0.15, -0.15, 0.18, radians( 30), radians( 25), radians(0)],
 
-                [0.30, -0.10, 0.28, radians( 30), radians( 25), radians(0)],
-                [0.30,  0.00, 0.28, radians( 30), radians( 25), radians(0)],
-                [0.30,  0.10, 0.28, radians( 30), radians( 25), radians(0)],
+                [0.15, -0.10, 0.28, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.00, 0.28, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.10, 0.28, radians( 30), radians( 25), radians(0)],
 
                 # [0.20,  0.15, 0.20, radians( 30), radians( 25), radians(0)],
                 # [0.20,  0.00, 0.20, radians( 30), radians( 25), radians(0)],
@@ -118,13 +118,13 @@ keyposes = {
     'aist': {
         'a_phoxi_m_camera': {
             'a_bot': [
-                [0.15, -0.20, 0.16, radians( 30), radians( 25), radians(0)],
-                [0.15, -0.10, 0.16, radians( 30), radians( 25), radians(0)],
-                [0.15,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.05, -0.10, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.05,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.05,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
 
-                [0.15,  0.00, 0.25, radians( 30), radians( 25), radians(0)],
-                [0.15, -0.10, 0.25, radians( 30), radians( 25), radians(0)],
-                [0.15, -0.20, 0.25, radians( 30), radians( 25), radians(0)],
+                [0.05,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
+                [0.05,  0.00, 0.25, radians( 30), radians( 25), radians(0)],
+                [0.05, -0.10, 0.25, radians( 30), radians( 25), radians(0)],
             ],
 
             'b_bot': [

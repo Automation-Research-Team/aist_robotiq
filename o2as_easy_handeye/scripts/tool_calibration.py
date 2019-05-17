@@ -17,7 +17,7 @@ from aist_routines.base import AISTBaseRoutines
 refposes = {
     'a_bot': [-0.10, -0.10, 0.20, radians(-90), radians(-90), radians(180)],
     # 'b_bot':[ 0.20,  0.10, 0.081, radians(  0), radians( 90), radians(-90)],
-    'b_bot': [ 0.05,  0.19, 0.17, radians(  0), radians( 90), radians(-90)],
+    'b_bot': [ 0.10,  0.00, 0.01, radians(  0), radians( 90), radians(-90)],
     'c_bot': [-0.30,  0.00, 0.35, radians(-90), radians(-90), radians(180)],
     'd_bot': [-0.30,  0.00, 0.35, radians(  0), radians( 90), radians(  0)],
 }
@@ -56,6 +56,9 @@ class ToolCalibrationRoutines:
         if robot_name == 'b_bot':
             gripper_base_link = robot_name + '_single_suction_gripper_base_link'
             gripper_tip_link  = robot_name + '_single_suction_gripper_pad_link'
+        elif robot_name == 'd_bot':
+            gripper_base_link = robot_name + '_dual_suction_gripper_base_link'
+            gripper_tip_link  = robot_name + '_dual_suction_gripper_pad_link'
         else:
             gripper_base_link = robot_name + '_robotiq_85_base_link'
             gripper_tip_link  = robot_name + '_robotiq_85_tip_link'
@@ -125,13 +128,13 @@ class ToolCalibrationRoutines:
 
     def rolling_motion(self):
         pose = copy.deepcopy(self.refpose)
-        for i in range(5):
+        for i in range(4):
             pose[3] += radians(30)
             self.move(pose)
-        for i in range(10):
+        for i in range(8):
             pose[3] -= radians(30)
             self.move(pose)
-        for i in range(5):
+        for i in range(4):
             pose[3] += radians(30)
             self.move(pose)
 
@@ -203,7 +206,7 @@ class ToolCalibrationRoutines:
                 axis = 'Z    '
             elif key == 'P':
                 axis = 'Pitch'
-            elif key == 'Y':
+            elif key == 'W':
                 axis = 'Yaw  '
             elif key == '+':
                 if axis == 'X    ':
@@ -282,7 +285,7 @@ if __name__ == '__main__':
         else:
             base_routines = AISTBaseRoutines({args.robot_name})
 
-        speed = 0.05
+        speed = 0.1
         routines = ToolCalibrationRoutines(base_routines, args.robot_name,
                                            speed)
 
