@@ -1,16 +1,22 @@
 #!/usr/bin/env python
 
-from math import pi
+import sys
+from math import pi, radians
 import copy
-import numpy as np
 
+import numpy as np
 import rospy
 import geometry_msgs.msg
 import visualization_msgs.msg
 import tf
 import tf_conversions
+import actionlib
+import moveit_commander
+import robotiq_msgs.msg
 
 import o2as_msgs.srv
+import aist_graspability.msg
+import aist_skills.msg
 
 def quaternion_msg_to_tf(orientation):
     """Convert quaternion geometry_msgs.msg.Quaternion to tf quaternion (as numpy.ndarray).
@@ -40,12 +46,37 @@ def rotatePoseByRPY(roll, pitch, yaw, inpose):
 class SkillServer(object):
     def __init__(self):
         super(SkillServer, self).__init__()
+        moveit_commander.roscpp_initialize(sys.argv)
+        self.listener = tf.TransformListener()
 
         # Topics to publish
         self.pubMarker_ = rospy.Publisher("visualization_marker", visualization_msgs.msg.Marker, queue_size=10)
 
         # Services to advertise
         self.publishMarkerService_ = rospy.Service("aist_skills/publishMarker", o2as_msgs.srv.publishMarker, self.publishMarkerCallback)
+
+        # Action clients
+        # self.fge_action_client = actionlib.SimpleActionClient('aist_graspability/search_grasp_from_phoxi', aist_graspability.msg.SearchGraspFromPhoxiAction)
+        # self.fge_action_client.wait_for_server()
+        self.robotiq_action_client = actionlib.SimpleActionClient('a_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction)
+        self.robotiq_action_client.wait_for_server()
+
+        # Actions
+        self.move_lin_action = actionlib.SimpleActionServer('aist_skills/move_lin',
+                                                            aist_skills.msg.MoveLinAction,
+                                                            execute_cb=self.move_lin_action_callback,
+                                                            auto_start=False)
+        self.move_lin_action.start()
+        self.pick_action = actionlib.SimpleActionServer('aist_skills/pick',
+                                                        aist_skills.msg.PickAction,
+                                                        execute_cb=self.pick_action_callback,
+                                                        auto_start=False)
+        self.pick_action.start()
+        self.place_action = actionlib.SimpleActionServer('aist_skills/place',
+                                                        aist_skills.msg.PlaceAction,
+                                                        execute_cb=self.place_action_callback,
+                                                        auto_start=False)
+        self.place_action.start()
 
         self.marker_id_count = 0
 
@@ -165,14 +196,205 @@ class SkillServer(object):
 
         return True
 
+    def move_lin_action_callback(self, goal):
+        pose_goal = geometry_msgs.msg.PoseStamped()
+        pose_goal.header.frame_id = goal.frame_id
+        pose_goal.pose.position = goal.position
+        pose_goal.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(radians(goal.orientation.x), radians(goal.orientation.y), radians(goal.orientation.z)))
+        goal_res = aist_skills.msg.MoveLinResult()
+        try:
+            success, success_rate, current_pose = self.move_lin(goal.group_name, pose_goal, goal.speed)
+        except rospy.ROSException:
+            self.move_lin_action.set_aborted()
+        goal_res.success = success
+        goal_res.success_rate = success_rate*100
+        goal_res.current_pose = current_pose
+        self.move_lin_action.set_succeeded(goal_res)
+
+    def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, end_effector_link = ""):
+        robots = moveit_commander.RobotCommander()
+        planning_scene = moveit_commander.PlanningSceneInterface()
+
+        self.publishMarker(pose_goal_stamped, "pose")
+
+        if end_effector_link == "":
+            if group_name == 'a_bot':
+                end_effector_link = 'a_bot_robotiq_85_tip_link'
+            elif group_name == "b_bot":
+                end_effector_link = "b_bot_single_suction_gripper_pad_link"
+            elif group_name == 'c_bot':
+                end_effector_link = 'c_bot_robotiq_85_tip_link'
+            elif group_name == "d_bot":
+                end_effector_link = "d_bot_dual_suction_gripper_pad_link"
+
+        group = moveit_commander.MoveGroupCommander(group_name)
+
+        group.set_end_effector_link(end_effector_link)
+        group.set_pose_target(pose_goal_stamped)
+        rospy.logdebug("Setting velocity scaling to " + str(speed))
+        group.set_max_velocity_scaling_factor(speed)
+        group.set_goal_position_tolerance(0.0001)
+
+        # FIXME: At the start of the program, get_current_pose() did not return the correct value. Should be a bug report.
+        waypoints = []
+        # waypoints.append(group.get_current_pose().pose)
+        pose_goal_world = self.listener.transformPose("world", pose_goal_stamped).pose
+        waypoints.append(pose_goal_world)
+        (plan, fraction) = group.compute_cartesian_path(waypoints,  # waypoints to follow
+                                                        0.005,       # eef_step
+                                                        0.0)        # jump_threshold
+        rospy.loginfo("Compute cartesian path succeeded with " + str(fraction*100) + "%")
+        plan = group.retime_trajectory(robots.get_current_state(), plan, speed)
+
+        plan_success = group.execute(plan, wait=True)
+        group.stop()
+        group.clear_pose_targets()
+        current_pose = group.get_current_pose()
+        current_pose_world = self.listener.transformPose('o2as_ground', current_pose)
+        return plan_success, fraction, current_pose_world
+
+    def pick_action_callback(self, goal):
+        feedback = aist_skills.msg.PickFeedback()
+
+        target_point = geometry_msgs.msg.PointStamped()
+        target_point.header.frame_id = goal.frame_id
+        target_point.point = goal.position
+        target_point_world = self.listener.transformPoint('o2as_ground', target_point)
+        feedback.is_running = True
+        feedback.message = 'Transformed target point in world: '
+        feedback.current_pose.header.frame_id = 'o2as_ground'
+        feedback.current_pose.pose.position = target_point_world.point
+        self.pick_action.publish_feedback(feedback)
+
+        rospy.loginfo('above the target')
+        goal_pose = geometry_msgs.msg.PoseStamped()
+        goal_pose.header.frame_id = target_point_world.header.frame_id
+        goal_pose.pose.position = copy.deepcopy(target_point_world.point)
+        goal_pose.pose.position.z += goal.approach_offset
+        goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(radians(-90), radians(90), radians(0)))
+        speed = goal.speed_fast
+        plan_success, _, current_pose = self.move_lin(goal.group_name, goal_pose, speed=speed)
+        feedback.is_running = True
+        feedback.message = 'Pose moved above the target before picking'
+        feedback.current_pose = current_pose
+        self.pick_action.publish_feedback(feedback)
+
+        rospy.loginfo('approach to target')
+        goal_pose = geometry_msgs.msg.PoseStamped()
+        goal_pose.header.frame_id = target_point_world.header.frame_id
+        goal_pose.pose.position = copy.deepcopy(target_point_world.point)
+        goal_pose.pose.position.z -= goal.grasp_offset
+        # NOTE: Sometimes below pose move unexpected direction.
+        # For example, we expect rotating to -135 deg. in x-axis, but flange rotates to 45 deg. in x-axis.
+        # Gimbals rock? encoder's error? I don't understand... Needs to check more details.
+        goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(radians(-goal.orientation.x), radians(goal.orientation.y), radians(goal.orientation.z)))
+        speed = goal.speed_slow
+        plan_success, _, current_pose = self.move_lin(goal.group_name, goal_pose, speed=speed)
+        feedback.is_running = True
+        feedback.message = 'Pose after approached to target'
+        feedback.current_pose = current_pose
+        self.pick_action.publish_feedback(feedback)
+
+        rospy.loginfo('grasp the target')
+        goal_gripper = robotiq_msgs.msg.CModelCommandGoal()
+        goal_gripper.position = 0.0
+        goal_gripper.velocity = 0.1
+        goal_gripper.force = 40.0
+        self.robotiq_action_client.send_goal(goal_gripper)
+        self.robotiq_action_client.wait_for_result()
+        res_gripper = self.robotiq_action_client.get_result()
+
+        rospy.loginfo('above the target')
+        goal_pose = geometry_msgs.msg.PoseStamped()
+        goal_pose.header.frame_id = target_point_world.header.frame_id
+        goal_pose.pose.position = copy.deepcopy(target_point_world.point)
+        goal_pose.pose.position.z += goal.approach_offset
+        # goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(radians(-90), radians(90), radians(0)))
+        goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(radians(goal.orientation.x), radians(goal.orientation.y), radians(goal.orientation.z)))
+        speed = goal.speed_slow
+        plan_success, _, current_pose = self.move_lin(goal.group_name, goal_pose, speed=speed)
+        feedback.is_running = True
+        feedback.message = 'Pose moved above the target after picked'
+        feedback.current_pose = current_pose
+        self.pick_action.publish_feedback(feedback)
+
+        result = aist_skills.msg.PickResult()
+        result.current_pose = copy.deepcopy(current_pose)
+        result.success = True
+        self.pick_action.set_succeeded(result)
+
+    def place_action_callback(self, goal):
+        feedback = aist_skills.msg.PlaceFeedback()
+
+        target_point = geometry_msgs.msg.PointStamped()
+        target_point.header.frame_id = goal.frame_id
+        target_point.point = goal.position
+        target_point_world = self.listener.transformPoint('o2as_ground', target_point)
+        feedback.is_running = True
+        feedback.message = 'Transformed target point in world: '
+        feedback.current_pose.header.frame_id = 'o2as_ground'
+        feedback.current_pose.pose.position = target_point_world.point
+        self.place_action.publish_feedback(feedback)
+
+        rospy.loginfo('Move above the release point')
+        goal_pose = geometry_msgs.msg.PoseStamped()
+        goal_pose.header.frame_id = target_point_world.header.frame_id
+        goal_pose.pose.position = copy.deepcopy(target_point_world.point)
+        goal_pose.pose.position.z = goal.approach_height
+        goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(radians(goal.orientation.x), radians(goal.orientation.y), radians(goal.orientation.z)))
+        speed = goal.speed_fast
+        plan_success, _, current_pose = self.move_lin(goal.group_name, goal_pose, speed=speed)
+        feedback.is_running = True
+        feedback.message = 'Pose above the release point'
+        feedback.current_pose = current_pose
+        self.place_action.publish_feedback(feedback)
+
+        rospy.loginfo('Move the release height')
+        goal_pose = geometry_msgs.msg.PoseStamped()
+        goal_pose.header.frame_id = target_point_world.header.frame_id
+        goal_pose.pose.position = copy.deepcopy(target_point_world.point)
+        goal_pose.pose.position.z = goal.release_height
+        goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(radians(goal.orientation.x), radians(goal.orientation.y), radians(goal.orientation.z)))
+        speed = goal.speed_fast
+        plan_success, _, current_pose = self.move_lin(goal.group_name, goal_pose, speed=speed)
+        feedback.is_running = True
+        feedback.message = 'Pose of the release point'
+        feedback.current_pose = current_pose
+        self.place_action.publish_feedback(feedback)
+
+        rospy.loginfo('Place the object')
+        res_gripper = self.robotiq_action_client.get_result()
+        goal_gripper = robotiq_msgs.msg.CModelCommandGoal()
+        goal_gripper.position = 0.085
+        goal_gripper.velocity = 0.1
+        goal_gripper.force = 40.0
+        self.robotiq_action_client.send_goal(goal_gripper)
+        self.robotiq_action_client.wait_for_result()
+        res_gripper = self.robotiq_action_client.get_result()
+
+        rospy.loginfo('Move above the release point')
+        goal_pose = geometry_msgs.msg.PoseStamped()
+        goal_pose.header.frame_id = target_point_world.header.frame_id
+        goal_pose.pose.position = copy.deepcopy(target_point_world.point)
+        goal_pose.pose.position.z = goal.approach_height
+        goal_pose.pose.orientation = geometry_msgs.msg.Quaternion(*tf.transformations.quaternion_from_euler(radians(goal.orientation.x), radians(goal.orientation.y), radians(goal.orientation.z)))
+        speed = goal.speed_fast
+        plan_success, _, current_pose = self.move_lin(goal.group_name, goal_pose, speed=speed)
+        feedback.is_running = True
+        feedback.message = 'Pose above the release point'
+        feedback.current_pose = current_pose
+        self.place_action.publish_feedback(feedback)
+
+        result = aist_skills.msg.PlaceResult()
+        result.current_pose = copy.deepcopy(current_pose)
+        result.success = True
+        self.place_action.set_succeeded(result)
 
 if __name__ == '__main__':
     rospy.init_node("aist_skills", anonymous=True)
-
     try:
         node = SkillServer()
         while not rospy.is_shutdown():
-            rospy.sleep(.1)
             rospy.spin()
     except rospy.ROSInterruptException:
         pass

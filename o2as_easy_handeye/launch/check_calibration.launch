@@ -1,9 +1,10 @@
 <?xml version="1.0" ?>
 <launch>
+  <arg name="config"		default="aist"/>
+  <arg name="scene"		default="$(arg config)_calibration"/>
   <arg name="robot_name"	default="b_bot"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
   <arg name="marker_id"		default="26"/>
-  <arg name="config"		default="aist"/>
 
   <arg name="eye_on_hand" type="bool"
        value="$(eval arg('camera_name') == arg('robot_name') + '_camera')"/>
@@ -20,13 +21,15 @@
     <arg name="reference_frame"	value="workspace_center"/>
     <arg name="camera_frame"
 	 value="$(arg camera_name)_from_$(arg robot_name)"/>
-    <arg name="marker_id"	value="$(arg marker_id)"/>
   </include>
 
   <!-- Start robot controller -->
   <include file="$(find o2as_easy_handeye)/launch/robot_controller.launch">
     <arg name="config"	value="$(arg config)"/>
+    <arg name="scene"	value="$(arg scene)"/>
     <arg name="sim"	value="false"/>
+    <arg name="rviz_config"
+    	 value="$(find o2as_easy_handeye)/launch/o2as_easy_handeye.rviz"/>
   </include>
 
   <!-- Start rqt_reconfigure -->

@@ -17,6 +17,30 @@ from o2as_routines.base import O2ASBaseRoutines
 from aist_routines.base import AISTBaseRoutines
 from math import radians, degrees
 
+orientations = {
+    'o2as': {
+        'a_bot': [
+            radians(-90), radians( 90), radians(0)],
+        'b_bot': [
+            radians(  0), radians( 90), radians(0)],
+        'c_bot': [
+            radians(  0), radians( 90), radians(0)],
+    },
+
+    'aist': {
+        'a_bot': [
+            radians(-90), radians( 90), radians(0)],
+        'b_bot': [
+            radians(  0), radians( 90), radians(0)],
+    },
+
+    'ur5e': {
+        'c_bot': [
+            radians(-90), radians( 90), radians(0)],
+        'd_bot': [
+            radians(  0), radians( 90), radians(0)],
+    },
+}
 
 ######################################################################
 #  global functions                                                  #
@@ -39,7 +63,7 @@ def format_pose(pose):
 class VisitRoutines:
     """Wrapper of MoveGroupCommander specific for this script"""
 
-    def __init__(self, routines, camera_name, robot_name):
+    def __init__(self, routines, camera_name, robot_name, orientations):
         self.routines = routines
 
         cs = "/{}/".format(camera_name)
@@ -66,6 +90,8 @@ class VisitRoutines:
               group.get_pose_reference_frame())
         print("==== End effector link:    %s" % group.get_end_effector_link())
 
+        self.orientations = orientations
+
     def move(self, speed):
         self.start_acquisition()
         position = rospy.wait_for_message("/aruco_tracker/position",
@@ -80,7 +106,9 @@ class VisitRoutines:
         poseStamped.pose.position.z = position.vector.z + 0.05
         poseStamped.pose.orientation \
           = geometry_msgs.msg.Quaternion(
-            *tfs.quaternion_from_euler(radians(0), radians(90), radians(-90)))
+            *tfs.quaternion_from_euler(self.orientations[0],
+                                       self.orientations[1],
+                                       self.orientations[2]))
         [all_close, move_success] \
             = self.routines.go_to_pose_goal(
                   self.group_name, poseStamped, speed,
@@ -160,16 +188,17 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print(args)
 
-    if args.config == 'aist':
-        base_routines = AISTBaseRoutines()
-    else:
+    if args.config == 'o2as':
         base_routines = O2ASBaseRoutines()
+    else:
+        base_routines = AISTBaseRoutines({args.robot_name})
     camera_name = args.camera_name
     robot_name = args.robot_name
 
     assert (camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
     assert (robot_name in {"a_bot", "b_bot", "c_bot"})
 
-    routines = VisitRoutines(base_routines, camera_name, robot_name)
+    routines = VisitRoutines(base_routines, camera_name, robot_name,
+                             orientations[args.config][args.robot_name])
     speed = 0.05
     routines.run(speed)
