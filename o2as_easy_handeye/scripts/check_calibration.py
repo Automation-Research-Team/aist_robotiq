@@ -116,7 +116,7 @@ class VisitRoutines:
                   move_lin=False)
         rospy.sleep(1)
 
-        poseStamped.pose.position.z = position.vector.z + 0.005
+        poseStamped.pose.position.z = position.vector.z
         print("     move to " + format_pose(poseStamped.pose))
         [all_close, move_success] \
             = self.routines.go_to_pose_goal(
@@ -188,10 +188,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print(args)
 
-    if args.config == 'aist':
-        base_routines = AISTBaseRoutines({args.robot_name})
-    else:
+    if args.config == 'o2as':
         base_routines = O2ASBaseRoutines()
+    else:
+        base_routines = AISTBaseRoutines({args.robot_name})
     camera_name = args.camera_name
     robot_name = args.robot_name
 
