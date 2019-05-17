@@ -56,13 +56,13 @@ class SkillServer(object):
         self.publishMarkerService_ = rospy.Service("aist_skills/publishMarker", o2as_msgs.srv.publishMarker, self.publishMarkerCallback)
 
         # Action clients
-        self.fge_action_client = actionlib.SimpleActionClient('aist_graspability/search_grasp_from_phoxi', aist_graspability.msg.SearchGraspFromPhoxiAction)
-        self.fge_action_client.wait_for_server()
+        # self.fge_action_client = actionlib.SimpleActionClient('aist_graspability/search_grasp_from_phoxi', aist_graspability.msg.SearchGraspFromPhoxiAction)
+        # self.fge_action_client.wait_for_server()
         self.robotiq_action_client = actionlib.SimpleActionClient('a_bot_gripper/gripper_action_controller', robotiq_msgs.msg.CModelCommandAction)
         self.robotiq_action_client.wait_for_server()
 
         # Actions
-        self.move_lin_action = actionlib.SimpleActionServer('aist_skills/move_lin', 
+        self.move_lin_action = actionlib.SimpleActionServer('aist_skills/move_lin',
                                                             aist_skills.msg.MoveLinAction,
                                                             execute_cb=self.move_lin_action_callback,
                                                             auto_start=False)
@@ -214,7 +214,7 @@ class SkillServer(object):
     def move_lin(self, group_name, pose_goal_stamped, speed = 1.0, acceleration = 0.0, end_effector_link = ""):
         robots = moveit_commander.RobotCommander()
         planning_scene = moveit_commander.PlanningSceneInterface()
-        
+
         self.publishMarker(pose_goal_stamped, "pose")
 
         if end_effector_link == "":

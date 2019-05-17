@@ -117,7 +117,7 @@ calibrationSingle(const std::vector<Transform<T> >& cMo,
     Vector<T, 4>	evalues;
     Quaternion<T>	q(eigen(M, evalues)[3]);	// computed rotation
 #ifdef DEBUG
-    std::cerr << "--- Rotation: eigenvalues ---\n" << evalues << std::endl;
+    std::cerr << "--- Eigenvalues ---\n" << evalues << std::endl;
 #endif
 
   // Compute translation.

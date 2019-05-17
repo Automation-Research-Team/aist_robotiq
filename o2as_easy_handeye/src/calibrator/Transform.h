@@ -27,27 +27,24 @@ class Transform : boost::multipliable<Transform<T> >
     using rotation_type		= typename quaternion_type::rotation_type;
 
   public:
-			Transform(const translation_type& t={0, 0, 0},
-				  const quaternion_type&  q={1, 0, 0, 0})
-			    :_dq(q, 0.5*quaternion_type(0, t)*q)
-			{
-			    if (q.scalar() < 0)
-				_dq *= -1;
-#ifdef DEBUG
-			    std::cerr << "p*p-1 = " << square(primary()) - 1
-				      << std::endl;
-#endif
-			}
-
 			Transform(const dual_quaternion_type& x)
 			    :_dq(x)
 			{
+			    if (primary().scalar() < 0)
+				_dq *= -1;
 #ifdef DEBUG
 			    const Vector<T, 4>	p(primary()), d(dual());
 			    std::cerr << "p*p-1 = " << square(p) - 1
-				      << std::endl;
+			    	      << std::endl;
 			    std::cerr << "p*d   = " << p*d << std::endl;
 #endif
+			}
+
+			Transform(const translation_type& t={0, 0, 0},
+				  const quaternion_type&  q={1, 0, 0, 0})
+			    :Transform(dual_quaternion_type(
+					   q, 0.5*quaternion_type(0, t)*q))
+			{
 			}
 
 			Transform(const geometry_msgs::Transform& trans)
@@ -76,12 +73,11 @@ class Transform : boost::multipliable<Transform<T> >
 			    return ret;
 			}
 
-    const Transform&	operator +()	const	{ return *this; }
-    Transform		operator -()	const	{ return -_dq; }
-
     Transform&		operator *=(const Transform& x)
 			{
 			    _dq *= x._dq;
+			    if (primary().scalar() < 0)
+				_dq *= -1;
 			    return *this;
 			}
 
@@ -108,7 +104,20 @@ class Transform : boost::multipliable<Transform<T> >
 
     auto		angular_difference(const Transform& trns) const
 			{
-			    return length(rpy() - trns.rpy());
+			    const auto	rpy0 = rpy();
+			    const auto	rpy1 = trns.rpy();
+			    scalar_type	sqr  = 0;
+			    for (size_t i = 0; i < 3; ++i)
+			    {
+				auto	diff = rpy0[i] - rpy1[i];
+				while (diff >= 2*M_PI)
+				    diff -= 2*M_PI;
+				while (diff < -2*M_PI)
+				    diff += 2*M_PI;
+				sqr += diff*diff;
+			    }
+
+			    return std::sqrt(sqr/3);
 			}
 
     std::ostream&	print(std::ostream& out) const
@@ -118,7 +127,7 @@ class Transform : boost::multipliable<Transform<T> >
 			    return out << "xyz(m)    = " << t()
 				       << "rot(deg.) = " << rpy()*degree;
 			}
-    
+
   private:
     dual_quaternion_type	_dq;
 };
@@ -137,13 +146,13 @@ operator >>(std::istream& in, Transform<T>& x)
 
     return in;
 }
-    
+
 template <class T> inline std::ostream&
 operator <<(std::ostream& out, const Transform<T>& x)
 {
     x.t().put(out) << ';';
     return x.primary().put(out);	// Put vector part first, then scalar.
 }
-    
+
 }	// namespace TU
 #endif	// !TU_TRANSFORM_H

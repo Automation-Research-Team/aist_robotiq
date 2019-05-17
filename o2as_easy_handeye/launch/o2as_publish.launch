@@ -29,7 +29,8 @@
     <param name ="tracking_base_frame"
 	       value="$(arg camera_name)_from_$(arg robot_name)"/>
 
-    <param name="robot_base_frame"	value="$(arg robot_name)_base_link"/>
+    <!-- <param name="robot_base_frame"	value="$(arg robot_name)_base_link"/> -->
+    <param name="robot_base_frame"	value="workspace_center"/>
     <param name="robot_effector_frame"	value="$(arg robot_name)_ee_link"
            unless="$(arg eye_on_hand)"/>
     <param name="robot_effector_frame"	value="$(arg robot_name)_wrist_2_link"
