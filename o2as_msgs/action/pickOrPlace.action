@@ -1,0 +1,13 @@
+# Goal
+string group_name
+geometry_msgs/PoseStamped pose
+float32 approach_offset
+float32 speed_fast
+float32 speed_slow
+---
+# Result
+geometry_msgs/PoseStamped current_pose
+bool success
+---
+# Feedback
+geometry_msgs/PoseStamped current_pose
