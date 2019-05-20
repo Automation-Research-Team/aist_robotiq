@@ -7,7 +7,7 @@ from aist_routines.base import AISTBaseRoutines
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Move a robot to home')
+    parser = argparse.ArgumentParser(description='Move robot to named pose')
     parser.add_argument('-C', '--config',
                         action='store', nargs='?',
                         default='aist', type=str, choices=None,
@@ -26,6 +26,6 @@ if __name__ == '__main__':
     if args.config == "o2as":
         baseRoutines = O2ASBaseRoutines()
     else:
-        baseRoutines = AISTBaseRoutines({args.robot_name})
+        baseRoutines = AISTBaseRoutines()
 
-    baseRoutines.go_to_named_pose(args.pose, args.robot_name)
+    baseRoutines.go_to_named_pose(args.robot_name, args.pose)

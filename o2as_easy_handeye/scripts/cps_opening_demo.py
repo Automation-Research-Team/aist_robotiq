@@ -36,7 +36,7 @@ keyposes = {
             [0.15, -0.10, 0.13, radians( 30), radians( 25), radians(0)],
             [0.15,  0.00, 0.13, radians( 30), radians( 25), radians(0)],
             [0.15,  0.10, 0.13, radians( 30), radians( 25), radians(0)],
-    
+
             [0.15,  0.10, 0.23, radians( 30), radians( 25), radians(0)],
             [0.15,  0.00, 0.23, radians( 30), radians( 25), radians(0)],
             [0.15, -0.10, 0.23, radians( 30), radians( 25), radians(0)],
@@ -46,7 +46,7 @@ keyposes = {
             [ 0.15,  0.20, 0.15, radians( 30), radians( 25), radians(0)],
             [ 0.15,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
             [ 0.15, -0.20, 0.15, radians( 30), radians( 25), radians(0)],
-    
+
             [ 0.15, -0.20, 0.35, radians( 30), radians( 25), radians(0)],
             [ 0.15,  0.00, 0.35, radians( 30), radians( 25), radians(0)],
             [ 0.15,  0.20, 0.35, radians( 30), radians( 25), radians(0)],
@@ -66,7 +66,7 @@ keyposes = {
             [0.15, -0.10, 0.13, radians( 30), radians( 25), radians(0)],
             [0.15,  0.00, 0.13, radians( 30), radians( 25), radians(0)],
             [0.15,  0.10, 0.13, radians( 30), radians( 25), radians(0)],
-    
+
             [0.15,  0.10, 0.23, radians( 30), radians( 25), radians(0)],
             [0.15,  0.00, 0.23, radians( 30), radians( 25), radians(0)],
             [0.15, -0.10, 0.23, radians( 30), radians( 25), radians(0)],
@@ -76,7 +76,7 @@ keyposes = {
             [ 0.15,  0.20, 0.15, radians( 30), radians( 25), radians(0)],
             [ 0.15,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
             [ 0.15, -0.20, 0.15, radians( 30), radians( 25), radians(0)],
-    
+
             [ 0.15, -0.20, 0.35, radians( 30), radians( 25), radians(0)],
             [ 0.15,  0.00, 0.35, radians( 30), radians( 25), radians(0)],
             [ 0.15,  0.20, 0.35, radians( 30), radians( 25), radians(0)],
@@ -197,11 +197,11 @@ if __name__ == '__main__':
                         metavar=None)
 
     args = parser.parse_args()
-    
+
     try:
         assert(args.robot_name in {"a_bot", "b_bot", "c_bot", "d_bot"})
 
-        base_routines = AISTBaseRoutines({args.robot_name})
+        base_routines = AISTBaseRoutines()
         speed         = 1
         sleep_time    = 0
         routines      = MotionRoutines(base_routines, args.robot_name,

@@ -43,21 +43,6 @@ orientations = {
 }
 
 ######################################################################
-#  global functions                                                  #
-######################################################################
-def format_pose(pose):
-    rpy = map(
-        degrees,
-        tfs.euler_from_quaternion([
-            pose.orientation.w, pose.orientation.x, pose.orientation.y,
-            pose.orientation.z
-        ]))
-    return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
-        pose.position.x, pose.position.y, pose.position.z, rpy[0], rpy[1],
-        rpy[2])
-
-
-######################################################################
 #  class VisitRoutines                                               #
 ######################################################################
 class VisitRoutines:
@@ -72,23 +57,25 @@ class VisitRoutines:
         self.stop_acquisition = rospy.ServiceProxy(cs + "stop_acquisition",
                                                    Trigger)
 
-        # Initialize `moveit_commander`
-        self.group_name = robot_name
-        group = self.routines.groups[self.group_name]
+        ## Initialize `moveit_commander`
+        self.group = moveit_commander.MoveGroupCommander(robot_name)
 
         # Set `_ee_link` as end effector wrt `_base_link` of the robot
-        group.set_pose_reference_frame("workspace_center")
+        self.group.set_pose_reference_frame("workspace_center")
         if robot_name == 'b_bot':
-            group.set_end_effector_link(robot_name +
-                                        "_single_suction_gripper_pad_link")
+            self.group.set_end_effector_link(
+                robot_name + "_single_suction_gripper_pad_link")
         else:
-            group.set_end_effector_link(robot_name + "_robotiq_85_tip_link")
+            self.group.set_end_effector_link(
+                robot_name + "_robotiq_85_tip_link")
 
         # Logging
-        print("==== Planning frame:       %s" % group.get_planning_frame())
+        print("==== Planning frame:       %s" %
+              self.group.get_planning_frame())
         print("==== Pose reference frame: %s" %
-              group.get_pose_reference_frame())
-        print("==== End effector link:    %s" % group.get_end_effector_link())
+              self.group.get_pose_reference_frame())
+        print("==== End effector link:    %s" %
+              self.group.get_end_effector_link())
 
         self.orientations = orientations
 
@@ -98,9 +85,8 @@ class VisitRoutines:
                                           geometry_msgs.msg.Vector3Stamped, 10)
         self.stop_acquisition()
 
-        group = self.routines.groups[self.group_name]
         poseStamped = geometry_msgs.msg.PoseStamped()
-        poseStamped.header.frame_id = group.get_pose_reference_frame()
+        poseStamped.header.frame_id = self.group.get_pose_reference_frame()
         poseStamped.pose.position.x = position.vector.x
         poseStamped.pose.position.y = position.vector.y
         poseStamped.pose.position.z = position.vector.z + 0.05
@@ -109,27 +95,22 @@ class VisitRoutines:
             *tfs.quaternion_from_euler(self.orientations[0],
                                        self.orientations[1],
                                        self.orientations[2]))
-        [all_close, move_success] \
-            = self.routines.go_to_pose_goal(
-                  self.group_name, poseStamped, speed,
-                  end_effector_link=group.get_end_effector_link(),
+        self.routines.go_to_pose_goal(
+                  self.group.get_name(), poseStamped, speed,
+                  end_effector_link=self.group.get_end_effector_link(),
                   move_lin=False)
         rospy.sleep(1)
 
         poseStamped.pose.position.z = position.vector.z
-        print("     move to " + format_pose(poseStamped.pose))
-        [all_close, move_success] \
-            = self.routines.go_to_pose_goal(
-                  self.group_name, poseStamped, speed,
-                  end_effector_link=group.get_end_effector_link(),
+        print("     move to " + self.format_pose(poseStamped))
+        res = self.routines.go_to_pose_goal(
+                  self.group.get_name(), poseStamped, speed,
+                  end_effector_link=self.group.get_end_effector_link(),
                   move_lin=False)
-
-        poseReached = self.routines.listener.transformPose(
-            group.get_pose_reference_frame(), group.get_current_pose())
-        print("  reached to " + format_pose(poseReached.pose))
+        print("  reached to " + self.format_pose(res.current_pose))
 
     def go_home(self):
-        self.routines.go_to_named_pose("home", self.group_name)
+        self.routines.go_to_named_pose(self.group_name, "home")
 
     def run(self, speed):
         self.stop_acquisition()
@@ -150,6 +131,20 @@ class VisitRoutines:
                 return
 
         self.go_home()
+
+    def format_pose(self, poseStamped):
+        listener = TransformListener()  # Needs Listener but TransformerROS.
+        pose = listener.transformPose(self.group.get_pose_reference_frame(),
+                                      poseStamped).pose
+        rpy = map(
+            degrees,
+            tfs.euler_from_quaternion([
+                pose.orientation.w, pose.orientation.x, pose.orientation.y,
+                pose.orientation.z
+            ]))
+        return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
+            pose.position.x, pose.position.y, pose.position.z, rpy[0], rpy[1],
+            rpy[2])
 
 
 ######################################################################
@@ -191,12 +186,12 @@ if __name__ == '__main__':
     if args.config == 'o2as':
         base_routines = O2ASBaseRoutines()
     else:
-        base_routines = AISTBaseRoutines({args.robot_name})
+        base_routines = AISTBaseRoutines()
     camera_name = args.camera_name
     robot_name = args.robot_name
 
     assert (camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
-    assert (robot_name in {"a_bot", "b_bot", "c_bot"})
+    assert (robot_name in {"a_bot", "b_bot", "c_bot", "d_bot"})
 
     routines = VisitRoutines(base_routines, camera_name, robot_name,
                              orientations[args.config][args.robot_name])
