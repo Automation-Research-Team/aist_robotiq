@@ -10,19 +10,19 @@ import o2as_msgs.msg
 import o2as_msgs.srv
 
 class GripperBase(object):
-    def __init__(self, name, end_effector_link, grasp_offset=0, timeout=0):
-        self._name              = name
-        self._end_effector_link = end_effector_link
-        self._grasp_offset      = grasp_offset
-        self._timeout           = timeout
+    def __init__(self, name, tip_link, grasp_offset=0, timeout=0):
+        self._name         = name
+        self._tip_link     = tip_link
+        self._grasp_offset = grasp_offset
+        self._timeout      = timeout
 
     @property
     def name(self):
         return self._name
 
     @property
-    def end_effector_link(self):
-        return self._end_effector_link
+    def tip_link(self):
+        return self._tip_link
 
     @property
     def grasp_offset(self):
@@ -52,7 +52,7 @@ class GripperBase(object):
 
 class Robotiq85Gripper(GripperBase):
     def __init__(self, prefix='a_bot_', grasp_offset=-0.005,
-                 force=5.0, velocity=0.1, timout=6.0):
+                 force=5.0, velocity=0.1, timeout=6.0):
         super(Robotiq85Gripper, self).__init__(str(prefix) +
                                                'robotiq_85_gripper',
                                                str(prefix) +

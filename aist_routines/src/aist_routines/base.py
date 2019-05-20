@@ -46,7 +46,6 @@ import std_msgs.msg
 import geometry_msgs.msg
 import moveit_commander
 from moveit_commander.conversions import pose_to_list
-#import ur_modern_driver.msg
 import robotiq_msgs.msg
 
 import o2as_msgs.msg
@@ -128,12 +127,12 @@ class AISTBaseRoutines(object):
         req.named_pose     = named_pose
         return self.goToNamedPose_client.call(req)
 
-    def go_to_pose_goal(self, group_name, pose, speed=1.0,
+    def go_to_pose_goal(self, group_name, target_pose, speed=1.0,
                         high_precision=False, end_effector_link="",
                         move_lin=False):
         req = o2as_msgs.srv.goToPoseGoalRequest()
         req.planning_group    = group_name
-        req.pose              = pose
+        req.target_pose       = target_pose
         req.speed             = speed
         req.high_precision    = high_precision
         req.end_effector_link = end_effector_link

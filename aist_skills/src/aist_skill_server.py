@@ -17,7 +17,7 @@ from moveit_commander.conversions import pose_to_list
 
 import o2as_msgs.srv
 import aist_graspability.msg
-import aist_skills.msg
+
 
 def quaternion_msg_to_tf(orientation):
     """Convert quaternion geometry_msgs.msg.Quaternion to tf quaternion (as numpy.ndarray).
@@ -109,20 +109,19 @@ class SkillServer(object):
                                                   o2as_msgs.srv.goToPoseGoal,
                                                   self.goToPoseGoalCallback)
 
-
-        # Services to advertise
-
         # Action clients
         # self.fge_action_client = actionlib.SimpleActionClient('aist_graspability/search_grasp_from_phoxi', aist_graspability.msg.SearchGraspFromPhoxiAction)
         # self.fge_action_client.wait_for_server()
 
         # Action servers
-        self.pickOrPlaceAction = actionlib.SimpleActionServer('aist_skills/pickOrPlace',
-                                                              o2as_msgs.msg.pickOrPlaceAction,
-                                                              execute_cb=self.pickOrPlaceCallback,
-                                                              auto_start=False)
+        self.pickOrPlaceAction = actionlib.SimpleActionServer(
+                                        'aist_skills/pickOrPlace',
+                                        o2as_msgs.msg.pickOrPlaceAction,
+                                        execute_cb=self.pickOrPlaceCallback,
+                                        auto_start=False)
         self.pickOrPlaceAction.start()
 
+        self.listener = tf.TransformListener()
         self.marker_id_count = 0
 
         rospy.loginfo("aist_skills server starting up!")
@@ -251,29 +250,28 @@ class SkillServer(object):
         return success
 
     def goToPoseGoalCallback(self, req):
-        res = o2as_msgs.srv.goToPoseGoalResponse()
-        (res.success, res.current_pose) = \
-            self.goToPoseGoal(req.planning_group, req.pose,
-                              req.speed, req.high_precision,
-                              req.end_effector_link, req.move_lin)
-        return res
+        return self.goToPoseGoal(req.planning_group, req.target_pose,
+                                 req.speed, req.high_precision,
+                                 req.end_effector_link, req.move_lin)
 
-    def goToPoseGoal(self, group_name, pose,
+    def goToPoseGoal(self, group_name, target_pose,
                      speed=1.0, high_precision=False, end_effector_link="",
                      move_lin=True):
-        # self.publish_marker(pose, "pose")
+        # self.publish_marker(target_pose, "pose")
 
         if end_effector_link == "":
-            end_effector_link = self.grippers[group_name].end_effector_link()
+            end_effector_link = self.grippers[group_name].tip_link
         group = moveit_commander.MoveGroupCommander(group_name)
         group.set_end_effector_link(end_effector_link)
-        group.set_pose_target(pose)
+        group.set_pose_target(target_pose)
         group.set_max_velocity_scaling_factor(clamp(speed, 0.0, 1.0))
 
+        res = o2as_msgs.srv.goToPoseGoalResponse()
+
         if move_lin:
-            transformer = tf.TransformerROS()
-            pose_world  = transformer.transformPose("world", pose).pose
-            waypoints   = []
+            pose_world = self.listener.transformPose(group.get_planning_frame(),
+                                                     target_pose).pose
+            waypoints  = []
             waypoints.append(pose_world)
             (plan, fraction) = group.compute_cartesian_path(
                                 waypoints,  # waypoints to follow
@@ -281,17 +279,17 @@ class SkillServer(object):
                                 0.0)        # jump_threshold
             rospy.loginfo("Compute cartesian path succeeded with " +
                           str(fraction*100) + "%")
-            robots  = moveit_commander.RobotCommander()
-            plan    = group.retime_trajectory(robots.get_current_state(),
-                                              plan, speed)
-            success = group.execute(plan, wait=True)
+            robots      = moveit_commander.RobotCommander()
+            plan        = group.retime_trajectory(robots.get_current_state(),
+                                                  plan, speed)
+            res.success = group.execute(plan, wait=True)
         else:
             goal_tolerance = group.get_goal_tolerance()
             planning_time  = group.get_planning_time()
             if high_precision:
                 group.set_goal_tolerance(.000001)
                 group.set_planning_time(10)
-            success = group.go(wait=True)
+            res.success = group.go(wait=True)
             if high_precision:
                 group.set_goal_tolerance(goal_tolerance)
                 group.set_planning_time(planning_time)
@@ -301,44 +299,44 @@ class SkillServer(object):
         # Note: there is no equivalent function for clear_joint_value_targets()
         group.clear_pose_targets()
 
-        actual_pose = group.get_current_pose()
+        res.current_pose = group.get_current_pose()
+        res.all_close    = all_close(target_pose.pose, res.current_pose.pose,
+                                     0.01)
         rospy.loginfo("Target position: ")
-        rospy.loginfo(pose)
+        rospy.loginfo(target_pose)
         rospy.loginfo("Actual position: ")
-        rospy.loginfo(actual_pose)
+        rospy.loginfo(res.current_pose)
 
-        return (all_close(pose.pose, actual_pose.pose, 0.01) and success,
-                actual_pose)
+        return res
 
     def pickOrPlaceCallback(self, goal):
         gripper  = self.grippers[goal.group_name]
         feedback = aist_skills.msg.pickOrPlaceFeedback()
 
-        (success, feedback.current_pose) = \
-            self.goToPoseGoal(goal.group_name,
-                              self.gripper_pose(goal.pose,
-                                                goal.approach_offset),
-                              goal.speed_fast if pick else goal.speed_slow)
+        res = self.goToPoseGoal(goal.group_name,
+                                self.gripper_pose(goal.pose,
+                                                  goal.approach_offset),
+                                goal.speed_fast if pick else goal.speed_slow)
+        feedback.current_pose = res.current_pose
         self.pickOrPlaceAction.publish_feedback(feedback)
 
         if goal.pick:
             gripper.pregrasp()
 
-        (success, feedback.current_pose) = \
-            self.goToPoseGoal(goal.group_name,
-                              self.gripper_pose(goal.pose,
-                                                gripper.grasp_offset),
-                              goal.speed_slow)
+        res = self.goToPoseGoal(goal.group_name,
+                                self.gripper_pose(goal.pose,
+                                                  gripper.grasp_offset),
+                                goal.speed_slow)
+        feedback.current_pose = res.current_pose
         self.pickOrPlaceAction.publish_feedback(feedback)
 
         res_gripper = gripper.grasp() if goal_pick else gripper.release()
 
         result = aist_skills.msg.pickOrPlaceResult()
-        (result.success, result.current_pose) = \
-            self.goToPoseGoal(goal.group_name,
-                              self.gripper_pose(goal.pose,
-                                                goal.approach_offset),
-                              goal.speed_slow)
+        res = self.goToPoseGoal(goal.group_name,
+                                self.gripper_pose(goal.pose,
+                                                  goal.approach_offset),
+                                goal.speed_slow)
         result.success = result.success and res_gripper
         self.pickOrPlaceAction.set_succeeded(result)
 

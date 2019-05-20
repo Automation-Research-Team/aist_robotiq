@@ -5,17 +5,15 @@ import os
 import copy
 import rospy
 import argparse
+from math import radians, degrees
 
-import moveit_msgs.msg
 import geometry_msgs.msg
+import moveit_commander
 
-from tf import transformations as tfs
-from o2as_aruco_ros.msg import Corners
+from tf import TransformListener, transformations as tfs
 from std_srvs.srv import Trigger
-
 from o2as_routines.base import O2ASBaseRoutines
 from aist_routines.base import AISTBaseRoutines
-from math import radians, degrees
 
 orientations = {
     'o2as': {
@@ -54,20 +52,12 @@ class VisitRoutines:
         cs = "/{}/".format(camera_name)
         self.start_acquisition = rospy.ServiceProxy(cs + "start_acquisition",
                                                     Trigger)
-        self.stop_acquisition = rospy.ServiceProxy(cs + "stop_acquisition",
-                                                   Trigger)
+        self.stop_acquisition  = rospy.ServiceProxy(cs + "stop_acquisition",
+                                                    Trigger)
 
         ## Initialize `moveit_commander`
         self.group = moveit_commander.MoveGroupCommander(robot_name)
-
-        # Set `_ee_link` as end effector wrt `_base_link` of the robot
         self.group.set_pose_reference_frame("workspace_center")
-        if robot_name == 'b_bot':
-            self.group.set_end_effector_link(
-                robot_name + "_single_suction_gripper_pad_link")
-        else:
-            self.group.set_end_effector_link(
-                robot_name + "_robotiq_85_tip_link")
 
         # Logging
         print("==== Planning frame:       %s" %
@@ -95,22 +85,18 @@ class VisitRoutines:
             *tfs.quaternion_from_euler(self.orientations[0],
                                        self.orientations[1],
                                        self.orientations[2]))
-        self.routines.go_to_pose_goal(
-                  self.group.get_name(), poseStamped, speed,
-                  end_effector_link=self.group.get_end_effector_link(),
-                  move_lin=False)
+        self.routines.go_to_pose_goal(self.group.get_name(), poseStamped,
+                                      speed, move_lin=False)
         rospy.sleep(1)
 
         poseStamped.pose.position.z = position.vector.z
         print("     move to " + self.format_pose(poseStamped))
-        res = self.routines.go_to_pose_goal(
-                  self.group.get_name(), poseStamped, speed,
-                  end_effector_link=self.group.get_end_effector_link(),
-                  move_lin=False)
+        res = self.routines.go_to_pose_goal(self.group.get_name(), poseStamped,
+                                            speed, move_lin=True)
         print("  reached to " + self.format_pose(res.current_pose))
 
     def go_home(self):
-        self.routines.go_to_named_pose(self.group_name, "home")
+        self.routines.go_to_named_pose(self.group.get_name(), "home")
 
     def run(self, speed):
         self.stop_acquisition()

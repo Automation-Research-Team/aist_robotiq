@@ -12,9 +12,7 @@ from math import radians, degrees
 from tf import TransformListener, transformations as tfs
 
 from std_msgs.msg import String
-from std_srvs.srv import Empty
-from std_srvs.srv import Trigger
-from o2as_phoxi_camera.srv import GetFrame
+from std_srvs.srv import Empty, Trigger
 from easy_handeye.srv import TakeSample, RemoveSample, ComputeCalibration
 
 from o2as_routines.base import O2ASBaseRoutines
