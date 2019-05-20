@@ -6,7 +6,7 @@
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
   <arg name="marker_id"		default="26"/>
 
-  <arg name="eye_on_hand" type="bool"
+  <arg name="eye_on_hand"
        value="$(eval arg('camera_name') == arg('robot_name') + '_camera')"/>
 
   <include file="$(find o2as_easy_handeye)/launch/o2as_publish.launch">

@@ -6,20 +6,19 @@ import copy
 import rospy
 import argparse
 import moveit_msgs.msg
+import moveit_commander
 
 from geometry_msgs import msg as msg
-from tf import TransformBroadcaster, TransformListener, \
-               TransformerROS, transformations as tfs
+from tf import TransformListener, transformations as tfs
 from math import radians, degrees
 from o2as_routines.base import O2ASBaseRoutines
 from aist_routines.base import AISTBaseRoutines
 
 refposes = {
-    'a_bot': [-0.10, -0.10, 0.20, radians(-90), radians(-90), radians(180)],
-    # 'b_bot':[ 0.20,  0.10, 0.081, radians(  0), radians( 90), radians(-90)],
-    'b_bot': [ 0.10,  0.00, 0.01, radians(  0), radians( 90), radians(-90)],
-    'c_bot': [-0.30,  0.00, 0.35, radians(-90), radians(-90), radians(180)],
-    'd_bot': [-0.30,  0.00, 0.35, radians(  0), radians( 90), radians(  0)],
+    'a_bot': [-0.10, -0.10, 0.20,  radians(-90), radians(-90), radians(180)],
+    'b_bot': [ 0.10,  0.00, 0.015, radians(  0), radians( 90), radians(-90)],
+    'c_bot': [-0.30,  0.00, 0.35,  radians(-90), radians(-90), radians(180)],
+    'd_bot': [-0.30,  0.00, 0.35,  radians(  0), radians( 90), radians(  0)],
 }
 
 
@@ -33,10 +32,10 @@ class ToolCalibrationRoutines:
         self.refpose = refposes[robot_name]
 
         ## Initialize `moveit_commander`
-        self.group = self.routines.groups[robot_name]
+        self.group = moveit_commander.MoveGroupCommander(robot_name)
 
         # Set `_ee_link` as end effector wrt `_base_link` of the robot
-        group.set_pose_reference_frame('workspace_center')
+        self.group.set_pose_reference_frame('workspace_center')
         if robot_name == 'b_bot':
             gripper_base_link = robot_name + '_single_suction_gripper_base_link'
             gripper_tip_link  = robot_name + '_single_suction_gripper_pad_link'
@@ -98,14 +97,14 @@ class ToolCalibrationRoutines:
         poseStamped.pose = msg.Pose(
             msg.Point(*tfs.translation_from_matrix(T)),
             msg.Quaternion(*tfs.quaternion_from_matrix(T)))
-        print("     move to " + format_pose(poseStamped.pose))
+        print("     move to " + self.format_pose(poseStamped))
         res = self.routines.go_to_pose_goal(
                      self.group.get_name(), poseStamped, self.speed,
                      end_effector_link=self.group.get_end_effector_link(),
                      move_lin=False)
         rospy.sleep(1)
         print("  reached to " + self.format_pose(res.current_pose))
-        return move_success
+        return res.success
 
     def rolling_motion(self):
         pose = copy.deepcopy(self.refpose)
@@ -231,6 +230,19 @@ class ToolCalibrationRoutines:
         # Reset pose
         self.go_home()
         self.print_tip_link()
+
+    def format_pose(self, poseStamped):
+        pose = self.listener.transformPose(
+                        self.group.get_pose_reference_frame(), poseStamped).pose
+        rpy = map(
+            degrees,
+            tfs.euler_from_quaternion([
+                pose.orientation.w, pose.orientation.x, pose.orientation.y,
+                pose.orientation.z
+            ]))
+        return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
+            pose.position.x, pose.position.y, pose.position.z, rpy[0], rpy[1],
+            rpy[2])
 
 
 ######################################################################
