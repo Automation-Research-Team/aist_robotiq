@@ -9,6 +9,15 @@ import robotiq_msgs.msg
 import o2as_msgs.msg
 import o2as_msgs.srv
 
+######################################################################
+#  global functions                                                  #
+######################################################################
+def clamp(x, x_min, x_max):
+    return min(max(x, x_min), x_max)
+
+######################################################################
+#  class GripperBase                                                 #
+######################################################################
 class GripperBase(object):
     def __init__(self, name, tip_link, grasp_offset=0, timeout=0):
         self._name         = name
@@ -49,7 +58,9 @@ class GripperBase(object):
     def release(self):
         return True
 
-
+######################################################################
+#  class Robotiq85Gripper                                            #
+######################################################################
 class Robotiq85Gripper(GripperBase):
     def __init__(self, prefix='a_bot_', grasp_offset=-0.005,
                  force=5.0, velocity=0.1, timeout=6.0):
@@ -92,20 +103,17 @@ class Robotiq85Gripper(GripperBase):
         return self.open(0.085)
 
     def open(self, position):
-        self._goal.position = self._clamp(position, 0.0, 0.085)
-        rospy.loginfo('(' + self.name + ') open to ' + str(self._goal.position))
+        self._goal.position = clamp(position, 0.0, 0.085)
         self._client.send_goal(self._goal)
         # This sleep is necessary for robotiq gripper to work just as intended.
         rospy.sleep(.5)
         self._client.wait_for_result(rospy.Duration(self.timeout))
         result = self._client.get_result()
-        rospy.loginfo('(' + self.name + ') result=' + str(result))
-        return result
+        return result.reached_goal
 
-    def _clamp(x, x_min, x_max):
-        return min(max(x, x_min), x_max)
-
-
+######################################################################
+#  class SuctionGripper                                              #
+######################################################################
 class SuctionGripper(GripperBase):
     def __init__(self, prefix='b_bot_single_', grasp_offset=0, eject=False,
                  timeout=2.0):
@@ -142,7 +150,7 @@ class SuctionGripper(GripperBase):
         return self._send_command(True)
 
     def grasp(self):
-        return True
+        return self._send_command(True) and self._suctioned
 
     def release(self):
         return self._send_command(False)
@@ -150,14 +158,10 @@ class SuctionGripper(GripperBase):
     def _send_command(self, turn_suction_on):
         self._goal.turn_suction_on = turn_suction_on
         self._goal.eject_screw     = not turn_suction_on and self._eject
-        rospy.loginfo('(' + self.name +
-                      ') turn_suction_on=' + str(self._goal.turn_suction_on) +
-                      ', eject_screw='     + str(self._goal.eject_screw))
         self._client.send_goal(self._goal)
         self._client.wait_for_result(rospy.Duration(self.timeout))
         result = self._client.get_result()
-        rospy.loginfo('(' + self.name + ') result=' + str(result))
-        return result
+        return result.success
 
     def _state_callback(self, msg):
         self._suctioned = msg.data

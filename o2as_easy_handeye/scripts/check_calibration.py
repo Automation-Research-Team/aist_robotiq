@@ -96,7 +96,7 @@ class VisitRoutines:
         print("  reached to " + self.format_pose(res.current_pose))
 
     def go_home(self):
-        self.routines.go_to_named_pose(self.group.get_name(), "home")
+        self.routines.go_to_named_pose("home", self.group.get_name())
 
     def run(self, speed):
         self.stop_acquisition()

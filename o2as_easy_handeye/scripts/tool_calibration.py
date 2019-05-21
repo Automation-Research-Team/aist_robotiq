@@ -15,10 +15,11 @@ from o2as_routines.base import O2ASBaseRoutines
 from aist_routines.base import AISTBaseRoutines
 
 refposes = {
-    'a_bot': [-0.10, -0.10, 0.20,  radians(-90), radians(-90), radians(180)],
-    'b_bot': [ 0.10,  0.00, 0.015, radians(  0), radians( 90), radians(-90)],
-    'c_bot': [-0.30,  0.00, 0.35,  radians(-90), radians(-90), radians(180)],
-    'd_bot': [-0.30,  0.00, 0.35,  radians(  0), radians( 90), radians(  0)],
+#    'a_bot': [-0.10, 0.00, 0.20,  radians(-90), radians(-90), radians(180)],
+    'a_bot': [-0.10, 0.00, 0.20,  radians(  0), radians( 90), radians( 90)],
+    'b_bot': [ 0.10, 0.00, 0.015, radians(  0), radians( 90), radians(-90)],
+    'c_bot': [-0.30, 0.00, 0.35,  radians(-90), radians(-90), radians(180)],
+    'd_bot': [-0.30, 0.00, 0.35,  radians(  0), radians( 90), radians(  0)],
 }
 
 
@@ -67,7 +68,7 @@ class ToolCalibrationRoutines:
         self.yaw   = 0.0
 
     def go_home(self):
-        self.routines.go_to_named_pose(self.group.get_name(), 'home')
+        self.routines.go_to_named_pose('home', self.group.get_name())
 
     def correct_end_effector_link(self):
         D = tfs.concatenate_matrices(
@@ -145,15 +146,24 @@ class ToolCalibrationRoutines:
             self.move(pose)
 
     def print_tip_link(self):
-        R = self.listener.fromTranslationRotation(
-            (0, 0, 0), tfs.quaternion_from_euler(0, self.pitch, self.yaw))
-        D = tfs.concatenate_matrices(R, self.D0)
+        R   = self.listener.fromTranslationRotation(
+                (0, 0, 0), tfs.quaternion_from_euler(0, self.pitch, self.yaw))
+        D   = tfs.concatenate_matrices(R, self.D0)
         xyz = tfs.translation_from_matrix(D)
-        q = tfs.quaternion_from_matrix(D)
+        q   = tfs.quaternion_from_matrix(D)
         rpy = map(degrees, tfs.euler_from_quaternion(q))
         print(
             '<origin xyz="{0[0]} {0[1]} {0[2]}" rpy="${{{1[0]}*pi/180}} ${{{1[1]}*pi/180}} ${{{1[2]}*pi/180}}"/>'
             .format(xyz, rpy))
+
+    def pregrasp(self):
+        self.routines.send_gripper_command(self.group.get_name(), "pregrasp")
+
+    def grasp(self):
+        self.routines.send_gripper_command(self.group.get_name(), "grasp")
+
+    def release(self):
+        self.routines.send_gripper_command(self.group.get_name(), "release")
 
     def run(self):
         # Reset pose
@@ -214,6 +224,12 @@ class ToolCalibrationRoutines:
                 self.move(self.refpose)
             elif key == 'd':
                 self.print_tip_link()
+            elif key == 'pregrasp':
+                self.pregrasp()
+            elif key == 'grasp':
+                self.grasp()
+            elif key == 'release':
+                self.release()
             else:
                 if axis == 'X    ':
                     self.refpose[0] = float(key)
