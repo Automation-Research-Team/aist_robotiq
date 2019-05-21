@@ -7,8 +7,8 @@ import rospy
 import argparse
 import moveit_msgs.msg
 import moveit_commander
-
 from geometry_msgs import msg as msg
+
 from tf import TransformListener, transformations as tfs
 from math import radians, degrees
 from o2as_routines.base import O2ASBaseRoutines
@@ -16,10 +16,10 @@ from aist_routines.base import AISTBaseRoutines
 
 refposes = {
 #    'a_bot': [-0.10, 0.00, 0.20,  radians(-90), radians(-90), radians(180)],
-    'a_bot': [-0.10, 0.00, 0.20,  radians(  0), radians( 90), radians( 90)],
+    'a_bot': [-0.10, 0.00, 0.020, radians(  0), radians( 90), radians( 90)],
     'b_bot': [ 0.10, 0.00, 0.015, radians(  0), radians( 90), radians(-90)],
-    'c_bot': [-0.30, 0.00, 0.35,  radians(-90), radians(-90), radians(180)],
-    'd_bot': [-0.30, 0.00, 0.35,  radians(  0), radians( 90), radians(  0)],
+    'c_bot': [-0.10, 0.00, 0.015, radians(  0), radians( 90), radians( 90)],
+    'd_bot': [-0.30, 0.00, 0.015, radians(  0), radians( 90), radians(  0)],
 }
 
 
@@ -66,6 +66,20 @@ class ToolCalibrationRoutines:
                                            gripper_tip_link, now))
         self.pitch = 0.0
         self.yaw   = 0.0
+
+        self.pick_pose = msg.PoseStamped()
+        self.pick_pose.header.frame_id = self.group.get_pose_reference_frame()
+        self.pick_pose.pose = msg.Pose(msg.Point(0, 0, 0.1),
+                                       msg.Quaternion(
+                                           *tfs.quaternion_from_euler(
+                                               radians(15), 0, 0)))
+
+        self.place_pose = msg.PoseStamped()
+        self.place_pose.header.frame_id  = self.group.get_pose_reference_frame()
+        self.place_pose.pose = msg.Pose(msg.Point(0, 0, 0.1),
+                                        msg.Quaternion(
+                                            *tfs.quaternion_from_euler(
+                                                0, 0, 0)))
 
     def go_home(self):
         self.routines.go_to_named_pose('home', self.group.get_name())
@@ -165,6 +179,14 @@ class ToolCalibrationRoutines:
     def release(self):
         self.routines.send_gripper_command(self.group.get_name(), "release")
 
+    def pick(self):
+        print("   approach to " + self.format_pose(self.pick_pose))
+        self.routines.do_pick_action(self.group.get_name(), self.pick_pose)
+
+    def place(self):
+        print("   approach to " + self.format_pose(self.pick_pose))
+        self.routines.do_place_action(self.group.get_name(), self.place_pose)
+
     def run(self):
         # Reset pose
         self.go_home()
@@ -230,6 +252,10 @@ class ToolCalibrationRoutines:
                 self.grasp()
             elif key == 'release':
                 self.release()
+            elif key == 'pick':
+                self.pick()
+            elif key == 'place':
+                self.place()
             else:
                 if axis == 'X    ':
                     self.refpose[0] = float(key)

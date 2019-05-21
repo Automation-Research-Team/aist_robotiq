@@ -1,19 +1,23 @@
 <?xml version="1.0"?>
 
 <launch>
-  <arg name="config_dir"         default="$(find o2as_fastening_tools)/config"/>
-  <arg name="suction_control"      default="suction_control"/>
-  <arg name="operation_mode"      default="operation_mode"/>
+  <arg name="config_dir"        default="$(find o2as_fastening_tools)/config"/>
+  <arg name="suction_control"   default="suction_control"/>
+  <arg name="operation_mode"    default="operation_mode"/>
   <arg name="sim"		default="false"/>
 
-  <node name="ur_program_relay" pkg="o2as_skills" type="ur_program_relay.py" respawn="false" output="screen"/>
+  <node name="ur_program_relay" pkg="o2as_skills"
+	type="ur_program_relay.py"
+	respawn="false" output="screen"/>
 
-  <node pkg="aist_skills" type="aist_skill_server.py" name="aist_skills" />
+  <node pkg="aist_skills" type="aist_skill_server.py" name="aist_skills"/>
 
-  <node name="suction_controller" pkg="o2as_fastening_tools" type="suction_controller.py" output="screen">
-    <param name="config_dir"    type="string" value="$(arg config_dir)"/>
+  <node name="suction_controller" pkg="o2as_fastening_tools"
+	type="suction_controller.py" output="screen">
+    <param name="config_dir"      type="string" value="$(arg config_dir)"/>
     <param name="suction_control" type="string" value="$(arg suction_control)"/>
-    <param name="operation_mode" type="string" value="$(arg operation_mode)"/>
+    <param name="operation_mode"  type="string" value="$(arg operation_mode)"/>
   </node>
-  <include file="$(find aist_graspability)/launch/aist_graspability.launch" />
+
+  <include file="$(find aist_graspability)/launch/aist_graspability.launch"/>
 </launch>

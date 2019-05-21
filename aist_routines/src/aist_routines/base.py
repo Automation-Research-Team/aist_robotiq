@@ -60,9 +60,11 @@ def is_program_running(topic_namespace = ""):
         rospy.logerr("No message received from the robot. Is everything running? Is the namespace entered correctly with a leading slash?")
         return False
 
-def wait_for_UR_program(topic_namespace = "", timeout_duration = rospy.Duration.from_sec(20.0)):
+def wait_for_UR_program(topic_namespace="",
+                        timeout_duration=rospy.Duration.from_sec(20.0)):
     rospy.logdebug("Waiting for UR program to finish.")
-    # Only run this after sending custom URScripts and not the regular motion commands, or this call will not terminate before the timeout.
+    # Only run this after sending custom URScripts and not the regular
+    # motion commands, or this call will not terminate before the timeout.
     rospy.sleep(1.0)
     t_start = rospy.Time.now()
     time_passed = rospy.Time.now() - t_start
@@ -82,6 +84,7 @@ class AISTBaseRoutines(object):
         rospy.init_node("aist_routines", anonymous=True)
         moveit_commander.roscpp_initialize(sys.argv)
 
+        # Service clients
         self.goToNamedPose_client  = rospy.ServiceProxy(
                                         '/aist_skills/goToNamedPose',
                                         o2as_msgs.srv.goToNamedPose)
@@ -95,9 +98,11 @@ class AISTBaseRoutines(object):
                                         '/aist_skills/gripperCommand',
                                         o2as_msgs.srv.gripperCommand)
 
+        # Action clients
         self.pickOrPlace_client    = actionlib.SimpleActionClient(
-                                        '/aist_skills/pick',
+                                        '/aist_skills/pickOrPlace',
                                         o2as_msgs.msg.pickOrPlaceAction)
+        self.pickOrPlace_client.wait_for_server()
 
     def cycle_through_calibration_poses(self, poses, robot_name,
                                         speed=0.3, move_lin=False,
@@ -146,6 +151,12 @@ class AISTBaseRoutines(object):
         req.move_lin          = move_lin
         return self.goToPoseGoal_client.call(req)
 
+    def send_gripper_command(self, group_name, command):
+        req = o2as_msgs.srv.gripperCommandRequest()
+        req.group_name = group_name
+        req.command    = command
+        return self.gripperCommand_client.call(req)
+
     def do_pick_action(self, group_name, pose_stamped):
         return self.pickOrPlace(group_name, pose_stamped, True)
 
@@ -159,16 +170,10 @@ class AISTBaseRoutines(object):
         goal.pick            = pick
         goal.approach_offset = 0.1
         goal.speed_fast      = 1.0
-        goal.speed_slow      = 0.1
+        goal.speed_slow      = 0.02
         self.pickOrPlace_client.send_goal(goal)
         self.pickOrPlace_client.wait_for_result()
-        return self.pick_client.get_result()
-
-    def send_gripper_command(self, group_name, command):
-        req = o2as_msgs.srv.gripperCommandRequest()
-        req.group_name = group_name
-        req.command    = command
-        return self.gripperCommand_client.call(req)
+        return self.pickOrPlace_client.get_result()
 
     # def do_linear_push(self, robot_name, force, wait=True, direction="Z+", max_approach_distance=0.1, forward_speed=0.0):
     #     if not self.use_real_robot:
