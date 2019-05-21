@@ -79,18 +79,25 @@ def wait_for_UR_program(topic_namespace = "", timeout_duration = rospy.Duration.
 class AISTBaseRoutines(object):
     def __init__(self):
         super(AISTBaseRoutines, self).__init__()
+        rospy.init_node("aist_routines", anonymous=True)
         moveit_commander.roscpp_initialize(sys.argv)
-        rospy.init_node("kitting_task", anonymous=True)
 
-        self.goToNamedPose_client = rospy.ServiceProxy(
+        self.goToNamedPose_client  = rospy.ServiceProxy(
                                         '/aist_skills/goToNamedPose',
                                         o2as_msgs.srv.goToNamedPose)
-        self.goToPoseGoal_client  = rospy.ServiceProxy(
+        self.goToPoseGoal_client   = rospy.ServiceProxy(
                                         '/aist_skills/goToPoseGoal',
                                         o2as_msgs.srv.goToPoseGoal)
-        self.urscript_client      = rospy.ServiceProxy(
+        self.urscript_client       = rospy.ServiceProxy(
                                         '/o2as_skills/sendScriptToUR',
                                         o2as_msgs.srv.sendScriptToUR)
+        self.gripperCommand_client = rospy.ServiceProxy(
+                                        '/aist_skills/gripperCommand',
+                                        o2as_msgs.srv.gripperCommand)
+
+        self.pickOrPlace_client    = actionlib.SimpleActionClient(
+                                        '/aist_skills/pick',
+                                        o2as_msgs.msg.pickOrPlaceAction)
 
     def cycle_through_calibration_poses(self, poses, robot_name,
                                         speed=0.3, move_lin=False,
@@ -121,7 +128,7 @@ class AISTBaseRoutines(object):
             self.go_to_named_pose(robot_name, "home")
         return
 
-    def go_to_named_pose(self, group_name, named_pose):
+    def go_to_named_pose(self, named_pose, group_name):
         req = o2as_msgs.srv.goToNamedPoseRequest()
         req.planning_group = group_name
         req.named_pose     = named_pose
@@ -138,6 +145,30 @@ class AISTBaseRoutines(object):
         req.end_effector_link = end_effector_link
         req.move_lin          = move_lin
         return self.goToPoseGoal_client.call(req)
+
+    def do_pick_action(self, group_name, pose_stamped):
+        return self.pickOrPlace(group_name, pose_stamped, True)
+
+    def do_place_action(self, group_name, pose_stamped):
+        return self.pickOrPlace(group_name, pose_stamped, False)
+
+    def pickOrPlace(self, group_name, pose_stamped, pick):
+        goal = o2as_msgs.msg.pickOrPlaceGoal()
+        goal.group_name      = group_name
+        goal.pose            = pose_stamped
+        goal.pick            = pick
+        goal.approach_offset = 0.1
+        goal.speed_fast      = 1.0
+        goal.speed_slow      = 0.1
+        self.pickOrPlace_client.send_goal(goal)
+        self.pickOrPlace_client.wait_for_result()
+        return self.pick_client.get_result()
+
+    def send_gripper_command(self, group_name, command):
+        req = o2as_msgs.srv.gripperCommandRequest()
+        req.group_name = group_name
+        req.command    = command
+        return self.gripperCommand_client.call(req)
 
     # def do_linear_push(self, robot_name, force, wait=True, direction="Z+", max_approach_distance=0.1, forward_speed=0.0):
     #     if not self.use_real_robot:

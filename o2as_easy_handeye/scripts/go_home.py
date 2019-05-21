@@ -28,4 +28,4 @@ if __name__ == '__main__':
     else:
         baseRoutines = AISTBaseRoutines()
 
-    baseRoutines.go_to_named_pose(args.robot_name, args.pose)
+    baseRoutines.go_to_named_pose(args.pose, args.robot_name)

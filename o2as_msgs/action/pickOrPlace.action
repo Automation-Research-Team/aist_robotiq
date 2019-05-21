@@ -1,6 +1,7 @@
 # Goal
 string group_name
 geometry_msgs/PoseStamped pose
+bool pick
 float32 approach_offset
 float32 speed_fast
 float32 speed_slow

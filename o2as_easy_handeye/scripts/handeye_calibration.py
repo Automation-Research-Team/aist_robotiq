@@ -242,7 +242,7 @@ class HandEyeCalibrationRoutines:
               self.group.get_end_effector_link())
 
     def go_home(self):
-        self.routines.go_to_named_pose(self.group.get_name(), "home")
+        self.routines.go_to_named_pose("home", self.group.get_name())
 
     def save_image(self, file_name):
         img_msg = rospy.wait_for_message("/aruco_tracker/result",

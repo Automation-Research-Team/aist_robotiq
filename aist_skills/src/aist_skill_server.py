@@ -108,6 +108,9 @@ class SkillServer(object):
         self.goToPoseGoalService  = rospy.Service("aist_skills/goToPoseGoal",
                                                   o2as_msgs.srv.goToPoseGoal,
                                                   self.goToPoseGoalCallback)
+        self.gripperCommandService = rospy.Service("aist_skills/gripperCommand",
+                                                   o2as_msgs.srv.gripperCommand,
+                                                   self.gripperCommandCallback)
 
         # Action clients
         # self.fge_action_client = actionlib.SimpleActionClient('aist_graspability/search_grasp_from_phoxi', aist_graspability.msg.SearchGraspFromPhoxiAction)
@@ -342,6 +345,19 @@ class SkillServer(object):
 
     def gripper_pose(pose, offset):
         pass
+
+    def gripperCommandCallback(self, req):
+        gripper = self.grippers[req.group_name]
+        res     = o2as_msgs.srv.gripperCommandResponse()
+        if req.command == "pregrasp":
+            gripper.pregrasp()
+        elif req.command == "grasp":
+            gripper.grasp()
+        elif req.command == "release":
+            gripper.release()
+        res.success = True
+        return res
+
 
 if __name__ == '__main__':
     rospy.init_node("aist_skills", anonymous=True)
