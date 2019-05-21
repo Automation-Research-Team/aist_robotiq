@@ -90,7 +90,7 @@ class Robotiq85Gripper(GripperBase):
         return self._goal.velocity
 
     @velocity.setter
-    def set_velocity(self, v):
+    def velocity(self, v):
         self._goal.velocity = v
 
     def pregrasp(self):
