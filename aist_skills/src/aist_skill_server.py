@@ -7,9 +7,10 @@ import copy
 
 import numpy as np
 import rospy
-import geometry_msgs.msg
+from geometry_msgs import msg as msg
 import visualization_msgs.msg
 import tf
+from tf import transformations as tfs
 import tf_conversions
 import actionlib
 import moveit_commander
@@ -29,7 +30,7 @@ def quaternion_tf_to_msg(quaternion):
     """Convert quaternion tf quaternion (as numpy.ndarray) to geometry_msgs.msg.Quaternion.
     """
 
-    return geometry_msgs.msg.Quaternion(quaternion[0], quaternion[1], quaternion[2], quaternion[3])
+    return msg.Quaternion(quaternion[0], quaternion[1], quaternion[2], quaternion[3])
 
 def rotatePoseByRPY(roll, pitch, yaw, inpose):
     """Return pose rotated by rpy.
@@ -37,9 +38,9 @@ def rotatePoseByRPY(roll, pitch, yaw, inpose):
     This function is converted of o2as_helper_function.h.
     """
 
-    q_rotate = tf.transformations.quaternion_from_euler(roll, pitch, yaw)
+    q_rotate = tfs.quaternion_from_euler(roll, pitch, yaw)
     q = quaternion_msg_to_tf(inpose.orientation)
-    q = tf.transformations.quaternion_multiply(q, q_rotate)
+    q = tfs.quaternion_multiply(q, q_rotate)
     inpose.orientation = quaternion_tf_to_msg(q)
 
     return inpose
@@ -58,10 +59,10 @@ def all_close(goal, actual, tolerance):
             if abs(actual[index] - goal[index]) > tolerance:
                 return False
 
-    elif type(goal) is geometry_msgs.msg.PoseStamped:
+    elif type(goal) is msg.PoseStamped:
         return all_close(goal.pose, actual.pose, tolerance)
 
-    elif type(goal) is geometry_msgs.msg.Pose:
+    elif type(goal) is msg.Pose:
         return all_close(pose_to_list(goal), pose_to_list(actual), tolerance)
 
     return True
@@ -312,40 +313,6 @@ class SkillServer(object):
 
         return res
 
-    def pickOrPlaceCallback(self, goal):
-        gripper  = self.grippers[goal.group_name]
-        feedback = aist_skills.msg.pickOrPlaceFeedback()
-
-        res = self.goToPoseGoal(goal.group_name,
-                                self.gripper_pose(goal.pose,
-                                                  goal.approach_offset),
-                                goal.speed_fast if pick else goal.speed_slow)
-        feedback.current_pose = res.current_pose
-        self.pickOrPlaceAction.publish_feedback(feedback)
-
-        if goal.pick:
-            gripper.pregrasp()
-
-        res = self.goToPoseGoal(goal.group_name,
-                                self.gripper_pose(goal.pose,
-                                                  gripper.grasp_offset),
-                                goal.speed_slow)
-        feedback.current_pose = res.current_pose
-        self.pickOrPlaceAction.publish_feedback(feedback)
-
-        res_gripper = gripper.grasp() if goal_pick else gripper.release()
-
-        result = aist_skills.msg.pickOrPlaceResult()
-        res = self.goToPoseGoal(goal.group_name,
-                                self.gripper_pose(goal.pose,
-                                                  goal.approach_offset),
-                                goal.speed_slow)
-        result.success = result.success and res_gripper
-        self.pickOrPlaceAction.set_succeeded(result)
-
-    def gripper_pose(pose, offset):
-        pass
-
     def gripperCommandCallback(self, req):
         gripper = self.grippers[req.group_name]
         res     = o2as_msgs.srv.gripperCommandResponse()
@@ -357,6 +324,65 @@ class SkillServer(object):
             gripper.release()
         res.success = True
         return res
+
+    def pickOrPlaceCallback(self, goal):
+        gripper  = self.grippers[goal.group_name]
+        feedback = o2as_msgs.msg.pickOrPlaceFeedback()
+
+        # Go to approach pose.
+        res = self.goToPoseGoal(
+                       goal.group_name,
+                       self.gripperPose(goal.pose, goal.approach_offset),
+                       goal.speed_fast if goal.pick else goal.speed_slow)
+        feedback.current_pose = res.current_pose
+        self.pickOrPlaceAction.publish_feedback(feedback)
+
+        # Pregrasp
+        if goal.pick:
+            gripper.pregrasp()
+
+        # Go to pick/place pose.
+        res = self.goToPoseGoal(goal.group_name,
+                                self.gripperPose(goal.pose,
+                                                 gripper.grasp_offset),
+                                goal.speed_slow)
+        feedback.current_pose = res.current_pose
+        self.pickOrPlaceAction.publish_feedback(feedback)
+
+        # Grasp or release
+        res_gripper = gripper.grasp() if goal.pick else gripper.release()
+
+        # Go back to approach pose.
+        result = o2as_msgs.msg.pickOrPlaceResult()
+        res = self.goToPoseGoal(
+                       goal.group_name,
+                       self.gripperPose(goal.pose, goal.approach_offset),
+                       goal.speed_slow if goal.pick else goal.speed_fast)
+        result.current_pose = res.current_pose
+        result.success      = result.success and res_gripper
+        self.pickOrPlaceAction.set_succeeded(result)
+
+    def gripperPose(self, target_pose, offset):
+        T = tfs.concatenate_matrices(
+                self.listener.fromTranslationRotation(
+                    (target_pose.pose.position.x,
+                     target_pose.pose.position.y,
+                     target_pose.pose.position.z),
+                    (target_pose.pose.orientation.x,
+                     target_pose.pose.orientation.y,
+                     target_pose.pose.orientation.z,
+                     target_pose.pose.orientation.w)),
+                self.listener.fromTranslationRotation(
+                    (0, 0, offset),
+                    tfs.quaternion_from_euler(0, radians(90), 0)))
+
+        gripper_pose = msg.PoseStamped()
+        gripper_pose.header.frame_id  = target_pose.header.frame_id
+        gripper_pose.pose = msg.Pose(msg.Point(
+                                         *tfs.translation_from_matrix(T)),
+                                     msg.Quaternion(
+                                         *tfs.quaternion_from_matrix(T)))
+        return gripper_pose
 
 
 if __name__ == '__main__':
