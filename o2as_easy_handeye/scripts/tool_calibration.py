@@ -7,7 +7,7 @@ import rospy
 import argparse
 import moveit_msgs.msg
 import moveit_commander
-from geometry_msgs import msg as msg
+from geometry_msgs import msg as gmsg
 
 from tf import TransformListener, transformations as tfs
 from math import radians, degrees
@@ -67,19 +67,19 @@ class ToolCalibrationRoutines:
         self.pitch = 0.0
         self.yaw   = 0.0
 
-        self.pick_pose = msg.PoseStamped()
+        self.pick_pose = gmsg.PoseStamped()
         self.pick_pose.header.frame_id = self.group.get_pose_reference_frame()
-        self.pick_pose.pose = msg.Pose(msg.Point(0, 0, 0.1),
-                                       msg.Quaternion(
+        self.pick_pose.pose = gmsg.Pose(gmsg.Point(-0.1, 0.1, 0.01),
+                                       gmsg.Quaternion(
                                            *tfs.quaternion_from_euler(
                                                radians(15), 0, 0)))
 
-        self.place_pose = msg.PoseStamped()
+        self.place_pose = gmsg.PoseStamped()
         self.place_pose.header.frame_id  = self.group.get_pose_reference_frame()
-        self.place_pose.pose = msg.Pose(msg.Point(0, 0, 0.1),
-                                        msg.Quaternion(
-                                            *tfs.quaternion_from_euler(
-                                                0, 0, 0)))
+        self.place_pose.pose = gmsg.Pose(gmsg.Point(0.1, 0, 0.01),
+                                         gmsg.Quaternion(
+                                             *tfs.quaternion_from_euler(
+                                                 0, 0, 0)))
 
     def go_home(self):
         self.routines.go_to_named_pose('home', self.group.get_name())
@@ -101,24 +101,24 @@ class ToolCalibrationRoutines:
 
     def move(self, pose):
         R = self.listener.fromTranslationRotation(
-            (0, 0, 0), tfs.quaternion_from_euler(0, self.pitch, self.yaw))
+                (0, 0, 0), tfs.quaternion_from_euler(0, self.pitch, self.yaw))
         T = tfs.concatenate_matrices(
             self.listener.fromTranslationRotation(
                 (pose[0], pose[1], pose[2]),
                 tfs.quaternion_from_euler(pose[3], pose[4], pose[5])),
             tfs.inverse_matrix(self.D0), tfs.inverse_matrix(R), self.D0)
-        poseStamped = msg.PoseStamped()
+        poseStamped = gmsg.PoseStamped()
         poseStamped.header.frame_id = self.group.get_pose_reference_frame()
-        poseStamped.pose = msg.Pose(
-            msg.Point(*tfs.translation_from_matrix(T)),
-            msg.Quaternion(*tfs.quaternion_from_matrix(T)))
-        print("     move to " + self.format_pose(poseStamped))
+        poseStamped.pose = gmsg.Pose(
+            gmsg.Point(*tfs.translation_from_matrix(T)),
+            gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
+        print("   move to " + self.format_pose(poseStamped))
         res = self.routines.go_to_pose_goal(
-                     self.group.get_name(), poseStamped, self.speed,
-                     end_effector_link=self.group.get_end_effector_link(),
-                     move_lin=False)
+                  self.group.get_name(), poseStamped, self.speed,
+                  end_effector_link=self.group.get_end_effector_link(),
+                  move_lin=False)
         rospy.sleep(1)
-        print("  reached to " + self.format_pose(res.current_pose))
+        print("   reached " + self.format_pose(res.current_pose))
         return res.success
 
     def rolling_motion(self):
@@ -275,16 +275,14 @@ class ToolCalibrationRoutines:
 
     def format_pose(self, poseStamped):
         pose = self.listener.transformPose(
-                        self.group.get_pose_reference_frame(), poseStamped).pose
+            self.group.get_pose_reference_frame(), poseStamped).pose
         rpy = map(
             degrees,
-            tfs.euler_from_quaternion([
-                pose.orientation.w, pose.orientation.x, pose.orientation.y,
-                pose.orientation.z
-            ]))
+            tfs.euler_from_quaternion([pose.orientation.w, pose.orientation.x,
+                                       pose.orientation.y, pose.orientation.z]))
         return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
-            pose.position.x, pose.position.y, pose.position.z, rpy[0], rpy[1],
-            rpy[2])
+            pose.position.x, pose.position.y, pose.position.z,
+            rpy[0], rpy[1], rpy[2])
 
 
 ######################################################################
