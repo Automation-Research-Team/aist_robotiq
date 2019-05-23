@@ -2,17 +2,13 @@
 
 import sys
 import os
-import copy
 import rospy
 import argparse
-import moveit_msgs.msg
-import geometry_msgs.msg
-
 from math import radians, degrees
+from std_srvs.srv import Empty, Trigger
+from geometry_msgs import msg as gmsg
 from tf import TransformListener, transformations as tfs
 
-from std_msgs.msg import String
-from std_srvs.srv import Empty, Trigger
 from easy_handeye.srv import TakeSample, RemoveSample, ComputeCalibration
 
 from o2as_routines.base import O2ASBaseRoutines
@@ -252,19 +248,18 @@ class HandEyeCalibrationRoutines:
         cv2.imwrite(file_name, bridge.imgmsg_to_cv2(img_msg, "bgr8"))
 
     def move(self, pose):
-        poseStamped = geometry_msgs.msg.PoseStamped()
+        poseStamped = gmsg.PoseStamped()
         poseStamped.header.frame_id = self.group.get_pose_reference_frame()
-        poseStamped.pose.position.x = pose[0]
-        poseStamped.pose.position.y = pose[1]
-        poseStamped.pose.position.z = pose[2]
-        poseStamped.pose.orientation = geometry_msgs.msg.Quaternion(
-            *tfs.quaternion_from_euler(pose[3], pose[4], pose[5]))
-        print("     move to " + self.format_pose(poseStamped))
+        poseStamped.pose = gmsg.Pose(
+            gmsg.Point(pose[0], pose[1], pose[2]),
+            gmsg.Quaternion(
+                *tfs.quaternion_from_euler(pose[3], pose[4], pose[5])))
+        print("  move to " + self.format_pose(poseStamped))
         res = self.routines.go_to_pose_goal(
                 self.group.get_name(), poseStamped, self.speed,
                 end_effector_link=self.group.get_end_effector_link(),
                 move_lin=False)
-        print("  reached to " + self.format_pose(res.current_pose))
+        print("  reached " + self.format_pose(res.current_pose))
         return res.success
 
     def move_to(self, pose, keypose_num, subpose_num):
@@ -341,7 +336,7 @@ class HandEyeCalibrationRoutines:
         #       pose[3], pose[4], pose[5])
         # q_rotate_30_in_y = tf_conversions.transformations.quaternion_from_euler(0, pi/6, 0)
         # q_rotated = tf_conversions.transformations.quaternion_multiply(quaternion_0, q_rotate_30_in_y)
-        # poseStamped.pose.orientation = geometry_msgs.msg.Quaternion(*q_rotated)
+        # poseStamped.pose.orientation = gmsg.Quaternion(*q_rotated)
 
     def run(self, initpose, keyposes):
         if self.stop_acquisition:
@@ -378,18 +373,16 @@ class HandEyeCalibrationRoutines:
         self.go_home()
 
     def format_pose(self, poseStamped):
-        listener = TransformListener()  # Needs Listener but TransformerROS.
+        listener = TransformListener()  # Should be Listener but TransformerROS
         pose = listener.transformPose(self.group.get_pose_reference_frame(),
                                       poseStamped).pose
         rpy = map(
             degrees,
-            tfs.euler_from_quaternion([
-                pose.orientation.w, pose.orientation.x, pose.orientation.y,
-                pose.orientation.z
-            ]))
+            tfs.euler_from_quaternion([pose.orientation.w, pose.orientation.x,
+                                       pose.orientation.y, pose.orientation.z]))
         return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
-            pose.position.x, pose.position.y, pose.position.z, rpy[0], rpy[1],
-            rpy[2])
+            pose.position.x, pose.position.y, pose.position.z,
+            rpy[0], rpy[1], rpy[2])
 
 
 ######################################################################

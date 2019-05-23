@@ -2,16 +2,15 @@
 
 import sys
 import os
-import copy
 import rospy
 import argparse
 from math import radians, degrees
+from std_srvs.srv import Trigger
+from geometry_msgs import msg as gmsg
+from tf import TransformListener, transformations as tfs
 
-import geometry_msgs.msg
 import moveit_commander
 
-from tf import TransformListener, transformations as tfs
-from std_srvs.srv import Trigger
 from o2as_routines.base import O2ASBaseRoutines
 from aist_routines.base import AISTBaseRoutines
 
@@ -72,28 +71,24 @@ class VisitRoutines:
     def move(self, speed):
         self.start_acquisition()
         position = rospy.wait_for_message("/aruco_tracker/position",
-                                          geometry_msgs.msg.Vector3Stamped, 10)
+                                          gmsg.PointStamped, 10)
         self.stop_acquisition()
 
-        poseStamped = geometry_msgs.msg.PoseStamped()
+        poseStamped = gmsg.PoseStamped()
         poseStamped.header.frame_id = self.group.get_pose_reference_frame()
-        poseStamped.pose.position.x = position.vector.x
-        poseStamped.pose.position.y = position.vector.y
-        poseStamped.pose.position.z = position.vector.z + 0.05
-        poseStamped.pose.orientation \
-          = geometry_msgs.msg.Quaternion(
-            *tfs.quaternion_from_euler(self.orientations[0],
-                                       self.orientations[1],
-                                       self.orientations[2]))
+        poseStamped.pose = gmsg.Pose(
+            position.point,
+            gmsg.Quaternion(*tfs.quaternion_from_euler(*self.orientations)))
+        poseStamped.pose.position.z += 0.05
         self.routines.go_to_pose_goal(self.group.get_name(), poseStamped,
                                       speed, move_lin=False)
         rospy.sleep(1)
 
-        poseStamped.pose.position.z = position.vector.z
-        print("     move to " + self.format_pose(poseStamped))
+        poseStamped.pose.position.z -= 0.05
+        print("  move to " + self.format_pose(poseStamped))
         res = self.routines.go_to_pose_goal(self.group.get_name(), poseStamped,
                                             speed, move_lin=True)
-        print("  reached to " + self.format_pose(res.current_pose))
+        print("  reached " + self.format_pose(res.current_pose))
 
     def go_home(self):
         self.routines.go_to_named_pose("home", self.group.get_name())
@@ -124,13 +119,11 @@ class VisitRoutines:
                                       poseStamped).pose
         rpy = map(
             degrees,
-            tfs.euler_from_quaternion([
-                pose.orientation.w, pose.orientation.x, pose.orientation.y,
-                pose.orientation.z
-            ]))
+            tfs.euler_from_quaternion([pose.orientation.w, pose.orientation.x,
+                                       pose.orientation.y, pose.orientation.z]))
         return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
-            pose.position.x, pose.position.y, pose.position.z, rpy[0], rpy[1],
-            rpy[2])
+            pose.position.x, pose.position.y, pose.position.z,
+            rpy[0], rpy[1], rpy[2])
 
 
 ######################################################################

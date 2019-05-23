@@ -176,7 +176,7 @@ Simple::Simple()
      _pose_pub(_nh.advertise<geometry_msgs::PoseStamped>("pose", 100)),
      _transform_pub(_nh.advertise<geometry_msgs::TransformStamped>(
 			"transform", 100)),
-     _position_pub(_nh.advertise<geometry_msgs::Vector3Stamped>(
+     _position_pub(_nh.advertise<geometry_msgs::PointStamped>(
 		       "position", 100)),
      _marker_pub(_nh.advertise<visualization_msgs::Marker>("marker", 10)),
      _pixel_pub(_nh.advertise<geometry_msgs::PointStamped>("pixel", 10)),
@@ -574,9 +574,9 @@ Simple::publish_marker_info(const aruco::Marker& marker,
     tf::transformStampedTFToMsg(stampedTransform, transformMsg);
     _transform_pub.publish(transformMsg);
 
-    geometry_msgs::Vector3Stamped	positionMsg;
-    positionMsg.header = transformMsg.header;
-    positionMsg.vector = transformMsg.transform.translation;
+    geometry_msgs::PointStamped	positionMsg;
+    positionMsg.header = poseMsg.header;
+    positionMsg.point  = poseMsg.pose.position;
     _position_pub.publish(positionMsg);
 
     geometry_msgs::PointStamped	pixelMsg;

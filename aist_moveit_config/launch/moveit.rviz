@@ -10,7 +10,9 @@ Panels:
         - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
         - /TF1
+        - /TF1/Frames1
         - /TF1/Tree1
+        - /Marker1
       Splitter Ratio: 0.5
     Tree Height: 348
   - Class: rviz/Selection
@@ -85,21 +87,11 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
-          a_bot_ar_marker:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           a_bot_base:
             Alpha: 1
             Show Axes: false
             Show Trail: false
           a_bot_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_base_smfl:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -214,21 +206,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          b_bot_ar_marker:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           b_bot_base:
             Alpha: 1
             Show Axes: false
             Show Trail: false
           b_bot_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          b_bot_base_smfl:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -294,12 +276,12 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          workbox:
+          vwall1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          workspace_ar_marker:
+          workbox:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -357,21 +339,11 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
-          a_bot_ar_marker:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           a_bot_base:
             Alpha: 1
             Show Axes: false
             Show Trail: false
           a_bot_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_base_smfl:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -486,21 +458,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          b_bot_ar_marker:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           b_bot_base:
             Alpha: 1
             Show Axes: false
             Show Trail: false
           b_bot_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          b_bot_base_smfl:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -566,12 +528,12 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          workbox:
+          vwall1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          workspace_ar_marker:
+          workbox:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -592,104 +554,100 @@ Visualization Manager:
       Enabled: true
       Frame Timeout: 15
       Frames:
-        All Enabled: true
-        a_bot_ar_marker:
-          Value: true
+        All Enabled: false
         a_bot_base:
-          Value: true
+          Value: false
         a_bot_base_link:
-          Value: true
-        a_bot_base_smfl:
-          Value: true
+          Value: false
         a_bot_ee_link:
-          Value: true
+          Value: false
         a_bot_forearm_link:
-          Value: true
+          Value: false
         a_bot_ft300_frange_link:
-          Value: true
+          Value: false
         a_bot_ft300_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_base_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_left_finger_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_left_finger_tip_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_left_inner_knuckle_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_left_knuckle_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_right_finger_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_right_finger_tip_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_right_inner_knuckle_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_right_knuckle_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_tip_link:
           Value: true
         a_bot_shoulder_link:
-          Value: true
+          Value: false
         a_bot_tool0:
-          Value: true
+          Value: false
+        a_bot_tool0_controller:
+          Value: false
         a_bot_upper_arm_link:
-          Value: true
+          Value: false
         a_bot_wrist_1_link:
-          Value: true
+          Value: false
         a_bot_wrist_2_link:
-          Value: true
+          Value: false
         a_bot_wrist_3_link:
-          Value: true
+          Value: false
         a_phoxi_m_camera:
-          Value: true
+          Value: false
         a_phoxi_m_camera_link:
-          Value: true
+          Value: false
         a_phoxi_m_sensor:
           Value: true
-        b_bot_ar_marker:
-          Value: true
         b_bot_base:
-          Value: true
+          Value: false
         b_bot_base_link:
-          Value: true
-        b_bot_base_smfl:
-          Value: true
+          Value: false
         b_bot_ee_link:
-          Value: true
+          Value: false
         b_bot_forearm_link:
-          Value: true
+          Value: false
         b_bot_ft300_frange_link:
-          Value: true
+          Value: false
         b_bot_ft300_link:
-          Value: true
+          Value: false
         b_bot_shoulder_link:
-          Value: true
+          Value: false
         b_bot_single_suction_gripper_base_link:
-          Value: true
+          Value: false
         b_bot_single_suction_gripper_pad_link:
           Value: true
         b_bot_tool0:
-          Value: true
+          Value: false
+        b_bot_tool0_controller:
+          Value: false
         b_bot_upper_arm_link:
-          Value: true
+          Value: false
         b_bot_wrist_1_link:
-          Value: true
+          Value: false
         b_bot_wrist_2_link:
-          Value: true
+          Value: false
         b_bot_wrist_3_link:
-          Value: true
+          Value: false
         o2as_ground:
-          Value: true
+          Value: false
+        vwall1:
+          Value: false
         workbox:
-          Value: true
-        workspace_ar_marker:
-          Value: true
+          Value: false
         workspace_center:
           Value: true
         world:
-          Value: true
-      Marker Scale: 0.0299999993
+          Value: false
+      Marker Scale: 0.300000012
       Name: TF
       Show Arrows: false
       Show Axes: true
@@ -699,7 +657,8 @@ Visualization Manager:
           o2as_ground:
             a_bot_base_link:
               a_bot_base:
-                {}
+                a_bot_tool0_controller:
+                  {}
               a_bot_shoulder_link:
                 a_bot_upper_arm_link:
                   a_bot_forearm_link:
@@ -723,19 +682,17 @@ Visualization Manager:
                                     a_bot_robotiq_85_right_finger_link:
                                       {}
                                   a_bot_robotiq_85_tip_link:
-                                    a_bot_ar_marker:
-                                      {}
+                                    {}
                           a_bot_tool0:
                             {}
-            a_bot_base_smfl:
-              {}
             a_phoxi_m_camera:
               a_phoxi_m_sensor:
                 a_phoxi_m_camera_link:
                   {}
             b_bot_base_link:
               b_bot_base:
-                {}
+                b_bot_tool0_controller:
+                  {}
               b_bot_shoulder_link:
                 b_bot_upper_arm_link:
                   b_bot_forearm_link:
@@ -746,27 +703,24 @@ Visualization Manager:
                             b_bot_ft300_link:
                               b_bot_ft300_frange_link:
                                 b_bot_single_suction_gripper_base_link:
-                                  b_bot_ar_marker:
-                                    {}
                                   b_bot_single_suction_gripper_pad_link:
                                     {}
                           b_bot_tool0:
                             {}
-            b_bot_base_smfl:
+            vwall1:
               {}
             workbox:
               {}
             workspace_center:
-              workspace_ar_marker:
-                {}
+              {}
       Update Interval: 0
       Value: true
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: visualization_marker
+      Marker Topic: /visualization_marker
       Name: Marker
       Namespaces:
-        {}
+        markers: true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -794,25 +748,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.53174615
+      Distance: 1.40841675
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.167168975
-        Y: -0.158008695
-        Z: 0.783964515
+        X: 0.10762766
+        Y: 0.00601688027
+        Z: 0.99728477
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.944648027
+      Pitch: 1.14251184
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.0284699425
+      Yaw: 0.0180255324
     Saved: ~
 Window Geometry:
   Displays:

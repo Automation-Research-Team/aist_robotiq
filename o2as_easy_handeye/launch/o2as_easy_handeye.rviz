@@ -10,6 +10,7 @@ Panels:
         - /TF1/Frames1
         - /Image1
         - /Image2
+        - /Marker1
       Splitter Ratio: 0.615942001
     Tree Height: 333
   - Class: rviz/Selection
@@ -31,6 +32,8 @@ Panels:
     Name: Time
     SyncMode: 0
     SyncSource: Image
+Toolbars:
+  toolButtonStyle: 2
 Visualization Manager:
   Class: ""
   Displays:
@@ -82,21 +85,11 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
-          a_bot_ar_marker:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           a_bot_base:
             Alpha: 1
             Show Axes: false
             Show Trail: false
           a_bot_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_base_smfl:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -211,21 +204,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          b_bot_ar_marker:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           b_bot_base:
             Alpha: 1
             Show Axes: false
             Show Trail: false
           b_bot_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          b_bot_base_smfl:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -291,12 +274,12 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          workbox:
+          vwall1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          workspace_ar_marker:
+          workbox:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -354,21 +337,11 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
-          a_bot_ar_marker:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           a_bot_base:
             Alpha: 1
             Show Axes: false
             Show Trail: false
           a_bot_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_base_smfl:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -483,21 +456,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          b_bot_ar_marker:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           b_bot_base:
             Alpha: 1
             Show Axes: false
             Show Trail: false
           b_bot_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          b_bot_base_smfl:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -563,12 +526,12 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          workbox:
+          vwall1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          workspace_ar_marker:
+          workbox:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -590,14 +553,10 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        a_bot_ar_marker:
-          Value: true
         a_bot_base:
           Value: false
         a_bot_base_link:
           Value: true
-        a_bot_base_smfl:
-          Value: false
         a_bot_ee_link:
           Value: true
         a_bot_forearm_link:
@@ -630,6 +589,8 @@ Visualization Manager:
           Value: true
         a_bot_tool0:
           Value: false
+        a_bot_tool0_controller:
+          Value: true
         a_bot_upper_arm_link:
           Value: true
         a_bot_wrist_1_link:
@@ -640,17 +601,15 @@ Visualization Manager:
           Value: false
         a_phoxi_m_camera:
           Value: true
+        a_phoxi_m_camera_from_b_bot:
+          Value: true
         a_phoxi_m_camera_link:
           Value: false
         a_phoxi_m_sensor:
           Value: true
-        b_bot_ar_marker:
-          Value: true
         b_bot_base:
           Value: false
         b_bot_base_link:
-          Value: false
-        b_bot_base_smfl:
           Value: false
         b_bot_ee_link:
           Value: false
@@ -665,9 +624,11 @@ Visualization Manager:
         b_bot_single_suction_gripper_base_link:
           Value: true
         b_bot_single_suction_gripper_pad_link:
-          Value: true
+          Value: false
         b_bot_tool0:
           Value: false
+        b_bot_tool0_controller:
+          Value: true
         b_bot_upper_arm_link:
           Value: false
         b_bot_wrist_1_link:
@@ -676,13 +637,13 @@ Visualization Manager:
           Value: false
         b_bot_wrist_3_link:
           Value: false
-        camera_link:
-          Value: false
+        camera_marker:
+          Value: true
         o2as_ground:
           Value: false
-        workbox:
+        vwall1:
           Value: true
-        workspace_ar_marker:
+        workbox:
           Value: true
         workspace_center:
           Value: true
@@ -698,7 +659,8 @@ Visualization Manager:
           o2as_ground:
             a_bot_base_link:
               a_bot_base:
-                {}
+                a_bot_tool0_controller:
+                  {}
               a_bot_shoulder_link:
                 a_bot_upper_arm_link:
                   a_bot_forearm_link:
@@ -722,19 +684,17 @@ Visualization Manager:
                                     a_bot_robotiq_85_right_finger_link:
                                       {}
                                   a_bot_robotiq_85_tip_link:
-                                    a_bot_ar_marker:
-                                      {}
+                                    {}
                           a_bot_tool0:
                             {}
-            a_bot_base_smfl:
-              {}
             a_phoxi_m_camera:
               a_phoxi_m_sensor:
                 a_phoxi_m_camera_link:
                   {}
             b_bot_base_link:
               b_bot_base:
-                {}
+                b_bot_tool0_controller:
+                  {}
               b_bot_shoulder_link:
                 b_bot_upper_arm_link:
                   b_bot_forearm_link:
@@ -745,20 +705,18 @@ Visualization Manager:
                             b_bot_ft300_link:
                               b_bot_ft300_frange_link:
                                 b_bot_single_suction_gripper_base_link:
-                                  b_bot_ar_marker:
-                                    {}
                                   b_bot_single_suction_gripper_pad_link:
                                     {}
                           b_bot_tool0:
                             {}
-              camera_link:
-                {}
-            b_bot_base_smfl:
+            vwall1:
               {}
             workbox:
               {}
             workspace_center:
-              workspace_ar_marker:
+              a_phoxi_m_camera_from_b_bot:
+                {}
+              camera_marker:
                 {}
       Update Interval: 0
       Value: true
@@ -786,6 +744,14 @@ Visualization Manager:
       Transport Hint: raw
       Unreliable: false
       Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: visualization_marker
+      Name: Marker
+      Namespaces:
+        markers: true
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -811,25 +777,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.06177032
+      Distance: 0.364107639
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.458343059
-        Y: 0.0350227654
-        Z: 1.70416093
+        X: 0.0210876465
+        Y: 0.012263
+        Z: 0.80112648
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.800203204
+      Pitch: -0.081152156
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.0470523015
+      Yaw: 1.51741266
     Saved: ~
 Window Geometry:
   Displays:
@@ -853,5 +819,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1330
-  X: 100
-  Y: 76
+  X: 99
+  Y: 24
