@@ -1,0 +1,7 @@
+# Request
+string name     # gripper name
+int8 action     # 0: pregrasp, 1: grasp, 2: release
+string command  # additional command for precision gripper
+---
+# Response
+bool success

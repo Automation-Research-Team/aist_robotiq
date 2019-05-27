@@ -14,6 +14,7 @@ find_package(catkin REQUIRED
 	control_msgs
 	robotiq_msgs
 	o2as_msgs
+	aist_msgs
 	std_srvs
 	moveit_core
 	moveit_commander
@@ -142,7 +143,7 @@ ${catkin_INCLUDE_DIRS}
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(aist_skill_server src/aist_skill_server.cpp)
-# add_dependencies(aist_skill_server 
+# add_dependencies(aist_skill_server
 # 	${${PROJECT_NAME}_EXPORTED_TARGETS}
 #   	${catkin_EXPORTED_TARGETS})
 # target_link_libraries(aist_skill_server ${catkin_LIBRARIES})

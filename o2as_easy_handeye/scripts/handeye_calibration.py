@@ -193,16 +193,6 @@ class HandEyeCalibrationRoutines:
         self.speed = speed
         self.sleep_time = sleep_time
 
-        if rospy.get_param('use_real_robot', False):
-            cs = "/{}/".format(camera_name)
-            self.start_acquisition = rospy.ServiceProxy(
-                cs + "start_acquisition", Trigger)
-            self.stop_acquisition = rospy.ServiceProxy(cs + "stop_acquisition",
-                                                       Trigger)
-        else:
-            self.start_acquisition = False
-            self.stop_acquisition = False
-
         if needs_calib:
             ns = "/{}_from_{}/".format(camera_name, robot_name)
             self.take_sample = rospy.ServiceProxy(ns + "take_sample",
@@ -216,11 +206,11 @@ class HandEyeCalibrationRoutines:
             self.save_calibration = rospy.ServiceProxy(ns + "save_calibration",
                                                        Empty)
         else:
-            self.take_sample = False
-            self.get_sample_list = False
-            self.remove_sample = False
-            self.compute_calibration = False
-            self.save_calibration = False
+            self.take_sample = None
+            self.get_sample_list = None
+            self.remove_sample = None
+            self.compute_calibration = None
+            self.save_calibration = None
 
         ## Initialize `moveit_commander`
         self.group = moveit_commander.MoveGroupCommander(robot_name)
@@ -266,20 +256,19 @@ class HandEyeCalibrationRoutines:
         if not self.move(pose):
             return False
 
-        if self.start_acquisition:
-            self.start_acquisition()
+        rospy.sleep(self.sleep_time)  # Wait until the robot settles.
 
-            try:
-                self.save_image("aruco_result-{:0=2}-{:0=2}.jpeg".format(
-                    keypose_num, subpose_num))
-            except CvBridgeError, e:
-                print(e)
-            except rospy.ROSException, e:
-                print(e)
+        self.routines.start_acquisition(self.camera_name)
 
         rospy.sleep(self.sleep_time)
 
-        success = True
+        # try:
+        #     self.save_image("aruco_result-{:0=2}-{:0=2}.jpeg".format(
+        #         keypose_num, subpose_num))
+        # except CvBridgeError, e:
+        #     print(e)
+        # except rospy.ROSException, e:
+        #     print(e)
 
         if self.take_sample:
             try:
@@ -288,12 +277,12 @@ class HandEyeCalibrationRoutines:
                 n = len(sample_list.samples.hand_world_samples.transforms)
                 print(
                     "  took {} (hand-world, camera-marker) samples").format(n)
+                success = True
             except rospy.ServiceException as e:
                 print "Service call failed: %s" % e
                 success = False
 
-        if self.stop_acquisition:
-            self.stop_acquisition()
+        self.routines.stop_acquisition(self.camera_name)
 
         return success
 
@@ -339,8 +328,7 @@ class HandEyeCalibrationRoutines:
         # poseStamped.pose.orientation = gmsg.Quaternion(*q_rotated)
 
     def run(self, initpose, keyposes):
-        if self.stop_acquisition:
-            self.stop_acquisition()
+        self.routines.stop_acquisition(self.camera_name)
 
         if self.get_sample_list:
             n_samples = len(

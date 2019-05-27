@@ -1,6 +1,0 @@
-# Request
-string group_name
-string command
----
-# Response
-bool success

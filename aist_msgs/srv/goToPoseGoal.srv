@@ -1,0 +1,13 @@
+# This is just a wrapper around the move_group functionality
+# Request
+string robot_name
+geometry_msgs/PoseStamped target_pose
+float64 speed
+bool high_precision
+string end_effector_link
+bool move_lin
+---
+# Response
+bool success
+bool all_close
+geometry_msgs/PoseStamped current_pose

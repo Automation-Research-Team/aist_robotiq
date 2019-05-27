@@ -50,6 +50,8 @@ import robotiq_msgs.msg
 
 import o2as_msgs.msg
 import o2as_msgs.srv
+import aist_msgs.msg
+import aist_msgs.srv
 
 def is_program_running(topic_namespace = ""):
     """Checks if a program is running on the UR"""
@@ -85,24 +87,22 @@ class AISTBaseRoutines(object):
         moveit_commander.roscpp_initialize(sys.argv)
 
         # Service clients
-        self.goToNamedPose_client  = rospy.ServiceProxy(
-                                        '/aist_skills/goToNamedPose',
-                                        o2as_msgs.srv.goToNamedPose)
-        self.goToPoseGoal_client   = rospy.ServiceProxy(
-                                        '/aist_skills/goToPoseGoal',
-                                        o2as_msgs.srv.goToPoseGoal)
-        self.urscript_client       = rospy.ServiceProxy(
-                                        '/o2as_skills/sendScriptToUR',
-                                        o2as_msgs.srv.sendScriptToUR)
-        self.gripperCommand_client = rospy.ServiceProxy(
-                                        '/aist_skills/gripperCommand',
-                                        o2as_msgs.srv.gripperCommand)
+        self.goToNamedPose  = rospy.ServiceProxy('/aist_skills/goToNamedPose',
+                                                 o2as_msgs.srv.goToNamedPose)
+        self.goToPoseGoal   = rospy.ServiceProxy('/aist_skills/goToPoseGoal',
+                                                 aist_msgs.srv.goToPoseGoal)
+        self.sendScriptToUR = rospy.ServiceProxy('/o2as_skills/sendScriptToUR',
+                                                 o2as_msgs.srv.sendScriptToUR)
+        self.commandGripper = rospy.ServiceProxy('/aist_skills/commandGripper',
+                                                 aist_msgs.srv.commandGripper)
+        self.commandCamera  = rospy.ServiceProxy('/aist_skills/commandCamera',
+                                                 aist_msgs.srv.commandCamera)
 
         # Action clients
-        self.pickOrPlace_client    = actionlib.SimpleActionClient(
+        self.pickOrPlace    = actionlib.SimpleActionClient(
                                         '/aist_skills/pickOrPlace',
-                                        o2as_msgs.msg.pickOrPlaceAction)
-        self.pickOrPlace_client.wait_for_server()
+                                        aist_msgs.msg.pickOrPlaceAction)
+        self.pickOrPlace.wait_for_server()
 
     def cycle_through_calibration_poses(self, poses, robot_name,
                                         speed=0.3, move_lin=False,
@@ -137,43 +137,89 @@ class AISTBaseRoutines(object):
         req = o2as_msgs.srv.goToNamedPoseRequest()
         req.planning_group = group_name
         req.named_pose     = named_pose
-        return self.goToNamedPose_client.call(req)
+        return self.goToNamedPose.call(req)
 
-    def go_to_pose_goal(self, group_name, target_pose, speed=1.0,
+    def go_to_pose_goal(self, robot_name, target_pose, speed=1.0,
                         high_precision=False, end_effector_link="",
                         move_lin=False):
-        req = o2as_msgs.srv.goToPoseGoalRequest()
-        req.planning_group    = group_name
+        req = aist_msgs.srv.goToPoseGoalRequest()
+        req.robot_name        = robot_name
         req.target_pose       = target_pose
         req.speed             = speed
         req.high_precision    = high_precision
         req.end_effector_link = end_effector_link
         req.move_lin          = move_lin
-        return self.goToPoseGoal_client.call(req)
+        return self.goToPoseGoal.call(req)
 
-    def send_gripper_command(self, group_name, command):
-        req = o2as_msgs.srv.gripperCommandRequest()
-        req.group_name = group_name
-        req.command    = command
-        return self.gripperCommand_client.call(req)
+    def pregrasp(self, robot_name, command=""):
+        req = aist_msgs.srv.commandGripperRequest()
+        req.name    = robot_name
+        req.action  = 0
+        req.command = command
+        return self.commandGripper.call(req)
 
-    def do_pick_action(self, group_name, pose_stamped):
-        return self.pickOrPlace(group_name, pose_stamped, True)
+    def grasp(self, robot_name, command=""):
+        req = aist_msgs.srv.commandGripperRequest()
+        req.name    = robot_name
+        req.action  = 1
+        req.command = command
+        return self.commandGripper.call(req)
 
-    def do_place_action(self, group_name, pose_stamped):
-        return self.pickOrPlace(group_name, pose_stamped, False)
+    def release(self, robot_name, command=""):
+        req = aist_msgs.srv.commandGripperRequest()
+        req.name    = robot_name
+        req.action  = 2
+        req.command = command
+        return self.commandGripper.call(req)
 
-    def pickOrPlace(self, group_name, pose_stamped, pick):
-        goal = o2as_msgs.msg.pickOrPlaceGoal()
-        goal.group_name      = group_name
+    def start_acquisition(self, camera_name):
+        req = aist_msgs.srv.commandCameraRequest()
+        req.name    = camera_name
+        req.acquire = True
+        return self.commandCamera.call(req)
+
+    def stop_acquisition(self, camera_name):
+        req = aist_msgs.srv.commandCameraRequest()
+        req.name    = camera_name
+        req.acquire = False
+        return self.commandCamera.call(req)
+
+    def pick(self, robot_name, pose_stamped, grasp_offset=0.0,
+             gripper_command="close",
+             speed_fast=1.0, speed_slow=0.1, approach_offset=0.05,
+             liftup_after=True, acc_fast=1.0, acc_slow=0.5):
+        return self._pick_or_place(robot_name, pose_stamped, True,
+                                   gripper_command,
+                                   grasp_offset, approach_offset, liftup_after,
+                                   speed_fast, speed_slow, acc_fast, acc_slow)
+
+    def place(self, robot_name, pose_stamped, grasp_offset=0.0,
+              gripper_command="open",
+              speed_fast=1.0, speed_slow=0.1, approach_offset=0.05,
+              liftup_after=True, acc_fast=1.0, acc_slow=0.5):
+        return self._pick_or_place(robot_name, pose_stamped, False,
+                                   gripper_command,
+                                   grasp_offset, approach_offset, liftup_after,
+                                   speed_fast, speed_slow, acc_fast, acc_slow)
+
+    def _pick_or_place(self, robot_name, pose_stamped, pick, gripper_command,
+                       grasp_offset, approach_offset, liftup_after,
+                       speed_fast, speed_slow, acc_fast, acc_slow):
+        goal = aist_msgs.msg.pickOrPlaceGoal()
+        goal.robot_name      = robot_name
         goal.pose            = pose_stamped
         goal.pick            = pick
-        goal.approach_offset = 0.1
-        goal.speed_fast      = 1.0
-        goal.speed_slow      = 0.02
-        self.pickOrPlace_client.send_goal(goal)
-        self.pickOrPlace_client.wait_for_result()
-        return self.pickOrPlace_client.get_result()
+        goal.gripper_command = gripper_command
+        goal.grasp_offset    = grasp_offset
+        goal.approach_offset = approach_offset
+        goal.liftup_after    = liftup_after
+        goal.speed_fast      = speed_fast
+        goal.speed_slow      = speed_slow
+        goal.acc_fast        = acc_fast
+        goal.acc_slow        = acc_slow
+        self.pickOrPlace.send_goal(goal)
+        self.pickOrPlace.wait_for_result()
+        return self.pickOrPlace.get_result()
 
     # def do_linear_push(self, robot_name, force, wait=True, direction="Z+", max_approach_distance=0.1, forward_speed=0.0):
     #     if not self.use_real_robot:
@@ -186,7 +232,7 @@ class AISTBaseRoutines(object):
     #     req.max_approach_distance = max_approach_distance
     #     req.forward_speed = forward_speed
     #     req.program_id = "linear_push"
-    #     res = self.urscript_client.call(req)
+    #     res = self.urscript.call(req)
     #     if wait:
     #         rospy.sleep(2.0)    # This program seems to take some time
     #         wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
@@ -197,5 +243,5 @@ class AISTBaseRoutines(object):
         req = o2as_msgs.srv.publishMarkerRequest()
         req.marker_pose = pose_stamped
         req.marker_type = marker_type
-        self.publishMarker_client.call(req)
+        self.publishMarker.call(req)
         return True

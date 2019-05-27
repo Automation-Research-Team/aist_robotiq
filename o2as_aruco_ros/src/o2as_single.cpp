@@ -166,8 +166,8 @@ Simple::Simple()
      _cam_info_sub(_nh.subscribe("/camera_info", 1,
 				 &Simple::cam_info_callback, this)),
      _it(_nh),
-     _image_sub(_it.subscribe("/image", 1
-			      , &Simple::image_callback, this)),
+     _image_sub(_it.subscribe("/image", 1,
+			      &Simple::image_callback, this)),
      _image_pub(_it.advertise("result", 1)),
      _cloud_sub(_nh.subscribe("/pointcloud", 1,
 			      &Simple::cloud_callback, this)),
