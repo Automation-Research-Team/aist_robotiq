@@ -27,12 +27,13 @@
   <exec_depend>tf</exec_depend>
 
   <build_depend>o2as_msgs</build_depend>
+  <build_depend>aist_msgs</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>std_srvs</build_depend>
   <build_depend>control_msgs</build_depend>
   <build_depend>robotiq_msgs</build_depend>
   <exec_depend>message_generation</exec_depend>
-  
+
   <exec_depend>moveit_core</exec_depend>
   <exec_depend>moveit_commander</exec_depend>
   <exec_depend>moveit_ros_planning_interface</exec_depend>

@@ -70,9 +70,9 @@ class ToolCalibrationRoutines:
         self.pick_pose = gmsg.PoseStamped()
         self.pick_pose.header.frame_id = self.group.get_pose_reference_frame()
         self.pick_pose.pose = gmsg.Pose(gmsg.Point(-0.1, 0.1, 0.01),
-                                       gmsg.Quaternion(
-                                           *tfs.quaternion_from_euler(
-                                               radians(15), 0, 0)))
+                                        gmsg.Quaternion(
+                                            *tfs.quaternion_from_euler(
+                                                radians(15), 0, 0)))
 
         self.place_pose = gmsg.PoseStamped()
         self.place_pose.header.frame_id  = self.group.get_pose_reference_frame()
@@ -171,21 +171,21 @@ class ToolCalibrationRoutines:
             .format(xyz, rpy))
 
     def pregrasp(self):
-        self.routines.send_gripper_command(self.group.get_name(), "pregrasp")
+        self.routines.pregrasp(self.group.get_name())
 
     def grasp(self):
-        self.routines.send_gripper_command(self.group.get_name(), "grasp")
+        self.routines.grasp(self.group.get_name())
 
     def release(self):
-        self.routines.send_gripper_command(self.group.get_name(), "release")
+        self.routines.release(self.group.get_name())
 
     def pick(self):
         print("   approach to " + self.format_pose(self.pick_pose))
-        self.routines.do_pick_action(self.group.get_name(), self.pick_pose)
+        self.routines.pick(self.group.get_name(), self.pick_pose)
 
     def place(self):
         print("   approach to " + self.format_pose(self.pick_pose))
-        self.routines.do_place_action(self.group.get_name(), self.place_pose)
+        self.routines.place(self.group.get_name(), self.place_pose)
 
     def run(self):
         # Reset pose

@@ -47,12 +47,7 @@ class VisitRoutines:
 
     def __init__(self, routines, camera_name, robot_name, orientations):
         self.routines = routines
-
-        cs = "/{}/".format(camera_name)
-        self.start_acquisition = rospy.ServiceProxy(cs + "start_acquisition",
-                                                    Trigger)
-        self.stop_acquisition  = rospy.ServiceProxy(cs + "stop_acquisition",
-                                                    Trigger)
+        self.camera_name = camera_name
 
         ## Initialize `moveit_commander`
         self.group = moveit_commander.MoveGroupCommander(robot_name)
@@ -69,10 +64,10 @@ class VisitRoutines:
         self.orientations = orientations
 
     def move(self, speed):
-        self.start_acquisition()
+        self.routines.start_acquisition(self.camera_name)
         position = rospy.wait_for_message("/aruco_tracker/position",
                                           gmsg.PointStamped, 10)
-        self.stop_acquisition()
+        self.routines.stop_acquisition(self.camera_name)
 
         poseStamped = gmsg.PoseStamped()
         poseStamped.header.frame_id = self.group.get_pose_reference_frame()
@@ -94,7 +89,7 @@ class VisitRoutines:
         self.routines.go_to_named_pose("home", self.group.get_name())
 
     def run(self, speed):
-        self.stop_acquisition()
+        self.routines.stop_acquisition(self.camera_name)
         self.go_home()
 
         while True:
@@ -104,7 +99,7 @@ class VisitRoutines:
                     break
                 self.move(speed)
             except Exception as ex:
-                self.stop_acquisition()
+                self.routines.stop_acquisition(self.camera_name)
                 print ex.message
             except rospy.ROSInterruptException:
                 return

@@ -5,24 +5,29 @@ import rospy
 from math import pi, radians, degrees
 import copy
 
-import numpy as np
-from geometry_msgs import msg as gmsg
-from visualization_msgs import msg as vmsg
 from tf import TransformListener, transformations as tfs
 import actionlib
 import moveit_commander
 from moveit_commander.conversions import pose_to_list
 
+from geometry_msgs import msg as gmsg
+import visualization_msgs.msg
+import std_msgs.msg
+import o2as_msgs.msg
 import o2as_msgs.srv
+import aist_msgs.msg
+import aist_msgs.srv
 import aist_graspability.msg
+import aist_graspability.srv
 
-from grippers import GripperBase, Robotiq85Gripper, SuctionGripper
-
+from GripperClient import GripperClient, Robotiq85Gripper, SuctionGripper
+from CameraClient  import CameraClient, PhoXiCamera, RealsenseCamera
+from GraspabilityClient import GraspabilityClient
 
 ######################################################################
 #  global fucntions                                                  #
 ######################################################################
-def poseRotatedByRPY(pose, roll, pitch, yaw):
+def pose_rotated_by_rpy(pose, roll, pitch, yaw):
     pose_rotated = copy.deepcopy(pose)
     pose_rotated.orientation = gmsg.Quaternion(
         *tfs.quaternion_multiply((pose.orientation.x, pose.orientation.y,
@@ -59,170 +64,153 @@ def clamp(x, min_x, max_x):
 #  class SkillServer                                                 #
 ######################################################################
 class SkillServer(object):
+    marker_props = {     #axes    scale                  color(RGBA)
+        "pose":          (True,  (0.010, 0.050, 0.050), (0.0, 1.0, 0.0, 0.8)),
+        "pick_pose":     (True,  (0.010, 0.050, 0.050), (1.0, 0.0, 1.0, 0.8)),
+        "place_pose":    (True,  (0.010, 0.050, 0.050), (0.0, 1.0, 1.0, 0.8)),
+        "vision_result": (False, (0.005, 0.005, 0.005), (0.0, 1.0, 0.0, 0.8)),
+        "":              (False, (0.020, 0.100, 0.100), (0.0, 1.0, 0.0, 0.8)),
+        }
+
     def __init__(self):
         super(SkillServer, self).__init__()
         moveit_commander.roscpp_initialize(sys.argv)
 
-        if rospy.get_param('use_real_robot', False):
+        if rospy.get_param("use_real_robot", False):
             self.grippers = {
-                'a_bot': Robotiq85Gripper('a_bot_'),
-                'b_bot': SuctionGripper('b_bot_single_'),
-                'c_bot': Robotiq85Gripper('c_bot_'),
-                'd_bot': SuctionGripper('d_bot_dual_')
+                "a_bot": Robotiq85Gripper("a_bot_"),
+                "b_bot": SuctionGripper("b_bot_single_"),
+                "c_bot": Robotiq85Gripper("c_bot_"),
+                "d_bot": SuctionGripper("d_bot_dual_")
             }
+            self.cameras = {
+                "a_phoxi_m_camera": PhoXiCamera("a_phoxi_m_camera"),
+                "a_bot_camera":     RealsenseCamera("a_bot_camera"),
+            }
+            self.graspability = GraspabilityClient()
+            self.search_graspability_srv \
+                = rospy.Service("aist_skills/searchGraspability",
+                                aist_graspability.srv.searchGraspability,
+                                self.search_graspability_cb)
         else:
             self.grippers = {
-                'a_bot': GripperBase('a_bot_robotiq_85_gripper',
-                                     'a_bot_robotiq_85_tip_link'),
-                'b_bot': GripperBase('b_bot_single_suction_gripper',
-                                     'b_bot_single_suction_gripper_pad_link'),
-                'c_bot': GripperBase('c_bot_robotiq_85_gripper',
-                                     'c_bot_robotiq_85_tip_link'),
-                'd_bot': GripperBase('d_bot_dual_suction_gripper',
-                                     'd_bot_dual_suction_gripper_pad_link')
+                "a_bot": GripperClient("a_bot_robotiq_85_gripper",
+                                       "two-finger",
+                                       "a_bot_robotiq_85_base_link",
+                                       "a_bot_robotiq_85_tip_link"),
+                "b_bot": GripperClient("b_bot_single_suction_gripper",
+                                       "suction",
+                                       "b_bot_single_suction_gripper_base_link",
+                                       "b_bot_single_suction_gripper_pad_link"),
+                "c_bot": GripperClient("c_bot_robotiq_85_gripper",
+                                       "two-finer",
+                                       "c_bot_robotiq_85_base_link",
+                                       "c_bot_robotiq_85_tip_link"),
+                "d_bot": GripperClient("d_bot_dual_suction_gripper",
+                                       "suction",
+                                       "d_bot_dual_suction_gripper_base_link",
+                                       "d_bot_dual_suction_gripper_pad_link")
             }
+            self.cameras = {
+                "a_phoxi_m_camera": CameraClient(
+                                        "a_phoxi_m_camera",
+                                        "depth",
+                                        "/a_phoxi_m_camera/camera_info",
+                                        "/a_phoxi_m_camera/depth_map"),
+                "a_bot_camera":     CameraClient(
+                                        "a_bot_camera",
+                                        "depth",
+                                        "/a_bot_camera/rgb/camera_info",
+                                        "/a_bot_camera/depth/points"),
+            }
+            self.graspability = None
+            self.search_graspability_srv = None
 
-        # Topics to publish
-        self.markerPub = rospy.Publisher("visualization_marker",
-                                         vmsg.Marker, queue_size=10)
-        # Services
-        self.publishMarkerService = rospy.Service("aist_skills/publishMarker",
+        # Topics to be published
+        self.marker_pub = rospy.Publisher("visualization_marker",
+                                          visualization_msgs.msg.Marker,
+                                          queue_size=10)
+
+        # Service servers
+        self.publish_marker_srv   = rospy.Service("aist_skills/publishMarker",
                                                   o2as_msgs.srv.publishMarker,
-                                                  self.publishMarkerCallback)
-        self.goToNamedPoseService = rospy.Service("aist_skills/goToNamedPose",
+                                                  self.publish_marker_cb)
+        self.go_to_named_pose_srv = rospy.Service("aist_skills/goToNamedPose",
                                                   o2as_msgs.srv.goToNamedPose,
-                                                  self.goToNamedPoseCallback)
-        self.goToPoseGoalService  = rospy.Service("aist_skills/goToPoseGoal",
-                                                  o2as_msgs.srv.goToPoseGoal,
-                                                  self.goToPoseGoalCallback)
-        self.gripperCommandService = rospy.Service("aist_skills/gripperCommand",
-                                                   o2as_msgs.srv.gripperCommand,
-                                                   self.gripperCommandCallback)
-
-        # Action clients
-        # self.fge_action_client = actionlib.SimpleActionClient('aist_graspability/search_grasp_from_phoxi', aist_graspability.msg.SearchGraspFromPhoxiAction)
-        # self.fge_action_client.wait_for_server()
+                                                  self.go_to_named_pose_cb)
+        self.go_to_pose_goal_srv  = rospy.Service("aist_skills/goToPoseGoal",
+                                                  aist_msgs.srv.goToPoseGoal,
+                                                  self.go_to_pose_goal_cb)
+        self.command_gripper_srv  = rospy.Service("aist_skills/commandGripper",
+                                                  aist_msgs.srv.commandGripper,
+                                                  self.command_gripper_cb)
+        self.command_camera_srv   = rospy.Service("aist_skills/commandCamera",
+                                                  aist_msgs.srv.commandCamera,
+                                                  self.command_camera_cb)
 
         # Action servers
-        self.pickOrPlaceAction = actionlib.SimpleActionServer(
-                                        'aist_skills/pickOrPlace',
-                                        o2as_msgs.msg.pickOrPlaceAction,
-                                        execute_cb=self.pickOrPlaceCallback,
+        self.pick_or_place_action = actionlib.SimpleActionServer(
+                                        "aist_skills/pickOrPlace",
+                                        aist_msgs.msg.pickOrPlaceAction,
+                                        execute_cb=self.pick_or_place_cb,
                                         auto_start=False)
-        self.pickOrPlaceAction.start()
+        self.pick_or_place_action.start()
 
         self.listener = TransformListener()
         self.marker_id_count = 0
 
         rospy.loginfo("aist_skills server starting up!")
 
-    # publishMarker stuffs
-    def publishMarkerCallback(self, req):
-        rospy.loginfo("Received publishMarker callback.")
-        return self.publishMarker(req.marker_pose, req.marker_type)
+    # publish_marker stuffs
+    def publish_marker_cb(self, req):
+        return self._publish_marker(req.marker_pose, req.marker_type)
 
-    def publishMarker(self, marker_pose, marker_type):
-        marker = vmsg.Marker()
-        marker.header   = marker_pose.header
+    def _publish_marker(self, marker_pose, marker_type):
+        marker_prop = self.marker_props[marker_type]
+
+        marker              = visualization_msgs.msg.Marker()
+        marker.header       = marker_pose.header
         marker.header.stamp = rospy.Time.now()
-        marker.ns       = "markers"
-        marker.id       = self.marker_id_count
+        marker.ns           = "markers"
+        marker.action       = visualization_msgs.msg.Marker.ADD
+        marker.lifetime     = rospy.Duration(15.0)
+
+        if marker_prop[0]:  # Draw frame axes?
+            marker.type  = visualization_msgs.msg.Marker.ARROW
+            marker.pose  = marker_pose.pose
+            marker.scale = gmsg.Vector3(0.1, 0.01, 0.01)
+            marker.color = std_msgs.msg.ColorRGBA(1.0, 0.0, 0.0, 0.8)
+            marker.id    = self.marker_id_count
+            self.marker_id_count += 1
+            self.marker_pub.publish(marker)  # x-axis
+
+            marker.pose  = pose_rotated_by_rpy(marker_pose.pose, 0, 0, pi/2)
+            marker.color = std_msgs.msg.ColorRGBA(0.0, 1.0, 0.0, 0.8)
+            marker.id    = self.marker_id_count
+            self.marker_id_count += 1
+            self.marker_pub.publish(marker)  # y-axis
+
+            marker.pose  = pose_rotated_by_rpy(marker_pose.pose, 0, -pi/2, 0)
+            marker.color = std_msgs.msg.ColorRGBA(0.0, 0.0, 1.0, 0.8)
+            marker.id    = self.marker_id_count
+            self.marker_id_count += 1
+            self.marker_pub.publish(marker)  # z-axis
+
+        marker.type  = visualization_msgs.msg.Marker.SPHERE
+        marker.pose  = marker_pose.pose
+        marker.scale = gmsg.Vector3(*marker_prop[1])
+        marker.color = std_msgs.msg.ColorRGBA(*marker_prop[2])
+        marker.id    = self.marker_id_count
         self.marker_id_count += 1
-        marker.action   = vmsg.Marker.ADD
-        marker.pose     = marker_pose.pose
-        marker.color.a  = 0.8
-        marker.lifetime = rospy.Duration(30.0)
+        self.marker_pub.publish(marker)
 
-        if marker_type == "pose":
-            self.publishPoseMarker(marker_pose)
-            # Add a flat sphere
-            marker.type = vmsg.Marker.SPHERE
-            marker.scale.x = .01
-            marker.scale.y = .05
-            marker.scale.z = .05
-            marker.color.g = 1.0
-        elif marker_type == "pick_pose":
-            self.publishPoseMarker(marker_pose)
-            # Add a flat sphere
-            marker.type = vmsg.Marker.SPHERE
-            marker.scale.x = .01
-            marker.scale.y = .05
-            marker.scale.z = .05
-            marker.color.r = 0.8
-            marker.color.g = 0.4
-        elif marker_type == "place_pose":
-            self.publishPoseMarker(marker_pose)
-            # Add a flat sphere
-            marker.type = vmsg.Marker.SPHERE
-            marker.scale.x = .01
-            marker.scale.y = .05
-            marker.scale.z = .05
-            marker.color.g = 1.0
-        elif marker_type == "aist_vision_result":
-            # Add a sphere
-            marker.type = vmsg.Marker.SPHERE
-            marker.scale.x = .01
-            marker.scale.y = .01
-            marker.scale.z = .01
-            marker.color.r = 0.8
-            marker.color.g = 0.4
-            marker.color.b = 0.0
-        elif marker_type == "":
-            marker.type = vmsg.Marker.SPHERE
-            marker.scale.x = .02
-            marker.scale.y = .1
-            marker.scale.z = .1
-            marker.color.g = 1.0
-        else:
-            rospy.logwarn("No useful marker message received.")
-            return False
-
-        self.markerPub.publish(marker)
-        if self.marker_id_count > 50:
+        self.marker_id_count += 1
+        if self.marker_id_count == 50:
             self.marker_id_count = 0
-        return True
-
-    def publishPoseMarker(self, marker_pose):
-        marker = vmsg.Marker()
-        marker.header   = marker_pose.header
-        marker.header.stamp = rospy.Time.now()
-        marker.ns       = "markers"
-        marker.type     = vmsg.Marker.ARROW
-        marker.action   = vmsg.Marker.ADD
-        marker.scale.x  = 0.1
-        marker.scale.y  = 0.01
-        marker.scale.z  = 0.01
-        marker.color.a  = 0.8
-        marker.lifetime = rospy.Duration(30)
-
-        # This draws a TF-like frame.
-        marker.id      = self.marker_id_count
-        self.marker_id_count += 1
-        marker.pose    = marker_pose.pose
-        marker.color.r = 1.0
-        marker.color.g = 0.0
-        marker.color.b = 0.0
-        self.markerPub.publish(marker)  # x-axis
-
-        marker.id      = self.marker_id_count
-        self.marker_id_count += 1
-        marker.pose    = poseRotatedByRPY(marker_pose.pose, 0, 0, pi/2)
-        marker.color.r = 0.0
-        marker.color.g = 1.0
-        marker.color.b = 0.0
-        self.markerPub.publish(marker)  # y-axis
-
-        marker.id      = self.marker_id_count
-        self.marker_id_count += 1
-        marker.pose    = poseRotatedByRPY(marker_pose.pose, 0, -pi/2, 0)
-        marker.color.r = 0.0
-        marker.color.g = 0.0
-        marker.color.b = 1.0
-        self.markerPub.publish(marker)  # z-axis
 
         return True
 
-    def goToNamedPoseCallback(self, req):
+    def go_to_named_pose_cb(self, req):
         group = moveit_commander.MoveGroupCommander(req.planning_group)
         group.set_named_target(req.named_pose)
         group.set_max_velocity_scaling_factor(1.0)
@@ -230,25 +218,26 @@ class SkillServer(object):
         group.clear_pose_targets()
         return success
 
-    def goToPoseGoalCallback(self, req):
-        self.publishMarker(req.target_pose, "pose")
-        return self.goToPoseGoal(req.planning_group, req.target_pose,
-                                 req.speed, req.high_precision,
-                                 req.end_effector_link, req.move_lin)
+    def go_to_pose_goal_cb(self, req):
+        self._publish_marker(req.target_pose, "pose")
+        return self._go_to_pose_goal(req.robot_name, req.target_pose,
+                                     req.speed, req.high_precision,
+                                     req.end_effector_link, req.move_lin)
 
-    def goToPoseGoal(self, group_name, target_pose,
-                     speed=1.0, high_precision=False, end_effector_link="",
-                     move_lin=True):
-        rospy.loginfo("move to " + self.format_pose(target_pose))
+    def _go_to_pose_goal(self, robot_name, target_pose, speed=1.0,
+                         high_precision=False, end_effector_link="",
+                         move_lin=True):
+        rospy.loginfo("move to " + self._format_pose(target_pose))
 
         if end_effector_link == "":
-            end_effector_link = self.grippers[group_name].tip_link
-        group = moveit_commander.MoveGroupCommander(group_name)
+            end_effector_link = self.grippers[robot_name].tip_link
+
+        group = moveit_commander.MoveGroupCommander(robot_name)
         group.set_end_effector_link(end_effector_link)
         group.set_pose_target(target_pose)
         group.set_max_velocity_scaling_factor(clamp(speed, 0.0, 1.0))
 
-        res = o2as_msgs.srv.goToPoseGoalResponse()
+        res = aist_msgs.srv.goToPoseGoalResponse()
 
         if move_lin:
             pose_world = self.listener.transformPose(group.get_planning_frame(),
@@ -283,60 +272,87 @@ class SkillServer(object):
         res.current_pose = group.get_current_pose()
         res.all_close    = all_close(target_pose.pose, res.current_pose.pose,
                                      0.01)
-        rospy.loginfo("reached " + self.format_pose(res.current_pose))
+        rospy.loginfo("reached " + self._format_pose(res.current_pose))
         return res
 
-    def gripperCommandCallback(self, req):
-        gripper = self.grippers[req.group_name]
-        res     = o2as_msgs.srv.gripperCommandResponse()
-        if req.command == "pregrasp":
-            gripper.pregrasp()
-        elif req.command == "grasp":
-            gripper.grasp()
-        elif req.command == "release":
-            gripper.release()
-        res.success = True
+    def command_gripper_cb(self, req):
+        gripper     = self.grippers[req.name]
+        res         = aist_msgs.srv.commandGripperResponse()
+        if req.action == 0:
+            res.success = gripper.pregrasp(req.command)
+        elif req.action == 1:
+            res.success = gripper.grasp(req.command)
+        else:
+            res.success = gripper.release(req.command)
         return res
 
-    def pickOrPlaceCallback(self, goal):
-        gripper  = self.grippers[goal.group_name]
-        feedback = o2as_msgs.msg.pickOrPlaceFeedback()
+    def command_camera_cb(self, req):
+        camera      = self.cameras[req.name]
+        res         = aist_msgs.srv.commandCameraResponse()
+        if req.acquire:
+            res.success = camera.start_acquisition()
+        else:
+            res.success = camera.stop_acquisition()
+        return res
+
+    def search_graspability_cb(self, req):
+        gripper = self.grippers[req.robot_name]
+        camera  = self.cameras[req.camera_name]
+        camera.command("start_acquisition")
+        res     = self.graspability.search(camera.camera_info_topic,
+                                           camera.image_topic,
+                                           req.partsID, req.binID,
+                                           gripper.type)
+        camera.command("stop_acquisition")
+        return res
+
+    def pick_or_place_cb(self, goal):
+        gripper  = self.grippers[goal.robot_name]
+        feedback = aist_msgs.msg.pickOrPlaceFeedback()
 
         # Go to approach pose.
         rospy.loginfo("Go to approach pose:")
-        res = self.goToPoseGoal(
-            goal.group_name, self.gripperPose(goal.pose, goal.approach_offset),
-            goal.speed_fast if goal.pick else goal.speed_slow)
+        res = self._go_to_pose_goal(goal.robot_name,
+                                    self._gripper_target_pose(
+                                        goal.pose, goal.approach_offset),
+                                    goal.speed_fast)
         feedback.current_pose = res.current_pose
-        self.pickOrPlaceAction.publish_feedback(feedback)
+        self.pick_or_place_action.publish_feedback(feedback)
 
         # Pregrasp
         if goal.pick:
-            gripper.pregrasp()
+            gripper.pregrasp(goal.gripper_command)
 
         # Go to pick/place pose.
         rospy.loginfo("Go to pick/place pose:")
-        target_pose = self.gripperPose(goal.pose, gripper.grasp_offset)
-        self.publishMarker(target_pose,
-                           "pick_pose" if goal.pick else "place_pose")
-        res = self.goToPoseGoal(goal.group_name, target_pose, goal.speed_slow)
+        target_pose = self._gripper_target_pose(goal.pose, goal.grasp_offset)
+        self._publish_marker(target_pose,
+                             "pick_pose" if goal.pick else "place_pose")
+        res = self._go_to_pose_goal(goal.robot_name, target_pose,
+                                    goal.speed_slow)
         feedback.current_pose = res.current_pose
-        self.pickOrPlaceAction.publish_feedback(feedback)
+        self.pick_or_place_action.publish_feedback(feedback)
 
         # Grasp or release
-        res_gripper = gripper.grasp() if goal.pick else gripper.release()
+        if goal.pick:
+            res_gripper = gripper.grasp(goal.gripper_command)
+        else:
+            res_gripper = gripper.release(goal.gripper_command)
 
         # Go back to approach pose.
-        rospy.loginfo("Go back to approach pose:")
-        res = self.goToPoseGoal(
-            goal.group_name, self.gripperPose(goal.pose, goal.approach_offset),
-            goal.speed_slow if goal.pick else goal.speed_fast)
-        result = o2as_msgs.msg.pickOrPlaceResult()
+        if goal.liftup_after:
+            rospy.loginfo("Go back to approach pose:")
+            res = self._go_to_pose_goal(goal.robot_name,
+                                        self._gripper_target_pose(
+                                            goal.pose, goal.approach_offset),
+                                        goal.speed_fast)
+
+        result = aist_msgs.msg.pickOrPlaceResult()
         result.success      = res.success and res_gripper
         result.current_pose = res.current_pose
-        self.pickOrPlaceAction.set_succeeded(result)
+        self.pick_or_place_action.set_succeeded(result)
 
-    def gripperPose(self, target_pose, offset):
+    def _gripper_target_pose(self, target_pose, offset):
         T = tfs.concatenate_matrices(
                 self.listener.fromTranslationRotation(
                     (target_pose.pose.position.x,
@@ -350,15 +366,13 @@ class SkillServer(object):
                     (0, 0, offset),
                     tfs.quaternion_from_euler(0, radians(90), 0)))
 
-        gripper_pose = gmsg.PoseStamped()
-        gripper_pose.header.frame_id  = target_pose.header.frame_id
-        gripper_pose.pose = gmsg.Pose(gmsg.Point(
-                                          *tfs.translation_from_matrix(T)),
-                                      gmsg.Quaternion(
-                                          *tfs.quaternion_from_matrix(T)))
-        return gripper_pose
+        pose = gmsg.PoseStamped()
+        pose.header.frame_id  = target_pose.header.frame_id
+        pose.pose = gmsg.Pose(gmsg.Point(*tfs.translation_from_matrix(T)),
+                              gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
+        return pose
 
-    def format_pose(self, poseStamped):
+    def _format_pose(self, poseStamped):
         pose = self.listener.transformPose("workspace_center", poseStamped).pose
         rpy  = map(
             degrees,
@@ -369,7 +383,7 @@ class SkillServer(object):
             rpy[0], rpy[1], rpy[2])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     rospy.init_node("aist_skills", anonymous=True)
     try:
         node = SkillServer()

@@ -20,13 +20,23 @@ class URScriptRelay():
     def __init__(self):
         self.listener = tf.TransformListener()
         self.publishers = {
-            'b_bot':rospy.Publisher("/b_bot_controller/ur_driver/URScript", std_msgs.msg.String, queue_size=1)
+            'a_bot': rospy.Publisher("/a_bot_controller/ur_driver/URScript",
+                                     std_msgs.msg.String, queue_size=1),
+            'b_bot': rospy.Publisher("/b_bot_controller/ur_driver/URScript",
+                                     std_msgs.msg.String, queue_size=1),
+            'c_bot': rospy.Publisher("/c_bot_controller/ur_driver/URScript",
+                                     std_msgs.msg.String, queue_size=1),
+            'd_bot': rospy.Publisher("/d_bot_controller/ur_driver/URScript",
+                                     std_msgs.msg.String, queue_size=1),
         }
-        rospy.sleep(0.5) # Wait for the publishers to be registered and the listener to receive 
-        
+
+         # Wait for the publishers to be registered and the listener to receive
+        rospy.sleep(0.5)
+
         self.rospack = rospkg.RosPack()
         self.read_templates()
-        s = rospy.Service('aist_skills/sendScriptToUR', o2as_msgs.srv.sendScriptToUR, self.srv_callback)
+        s = rospy.Service('aist_skills/sendScriptToUR',
+                          o2as_msgs.srv.sendScriptToUR, self.srv_callback)
 
         # Main while loop.
         while not rospy.is_shutdown():
@@ -34,7 +44,8 @@ class URScriptRelay():
 
     # Create a callback function for the service.
     def srv_callback(self, req):
-        # Interpret the service parameters, construct the program, send it to the UR
+        # Interpret the service parameters, construct the program,
+        # send it to the UR
         if not req.robot_name:
             rospy.logerr("robot_name was not defined in the service call to sendScriptToUR!")
             return False
@@ -58,7 +69,7 @@ class URScriptRelay():
 
             ### Function definitions, for reference:
             ### rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 )
-            
+
             program_back += "    rq_zero_sensor()\n"
             program_back += "    textmsg(\"Approaching linearly.\")\n"
             program_back += "    rq_linear_search(\"" + req.force_direction + "\"," \
