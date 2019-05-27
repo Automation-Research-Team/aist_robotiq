@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 # Declare the message files to be built
-add_message_files(DIRECTORY msg)
+#add_message_files(DIRECTORY msg)
 
 add_service_files(DIRECTORY srv)
 
