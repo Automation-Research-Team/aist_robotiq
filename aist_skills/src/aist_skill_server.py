@@ -87,10 +87,10 @@ class SkillServer(object):
                 "a_phoxi_m_camera": PhoXiCamera("a_phoxi_m_camera"),
                 "a_bot_camera":     RealsenseCamera("a_bot_camera"),
             }
-            self.graspability = GraspabilityClient()
+            self.graspabilityClient = GraspabilityClient()
             self.search_graspability_srv \
                 = rospy.Service("aist_skills/searchGraspability",
-                                aist_graspability.srv.searchGraspability,
+                                aist_msgs.srv.searchGraspability,
                                 self.search_graspability_cb)
         else:
             self.grippers = {
@@ -123,7 +123,7 @@ class SkillServer(object):
                                         "/a_bot_camera/rgb/camera_info",
                                         "/a_bot_camera/depth/points"),
             }
-            self.graspability = None
+            self.graspabilityClient = None
             self.search_graspability_srv = None
 
         # Topics to be published
@@ -141,9 +141,15 @@ class SkillServer(object):
         self.go_to_pose_goal_srv  = rospy.Service("aist_skills/goToPoseGoal",
                                                   aist_msgs.srv.goToPoseGoal,
                                                   self.go_to_pose_goal_cb)
+        self.get_gripper_info_srv = rospy.Service("aist_skills/getGripperInfo",
+                                                  aist_msgs.srv.getGripperInfo,
+                                                  self.get_gripper_info_cb)
         self.command_gripper_srv  = rospy.Service("aist_skills/commandGripper",
                                                   aist_msgs.srv.commandGripper,
                                                   self.command_gripper_cb)
+        self.get_camera_info_srv  = rospy.Service("aist_skills/getCameraInfo",
+                                                  aist_msgs.srv.getCameraInfo,
+                                                  self.get_gripper_info_cb)
         self.command_camera_srv   = rospy.Service("aist_skills/commandCamera",
                                                   aist_msgs.srv.commandCamera,
                                                   self.command_camera_cb)
@@ -204,8 +210,7 @@ class SkillServer(object):
         self.marker_id_count += 1
         self.marker_pub.publish(marker)
 
-        self.marker_id_count += 1
-        if self.marker_id_count == 50:
+        if self.marker_id_count == 100:
             self.marker_id_count = 0
 
         return True
@@ -275,9 +280,19 @@ class SkillServer(object):
         rospy.loginfo("reached " + self._format_pose(res.current_pose))
         return res
 
+    # Gripper stuffs
+    def get_gripper_info_cb(self, req):
+        gripper = self.grippers[req.name]
+        res     = aist_msgs.srv.getGripperInfoResponse()
+        res.gripper_type = gripper.gripper_type
+        res.base_link    = gripper.base_link
+        res.tip_link     = gripper.tip_link
+        res.success      = True
+        return res
+
     def command_gripper_cb(self, req):
-        gripper     = self.grippers[req.name]
-        res         = aist_msgs.srv.commandGripperResponse()
+        gripper = self.grippers[req.name]
+        res     = aist_msgs.srv.commandGripperResponse()
         if req.action == 0:
             res.success = gripper.pregrasp(req.command)
         elif req.action == 1:
@@ -286,26 +301,46 @@ class SkillServer(object):
             res.success = gripper.release(req.command)
         return res
 
+    # Camera stuffs
+    def get_camera_info_cb(self, req):
+        camera = self.cameras[req.name]
+        res    = aist_msgs.srv.getCameraInfoResponse()
+        res.camera_type       = camera.camera_type
+        res.camera_info_topic = camera.camera_info_topic
+        res.image_topic       = camera.image_topic
+        res.success           = True
+        return res
+
     def command_camera_cb(self, req):
-        camera      = self.cameras[req.name]
-        res         = aist_msgs.srv.commandCameraResponse()
+        camera = self.cameras[req.name]
+        res    = aist_msgs.srv.commandCameraResponse()
         if req.acquire:
             res.success = camera.start_acquisition()
         else:
             res.success = camera.stop_acquisition()
         return res
 
+    # Graspability stuffs
     def search_graspability_cb(self, req):
         gripper = self.grippers[req.robot_name]
         camera  = self.cameras[req.camera_name]
-        camera.command("start_acquisition")
-        res     = self.graspability.search(camera.camera_info_topic,
+
+        camera.start_acquisition()
+        (poses, rotipz, gscore, success) = \
+            self.graspabilityClient.search(camera.camera_info_topic,
                                            camera.image_topic,
-                                           req.partsID, req.binID,
-                                           gripper.type)
-        camera.command("stop_acquisition")
+                                           gripper.gripper_type,
+                                           req.part_id, req.bin_id, req.dir_path)
+        camera.stop_acquisition()
+
+        res = aist_msgs.srv.searchGraspabilityResponse()
+        res.poses   = poses
+        res.rotipz  = rotipz
+        res.gscore  = gscore
+        res.success = success
         return res
 
+    # Various actions
     def pick_or_place_cb(self, goal):
         gripper  = self.grippers[goal.robot_name]
         feedback = aist_msgs.msg.pickOrPlaceFeedback()

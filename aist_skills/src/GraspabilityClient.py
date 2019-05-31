@@ -89,46 +89,49 @@ class GraspabilityClient(object):
         req.dir_path    = dir_path
         return self.createMaskImage.call(req)
 
-    def search(self, camera_info_topic, image_topic, part_id, bin_id,
-               gripper_type, dir_path):
+    def search(self, camera_info_topic, image_topic, gripper_type,
+               part_id, bin_id, dir_path):
         parts_prop = parts_props[part_id]
         rospy.loginfo("search graspabilities for " + parts_prop.name)
 
         try:
             (K, D) = self._get_camera_intrinsics(camera_info_topic)
+            res = self.searchGraspability(image_topic, gripper_type,
+                                          part_id, bin_id, dir_parh)
 
-            req = asrv.searchGraspabilityRequest()
-            req.image_topic  = image_topic
-            req.part_id      = part_id
-            req.bin_id       = bin_id
-            req.gripper_type = gripper_type
-            req.dir_path     = dir_path
-            res = self.searchGraspability.call(req)
+            poses = gmsg.PoseArray()
+            poses.header = res.header
+            for i in range(len(res.pos3D)):
+                (x, y, z) = self._back_project_pixel(res.pos3D[i], K, D)
+                pose = gmsg.Pose((x, y, z), )
+                poses.poses.append(pose)
+            return ([], [], [], res.success)
+
         except rospy.ROSException:
             rospy.logerr("wait_for_message(): Timeout expired!")
-            return False
-        return True
+            return (None, None, None, False)
 
     def _get_camera_intrinsics(camera_info_topic):
-        cinfo_msg = rospy.wait_for_message(camera_info_topic,
-                                           smsg.Camerainfo, timeout=10.0)
-        return (np.array(cinfo_msg.K).reshape((3, 3)), np.array(cinfo_msg.D))
+        camera_info = rospy.wait_for_message(camera_info_topic,
+                                             smsg.Camerainfo, timeout=10.0)
+        return (np.array(camera_info.K).reshape((3, 3)),
+                np.array(camera_info.D))
 
-
-    def _back_project_pixel(self, u, v, d, K, D):
+    def _back_project_pixel(self, uvd, K, D):
         """
         convert graspability result pixel value to distance.
         """
 
-        rospy.logdebug("pixel point and depth: %f, %f, %f" % (u, v, d))
+        rospy.logdebug("pixel point and depth: %f, %f, %f" %
+                       (uvd[0], uvd[1], uvd[2]))
         # z = d
         # x = (u - self.cx) * d / self.fx
         # y = (v - self.cy) * d / self.fy
-        distorted_uv = np.array([[[u,v]]], dtype=np.float32)
+        distorted_uv = np.array([[[uvd[0], uvd[1]]]], dtype=np.float32)
         undistorted_xy = cv2.undistortPoints(distorted_uv, K, D)
         normalized_x = undistorted_xy[0,0,0]
         normalized_y = undistorted_xy[0,0,1]
-        z = d
+        z = uvd[2]
         x = normalized_x * z
         y = normalized_y * z
         rospy.logdebug("spatial position: %f, %f, %f" % (x, y, z))

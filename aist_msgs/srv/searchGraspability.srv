@@ -1,0 +1,12 @@
+# Request definition
+string robot_name
+string camera_name
+int32  part_id
+int32  bin_id
+string dir_path
+---
+# Response definition
+geometry_msgs/PoseArray poses
+float32[] rotipz # gripper rotation
+float32[] gscore
+bool success
