@@ -38,7 +38,7 @@ class ToolCalibrationRoutines:
         # Set `_ee_link` as end effector wrt `_base_link` of the robot
         self.group.set_pose_reference_frame('workspace_center')
         (_, gripper_base_link, gripper_tip_link, _) = \
-            self.routine.get_gripper_info(robot_name)
+            self.routines.get_gripper_info(robot_name)
         # if robot_name == 'b_bot':
         #     gripper_base_link = robot_name + '_single_suction_gripper_base_link'
         #     gripper_tip_link  = robot_name + '_single_suction_gripper_pad_link'
@@ -48,6 +48,8 @@ class ToolCalibrationRoutines:
         # else:
         #     gripper_base_link = robot_name + '_robotiq_85_base_link'
         #     gripper_tip_link  = robot_name + '_robotiq_85_tip_link'
+        print("gripper_base_link = " + gripper_base_link)
+        print("gripper_tip_link  = " + gripper_tip_link)
         self.gripper_base_link = gripper_base_link
         self.group.set_end_effector_link(gripper_tip_link)
 
@@ -163,7 +165,8 @@ class ToolCalibrationRoutines:
 
     def print_tip_link(self):
         R   = self.listener.fromTranslationRotation(
-                (0, 0, 0), tfs.quaternion_from_euler(0, self.pitch, self.yaw))
+                (0, 0, 0),
+                tfs.quaternion_from_euler(0, self.pitch, self.yaw))
         D   = tfs.concatenate_matrices(R, self.D0)
         xyz = tfs.translation_from_matrix(D)
         q   = tfs.quaternion_from_matrix(D)
@@ -182,11 +185,11 @@ class ToolCalibrationRoutines:
         self.routines.release(self.group.get_name())
 
     def pick(self):
-        print("   approach to " + self.format_pose(self.pick_pose))
+        print("   pick at " + self.format_pose(self.pick_pose))
         self.routines.pick(self.group.get_name(), self.pick_pose)
 
     def place(self):
-        print("   approach to " + self.format_pose(self.pick_pose))
+        print("  place at " + self.format_pose(self.pick_pose))
         self.routines.place(self.group.get_name(), self.place_pose)
 
     def run(self):
