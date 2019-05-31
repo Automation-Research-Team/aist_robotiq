@@ -18,5 +18,5 @@
     <param name="operation_mode"  type="string" value="$(arg operation_mode)"/>
   </node>
 
-  <include file="$(find aist_graspability)/launch/aist_graspability.launch"/>
+  <!-- <include file="$(find aist_graspability)/launch/aist_graspability.launch"/> -->
 </launch>

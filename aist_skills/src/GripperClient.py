@@ -34,7 +34,7 @@ class GripperClient(object):
 
     @property
     def base_link(self):
-        return self._tip_link
+        return self._base_link
 
     @property
     def tip_link(self):

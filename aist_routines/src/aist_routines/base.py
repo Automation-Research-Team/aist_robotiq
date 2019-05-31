@@ -138,7 +138,7 @@ class AISTBaseRoutines(object):
         return
 
     def go_to_named_pose(self, named_pose, group_name):
-        return self.goToNamedPose(group_name, named_pose)
+        return self.goToNamedPose(named_pose, group_name)
 
     def go_to_pose_goal(self, robot_name, target_pose, speed=1.0,
                         high_precision=False, end_effector_link="",
