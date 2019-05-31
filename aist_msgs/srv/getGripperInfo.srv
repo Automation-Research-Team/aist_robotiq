@@ -1,0 +1,8 @@
+# Request
+string name     # gripper name
+---
+# Response
+string gripper_type
+string base_link
+string tip_link
+bool success

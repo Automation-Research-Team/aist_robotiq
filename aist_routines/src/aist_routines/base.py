@@ -93,8 +93,12 @@ class AISTBaseRoutines(object):
                                                  aist_msgs.srv.goToPoseGoal)
         self.sendScriptToUR = rospy.ServiceProxy('/o2as_skills/sendScriptToUR',
                                                  o2as_msgs.srv.sendScriptToUR)
+        self.getGripperInfo = rospy.ServiceProxy('/aist_skills/getGripperInfo',
+                                                 aist_msgs.srv.getGripperInfo)
         self.commandGripper = rospy.ServiceProxy('/aist_skills/commandGripper',
                                                  aist_msgs.srv.commandGripper)
+        self.getCameraInfo  = rospy.ServiceProxy('/aist_skills/getCameraInfo',
+                                                 aist_msgs.srv.getCameraInfo)
         self.commandCamera  = rospy.ServiceProxy('/aist_skills/commandCamera',
                                                  aist_msgs.srv.commandCamera)
 
@@ -134,56 +138,41 @@ class AISTBaseRoutines(object):
         return
 
     def go_to_named_pose(self, named_pose, group_name):
-        req = o2as_msgs.srv.goToNamedPoseRequest()
-        req.planning_group = group_name
-        req.named_pose     = named_pose
-        return self.goToNamedPose.call(req)
+        return self.goToNamedPose(group_name, named_pose)
 
     def go_to_pose_goal(self, robot_name, target_pose, speed=1.0,
                         high_precision=False, end_effector_link="",
                         move_lin=False):
-        req = aist_msgs.srv.goToPoseGoalRequest()
-        req.robot_name        = robot_name
-        req.target_pose       = target_pose
-        req.speed             = speed
-        req.high_precision    = high_precision
-        req.end_effector_link = end_effector_link
-        req.move_lin          = move_lin
-        return self.goToPoseGoal.call(req)
+        return self.goToPoseGoal(robot_name, target_pose, speed,
+                                 high_precision, end_effector_link, move_lin)
+
+    # Gripper stuffs
+    def get_gripper_info(self, robot_name):
+        res = self.getGripperInfo(robot_name)
+        return (res.gripper_type, res.base_link, res.tip_link, res.success)
 
     def pregrasp(self, robot_name, command=""):
-        req = aist_msgs.srv.commandGripperRequest()
-        req.name    = robot_name
-        req.action  = 0
-        req.command = command
-        return self.commandGripper.call(req)
+        return self.commandGripper(robot_name, 0, command).success
 
     def grasp(self, robot_name, command=""):
-        req = aist_msgs.srv.commandGripperRequest()
-        req.name    = robot_name
-        req.action  = 1
-        req.command = command
-        return self.commandGripper.call(req)
+        return self.commandGripper(robot_name, 1, command).success
 
     def release(self, robot_name, command=""):
-        req = aist_msgs.srv.commandGripperRequest()
-        req.name    = robot_name
-        req.action  = 2
-        req.command = command
-        return self.commandGripper.call(req)
+        return self.commandGripper(robot_name, 2, command).success
+
+    # Camera stuffs
+    def get_camera_info(self, camera_name):
+        res = self.getCameraInfo(camera_name)
+        return (res.camera_type, res.camera_info_topic,
+                res.image_topic, res.success)
 
     def start_acquisition(self, camera_name):
-        req = aist_msgs.srv.commandCameraRequest()
-        req.name    = camera_name
-        req.acquire = True
-        return self.commandCamera.call(req)
+        return self.commandCamera(camera_name, True).success
 
     def stop_acquisition(self, camera_name):
-        req = aist_msgs.srv.commandCameraRequest()
-        req.name    = camera_name
-        req.acquire = False
-        return self.commandCamera.call(req)
+        return self.commandCamera(camera_name, False).success
 
+    # Various actions
     def pick(self, robot_name, pose_stamped, grasp_offset=0.0,
              gripper_command="close",
              speed_fast=1.0, speed_slow=0.1, approach_offset=0.05,

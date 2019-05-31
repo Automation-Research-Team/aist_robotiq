@@ -37,15 +37,17 @@ class ToolCalibrationRoutines:
 
         # Set `_ee_link` as end effector wrt `_base_link` of the robot
         self.group.set_pose_reference_frame('workspace_center')
-        if robot_name == 'b_bot':
-            gripper_base_link = robot_name + '_single_suction_gripper_base_link'
-            gripper_tip_link  = robot_name + '_single_suction_gripper_pad_link'
-        elif robot_name == 'd_bot':
-            gripper_base_link = robot_name + '_dual_suction_gripper_base_link'
-            gripper_tip_link  = robot_name + '_dual_suction_gripper_pad_link'
-        else:
-            gripper_base_link = robot_name + '_robotiq_85_base_link'
-            gripper_tip_link  = robot_name + '_robotiq_85_tip_link'
+        (_, gripper_base_link, gripper_tip_link, _) = \
+            self.routine.get_gripper_info(robot_name)
+        # if robot_name == 'b_bot':
+        #     gripper_base_link = robot_name + '_single_suction_gripper_base_link'
+        #     gripper_tip_link  = robot_name + '_single_suction_gripper_pad_link'
+        # elif robot_name == 'd_bot':
+        #     gripper_base_link = robot_name + '_dual_suction_gripper_base_link'
+        #     gripper_tip_link  = robot_name + '_dual_suction_gripper_pad_link'
+        # else:
+        #     gripper_base_link = robot_name + '_robotiq_85_base_link'
+        #     gripper_tip_link  = robot_name + '_robotiq_85_tip_link'
         self.gripper_base_link = gripper_base_link
         self.group.set_end_effector_link(gripper_tip_link)
 
