@@ -39,10 +39,10 @@ class CameraClient(object):
     def image_topic(self):
         return self._image_topic
 
-    def start_acquisiton(self):
+    def start_acquisition(self):
         return True
 
-    def stop_acquisiton(self):
+    def stop_acquisition(self):
         return True
 
 

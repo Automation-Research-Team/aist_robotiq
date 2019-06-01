@@ -1,47 +1,3 @@
-/****************************************************************************
- *
- * $Id: file.h 3496 2011-11-22 15:14:32Z fnovotny $
- *
- * This file is part of the ViSP software.
- * Copyright (C) 2005 - 2012 by INRIA. All rights reserved.
- *
- * This software is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * ("GPL") version 2 as published by the Free Software Foundation.
- * See the file LICENSE.txt at the root directory of this source
- * distribution for additional information about the GNU GPL.
- *
- * For using ViSP with software that can not be combined with the GNU
- * GPL, please contact INRIA about acquiring a ViSP Professional
- * Edition License.
- *
- * See http://www.irisa.fr/lagadic/visp/visp.html for more information.
- *
- * This software was developed at:
- * INRIA Rennes - Bretagne Atlantique
- * Campus Universitaire de Beaulieu
- * 35042 Rennes Cedex
- * France
- * http://www.irisa.fr/lagadic
- *
- * If you have questions regarding the use of this file, please contact
- * INRIA at visp@inria.fr
- *
- * This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
- * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
- *
- * Contact visp@irisa.fr if any conditions of this licensing are
- * not clear to you.
- *
- * Description:
- * Calibrator node
- *
- * Authors:
- * Filip Novotny
- *
- *
- *****************************************************************************/
-
 /*!
   \file		Calibrator.h
   \brief	Calibrator node implementing a quick compute service, a compute service and 2 subscribers to world_effector_topic and camera_object_topic.
@@ -50,18 +6,14 @@
 #ifndef CALIBRATOR_H
 #define CALIBRATOR_H
 
-#include "ros/ros.h"
+#include <ros/ros.h>
+#include <tf/transform_listener.h>
+#include <std_srvs/Empty.h>
+#include <std_srvs/Trigger.h>
+#include <o2as_easy_handeye/GetSampleList.h>
+#include <o2as_easy_handeye/ComputeCalibration.h>
 
-#include "Transform.h"
-#include "visp_hand2eye_calibration/TransformArray.h"
-#include "visp_hand2eye_calibration/compute_effector_camera_quick.h"
-#include "visp_hand2eye_calibration/compute_effector_camera.h"
-#include "visp_hand2eye_calibration/reset.h"
-#include "image_proc/advertisement_checker.h"
-
-#include <vector>
-
-namespace visp_hand2eye_calibration
+namespace o2as_easy_handeye
 {
 /************************************************************************
 *  class Calibrator							*
@@ -69,78 +21,48 @@ namespace visp_hand2eye_calibration
 class Calibrator
 {
   public:
-    using transform_t	= TU::Transform<double>;
-    
+    using transformMsg_t	= geometry_msgs::TransformStamped;
+
   public:
-  //! advertises services and subscribes to topics
 		Calibrator();
 		~Calibrator();
 
-  //! spins the ros node
     void	spin();
-    
+
   private:
-  /*!
-    \brief callback corresponding to the camera->object topic.
+    const std::string&	camera_frame()				const	;
+    const std::string&	effector_frame()			const	;
+    const std::string&	object_frame()				const	;
+    const std::string&	world_frame()				const	;
 
-    Adds a geometry_msgs::Transform to the internal queue. 
-    A service may compute the calibration on all recieved elements later.
-    \param trans: camera->object transformation
-  */
-    void	cameraObjectCallback(
-		    const geometry_msgs::Transform::ConstPtr& trans);
-  /*!
-    \brief callback corresponding to the world->effector topic.
+    bool	get_sample_list(GetSampleList::Request&  req,
+				GetSampleList::Response& res)		;
+    bool	take_sample(std_srvs::Trigger::Request&  req,
+			    std_srvs::Trigger::Response& res)		;
+    bool	compute_calibration(ComputeCalibration::Request&  req,
+				    ComputeCalibration::Response& res)	;
+    bool	save_calibration(std_srvs::Trigger::Request&  req,
+				 std_srvs::Trigger::Response& res)	;
+    bool	reset(std_srvs::Empty::Request&,
+		      std_srvs::Empty::Response&)			;
 
-    Adds a geometry_msgs::Transform to the internal queue. 
-    A service may compute the calibration on all recieved elements later.
-    \param trans: world->effector transformation
-  */
-    void	worldEffectorCallback(
-		    const geometry_msgs::Transform::ConstPtr& trans);
+  private:
+    ros::NodeHandle		_node;
 
-  /*!
-    \brief service computing world->effector transformation from
-    accumulated data. The service expects the number of recorded
-    camera->object transformation to be equal to the number
-    of recorded world->effector transformations.
-    If it is not equal, the service fails.
-  */
-    bool	computeEffectorCameraCallback(
-		    compute_effector_camera::Request&  req,
-		    compute_effector_camera::Response& res)		;
+    const ros::ServiceServer	_get_sample_list_srv;
+    const ros::ServiceServer	_take_sample_srv;
+    const ros::ServiceServer	_compute_calibration_srv;
+    const ros::ServiceServer	_save_calibration_srv;
+    const ros::ServiceServer	_reset_srv;
 
-  /*!
-    \brief service computing world->effector transformation
-    from parameter-passed data. The service expects the number
-    of recorded camera->object transformation to be equal
-    to the number of recorded world->effector transformations.
-    If it is not equal, the service fails.
-  */
-    bool	computeEffectorCameraQuickCallback(
-		    compute_effector_camera_quick::Request&  req,
-		    compute_effector_camera_quick::Response& res)	;
-  /*!
-    \brief service reseting the acumulated data
-  */
-    bool	resetCallback(reset::Request& req, reset::Response& res);
-    
-  private:    
-  //subscribers. Must be class-persistant
-    ros::NodeHandle			_node;
-    
-    const ros::ServiceServer		_computeEffectorCamera;
-    const ros::ServiceServer		_computeEffectorCameraQuick;
-    const ros::ServiceServer		_reset;
-    ros::Subscriber			_cMo_subscriber;
-    ros::Subscriber			_wMe_subscriber;
-    image_proc::AdvertisementChecker	_check_inputs;
+    tf::TransformListener	_listener;
 
-    std::vector<transform_t>		_cMo;
-    std::vector<transform_t>		_wMe;
+    std::vector<transformMsg_t>	_cMo;	//!< in:  camera <- object   transform
+    std::vector<transformMsg_t>	_wMe;	//!< in:  world  <- effector transform
+    transformMsg_t		_eMc;	//!< out: effector <- camera transform
+    transformMsg_t		_wMo;	//!< out: world    <- object transform
 
-    size_t				_queue_size;
+    double			_timeout;
 };
 }	// namespace visp_hnad2eye_calibration
 #endif	// !CALIBRATOR_H
-

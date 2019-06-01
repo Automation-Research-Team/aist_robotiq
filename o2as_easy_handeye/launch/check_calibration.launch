@@ -9,7 +9,7 @@
   <arg name="eye_on_hand"
        value="$(eval arg('camera_name') == arg('robot_name') + '_camera')"/>
 
-  <include file="$(find o2as_easy_handeye)/launch/o2as_publish.launch">
+  <include file="$(find o2as_easy_handeye)/launch/publish.launch">
     <arg name="robot_name"	value="$(arg robot_name)" />
     <arg name="camera_name"	value="$(arg camera_name)" />
   </include>

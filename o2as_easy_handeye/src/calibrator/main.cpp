@@ -54,7 +54,7 @@ int
 main(int argc, char **argv)
 {
     ros::init(argc, argv, "calibrator");
-    visp_hand2eye_calibration::Calibrator().spin();
+    o2as_easy_handeye::Calibrator().spin();
 
     return 0;
 }

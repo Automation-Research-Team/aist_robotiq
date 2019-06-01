@@ -9,7 +9,7 @@ from std_srvs.srv import Empty, Trigger
 from geometry_msgs import msg as gmsg
 from tf import TransformListener, transformations as tfs
 
-from easy_handeye.srv import TakeSample, RemoveSample, ComputeCalibration
+from o2as_easy_handeye.srv import GetSampleList, ComputeCalibration
 
 from o2as_routines.base import O2ASBaseRoutines
 from aist_routines.base import AISTBaseRoutines
@@ -188,29 +188,27 @@ keyposes = {
 class HandEyeCalibrationRoutines:
     def __init__(self, routines, camera_name, robot_name, speed, sleep_time,
                  needs_calib):
-        self.routines = routines
+        self.routines    = routines
         self.camera_name = camera_name
-        self.speed = speed
-        self.sleep_time = sleep_time
+        self.speed       = speed
+        self.sleep_time  = sleep_time
 
         if needs_calib:
             ns = "/{}_from_{}/".format(camera_name, robot_name)
-            self.take_sample = rospy.ServiceProxy(ns + "take_sample",
-                                                  TakeSample)
             self.get_sample_list = rospy.ServiceProxy(ns + "get_sample_list",
-                                                      TakeSample)
-            self.remove_sample = rospy.ServiceProxy(ns + "remove_sample",
-                                                    RemoveSample)
+                                                      GetSampleList)
+            self.take_sample = rospy.ServiceProxy(ns + "take_sample", Trigger)
             self.compute_calibration = rospy.ServiceProxy(
                 ns + "compute_calibration", ComputeCalibration)
             self.save_calibration = rospy.ServiceProxy(ns + "save_calibration",
-                                                       Empty)
+                                                       Trigger)
+            self.reset = rospy.ServiceProxy(ns + "reset", Empty)
         else:
-            self.take_sample = None
-            self.get_sample_list = None
-            self.remove_sample = None
+            self.get_sample_list     = None
+            self.take_sample         = None
             self.compute_calibration = None
-            self.save_calibration = None
+            self.save_calibration    = None
+            self.reset               = None
 
         ## Initialize `moveit_commander`
         self.group = moveit_commander.MoveGroupCommander(robot_name)
@@ -273,8 +271,7 @@ class HandEyeCalibrationRoutines:
         if self.take_sample:
             try:
                 self.take_sample()
-                sample_list = self.get_sample_list()
-                n = len(sample_list.samples.hand_world_samples.transforms)
+                n = len(self.get_sample_list().cMo)
                 print(
                     "  took {} (hand-world, camera-marker) samples").format(n)
                 success = True
@@ -330,12 +327,8 @@ class HandEyeCalibrationRoutines:
     def run(self, initpose, keyposes):
         self.routines.stop_acquisition(self.camera_name)
 
-        if self.get_sample_list:
-            n_samples = len(
-                self.get_sample_list().samples.hand_world_samples.transforms)
-            if 0 < n_samples:
-                for _ in range(n_samples):
-                    self.remove_sample(0)
+        if self.reset:
+            self.reset()
 
         # Reset pose
         self.go_home()
@@ -353,7 +346,8 @@ class HandEyeCalibrationRoutines:
                 i + 1, len(keyposes)))
 
         if self.compute_calibration:
-            self.compute_calibration()
+            res = self.compute_calibration()
+            print(res.message)
             self.save_calibration()
 
         # Reset pose
