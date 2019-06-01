@@ -66,10 +66,10 @@ class Robotiq85Gripper(GripperClient):
         super(Robotiq85Gripper, self).__init__(str(prefix) +
                                                "robotiq_85_gripper",
                                                "two-finger",
-                                               str(prefix) +
-                                               "robotiq_85_base_link",
-                                               str(prefix) +
-                                               "robotiq_85_tip_link",
+                                               str(prefix)
+                                                 + "robotiq_85_base_link",
+                                               str(prefix)
+                                                 + "robotiq_85_tip_link",
                                                timeout)
         self._client = actionlib.SimpleActionClient(
                            str(prefix) + "gripper/gripper_action_controller",
@@ -126,10 +126,10 @@ class SuctionGripper(GripperClient):
                  timeout=2.0):
         super(SuctionGripper, self).__init__(str(prefix) + "suction_gripper",
                                              "suction",
-                                             str(prefix) +
-                                             "suction_gripper_base_link",
-                                             str(prefix) +
-                                             "suction_gripper_pad_link",
+                                             str(prefix)
+                                               + "suction_gripper_base_link",
+                                             str(prefix)
+                                               + "suction_gripper_pad_link",
                                              timeout)
         self._client    = actionlib.SimpleActionClient(
                               "o2as_fastening_tools/suction_control",
@@ -187,12 +187,12 @@ class SuctionGripper(GripperClient):
 class PrecisionGripper(GripperClient):
     def __init__(self, prefix="a_bot_", timeout=3.0):
         super(PrecisionGripper, self).__init__(str(prefix) +
-                                               "precision_gripper",
+                                               "gripper",
                                                "two-finger",
-                                               str(prefix) +
-                                               "precision_gripper_base_link",
-                                               str(prefix) +
-                                               "precision_gripper_tip_link",
+                                               str(prefix)
+                                                 + "gripper_base_link",
+                                               str(prefix)
+                                                 + "gripper_tip_link",
                                                timeout)
         self._client = actionlib.SimpleActionClient(
                            str(prefix) + "gripper/gripper_action_controller",
