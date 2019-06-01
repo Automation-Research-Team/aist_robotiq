@@ -9,7 +9,7 @@ $ roslaunch o2as_gazebo o2as_gazebo.launch
 
 2-1: Launch services for calibration
 ```bash
-$ roslaunch o2as_easy_handeye o2as_calibrate.launch camera_name:=$CAMERA_NAME robot_name=$ROBOT_NAME
+$ roslaunch o2as_easy_handeye calibrate.launch camera_name:=$CAMERA_NAME robot_name=$ROBOT_NAME
 ```
 After robots appear in the screen, open the RViz config file `o2as_easy_handeye.rviz`. Then the marker tracker and the hand-eye calibrator start.
 
@@ -20,7 +20,7 @@ $ rosrun o2as_easy_handeye run_handeye_calibration.py $CAMERA_NAME $ROBOT_NAME n
 
 2-3: Publish the estimated camera frames, loaded from the calibration files:
 ```bash
-$ roslaunch o2as_easy_handeye o2as_publish_handeye.launch camera_name:=$CAMERA_NAME robot_name=$ROBOT_NAME
+$ roslaunch o2as_easy_handeye publish.launch camera_name:=$CAMERA_NAME robot_name=$ROBOT_NAME
 ```
 Estimated parameters are stored in `~/.ros/easy_handeye/o2as_easy_handeye_$ROBOT_NAME_eye_on[base|hand].yaml`.
 

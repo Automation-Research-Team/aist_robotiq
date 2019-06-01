@@ -57,7 +57,6 @@
   <depend>std_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>std_srvs</depend>
-  <depend>visp_hand2eye_calibration</depend>
   <depend>sensor_msgs</depend>
   <depend>opencv2</depend>
   <depend>cv_bridge</depend>

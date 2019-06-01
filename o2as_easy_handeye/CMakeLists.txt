@@ -8,13 +8,14 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   image_proc
   image_transport
-  geometry_msgs
-  sensor_msgs
-  std_msgs
   std_srvs
+  std_msgs
+  sensor_msgs
+  geometry_msgs
   cv_bridge
-  visp_hand2eye_calibration
   message_generation
+  dynamic_reconfigure
+  tf
   pcl_ros
   pcl_conversions
 )
@@ -28,6 +29,16 @@ generate_dynamic_reconfigure_options(
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
+add_service_files(DIRECTORY srv)
+
+generate_messages(
+  DEPENDENCIES
+  std_srvs
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+)
+
 catkin_package()
 
 ###########
@@ -38,14 +49,13 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
   src/calibrator
 )
+
 add_executable(calibrator
   src/calibrator/main.cpp
   src/calibrator/Calibrator.cpp
   src/calibrator/Calibrator.h
   src/calibrator/Transform.h
   src/calibrator/HandeyeCalibration.h
-  src/calibrator/names.cpp
-  src/calibrator/names.h
 )
 
 target_link_libraries(calibrator
