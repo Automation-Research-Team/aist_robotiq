@@ -20,12 +20,25 @@ import o2as_msgs.msg
 import aist_graspability.msg
 
 
+######################################################################
+#  global variables                                                  #
+######################################################################
 rp = rospkg.RosPack()
 
 ts = time.time()
 start_date_time = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d_%H-%M-%S')
 number_of_attempted = 1
 
+######################################################################
+#  global functions                                                  #
+######################################################################
+def clamp(n, minn, maxn):
+    """Constrain a number n to the interval [minn, maxn]"""
+    return min(max(n, minn), maxn)
+
+######################################################################
+#  class kitting_order_entry                                         #
+######################################################################
 class kitting_order_entry():
     """
     Object that tracks if its order was fulfilled, and the number of attempts spent on it.
@@ -44,10 +57,9 @@ class kitting_order_entry():
         self.fulfilled = False
         self.in_feeder = False
 
-def clamp(n, minn, maxn):
-    """Constrain a number n to the interval [minn, maxn]"""
-    return min(max(n, minn), maxn)
-
+######################################################################
+#  class AISTBaseRoutines                                            #
+######################################################################
 class KittingClass(AISTBaseRoutines):
     """Implements kitting routines for aist robot system."""
 

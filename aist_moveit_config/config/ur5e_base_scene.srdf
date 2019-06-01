@@ -44,6 +44,14 @@
         <joint name="c_bot_wrist_2_joint" value="1.57082" />
         <joint name="c_bot_wrist_3_joint" value="0" />
     </group_state>
+    <group_state name="back" group="c_bot">
+        <joint name="a_bot_elbow_joint" value="1" />
+        <joint name="a_bot_shoulder_lift_joint" value="-2.4" />
+        <joint name="a_bot_shoulder_pan_joint" value="1.57" />
+        <joint name="a_bot_wrist_1_joint" value="-0.85" />
+        <joint name="a_bot_wrist_2_joint" value="-1.57" />
+        <joint name="a_bot_wrist_3_joint" value="0" />
+    </group_state>
     <group_state name="home" group="d_bot">
         <joint name="d_bot_shoulder_pan_joint" value="1.5708" />
         <joint name="d_bot_shoulder_lift_joint" value="-2.1" />
@@ -59,6 +67,14 @@
         <joint name="d_bot_wrist_1_joint" value="-2.36605" />
         <joint name="d_bot_wrist_2_joint" value="1.5708" />
         <joint name="d_bot_wrist_3_joint" value="0" />
+    </group_state>
+    <group_state name="back" group="d_bot">
+        <joint name="b_bot_elbow_joint" value="1" />
+        <joint name="b_bot_shoulder_lift_joint" value="-2.4" />
+        <joint name="b_bot_shoulder_pan_joint" value="1.57" />
+        <joint name="b_bot_wrist_1_joint" value="-1.267" />
+        <joint name="b_bot_wrist_2_joint" value="-1.57" />
+        <joint name="b_bot_wrist_3_joint" value="0" />
     </group_state>
     <group_state name="above_center_parts_bin" group="d_bot">
         <joint name="d_bot_elbow_joint" value="1.64988" />

@@ -53,6 +53,9 @@ import o2as_msgs.srv
 import aist_msgs.msg
 import aist_msgs.srv
 
+######################################################################
+#  global fucntions                                                  #
+######################################################################
 def is_program_running(topic_namespace = ""):
     """Checks if a program is running on the UR"""
     msg = rospy.wait_for_message(topic_namespace + "/ur_driver/robot_mode_state", ur_modern_driver.msg.RobotModeDataMsg)
@@ -79,7 +82,9 @@ def wait_for_UR_program(topic_namespace="",
     rospy.logdebug("UR Program has terminated.")
     return True
 
-
+######################################################################
+#  class AISTBaseRoutines                                            #
+######################################################################
 class AISTBaseRoutines(object):
     def __init__(self):
         super(AISTBaseRoutines, self).__init__()
