@@ -30,7 +30,7 @@ qdiff_matrix(const Quaternion<T>& a, const Quaternion<T>& b)
     C[1][1]	     += C[0][0];
     C[2][2]	     += C[0][0];
     C[3][3]	     += C[0][0];
-    
+
     return C;
 }
 #else
@@ -47,11 +47,11 @@ qdiff_matrix(const Quaternion<T>& a, const Quaternion<T>& b)
     C[0][1]	    += sdiff;
     C[1][2]	    += sdiff;
     C[2][3]	    += sdiff;
-    
+
     return C;
 }
 #endif
-    
+
 template <class T> static DualNumber<Quaternion<T> >
 computeDualQuaternion(const range<const T*>& up, const range<const T*>& ud,
 		      const range<const T*>& vp, const range<const T*>& vd)
@@ -59,7 +59,7 @@ computeDualQuaternion(const range<const T*>& up, const range<const T*>& ud,
     auto	a = up * ud;
     auto	b = up * vd + vp * ud;
     auto	c = vp * vd;
-    
+
     if (std::abs(a) > std::abs(c))
     {
 	c /= a;
@@ -70,7 +70,7 @@ computeDualQuaternion(const range<const T*>& up, const range<const T*>& ud,
 	const auto	x1 = c/x0;
 	const auto	l0 = length(x0*up + vp);
 	const auto	l1 = length(x1*up + vp);
-	
+
 	if (l0 > l1)
 	    return {(x0/l0)*up + (1/l0)*vp, (x0/l0)*ud + (1/l0)*vd};
 	else
@@ -86,7 +86,7 @@ computeDualQuaternion(const range<const T*>& up, const range<const T*>& ud,
 	const auto	y1 = a/y0;
 	const auto	l0 = length(up + y0*vp);
 	const auto	l1 = length(up + y1*vp);
-	
+
 	if (l0 > l1)
 	    return {(1/l0)*up + (y0/l0)*vp, (1/l0)*ud + (y0/l0)*vd};
 	else
@@ -99,9 +99,17 @@ computeDualQuaternion(const range<const T*>& up, const range<const T*>& ud,
 *  global functions							*
 ************************************************************************/
 template <class T> Transform<T>
-calibrationSingle(const std::vector<Transform<T> >& cMo,
-		  const std::vector<Transform<T> >& wMe)
+cameraToEffectorSingle(const std::vector<Transform<T> >& cMo,
+		       const std::vector<Transform<T> >& wMe)
 {
+    if (cMo.size() != wMe.size())
+	throw std::runtime_error("transformations with different sizes("
+				 + std::to_string(cMo.size()) + "!="
+				 + std::to_string(wMe.size()) + ").");
+    else if (cMo.size() < 2)
+	throw std::runtime_error("too few transformations("
+				 + std::to_string(cMo.size()) + ").");
+
     const auto	nposes = cMo.size();
 
   // Compute rotation.
@@ -139,11 +147,19 @@ calibrationSingle(const std::vector<Transform<T> >& cMo,
 
     return {t, q};
 }
-    
+
 template <class T> Transform<T>
-calibrationDual(const std::vector<Transform<T> >& cMo,
-		const std::vector<Transform<T> >& wMe)
+cameraToEffectorDual(const std::vector<Transform<T> >& cMo,
+		     const std::vector<Transform<T> >& wMe)
 {
+    if (cMo.size() != wMe.size())
+	throw std::runtime_error("transformations with different sizes("
+				 + std::to_string(cMo.size()) + "!="
+				 + std::to_string(wMe.size()) + ").");
+    else if (cMo.size() < 2)
+	throw std::runtime_error("too few transformations("
+				 + std::to_string(cMo.size()) + ").");
+
     const auto	nposes = cMo.size();
 
   // Compute rotation.
@@ -160,7 +176,7 @@ calibrationDual(const std::vector<Transform<T> >& cMo,
 	    M(4, 4, 4, 4) += transpose(C) * C;
 	}
     symmetrize(M);
-    
+
     Vector<T, 8>	evalues;
     const auto		U = eigen(M, evalues);	// computed rotation
 #ifdef DEBUG
@@ -172,13 +188,13 @@ calibrationDual(const std::vector<Transform<T> >& cMo,
 							  slice(U[7], 4, 4)));
     return eMc;
 }
-    
+
 template <class T> Transform<T>
 objectToWorld(const std::vector<Transform<T> >& cMo,
 	      const std::vector<Transform<T> >& wMe, const Transform<T>& eMc)
 {
     using vector4_type	= typename Quaternion<T>::vector4_type;
-    
+
     const auto		nposes = cMo.size();
     vector4_type	p, d;
     for (size_t i = 0; i < nposes; ++i)

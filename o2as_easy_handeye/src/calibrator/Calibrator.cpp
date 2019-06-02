@@ -4,7 +4,11 @@
 */
 #include <fstream>
 #include <sstream>
+#include <cstdlib>	// for std::getenv()
+#include <sys/stat.h>	// for mkdir()
+#include <errno.h>
 #include <tf/transform_datatypes.h>
+#include <yaml-cpp/yaml.h>
 #include "Calibrator.h"
 #include "HandeyeCalibration.h"
 
@@ -32,14 +36,14 @@ Calibrator::Calibrator()
 				&Calibrator::save_calibration, this)),
      _reset_srv(_node.advertiseService("reset", &Calibrator::reset, this)),
      _listener(),
-     _timeout(10.0)
+     _eye_on_hand(true),
+     _timeout(5.0)
 {
     ROS_INFO_STREAM("initializing calibrator...");
 
-    bool	eye_on_hand;
-    _node.param<bool>("eye_on_hand", eye_on_hand, true);
+    _node.param<bool>("eye_on_hand", _eye_on_hand, true);
 
-    if (eye_on_hand)
+    if (_eye_on_hand)
     {
 	_node.param<std::string>("effector_frame", _eMc.header.frame_id,
 				 "tool0");
@@ -151,14 +155,7 @@ bool
 Calibrator::compute_calibration(ComputeCalibration::Request&  req,
 				ComputeCalibration::Response& res)
 {
-    if (_cMo.size() != _wMe.size() || _cMo.size() < 2)
-    {
-	res.success = false;
-	res.message = "transformation vectors have different sizes or contain too few elements";
-
-	ROS_ERROR_STREAM("compute_calibration(): " << res.message);
-    }
-    else
+    try
     {
 	using transform_t	= TU::Transform<double>;
 
@@ -171,7 +168,7 @@ Calibrator::compute_calibration(ComputeCalibration::Request&  req,
 	    wMe.emplace_back(_wMe[i].transform);
 	}
 
-	const auto	eMc = TU::calibrationDual(cMo, wMe);
+	const auto	eMc = TU::cameraToEffectorDual(cMo, wMe);
 	const auto	wMo = TU::objectToWorld(cMo, wMe, eMc);
 
 	const auto	now = ros::Time::now();
@@ -198,6 +195,13 @@ Calibrator::compute_calibration(ComputeCalibration::Request&  req,
 	out << sout.str();
 #endif
     }
+    catch (const std::exception& err)
+    {
+	res.success = false;
+	res.message = err.what();
+
+	ROS_ERROR_STREAM("compute_calibration(): " << res.message);
+    }
 
     return res.success;
 }
@@ -206,8 +210,65 @@ bool
 Calibrator::save_calibration(std_srvs::Trigger::Request&  req,
 			     std_srvs::Trigger::Response& res)
 {
-    res.success = true;
-    ROS_INFO_STREAM("save_calibration(): " << res.message);
+    try
+    {
+	YAML::Emitter	emitter;
+	emitter << YAML::BeginMap;
+	emitter << YAML::Key   << "eye_on_hand"
+		<< YAML::Value << _eye_on_hand;
+	emitter << YAML::Key   << "robot_base_frame"
+		<< YAML::Value << (_eye_on_hand ? world_frame()
+						: effector_frame());
+	emitter << YAML::Key   << "tracking_base_frame"
+		<< YAML::Value << camera_frame();
+	emitter << YAML::Key   << "transformation"
+		<< YAML::Value << YAML::Flow << YAML::BeginMap
+		<< YAML::Key   << "qw"
+		<< YAML::Value << _eMc.transform.rotation.w
+		<< YAML::Key   << "qx"
+		<< YAML::Value << _eMc.transform.rotation.x
+		<< YAML::Key   << "qy"
+		<< YAML::Value << _eMc.transform.rotation.y
+		<< YAML::Key   << "qz"
+		<< YAML::Value << _eMc.transform.rotation.z
+		<< YAML::Key   << "x"
+		<< YAML::Value << _eMc.transform.translation.x
+		<< YAML::Key   << "y"
+		<< YAML::Value << _eMc.transform.translation.y
+		<< YAML::Key   << "z"
+		<< YAML::Value << _eMc.transform.translation.z
+		<< YAML::EndMap;
+	emitter << YAML::EndMap;
+
+	const auto	home = getenv("HOME");
+	if (!home)
+	    throw std::runtime_error("environment variable HOME is not set.");
+
+	std::string	name = home + std::string("/.ros/easy_handeye");
+	struct stat	buf;
+	if (stat(name.c_str(), &buf) && mkdir(name.c_str(), S_IRWXU))
+	    throw std::runtime_error("cannot create " + name + ": "
+						      + strerror(errno));
+
+	name += (ros::this_node::getNamespace() + ".yaml");
+	std::ofstream	out(name.c_str());
+	if (!out)
+	    throw std::runtime_error("cannot open " + name + ": "
+						    + strerror(errno));
+
+	out << emitter.c_str() << std::endl;
+
+	res.success = true;
+	res.message = "saved in " + name;
+	ROS_INFO_STREAM("save_calibration(): " << res.message);
+    }
+    catch (const std::exception& err)
+    {
+	res.success = false;
+	res.message = err.what();
+
+	ROS_ERROR_STREAM("compute_calibration(): " << res.message);
+    }
 
     return res.success;
 }
