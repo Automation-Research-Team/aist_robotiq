@@ -55,13 +55,14 @@ class Calibrator
     const ros::ServiceServer	_save_calibration_srv;
     const ros::ServiceServer	_reset_srv;
 
-    tf::TransformListener	_listener;
+    const tf::TransformListener	_listener;
 
     std::vector<transformMsg_t>	_cMo;	//!< in:  camera <- object   transform
     std::vector<transformMsg_t>	_wMe;	//!< in:  world  <- effector transform
     transformMsg_t		_eMc;	//!< out: effector <- camera transform
     transformMsg_t		_wMo;	//!< out: world    <- object transform
 
+    bool			_eye_on_hand;
     double			_timeout;
 };
 }	// namespace visp_hnad2eye_calibration

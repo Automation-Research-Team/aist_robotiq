@@ -61,6 +61,7 @@ add_executable(calibrator
 target_link_libraries(calibrator
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
+  yaml-cpp
 )
 
 add_dependencies(calibrator

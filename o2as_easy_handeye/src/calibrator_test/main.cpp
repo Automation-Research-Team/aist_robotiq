@@ -14,17 +14,17 @@ doJob(bool single, bool eye_on_hand)
 	std::cin >> cMo[n] >> wMe[n];
 	std::cout << "=== cMo[" << n << "] ===" << std::endl;
 	cMo[n].print(std::cout);
-	
+
 	std::cout << "=== wMe[" << n << "] ===" << std::endl;
 	if (eye_on_hand)
 	    wMe[n].print(std::cout) << std::endl;
 	else
 	    wMe[n].inverse().print(std::cout) << std::endl;
     }
-    
 
-    const auto	eMc = (single ? calibrationSingle(cMo, wMe)
-			      : calibrationDual(cMo, wMe));
+
+    const auto	eMc = (single ? cameraToEffectorSingle(cMo, wMe)
+			      : cameraToEffectorDual(cMo, wMe));
     const auto	wMo = objectToWorld(cMo, wMe, eMc);
     evaluateAccuracy(std::cout, cMo, wMe, eMc, wMo);
 }
