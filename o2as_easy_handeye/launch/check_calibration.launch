@@ -29,7 +29,7 @@
     <arg name="scene"	value="$(arg scene)"/>
     <arg name="sim"	value="false"/>
     <arg name="rviz_config"
-    	 value="$(find o2as_easy_handeye)/launch/o2as_easy_handeye.rviz"/>
+    	 value="$(find o2as_easy_handeye)/launch/check_calibration.rviz"/>
   </include>
 
   <!-- Start rqt_reconfigure -->

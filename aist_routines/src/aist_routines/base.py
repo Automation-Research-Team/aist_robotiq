@@ -32,9 +32,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# Author: Yuma Hijioka
-
-# This file is based on moveit tutorial for the kinetic MoveIt tutorial for the Python movegroup interface.or python.
+# Author: Toshio UESHIBA
 
 from math import pi
 import sys
@@ -106,6 +104,8 @@ class AISTBaseRoutines(object):
                                                  aist_msgs.srv.getCameraInfo)
         self.commandCamera  = rospy.ServiceProxy('/aist_skills/commandCamera',
                                                  aist_msgs.srv.commandCamera)
+        self.searchGraspability = rospy.ServiceProxy('/aist_skills/searchGraspability',
+                                                 aist_msgs.srv.searchGraspability)
 
         # Action clients
         self.pickOrPlace    = actionlib.SimpleActionClient(
@@ -154,7 +154,7 @@ class AISTBaseRoutines(object):
     # Gripper stuffs
     def get_gripper_info(self, robot_name):
         res = self.getGripperInfo(robot_name)
-        return (res.gripper_type, res.base_link, res.tip_link, res.success)
+        return (res.type, res.base_link, res.tip_link, res.success)
 
     def pregrasp(self, robot_name, command=""):
         return self.commandGripper(robot_name, 0, command).success
@@ -168,14 +168,18 @@ class AISTBaseRoutines(object):
     # Camera stuffs
     def get_camera_info(self, camera_name):
         res = self.getCameraInfo(camera_name)
-        return (res.camera_type, res.camera_info_topic,
-                res.image_topic, res.success)
+        return (res.type, res.camera_info_topic, res.image_topic, res.success)
 
     def start_acquisition(self, camera_name):
         return self.commandCamera(camera_name, True).success
 
     def stop_acquisition(self, camera_name):
         return self.commandCamera(camera_name, False).success
+
+    # Graspability stuffs
+    def search_graspability(self, robot_name, camera_name, part_id, bin_id):
+        res = self.searchGraspability(robot_name, camera_name, part_id, bin_id)
+        return (res.poses, res.rotipz, res.gscore, res.success)
 
     # Various actions
     def pick(self, robot_name, pose_stamped, grasp_offset=0.0,

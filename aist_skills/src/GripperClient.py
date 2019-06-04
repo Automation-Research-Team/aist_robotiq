@@ -17,20 +17,20 @@ def clamp(x, x_min, x_max):
 #  class GripperClient                                               #
 ######################################################################
 class GripperClient(object):
-    def __init__(self, name, gripper_type, base_link, tip_link, timeout=0):
-        self._name         = name
-        self._gripper_type = gripper_type
-        self._base_link    = base_link
-        self._tip_link     = tip_link
-        self._timeout      = timeout
+    def __init__(self, name, type, base_link, tip_link, timeout=0):
+        self._name      = name
+        self._type      = type
+        self._base_link = base_link
+        self._tip_link  = tip_link
+        self._timeout   = timeout
 
     @property
     def name(self):
         return self._name
 
     @property
-    def gripper_type(self):
-        return self._gripper_type
+    def type(self):
+        return self._type
 
     @property
     def base_link(self):

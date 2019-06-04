@@ -27,8 +27,9 @@ refposes = {
 #  class ToolCalibrationRoutines                                     #
 ######################################################################
 class ToolCalibrationRoutines:
-    def __init__(self, routines, robot_name, speed):
+    def __init__(self, routines, robot_name, camera_name, speed):
         self.routines = routines
+        self.camera_name = camera_name
         self.speed = speed
         self.refpose = refposes[robot_name]
 
@@ -192,10 +193,17 @@ class ToolCalibrationRoutines:
         print("  place at " + self.format_pose(self.pick_pose))
         self.routines.place(self.group.get_name(), self.place_pose)
 
+    def search_graspability(self):
+        (poses, rotipz, gscore, success) = \
+            self.routines.search_graspability(self.group.get_name(),
+                                              self.camera_name, 4, 0)
+        for gs in gscore:
+            print(str(gs))
+        print(str(poses))
+
     def run(self):
         # Reset pose
         self.go_home()
-        self.move(self.refpose)
 
         axis = 'Pitch'
 
@@ -206,12 +214,16 @@ class ToolCalibrationRoutines:
             if key == 'q':
                 break
             elif key == 'r':
+                self.move(self.refpose)
                 self.rolling_motion()
             elif key == 'p':
+                self.move(self.refpose)
                 self.pitching_motion()
             elif key == 'y':
+                self.move(self.refpose)
                 self.yawing_motion()
             elif key == 't':
+                self.move(self.refpose)
                 self.rolling_motion()
                 self.pitching_motion()
                 self.yawing_motion()
@@ -261,6 +273,10 @@ class ToolCalibrationRoutines:
                 self.pick()
             elif key == 'place':
                 self.place()
+            elif key == 's':
+                self.search_graspability()
+            elif key == 'h':
+                self.go_home()
             else:
                 if axis == 'X    ':
                     self.refpose[0] = float(key)
@@ -313,6 +329,15 @@ if __name__ == '__main__':
                         choices=None,
                         help='robot name',
                         metavar=None)
+    parser.add_argument('-c',
+                        '--camera_name',
+                        action='store',
+                        nargs='?',
+                        default='a_phoxi_m_camera',
+                        type=str,
+                        choices=None,
+                        help='camera name',
+                        metavar=None)
     args = parser.parse_args()
 
     try:
@@ -325,7 +350,7 @@ if __name__ == '__main__':
 
         speed = 0.1
         routines = ToolCalibrationRoutines(base_routines, args.robot_name,
-                                           speed)
+                                           args.camera_name, speed)
 
         routines.run()
 
