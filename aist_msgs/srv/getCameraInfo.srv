@@ -2,7 +2,7 @@
 string name     # camera name
 ---
 # Response
-string camera_type
+string type
 string camera_info_topic
 string image_topic
 bool success

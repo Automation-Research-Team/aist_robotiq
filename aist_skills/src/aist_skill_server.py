@@ -65,11 +65,11 @@ def clamp(x, min_x, max_x):
 ######################################################################
 class SkillServer(object):
     marker_props = {     #axes    scale                  color(RGBA)
-        "pose":          (True,  (0.010, 0.050, 0.050), (0.0, 1.0, 0.0, 0.8)),
-        "pick_pose":     (True,  (0.010, 0.050, 0.050), (1.0, 0.0, 1.0, 0.8)),
-        "place_pose":    (True,  (0.010, 0.050, 0.050), (0.0, 1.0, 1.0, 0.8)),
-        "vision_result": (False, (0.005, 0.005, 0.005), (0.0, 1.0, 0.0, 0.8)),
-        "":              (False, (0.020, 0.100, 0.100), (0.0, 1.0, 0.0, 0.8)),
+        "pose":          (True,  (0.006, 0.020, 0.020), (0.0, 1.0, 0.0, 0.8)),
+        "pick_pose":     (True,  (0.006, 0.020, 0.020), (1.0, 0.0, 1.0, 0.8)),
+        "place_pose":    (True,  (0.006, 0.020, 0.020), (0.0, 1.0, 1.0, 0.8)),
+        "graspability":  (True,  (0.004, 0.004, 0.004), (1.0, 1.0, 0.0, 0.8)),
+        "":              (False, (0.004, 0.004, 0.004), (0.0, 1.0, 0.0, 0.8)),
         }
 
     def __init__(self):
@@ -78,8 +78,8 @@ class SkillServer(object):
 
         if rospy.get_param("use_real_robot", False):
             self.grippers = {
-                # "a_bot": Robotiq85Gripper("a_bot_"),
-                "a_bot": PrecisionGripper("a_bot_"),
+                "a_bot": Robotiq85Gripper("a_bot_"),
+                # "a_bot": PrecisionGripper("a_bot_"),
                 "b_bot": SuctionGripper("b_bot_single_"),
                 "c_bot": Robotiq85Gripper("c_bot_"),
                 "d_bot": SuctionGripper("d_bot_dual_")
@@ -95,14 +95,14 @@ class SkillServer(object):
                                 self.search_graspability_cb)
         else:
             self.grippers = {
-                # "a_bot": GripperClient("a_bot_robotiq_85_gripper",
-                #                        "two-finger",
-                #                        "a_bot_robotiq_85_base_link",
-                #                        "a_bot_robotiq_85_tip_link"),
-                "a_bot": GripperClient("a_bot_gripper",
+                "a_bot": GripperClient("a_bot_robotiq_85_gripper",
                                        "two-finger",
-                                       "a_bot_gripper_base_link",
-                                       "a_bot_gripper_tip_link"),
+                                       "a_bot_robotiq_85_base_link",
+                                       "a_bot_robotiq_85_tip_link"),
+                # "a_bot": GripperClient("a_bot_gripper",
+                #                        "two-finger",
+                #                        "a_bot_gripper_base_link",
+                #                        "a_bot_gripper_tip_link"),
                 "b_bot": GripperClient("b_bot_single_suction_gripper",
                                        "suction",
                                        "b_bot_single_suction_gripper_base_link",
@@ -176,7 +176,7 @@ class SkillServer(object):
     def publish_marker_cb(self, req):
         return self._publish_marker(req.marker_pose, req.marker_type)
 
-    def _publish_marker(self, marker_pose, marker_type):
+    def _publish_marker(self, marker_pose, marker_type, text="", lifetime=15):
         marker_prop = self.marker_props[marker_type]
 
         marker              = visualization_msgs.msg.Marker()
@@ -184,12 +184,15 @@ class SkillServer(object):
         marker.header.stamp = rospy.Time.now()
         marker.ns           = "markers"
         marker.action       = visualization_msgs.msg.Marker.ADD
-        marker.lifetime     = rospy.Duration(15.0)
+        marker.lifetime     = rospy.Duration(lifetime)
 
         if marker_prop[0]:  # Draw frame axes?
+            smax = max(*marker_prop[1])
+            smin = min(*marker_prop[1])
+
             marker.type  = visualization_msgs.msg.Marker.ARROW
             marker.pose  = marker_pose.pose
-            marker.scale = gmsg.Vector3(0.1, 0.01, 0.01)
+            marker.scale = gmsg.Vector3(2.5*smax, 0.5*smin, 0.5*smin)
             marker.color = std_msgs.msg.ColorRGBA(1.0, 0.0, 0.0, 0.8)
             marker.id    = self.marker_id_count
             self.marker_id_count += 1
@@ -215,7 +218,16 @@ class SkillServer(object):
         self.marker_id_count += 1
         self.marker_pub.publish(marker)
 
-        if self.marker_id_count == 100:
+        if text != "":
+            marker.pose.position.z -= (marker.scale.z + 0.001)
+            marker.type  = visualization_msgs.msg.Marker.TEXT_VIEW_FACING
+            marker.color = std_msgs.msg.ColorRGBA(1.0, 1.0, 1.0, 0.8)
+            marker.text  = text
+            marker.id    = self.marker_id_count
+            self.marker_id_count += 1
+            self.marker_pub.publish(marker)
+
+        if self.marker_id_count == 100000:
             self.marker_id_count = 0
 
         return True
@@ -289,7 +301,7 @@ class SkillServer(object):
     def get_gripper_info_cb(self, req):
         gripper = self.grippers[req.name]
         res     = aist_msgs.srv.getGripperInfoResponse()
-        res.gripper_type = gripper.gripper_type
+        res.type = gripper.type
         res.base_link    = gripper.base_link
         res.tip_link     = gripper.tip_link
         res.success      = True
@@ -310,7 +322,7 @@ class SkillServer(object):
     def get_camera_info_cb(self, req):
         camera = self.cameras[req.name]
         res    = aist_msgs.srv.getCameraInfoResponse()
-        res.camera_type       = camera.camera_type
+        res.type       = camera.type
         res.camera_info_topic = camera.camera_info_topic
         res.image_topic       = camera.image_topic
         res.success           = True
@@ -334,9 +346,11 @@ class SkillServer(object):
         (poses, rotipz, gscore, success) = \
             self.graspabilityClient.search(camera.camera_info_topic,
                                            camera.image_topic,
-                                           gripper.gripper_type,
-                                           req.part_id, req.bin_id, req.dir_path)
+                                           gripper.type, req.part_id, req.bin_id)
         camera.stop_acquisition()
+
+        if success:
+            self._publish_graspability_markers(poses, gscore, 0)
 
         res = aist_msgs.srv.searchGraspabilityResponse()
         res.poses   = poses
@@ -344,6 +358,15 @@ class SkillServer(object):
         res.gscore  = gscore
         res.success = success
         return res
+
+    def _publish_graspability_markers(self, marker_poses, gscore, lifetime=15):
+        for i in range(len(marker_poses.poses)):
+            pose = gmsg.PoseStamped()
+            pose.header = marker_poses.header
+            pose.pose   = marker_poses.poses[i]
+            self._publish_marker(pose, "graspability",
+                                 "{}[{:.3f}]".format(i, gscore[i]), lifetime)
+        return True
 
     # Various actions
     def pick_or_place_cb(self, goal):

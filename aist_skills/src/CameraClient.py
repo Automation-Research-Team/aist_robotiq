@@ -17,9 +17,9 @@ def clamp(x, x_min, x_max):
 #  class CameraClient                                                 #
 ######################################################################
 class CameraClient(object):
-    def __init__(self, name, camera_type, camera_info_topic, image_topic):
-        self._name               = name
-        self._camera_type       = camera_type
+    def __init__(self, name, type, camera_info_topic, image_topic):
+        self._name              = name
+        self._type              = type
         self._camera_info_topic = camera_info_topic
         self._image_topic       = image_topic
 
@@ -28,8 +28,8 @@ class CameraClient(object):
         return self._name
 
     @property
-    def camera_type(self):
-        return self._camera_type
+    def type(self):
+        return self._type
 
     @property
     def camera_info_topic(self):
