@@ -45,6 +45,15 @@ initposes = {
         },
     },
 
+    'pgrp': {
+        'a_phoxi_m_camera': {
+            'a_bot': [
+                0.10, -0.20, 0.35, radians(  0), radians( 90), radians(0)],
+            'b_bot': [
+                0.10,  0.10, 0.35, radians(  0), radians( 90), radians(0)],
+        },
+    },
+
     'ur5e': {
         'a_phoxi_m_camera': {
             'c_bot': [
@@ -111,6 +120,38 @@ keyposes = {
     },
 
     'aist': {
+        'a_phoxi_m_camera': {
+            'a_bot': [
+                [0.05, -0.10, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.05,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.05,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
+
+                [0.05,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
+                [0.05,  0.00, 0.25, radians( 30), radians( 25), radians(0)],
+                [0.05, -0.10, 0.25, radians( 30), radians( 25), radians(0)],
+            ],
+
+            'b_bot': [
+                [0.15,  0.20, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
+
+                [0.15,  0.00, 0.25, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
+                [0.15,  0.20, 0.25, radians( 30), radians( 25), radians(0)],
+
+                # [0.40,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
+                # [0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
+                # [0.40, -0.15, 0.15, radians(  0), radians( 25), radians(0)],
+
+                # [0.35, -0.10, 0.10, radians(  0), radians( 25), radians(0)],
+                # [0.35,  0.05, 0.10, radians( 30), radians( 25), radians(0)],
+                # [0.35,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
+            ],
+        },
+    },
+
+    'pgrp': {
         'a_phoxi_m_camera': {
             'a_bot': [
                 [0.05, -0.10, 0.16, radians( 30), radians( 25), radians(0)],
@@ -376,7 +417,7 @@ if __name__ == '__main__':
                         '--config',
                         action='store',
                         nargs='?',
-                        default='aist',
+                        default='pgrp',
                         type=str,
                         choices=None,
                         help='configuration name',
@@ -394,7 +435,7 @@ if __name__ == '__main__':
                         '--robot_name',
                         action='store',
                         nargs='?',
-                        default='b_bot',
+                        default='a_bot',
                         type=str,
                         choices=None,
                         help='robot name',

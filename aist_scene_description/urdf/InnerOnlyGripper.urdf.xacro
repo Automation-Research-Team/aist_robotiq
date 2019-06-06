@@ -68,7 +68,8 @@
     <parent link="${prefix}${grippername}_base_link"/>
     <child link="${prefix}${grippername}_tip_link"/>
     <!-- <origin rpy="0.0 ${-pi/2} 0.0" xyz="0.001 -0.008 .162"/> -->
-    <origin rpy="0 0 0" xyz="0.162 -0.008 -0.001"/>
+    <!-- <origin rpy="0 0 0" xyz="0.162 -0.008 -0.001"/> -->
+    <origin rpy="0 0 0" xyz="0.162 -0.015 -0.001"/>
     <!-- +y is the same, +x in the new frame is +z in the parent, +z is -x in the parent? -->
   </joint>
   <link name="${prefix}${grippername}_tip_link"/>

@@ -20,7 +20,7 @@ import aist_msgs.srv
 import aist_graspability.msg
 import aist_graspability.srv
 
-from GripperClient import GripperClient, Robotiq85Gripper, SuctionGripper
+from GripperClient import GripperClient, Robotiq85Gripper, SuctionGripper, PrecisionGripper
 from CameraClient  import CameraClient, PhoXiCamera, RealsenseCamera
 from GraspabilityClient import GraspabilityClient
 
@@ -78,8 +78,8 @@ class SkillServer(object):
 
         if rospy.get_param("use_real_robot", False):
             self.grippers = {
-                "a_bot": Robotiq85Gripper("a_bot_"),
-                # "a_bot": PrecisionGripper("a_bot_"),
+                # "a_bot": Robotiq85Gripper("a_bot_"),
+                "a_bot": PrecisionGripper("a_bot_"),
                 "b_bot": SuctionGripper("b_bot_single_"),
                 "c_bot": Robotiq85Gripper("c_bot_"),
                 "d_bot": SuctionGripper("d_bot_dual_")
@@ -95,14 +95,14 @@ class SkillServer(object):
                                 self.search_graspability_cb)
         else:
             self.grippers = {
-                "a_bot": GripperClient("a_bot_robotiq_85_gripper",
-                                       "two-finger",
-                                       "a_bot_robotiq_85_base_link",
-                                       "a_bot_robotiq_85_tip_link"),
-                # "a_bot": GripperClient("a_bot_gripper",
+                # "a_bot": GripperClient("a_bot_robotiq_85_gripper",
                 #                        "two-finger",
-                #                        "a_bot_gripper_base_link",
-                #                        "a_bot_gripper_tip_link"),
+                #                        "a_bot_robotiq_85_base_link",
+                #                        "a_bot_robotiq_85_tip_link"),
+                "a_bot": GripperClient("a_bot_gripper",
+                                       "two-finger",
+                                       "a_bot_gripper_base_link",
+                                       "a_bot_gripper_tip_link"),
                 "b_bot": GripperClient("b_bot_single_suction_gripper",
                                        "suction",
                                        "b_bot_single_suction_gripper_base_link",

@@ -195,7 +195,8 @@ class PrecisionGripper(GripperClient):
                                                  + "gripper_tip_link",
                                                timeout)
         self._client = actionlib.SimpleActionClient(
-                           str(prefix) + "gripper/gripper_action_controller",
+                           "precision_gripper_action",
+                           # str(prefix) + "gripper/gripper_action_controller",
                            o2as_msgs.msg.PrecisionGripperCommandAction)
         self._goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
         self._goal.stop                         = False
@@ -219,11 +220,12 @@ class PrecisionGripper(GripperClient):
         elif cmd == "complex_pick_from_outside":
             self._inner_command(False)
         elif cmd == "easy_pick_only_inner" or \
-             cmd == "inner_gripper_from_inside":
-            self._inner_command(True)
+             cmd == "inner_gripper_from_inside" or \
+             cmd == "":
+            self._inner_command(False)
         elif cmd == "easy_pick_outside_only_inner" or \
              cmd == "inner_gripper_from_outside":
-            self._inner_command(False)
+            self._inner_command(True)
         else:
             return False
         return True
@@ -236,11 +238,12 @@ class PrecisionGripper(GripperClient):
             self._inner_command(True, True)
             self._outer_command(True)
         elif cmd == "easy_pick_only_inner" or \
-             cmd == "inner_gripper_from_inside":
-            self._inner_command(False, True)
+             cmd == "inner_gripper_from_inside" or \
+             cmd == "":
+            self._inner_command(True, True)
         elif cmd == "easy_pick_outside_only_inner" or \
              cmd == "inner_gripper_from_outside":
-            self._inner_command(True, True)
+            self._inner_command(False, True)
         else:
             return False
         return True
@@ -253,11 +256,12 @@ class PrecisionGripper(GripperClient):
             self._outer_command(False)
             self._inner_command(False)
         elif cmd == "easy_pick_only_inner" or \
-             cmd == "inner_gripper_from_inside":
-            self._inner_command(True)
+             cmd == "inner_gripper_from_inside" or \
+             cmd == "":
+            self._inner_command(False)
         elif cmd == "easy_pick_outside_only_inner" or \
              cmd == "inner_gripper_from_outside":
-            self._inner_command(False)
+            self._inner_command(True)
         else:
             return False
         return True
