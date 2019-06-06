@@ -31,6 +31,13 @@ orientations = {
             radians(  0), radians( 90), radians(0)],
     },
 
+    'pgrp': {
+        'a_bot': [
+            radians(-90), radians( 90), radians(0)],
+        'b_bot': [
+            radians(  0), radians( 90), radians(0)],
+    },
+
     'ur5e': {
         'c_bot': [
             radians(-90), radians( 90), radians(0)],
@@ -130,7 +137,7 @@ if __name__ == '__main__':
                         '--config',
                         action='store',
                         nargs='?',
-                        default='aist',
+                        default='pgrp',
                         type=str,
                         choices=None,
                         help='configuration name',
@@ -148,7 +155,7 @@ if __name__ == '__main__':
                         '--robot_name',
                         action='store',
                         nargs='?',
-                        default='b_bot',
+                        default='a_bot',
                         type=str,
                         choices=None,
                         help='robot name',

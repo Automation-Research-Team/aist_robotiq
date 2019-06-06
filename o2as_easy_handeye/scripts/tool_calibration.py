@@ -16,7 +16,7 @@ from aist_routines.base import AISTBaseRoutines
 
 refposes = {
 #    'a_bot': [-0.10, 0.00, 0.20,  radians(-90), radians(-90), radians(180)],
-    'a_bot': [-0.10, 0.00, 0.020, radians(  0), radians( 90), radians( 90)],
+    'a_bot': [-0.00, 0.00, 0.010, radians(  0), radians( 90), radians( 90)],
     'b_bot': [ 0.10, 0.00, 0.015, radians(  0), radians( 90), radians(-90)],
     'c_bot': [-0.10, 0.00, 0.015, radians(  0), radians( 90), radians( 90)],
     'd_bot': [-0.30, 0.00, 0.015, radians(  0), radians( 90), radians(  0)],
@@ -121,7 +121,7 @@ class ToolCalibrationRoutines:
         res = self.routines.go_to_pose_goal(
                   self.group.get_name(), poseStamped, self.speed,
                   end_effector_link=self.group.get_end_effector_link(),
-                  move_lin=False)
+                  move_lin=True)
         rospy.sleep(1)
         print("   reached " + self.format_pose(res.current_pose))
         return res.success
@@ -315,7 +315,7 @@ if __name__ == '__main__':
                         '--config',
                         action='store',
                         nargs='?',
-                        default='aist',
+                        default='pgrp',
                         type=str,
                         choices=None,
                         help='configuration name',
@@ -324,7 +324,7 @@ if __name__ == '__main__':
                         '--robot_name',
                         action='store',
                         nargs='?',
-                        default='b_bot',
+                        default='a_bot',
                         type=str,
                         choices=None,
                         help='robot name',

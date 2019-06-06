@@ -1,9 +1,9 @@
 <?xml version="1.0" ?>
 <launch>
-  <arg name="config"		default="aist"/>
+  <arg name="config"		default="pgrp"/>
   <arg name="scene"		default="$(arg config)_calibration"/>
   <arg name="sim"		default="false"/>
-  <arg name="robot_name"	default="b_bot"
+  <arg name="robot_name"	default="a_bot"
        unless="$(eval arg('config') == 'ur5e')"/>
   <arg name="robot_name"	default="d_bot"
        if="$(eval arg('config') == 'ur5e')"/>
