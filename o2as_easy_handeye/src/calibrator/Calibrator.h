@@ -35,13 +35,13 @@ class Calibrator
     const std::string&	object_frame()				const	;
     const std::string&	world_frame()				const	;
 
-    bool	get_sample_list(GetSampleList::Request&  req,
+    bool	get_sample_list(GetSampleList::Request&,
 				GetSampleList::Response& res)		;
-    bool	take_sample(std_srvs::Trigger::Request&  req,
+    bool	take_sample(std_srvs::Trigger::Request&,
 			    std_srvs::Trigger::Response& res)		;
-    bool	compute_calibration(ComputeCalibration::Request&  req,
+    bool	compute_calibration(ComputeCalibration::Request&,
 				    ComputeCalibration::Response& res)	;
-    bool	save_calibration(std_srvs::Trigger::Request&  req,
+    bool	save_calibration(std_srvs::Trigger::Request&,
 				 std_srvs::Trigger::Response& res)	;
     bool	reset(std_srvs::Empty::Request&,
 		      std_srvs::Empty::Response&)			;

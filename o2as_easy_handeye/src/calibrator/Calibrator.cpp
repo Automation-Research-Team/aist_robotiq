@@ -99,7 +99,7 @@ Calibrator::world_frame() const
 }
 
 bool
-Calibrator::get_sample_list(GetSampleList::Request&  req,
+Calibrator::get_sample_list(GetSampleList::Request&,
 			    GetSampleList::Response& res)
 {
     res.success = true;
@@ -113,7 +113,7 @@ Calibrator::get_sample_list(GetSampleList::Request&  req,
 }
 
 bool
-Calibrator::take_sample(std_srvs::Trigger::Request&  req,
+Calibrator::take_sample(std_srvs::Trigger::Request&,
 			std_srvs::Trigger::Response& res)
 {
     try
@@ -152,7 +152,7 @@ Calibrator::take_sample(std_srvs::Trigger::Request&  req,
 }
 
 bool
-Calibrator::compute_calibration(ComputeCalibration::Request&  req,
+Calibrator::compute_calibration(ComputeCalibration::Request&,
 				ComputeCalibration::Response& res)
 {
     try
@@ -207,7 +207,7 @@ Calibrator::compute_calibration(ComputeCalibration::Request&  req,
 }
 
 bool
-Calibrator::save_calibration(std_srvs::Trigger::Request&  req,
+Calibrator::save_calibration(std_srvs::Trigger::Request&,
 			     std_srvs::Trigger::Response& res)
 {
     try
@@ -216,9 +216,9 @@ Calibrator::save_calibration(std_srvs::Trigger::Request&  req,
 	emitter << YAML::BeginMap;
 	emitter << YAML::Key   << "eye_on_hand"
 		<< YAML::Value << _eye_on_hand;
-	emitter << YAML::Key   << "robot_base_frame"
-		<< YAML::Value << (_eye_on_hand ? world_frame()
-						: effector_frame());
+	emitter << YAML::Key   << (_eye_on_hand ? "robot_effector_frame"
+						: "robot_base_frame")
+		<< YAML::Value << effector_frame();
 	emitter << YAML::Key   << "tracking_base_frame"
 		<< YAML::Value << camera_frame();
 	emitter << YAML::Key   << "transformation"
