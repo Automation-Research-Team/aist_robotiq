@@ -83,7 +83,7 @@ class VisitRoutines:
             gmsg.Quaternion(*tfs.quaternion_from_euler(*self.orientations)))
         poseStamped.pose.position.z += 0.05
         self.routines.go_to_pose_goal(self.group.get_name(), poseStamped,
-                                      speed, move_lin=False)
+                                      speed, move_lin=True)
         rospy.sleep(1)
 
         poseStamped.pose.position.z -= 0.05

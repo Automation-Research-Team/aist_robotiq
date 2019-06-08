@@ -34,13 +34,18 @@
     	 value="$(find o2as_easy_handeye)/launch/o2as_easy_handeye.rviz"/>
   </include>
 
-  <!-- Dummy calibration to have a fully connected TF tree and see all frames -->
-  <node unless="$(arg eye_on_hand)"
-	name="dummy_handeye" pkg="tf" type="static_transform_publisher"
-        args="-0.425 0.45 0.88 -1.5707 0 -2.8 $(arg world_frame) $(arg camera_frame) 10" />
-  <node if="$(arg eye_on_hand)"
-	name="dummy_handeye" pkg="tf" type="static_transform_publisher"
-        args="0 0 0.05 0 0 0 $(arg effector_frame) $(arg camera_frame) 10" />
+  <!-- Dummy calibration to have a fully connected TF tree and
+       see all frames -->
+  <arg name="effector_frame"	value="$(arg robot_name)_wrist_2_link"
+       if="$(arg eye_on_hand)"/>
+  <arg name="effector_frame"	value="$(arg robot_name)_ee_link"
+       unless="$(arg eye_on_hand)"/>
+  <node name="dummy_handeye" pkg="tf" type="static_transform_publisher"
+        args="0 0 0.05 0 0 0 $(arg effector_frame) $(arg camera_frame) 10"
+	if="$(arg eye_on_hand)"/>
+  <node name="dummy_handeye" pkg="tf" type="static_transform_publisher"
+        args="-0.425 0.45 0.88 -1.5707 0 -2.8 $(arg world_frame) $(arg camera_frame) 10"
+	unless="$(arg eye_on_hand)"/>
 
   <!-- Set up namespace -->
   <arg name="namespace"	value="$(arg camera_name)_from_$(arg robot_name)"/>
@@ -48,10 +53,7 @@
   <group ns="$(arg namespace)" >
     <param name="eye_on_hand"		value="$(arg eye_on_hand)"/>
     <param name="world_frame"		value="$(arg world_frame)"/>
-    <param name="effector_frame"	value="$(arg robot_name)_ee_link"
-           unless="$(arg eye_on_hand)"/>
-    <param name="robot_effector_frame"	value="$(arg robot_name)_wrist_2_link"
-           if="$(arg eye_on_hand)"/>
+    <param name="effector_frame"	value="$(arg effector_frame)"/>
     <param name="camera_frame"		value="$(arg camera_frame)" />
     <param name="object_frame"		value="$(arg object_frame)" />
   </group>

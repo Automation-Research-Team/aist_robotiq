@@ -3,7 +3,7 @@
   <gazebo reference="a_bot_camera_depth_frame">
     <sensor type="depth" name="a_bot_camera">
       <always_on>true</always_on>
-      <visualize>true</visualize>             
+      <visualize>true</visualize>
       <camera>
         <horizontal_fov>1.047</horizontal_fov>
         <image>
@@ -27,10 +27,10 @@
         <imageTopicName>rgb/image_raw</imageTopicName>
         <depthImageTopicName>depth/image_raw</depthImageTopicName>
         <pointCloudTopicName>depth/points</pointCloudTopicName>
-        <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>              
-        <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>            
-        <pointCloudCutoff>0.4</pointCloudCutoff>                
-        <hackBaseline>0.07</hackBaseline>
+        <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+        <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+        <pointCloudCutoff>0.4</pointCloudCutoff>
+        <!-- <hackBaseline>0.07</hackBaseline> -->
         <distortionK1>0.0</distortionK1>
         <distortionK2>0.0</distortionK2>
         <distortionK3>0.0</distortionK3>
@@ -45,9 +45,9 @@
   </gazebo>
 
   <gazebo reference="c_bot_camera_depth_frame">
-    <sensor type="depth" name="c_bot_camera">       
+    <sensor type="depth" name="c_bot_camera">
       <always_on>true</always_on>
-      <visualize>true</visualize>             
+      <visualize>true</visualize>
       <camera>
         <horizontal_fov>1.047</horizontal_fov>
         <image>
@@ -71,10 +71,10 @@
         <imageTopicName>rgb/image_raw</imageTopicName>
         <depthImageTopicName>depth/image_raw</depthImageTopicName>
         <pointCloudTopicName>depth/points</pointCloudTopicName>
-        <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>             
-        <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>            
+        <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+        <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
         <pointCloudCutoff>0.4</pointCloudCutoff>
-        <hackBaseline>0.07</hackBaseline>
+        <!-- <hackBaseline>0.07</hackBaseline> -->
         <distortionK1>0.0</distortionK1>
         <distortionK2>0.0</distortionK2>
         <distortionK3>0.0</distortionK3>
@@ -117,7 +117,7 @@
         <pointCloudTopicName>pointcloud</pointCloudTopicName>
         <cameraInfoTopicName>camera_info</cameraInfoTopicName>
         <depthImageCameraInfoTopicName>camera_info</depthImageCameraInfoTopicName>
-        <pointCloudCutoff>0.4</pointCloudCutoff>  
+        <pointCloudCutoff>0.4</pointCloudCutoff>
         <!-- <hackBaseline>0.35</hackBaseline> -->
         <distortionK1>0.0</distortionK1>
         <distortionK2>0.0</distortionK2>

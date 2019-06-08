@@ -52,6 +52,10 @@ initposes = {
             'b_bot': [
                 0.10,  0.10, 0.35, radians(  0), radians( 90), radians(0)],
         },
+        'a_bot_camera': {
+            'a_bot': [
+                0.00, -0.20, 0.35, radians(  0), radians( 90), radians(0)],
+        },
     },
 
     'ur5e': {
@@ -154,9 +158,9 @@ keyposes = {
     'pgrp': {
         'a_phoxi_m_camera': {
             'a_bot': [
-                [0.05, -0.10, 0.16, radians( 30), radians( 25), radians(0)],
-                [0.05,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
-                [0.05,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.05, -0.10, 0.14, radians( 30), radians( 25), radians(0)],
+                [0.05,  0.00, 0.14, radians( 30), radians( 25), radians(0)],
+                [0.05,  0.10, 0.14, radians( 30), radians( 25), radians(0)],
 
                 [0.05,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
                 [0.05,  0.00, 0.25, radians( 30), radians( 25), radians(0)],
@@ -180,6 +184,20 @@ keyposes = {
                 # [0.35,  0.05, 0.10, radians( 30), radians( 25), radians(0)],
                 # [0.35,  0.20, 0.10, radians( 30), radians( 25), radians(0)],
             ],
+        },
+
+        'a_bot_camera': {
+            'a_bot': [
+                [-0.10, -0.15, 0.35, radians(  0), radians( 60), radians(  0)],
+                [-0.07, -0.17, 0.35, radians(  0), radians( 75), radians(  0)],
+                [-0.05, -0.15, 0.35, radians(  0), radians( 90), radians(  0)],
+                [-0.05, -0.13, 0.35, radians(  0), radians(100), radians(  0)],
+                [-0.05, -0.10, 0.35, radians(  0), radians(110), radians(  0)],
+                [-0.05, -0.03, 0.35, radians(-90), radians( 70), radians(-90)],
+                [-0.05, -0.10, 0.35, radians(-90), radians( 85), radians(-90)],
+                [-0.05, -0.20, 0.35, radians(-90), radians(105), radians(-90)],
+                [-0.05, -0.30, 0.35, radians(-90), radians(120), radians(-90)],
+            ]
         },
     },
 
@@ -287,7 +305,7 @@ class HandEyeCalibrationRoutines:
         res = self.routines.go_to_pose_goal(
                 self.group.get_name(), poseStamped, self.speed,
                 end_effector_link=self.group.get_end_effector_link(),
-                move_lin=False)
+                move_lin=True)
         print("  reached " + self.format_pose(res.current_pose))
         return res.success
 
@@ -311,10 +329,10 @@ class HandEyeCalibrationRoutines:
 
         if self.take_sample:
             try:
-                self.take_sample()
+                res = self.take_sample()
                 n = len(self.get_sample_list().cMo)
                 print(
-                    "  took {} (hand-world, camera-marker) samples").format(n)
+                    "  {} samples taken: {}").format(n, res.message)
                 success = True
             except rospy.ServiceException as e:
                 print "Service call failed: %s" % e
@@ -345,26 +363,6 @@ class HandEyeCalibrationRoutines:
                 print("--- Subpose [{}/5]: Failed. ---".format(i + 4))
             pose[4] -= radians(30)
 
-        # ### How to define poses/positions for calibration
-        # # 1. From rostopic echo /joint_states (careful with the order of the joints)
-        # joint_pose = [-0.127, 0.556, 0.432, -1.591,  0.147, -0.285]
-
-        # # 2. From Rviz, ee frame position after planning (Open TF Frames, unfold the frame a_bot_ee_link)
-        # poseStamped.pose.position.x = -0.16815
-        # poseStamped.pose.position.y = -0.10744
-        # poseStamped.pose.position.z = 1.1898
-        # poseStamped.pose.orientation.x = -0.531
-        # poseStamped.pose.orientation.y = 0.5318
-        # poseStamped.pose.orientation.z = 0.46652
-        # poseStamped.pose.orientation.w = 0.46647
-
-        # # 3. Rotate an orientation using TF quaternions
-        # quaternion_0 = tf_conversions.transformations.quaternion_from_euler(
-        #       pose[3], pose[4], pose[5])
-        # q_rotate_30_in_y = tf_conversions.transformations.quaternion_from_euler(0, pi/6, 0)
-        # q_rotated = tf_conversions.transformations.quaternion_multiply(quaternion_0, q_rotate_30_in_y)
-        # poseStamped.pose.orientation = gmsg.Quaternion(*q_rotated)
-
     def run(self, initpose, keyposes):
         self.routines.stop_acquisition(self.camera_name)
 
@@ -389,10 +387,9 @@ class HandEyeCalibrationRoutines:
         if self.compute_calibration:
             res = self.compute_calibration()
             print(res.message)
-            self.save_calibration()
+            res = self.save_calibration()
+            print(res.message)
 
-        # Reset pose
-        #self.move(initpose)
         self.go_home()
 
     def format_pose(self, poseStamped):
