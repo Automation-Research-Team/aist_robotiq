@@ -193,6 +193,9 @@ class ToolCalibrationRoutines:
         print("  place at " + self.format_pose(self.pick_pose))
         self.routines.place(self.group.get_name(), self.place_pose)
 
+    def create_mask_image(self, nbins):
+        return self.routines.create_mask_image(self.camera_name, nbins)
+
     def search_graspability(self):
         (poses, rotipz, gscore, success) = \
             self.routines.search_graspability(self.group.get_name(),
@@ -273,6 +276,8 @@ class ToolCalibrationRoutines:
                 self.pick()
             elif key == 'place':
                 self.place()
+            elif key == 'c':
+                self.create_mask_image(int(raw_input("  #bins? ")))
             elif key == 's':
                 self.search_graspability()
             elif key == 'h':

@@ -12,7 +12,7 @@ from aist_graspability import srv as asrv
 ######################################################################
 class BinProperty(object):
     def __init__(self, name):
-        self._name       = name
+        self._name = name
 
     @property
     def name(self):
@@ -23,7 +23,8 @@ class BinProperty(object):
 #  class PartProperty                                               #
 ######################################################################
 class PartProperty(object):
-    def __init__(self, name, radius, obj_size, open_width, insertion_depth, ns):
+    def __init__(self,
+                 name, radius, obj_size, open_width, insertion_depth, ns):
         self._name            = name
         self._radius          = radius       # radius of the suction pad(pixel)
         self._obj_size        = obj_size     # approximate size of part
@@ -80,13 +81,13 @@ class GraspabilityClient(object):
 
     def __init__(self):
         super(GraspabilityClient, self).__init__()
-        self.createMaskImage    = rospy.ServiceProxy("create_mask_image",
-                                                     asrv.createMaskImage)
-        self.searchGraspability = rospy.ServiceProxy("search_graspability",
-                                                     asrv.searchGraspability)
+        self._createMaskImage    = rospy.ServiceProxy("create_mask_image",
+                                                      asrv.createMaskImage)
+        self._searchGraspability = rospy.ServiceProxy("search_graspability",
+                                                      asrv.searchGraspability)
 
-    def create_mask_image(self, image_topic, image_dir):
-        return self.createMaskImage(image_topic, image_dir).success
+    def create_mask_image(self, image_topic, nbins, image_dir=""):
+        return self._createMaskImage(image_topic, nbins, image_dir).success
 
     def search(self, camera_info_topic, image_topic, gripper_type,
                part_id, bin_id, image_dir=""):
@@ -95,8 +96,8 @@ class GraspabilityClient(object):
 
         try:
             (K, D) = self._get_camera_intrinsics(camera_info_topic)
-            res    = self.searchGraspability(image_topic, gripper_type,
-                                             part_id, bin_id, image_dir)
+            res    = self._searchGraspability(image_topic, gripper_type,
+                                              part_id, bin_id, image_dir)
 
             poses = gmsg.PoseArray()
             poses.header = res.header
@@ -117,7 +118,6 @@ class GraspabilityClient(object):
                 np.array(camera_info.D))
 
     def _back_project_pixel(self, uvd, K, D):
-        rospy.logdebug("pixel point and depth: %f, %f, %f" % (uvd.x, uvd.y, uvd.z))
         # z = d
         # x = (u - self.cx) * d / self.fx
         # y = (v - self.cy) * d / self.fy
@@ -128,5 +128,4 @@ class GraspabilityClient(object):
         z = uvd.z
         x = normalized_x * z
         y = normalized_y * z
-        rospy.logdebug("spatial position: %f, %f, %f" % (x, y, z))
         return x, y, z
