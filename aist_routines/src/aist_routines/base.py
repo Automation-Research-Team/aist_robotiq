@@ -34,7 +34,6 @@
 #
 # Author: Toshio UESHIBA
 
-from math import pi
 import sys
 import copy
 
@@ -104,8 +103,10 @@ class AISTBaseRoutines(object):
                                                  aist_msgs.srv.getCameraInfo)
         self.commandCamera  = rospy.ServiceProxy('/aist_skills/commandCamera',
                                                  aist_msgs.srv.commandCamera)
+        self.createMaskImage = rospy.ServiceProxy('/aist_skills/createMaskImage',
+                                                  aist_msgs.srv.createMaskImage)
         self.searchGraspability = rospy.ServiceProxy('/aist_skills/searchGraspability',
-                                                 aist_msgs.srv.searchGraspability)
+                                                     aist_msgs.srv.searchGraspability)
 
         # Action clients
         self.pickOrPlace    = actionlib.SimpleActionClient(
@@ -177,6 +178,10 @@ class AISTBaseRoutines(object):
         return self.commandCamera(camera_name, False).success
 
     # Graspability stuffs
+    def create_mask_image(self, camera_name, nbins):
+        res = self.createMaskImage(camera_name, nbins)
+        return res.success
+
     def search_graspability(self, robot_name, camera_name, part_id, bin_id):
         res = self.searchGraspability(robot_name, camera_name, part_id, bin_id)
         return (res.poses, res.rotipz, res.gscore, res.success)
