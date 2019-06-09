@@ -58,14 +58,6 @@ def clamp(x, min_x, max_x):
 #  class SkillServer                                                 #
 ######################################################################
 class SkillServer(object):
-    marker_props = {     #axes    scale                  color(RGBA)
-        "pose":          (True,  (0.006, 0.020, 0.020), (0.0, 1.0, 0.0, 0.8)),
-        "pick_pose":     (True,  (0.006, 0.020, 0.020), (1.0, 0.0, 1.0, 0.8)),
-        "place_pose":    (True,  (0.006, 0.020, 0.020), (0.0, 1.0, 1.0, 0.8)),
-        "graspability":  (True,  (0.004, 0.004, 0.004), (1.0, 1.0, 0.0, 0.8)),
-        "":              (False, (0.004, 0.004, 0.004), (0.0, 1.0, 0.0, 0.8)),
-        }
-
     def __init__(self):
         super(SkillServer, self).__init__()
         moveit_commander.roscpp_initialize(sys.argv)
@@ -260,9 +252,12 @@ class SkillServer(object):
     def get_camera_info_cb(self, req):
         camera = self.cameras[req.name]
         res    = aist_msgs.srv.getCameraInfoResponse()
-        res.type       = camera.type
+        res.type              = camera.type
         res.camera_info_topic = camera.camera_info_topic
         res.image_topic       = camera.image_topic
+        res.pointcloud_topic  = camera.pointcloud_topic
+        res.depth_topic       = camera.depth_topic
+        res.normal_topic      = camera.normal_topic
         res.success           = True
         return res
 
@@ -298,15 +293,16 @@ class SkillServer(object):
         camera.start_acquisition()
         (poses, rotipz, gscore, success) = \
             self._graspabilityClient.search(camera.camera_info_topic,
-                                            camera.image_topic, gripper.type,
+                                            camera.depth_topic,
+                                            camera.normal_topic, gripper.type,
                                             req.part_id, req.bin_id)
         camera.stop_acquisition()
 
         if success:
-            for i in range(len(poses)):
+            for i in range(len(poses.poses)):
                 pose = gmsg.PoseStamped()
-                pose.header = marker_poses.header
-                pose.pose   = marker_poses.poses[i]
+                pose.header = poses.header
+                pose.pose   = poses.poses[i]
                 self._markerPublisher.add(pose, "graspability",
                                           "{}[{:.3f}]".format(i, gscore[i]), 0)
 

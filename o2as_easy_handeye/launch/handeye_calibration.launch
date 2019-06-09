@@ -50,12 +50,12 @@
   <!-- Set up namespace -->
   <arg name="namespace"	value="$(arg camera_name)_from_$(arg robot_name)"/>
 
-  <group ns="$(arg namespace)" >
+  <group ns="$(arg namespace)">
     <param name="eye_on_hand"		value="$(arg eye_on_hand)"/>
     <param name="robot_base_frame"	value="$(arg robot_base_frame)"/>
     <param name="robot_effector_frame"	value="$(arg robot_effector_frame)"/>
-    <param name="tracking_base_frame"	value="$(arg camera_frame)" />
-    <param name="tracking_marker_frame"	value="$(arg marker_frame)" />
+    <param name="tracking_base_frame"	value="$(arg camera_frame)"/>
+    <param name="tracking_marker_frame"	value="$(arg marker_frame)"/>
   </group>
 
   <!-- Start easy_handeye calibrator -->

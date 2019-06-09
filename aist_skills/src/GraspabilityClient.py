@@ -3,9 +3,11 @@ import os
 import rospy
 import numpy as np
 import cv2
-from sensor_msgs import msg as smsg
-from geometry_msgs import msg as gmsg
+from math              import pi, radians, degrees
+from sensor_msgs       import msg as smsg
+from geometry_msgs     import msg as gmsg
 from aist_graspability import srv as asrv
+from cv_bridge         import CvBridge, CvBridgeError
 
 ######################################################################
 #  class BinProperty                                                 #
@@ -86,29 +88,49 @@ class GraspabilityClient(object):
         self._searchGraspability = rospy.ServiceProxy("search_graspability",
                                                       asrv.searchGraspability)
 
-    def create_mask_image(self, image_topic, nbins, image_dir=""):
-        return self._createMaskImage(image_topic, nbins, image_dir).success
+    def create_mask_image(self, depth_topic, nbins, image_dir=""):
+        return self._createMaskImage(depth_topic, nbins, image_dir).success
 
-    def search(self, camera_info_topic, image_topic, gripper_type,
-               part_id, bin_id, image_dir=""):
+    def search(self, camera_info_topic, depth_topic, normal_topic,
+               gripper_type, part_id, bin_id, image_dir=""):
         part_prop = GraspabilityClient.part_props[part_id]
         rospy.loginfo("search graspabilities for " + part_prop.name)
 
         try:
             (K, D) = self._get_camera_intrinsics(camera_info_topic)
-            res    = self._searchGraspability(image_topic, gripper_type,
+            res    = self._searchGraspability(depth_topic, gripper_type,
                                               part_id, bin_id, image_dir)
 
             poses = gmsg.PoseArray()
             poses.header = res.header
-            for i in range(len(res.pos3D)):
-                p = self._back_project_pixel(res.pos3D[i], K, D)
-                poses.poses.append(gmsg.Pose(gmsg.Point(*p),
-                                             gmsg.Quaternion(0, 0, 0, 1)))
+
+            if normal_topic == "":
+                for uvd in res.pos3D:
+                    xyz = self._back_project_pixel(uvd, K, D)
+                    poses.poses.append(gmsg.Pose(gmsg.Point(*xyz),
+                                                 gmsg.Quaternion(1, 0, 0, 0)))
+            else:
+                bridge  = CvBridge()
+                normals = bridge.imgmsg_to_cv2(
+                              rospy.wait_for_message(normal_topic,
+                                                     smsg.Image, timeout=10.0),
+                              "32FC3")
+                for i in range(len(res.pos3D)):
+                    uvd = res.pos3D[i]
+                    xyz = self._back_project_pixel(uvd, K, D)
+                    n   = normals[uvd.y, uvd.x, 0:3]
+                    rot = -radians(res.rotipz[i])
+                    poses.poses.append(gmsg.Pose(gmsg.Point(*xyz),
+                                                 gmsg.Quaternion(1, 0, 0, 0)))
+
             return (poses, res.rotipz, res.gscore, res.success)
 
         except rospy.ROSException:
             rospy.logerr("wait_for_message(): Timeout expired!")
+            return (None, None, None, False)
+
+        except CvBridgeError as e:
+            rospy.logerr(e)
             return (None, None, None, False)
 
     def _get_camera_intrinsics(self, camera_info_topic):
@@ -129,3 +151,6 @@ class GraspabilityClient(object):
         x = normalized_x * z
         y = normalized_y * z
         return x, y, z
+
+    def _get_normal(normals, pos3D):
+        u = pos3D.x
