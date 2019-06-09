@@ -50,7 +50,7 @@ catkin_package(
 )
 
 add_executable(o2as_single
-  src/o2as_single.cpp
+  src/main.cpp
   src/BinDescription.cpp
 )
 

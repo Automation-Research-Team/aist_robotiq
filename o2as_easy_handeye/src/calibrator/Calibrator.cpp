@@ -45,22 +45,22 @@ Calibrator::Calibrator()
 
     if (_eye_on_hand)
     {
-	_node.param<std::string>("effector_frame", _eMc.header.frame_id,
+	_node.param<std::string>("robot_effector_frame", _eMc.header.frame_id,
 				 "tool0");
-	_node.param<std::string>("world_frame",	   _wMo.header.frame_id,
+	_node.param<std::string>("robot_base_frame",	 _wMo.header.frame_id,
 				 "base_link");
     }
     else
     {
-	_node.param<std::string>("effector_frame", _wMo.header.frame_id,
+	_node.param<std::string>("robot_effector_frame", _wMo.header.frame_id,
 				 "tool0");
-	_node.param<std::string>("world_frame",	   _eMc.header.frame_id,
+	_node.param<std::string>("robot_base_frame",	 _eMc.header.frame_id,
 				 "base_link");
     }
 
-    _node.param<std::string>("camera_frame", _eMc.child_frame_id,
+    _node.param<std::string>("tracking_base_frame",   _eMc.child_frame_id,
 			     "tracking_origin");
-    _node.param<std::string>("object_frame", _wMo.child_frame_id,
+    _node.param<std::string>("tracking_marker_frame", _wMo.child_frame_id,
 			     "tracking_target");
 }
 
