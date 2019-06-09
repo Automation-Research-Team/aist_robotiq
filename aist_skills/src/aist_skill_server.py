@@ -200,8 +200,8 @@ class SkillServer(object):
         res = aist_msgs.srv.goToPoseGoalResponse()
 
         if move_lin:
-            pose_world = self._listener.transformPose(group.get_planning_frame(),
-                                                     target_pose).pose
+            pose_world = self._listener.transformPose(
+                                group.get_planning_frame(), target_pose).pose
             waypoints  = []
             waypoints.append(pose_world)
             (plan, fraction) = group.compute_cartesian_path(waypoints,

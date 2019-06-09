@@ -104,14 +104,8 @@
 
   <!-- Add RealSense camerar -->
   <xacro:include filename="$(find o2as_realsense2_camera)/urdf/_d435.urdf.xacro" />
-  <link name="a_bot_cam_holder_link" />
-  <joint name="a_bot_cam_holder_joint" type="fixed">
-    <parent link="a_bot_wrist_2_link" />
-    <child  link="a_bot_cam_holder_link" />
+  <xacro:sensor_d435 prefix="a_bot_" parent="a_bot_wrist_2_link">
     <origin xyz="0.0 -0.06 0.20" rpy="${0*pi/180} 0.0 ${pi/2}" />
-  </joint>
-  <xacro:sensor_d435 prefix="a_bot_" parent="a_bot_cam_holder_link">
-    <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:sensor_d435>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->

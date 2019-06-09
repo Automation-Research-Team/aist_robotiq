@@ -7,35 +7,28 @@
        value="$(eval arg('camera_name') == arg('robot_name') + '_camera')"/>
 
   <!-- Set body/optical frame of the camera -->
-  <arg name ="camera_body_frame"
-       value="a_phoxi_m_camera"
+  <arg name ="camera_body_frame"	value="$(arg camera_name)"
        if   ="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
-  <arg name ="camera_optical_frame"
-       value="a_phoxi_m_sensor"
+  <arg name ="camera_optical_frame"	value="a_phoxi_m_sensor"
        if   ="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
 
-  <arg name  ="camera_body_frame"
-       value ="$(arg camera_name)_link"
-       unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
-  <arg name  ="camera_optical_frame"
-       value ="$(arg camera_name)_depth_optical_frame"
-       unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
+  <arg name ="camera_body_frame"	value="$(arg camera_name)"
+       if   ="$(eval arg('camera_name') == 'b_phoxi_m_camera')"/>
+  <arg name ="camera_optical_frame"	value="b_phoxi_m_sensor"
+       if   ="$(eval arg('camera_name') == 'b_phoxi_m_camera')"/>
+
+  <arg name ="camera_body_frame"	value ="$(arg camera_name)_link"
+       if   ="$(eval arg('camera_name') == 'a_bot_camera')"/>
+  <arg name ="camera_optical_frame"
+       value="$(arg camera_name)_depth_optical_frame"
+       if   ="$(eval arg('camera_name') == 'a_bot_camera')"/>
 
   <!-- Publish hand-eye calibration -->
   <arg name   ="namespace"
        default="$(arg camera_name)_from_$(arg robot_name)"/>
 
   <group ns="$(arg namespace)">
-    <param name ="tracking_base_frame"
-	       value="$(arg camera_name)_from_$(arg robot_name)"/>
-
-    <!-- <param name="robot_base_frame"	value="$(arg robot_name)_base_link"/> -->
-    <param name="robot_base_frame"	value="workspace_center"/>
-    <param name="robot_effector_frame"	value="$(arg robot_name)_ee_link"
-           unless="$(arg eye_on_hand)"/>
-    <param name="robot_effector_frame"	value="$(arg robot_name)_wrist_2_link"
-           if="$(arg eye_on_hand)"/>
-
+    <param name="tracking_base_frame"	value="$(arg namespace)"/>
     <param name="camera_body_frame"	value="$(arg camera_body_frame)"/>
     <param name="camera_optical_frame"	value="$(arg camera_optical_frame)"/>
 
