@@ -2,8 +2,8 @@
 <launch>
   <arg name="eye_on_hand"	default="false"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
-  <arg name="camera_frame"	default="camera_link"/>
-  <arg name="marker_frame"	default="camera_marker"/>
+  <arg name="camera_frame"	default="dummy_camera"/>
+  <arg name="marker_frame"	default="dummy_marker"/>
   <arg name="reference_frame"	default=""/>
 
   <arg name="marker_id"		value="26"	unless="$(arg eye_on_hand)"/>
@@ -22,12 +22,19 @@
     <remap from="/pointcloud"	to="/$(arg camera_name)/pointcloud"
     	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
 
+    <remap from="/camera_info"	to="/$(arg camera_name)/camera_info"
+	   if="$(eval arg('camera_name') == 'b_phoxi_m_camera')"/>
+    <remap from="/image"	to="/$(arg camera_name)/texture"
+	   if="$(eval arg('camera_name') == 'b_phoxi_m_camera')"/>
+    <remap from="/pointcloud"	to="/$(arg camera_name)/pointcloud"
+    	   if="$(eval arg('camera_name') == 'b_phoxi_m_camera')"/>
+
     <remap from="/camera_info"	to="/$(arg camera_name)/rgb/camera_info"
-	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
+	   if="$(eval arg('camera_name') == 'a_bot_camera')"/>
     <remap from="/image"	to="/$(arg camera_name)/rgb/image_raw"
-	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
+	   if="$(eval arg('camera_name') == 'a_bot_camera')"/>
     <remap from="/pointcloud"	to="/$(arg camera_name)/depth/points"
-    	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
+    	   if="$(eval arg('camera_name') == 'a_bot_camera')"/>
 
     <!-- Other parameters -->
     <param name="image_is_rectified" value="false"/>

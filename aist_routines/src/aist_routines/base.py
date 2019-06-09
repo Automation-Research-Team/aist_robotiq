@@ -169,7 +169,9 @@ class AISTBaseRoutines(object):
     # Camera stuffs
     def get_camera_info(self, camera_name):
         res = self.getCameraInfo(camera_name)
-        return (res.type, res.camera_info_topic, res.image_topic, res.success)
+        return (res.type, res.camera_info_topic, res.image_topic,
+                res.pointcloud_topic, res.depth_topic, res.normal_topic,
+                res.success)
 
     def start_acquisition(self, camera_name):
         return self.commandCamera(camera_name, True).success
