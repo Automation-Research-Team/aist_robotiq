@@ -58,6 +58,34 @@ class kitting_order_entry():
         self.in_feeder = False
 
 ######################################################################
+#  class kitting_order_entry                                         #
+######################################################################
+class ItemProperties():
+    def __init__(self, tray, partition, grasp_strategy, dropoff_height):
+        self._tray           = tray
+        self._partition      = partition
+        self._grasp_strategy = grasp_strategy
+        self._dropoff_height = dropofff_height
+
+    @property
+    def tray(self):
+        return self._tray
+
+    @property
+    def partition(self):
+        return self._partition
+
+    @property
+    def grasp_strategy(self):
+        return self._grasp_strategy
+
+    @property
+    def dropoff_height(self):
+        return self._dropoff_height
+
+
+
+######################################################################
 #  class AISTBaseRoutines                                            #
 ######################################################################
 class KittingClass(AISTBaseRoutines):
