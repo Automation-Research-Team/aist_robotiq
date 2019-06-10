@@ -118,7 +118,7 @@ class GraspabilityClient(object):
                 for i in range(len(res.pos3D)):
                     uvd = res.pos3D[i]
                     xyz = self._back_project_pixel(uvd, K, D)
-                    n   = normals[uvd.y, uvd.x, 0:3]
+                    # n   = normals[uvd.y, uvd.x]
                     rot = -radians(res.rotipz[i])
                     poses.poses.append(gmsg.Pose(gmsg.Point(*xyz),
                                                  gmsg.Quaternion(1, 0, 0, 0)))

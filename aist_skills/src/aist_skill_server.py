@@ -294,7 +294,7 @@ class SkillServer(object):
         (poses, rotipz, gscore, success) = \
             self._graspabilityClient.search(camera.camera_info_topic,
                                             camera.depth_topic,
-                                            camera.normal_topic, gripper.type,
+                                            "", gripper.type,
                                             req.part_id, req.bin_id)
         camera.stop_acquisition()
 
@@ -304,7 +304,7 @@ class SkillServer(object):
                 pose.header = poses.header
                 pose.pose   = poses.poses[i]
                 self._markerPublisher.add(pose, "graspability",
-                                          "{}[{:.3f}]".format(i, gscore[i]), 0)
+                                          "{}[{:.3f}]".format(i, gscore[i]), 60)
 
         res = aist_msgs.srv.searchGraspabilityResponse()
         res.poses   = poses
