@@ -16,45 +16,36 @@ from aist_routines.base import AISTBaseRoutines
 
 refposes = {
 #    'a_bot': [-0.10, 0.00, 0.20,  radians(-90), radians(-90), radians(180)],
-    'a_bot': [-0.00, 0.00, 0.010, radians(  0), radians( 90), radians( 90)],
-    'b_bot': [ 0.10, 0.00, 0.015, radians(  0), radians( 90), radians(-90)],
-    'c_bot': [-0.10, 0.00, 0.015, radians(  0), radians( 90), radians( 90)],
-    'd_bot': [-0.30, 0.00, 0.015, radians(  0), radians( 90), radians(  0)],
+    'a_bot': [0.00, 0.00, 0.015, radians(  0), radians( 90), radians( 90)],
+    'b_bot': [0.00, 0.00, 0.015, radians(  0), radians( 90), radians(-90)],
+    'c_bot': [0.00, 0.00, 0.015, radians(  0), radians( 90), radians( 90)],
+    'd_bot': [0.00, 0.00, 0.015, radians(  0), radians( 90), radians(  0)],
 }
 
 
 ######################################################################
 #  class ToolCalibrationRoutines                                     #
 ######################################################################
-class ToolCalibrationRoutines:
-    def __init__(self, routines, robot_name, camera_name, speed):
-        self.routines = routines
+class ToolCalibrationRoutines(AISTBaseRoutines):
+    def __init__(self, robot_name, camera_name, speed):
+        super(ToolCalibrationRoutines, self).__init__()
+
         self.camera_name = camera_name
-        self.speed = speed
-        self.refpose = refposes[robot_name]
+        self.speed       = speed
+        self.refpose     = refposes[robot_name]
+        self.goalpose    = copy.deepcopy(self.refpose)
 
         ## Initialize `moveit_commander`
         self.group = moveit_commander.MoveGroupCommander(robot_name)
 
-        # Set `_ee_link` as end effector wrt `_base_link` of the robot
+        self.gripper_base_link = self.gripper(robot_name).base_link
+        self.gripper_tip_link  = self.gripper(robot_name).tip_link
         self.group.set_pose_reference_frame('workspace_center')
-        (_, gripper_base_link, gripper_tip_link, _) = \
-            self.routines.get_gripper_info(robot_name)
-        # if robot_name == 'b_bot':
-        #     gripper_base_link = robot_name + '_single_suction_gripper_base_link'
-        #     gripper_tip_link  = robot_name + '_single_suction_gripper_pad_link'
-        # elif robot_name == 'd_bot':
-        #     gripper_base_link = robot_name + '_dual_suction_gripper_base_link'
-        #     gripper_tip_link  = robot_name + '_dual_suction_gripper_pad_link'
-        # else:
-        #     gripper_base_link = robot_name + '_robotiq_85_base_link'
-        #     gripper_tip_link  = robot_name + '_robotiq_85_tip_link'
-        print("gripper_base_link = " + gripper_base_link)
-        print("gripper_tip_link  = " + gripper_tip_link)
-        self.gripper_base_link = gripper_base_link
-        self.group.set_end_effector_link(gripper_tip_link)
+        self.group.set_end_effector_link(self.gripper_tip_link)
 
         # Logging
+        print("gripper_base_link = " + self.gripper_base_link)
+        print("gripper_tip_link  = " + self.gripper_tip_link)
         print("==== Planning frame:       %s" %
               self.group.get_planning_frame())
         print("==== Pose reference frame: %s" %
@@ -64,11 +55,12 @@ class ToolCalibrationRoutines:
 
         self.listener = TransformListener()
         now = rospy.Time.now()
-        self.listener.waitForTransform(gripper_base_link, gripper_tip_link,
+        self.listener.waitForTransform(self.gripper_base_link,
+                                       self.gripper_tip_link,
                                        now, rospy.Duration(10))
         self.D0 = self.listener.fromTranslationRotation(
-            *self.listener.lookupTransform(gripper_base_link,
-                                           gripper_tip_link, now))
+            *self.listener.lookupTransform(self.gripper_base_link,
+                                           self.gripper_tip_link, now))
         self.pitch = 0.0
         self.yaw   = 0.0
 
@@ -86,8 +78,12 @@ class ToolCalibrationRoutines:
                                              *tfs.quaternion_from_euler(
                                                  0, 0, 0)))
 
+    @property
+    def robot_name(self):
+        return self.group.get_name()
+
     def go_home(self):
-        self.routines.go_to_named_pose('home', self.group.get_name())
+        self.go_to_named_pose('home', self.robot_name)
 
     def correct_end_effector_link(self):
         D = tfs.concatenate_matrices(
@@ -117,17 +113,13 @@ class ToolCalibrationRoutines:
         poseStamped.pose = gmsg.Pose(
             gmsg.Point(*tfs.translation_from_matrix(T)),
             gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
-        print("   move to " + self.format_pose(poseStamped))
-        res = self.routines.go_to_pose_goal(
-                  self.group.get_name(), poseStamped, self.speed,
-                  end_effector_link=self.group.get_end_effector_link(),
-                  move_lin=True)
-        rospy.sleep(1)
-        print("   reached " + self.format_pose(res.current_pose))
-        return res.success
+        (success, _, _ ) = self.go_to_pose_goal(self.robot_name, poseStamped,
+                                                self.speed, move_lin=True,
+                                                high_precision=True)
+        return success
 
     def rolling_motion(self):
-        pose = copy.deepcopy(self.refpose)
+        pose = copy.deepcopy(self.goalpose)
         for i in range(4):
             pose[3] += radians(30)
             self.move(pose)
@@ -139,7 +131,7 @@ class ToolCalibrationRoutines:
             self.move(pose)
 
     def pitching_motion(self):
-        pose = copy.deepcopy(self.refpose)
+        pose = copy.deepcopy(self.goalpose)
         for i in range(5):
             pose[4] += radians(6)
             self.move(pose)
@@ -151,7 +143,7 @@ class ToolCalibrationRoutines:
             self.move(pose)
 
     def yawing_motion(self):
-        pose = copy.deepcopy(self.refpose)
+        pose = copy.deepcopy(self.goalpose)
         pose[3] = radians(-90)
         pose[5] = radians(180)
         for i in range(5):
@@ -176,34 +168,6 @@ class ToolCalibrationRoutines:
             '<origin xyz="{0[0]} {0[1]} {0[2]}" rpy="${{{1[0]}*pi/180}} ${{{1[1]}*pi/180}} ${{{1[2]}*pi/180}}"/>'
             .format(xyz, rpy))
 
-    def pregrasp(self):
-        self.routines.pregrasp(self.group.get_name())
-
-    def grasp(self):
-        self.routines.grasp(self.group.get_name())
-
-    def release(self):
-        self.routines.release(self.group.get_name())
-
-    def pick(self):
-        print("   pick at " + self.format_pose(self.pick_pose))
-        self.routines.pick(self.group.get_name(), self.pick_pose)
-
-    def place(self):
-        print("  place at " + self.format_pose(self.pick_pose))
-        self.routines.place(self.group.get_name(), self.place_pose)
-
-    def create_mask_image(self, nbins):
-        return self.routines.create_mask_image(self.camera_name, nbins)
-
-    def search_graspability(self):
-        (poses, rotipz, gscore, success) = \
-            self.routines.search_graspability(self.group.get_name(),
-                                              self.camera_name, 4, 0)
-        for gs in gscore:
-            print(str(gs))
-        print(str(poses))
-
     def run(self):
         # Reset pose
         self.go_home()
@@ -216,17 +180,15 @@ class ToolCalibrationRoutines:
             key = raw_input(prompt)
             if key == 'q':
                 break
-            elif key == 'r':
+            elif key == 'o':
                 self.move(self.refpose)
+            elif key == 'r':
                 self.rolling_motion()
             elif key == 'p':
-                self.move(self.refpose)
                 self.pitching_motion()
             elif key == 'y':
-                self.move(self.refpose)
                 self.yawing_motion()
             elif key == 't':
-                self.move(self.refpose)
                 self.rolling_motion()
                 self.pitching_motion()
                 self.yawing_motion()
@@ -242,58 +204,66 @@ class ToolCalibrationRoutines:
                 axis = 'Yaw  '
             elif key == '+':
                 if axis == 'X    ':
-                    self.refpose[0] += 0.01
+                    self.goalpose[0] += 0.01
                 elif axis == 'Y    ':
-                    self.refpose[1] += 0.01
+                    self.goalpose[1] += 0.01
                 elif axis == 'Z    ':
-                    self.refpose[2] += 0.01
+                    self.goalpose[2] += 0.01
                 elif axis == 'Pitch':
                     self.pitch += radians(0.5)
                 else:
                     self.yaw += radians(0.5)
-                self.move(self.refpose)
+                self.move(self.goalpose)
             elif key == '-':
                 if axis == 'X    ':
-                    self.refpose[0] -= 0.01
+                    self.goalpose[0] -= 0.01
                 elif axis == 'Y    ':
-                    self.refpose[1] -= 0.01
+                    self.goalpose[1] -= 0.01
                 elif axis == 'Z    ':
-                    self.refpose[2] -= 0.01
+                    self.goalpose[2] -= 0.01
                 elif axis == 'Pitch':
                     self.pitch -= radians(0.5)
                 else:
                     self.yaw -= radians(0.5)
-                self.move(self.refpose)
+                self.move(self.goalpose)
             elif key == 'd':
                 self.print_tip_link()
             elif key == 'pregrasp':
-                self.pregrasp()
+                self.pregrasp(self.robot_name)
             elif key == 'grasp':
-                self.grasp()
+                self.grasp(self.robot_name)
             elif key == 'release':
-                self.release()
+                self.release(self.robot_name)
             elif key == 'pick':
-                self.pick()
+                print("   pick at " + self.format_pose(self.pick_pose))
+                self.pick(self.robot_name, self.pick_pose)
             elif key == 'place':
-                self.place()
+                print("  place at " + self.format_pose(self.pick_pose))
+                self.place(self.robot_name, self.place_pose)
             elif key == 'c':
-                self.create_mask_image(int(raw_input("  #bins? ")))
+                return self.create_mask_image(self.camera_name,
+                                              int(raw_input("  #bins? ")))
             elif key == 's':
-                self.search_graspability()
+                (poses, rotipz, gscore, success) = \
+                    self.search_graspability(self.robot_name,
+                                             self.camera_name, 4, 0)
+                for gs in gscore:
+                    print(str(gs))
+                print(str(poses))
             elif key == 'h':
                 self.go_home()
             else:
                 if axis == 'X    ':
-                    self.refpose[0] = float(key)
+                    self.goalpose[0] = float(key)
                 elif axis == 'Y    ':
-                    self.refpose[1] = float(key)
+                    self.goalpose[1] = float(key)
                 elif axis == 'Z    ':
-                    self.refpose[2] = float(key)
+                    self.goalpose[2] = float(key)
                 elif axis == 'Pitch':
                     self.pitch = radians(float(key))
                 else:
                     self.yaw = radians(float(key))
-                self.move(self.refpose)
+                self.move(self.goalpose)
 
         # Reset pose
         self.go_home()
@@ -316,15 +286,6 @@ class ToolCalibrationRoutines:
 ######################################################################
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Perform tool calibration')
-    parser.add_argument('-C',
-                        '--config',
-                        action='store',
-                        nargs='?',
-                        default='aist',
-                        type=str,
-                        choices=None,
-                        help='configuration name',
-                        metavar=None)
     parser.add_argument('-r',
                         '--robot_name',
                         action='store',
@@ -348,16 +309,11 @@ if __name__ == '__main__':
     try:
         assert (args.robot_name in {'a_bot', 'b_bot', 'c_bot', 'd_bot'})
 
-        if args.config == 'o2as':
-            base_routines = O2ASBaseRoutines()
-        else:
-            base_routines = AISTBaseRoutines()
-
         speed = 0.1
-        routines = ToolCalibrationRoutines(base_routines, args.robot_name,
+        routines = ToolCalibrationRoutines(args.robot_name,
                                            args.camera_name, speed)
-
         routines.run()
+        rospy.signal_shutdown("Calibration completed")
 
     except Exception as ex:
         print(ex.message)

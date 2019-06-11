@@ -1,6 +1,0 @@
-# Request definition
-string camera_name
-int32  nbins
----
-# Response definition
-bool success

@@ -1,10 +1,14 @@
 <?xml version="1.0" ?>
 <launch>
-  <arg name="config"	default="aist"/>
-  <arg name="scene"	default="$(arg config)_base_scene"/>
-  <arg name="sim"	default="false"/>
+  <arg name="config"		default="aist"/>
+  <arg name="scene"		default="$(arg config)_base_scene"/>
+  <arg name="sim"		default="false"/>
   <arg name="rviz_config"
        default = "$(find aist_moveit_config)/launch/moveit.rviz"/>
+  <arg name="config_dir"        default="$(find o2as_fastening_tools)/config"/>
+  <arg name="suction_control"   default="suction_control"/>
+  <arg name="operation_mode"    default="operation_mode"/>
+
   <param name="use_real_robot"	value="$(eval not arg('sim'))"/>
 
   <!-- Launch real robots if "sim" == "false" -->
@@ -29,7 +33,14 @@
   <!-- Launch skill server -->
   <include file="$(find o2as_skills)/launch/o2as_skill_server.launch"
 	   if="$(eval arg('config') == 'o2as')"/>
-  <!-- <include file="$(find aist_skills)/launch/aist_skill_server.launch" -->
-  <!-- 	   unless="$(eval arg('config') == 'o2as')"> -->
-  <!-- </include> -->
+
+  <!-- Launch fastening tools -->
+  <node name="suction_controller" pkg="o2as_fastening_tools"
+	type="suction_controller.py" output="screen"
+	if="$(eval not arg('config') == 'o2as' and not arg('sim'))">
+    <param name="config_dir"      type="string" value="$(arg config_dir)"/>
+    <param name="suction_control" type="string" value="$(arg suction_control)"/>
+    <param name="operation_mode"  type="string" value="$(arg operation_mode)"/>
+  </node>
+
 </launch>

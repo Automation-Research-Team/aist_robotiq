@@ -40,25 +40,17 @@ import rospy
 from math import pi, radians, degrees
 
 from tf import TransformListener, transformations as tfs
-import actionlib
 import moveit_commander
 from moveit_commander.conversions import pose_to_list
 
 from geometry_msgs import msg as gmsg
-import visualization_msgs.msg
-import std_msgs.msg
-import o2as_msgs.msg
-import o2as_msgs.srv
-import aist_msgs.msg
-import aist_msgs.srv
-import aist_graspability.msg
-import aist_graspability.srv
 
 from GripperClient      import GripperClient, Robotiq85Gripper, \
                                SuctionGripper, PrecisionGripper
 from CameraClient       import CameraClient, PhoXiCamera, RealsenseCamera
 from GraspabilityClient import GraspabilityClient
 from MarkerPublisher    import MarkerPublisher
+from PickOrPlaceAction  import PickOrPlaceAction
 
 ######################################################################
 #  global fucntions                                                  #
@@ -123,6 +115,7 @@ class AISTBaseRoutines(object):
         rospy.init_node("aist_routines", anonymous=True)
         moveit_commander.roscpp_initialize(sys.argv)
 
+        # Grippers and cameras
         if rospy.get_param("use_real_robot", False):
             self._grippers = {
                 # "a_bot": Robotiq85Gripper("a_bot_"),
@@ -171,27 +164,10 @@ class AISTBaseRoutines(object):
                                         "/a_bot_camera/depth/points"),
             }
 
-        # Marker stuffs
-        self._markerPublisher  = MarkerPublisher()
-
-        # Graspability stuffs
+        self._markerPublisher    = MarkerPublisher()
         self._graspabilityClient = GraspabilityClient()
-
-        # Action servers
-        self._pickOrPlaceAction = actionlib.SimpleActionServer(
-                                        "aist_skills/pickOrPlace",
-                                        aist_msgs.msg.pickOrPlaceAction,
-                                        execute_cb=self._pick_or_place_cb,
-                                        auto_start=False)
-        self._pickOrPlaceAction.start()
-
-        # Action clients
-        self._pickOrPlaceClient = actionlib.SimpleActionClient(
-                                        '/aist_skills/pickOrPlace',
-                                        aist_msgs.msg.pickOrPlaceAction)
-        self._pickOrPlaceClient.wait_for_server()
-
-        self._listener = TransformListener()
+        self._pickOrPlaceAction  = PickOrPlaceAction(self)
+        self.listener            = TransformListener()
 
     def cycle_through_calibration_poses(self, poses, robot_name,
                                         speed=0.3, move_lin=False,
@@ -234,8 +210,8 @@ class AISTBaseRoutines(object):
     def go_to_pose_goal(self, robot_name, target_pose, speed=1.0,
                         high_precision=False, end_effector_link="",
                         move_lin=False):
-        rospy.loginfo("move to " + self._format_pose(target_pose))
-        self._markerPublisher.add(target_pose, "pose")
+        rospy.loginfo("move to " + self.format_pose(target_pose))
+        self.publish_marker(target_pose, "pose")
 
         if end_effector_link == "":
             end_effector_link = self._grippers[robot_name].tip_link
@@ -245,10 +221,8 @@ class AISTBaseRoutines(object):
         group.set_pose_target(target_pose)
         group.set_max_velocity_scaling_factor(clamp(speed, 0.0, 1.0))
 
-        res = aist_msgs.srv.goToPoseGoalResponse()
-
         if move_lin:
-            pose_world = self._listener.transformPose(
+            pose_world = self.listener.transformPose(
                                 group.get_planning_frame(), target_pose).pose
             waypoints  = []
             waypoints.append(pose_world)
@@ -260,14 +234,14 @@ class AISTBaseRoutines(object):
             robots      = moveit_commander.RobotCommander()
             plan        = group.retime_trajectory(robots.get_current_state(),
                                                   plan, speed)
-            res.success = group.execute(plan, wait=True)
+            success = group.execute(plan, wait=True)
         else:
             goal_tolerance = group.get_goal_tolerance()
             planning_time  = group.get_planning_time()
             if high_precision:
                 group.set_goal_tolerance(.000001)
                 group.set_planning_time(10)
-            res.success = group.go(wait=True)
+            success = group.go(wait=True)
             if high_precision:
                 group.set_goal_tolerance(goal_tolerance)
                 group.set_planning_time(planning_time)
@@ -277,11 +251,10 @@ class AISTBaseRoutines(object):
         # Note: there is no equivalent function for clear_joint_value_targets()
         group.clear_pose_targets()
 
-        res.current_pose = group.get_current_pose()
-        res.all_close    = all_close(target_pose.pose, res.current_pose.pose,
-                                     0.01)
-        rospy.loginfo("reached " + self._format_pose(res.current_pose))
-        return res
+        current_pose = group.get_current_pose()
+        is_all_close = all_close(target_pose.pose, current_pose.pose, 0.01)
+        rospy.loginfo("reached " + self.format_pose(current_pose))
+        return (success, is_all_close, current_pose)
 
     # def do_linear_push(self, robot_name, force, wait=True, direction="Z+", max_approach_distance=0.1, forward_speed=0.0):
     #     if not self.use_real_robot:
@@ -301,33 +274,32 @@ class AISTBaseRoutines(object):
     #     return res.success
 
     # Gripper stuffs
-    @property
     def gripper(self, robot_name):
         return self._grippers[robot_name]
 
     def pregrasp(self, robot_name, command=""):
-        return self.gripper(robot_name).pregrasp(command)
+        return self._grippers[robot_name].pregrasp(command)
 
     def grasp(self, robot_name, command=""):
-        return self.gripper(robot_name).grasp(command)
+        return self._grippers[robot_name].grasp(command)
 
     def release(self, robot_name, command=""):
-        return self.gripper(robot_name).release(command)
+        return self._grippers[robot_name].release(command)
 
     # Camera stuffs
-    @property
     def camera(self, camera_name):
         return self._cameras[camera_name]
 
     def start_acquisition(self, camera_name):
-        return self.camera(camera_name).start_acquisition()
+        return self._cameras[camera_name].start_acquisition()
 
     def stop_acquisition(self, camera_name):
-        return self.camera(camera_name).stop_acquisition()
+        return self._cameras[camera_name].stop_acquisition()
 
     # Marker stuffs
-    def publish_marker(self, pose_stamped, marker_type):
-        return self._markerPublisher.add(pose_stamped, marker_type)
+    def publish_marker(self, pose_stamped, marker_type, text="", lifetime=15):
+        return self._markerPublisher.add(pose_stamped, marker_type,
+                                         text, lifetime)
 
     # Graspability stuffs
     def create_mask_image(self, camera_name, nbins):
@@ -338,7 +310,8 @@ class AISTBaseRoutines(object):
         camera.stop_acquisition()
         return success
 
-    def search_graspability(self, robot_name, camera_name, part_id, bin_id):
+    def search_graspability(self, robot_name, camera_name, part_id, bin_id,
+                            marker_lifetime=60):
         gripper = self._grippers[robot_name]
         camera  = self._cameras[camera_name]
         camera.start_acquisition()
@@ -347,124 +320,38 @@ class AISTBaseRoutines(object):
                                             camera.depth_topic,
                                             "", gripper.type, part_id, bin_id)
         camera.stop_acquisition()
-
         if success:
             for i in range(len(poses.poses)):
                 pose = gmsg.PoseStamped()
                 pose.header = poses.header
                 pose.pose   = poses.poses[i]
-                self._markerPublisher.add(pose, "graspability",
-                                          "{}[{:.3f}]".format(i, gscore[i]),
-                                          60)
-
+                self.publish_marker(pose, "graspability",
+                                    "{}[{:.3f}]".format(i, gscore[i]),
+                                    lifetime=marker_lifetime)
         return (poses, rotipz, gscore, success)
 
-    # Various actions
+    # Pick and place action stuffs
     def pick(self, robot_name, pose_stamped, grasp_offset=0.0,
              gripper_command="close",
              speed_fast=1.0, speed_slow=0.1, approach_offset=0.05,
              liftup_after=True, acc_fast=1.0, acc_slow=0.5):
-        return self._pick_or_place(robot_name, pose_stamped, True,
-                                   gripper_command,
-                                   grasp_offset, approach_offset, liftup_after,
-                                   speed_fast, speed_slow, acc_fast, acc_slow)
+        return self._pickOrPlaceAction.execute(
+            robot_name, pose_stamped, True, gripper_command,
+            grasp_offset, approach_offset, liftup_after,
+            speed_fast, speed_slow, acc_fast, acc_slow)
 
     def place(self, robot_name, pose_stamped, grasp_offset=0.0,
               gripper_command="open",
               speed_fast=1.0, speed_slow=0.1, approach_offset=0.05,
               liftup_after=True, acc_fast=1.0, acc_slow=0.5):
-        return self._pick_or_place(robot_name, pose_stamped, False,
-                                   gripper_command,
-                                   grasp_offset, approach_offset, liftup_after,
-                                   speed_fast, speed_slow, acc_fast, acc_slow)
+        return self._pickOrPlaceAction.execute(
+            robot_name, pose_stamped, False, gripper_command,
+            grasp_offset, approach_offset, liftup_after,
+            speed_fast, speed_slow, acc_fast, acc_slow)
 
-    # Private functions
-    def _pick_or_place(self, robot_name, pose_stamped, pick, gripper_command,
-                       grasp_offset, approach_offset, liftup_after,
-                       speed_fast, speed_slow, acc_fast, acc_slow):
-        goal = aist_msgs.msg.pickOrPlaceGoal()
-        goal.robot_name      = robot_name
-        goal.pose            = pose_stamped
-        goal.pick            = pick
-        goal.gripper_command = gripper_command
-        goal.grasp_offset    = grasp_offset
-        goal.approach_offset = approach_offset
-        goal.liftup_after    = liftup_after
-        goal.speed_fast      = speed_fast
-        goal.speed_slow      = speed_slow
-        goal.acc_fast        = acc_fast
-        goal.acc_slow        = acc_slow
-        self._pickOrPlaceClient.send_goal(goal)
-        self._pickOrPlaceClient.wait_for_result()
-        return self._pickOrPlaceClient.get_result()
-
-    def _pick_or_place_cb(self, goal):
-        gripper  = self._grippers[goal.robot_name]
-        feedback = aist_msgs.msg.pickOrPlaceFeedback()
-
-        # Go to approach pose.
-        rospy.loginfo("Go to approach pose:")
-        res = self.go_to_pose_goal(goal.robot_name,
-                                   self._gripper_target_pose(
-                                       goal.pose, goal.approach_offset),
-                                   goal.speed_fast)
-        feedback.current_pose = res.current_pose
-        self._pickOrPlaceAction.publish_feedback(feedback)
-
-        # Pregrasp
-        if goal.pick:
-            gripper.pregrasp(goal.gripper_command)
-
-        # Go to pick/place pose.
-        rospy.loginfo("Go to pick/place pose:")
-        target_pose = self._gripper_target_pose(goal.pose, goal.grasp_offset)
-        self._markerPublisher.add(target_pose,
-                                  "pick_pose" if goal.pick else "place_pose")
-        res = self.go_to_pose_goal(goal.robot_name, target_pose,
-                                   goal.speed_slow)
-        feedback.current_pose = res.current_pose
-        self._pickOrPlaceAction.publish_feedback(feedback)
-
-        # Grasp or release
-        if goal.pick:
-            res_gripper = gripper.grasp(goal.gripper_command)
-        else:
-            res_gripper = gripper.release(goal.gripper_command)
-
-        # Go back to approach pose.
-        if goal.liftup_after:
-            rospy.loginfo("Go back to approach pose:")
-            res = self.go_to_pose_goal(goal.robot_name,
-                                       self._gripper_target_pose(
-                                           goal.pose, goal.approach_offset),
-                                       goal.speed_fast)
-
-        result = aist_msgs.msg.pickOrPlaceResult()
-        result.success      = res.success and res_gripper
-        result.current_pose = res.current_pose
-        self._pickOrPlaceAction.set_succeeded(result)
-
-    def _gripper_target_pose(self, target_pose, offset):
-        T = tfs.concatenate_matrices(
-                self._listener.fromTranslationRotation(
-                    (target_pose.pose.position.x,
-                     target_pose.pose.position.y,
-                     target_pose.pose.position.z),
-                    (target_pose.pose.orientation.x,
-                     target_pose.pose.orientation.y,
-                     target_pose.pose.orientation.z,
-                     target_pose.pose.orientation.w)),
-                self._listener.fromTranslationRotation(
-                    (0, 0, offset),
-                    tfs.quaternion_from_euler(0, radians(90), 0)))
-        pose = gmsg.PoseStamped()
-        pose.header.frame_id = target_pose.header.frame_id
-        pose.pose = gmsg.Pose(gmsg.Point(*tfs.translation_from_matrix(T)),
-                              gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
-        return pose
-
-    def _format_pose(self, poseStamped):
-        pose = self._listener.transformPose("workspace_center",
+    # Utility functions
+    def format_pose(self, poseStamped):
+        pose = self.listener.transformPose("workspace_center",
                                             poseStamped).pose
         rpy  = map(
             degrees,
