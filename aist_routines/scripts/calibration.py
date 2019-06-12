@@ -10,28 +10,80 @@ import geometry_msgs.msg
 
 from aist_routines.base import AISTBaseRoutines
 
-class CalibrationClass(AISTBaseRoutines):
-    def __init__(self):
-        super(CalibrationClass, self).__init__()
-        self.use_real_robot = rospy.get_param("use_real_robot", False)
-        if self.use_real_robot:
-            self.acceleration = 1.0
-        else:
-            self.acceleration = 0.0
+######################################################################
+#  global variables                                                  #
+######################################################################
+orientations = {
+    'o2as': {
+        'a_bot': [radians(-90), radians( 90), radians(0)],
+        'b_bot': [radians(  0), radians( 90), radians(0)],
+        'c_bot': [radians(  0), radians( 90), radians(0)],
+    },
 
-        self.bin_names = ['bin_3_part_8']
+    'aist': {
+        'a_bot': [radians(-90), radians( 90), radians(0)],
+        'b_bot': [radians(  0), radians( 90), radians(0)],
+    },
 
+    'pgrp': {
+        'a_bot': [radians(-90), radians( 90), radians(0)],
+        'b_bot': [radians(  0), radians( 90), radians(0)],
+    },
 
+    'ur5e': {
+        'c_bot': [radians(-90), radians( 90), radians(0)],
+        'd_bot': [radians(  0), radians( 90), radians(0)],
+    },
+}
+
+######################################################################
+#  class BinCalibrationRoutines                                      #
+######################################################################
+class BinCalibrationRoutines(AISTBaseRoutines):
+    def __init__(self, robot_name):
+        super(BinCalibrationRoutines, self).__init__(orientation)
+        self._bins = {
+            "bin_2" : "part_4",
+            "bin_2" : "part_7",
+            "bin_2" : "part_8",
+            "bin_3" : "part_15",
+            "bin_3" : "part_16",
+        }
+        self.robot_name   = robot_name
         rospy.loginfo("Calibration class is staring up!")
 
+    @property
+    def robot_name(self):
+        return self.group.get_name()
 
-    def touch_the_table(self, robot_name):
+    @robot_name.setter
+    def robot_name(self, name):
+        self._group = moveit_commander.MoveGroupCommander(name)
+        self._group.set_pose_reference_frame("workspace_center")
+        self._group.set_end_effector_link(name + "_ee_link")
+
+    def move(self, pose)
+        poseStamped = gmsg.PoseStamped()
+        poseStamped.header.frame_id = self.group.get_pose_reference_frame()
+        poseStamped.pose = gmsg.Pose(
+            gmsg.Point(pose[0], pose[1], pose[2]),
+            gmsg.Quaternion(
+                *tfs.quaternion_from_euler(pose[3], pose[4], pose[5])))
+        print("  move to " + self.format_pose(poseStamped))
+        (success, _, current_pose) = self.go_to_pose_goal(
+                self.robot_name, poseStamped, self.speed,
+                end_effector_link=self.group.get_end_effector_link(),
+                move_lin=True)
+        print("  reached " + self.format_pose(current_pose))
+        return success
+
+    def touch_the_table(self):
         rospy.loginfo("Calibrating between robot and table.")
-        self.go_to_named_pose("home", robot_name)
+        self.go_to_named_pose("home", self.robot_name)
 
         poses = []
         pose_b = geometry_msgs.msg.PoseStamped()
-        pose_b.header.frame_id = "workspace_center"
+        pose_b.header.frame_id = self.group.get_pose_reference_frame()
         if robot_name == 'a_bot':
             pose_b.pose.orientation = self.downward_orientation_a_bot
         elif robot_name == 'b_bot':
@@ -124,7 +176,7 @@ class CalibrationClass(AISTBaseRoutines):
             if robot_name == "a_bot":
                 end_effector_link = "a_bot_robotiq_85_tip_link"
             elif robot_name == "b_bot":
-                end_effector_link = "b_bot_single_suction_gripper_pad_link"
+                end_effector_link = "b_bot_single_suction_effector_pad_link"
 
         pose0 = geometry_msgs.msg.PoseStamped()
         pose0.header.frame_id = "workspace_center"

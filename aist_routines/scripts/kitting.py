@@ -99,7 +99,7 @@ class PartProperty():
 ######################################################################
 class KittingClass(AISTBaseRoutines):
     """Implements kitting routines for aist robot system."""
-    part_properties = {
+    _part_properties = {
         "part_4"  : PartProperty( 4, "b_bot", "tray_1_partition_4", 0.15),
         "part_5"  : PartProperty( 5, "b_bot", "tray_2_partition_6", 0.15),
         "part_6"  : PartProperty( 6, "b_bot", "tray_1_partition_3", 0.15),
@@ -124,12 +124,13 @@ class KittingClass(AISTBaseRoutines):
 
 
     def initial_setup(self):
-        # self.part_bin_list = {
-        #     "part_5": "bin_3_part_5",
-        #     "part_12": "bin_3_part_12",
-        #     "part_8": "bin_3_part_8",
-        #     "part_7": "bin_3_part_7",
-        # }
+        self._bins = {
+            "bin_2" : "part_4",
+            "bin_2" : "part_7",
+            "bin_2" : "part_8",
+            "bin_3" : "part_15",
+            "bin_3" : "part_16",
+        }
         self.part_bin_list = rospy.get_param("part_bin_list")
 
         # How many candidates should we get from phoxi.

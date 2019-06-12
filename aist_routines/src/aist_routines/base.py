@@ -51,36 +51,11 @@ from CameraClient       import CameraClient, PhoXiCamera, RealsenseCamera
 from GraspabilityClient import GraspabilityClient
 from MarkerPublisher    import MarkerPublisher
 from PickOrPlaceAction  import PickOrPlaceAction
+from URScriptPublisher  import URScriptPublisher
 
 ######################################################################
 #  global fucntions                                                  #
 ######################################################################
-def is_program_running(topic_namespace = ""):
-    """Checks if a program is running on the UR"""
-    msg = rospy.wait_for_message(topic_namespace + "/ur_driver/robot_mode_state", ur_modern_driver.msg.RobotModeDataMsg)
-    if msg:
-        return msg.is_program_running
-    else:
-        rospy.logerr("No message received from the robot. Is everything running? Is the namespace entered correctly with a leading slash?")
-        return False
-
-def wait_for_UR_program(topic_namespace="",
-                        timeout_duration=rospy.Duration.from_sec(20.0)):
-    rospy.logdebug("Waiting for UR program to finish.")
-    # Only run this after sending custom URScripts and not the regular
-    # motion commands, or this call will not terminate before the timeout.
-    rospy.sleep(1.0)
-    t_start = rospy.Time.now()
-    time_passed = rospy.Time.now() - t_start
-    while is_program_running(topic_namespace):
-        rospy.sleep(.05)
-        time_passed = rospy.Time.now() - t_start
-        if time_passed > timeout_duration:
-            rospy.loginfo("Timeout reached.")
-        return False
-    rospy.logdebug("UR Program has terminated.")
-    return True
-
 def all_close(goal, actual, tolerance):
     """
     Convenience method for testing if a list of values are within a tolerance of their counterparts in another list
@@ -127,6 +102,12 @@ class AISTBaseRoutines(object):
             self._cameras = {
                 "a_phoxi_m_camera": PhoXiCamera("a_phoxi_m_camera"),
                 "a_bot_camera":     RealsenseCamera("a_bot_camera"),
+            }
+            self._urscript_publishers = {
+                "a_bot": URScriptPublisher("a_bot"),
+                "b_bot": URScriptPublisher("b_bot"),
+                "c_bot": URScriptPublisher("c_bot"),
+                "d_bot": URScriptPublisher("d_bot"),
             }
         else:
             self._grippers = {
@@ -256,22 +237,15 @@ class AISTBaseRoutines(object):
         rospy.loginfo("reached " + self.format_pose(current_pose))
         return (success, is_all_close, current_pose)
 
-    # def do_linear_push(self, robot_name, force, wait=True, direction="Z+", max_approach_distance=0.1, forward_speed=0.0):
-    #     if not self.use_real_robot:
-    #         return True
-    #     # Directly calls the UR service rather than the action of the skill_server
-    #     req = o2as_msgs.srv.sendScriptToURRequest()
-    #     req.robot_name = robot_name
-    #     req.max_force = force
-    #     req.force_direction = direction
-    #     req.max_approach_distance = max_approach_distance
-    #     req.forward_speed = forward_speed
-    #     req.program_id = "linear_push"
-    #     res = self.urscript.call(req)
-    #     if wait:
-    #         rospy.sleep(2.0)    # This program seems to take some time
-    #         wait_for_UR_program("/" + robot_name +"_controller", rospy.Duration.from_sec(30.0))
-    #     return res.success
+    def do_linear_push(self, robot_name, force, wait=True, direction="Z+",
+                       max_approach_distance=0.1, forward_speed=0.0):
+        urscript_publisher = self._urscript_publishers(robot_name)
+        urscript_publisher.linear_push(force, direction,
+                                       max_approach_distance, forward_speed)
+        if wait:
+            rospy.sleep(2.0)    # This program seems to take some time
+            return urscript_publisher.wait(rospy.Duration.from_sec(30.0))
+        return True
 
     # Gripper stuffs
     def gripper(self, robot_name):
@@ -353,10 +327,28 @@ class AISTBaseRoutines(object):
     def format_pose(self, poseStamped):
         pose = self.listener.transformPose("workspace_center",
                                             poseStamped).pose
-        rpy  = map(
-            degrees,
-            tfs.euler_from_quaternion([pose.orientation.w, pose.orientation.x,
-                                       pose.orientation.y, pose.orientation.z]))
+        rpy  = map(degrees, tfs.euler_from_quaternion([pose.orientation.w,
+                                                       pose.orientation.x,
+                                                       pose.orientation.y,
+                                                       pose.orientation.z]))
         return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
-            pose.position.x, pose.position.y, pose.position.z,
-            rpy[0], rpy[1], rpy[2])
+            pose.position.x, pose.position.y, pose.position.z, *rpy)
+
+    def effector_target_pose(self, target_pose, offset):
+        T = tfs.concatenate_matrices(
+                self.listener.fromTranslationRotation(
+                    (target_pose.pose.position.x,
+                     target_pose.pose.position.y,
+                     target_pose.pose.position.z),
+                    (target_pose.pose.orientation.x,
+                     target_pose.pose.orientation.y,
+                     target_pose.pose.orientation.z,
+                     target_pose.pose.orientation.w)),
+                self.listener.fromTranslationRotation(
+                    (0, 0, offset),
+                    tfs.quaternion_from_euler(0, radians(90), 0)))
+        pose = gmsg.PoseStamped()
+        pose.header.frame_id = target_pose.header.frame_id
+        pose.pose = gmsg.Pose(gmsg.Point(*tfs.translation_from_matrix(T)),
+                              gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
+        return pose
