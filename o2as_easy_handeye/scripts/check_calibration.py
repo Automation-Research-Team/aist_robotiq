@@ -16,33 +16,24 @@ from aist_routines.base import AISTBaseRoutines
 
 orientations = {
     'o2as': {
-        'a_bot': [
-            radians(-90), radians( 90), radians(0)],
-        'b_bot': [
-            radians(  0), radians( 90), radians(0)],
-        'c_bot': [
-            radians(  0), radians( 90), radians(0)],
+        'a_bot': [radians(-90), radians( 90), radians(0)],
+        'b_bot': [radians(  0), radians( 90), radians(0)],
+        'c_bot': [radians(  0), radians( 90), radians(0)],
     },
 
     'aist': {
-        'a_bot': [
-            radians(-90), radians( 90), radians(0)],
-        'b_bot': [
-            radians(  0), radians( 90), radians(0)],
+        'a_bot': [radians(-90), radians( 90), radians(0)],
+        'b_bot': [radians(  0), radians( 90), radians(0)],
     },
 
     'pgrp': {
-        'a_bot': [
-            radians(-90), radians( 90), radians(0)],
-        'b_bot': [
-            radians(  0), radians( 90), radians(0)],
+        'a_bot': [radians(-90), radians( 90), radians(0)],
+        'b_bot': [radians(  0), radians( 90), radians(0)],
     },
 
     'ur5e': {
-        'c_bot': [
-            radians(-90), radians( 90), radians(0)],
-        'd_bot': [
-            radians(  0), radians( 90), radians(0)],
+        'c_bot': [radians(-90), radians( 90), radians(0)],
+        'd_bot': [radians(  0), radians( 90), radians(0)],
     },
 }
 

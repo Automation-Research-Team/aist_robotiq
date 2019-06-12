@@ -80,10 +80,6 @@
 					  parent="a_bot_ft300_frange_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:robotiq_85_gripper_with_tip_link>
-  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/InnerOnlyGripper.xacro" /> -->
-  <!-- <xacro:InnerOnlyGripper prefix="a_bot_"  grippername = "gripper" parent = "a_bot_ft300_frange_link"> -->
-  <!--   <origin xyz="0 0 0" rpy="0 ${90*pi/180} 0"/> -->
-  <!-- </xacro:InnerOnlyGripper> -->
 
   <xacro:include filename="$(find o2as_scene_description)/urdf/single_suction_gripper.urdf.xacro"/>
   <xacro:single_suction_gripper_o2as prefix="b_bot_"

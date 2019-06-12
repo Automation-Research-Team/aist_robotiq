@@ -2,7 +2,6 @@ import rospy
 import actionlib
 from geometry_msgs import msg as gmsg
 from aist_msgs     import msg as amsg
-from math          import radians
 from tf            import transformations as tfs
 
 ######################################################################
@@ -50,7 +49,7 @@ class PickOrPlaceAction(object):
         rospy.loginfo("Go to approach pose:")
         (_, _, feedback.current_pose) \
             = routines.go_to_pose_goal(goal.robot_name,
-                                       self._gripper_target_pose(
+                                       routines.effector_target_pose(
                                            goal.pose, goal.approach_offset),
                                        goal.speed_fast)
         self._server.publish_feedback(feedback)
@@ -61,7 +60,8 @@ class PickOrPlaceAction(object):
 
         # Go to pick/place pose.
         rospy.loginfo("Go to pick/place pose:")
-        target_pose = self._gripper_target_pose(goal.pose, goal.grasp_offset)
+        target_pose = routines.effector_target_pose(goal.pose,
+                                                    goal.grasp_offset)
         routines.publish_marker(target_pose,
                                 "pick_pose" if goal.pick else "place_pose")
         (_, _, feedback.current_pose) \
@@ -81,28 +81,10 @@ class PickOrPlaceAction(object):
             rospy.loginfo("Go back to approach pose:")
             (result.success, _, result.current_pose) \
                 = routines.go_to_pose_goal(goal.robot_name,
-                                           self._gripper_target_pose(
-                                               goal.pose, goal.approach_offset),
+                                           routines.effector_target_pose(
+                                               goal.pose,
+                                               goal.approach_offset),
                                            goal.speed_fast)
 
         result.success = result.success and gripper_success
         self._server.set_succeeded(result)
-
-    def _gripper_target_pose(self, target_pose, offset):
-        T = tfs.concatenate_matrices(
-                self._routines.listener.fromTranslationRotation(
-                    (target_pose.pose.position.x,
-                     target_pose.pose.position.y,
-                     target_pose.pose.position.z),
-                    (target_pose.pose.orientation.x,
-                     target_pose.pose.orientation.y,
-                     target_pose.pose.orientation.z,
-                     target_pose.pose.orientation.w)),
-                self._routines.listener.fromTranslationRotation(
-                    (0, 0, offset),
-                    tfs.quaternion_from_euler(0, radians(90), 0)))
-        pose = gmsg.PoseStamped()
-        pose.header.frame_id = target_pose.header.frame_id
-        pose.pose = gmsg.Pose(gmsg.Point(*tfs.translation_from_matrix(T)),
-                              gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
-        return pose
