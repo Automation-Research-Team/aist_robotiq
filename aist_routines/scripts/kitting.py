@@ -58,26 +58,35 @@ class kitting_order_entry():
         self.in_feeder = False
 
 ######################################################################
-#  class kitting_order_entry                                         #
+#  class PartProperties                                              #
 ######################################################################
-class ItemProperties():
-    def __init__(self, tray, partition, grasp_strategy, dropoff_height):
-        self._tray           = tray
-        self._partition      = partition
-        self._grasp_strategy = grasp_strategy
-        self._dropoff_height = dropofff_height
+class PartProperty():
+    def __init__(self, id, robot_name, target_frame, dropoff_height):
+        self._id             = id
+        self._robot_name     = robot_name
+        self._source_frame   = "unknown"
+        self._target_frame   = target_frame
+        self._dropoff_height = dropoff_height
 
     @property
-    def tray(self):
-        return self._tray
+    def id(self):
+        return self._id
 
     @property
-    def partition(self):
-        return self._partition
+    def robot_name(self):
+        return self._robot_name
 
     @property
-    def grasp_strategy(self):
-        return self._grasp_strategy
+    def source_frame(self):
+        return self._source_frame
+
+    @source_frame.setter
+    def source_frame(self, f):
+        self._source_frame = f
+
+    @property
+    def target_frame(self):
+        return self._target_frame
 
     @property
     def dropoff_height(self):
@@ -90,68 +99,31 @@ class ItemProperties():
 ######################################################################
 class KittingClass(AISTBaseRoutines):
     """Implements kitting routines for aist robot system."""
+    part_properties = {
+        "part_4"  : PartProperty( 4, "b_bot", "tray_1_partition_4", 0.15),
+        "part_5"  : PartProperty( 5, "b_bot", "tray_2_partition_6", 0.15),
+        "part_6"  : PartProperty( 6, "b_bot", "tray_1_partition_3", 0.15),
+        "part_7"  : PartProperty( 7, "b_bot", "tray_1_partition_2", 0.15),
+        "part_8"  : PartProperty( 8, "b_bot", "tray_2_partition_1", 0.15),
+        "part_9"  : PartProperty( 9, "a_bot", "tray_2_partition_4", 0.15),
+        "part_10" : PartProperty(10, "a_bot", "tray_2_partition_7", 0.15),
+        "part_11" : PartProperty(11, "b_bot", "tray_1_partition_1", 0.15),
+        "part_12" : PartProperty(12, "b_bot", "tray_2_partition_3", 0.15),
+        "part_13" : PartProperty(13, "b_bot", "tray_1_partition_5", 0.15),
+        "part_14" : PartProperty(14, "a_bot", "tray_2_partition_2", 0.15),
+        "part_15" : PartProperty(15, "a_bot", "tray_2_partition_5", 0.15),
+        "part_16" : PartProperty(16, "a_bot", "tray_2_partition_8", 0.15),
+        "part_17" : PartProperty(17, "a_bot", "skrewholder_1",      0.15),
+        "part_18" : PartProperty(18, "a_bot", "skrewholder_2",      0.15),
+    }
 
-    def __init__(self, vision_algo="fge"):
-        """Initialize class object."""
+    def __init__(self):
         super(KittingClass, self).__init__()
-        self.vision_algo = vision_algo
         self.initial_setup()
         rospy.loginfo("Kitting class is staring up!")
 
-        self.downward_orientation2 = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, 0))
-
-        self._grasp_candidates_in_camera_pub = rospy.Publisher("aist_kitting/grasp_candidate_poses_in_camera", geometry_msgs.msg.PoseStamped, queue_size=5)
-        self._grasp_candidates_in_bin_pub = rospy.Publisher("aist_kitting/grasp_candidate_poses_in_bin", geometry_msgs.msg.PoseStamped, queue_size=5)
-
-    def read_order_file(self):
-        """
-        Read in the order file, return kitting_list and order_entry_list.
-
-        kitting_list is a list of lists with only the part IDs that are ordered.
-        order_entry_list is a list of kitting_entry_item objects.
-        """
-        order_entry_list = []
-        kitting_list = []
-        kitting_list.append([])
-        kitting_list.append([])
-        kitting_list.append([])
-
-        with open(os.path.join(rp.get_path("aist_scene_description"), "config", "kitting_order_file.csv"), 'r') as f:
-            reader = csv.reader(f)
-            header = next(reader)
-            # [0, 1, 2, 3, 4] = ["Set", "No.", "ID", "Name", "Note"]
-            for data in reader:
-                kitting_list[int(data[0])-1].append(int(data[2]))
-                order_entry_list.append(kitting_order_entry(part_id=int(data[2]), set_number=int(data[0]),
-                                                            number_in_set=int(data[1]),
-                                                            bin_name=self.part_bin_list["part_" + data[2]],
-                                                            target_frame="set_" + data[0] + "_" + self.part_position_in_tray["part_" + data[2]],
-                                                            ee_to_use=self.grasp_strategy["part_" + data[2]],
-                                                            item_name=data[4],
-                                                            dropoff_height=self.dropoff_heights["part_" + data[2]]))
-        return kitting_list, order_entry_list
 
     def initial_setup(self):
-        """Initialize class parameters."""
-        self.use_real_robot = rospy.get_param("use_real_robot", False)
-        self.is_aist_experiment = rospy.get_param("is_aist_experiment", True)
-
-        self._search_grasp_from_phoxi_client = actionlib.SimpleActionClient(
-                                                    "aist_graspability/search_grasp_from_phoxi",
-                                                    aist_graspability.msg.SearchGraspFromPhoxiAction
-                                                )
-
-        # Bin sizes to use random picking.
-        # `width` is defined as the size in the x-axis direction.
-        # `height` is defined as the size in the y-axis direction.
-        # The size range is equaled or longer than 0.
-        self.bin_1_width = 0.128
-        self.bin_1_length = 0.125
-        self.bin_2_width = 0.201
-        self.bin_2_length = 0.112
-        self.bin_3_width = 0.285
-        self.bin_3_length = 0.192
-
         # self.part_bin_list = {
         #     "part_5": "bin_3_part_5",
         #     "part_12": "bin_3_part_12",
@@ -160,110 +132,8 @@ class KittingClass(AISTBaseRoutines):
         # }
         self.part_bin_list = rospy.get_param("part_bin_list")
 
-        self.part_position_in_tray = {
-            "part_4" : "tray_1_partition_4",
-            "part_5" : "tray_2_partition_6",
-            "part_6" : "tray_1_partition_3",
-            "part_7" : "tray_1_partition_2",
-            "part_8" : "tray_2_partition_1",
-            "part_9" : "tray_2_partition_4",
-            "part_10": "tray_2_partition_7",
-            "part_11": "tray_1_partition_1",
-            "part_12": "tray_2_partition_3",
-            "part_13": "tray_1_partition_5",
-            "part_14": "tray_2_partition_2",
-            "part_15": "tray_2_partition_5",
-            "part_16": "tray_2_partition_8",
-            "part_17": "tray_2_this_is_a_screw_so_should_be_ignored",
-            "part_18": "tray_2_this_is_a_screw_so_should_be_ignored"
-        }
-
-        self.grasp_strategy = {
-            "part_4" : "robotiq_gripper",
-            "part_5" : "suction",
-            "part_6" : "robotiq_gripper",
-            "part_7" : "suction",
-            "part_8" : "suction",
-            "part_9" : "precision_gripper_from_inside",
-            "part_10": "precision_gripper_from_inside",
-            "part_11": "suction",
-            "part_12": "suction",
-            "part_13": "suction",
-            "part_14": "precision_gripper_from_outside",
-            "part_15": "precision_gripper_from_inside",
-            "part_16": "precision_gripper_from_inside",
-            "part_17": "precision_gripper_from_outside",
-            "part_18": "precision_gripper_from_outside"
-        }
-
-        # How high the end effector should hover over the tray when delivering the item
-        self.dropoff_heights = {
-            "part_4" : .15,
-            "part_5" : .15,
-            "part_6" : .15,
-            "part_7" : .15,
-            "part_8" : .15,
-            "part_9" : .15,
-            "part_10": .15,
-            "part_11": .15,
-            "part_12": .15,
-            "part_13": .15,
-            "part_14": .15,
-            "part_15": .15,
-            "part_16": .15,
-            "part_17": .15,
-            "part_18": .15
-        }
-
         # How many candidates should we get from phoxi.
         self.max_candidates_from_phoxi = 3
-        self.grasp_candidates = {
-            4 : {
-                "position" : []
-            },
-            5 : {
-                "position" : []
-            },
-            6 : {
-                "position" : []
-            },
-            7 : {
-                "position" : []
-            },
-            8 : {
-                "position" : []
-            },
-            9 : {
-                "position" : []
-            },
-            10: {
-                "position" : []
-            },
-            11: {
-                "position" : []
-            },
-            12: {
-                "position" : []
-            },
-            13: {
-                "position" : []
-            },
-            14: {
-                "position" : []
-            },
-            15: {
-                "position" : []
-            },
-            16: {
-                "position" : []
-            },
-            17: {
-                "position" : []
-            },
-            18:{
-                "position" : []
-            }
-        }
 
         self.order_list_raw, self.ordered_items = self.read_order_file()
         rospy.loginfo("Received order list:")
@@ -278,6 +148,19 @@ class KittingClass(AISTBaseRoutines):
             if order_item.ee_to_use == "robotiq_gripper":
                 rospy.loginfo("Appended item nr." + str(order_item.number_in_set) + " from set " + str(order_item.set_number) + " (part ID:" + str(order_item.part_id) + ") to list of suction items")
                 self.robotiq_items.append(order_item)
+
+    def read_order_file(self):
+        kitting_sets = dict()
+        with open(os.path.join(rp.get_path("aist_scene_description"),
+                               "config", "kitting_order_file.csv"), 'r') as f:
+            # [0, 1, 2, 3, 4] = ["Set", "No.", "ID", "Name", "Note"]
+            for data in csv.reader(f):
+                set_id  = "set_"  + data[0]
+                part_id = "part_" + data[2]
+                if not set_id in kitting_sets:
+                    kitting_sets[set_id] = []
+                kitting_sets[set_id].append(part_id)
+        return kitting_sets
 
     def attempt_item(self, item, max_attempts = 5):
         """
