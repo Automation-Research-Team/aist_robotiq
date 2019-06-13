@@ -188,6 +188,19 @@ class AISTBaseRoutines(object):
         group.clear_pose_targets()
         return success
 
+    def go_to_frame(self, robot_name, target_frame, offset=(0, 0, 0),
+                    speed=1.0, high_precision=False, end_effector_link="",
+                    move_lin=False):
+        target_pose = gmsg.PoseStamped()
+        target_pose.header.frame_id = target_frame
+        target_pose.pose            = gmsg.Pose(gmsg.Point(0, 0, 0),
+                                                gmsg.Quaternion(0, 0, 0, 1))
+        return self.go_to_pose_goal(robot_name,
+                                    self.effector_target_pose(target_pose,
+                                                              offset),
+                                    speed, high_precision, end_effector_link,
+                                    move_lin)
+
     def go_to_pose_goal(self, robot_name, target_pose, speed=1.0,
                         high_precision=False, end_effector_link="",
                         move_lin=False):
@@ -345,7 +358,7 @@ class AISTBaseRoutines(object):
                      target_pose.pose.orientation.z,
                      target_pose.pose.orientation.w)),
                 self.listener.fromTranslationRotation(
-                    (0, 0, offset),
+                    offset,
                     tfs.quaternion_from_euler(0, radians(90), 0)))
         pose = gmsg.PoseStamped()
         pose.header.frame_id = target_pose.header.frame_id

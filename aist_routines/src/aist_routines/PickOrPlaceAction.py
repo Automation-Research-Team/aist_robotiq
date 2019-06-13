@@ -50,7 +50,8 @@ class PickOrPlaceAction(object):
         (_, _, feedback.current_pose) \
             = routines.go_to_pose_goal(goal.robot_name,
                                        routines.effector_target_pose(
-                                           goal.pose, goal.approach_offset),
+                                           goal.pose,
+                                           (0, 0, goal.approach_offset)),
                                        goal.speed_fast)
         self._server.publish_feedback(feedback)
 
@@ -61,7 +62,7 @@ class PickOrPlaceAction(object):
         # Go to pick/place pose.
         rospy.loginfo("Go to pick/place pose:")
         target_pose = routines.effector_target_pose(goal.pose,
-                                                    goal.grasp_offset)
+                                                    (0, 0, goal.grasp_offset))
         routines.publish_marker(target_pose,
                                 "pick_pose" if goal.pick else "place_pose")
         (_, _, feedback.current_pose) \
@@ -83,7 +84,7 @@ class PickOrPlaceAction(object):
                 = routines.go_to_pose_goal(goal.robot_name,
                                            routines.effector_target_pose(
                                                goal.pose,
-                                               goal.approach_offset),
+                                               (0, 0, goal.approach_offset)),
                                            goal.speed_fast)
 
         result.success = result.success and gripper_success

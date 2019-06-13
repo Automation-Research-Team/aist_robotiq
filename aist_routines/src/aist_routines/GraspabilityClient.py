@@ -115,8 +115,7 @@ class GraspabilityClient(object):
                               rospy.wait_for_message(normal_topic,
                                                      smsg.Image, timeout=10.0),
                               "32FC3")
-                for i in range(len(res.pos3D)):
-                    uvd = res.pos3D[i]
+                for i, uvd in enumerate(res.pos3D):
                     xyz = self._back_project_pixel(uvd, K, D)
                     # n   = normals[uvd.y, uvd.x]
                     rot = -radians(res.rotipz[i])
