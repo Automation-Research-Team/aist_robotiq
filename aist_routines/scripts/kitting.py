@@ -32,9 +32,11 @@ def clamp(n, minn, maxn):
 #  class PartProperties                                              #
 ######################################################################
 class PartProperty():
-    def __init__(self, id, robot_name, target_frame, dropoff_height):
+    def __init__(self, id, robot_name, camera_name, target_frame,
+                 dropoff_height):
         self._id             = id
         self._robot_name     = robot_name
+        self._camera_name    = camera_name
         self._target_frame   = target_frame
         self._dropoff_height = dropoff_height
 
@@ -47,6 +49,10 @@ class PartProperty():
         return self._robot_name
 
     @property
+    def camera_name(self):
+        return self._camera_name
+
+    @property
     def target_frame(self):
         return self._target_frame
 
@@ -56,26 +62,41 @@ class PartProperty():
 
 
 ######################################################################
-#  class AISTBaseRoutines                                            #
+#  class KittingRoutines                                             #
 ######################################################################
-class KittingClass(AISTBaseRoutines):
+class KittingRoutines(AISTBaseRoutines):
     """Implements kitting routines for aist robot system."""
     _part_properties = {
-        "part_4"  : PartProperty( 4, "b_bot", "tray_1_partition_4", 0.15),
-        "part_5"  : PartProperty( 5, "b_bot", "tray_2_partition_6", 0.15),
-        "part_6"  : PartProperty( 6, "b_bot", "tray_1_partition_3", 0.15),
-        "part_7"  : PartProperty( 7, "b_bot", "tray_1_partition_2", 0.15),
-        "part_8"  : PartProperty( 8, "b_bot", "tray_2_partition_1", 0.15),
-        "part_9"  : PartProperty( 9, "a_bot", "tray_2_partition_4", 0.15),
-        "part_10" : PartProperty(10, "a_bot", "tray_2_partition_7", 0.15),
-        "part_11" : PartProperty(11, "b_bot", "tray_1_partition_1", 0.15),
-        "part_12" : PartProperty(12, "b_bot", "tray_2_partition_3", 0.15),
-        "part_13" : PartProperty(13, "b_bot", "tray_1_partition_5", 0.15),
-        "part_14" : PartProperty(14, "a_bot", "tray_2_partition_2", 0.15),
-        "part_15" : PartProperty(15, "a_bot", "tray_2_partition_5", 0.15),
-        "part_16" : PartProperty(16, "a_bot", "tray_2_partition_8", 0.15),
-        "part_17" : PartProperty(17, "a_bot", "skrewholder_1",      0.15),
-        "part_18" : PartProperty(18, "a_bot", "skrewholder_2",      0.15),
+        "part_4"  : PartProperty( 4, "b_bot", "a_phoxi_m_camera",
+                                  "tray_1_partition_4", 0.15),
+        "part_5"  : PartProperty( 5, "b_bot", "a_phoxi_m_camera",
+                                  "tray_2_partition_6", 0.15),
+        "part_6"  : PartProperty( 6, "b_bot", "a_phoxi_m_camera",
+                                  "tray_1_partition_3", 0.15),
+        "part_7"  : PartProperty( 7, "b_bot", "a_phoxi_m_camera",
+                                  "tray_1_partition_2", 0.15),
+        "part_8"  : PartProperty( 8, "b_bot", "a_phoxi_m_camera",
+                                  "tray_2_partition_1", 0.15),
+        "part_9"  : PartProperty( 9, "a_bot", "a_phoxi_m_camera",
+                                  "tray_2_partition_4", 0.15),
+        "part_10" : PartProperty(10, "a_bot", "a_phoxi_m_camera",
+                                 "tray_2_partition_7", 0.15),
+        "part_11" : PartProperty(11, "b_bot", "a_phoxi_m_camera",
+                                 "tray_1_partition_1", 0.15),
+        "part_12" : PartProperty(12, "b_bot", "a_phoxi_m_camera",
+                                 "tray_2_partition_3", 0.15),
+        "part_13" : PartProperty(13, "b_bot", "a_phoxi_m_camera",
+                                 "tray_1_partition_5", 0.15),
+        "part_14" : PartProperty(14, "a_bot", "a_phoxi_m_camera",
+                                 "tray_2_partition_2", 0.15),
+        "part_15" : PartProperty(15, "a_bot", "a_phoxi_m_camera",
+                                 "tray_2_partition_5", 0.15),
+        "part_16" : PartProperty(16, "a_bot", "a_phoxi_m_camera",
+                                 "tray_2_partition_8", 0.15),
+        "part_17" : PartProperty(17, "a_bot", "a_phoxi_m_camera",
+                                 "skrewholder_1",      0.15),
+        "part_18" : PartProperty(18, "a_bot", "a_phoxi_m_camera",
+                                 "skrewholder_2",      0.15),
     }
 
     def __init__(self):
@@ -87,13 +108,41 @@ class KittingClass(AISTBaseRoutines):
             "bin_3_part_15",
             "bin_3_part_16",
         ]
-        self._bins_with_poperties = dict()
+        self._items = {}
         for bin in self._bins:
             part_name = re.search("part_[0-9]*", bin).group()
-            self._bins_with_properties[bin] = self._part_properties[part_name]
+            self._items[bin] = KittingRoutines._part_properties[part_name]
+        self.go_to_named_pose("home", "all_bots")
 
-    def attempt_item(self, item, max_attempts = 5):
+    @property
+    def robot_name(self):
+        return self._group.get_name()
+
+    @robot_name.setter
+    def robot_name(self, name):
+        self._group = moveit_commander.MoveGroupCommander(name)
+        self._group.set_pose_reference_frame("workspace_center")
+        if self.gripper(name).type == "suction":
+            self.gripper(name).release()
+        else:
+            self.gripper(name).grasp()
+
+    ###----- main procedure
+    def kitting_task(self):
+        for bin in self._bins:
+            if rospy.is_shutdown():
+                break
+            self.attempt_bin(bin, 1)
+        self.go_to_named_pose("home", "all_bots")
+
+    def attempt_bin(self, bin, max_attempts=5):
         attempts = 0
+        (poses, rotipz, gscore, success) \
+            = self.search_graspability(item.robot_name, item.camera_name,
+                                       item.part_id)
+
+        item = self._items[bin]
+
         while attempts < max_attempts and not rospy.is_shutdown():
             attempts += 1
             item.attempts += 1
@@ -145,11 +194,14 @@ class KittingClass(AISTBaseRoutines):
             self.fulfilled_items += 1
             item.fulfilled = True
             rospy.loginfo("Delivered item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + ")! Total items delivered: " + str(self.fulfilled_items))
+            self.grasp_candidates[item.part_id]["position"] = []
             return True
 
         rospy.logerr("Was not able to pick item nr." + str(item.number_in_set) + " from set " + str(item.set_number) + " (part ID:" + str(item.part_id) + ")! Total attempts: " + str(item.attempts))
         if item.ee_to_use == "suction":
             self.go_to_named_pose("home", "b_bot")
+
+        self.grasp_candidates[item.part_id]["position"] = []
         return False
 
     def get_grasp_candidates_from_phoxi(self, item, take_new_image):
@@ -280,116 +332,6 @@ class KittingClass(AISTBaseRoutines):
 
         #TODO: Adjust the gripper orientation when close to the border
         return safe_pose
-
-    ###----- calibration for kitting
-    def bin_calibration(self, robot_name="b_bot", end_effector_link=""):
-        rospy.loginfo("============ Calibrating bins. ============")
-        rospy.loginfo(robot_name + " end effector should be 3 cm above center of bin.")
-
-        if end_effector_link=="":
-            self.go_to_named_pose("home", robot_name)
-
-        poses = []
-
-        pose0 = geometry_msgs.msg.PoseStamped()
-        pose0.pose.orientation = self.downward_orientation
-        pose0.pose.position.z = 0.03
-
-        for bin in ["bin_3_part_13"]:
-            pose0.header.frame_id = bin
-            world_pose = self.listener.transformPose("workspace_center", pose0)
-            poses.append(copy.deepcopy(pose0))
-
-        self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
-        return
-
-    def bin_corner_calibration(self, robot_name="b_bot", end_effector_link=""):
-        rospy.loginfo("============ Calibrating bin. ============")
-        rospy.loginfo(robot_name + " end effector should be 3 cm above each corner of each bin.")
-
-        if end_effector_link == "":
-            self.go_to_named_pose("home", robot_name)
-
-        poses = []
-
-        pose0 = geometry_msgs.msg.PoseStamped()
-        pose0.pose.position.z = 0.005
-        pose0.pose.orientation = self.downward_orientation
-
-        bin_names = ['bin_3_part_4']
-
-        for bin in bin_names:
-            pose0.header.frame_id = bin
-            world_pose = self.listener.transformPose("workspace_center", pose0)
-            new_pose = copy.deepcopy(pose0)
-            new_pose.header.frame_id = bin + "_top_back_left_corner"
-            poses.append(new_pose)
-            new_pose = copy.deepcopy(pose0)
-            new_pose.header.frame_id = bin + "_top_back_right_corner"
-            poses.append(new_pose)
-            new_pose = copy.deepcopy(pose0)
-            new_pose.header.frame_id = bin + "_top_front_right_corner"
-            poses.append(new_pose)
-            new_pose = copy.deepcopy(pose0)
-            new_pose.header.frame_id = bin + "_top_front_left_corner"
-            poses.append(new_pose)
-
-        self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
-        return
-
-    def bin_calibration(self, robot_name="b_bot", end_effector_link=""):
-        rospy.loginfo("============ Calibrating bins. ============")
-        rospy.loginfo(robot_name + " end effector should be 3 cm above center of bin.")
-
-        if end_effector_link=="":
-            self.go_to_named_pose("home", robot_name)
-
-        poses = []
-
-        pose0 = geometry_msgs.msg.PoseStamped()
-        pose0.pose.orientation = geometry_msgs.msg.Quaternion(*tf_conversions.transformations.quaternion_from_euler(0, pi/2, -pi/2))
-        pose0.pose.position.z = 0.03
-        pose_above_the_bin = geometry_msgs.msg.PoseStamped()
-        pose_above_the_bin.pose.orientation = copy.deepcopy(pose0.pose.orientation)
-        pose_above_the_bin.pose.position.z = 0.15
-
-        bin_names = ['bin_3_part_4']
-
-        for bin in bin_names:
-            pose_above_the_bin.header.frame_id = bin
-            poses.append(copy.deepcopy(pose_above_the_bin))
-            pose0.header.frame_id = bin
-            world_pose = self.listener.transformPose("workspace_center", pose0)
-            poses.append(copy.deepcopy(pose0))
-            poses.append(copy.deepcopy(pose_above_the_bin))
-
-        self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
-        return
-
-    ###----- main procedure
-    def kitting_task(self):
-        global number_of_attempted
-
-        self.fulfilled_items = 0
-        for item in self.suction_items:
-            if rospy.is_shutdown():
-                break
-            self.get_grasp_candidates_from_phoxi(item, True)
-            self.attempt_item(item, 1)
-            self.grasp_candidates[item.part_id]["position"] = []
-            number_of_attempted += 1
-        self.go_to_named_pose("home", "b_bot")
-        rospy.loginfo("==== Done with first suction pass")
-
-        for item in self.robotiq_items:
-            if rospy.is_shutdown():
-                break
-            self.get_grasp_candidates_from_phoxi(item, True)
-            self.attempt_item(item, 1)
-            self.grasp_candidates[item.part_id]["position"] = []
-            number_of_attempted += 1
-        self.go_to_named_pose("home", "a_bot")
-        rospy.loginfo("==== Done with first robotiq pass")
 
 
 if __name__ == '__main__':
