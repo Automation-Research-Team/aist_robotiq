@@ -313,7 +313,6 @@ if __name__ == '__main__':
         routines = ToolCalibrationRoutines(args.robot_name,
                                            args.camera_name, speed)
         routines.run()
-        rospy.signal_shutdown("Calibration completed")
-
     except Exception as ex:
         print(ex.message)
+    rospy.signal_shutdown("Calibration completed")

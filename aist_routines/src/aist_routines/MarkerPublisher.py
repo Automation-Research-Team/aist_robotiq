@@ -1,5 +1,6 @@
 import rospy
 import copy
+import collections
 
 from math import pi
 from tf   import transformations as tfs
@@ -12,12 +13,19 @@ from std_msgs           import msg as smsg
 #  class MarkerPublisher                                             #
 ######################################################################
 class MarkerPublisher(object):
-    _marker_props = {    #axes    scale                  color(RGBA)
-        "pose":          (True,  (0.006, 0.020, 0.020), (0.0, 1.0, 0.0, 0.8)),
-        "pick_pose":     (True,  (0.006, 0.020, 0.020), (1.0, 0.0, 1.0, 0.8)),
-        "place_pose":    (True,  (0.006, 0.020, 0.020), (0.0, 1.0, 1.0, 0.8)),
-        "graspability":  (True,  (0.004, 0.004, 0.004), (1.0, 1.0, 0.0, 0.8)),
-        "":              (False, (0.004, 0.004, 0.004), (0.0, 1.0, 0.0, 0.8)),
+    MarkerProps = collections.namedtuple('MarkerProps',
+                                         'draw_axes scale color')
+    _marker_props = {  #axes    scale                  color(RGBA)
+        "pose" :
+            MarkerProps(True,  (0.006, 0.020, 0.020), (0.0, 1.0, 0.0, 0.8)),
+        "pick_pose":
+            MarkerProps(True,  (0.006, 0.020, 0.020), (1.0, 0.0, 1.0, 0.8)),
+        "place_pose":
+            MarkerProps(True,  (0.006, 0.020, 0.020), (0.0, 1.0, 1.0, 0.8)),
+        "graspability":
+            MarkerProps(True,  (0.004, 0.004, 0.004), (1.0, 1.0, 0.0, 0.8)),
+        "":
+            MarkerProps(False, (0.004, 0.004, 0.004), (0.0, 1.0, 0.0, 0.8)),
         }
 
     def __init__(self):
@@ -43,9 +51,9 @@ class MarkerPublisher(object):
         marker.action       = vmsg.Marker.ADD
         marker.lifetime     = rospy.Duration(lifetime)
 
-        if marker_prop[0]:  # Draw frame axes?
-            smax = max(*marker_prop[1])
-            smin = min(*marker_prop[1])
+        if marker_prop.draw_axes:  # Draw frame axes?
+            smax = max(*marker_prop.scale)
+            smin = min(*marker_prop.scale)
 
             marker.type  = vmsg.Marker.ARROW
             marker.pose  = marker_pose.pose
@@ -71,8 +79,8 @@ class MarkerPublisher(object):
 
         marker.type  = vmsg.Marker.SPHERE
         marker.pose  = marker_pose.pose
-        marker.scale = gmsg.Vector3(*marker_prop[1])
-        marker.color = smsg.ColorRGBA(*marker_prop[2])
+        marker.scale = gmsg.Vector3(*marker_prop.scale)
+        marker.color = smsg.ColorRGBA(*marker_prop.color)
         marker.id    = self._nmarkers
         self._nmarkers += 1
         self._pub.publish(marker)
