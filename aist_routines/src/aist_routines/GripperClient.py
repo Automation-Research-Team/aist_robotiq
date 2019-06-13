@@ -48,13 +48,13 @@ class GripperClient(object):
     def timeout(self, t):
         self._timeout = t
 
-    def pregrasp(self, cmd):
+    def pregrasp(self, cmd=""):
         return True
 
-    def grasp(self, cmd):
+    def grasp(self, cmd=""):
         return True
 
-    def release(self, cmd):
+    def release(self, cmd=""):
         return True
 
 ######################################################################
@@ -95,13 +95,13 @@ class Robotiq85Gripper(GripperClient):
     def velocity(self, v):
         self._goal.velocity = v
 
-    def pregrasp(self, cmd):
+    def pregrasp(self, cmd=""):
         return self.move(0.085)
 
-    def grasp(self, cmd):
+    def grasp(self, cmd=""):
         return self.move(0.085)
 
-    def release(self, cmd):
+    def release(self, cmd=""):
         return self.move(0.0)
 
     def move(self, position):
@@ -156,13 +156,13 @@ class SuctionGripper(GripperClient):
     def suctioned(self):
         return self._suctioned
 
-    def pregrasp(self, cmd):
+    def pregrasp(self, cmd=""):
         return self._send_command(True)
 
-    def grasp(self, cmd):
+    def grasp(self, cmd=""):
         return self._send_command(True) and self._suctioned
 
-    def release(self, cmd):
+    def release(self, cmd=""):
         return self._send_command(False)
 
     def _send_command(self, turn_suction_on):
@@ -214,7 +214,7 @@ class PrecisionGripper(GripperClient):
     def linear_motor_position(self):
         return self._goal.linear_motor_position
 
-    def pregrasp(self, cmd):
+    def pregrasp(self, cmd=""):
         if cmd == "complex_pick_from_inside":
             self._inner_command(True)
         elif cmd == "complex_pick_from_outside":
@@ -230,7 +230,7 @@ class PrecisionGripper(GripperClient):
             return False
         return True
 
-    def grasp(self, cmd):
+    def grasp(self, cmd=""):
         if cmd == "complex_pick_from_inside":
             self._inner_command(False, True)
             self._outer_command(True)
@@ -248,7 +248,7 @@ class PrecisionGripper(GripperClient):
             return False
         return True
 
-    def release(self, cmd):
+    def release(self, cmd=""):
         if cmd == "complex_pick_from_inside":
             self._outer_command(False)
             self._inner_command(True)

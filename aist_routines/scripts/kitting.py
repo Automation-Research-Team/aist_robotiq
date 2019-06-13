@@ -1,12 +1,6 @@
 #!/usr/bin/env python
 
-from math import pi
-import random
-import os
-import csv
-import copy
-import time
-import datetime
+import os, csv, copy, time, datetime, re
 
 import rospy
 import rospkg
@@ -17,8 +11,6 @@ import actionlib
 
 from aist_routines.base import AISTBaseRoutines
 import o2as_msgs.msg
-import aist_graspability.msg
-
 
 ######################################################################
 #  global variables                                                  #
@@ -37,34 +29,12 @@ def clamp(n, minn, maxn):
     return min(max(n, minn), maxn)
 
 ######################################################################
-#  class kitting_order_entry                                         #
-######################################################################
-class kitting_order_entry():
-    """
-    Object that tracks if its order was fulfilled, and the number of attempts spent on it.
-    """
-    def __init__(self, part_id, set_number, number_in_set, bin_name, target_frame, ee_to_use, item_name, dropoff_height):
-        self.part_id = part_id  # The part id
-        self.set_number = set_number
-        self.number_in_set = number_in_set
-        self.bin_name = bin_name
-        self.target_frame = target_frame
-        self.ee_to_use = ee_to_use
-        self.item_name = item_name
-        self.dropoff_height = dropoff_height
-
-        self.attempts = 0
-        self.fulfilled = False
-        self.in_feeder = False
-
-######################################################################
 #  class PartProperties                                              #
 ######################################################################
 class PartProperty():
     def __init__(self, id, robot_name, target_frame, dropoff_height):
         self._id             = id
         self._robot_name     = robot_name
-        self._source_frame   = "unknown"
         self._target_frame   = target_frame
         self._dropoff_height = dropoff_height
 
@@ -77,21 +47,12 @@ class PartProperty():
         return self._robot_name
 
     @property
-    def source_frame(self):
-        return self._source_frame
-
-    @source_frame.setter
-    def source_frame(self, f):
-        self._source_frame = f
-
-    @property
     def target_frame(self):
         return self._target_frame
 
     @property
     def dropoff_height(self):
         return self._dropoff_height
-
 
 
 ######################################################################
@@ -119,75 +80,19 @@ class KittingClass(AISTBaseRoutines):
 
     def __init__(self):
         super(KittingClass, self).__init__()
-        self.initial_setup()
-        rospy.loginfo("Kitting class is staring up!")
-
-
-    def initial_setup(self):
-        self._bins = {
-            "bin_2" : "part_4",
-            "bin_2" : "part_7",
-            "bin_2" : "part_8",
-            "bin_3" : "part_15",
-            "bin_3" : "part_16",
-        }
-        self.part_bin_list = rospy.get_param("part_bin_list")
-
-        # How many candidates should we get from phoxi.
-        self.max_candidates_from_phoxi = 3
-
-        self.order_list_raw, self.ordered_items = self.read_order_file()
-        rospy.loginfo("Received order list:")
-        rospy.loginfo(self.order_list_raw)
-        self.suction_items = []
-        for order_item in self.ordered_items:
-            if order_item.ee_to_use == "suction":
-                rospy.loginfo("Appended item nr." + str(order_item.number_in_set) + " from set " + str(order_item.set_number) + " (part ID:" + str(order_item.part_id) + ") to list of suction items")
-                self.suction_items.append(order_item)
-        self.robotiq_items = []
-        for order_item in self.ordered_items:
-            if order_item.ee_to_use == "robotiq_gripper":
-                rospy.loginfo("Appended item nr." + str(order_item.number_in_set) + " from set " + str(order_item.set_number) + " (part ID:" + str(order_item.part_id) + ") to list of suction items")
-                self.robotiq_items.append(order_item)
-
-    def read_order_file(self):
-        kitting_sets = dict()
-        with open(os.path.join(rp.get_path("aist_scene_description"),
-                               "config", "kitting_order_file.csv"), 'r') as f:
-            # [0, 1, 2, 3, 4] = ["Set", "No.", "ID", "Name", "Note"]
-            for data in csv.reader(f):
-                set_id  = "set_"  + data[0]
-                part_id = "part_" + data[2]
-                if not set_id in kitting_sets:
-                    kitting_sets[set_id] = []
-                kitting_sets[set_id].append(part_id)
-        return kitting_sets
+        self._bins = [
+            "bin_2_part_4",
+            "bin_2_part_7",
+            "bin_2_part_8",
+            "bin_3_part_15",
+            "bin_3_part_16",
+        ]
+        self._bins_with_poperties = dict()
+        for bin in self._bins:
+            part_name = re.search("part_[0-9]*", bin).group()
+            self._bins_with_properties[bin] = self._part_properties[part_name]
 
     def attempt_item(self, item, max_attempts = 5):
-        """
-        This function attempts to pick an item.
-
-        It increases the item.attempts counter each time it does,
-        and sets item.fulfilled to True if item is delivered.
-        """
-        if item.ee_to_use == "suction":
-            robot_name = "b_bot"
-        elif item.ee_to_use == 'robotiq_gripper':
-            robot_name = 'a_bot'
-
-        if item.fulfilled:
-            rospy.logerr("This item is already fulfilled. Something is going wrong.")
-            return False
-
-        # Go to preparatory pose
-        if item.ee_to_use == "suction":
-            rospy.loginfo("Going to preparatory pose before picking from bins")
-            bin_center = geometry_msgs.msg.PoseStamped()
-            bin_center.header.frame_id = item.bin_name
-            bin_center.pose.orientation.w = 1.0
-            bin_center_on_table = self.listener.transformPose("workspace_center", bin_center).pose.position
-            self.go_to_named_pose("above_center_parts_bin", "b_bot", speed=1.0, acceleration=1.0)
-
         attempts = 0
         while attempts < max_attempts and not rospy.is_shutdown():
             attempts += 1

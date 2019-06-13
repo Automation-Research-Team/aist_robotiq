@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
-from math import pi
-import copy
-
 import rospy
+import moveit_commander
 import tf
 import tf_conversions
 import geometry_msgs.msg
@@ -11,264 +9,137 @@ import geometry_msgs.msg
 from aist_routines.base import AISTBaseRoutines
 
 ######################################################################
-#  global variables                                                  #
-######################################################################
-orientations = {
-    'o2as': {
-        'a_bot': [radians(-90), radians( 90), radians(0)],
-        'b_bot': [radians(  0), radians( 90), radians(0)],
-        'c_bot': [radians(  0), radians( 90), radians(0)],
-    },
-
-    'aist': {
-        'a_bot': [radians(-90), radians( 90), radians(0)],
-        'b_bot': [radians(  0), radians( 90), radians(0)],
-    },
-
-    'pgrp': {
-        'a_bot': [radians(-90), radians( 90), radians(0)],
-        'b_bot': [radians(  0), radians( 90), radians(0)],
-    },
-
-    'ur5e': {
-        'c_bot': [radians(-90), radians( 90), radians(0)],
-        'd_bot': [radians(  0), radians( 90), radians(0)],
-    },
-}
-
-######################################################################
 #  class BinCalibrationRoutines                                      #
 ######################################################################
 class BinCalibrationRoutines(AISTBaseRoutines):
-    def __init__(self, robot_name):
-        super(BinCalibrationRoutines, self).__init__(orientation)
+    def __init__(self, robot_name, speed):
+        super(BinCalibrationRoutines, self).__init__()
         self._bins = {
-            "bin_2" : "part_4",
-            "bin_2" : "part_7",
-            "bin_2" : "part_8",
-            "bin_3" : "part_15",
-            "bin_3" : "part_16",
+            "bin_2_part_4",
+            "bin_2_part_7",
+            "bin_2_part_8",
+            "bin_3_part_15",
+            "bin_3_part_16",
         }
-        self.robot_name   = robot_name
+        self._speed     = speed
+        self.robot_name = robot_name    # set property
         rospy.loginfo("Calibration class is staring up!")
 
     @property
     def robot_name(self):
-        return self.group.get_name()
+        return self._group.get_name()
 
     @robot_name.setter
     def robot_name(self, name):
         self._group = moveit_commander.MoveGroupCommander(name)
         self._group.set_pose_reference_frame("workspace_center")
-        self._group.set_end_effector_link(name + "_ee_link")
+        if self.gripper(name).type == "suction":
+            self.gripper(name).release()
+        else:
+            self.gripper(name).grasp()
 
-    def move(self, pose)
-        poseStamped = gmsg.PoseStamped()
-        poseStamped.header.frame_id = self.group.get_pose_reference_frame()
-        poseStamped.pose = gmsg.Pose(
-            gmsg.Point(pose[0], pose[1], pose[2]),
-            gmsg.Quaternion(
-                *tfs.quaternion_from_euler(pose[3], pose[4], pose[5])))
-        print("  move to " + self.format_pose(poseStamped))
-        (success, _, current_pose) = self.go_to_pose_goal(
-                self.robot_name, poseStamped, self.speed,
-                end_effector_link=self.group.get_end_effector_link(),
-                move_lin=True)
-        print("  reached " + self.format_pose(current_pose))
+    def go_home(self):
+        raw_input("  Press `Enter` to go home >> ")
+        self.go_to_named_pose("home", self.robot_name)
+
+    def go_to(self, target_frame, offset):
+        key = raw_input("  Press `Enter` to move >> ")
+        if key == "q":
+            raise Exception("Aborted!")
+        (success, _, current_pose) \
+            = self.go_to_frame(self.robot_name, target_frame, offset,
+                               self._speed, move_lin=True)
         return success
 
     def touch_the_table(self):
-        rospy.loginfo("Calibrating between robot and table.")
+        print("**** Calibrating between robot and table. ****")
         self.go_to_named_pose("home", self.robot_name)
+        print("==== Going to 3 cm above the table. ====")
+        self.go_to("workspace_center", (0, 0, 0.03))
+        print("==== Going to 1 cm above the table. ====")
+        self.go_to("workspace_center", (0, 0, 0.01))
+        self.go_home()
 
-        poses = []
-        pose_b = geometry_msgs.msg.PoseStamped()
-        pose_b.header.frame_id = self.group.get_pose_reference_frame()
-        if robot_name == 'a_bot':
-            pose_b.pose.orientation = self.downward_orientation_a_bot
-        elif robot_name == 'b_bot':
-            pose_b.pose.orientation = self.downward_orientation
-        pose_b.pose.position.x = .0
-        pose_b.pose.position.y = .0
-        pose_b.pose.position.z = .03
-        rospy.loginfo("============ Going to 3 cm above the table. ============")
-        self.go_to_pose_goal(robot_name, pose_b, speed=0.5, acceleration=self.acceleration, high_precision=False, end_effector_link="", move_lin=True)
+    def bin_calibration(self):
+        print("**** Calibrating bins. ****")
+        self.go_to_named_pose("home", self.robot_name)
+        for bin in self._bins:
+            print("==== Going to 3 cm above center of bin. ====")
+            self.go_to(bin, (0, 0, 0.03))
+        self.go_home()
 
-        rospy.loginfo("============ Press enter to go to 1 cm above the table. ============")
-        i = raw_input()
-        if not rospy.is_shutdown():
-            pose_b.pose.position.z = .01
-            self.go_to_pose_goal(robot_name, pose_b, speed=0.01, acceleration=self.acceleration, high_precision=False, end_effector_link="", move_lin=True)
+    def bin_corner_calibration(self):
+        print("**** Calibrating bin corners. ****")
+        self.go_to_named_pose("home", self.robot_name)
+        for bin in self._bins:
+            print("  " + bin)
+            target_frame = bin + "_top_back_left_corner"
+            self.go_to(target_frame, (0, 0, 0.03))
+            target_frame = bin + "_top_back_right_corner"
+            self.go_to(target_frame, (0, 0, 0.03))
+            target_frame = bin + "_top_front_right_corner"
+            self.go_to(target_frame, (0, 0, 0.03))
+            target_frame = bin + "_top_front_left_corner"
+            self.go_to(target_frame, (0, 0, 0.03))
+        self.go_home()
 
-        rospy.loginfo("============ Press enter to go home. ============")
-        raw_input()
-        self.go_to_named_pose("home", robot_name)
-        return
+    def workspace_calibration(self):
+        print("**** Calibrating workspace. ****")
+        self.go_to_named_pose("home", self.robot_name)
+        self.go_to("workspace_center", ( 0,    0, 0.03))
+        self.go_to("workspace_center", (-0.10, 0, 0.03))
+        self.go_to("workspace_center", (-0.20, 0, 0.03))
+        self.go_to("workspace_center", (-0.25, 0, 0.03))
+        self.go_to("workspace_center", ( 0,    0, 0.03))
+        self.go_to("workspace_center", ( 0.10, 0, 0.03))
+        self.go_to("workspace_center", ( 0.20, 0, 0.03))
+        self.go_to("workspace_center", ( 0.25, 0, 0.03))
+        self.go_home()
 
-
-    def bin_calibration(self, robot_name="b_bot", end_effector_link=""):
-        rospy.loginfo("============ Calibrating bins. ============")
-        rospy.loginfo(robot_name + " end effector should be 3 cm above center of bin.")
-
-        if end_effector_link=="":
-            self.go_to_named_pose("home", robot_name)
-
-        poses = []
-
-        pose0 = geometry_msgs.msg.PoseStamped()
-        if robot_name == 'a_bot':
-            pose0.pose.orientation = self.downward_orientation_a_bot
-        elif robot_name == 'b_bot':
-            pose0.pose.orientation = self.downward_orientation
-        pose0.pose.position.z = 0.03
-
-        for bin in self.bin_names:
-            pose0.header.frame_id = bin
-            world_pose = self.listener.transformPose("workspace_center", pose0)
-            poses.append(copy.deepcopy(pose0))
-
-        self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
-        return
-
-
-    def bin_corner_calibration(self, robot_name="b_bot", end_effector_link=""):
-        rospy.loginfo("============ Calibrating bin. ============")
-        rospy.loginfo(robot_name + " end effector should be 3 cm above each corner of each bin.")
-
-        if end_effector_link == "":
-            # FIXME: What does it mean? I think it is a bug.
-            self.go_to_named_pose("home", robot_name)
-
-        poses = []
-
-        pose0 = geometry_msgs.msg.PoseStamped()
-        pose0.pose.position.z = 0.03
-        if robot_name == 'a_bot':
-            pose0.pose.orientation = self.downward_orientation_a_bot
-        elif robot_name == 'b_bot':
-            pose0.pose.orientation = self.downward_orientation
-
-        for bin in self.bin_names:
-            pose0.header.frame_id = bin
-            world_pose = self.listener.transformPose("workspace_center", pose0)
-            new_pose = copy.deepcopy(pose0)
-            new_pose.header.frame_id = bin + "_top_back_left_corner"
-            poses.append(new_pose)
-            new_pose = copy.deepcopy(pose0)
-            new_pose.header.frame_id = bin + "_top_back_right_corner"
-            poses.append(new_pose)
-            new_pose = copy.deepcopy(pose0)
-            new_pose.header.frame_id = bin + "_top_front_right_corner"
-            poses.append(new_pose)
-            new_pose = copy.deepcopy(pose0)
-            new_pose.header.frame_id = bin + "_top_front_left_corner"
-            poses.append(new_pose)
-
-        self.cycle_through_calibration_poses(poses, robot_name, speed=0.1, end_effector_link=end_effector_link, move_lin=True, go_home=False)
-        return
-
-
-    def workspace_calibration(self, robot_name="b_bot", end_effector_link=""):
-        rospy.loginfo("================ Calibrating workspace. ================")
-        rospy.loginfo(robot_name + " end effector should be 3 cm above the table.")
-
-        if end_effector_link == "":
-            if robot_name == "a_bot":
-                end_effector_link = "a_bot_robotiq_85_tip_link"
-            elif robot_name == "b_bot":
-                end_effector_link = "b_bot_single_suction_effector_pad_link"
-
-        pose0 = geometry_msgs.msg.PoseStamped()
-        pose0.header.frame_id = "workspace_center"
-        pose0.pose.position.y = 0.2
-        pose0.pose.position.z = 0.01
-        if robot_name == 'a_bot':
-            pose0.pose.orientation = self.downward_orientation_a_bot
-        elif robot_name == 'b_bot':
-            pose0.pose.orientation = self.downward_orientation
-        poses = []
-        for i in xrange(7):
-            poses.append(copy.deepcopy(pose0))
-        poses[0].pose.position.x = 0.00
-        poses[1].pose.position.x = -0.10
-        poses[2].pose.position.x = -0.20
-        poses[3].pose.position.x = -0.25
-        poses[4].pose.position.x = 0.10
-        poses[5].pose.position.x = 0.20
-        poses[6].pose.position.x = 0.25
-
-        c.cycle_through_calibration_poses(poses, robot_name, speed=.05, end_effector_link=end_effector_link, move_lin=True, go_home=False)
-        return
-
-    def workspace_calibration_interactive(self, robot_name="b_bot", end_effector_link=""):
-        rospy.loginfo("================ Calibrating workspace. ================")
-        rospy.loginfo(robot_name + " end effector should be 3 cm above the table.")
-
-        if end_effector_link == "":
-            if robot_name == "a_bot":
-                end_effector_link = "a_bot_robotiq_85_tip_link"
-            elif robot_name == "b_bot":
-                end_effector_link = "b_bot_single_suction_gripper_pad_link"
-
-        pose = geometry_msgs.msg.PoseStamped()
-        pose.header.frame_id = "workspace_center"
-        if robot_name == 'a_bot':
-            pose.pose.orientation = self.downward_orientation_a_bot
-        elif robot_name == 'b_bot':
-            pose.pose.orientation = self.downward_orientation
-        pose.pose.position.x = float(raw_input("x >> "))
-        pose.pose.position.y = float(raw_input("y >> "))
-        pose.pose.position.z = float(raw_input("z >> "))
-        self.go_to_pose_goal(robot_name, pose, speed=0.5, acceleration=self.acceleration, high_precision=False, end_effector_link=end_effector_link, move_lin=True)
-
-        rospy.loginfo("Target position: " + str(pose))
-        current_pose_in_world = self.groups[robot_name].get_current_pose()
-        current_pose_in_workspace = self.listener.transformPose('workspace_center', current_pose_in_world)
-        rospy.loginfo("Current position: " + str())
-        rospy.loginfo(current_pose_in_workspace)
-
-        return
+    def workspace_calibration_interactive(self):
+        print("*** Calibrating workspace interactively. ****")
+        x = float(raw_input("x >> "))
+        y = float(raw_input("y >> "))
+        z = float(raw_input("z >> "))
+        self.go_to("workspace_center", (x, y, z))
 
 
 if __name__ == '__main__':
 
-    try:
-        c = CalibrationClass()
+    calib = BinCalibrationRoutines("b_bot", 0.3)
 
-        while not rospy.is_shutdown():
-            rospy.loginfo("============ Calibration procedures ============ ")
-            rospy.loginfo("1: Go home with all_bot (not implemented)")
-            rospy.loginfo("11, 12: Go home with a_bot, b_bot")
-            rospy.loginfo("211, 212: Touch the table (workspace_center) with a_bot, b_bot")
-            rospy.loginfo("221, 222: Workspace calibration with a_bot, b_bot")
-            rospy.loginfo("231, 232: Interactive workspace calibration with b_bot")
-            rospy.loginfo("322: Bins with b_bot")
-            rospy.loginfo("332: Bin corners with b_bot")
-            rospy.loginfo("x: Exit")
+    while not rospy.is_shutdown():
+        print("============ Calibration procedures ============ ")
+        print("  [A|B|C|D]: Switch to a_bot, b_bot, c_bot or d_bot")
+        print("  h: Go home")
+        print("  t: Touch the table (workspace_center)")
+        print("  b: Bin center calibration")
+        print("  c: Bin corner calibration")
+        print("  w: Workspace calibration")
+        print("  q: Quit")
 
-            i = raw_input()
-            if i == '11':
-                c.go_to_named_pose("home", "a_bot")
-            elif i == '12':
-                c.go_to_named_pose("home", "b_bot")
-            elif i == '211':
-                c.touch_the_table('a_bot')
-            elif i == '212':
-                c.touch_the_table('b_bot')
-            elif i == '221':
-                c.workspace_calibration("a_bot")
-            elif i == '222':
-                c.workspace_calibration("b_bot")
-            elif i == '231':
-                c.workspace_calibration_interactive("a_bot")
-            elif i == '232':
-                c.workspace_calibration_interactive("b_bot")
-            elif i == '322':
-                c.bin_calibration(robot_name="b_bot")
-            elif i == '332':
-                c.bin_corner_calibration(robot_name="b_bot")
-            if i == 'x':
+        try:
+            key = raw_input(calib.robot_name + ">> ")
+            if key == 'A':
+                calib.robot_name = "a_bot"
+            elif key == 'B':
+                calib.robot_name = "b_bot"
+            elif key == 'C':
+                calib.robot_name = "c_bot"
+            elif key == 'D':
+                calib.robot_name = "d_bot"
+            elif key == 'h':
+                calib.go_to_named_pose("home", calib.robot_name)
+            elif key == 't':
+                calib.touch_the_table()
+            elif key == 'b':
+                calib.bin_calibration()
+            elif key == 'c':
+                calib.bin_corner_calibration()
+            elif key == 'w':
+                calib.workspace_calibration()
+            elif key == 'q':
                 break
-        print("================ done!!")
-    except rospy.ROSInterruptException:
-        pass
+        except Exception:
+            calib.go_to_named_pose("home", calib.robot_name)
+    rospy.signal_shutdown("Calibration completed.")
