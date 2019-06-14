@@ -12,7 +12,6 @@ float32 acc_fast
 float32 acc_slow
 ---
 # Result
-geometry_msgs/PoseStamped current_pose
 bool success
 ---
 # Feedback

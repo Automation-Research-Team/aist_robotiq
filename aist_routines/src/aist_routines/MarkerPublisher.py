@@ -13,9 +13,9 @@ from std_msgs           import msg as smsg
 #  class MarkerPublisher                                             #
 ######################################################################
 class MarkerPublisher(object):
-    MarkerProps = collections.namedtuple('MarkerProps',
-                                         'draw_axes scale color')
-    _marker_props = {  #axes    scale                  color(RGBA)
+    MarkerProps = collections.namedtuple("MarkerProps",
+                                         "draw_axes, scale, color")
+    _marker_props = {
         "pose" :
             MarkerProps(True,  (0.006, 0.020, 0.020), (0.0, 1.0, 0.0, 0.8)),
         "pick_pose":
@@ -58,21 +58,21 @@ class MarkerPublisher(object):
             marker.type  = vmsg.Marker.ARROW
             marker.pose  = marker_pose.pose
             marker.scale = gmsg.Vector3(2.5*smax, 0.5*smin, 0.5*smin)
-            marker.color = smsg.ColorRGBA(1.0, 0.0, 0.0, 0.8)
+            marker.color = smsg.ColorRGBA(1.0, 0.0, 0.0, 0.8)  # red
             marker.id    = self._nmarkers
             self._nmarkers += 1
             self._pub.publish(marker)  # x-axis
 
             marker.pose  = self._pose_rotated_by_rpy(marker_pose.pose,
                                                      0, 0, pi/2)
-            marker.color = smsg.ColorRGBA(0.0, 1.0, 0.0, 0.8)
+            marker.color = smsg.ColorRGBA(0.0, 1.0, 0.0, 0.8)  # green
             marker.id    = self._nmarkers
             self._nmarkers += 1
             self._pub.publish(marker)  # y-axis
 
             marker.pose  = self._pose_rotated_by_rpy(marker_pose.pose,
                                                      0, -pi/2, 0)
-            marker.color = smsg.ColorRGBA(0.0, 0.0, 1.0, 0.8)
+            marker.color = smsg.ColorRGBA(0.0, 0.0, 1.0, 0.8)  # blue
             marker.id    = self._nmarkers
             self._nmarkers += 1
             self._pub.publish(marker)  # z-axis
@@ -88,7 +88,7 @@ class MarkerPublisher(object):
         if text != "":
             marker.pose.position.z -= (marker.scale.z + 0.001)
             marker.type  = vmsg.Marker.TEXT_VIEW_FACING
-            marker.color = smsg.ColorRGBA(1.0, 1.0, 1.0, 0.8)
+            marker.color = smsg.ColorRGBA(1.0, 1.0, 1.0, 0.8)  # white
             marker.text  = text
             marker.id    = self._nmarkers
             self._nmarkers += 1
