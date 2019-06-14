@@ -104,7 +104,7 @@ class BinCalibrationRoutines(AISTBaseRoutines):
         self.go_to("workspace_center", (x, y, z))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     calib = BinCalibrationRoutines("b_bot", 0.3)
 

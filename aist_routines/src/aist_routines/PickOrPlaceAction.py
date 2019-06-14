@@ -38,7 +38,7 @@ class PickOrPlaceAction(object):
         goal.acc_slow        = acc_slow
         self._client.send_goal(goal)
         self._client.wait_for_result()
-        return self._client.get_result()
+        return self._client.get_result().success
 
     def _callback(self, goal):
         routines = self._routines
@@ -80,7 +80,7 @@ class PickOrPlaceAction(object):
         result = amsg.pickOrPlaceResult()
         if goal.liftup_after:
             rospy.loginfo("Go back to approach pose:")
-            (result.success, _, result.current_pose) \
+            (result.success, _, _) \
                 = routines.go_to_pose_goal(goal.robot_name,
                                            routines.effector_target_pose(
                                                goal.pose,

@@ -255,6 +255,9 @@ class AISTBaseRoutines(object):
         return self._cameras[camera_name].stop_acquisition()
 
     # Marker stuffs
+    def delete_all_markers(self):
+        self._markerPublisher.delete_all()
+
     def publish_marker(self, pose_stamped, marker_type, text="", lifetime=15):
         return self._markerPublisher.add(pose_stamped, marker_type,
                                          text, lifetime)
@@ -289,23 +292,49 @@ class AISTBaseRoutines(object):
         return (poses, rotipz, gscore, success)
 
     # Pick and place action stuffs
-    def pick(self, robot_name, pose_stamped, grasp_offset=0.0,
-             gripper_command="close",
+    def pick(self, robot_name, target_pose,
+             grasp_offset=0.0, gripper_command="",
              speed_fast=1.0, speed_slow=0.1, approach_offset=0.05,
              liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         return self._pickOrPlaceAction.execute(
-            robot_name, pose_stamped, True, gripper_command,
+            robot_name, target_pose, True, gripper_command,
             grasp_offset, approach_offset, liftup_after,
             speed_fast, speed_slow, acc_fast, acc_slow)
 
-    def place(self, robot_name, pose_stamped, grasp_offset=0.0,
-              gripper_command="open",
+    def place(self, robot_name, target_pose,
+              grasp_offset=0.0, gripper_command="",
               speed_fast=1.0, speed_slow=0.1, approach_offset=0.05,
               liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         return self._pickOrPlaceAction.execute(
-            robot_name, pose_stamped, False, gripper_command,
+            robot_name, target_pose, False, gripper_command,
             grasp_offset, approach_offset, liftup_after,
             speed_fast, speed_slow, acc_fast, acc_slow)
+
+    def pick_at_frame(self, robot_name, target_frame, offset=(0, 0, 0),
+                      grasp_offset=0.0, gripper_command="",
+                      speed_fast=1.0, speed_slow=0.1, approach_offset=0.05,
+                      liftup_after=True, acc_fast=1.0, acc_slow=0.5):
+        target_pose = gmsg.PoseStamped()
+        target_pose.header.frame_id = target_frame
+        target_pose.pose            = gmsg.Pose(gmsg.Point(0, 0, 0),
+                                                gmsg.Quaternion(0, 0, 0, 1))
+        return self.pick(robot_name, target_pose,
+                         grasp_offset, gripper_command,
+                         speed_fast, speed_slow, approach_offset,
+                         liftup_after, acc_fast, acc_slow)
+
+    def place_at_frame(self, robot_name, target_frame, offset=(0, 0, 0),
+                       grasp_offset=0.0, gripper_command="",
+                       speed_fast=1.0, speed_slow=0.1, approach_offset=0.05,
+                       liftup_after=True, acc_fast=1.0, acc_slow=0.5):
+        target_pose = gmsg.PoseStamped()
+        target_pose.header.frame_id = target_frame
+        target_pose.pose            = gmsg.Pose(gmsg.Point(0, 0, 0),
+                                                gmsg.Quaternion(0, 0, 0, 1))
+        return self.place(robot_name, target_pose,
+                          grasp_offset, gripper_command,
+                          speed_fast, speed_slow, approach_offset,
+                          liftup_after, acc_fast, acc_slow)
 
     # Utility functions
     def format_pose(self, poseStamped):

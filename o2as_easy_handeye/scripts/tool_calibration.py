@@ -16,10 +16,10 @@ from aist_routines.base import AISTBaseRoutines
 
 refposes = {
 #    'a_bot': [-0.10, 0.00, 0.20,  radians(-90), radians(-90), radians(180)],
-    'a_bot': [0.00, 0.00, 0.015, radians(  0), radians( 90), radians( 90)],
-    'b_bot': [0.00, 0.00, 0.015, radians(  0), radians( 90), radians(-90)],
-    'c_bot': [0.00, 0.00, 0.015, radians(  0), radians( 90), radians( 90)],
-    'd_bot': [0.00, 0.00, 0.015, radians(  0), radians( 90), radians(  0)],
+    'a_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians( 90)],
+    'b_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians(-90)],
+    'c_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians( 90)],
+    'd_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians(  0)],
 }
 
 
@@ -241,9 +241,10 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
                 print("  place at " + self.format_pose(self.pick_pose))
                 self.place(self.robot_name, self.place_pose)
             elif key == 'c':
-                return self.create_mask_image(self.camera_name,
-                                              int(raw_input("  #bins? ")))
+                self.create_mask_image(self.camera_name,
+                                       int(raw_input("  #bins? ")))
             elif key == 's':
+                self.delete_all_markers()
                 (poses, rotipz, gscore, success) = \
                     self.search_graspability(self.robot_name,
                                              self.camera_name, 4, 0)
