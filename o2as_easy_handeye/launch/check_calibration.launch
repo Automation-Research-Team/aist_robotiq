@@ -2,6 +2,7 @@
 <launch>
   <arg name="config"		default="aist"/>
   <arg name="scene"		default="$(arg config)_base_scene"/>
+  <arg name="sim"		default="false"/>
   <arg name="robot_name"	default="b_bot"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
   <arg name="marker_id"		default="26"/>
@@ -27,7 +28,7 @@
   <include file="$(find aist_examples)/launch/robot_controller.launch">
     <arg name="config"	value="$(arg config)"/>
     <arg name="scene"	value="$(arg scene)"/>
-    <arg name="sim"	value="false"/>
+    <arg name="sim"	value="$(arg sim)"/>
     <arg name="rviz_config"
     	 value="$(find o2as_easy_handeye)/launch/check_calibration.rviz"/>
   </include>

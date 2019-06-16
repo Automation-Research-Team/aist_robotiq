@@ -139,13 +139,9 @@ class Simple
   // input pointcloud stuff
     const ros::Publisher				_cloud_pub;
     const ros::Publisher				_pose_pub;
-    const ros::Publisher				_transform_pub;
-    const ros::Publisher				_position_pub;
-    const ros::Publisher				_marker_pub;
+    const ros::Publisher				_visMarker_pub;
     const ros::Publisher				_pixel_pub;
     const ros::Publisher				_corners_pub;
-
-    Corners						_corners;
 
     dynamic_reconfigure::Server<aruco_ros::ArucoThresholdConfig>
 							_dyn_rec_server;
@@ -169,15 +165,11 @@ Simple::Simple()
      _it(_nh),
      _image_pub(_it.advertise("result", 1)),
      _debug_pub(_it.advertise("debug",  1)),
-     _cloud_pub(_nh.advertise<cloud_t>("pointcloud", 1)),
-     _pose_pub(_nh.advertise<geometry_msgs::PoseStamped>("pose", 100)),
-     _transform_pub(_nh.advertise<geometry_msgs::TransformStamped>(
-			"transform", 100)),
-     _position_pub(_nh.advertise<geometry_msgs::PointStamped>(
-		       "position", 100)),
-     _marker_pub(_nh.advertise<visualization_msgs::Marker>("marker", 10)),
-     _pixel_pub(_nh.advertise<geometry_msgs::PointStamped>("pixel", 10)),
-     _corners_pub(_nh.advertise<Corners>("corners", 10)),
+     _cloud_pub(     _nh.advertise<cloud_t>("pointcloud", 1)),
+     _pose_pub(      _nh.advertise<geometry_msgs::PoseStamped>("pose", 100)),
+     _visMarker_pub( _nh.advertise<visualization_msgs::Marker>("marker", 10)),
+     _pixel_pub(     _nh.advertise<geometry_msgs::PointStamped>("pixel", 10)),
+     _corners_pub(   _nh.advertise<Corners>("corners", 10)),
      _marker_id(0),
      _planarityTolerance(0.001)
 {
@@ -548,25 +540,17 @@ Simple::publish_marker_info(const aruco::Marker& marker,
     poseMsg.header.stamp    = stamp;
     _pose_pub.publish(poseMsg);
 
-    geometry_msgs::TransformStamped	transformMsg;
-    tf::transformStampedTFToMsg(stampedTransform, transformMsg);
-    _transform_pub.publish(transformMsg);
-
-    geometry_msgs::PointStamped	positionMsg;
-    positionMsg.header = poseMsg.header;
-    positionMsg.point  = poseMsg.pose.position;
-    _position_pub.publish(positionMsg);
-
     geometry_msgs::PointStamped	pixelMsg;
-    pixelMsg.header  = transformMsg.header;
-    pixelMsg.point.x = marker.getCenter().x;
-    pixelMsg.point.y = marker.getCenter().y;
-    pixelMsg.point.z = 0;
+    pixelMsg.header.frame_id = _marker_frame;
+    pixelMsg.header.stamp    = stamp;
+    pixelMsg.point.x	     = marker.getCenter().x;
+    pixelMsg.point.y	     = marker.getCenter().y;
+    pixelMsg.point.z	     = 0;
     _pixel_pub.publish(pixelMsg);
 
   //Publish rviz marker representing the ArUco marker patch
     visualization_msgs::Marker	visMarker;
-    visMarker.header   = transformMsg.header;
+    visMarker.header   = poseMsg.header;
     visMarker.id       = 1;
     visMarker.type     = visualization_msgs::Marker::CUBE;
     visMarker.action   = visualization_msgs::Marker::ADD;
@@ -579,7 +563,7 @@ Simple::publish_marker_info(const aruco::Marker& marker,
     visMarker.color.b  = 0;
     visMarker.color.a  = 1.0;
     visMarker.lifetime = ros::Duration(3.0);
-    _marker_pub.publish(visMarker);
+    _visMarker_pub.publish(visMarker);
 }
 
 void

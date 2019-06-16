@@ -106,19 +106,17 @@ class BinCalibrationRoutines(AISTBaseRoutines):
 
 if __name__ == "__main__":
 
-    calib = BinCalibrationRoutines("b_bot", 0.3)
+    with BinCalibrationRoutines("b_bot", 0.3) as calib:
+        while not rospy.is_shutdown():
+            print("============ Calibration procedures ============ ")
+            print("  [A|B|C|D]: Switch to a_bot, b_bot, c_bot or d_bot")
+            print("  h: Go home")
+            print("  t: Touch the table (workspace_center)")
+            print("  b: Bin center calibration")
+            print("  c: Bin corner calibration")
+            print("  w: Workspace calibration")
+            print("  q: Quit")
 
-    while not rospy.is_shutdown():
-        print("============ Calibration procedures ============ ")
-        print("  [A|B|C|D]: Switch to a_bot, b_bot, c_bot or d_bot")
-        print("  h: Go home")
-        print("  t: Touch the table (workspace_center)")
-        print("  b: Bin center calibration")
-        print("  c: Bin corner calibration")
-        print("  w: Workspace calibration")
-        print("  q: Quit")
-
-        try:
             key = raw_input(calib.robot_name + ">> ")
             if key == 'A':
                 calib.robot_name = "a_bot"
@@ -140,6 +138,3 @@ if __name__ == "__main__":
                 calib.workspace_calibration()
             elif key == 'q':
                 break
-        except Exception:
-            calib.go_to_named_pose("home", calib.robot_name)
-    rospy.signal_shutdown("Calibration completed.")
