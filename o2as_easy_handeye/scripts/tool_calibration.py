@@ -174,10 +174,11 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
 
         axis = 'Pitch'
 
-        while True:
+        while not rospy.is_shutdown():
             prompt = axis + '[p=' + str(degrees(self.pitch)) + \
                             ',y=' + str(degrees(self.yaw)) + '] >> '
             key = raw_input(prompt)
+
             if key == 'q':
                 break
             elif key == 'o':
@@ -307,13 +308,9 @@ if __name__ == '__main__':
                         metavar=None)
     args = parser.parse_args()
 
-    try:
-        assert (args.robot_name in {'a_bot', 'b_bot', 'c_bot', 'd_bot'})
+    assert (args.robot_name in {'a_bot', 'b_bot', 'c_bot', 'd_bot'})
 
-        speed = 0.1
-        routines = ToolCalibrationRoutines(args.robot_name,
-                                           args.camera_name, speed)
+    speed = 0.1
+    with ToolCalibrationRoutines(args.robot_name,
+                                 args.camera_name, speed) as routines:
         routines.run()
-    except Exception as ex:
-        print(ex.message)
-    rospy.signal_shutdown("Calibration completed")

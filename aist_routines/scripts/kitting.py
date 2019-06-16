@@ -127,10 +127,8 @@ class KittingRoutines(AISTBaseRoutines):
 
 
 if __name__ == '__main__':
-    try:
-        kit = KittingClass(vision_algo="fge")
-
-        while True:
+    with KittingClass(vision_algo="fge") as kitting:
+        while not rospy.is_shutdown():
             rospy.loginfo("")
             rospy.loginfo("1: to go to home all robots.")
             rospy.loginfo("322: Bins with b_bot")
@@ -141,25 +139,23 @@ if __name__ == '__main__':
 
             i = raw_input()
             if i == '1':
-                kit.go_to_named_pose("home", "b_bot")
+                kitting.go_to_named_pose("home", "b_bot")
             elif i == '322':
-                kit.bin_calibration(robot_name="b_bot")
+                kitting.bin_calibration(robot_name="b_bot")
             elif i == '332':
-                kit.bin_corner_calibration(robot_name="b_bot")
+                kitting.bin_corner_calibration(robot_name="b_bot")
             elif i in ["71", "72", "73", "74", "75", "76", "77", "78", "79"]:
-                item = kit.ordered_items[int(i)-71]
+                item = kitting.ordered_items[int(i)-71]
                 rospy.loginfo("Checking for item id " + str(item.part_id) + " in " + item.bin_name)
-                kit.get_grasp_candidates_from_phoxi(item, True)
+                kitting.get_grasp_candidates_from_phoxi(item, True)
                 rospy.loginfo("Grasp candidates of item " + str(item.part_id))
-                rospy.loginfo(kit.grasp_candidates[item.part_id]["position"])
+                rospy.loginfo(kitting.grasp_candidates[item.part_id]["position"])
                 try:
-                    kit.publish_marker(kit.grasp_candidates[item.part_id]["position"].pop(0), "aist_vision_result")
+                    kitting.publish_marker(kitting.grasp_candidates[item.part_id]["position"].pop(0), "aist_vision_result")
                 except IndexError:
                     pass
             elif i == 'START' or i == 'start':
-                kit.kitting_task()
+                kitting.kitting_task()
             elif i == 'x':
                 break
         print("================ Done!")
-    except rospy.ROSInterruptException:
-        pass

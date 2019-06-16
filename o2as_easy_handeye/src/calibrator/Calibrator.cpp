@@ -222,7 +222,9 @@ Calibrator::save_calibration(std_srvs::Trigger::Request&,
 	emitter << YAML::Key   << "tracking_base_frame"
 		<< YAML::Value << camera_frame();
 	emitter << YAML::Key   << "transformation"
-		<< YAML::Value << YAML::Flow << YAML::BeginMap
+		<< YAML::Value
+		<< YAML::Flow
+		<< YAML::BeginMap
 		<< YAML::Key   << "qw"
 		<< YAML::Value << _eMc.transform.rotation.w
 		<< YAML::Key   << "qx"
@@ -237,6 +239,30 @@ Calibrator::save_calibration(std_srvs::Trigger::Request&,
 		<< YAML::Value << _eMc.transform.translation.y
 		<< YAML::Key   << "z"
 		<< YAML::Value << _eMc.transform.translation.z
+		<< YAML::EndMap;
+	emitter << YAML::Key   << (_eye_on_hand ? "robot_base_frame"
+						: "robot_effector_frame")
+		<< YAML::Value << world_frame();
+	emitter << YAML::Key   << "tracking_marker_frame"
+		<< YAML::Value << object_frame();
+	emitter << YAML::Key   << "another_transformation"
+		<< YAML::Value
+		<< YAML::Flow
+		<< YAML::BeginMap
+		<< YAML::Key   << "qw"
+		<< YAML::Value << _wMo.transform.rotation.w
+		<< YAML::Key   << "qx"
+		<< YAML::Value << _wMo.transform.rotation.x
+		<< YAML::Key   << "qy"
+		<< YAML::Value << _wMo.transform.rotation.y
+		<< YAML::Key   << "qz"
+		<< YAML::Value << _wMo.transform.rotation.z
+		<< YAML::Key   << "x"
+		<< YAML::Value << _wMo.transform.translation.x
+		<< YAML::Key   << "y"
+		<< YAML::Value << _wMo.transform.translation.y
+		<< YAML::Key   << "z"
+		<< YAML::Value << _wMo.transform.translation.z
 		<< YAML::EndMap;
 	emitter << YAML::EndMap;
 

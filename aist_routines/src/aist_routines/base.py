@@ -89,6 +89,8 @@ class AISTBaseRoutines(object):
         super(AISTBaseRoutines, self).__init__()
         rospy.init_node("aist_routines", anonymous=True)
         moveit_commander.roscpp_initialize(sys.argv)
+        self.listener = TransformListener()
+        rospy.sleep(1.0)        # Necessary for listner spinning up
 
         # Grippers and cameras
         if rospy.get_param("use_real_robot", False):
@@ -148,7 +150,14 @@ class AISTBaseRoutines(object):
         self._markerPublisher    = MarkerPublisher()
         self._graspabilityClient = GraspabilityClient()
         self._pickOrPlaceAction  = PickOrPlaceAction(self)
-        self.listener            = TransformListener()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        #rospy.signal_shutdown("AISTBaseRoutines() completed.")
+        rospy.spin()  # Wait for Ctrl-C pressed to shutdown the routines
+        return False  # Do not forward exceptions
 
     # Basic motion stuffs
     def go_to_named_pose(self, named_pose, group_name):
@@ -175,7 +184,7 @@ class AISTBaseRoutines(object):
     def go_to_pose_goal(self, robot_name, target_pose, speed=1.0,
                         high_precision=False, end_effector_link="",
                         move_lin=False):
-        rospy.loginfo("move to " + self.format_pose(target_pose))
+        # rospy.loginfo("move to " + self.format_pose(target_pose))
         self.publish_marker(target_pose, "pose")
 
         if end_effector_link == "":
@@ -194,8 +203,8 @@ class AISTBaseRoutines(object):
             (plan, fraction) = group.compute_cartesian_path(waypoints,
                                                             0.0005,  # eef_step
                                                             0.0) # jump_threshold
-            rospy.loginfo("Compute cartesian path succeeded with " +
-                          str(fraction*100) + "%")
+            # rospy.loginfo("Compute cartesian path succeeded with " +
+            #               str(fraction*100) + "%")
             robots      = moveit_commander.RobotCommander()
             plan        = group.retime_trajectory(robots.get_current_state(),
                                                   plan, speed)
@@ -218,7 +227,7 @@ class AISTBaseRoutines(object):
 
         current_pose = group.get_current_pose()
         is_all_close = all_close(target_pose.pose, current_pose.pose, 0.01)
-        rospy.loginfo("reached " + self.format_pose(current_pose))
+        # rospy.loginfo("reached " + self.format_pose(current_pose))
         return (success, is_all_close, current_pose)
 
     def do_linear_push(self, robot_name, force, wait=True, direction="Z+",

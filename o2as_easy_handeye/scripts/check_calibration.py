@@ -146,8 +146,8 @@ if __name__ == '__main__':
     assert (args.camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
     assert (args.robot_name  in {"a_bot", "b_bot", "c_bot", "d_bot"})
 
-    routines = VisitRoutines(args.camera_name, args.robot_name,
-                             orientations[args.config][args.robot_name])
-    speed = 0.05
-    routines.run(speed)
-    rospy.signal_shutdown("Calibration completed.")
+    with VisitRoutines(args.camera_name, args.robot_name,
+                       orientations[args.config][args.robot_name]) as routines:
+
+        speed = 0.05
+        routines.run(speed)

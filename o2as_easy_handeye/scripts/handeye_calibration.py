@@ -300,7 +300,7 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
 
     def move(self, pose):
         poseStamped = gmsg.PoseStamped()
-        poseStamped.header.frame_id = self.group.get_pose_reference_frame()
+        poseStamped.header.frame_id = "workspace_center"
         poseStamped.pose = gmsg.Pose(
             gmsg.Point(pose[0], pose[1], pose[2]),
             gmsg.Quaternion(
@@ -436,15 +436,14 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    try:
-        assert (args.camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
-        assert (args.robot_name  in {"a_bot", "b_bot", "c_bot", "d_bot"})
+    assert (args.camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
+    assert (args.robot_name  in {"a_bot", "b_bot", "c_bot", "d_bot"})
 
-        speed = 1
-        sleep_time = 1
-        routines = HandEyeCalibrationRoutines(args.camera_name, args.robot_name,
+    speed = 1
+    sleep_time = 1
+    with HandEyeCalibrationRoutines(args.camera_name, args.robot_name,
                                               speed, sleep_time,
-                                              not args.visit)
+                                              not args.visit) as routines:
 
         print("=== Calibration started for {} + {} ===".format(
             args.camera_name, args.robot_name))
@@ -452,7 +451,3 @@ if __name__ == '__main__':
                      keyposes[ args.config][args.camera_name][args.robot_name])
         print("=== Calibration completed for {} + {} ===".format(
             args.camera_name, args.robot_name))
-        rospy.signal_shutdown("Calibration completed.")
-
-    except Exception as ex:
-        print(ex.message)
