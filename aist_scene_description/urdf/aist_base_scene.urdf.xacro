@@ -24,13 +24,13 @@
   <link name="o2as_ground"/>
 
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro"/>
-  <xacro:property name="plate_w" value="0.9"/>
-  <xacro:property name="plate_l" value="0.75"/>
-  <xacro:property name="plate_h" value="0.01"/>
+  <xacro:property name="table_w" value="0.9"/>
+  <xacro:property name="table_l" value="0.75"/>
+  <xacro:property name="table_h" value="0.01"/>
   <xacro:o2as_box boxname="workbox"
-		  box_w="${plate_w}" box_l="${plate_l}" box_h="${plate_h}"
+		  box_w="${table_w}" box_l="${table_l}" box_h="${table_h}"
 		  parent="o2as_ground">
-    <origin xyz="${-plate_w/2} ${-plate_l/2} ${bots_z - plate_h}" rpy="0 0 0"/>
+    <origin xyz="${-table_w/2} ${-table_l/2} ${bots_z - table_h}" rpy="0 0 0"/>
   </xacro:o2as_box>
   <link name="workspace_center"/>
   <joint name="world_to_workspace" type="fixed">
