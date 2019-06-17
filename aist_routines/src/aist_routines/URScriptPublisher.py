@@ -66,40 +66,13 @@ class URScriptPublisher(object):
         rospy.logdebug(q)
 
         # This seems to work, but it uses the ee_link TCP of the robot.
-        program  = ""
-        program += "def move_to_pose_lin():\n"
-        program += "    textmsg(\"Move_l to a pose.\")\n"
-        program += "    rv = rpy2rotvec([" \
-                 + str(rpy[0]) + "," \
-                 + str(rpy[1]) + "," \
-                 + str(rpy[2]) + "])\n"
-        program += "    target_pos=p[" \
-                 + str(xyz[0]) + "," \
-                 + str(xyz[1]) + "," \
-                 + str(xyz[2]) + ", rv[0], rv[1], rv[2]]\n"
-        program += "    movel(pose_trans(p[0.0,0.0,0.0,0.0,0.0,0.0], target_pos), a = " \
-                 + str(acceleration) + ", v = " \
-                 + str(velocity) + ")\n"
-        program += "    textmsg(\"Done.\")\n"
-        program += "end\n"
-        return _publish_program(program)
+        return _publish_program(self._lin_move_template,
+                                rpy, xyz, acceleration, velocity)
 
     def lin_mov_rel(self, translation, acceleration=0.5, velocity=0.03):
         xyz = [translation.x, translation.y, translation.z]
-        program = ""
-        program += "def move_lin_rel():\n"
-        program += "    textmsg(\"Move_l via relative translation.\")\n"
-        program += "    current_pos = get_actual_tcp_pose()\n"
-        program += "    offset_pose = p[" \
-                 + str(xyz[0]) + ", " \
-                 + str(xyz[1]) + ", " \
-                 + str(xyz[2]) + ", 0.0, 0.0, 0.0]\n"
-        program += "    movel(pose_trans(current_pos, offset_pose), a = " \
-                 + str(acceleration) + ", v = " \
-                 + str(velocity) + ")\n"
-        program += "    textmsg(\"Done.\")\n"
-        program += "end\n"
-        return _publish_program(program)
+        return _publish_program(self._lin_mov_rel_template,
+                                xyz, acceleration, velockty)
 
     def horizontal_insertion(self, max_force=10.0, force_direction="Y-",
                              forward_speed=0.02, max_approach_distance=0.1,
@@ -109,33 +82,11 @@ class URScriptPublisher(object):
         ### Function definitions, for reference:
         ### rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 )
         ### rq_spiral_search_new(max_insertion_distance, force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False):
-        program_front = self.horizontal_insertion_template
-        program_back  = ""
-        program_back += "    rq_zero_sensor()\n"
-        program_back += "    textmsg(\"Approaching.\")\n"
-        program_back += "    rq_linear_search(\"" \
-                      + force_direction + "\"," \
-                      + str(max_force) + "," \
-                      + str(forward_speed) + "," \
-                      + str(max_approach_distance) + ")\n"
-        program_back += "    max_insertion_distance = " \
-                      + str(max_insertion_distance) + "\n"
-        program_back += "    textmsg(\"Spiral searching.\")\n"
-        program_back += "    sleep(3.0)\n"
-        program_back += "    if rq_spiral_search_new(max_insertion_distance," \
-                      + str(max_force) + ", " \
-                      + str(max_radius*1000) + ", " \
-                      + str(radius_increment*1000) + ", peck_mode=" \
-                      + str(peck_mode) + "):\n"
-        program_back += "        #Insert the Part into the bore#\n"
-        program_back += "        textmsg(\"Impedance insert\")\n"
-        program_back += "        sleep(3.0)\n"
-        program_back += "        rq_impedance(max_insertion_distance, " \
-                      + str(impedance_mass) + ")\n"
-        program_back += "    end\n"
-        program_back += "    textmsg(\"Done. Exiting.\")\n"
-        program_back += "end\n"
-        return _publish_program(program_front + "\n" + program_back)
+        return _publish_program(self._horizontal_insertion_template,
+                                force_direction, max_force, forward_speed,
+                                max_approach_distance, max_insertion_distance,
+                                max_radius, radius_increment, peck_mode,
+                                impedance_mass)
 
     def insertion(self, max_force=10.0, force_direction="Z+",
                   forward_speed=0.02, max_approach_distance=0.1,
@@ -145,49 +96,17 @@ class URScriptPublisher(object):
         ### Function definitions, for reference:
         ### rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 )
         ### rq_spiral_search_new(max_insertion_distance, force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False):
-        program_front = self.insertion_template
-        program_back  = ""
-        program_back += "    rq_zero_sensor()\n"
-        program_back += "    textmsg(\"Approaching.\")\n"
-        program_back += "    rq_linear_search(\"" \
-                      + force_direction + "\"," \
-                      + str(max_force) + "," \
-                      + str(forward_speed) + "," \
-                      + str(max_approach_distance) + ")\n"
-        program_back += "    max_insertion_distance = " \
-                      + str(max_insertion_distance) + "\n"
-        program_back += "    textmsg(\"Spiral searching.\")\n"
-        program_back += "    sleep(3.0)\n"
-        program_back += "    if rq_spiral_search_new(max_insertion_distance," \
-                      + str(max_force) + ", " \
-                      + str(max_radius*1000) + ", " \
-                      + str(radius_increment*1000) + ", peck_mode=" \
-                      + str(peck_mode) + "):\n"
-        program_back += "        #Insert the Part into the bore#\n"
-        program_back += "        textmsg(\"Impedance insert\")\n"
-        program_back += "        sleep(3.0)\n"
-        program_back += "        rq_impedance(max_insertion_distance, " \
-                      + str(impedance_mass) + ")\n"
-        program_back += "    end\n"
-        program_back += "    textmsg(\"Done. Exiting.\")\n"
-        program_back += "end\n"
-        return _publish_program(program_front + "\n" + program_back)
+        return _publish_program(self._insertion_template,
+                                force_direction, max_force, forward_speed,
+                                max_approach_distance, max_insertion_distance,
+                                max_radius, radius_increment, peck_mode,
+                                impedance_mass)
 
     def linear_push(self, max_force=10.0, force_direction="Z+",
                     max_approach_distance=0.1, forward_speed=0.02):
-        ### Function definitions, for reference:
-        ### rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 )
-        program_front = self.linear_push_template
-        program_back  = ""
-        program_back += "    rq_zero_sensor()\n"
-        program_back += "    textmsg(\"Approaching linearly.\")\n"
-        program_back += "    rq_linear_search(\"" + force_direction + "\"," \
-                      + str(max_force) + "," \
-                      + str(forward_speed) + "," \
-                      + str(max_approach_distance) + ")\n"
-        program_back += "    textmsg(\"Done.\")\n"
-        program_back += "end\n"
-        return _publish_program(program_front + "\n" + program_back)
+        return _publish_program(self._linear_push_template,
+                                force_direct, max_force, forward_speed,
+                                max_approach_distance)
 
     def spiral_motion(self, acceleration=0.1, velocity=0.03,
                       max_radius=0.0065, radius_increment=0.002,
@@ -196,40 +115,17 @@ class URScriptPublisher(object):
             rospy.logerr("radius_incr needs to be between 0.0001 and 0.005 but is " + str(radius_increment))
             return False
 
-        program_front = self.spiral_motion_template
-        program_back = ""
-        program_back += "    textmsg(\"Performing spiral motion.\")\n"
-        program_back += "    spiral_motion(" \
-                      + str(max_radius) + ", " \
-                      + str(radius_increment) + ", " \
-                      + str(velocity) + ", " \
-                      + str(acceleration) + ", \"" \
-                      + spiral_axis + "\", " \
-                      + str(theta_increment) + ")\n"
-        program_back += "    textmsg(\"Done.\")\n"
-        program_back += "end\n"
-        return _publish_program(program_front + "\n" + program_back)
+        return _publish_program(self._spiral_motion_template, max_radius,
+                                radius_increment, velocity, acceleration,
+                                spiral_axis, theta_increment)
 
     def move_j(self, joint_positions, acceleration=0.5, velocity=0.5):
         if not len(joint_positions) == 6:
             rospy.logwarn("Joint pose vector not of the correct length")
             return False
 
-        program  = ""
-        program += "def move_to_joint_pose():\n"
-        program += "    textmsg(\"Move_j to a pose.\")\n"
-        program += "    target_pos=[" + str(joint_positions[0]) + "," \
-                 + str(joint_positions[1]) + "," \
-                 + str(joint_positions[2]) + "," \
-                 + str(joint_positions[3]) + "," \
-                 + str(joint_positions[4]) + "," \
-                 + str(joint_positions[5]) + "]\n"
-        program += "    movej(target_pos, a = " \
-                 + str(acceleration) + ", v = " \
-                 + str(velocity) + ")\n"
-        program += "    textmsg(\"Done.\")\n"
-        program += "end\n"
-        return _publish_program(program)
+        return _publish_program(self._move_j_template,
+                                *joint_positions, acceleration, velocity)
 
     # Private functions
     def _publish_program(self, program):

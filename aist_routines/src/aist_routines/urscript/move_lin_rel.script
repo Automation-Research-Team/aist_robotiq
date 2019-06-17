@@ -1,0 +1,7 @@
+def move_lin_rel():
+    textmsg("Move_l via relative translation.")
+    current_pos = get_actual_tcp_pose()
+    offset_pose = p[{0}[0], {0}[1], {0}[2], 0.0, 0.0, 0.0]
+    movel(pose_trans(current_pos, offset_pose), a = {1}, v = {2})
+    textmsg("Done.")
+end
