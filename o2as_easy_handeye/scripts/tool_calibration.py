@@ -252,6 +252,8 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
                 for gs in gscore:
                     print(str(gs))
                 print(str(poses))
+            elif key == 'l':
+                self.do_linear_push(self.robot_name, wait=False)
             elif key == 'h':
                 self.go_home()
             else:
