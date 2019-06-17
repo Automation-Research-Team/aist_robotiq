@@ -105,12 +105,6 @@ class AISTBaseRoutines(object):
                 "a_phoxi_m_camera": PhoXiCamera("a_phoxi_m_camera"),
                 "a_bot_camera":     RealsenseCamera("a_bot_camera"),
             }
-            self._urscript_publishers = {
-                "a_bot": URScriptPublisher("a_bot"),
-                "b_bot": URScriptPublisher("b_bot"),
-                "c_bot": URScriptPublisher("c_bot"),
-                "d_bot": URScriptPublisher("d_bot"),
-            }
         else:
             self._grippers = {
                 # "a_bot": GripperClient("a_bot_robotiq_85_gripper",
@@ -147,6 +141,12 @@ class AISTBaseRoutines(object):
                                         "/a_bot_camera/depth/points"),
             }
 
+            self._urscript_publishers = {
+                "a_bot": URScriptPublisher("a_bot"),
+                "b_bot": URScriptPublisher("b_bot"),
+                "c_bot": URScriptPublisher("c_bot"),
+                "d_bot": URScriptPublisher("d_bot"),
+            }
         self._markerPublisher    = MarkerPublisher()
         self._graspabilityClient = GraspabilityClient()
         self._pickOrPlaceAction  = PickOrPlaceAction(self)
@@ -230,15 +230,63 @@ class AISTBaseRoutines(object):
         # rospy.loginfo("reached " + self.format_pose(current_pose))
         return (success, is_all_close, current_pose)
 
-    def do_linear_push(self, robot_name, force, wait=True, direction="Z+",
-                       max_approach_distance=0.1, forward_speed=0.0):
-        urscript_publisher = self._urscript_publishers(robot_name)
-        urscript_publisher.linear_push(force, direction,
-                                       max_approach_distance, forward_speed)
-        if wait:
-            rospy.sleep(2.0)    # This program seems to take some time
-            return urscript_publisher.wait(rospy.Duration.from_sec(30.0))
-        return True
+    # UR script motions
+    def do_move_j(self, robot_name,
+                  joint_positions, acceleration=0.5, velocity=0.5, wait=False):
+        pub = self._urscript_publishers[robot_name]
+        return pub.move_j(self, joint_positions, acceleration, velocity, wait)
+
+    def do_lin_move(self, robot_name,
+                    target_pose, acceleration=0.5, velocity=0.03, wait=False):
+        pub = self._urscript_publishers[robot_name]
+        return pub.lin_move(target_pose, acceleration, velocity, wait)
+
+    def do_lin_mov_rel(self, robot_name, translation,
+                       acceleration=0.5, velocity=0.03, wait=False):
+        pub = self._urscript_publishers[robot_name]
+        return pub.lin_move_rel(translation, acceleration, velocity, wait)
+
+    def do_linear_push(self, robot_name, force=10.0, wait=True, direction="Z+",
+                       max_approach_distance=0.1, forward_speed=0.02):
+        pub = self._urscript_publishers[robot_name]
+        return pub.linear_push(force, direction,
+                               max_approach_distance, forward_speed, wait)
+
+    def do_spiral_motion(self, robot_name, acceleration=0.1, velocity=0.03,
+                         max_radius=0.0065, radius_increment=0.002,
+                         theta_increment=30, spiral_axis="Z", wait=False):
+        pub = self._urscript_publishers[robot_name]
+        return pub.spiral_motion(self, robot_name, acceleration, velocity,
+                                 max_radius, radius_increment,
+                                 theta_increment, spiral_axis, wait)
+
+    def do_horizontal_insertion(self, robot_name,
+                                max_force=10.0, force_direction="Y-",
+                                forward_speed=0.02, max_approach_distance=0.1,
+                                max_radius=0.007, radius_increment=0.0003,
+                                max_insertion_distance=0.035,
+                                impedance_mass=10,
+                                peck_mode=False, wait=False):
+        pub = self._urscript_publishers[robot_name]
+        return pub.horizontal_insertion(self, max_force, force_direction,
+                                        forward_speed, max_approach_distance,
+                                        max_radius, radius_increment,
+                                        max_insertion_distance,
+                                        impedance_mass, peck_mode, wait)
+
+    def do_horizontal_insertion(self, robot_name,
+                                max_force=10.0, force_direction="Y-",
+                                forward_speed=0.02, max_approach_distance=0.1,
+                                max_radius=0.007, radius_increment=0.0003,
+                                max_insertion_distance=0.035,
+                                impedance_mass=10,
+                                peck_mode=False, wait=False):
+        pub = self._urscript_publishers[robot_name]
+        return pub.horizontal_insertion(self, max_force, force_direction,
+                                        forward_speed, max_approach_distance,
+                                        max_radius, radius_increment,
+                                        max_insertion_distance,
+                                        impedance_mass, peck_mode, wait)
 
     # Gripper stuffs
     def gripper(self, robot_name):
