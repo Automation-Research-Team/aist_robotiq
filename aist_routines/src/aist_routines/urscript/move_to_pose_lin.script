@@ -1,7 +1,7 @@
 def move_to_pose_lin():
     textmsg("Move_l to a pose.")
-    rv = rpy2rotvec([{0}[0], {0}[1], {0}[2]])
-    target_pos=p[{1}[0], {1}[1], {1}[2], rv[0], rv[1], rv[2]]
-    movel(pose_trans(p[0.0,0.0,0.0,0.0,0.0,0.0], target_pos), a = {2}, v = {3})
+    rv = rpy2rotvec([{0}, {1}, {2}])
+    target_pos=p[{3}, {4}, {5}, rv[0], rv[1], rv[2]]
+    movel(pose_trans(p[0.0,0.0,0.0,0.0,0.0,0.0], target_pos), a = {6}, v = {7})
     textmsg("Done.")
 end

@@ -4,8 +4,8 @@
 
   <!-- base plate -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro"/>
-  <xacro:property name="plate_w" value="0.4"/>
-  <xacro:property name="plate_l" value="0.75"/>
+  <xacro:property name="plate_w" value="0.42"/>
+  <xacro:property name="plate_l" value="0.68"/>
   <xacro:property name="plate_h" value="0.015"/>
   <xacro:o2as_box boxname="plate"
 		  box_w="${plate_w}" box_l="${plate_l}" box_h="${plate_h}"

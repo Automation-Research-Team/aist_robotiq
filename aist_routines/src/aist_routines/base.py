@@ -105,6 +105,12 @@ class AISTBaseRoutines(object):
                 "a_phoxi_m_camera": PhoXiCamera("a_phoxi_m_camera"),
                 "a_bot_camera":     RealsenseCamera("a_bot_camera"),
             }
+            self._urscript_publishers = {
+                "a_bot": URScriptPublisher("a_bot"),
+                "b_bot": URScriptPublisher("b_bot"),
+                "c_bot": URScriptPublisher("c_bot"),
+                "d_bot": URScriptPublisher("d_bot"),
+            }
         else:
             self._grippers = {
                 # "a_bot": GripperClient("a_bot_robotiq_85_gripper",
@@ -141,12 +147,6 @@ class AISTBaseRoutines(object):
                                         "/a_bot_camera/depth/points"),
             }
 
-            self._urscript_publishers = {
-                "a_bot": URScriptPublisher("a_bot"),
-                "b_bot": URScriptPublisher("b_bot"),
-                "c_bot": URScriptPublisher("c_bot"),
-                "d_bot": URScriptPublisher("d_bot"),
-            }
         self._markerPublisher    = MarkerPublisher()
         self._graspabilityClient = GraspabilityClient()
         self._pickOrPlaceAction  = PickOrPlaceAction(self)
@@ -256,23 +256,22 @@ class AISTBaseRoutines(object):
                          max_radius=0.0065, radius_increment=0.002,
                          theta_increment=30, spiral_axis="Z", wait=False):
         pub = self._urscript_publishers[robot_name]
-        return pub.spiral_motion(self, robot_name, acceleration, velocity,
+        return pub.spiral_motion(acceleration, velocity,
                                  max_radius, radius_increment,
                                  theta_increment, spiral_axis, wait)
 
-    def do_horizontal_insertion(self, robot_name,
-                                max_force=10.0, force_direction="Y-",
-                                forward_speed=0.02, max_approach_distance=0.1,
-                                max_radius=0.007, radius_increment=0.0003,
-                                max_insertion_distance=0.035,
-                                impedance_mass=10,
-                                peck_mode=False, wait=False):
+    def do_insertion(self, robot_name,
+                     max_force=10.0, force_direction="Z+",
+                     forward_speed=0.02, max_approach_distance=0.1,
+                     max_radius=0.004, radius_increment=0.0003,
+                     max_insertion_distance=0.035, impedance_mass=10,
+                     peck_mode=False, wait=False):
         pub = self._urscript_publishers[robot_name]
-        return pub.horizontal_insertion(self, max_force, force_direction,
-                                        forward_speed, max_approach_distance,
-                                        max_radius, radius_increment,
-                                        max_insertion_distance,
-                                        impedance_mass, peck_mode, wait)
+        return pub.insertion(max_force, force_direction,
+                             forward_speed, max_approach_distance,
+                             max_radius, radius_increment,
+                             max_insertion_distance, impedance_mass,
+                             peck_mode, wait)
 
     def do_horizontal_insertion(self, robot_name,
                                 max_force=10.0, force_direction="Y-",
@@ -282,7 +281,7 @@ class AISTBaseRoutines(object):
                                 impedance_mass=10,
                                 peck_mode=False, wait=False):
         pub = self._urscript_publishers[robot_name]
-        return pub.horizontal_insertion(self, max_force, force_direction,
+        return pub.horizontal_insertion(max_force, force_direction,
                                         forward_speed, max_approach_distance,
                                         max_radius, radius_increment,
                                         max_insertion_distance,

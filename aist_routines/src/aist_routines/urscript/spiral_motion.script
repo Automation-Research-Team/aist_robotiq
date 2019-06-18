@@ -64,6 +64,6 @@ def SpiralMotion():
     end
 
     textmsg("Performing spiral motion.")
-    spiral_motion({0}, {1}, {2}, {3}, {4}, {5}, {6})
+    spiral_motion({0}, {1}, {2}, {3}, "{4}", {5})
     textmsg("Done.")
 end
