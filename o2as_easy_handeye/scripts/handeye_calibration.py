@@ -331,13 +331,12 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
         # except rospy.ROSException, e:
         #     print(e)
 
+        success = True
         if self.take_sample:
             try:
                 res = self.take_sample()
                 n = len(self.get_sample_list().cMo)
-                print(
-                    "  {} samples taken: {}").format(n, res.message)
-                success = True
+                print("  {} samples taken: {}").format(n, res.message)
             except rospy.ServiceException as e:
                 print "Service call failed: %s" % e
                 success = False
