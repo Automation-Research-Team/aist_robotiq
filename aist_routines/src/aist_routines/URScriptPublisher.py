@@ -40,22 +40,8 @@ class URScriptPublisher(object):
 
     def move_lin(self, target_pose, acceleration=0.5, velocity=0.03,
                  wait=False):
-        rospy.logdebug("UR script lin move uses the ee_link of the robot, not the EE of the move group.")
-        rospy.logdebug("original pose:")
-        rospy.logdebug(target_pose)
-
-        # Convert target_pose to pose w.r.t. base_frame of the robot.
-        for n in range(50):
-            try:
-                robot_pose = self._listener.transformPose(
-                                self._robot_name + "_base", target_pose).pose
-                break
-            except:
-                rospy.logdebug("Failed to transform from frame "
-                               + target_pose.header.frame_id
-                               + ". Waiting for .1 seconds")
-                rospy.sleep(.1)
-        if n == 50:
+        robot_base = self._convert_pose_to_base(target_pose)
+        if robot_base is None:
             return False
 
         xyz = [robot_pose.position.x,
@@ -138,6 +124,24 @@ class URScriptPublisher(object):
                 template += program_line
                 program_line = file.read(1024)
             return template
+
+    def _convert_pose_to_base(pose):
+        rospy.logdebug("UR script lin move uses the ee_link of the robot, not the EE of the move group.")
+        rospy.logdebug("original pose:")
+        rospy.logdebug(target_pose)
+
+        # Convert target_pose to pose w.r.t. base_frame of the robot.
+        for n in range(50):
+            try:
+                return = self._listener.transformPose(self._robot_name
+                                                      + "_base",
+                                                      target_pose).pose
+            except tf.Exception, e:
+                rospy.logdebug("Failed to transform from frame "
+                               + target_pose.header.frame_id
+                               + ". Waiting for .1 seconds")
+                rospy.sleep(.1)
+        return None
 
     def _publish_script(self, template, wait, *args):
         rospy.loginfo("Sending UR robot program ")
