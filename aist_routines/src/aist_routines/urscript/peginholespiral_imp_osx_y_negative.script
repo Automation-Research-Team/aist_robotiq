@@ -1327,16 +1327,15 @@ textmsg("disable external sensor")  # end: URCap Installation Node
 # end
     rq_zero_sensor()
     textmsg("Approaching.")
-    rq_linear_search(force_direction, {0}, {1}, {2})
-    max_insertion_distance = {3}
+    rq_linear_search("{0}", {1}, {2}, {3})
+    max_insertion_distance = {4}
     textmsg("Spiral searching.")
     sleep(3.0)
-    if rq_spiral_search_new(max_insertion_distance, {0}, {4}*1000, {5}*1000,
-                            peck_mode={6}):
+    if rq_spiral_search_new(max_insertion_distance, {1}, {5}*1000, {6}*1000, peck_mode={7}):
         #Insert the Part into the bore#\n"
         textmsg("Impedance insert")
         sleep(3.0)
-        rq_impedance(max_insertion_distance, {7})
+        rq_impedance(max_insertion_distance, {8})
     end
     textmsg("Done. Exiting.")
 end

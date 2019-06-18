@@ -252,8 +252,16 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
                 for gs in gscore:
                     print(str(gs))
                 print(str(poses))
-            elif key == 'l':
+            elif key == 'push':
                 self.do_linear_push(self.robot_name, wait=False)
+            elif key == 'spiral':
+                self.do_spiral_motion(self.robot_name, wait=False)
+            elif key == 'insertion':
+                self.do_insertion(self.robot_name, wait=False)
+            elif key == 'hinsertion':
+                self.do_horizontal_insertion(self.robot_name, wait=False)
+            elif key == 'spiral':
+                self.do_spiral_motion(self.robot_name, wait=False)
             elif key == 'h':
                 self.go_home()
             else:
