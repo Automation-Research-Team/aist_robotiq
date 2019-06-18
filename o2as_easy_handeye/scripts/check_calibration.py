@@ -68,15 +68,12 @@ class VisitRoutines(AISTBaseRoutines):
 
     def move(self, speed):
         self.start_acquisition(self.camera_name)
-        position = rospy.wait_for_message("/aruco_tracker/position",
-                                          gmsg.PointStamped, 10)
+        poseStamped = rospy.wait_for_message("/aruco_tracker/pose",
+                                             gmsg.PoseStamped, 10)
         self.stop_acquisition(self.camera_name)
 
-        poseStamped = gmsg.PoseStamped()
-        poseStamped.header.frame_id = self.group.get_pose_reference_frame()
-        poseStamped.pose = gmsg.Pose(
-            position.point,
-            gmsg.Quaternion(*tfs.quaternion_from_euler(*self.orientations)))
+        poseStamped.pose.orientation \
+            = gmsg.Quaternion(*tfs.quaternion_from_euler(*self.orientations))
         poseStamped.pose.position.z += 0.05
         self.go_to_pose_goal(self.robot_name, poseStamped, speed, move_lin=True)
         rospy.sleep(1)

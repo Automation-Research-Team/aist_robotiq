@@ -29,6 +29,7 @@
 
   <group ns="$(arg namespace)">
     <param name="tracking_base_frame"	value="$(arg namespace)"/>
+    <param name="tracking_marker_frame"	value="$(arg namespace)_marker"/>
     <param name="camera_body_frame"	value="$(arg camera_body_frame)"/>
     <param name="camera_optical_frame"	value="$(arg camera_optical_frame)"/>
 

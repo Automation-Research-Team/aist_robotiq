@@ -19,9 +19,9 @@
   <include file="$(find o2as_easy_handeye)/launch/aruco_tracker.launch">
     <arg name="eye_on_hand"	value="$(arg eye_on_hand)"/>
     <arg name="camera_name"	value="$(arg camera_name)"/>
-    <arg name="reference_frame"	value="workspace_center"/>
     <arg name="camera_frame"
 	 value="$(arg camera_name)_from_$(arg robot_name)"/>
+    <arg name="reference_frame"	value="workspace_center"/>
   </include>
 
   <!-- Start robot controller -->
