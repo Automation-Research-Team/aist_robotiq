@@ -74,13 +74,13 @@ class BinCalibrationRoutines(AISTBaseRoutines):
         for bin in self._bins:
             print("  " + bin)
             target_frame = bin + "_top_back_left_corner"
-            self.go_to(target_frame, (0, 0, 0.03))
+            self.go_to(target_frame, (0, 0, 0.005))
             target_frame = bin + "_top_back_right_corner"
-            self.go_to(target_frame, (0, 0, 0.03))
+            self.go_to(target_frame, (0, 0, 0.005))
             target_frame = bin + "_top_front_right_corner"
-            self.go_to(target_frame, (0, 0, 0.03))
+            self.go_to(target_frame, (0, 0, 0.005))
             target_frame = bin + "_top_front_left_corner"
-            self.go_to(target_frame, (0, 0, 0.03))
+            self.go_to(target_frame, (0, 0, 0.005))
         self.go_home()
 
     def workspace_calibration(self):
@@ -112,7 +112,7 @@ if __name__ == "__main__":
             print("  [A|B|C|D]: Switch to a_bot, b_bot, c_bot or d_bot")
             print("  h: Go home")
             print("  t: Touch the table (workspace_center)")
-            print("  b: Bin center calibration")
+            # print("  b: Bin center calibration")
             print("  c: Bin corner calibration")
             print("  w: Workspace calibration")
             print("  q: Quit")
@@ -130,8 +130,8 @@ if __name__ == "__main__":
                 calib.go_to_named_pose("home", calib.robot_name)
             elif key == 't':
                 calib.touch_the_table()
-            elif key == 'b':
-                calib.bin_calibration()
+            # elif key == 'b':
+            #     calib.bin_calibration()
             elif key == 'c':
                 calib.bin_corner_calibration()
             elif key == 'w':
