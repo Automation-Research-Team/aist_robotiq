@@ -59,11 +59,12 @@ class KittingRoutines(AISTBaseRoutines):
     def __init__(self):
         super(KittingRoutines, self).__init__()
         self._bins = [
+            "bin_1_part_15",
+            "bin_1_part_16",
+            "bin_1_part_17",
             "bin_2_part_4",
             "bin_2_part_7",
             "bin_2_part_8",
-            "bin_3_part_15",
-            "bin_3_part_16",
         ]
 
         # Assign part information to each bin.

@@ -15,11 +15,12 @@ class BinCalibrationRoutines(AISTBaseRoutines):
     def __init__(self, robot_name, speed):
         super(BinCalibrationRoutines, self).__init__()
         self._bins = {
+            "bin_1_part_15",
+            "bin_1_part_16",
+            "bin_1_part_17",
             "bin_2_part_4",
             "bin_2_part_7",
             "bin_2_part_8",
-            "bin_3_part_15",
-            "bin_3_part_16",
         }
         self._speed     = speed
         self.robot_name = robot_name    # set property
@@ -72,7 +73,7 @@ class BinCalibrationRoutines(AISTBaseRoutines):
         print("**** Calibrating bin corners. ****")
         self.go_to_named_pose("home", self.robot_name)
         for bin in self._bins:
-            print("  " + bin)
+            print("---- " + bin + " ----")
             target_frame = bin + "_top_back_left_corner"
             self.go_to(target_frame, (0, 0, 0.005))
             target_frame = bin + "_top_back_right_corner"
