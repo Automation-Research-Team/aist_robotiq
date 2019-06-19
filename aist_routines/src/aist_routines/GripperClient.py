@@ -99,10 +99,10 @@ class Robotiq85Gripper(GripperClient):
         return self.move(0.085)
 
     def grasp(self, cmd=""):
-        return self.move(0.085)
+        return self.move(0.0)
 
     def release(self, cmd=""):
-        return self.move(0.0)
+        return self.move(0.085)
 
     def move(self, position):
         try:
