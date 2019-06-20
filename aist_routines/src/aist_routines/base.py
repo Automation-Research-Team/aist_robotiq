@@ -155,8 +155,8 @@ class AISTBaseRoutines(object):
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
-        #rospy.signal_shutdown("AISTBaseRoutines() completed.")
-        rospy.spin()  # Wait for Ctrl-C pressed to shutdown the routines
+        rospy.signal_shutdown("AISTBaseRoutines() completed.")
+        # rospy.spin()  # Wait for Ctrl-C pressed to shutdown the routines
         return False  # Do not forward exceptions
 
     # Basic motion stuffs
@@ -319,6 +319,14 @@ class AISTBaseRoutines(object):
                                          text, lifetime)
 
     # Graspability stuffs
+    def create_background_image(self, camera_name):
+        camera = self._cameras[camera_name]
+        camera.start_acquisition()
+        success = self._graspabilityClient.create_background_image(
+                        camera.image_topic)
+        camera.stop_acquisition()
+        return success
+
     def create_mask_image(self, camera_name, nbins):
         camera = self._cameras[camera_name]
         camera.start_acquisition()
@@ -335,13 +343,11 @@ class AISTBaseRoutines(object):
         (poses, rotipz, gscore, success) = \
             self._graspabilityClient.search(camera.camera_info_topic,
                                             camera.depth_topic,
-                                            "", gripper.type, part_id, bin_id)
+                                            camera.normal_topic,
+                                            gripper.type, part_id, bin_id)
         camera.stop_acquisition()
         if success:
-            for i in range(len(poses.poses)):
-                pose = gmsg.PoseStamped()
-                pose.header = poses.header
-                pose.pose   = poses.poses[i]
+            for i, pose in enumerate(poses):
                 self.publish_marker(pose, "graspability",
                                     "{}[{:.3f}]".format(i, gscore[i]),
                                     lifetime=marker_lifetime)
@@ -350,7 +356,7 @@ class AISTBaseRoutines(object):
     # Pick and place action stuffs
     def pick(self, robot_name, target_pose,
              grasp_offset=0.0, gripper_command="",
-             speed_fast=1.0, speed_slow=0.1, approach_offset=0.05,
+             speed_fast=1.0, speed_slow=0.1, approach_offset=0.10,
              liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         return self._pickOrPlaceAction.execute(
             robot_name, target_pose, True, gripper_command,

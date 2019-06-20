@@ -15,7 +15,7 @@ class BinCalibrationRoutines(AISTBaseRoutines):
     def __init__(self, robot_name, speed):
         super(BinCalibrationRoutines, self).__init__()
         self._bins = {
-            "bin_1_part_15",
+            "bin_1_part_5",
             "bin_1_part_16",
             "bin_1_part_17",
             "bin_2_part_4",
@@ -106,7 +106,6 @@ class BinCalibrationRoutines(AISTBaseRoutines):
 
 
 if __name__ == "__main__":
-
     with BinCalibrationRoutines("b_bot", 0.3) as calib:
         while not rospy.is_shutdown():
             print("============ Calibration procedures ============ ")

@@ -12,7 +12,6 @@
 #include "Calibrator.h"
 #include "HandeyeCalibration.h"
 
-#define USE_AIST_CALIBRATION
 #define DEBUG
 
 namespace o2as_easy_handeye
@@ -168,7 +167,8 @@ Calibrator::compute_calibration(ComputeCalibration::Request&,
 	    wMe.emplace_back(_wMe[i].transform);
 	}
 
-	const auto	eMc = TU::cameraToEffectorDual(cMo, wMe);
+	const auto	eMc = TU::cameraToEffectorSingle(cMo, wMe);
+      //const auto	eMc = TU::cameraToEffectorDual(cMo, wMe);
 	const auto	wMo = TU::objectToWorld(cMo, wMe, eMc);
 
 	const auto	now = ros::Time::now();
