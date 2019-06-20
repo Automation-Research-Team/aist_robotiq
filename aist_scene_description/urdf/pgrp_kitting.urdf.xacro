@@ -13,7 +13,7 @@
 		  box_l="${plate_l}"
 		  box_h="${plate_h}"
 		  parent="workspace_center">
-    <origin xyz="${table_w/2 - plate_w - 0.08} ${-plate_l/2} 0"
+    <origin xyz="${table_w/2 - plate_w - 0.14} ${-plate_l/2} 0"
 	    rpy="0 0 0"/>
   </xacro:o2as_box>
   <link name="plate_center"/>
@@ -51,7 +51,7 @@
   <xacro:property name="set2_z" value="0"/>
 
   <!--bin_1_part_15_-->
-  <xacro:kitting_bin_1 binname	      ="bin_1_part_15"
+  <xacro:kitting_bin_1 binname	      ="bin_1_part_5"
 		       parent	      ="plate_center"
 		       z_origin_offset="${z_origin_offset_1}">
     <origin xyz="${plate_w/2 - bin_1_length/2}
@@ -65,7 +65,7 @@
 		       z_origin_offset="${z_origin_offset_1}">
     <origin xyz="${plate_w/2 - bin_1_length/2}
 		 0
-		 ${-z_origin_offset_2}"
+		 ${-z_origin_offset_1}"
 	    rpy="0 0 0" />
   </xacro:kitting_bin_1>
   <!--bin_1_part_17_-->
