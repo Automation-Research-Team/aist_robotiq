@@ -2,11 +2,12 @@ import sys, os, collections
 import rospy
 import numpy as np
 import cv2
-from math              import pi, radians, degrees
+from math              import radians, cos, sin, sqrt
 from sensor_msgs       import msg as smsg
 from geometry_msgs     import msg as gmsg
 from aist_graspability import srv as asrv
 from cv_bridge         import CvBridge, CvBridgeError
+from tf                import transformations as tfs
 
 ######################################################################
 #  class GraspabilityClient                                          #
@@ -58,7 +59,6 @@ class GraspabilityClient(object):
             (K, D) = self._get_camera_intrinsics(camera_info_topic)
             res    = self._searchGraspability(depth_topic, gripper_type,
                                               part_id, bin_id, image_dir)
-
             poses = []
             if normal_topic == "":
                 for uvd in res.pos3D:
@@ -80,8 +80,9 @@ class GraspabilityClient(object):
                     poses.append(gmsg.PoseStamped(
                         res.header,
                         gmsg.Pose(gmsg.Point(*xyz),
-                                  gmsg.Quaternion(1, 0, 0, 0))))
-                    print("normal = ({})".format(n))
+                                  gmsg.Quaternion(*self._get_rotation(n,
+                                                                      rot)))))
+                    print("normal = {}".format(n))
 
             return (poses, res.rotipz, res.gscore, res.success)
 
@@ -104,5 +105,13 @@ class GraspabilityClient(object):
                                  K, D)[0, 0]
         return np.array((xy[0]*uvd.z, xy[1]*uvd.z, uvd.z))
 
-    def _get_normal(normals, pos3D):
-        u = pos3D.x
+    def _get_rotation(self, normal, theta):
+        c = cos(theta)
+        s = sin(theta)
+        k = (normal[0]*c + normal[1]*s)/normal[2]
+        r = 1.0/sqrt(1.0 + k*k)
+        R = np.identity(4, dtype=np.float32)
+        R[0:3, 2] = normal
+        R[0:3, 0] = (r*c, r*s, -r*k)
+        R[0:3, 1] = np.cross(R[0:3, 2], R[0:3, 0])
+        return tfs.quaternion_from_matrix(R)
