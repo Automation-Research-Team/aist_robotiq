@@ -108,14 +108,16 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
                 (pose[0], pose[1], pose[2]),
                 tfs.quaternion_from_euler(pose[3], pose[4], pose[5])),
             tfs.inverse_matrix(self.D0), tfs.inverse_matrix(R), self.D0)
-        poseStamped = gmsg.PoseStamped()
-        poseStamped.header.frame_id = self.group.get_pose_reference_frame()
-        poseStamped.pose = gmsg.Pose(
+        target_pose = gmsg.PoseStamped()
+        target_pose.header.frame_id = self.group.get_pose_reference_frame()
+        target_pose.pose = gmsg.Pose(
             gmsg.Point(*tfs.translation_from_matrix(T)),
             gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
-        (success, _, _ ) = self.go_to_pose_goal(self.robot_name, poseStamped,
-                                                self.speed, move_lin=True,
-                                                high_precision=True)
+        print("move to " + self.format_pose(target_pose))
+        (success, _, pose) = self.go_to_pose_goal(self.robot_name, target_pose,
+                                                  self.speed, move_lin=True,
+                                                  high_precision=True)
+        print("reached " + self.format_pose(pose))
         return success
 
     def rolling_motion(self):
@@ -280,18 +282,6 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
         # Reset pose
         self.go_home()
         self.print_tip_link()
-
-    def format_pose(self, poseStamped):
-        pose = self.listener.transformPose(
-            self.group.get_pose_reference_frame(), poseStamped).pose
-        rpy = map(
-            degrees,
-            tfs.euler_from_quaternion([pose.orientation.w, pose.orientation.x,
-                                       pose.orientation.y, pose.orientation.z]))
-        return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
-            pose.position.x, pose.position.y, pose.position.z,
-            rpy[0], rpy[1], rpy[2])
-
 
 ######################################################################
 #  global functions                                                  #

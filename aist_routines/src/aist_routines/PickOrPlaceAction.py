@@ -52,7 +52,8 @@ class PickOrPlaceAction(object):
                                        routines.effector_target_pose(
                                            goal.pose,
                                            (0, 0, goal.approach_offset)),
-                                       goal.speed_fast)
+                                       goal.speed_fast if goal.pick else
+                                       goal.speed_slow, move_lin=True)
         self._server.publish_feedback(feedback)
 
         # Pregrasp
@@ -67,7 +68,7 @@ class PickOrPlaceAction(object):
                                 "pick_pose" if goal.pick else "place_pose")
         (_, _, feedback.current_pose) \
             = routines.go_to_pose_goal(goal.robot_name, target_pose,
-                                       goal.speed_slow)
+                                       goal.speed_slow, move_lin=True)
         self._server.publish_feedback(feedback)
 
         # Grasp or release
@@ -87,7 +88,8 @@ class PickOrPlaceAction(object):
                                            routines.effector_target_pose(
                                                goal.pose,
                                                (0, 0, goal.approach_offset)),
-                                           goal.speed_fast)
+                                           goal.speed_slow if goal.pick else
+                                           goal.speed_fast, move_lin=True)
 
         result.success = result.success and gripper_success
         self._server.set_succeeded(result)

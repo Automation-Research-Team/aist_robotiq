@@ -170,7 +170,7 @@ class AISTBaseRoutines(object):
 
     def go_to_frame(self, robot_name, target_frame, offset=(0, 0, 0),
                     speed=1.0, high_precision=False, end_effector_link="",
-                    move_lin=False):
+                    move_lin=True):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = target_frame
         target_pose.pose            = gmsg.Pose(gmsg.Point(0, 0, 0),
@@ -183,7 +183,7 @@ class AISTBaseRoutines(object):
 
     def go_to_pose_goal(self, robot_name, target_pose, speed=1.0,
                         high_precision=False, end_effector_link="",
-                        move_lin=False):
+                        move_lin=True):
         # rospy.loginfo("move to " + self.format_pose(target_pose))
         self.publish_marker(target_pose, "pose")
 
@@ -205,9 +205,9 @@ class AISTBaseRoutines(object):
                                                             0.0) # jump_threshold
             # rospy.loginfo("Compute cartesian path succeeded with " +
             #               str(fraction*100) + "%")
-            robots      = moveit_commander.RobotCommander()
-            plan        = group.retime_trajectory(robots.get_current_state(),
-                                                  plan, speed)
+            robots  = moveit_commander.RobotCommander()
+            plan    = group.retime_trajectory(robots.get_current_state(),
+                                              plan, speed)
             success = group.execute(plan, wait=True)
         else:
             goal_tolerance = group.get_goal_tolerance()
@@ -364,12 +364,12 @@ class AISTBaseRoutines(object):
             speed_fast, speed_slow, acc_fast, acc_slow)
 
     def place(self, robot_name, target_pose,
-              grasp_offset=0.0, gripper_command="",
+              place_offset=0.0, gripper_command="",
               speed_fast=1.0, speed_slow=0.1, approach_offset=0.05,
               liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         return self._pickOrPlaceAction.execute(
             robot_name, target_pose, False, gripper_command,
-            grasp_offset, approach_offset, liftup_after,
+            place_offset, approach_offset, liftup_after,
             speed_fast, speed_slow, acc_fast, acc_slow)
 
     def pick_at_frame(self, robot_name, target_frame, offset=(0, 0, 0),
@@ -378,7 +378,7 @@ class AISTBaseRoutines(object):
                       liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = target_frame
-        target_pose.pose            = gmsg.Pose(gmsg.Point(0, 0, 0),
+        target_pose.pose            = gmsg.Pose(gmsg.Point(*offset),
                                                 gmsg.Quaternion(0, 0, 0, 1))
         return self.pick(robot_name, target_pose,
                          grasp_offset, gripper_command,
@@ -386,15 +386,15 @@ class AISTBaseRoutines(object):
                          liftup_after, acc_fast, acc_slow)
 
     def place_at_frame(self, robot_name, target_frame, offset=(0, 0, 0),
-                       grasp_offset=0.0, gripper_command="",
+                       place_offset=0.0, gripper_command="",
                        speed_fast=1.0, speed_slow=0.1, approach_offset=0.05,
                        liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = target_frame
-        target_pose.pose            = gmsg.Pose(gmsg.Point(0, 0, 0),
+        target_pose.pose            = gmsg.Pose(gmsg.Point(*offset),
                                                 gmsg.Quaternion(0, 0, 0, 1))
         return self.place(robot_name, target_pose,
-                          grasp_offset, gripper_command,
+                          place_offset, gripper_command,
                           speed_fast, speed_slow, approach_offset,
                           liftup_after, acc_fast, acc_slow)
 

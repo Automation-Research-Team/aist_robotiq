@@ -109,18 +109,18 @@
 
   <!-- tray_1 -->
   <xacro:kitting_tray1 trayname="tray_1" parent="plate_center">
-    <origin xyz="${plate_w/2 - bin_1_length - bin_2_length - tray_length}
-		 0
+    <origin xyz="${plate_w/2 - bin_1_length - bin_2_length - tray_width}
+		 ${tray_length}
 		 0"
-	    rpy="0 0 0" />
+	    rpy="0 0 ${-pi/2}" />
   </xacro:kitting_tray1>
 
   <!-- tray_2 -->
   <xacro:kitting_tray2 trayname="tray_2" parent="plate_center">
-    <origin xyz="${plate_w/2 - bin_1_length - bin_2_length - tray_length}
-		 ${-tray_width}
+    <origin xyz="${plate_w/2 - bin_1_length - bin_2_length - tray_width}
+		 0
 		 0"
-	    rpy="0 0 0" />
+	    rpy="0 0 ${-pi/2}" />
   </xacro:kitting_tray2>
 
 </robot>
