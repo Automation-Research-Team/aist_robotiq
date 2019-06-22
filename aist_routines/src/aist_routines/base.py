@@ -192,8 +192,13 @@ class AISTBaseRoutines(object):
 
         group = moveit_commander.MoveGroupCommander(robot_name)
         group.set_end_effector_link(end_effector_link)
-        group.set_pose_target(target_pose)
         group.set_max_velocity_scaling_factor(clamp(speed, 0.0, 1.0))
+
+        if high_precision:
+            goal_tolerance = group.get_goal_tolerance()
+            planning_time  = group.get_planning_time()
+            group.set_goal_tolerance(.000001)
+            group.set_planning_time(10)
 
         if move_lin:
             pose_world = self.listener.transformPose(
@@ -210,15 +215,12 @@ class AISTBaseRoutines(object):
                                               plan, speed)
             success = group.execute(plan, wait=True)
         else:
-            goal_tolerance = group.get_goal_tolerance()
-            planning_time  = group.get_planning_time()
-            if high_precision:
-                group.set_goal_tolerance(.000001)
-                group.set_planning_time(10)
+            group.set_pose_target(target_pose)
             success = group.go(wait=True)
-            if high_precision:
-                group.set_goal_tolerance(goal_tolerance)
-                group.set_planning_time(planning_time)
+
+        if high_precision:
+            group.set_goal_tolerance(goal_tolerance[1])
+            group.set_planning_time(planning_time)
 
         group.stop()
         # It is always good to clear your targets after planning with poses.

@@ -20,38 +20,38 @@ number_of_attempted = 1
 class KittingRoutines(AISTBaseRoutines):
     """Implements kitting routines for aist robot system."""
     PartProps = collections.namedtuple(
-        "PartProps", "robot_name, camera_name, destination, grasp_offset, approach_offset, dropoff_height")
+        "PartProps", "robot_name, camera_name, destination, approach_offset, grasp_offset, place_offset")
     _part_props = {
         4  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_4",
-                       -0.002, 0.15, 0.05),
+                       0.15, -0.002, 0.05),
         5  : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_6",
-                       -0.002, 0.05, 0.03),
+                       0.05, -0.002, 0.03),
         6  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_3",
-                       0.0, 0.10, 0.05),
+                       0.10, 0.0, 0.05),
         7  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_2",
-                       -0.002, 0.15, 0.05),
+                       0.15, -0.002, 0.05),
         8  : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_1",
-                       -0.002, 0.05, 0.03),
+                       0.05, -0.002, 0.03),
         9  : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_4",
-                       -0.001, 0.10, 0.05),
+                       0.10, -0.001, 0.05),
         10 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_7",
-                       -0.001, 0.10, 0.05),
+                       0.10, -0.001, 0.05),
         11 : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_1",
-                       0.0, 0.10, 0.05),
+                       0.10, 0.0, 0.05),
         12 : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_3",
-                       0.0, 0.10, 0.05),
+                       0.10, 0.0, 0.05),
         13 : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_5",
-                       0.0, 0.10, 0.05),
+                       0.10, 0.0, 0.05),
         14 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_2",
-                       -0.001, 0.10, 0.05),
+                       0.10, -0.001, 0.05),
         15 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_5",
-                       -0.001, 0.10, 0.05),
+                       0.10, -0.001, 0.05),
         16 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_8",
-                       -0.001, 0.10, 0.05),
+                       0.10, -0.001, 0.05),
         17 : PartProps("a_bot", "a_phoxi_m_camera", "skrewholder_1",
-                       -0.001, 0.10, 0.05),
+                       0.10, -0.001, 0.05),
         18 : PartProps("a_bot", "a_phoxi_m_camera", "skrewholder_2",
-                       -0.001, 0.10, 0.05),
+                       0.10, -0.001, 0.05),
     }
     BinProps = collections.namedtuple("BinProps",
                                       "bin_id, part_id, part_props")
@@ -127,7 +127,7 @@ class KittingRoutines(AISTBaseRoutines):
                          grasp_offset=props.grasp_offset,
                          approach_offset=props.approach_offset):
                 self.place_at_frame(props.robot_name, props.destination,
-                                    place_offset=props.dropoff_height,
+                                    place_offset=props.place_offset,
                                     approach_offset=props.approach_offset)
                 return True
             else:

@@ -30,98 +30,67 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
     def __init__(self, robot_name, camera_name, speed):
         super(ToolCalibrationRoutines, self).__init__()
 
-        self.camera_name = camera_name
-        self.speed       = speed
-        self.refpose     = refposes[robot_name]
-        self.goalpose    = copy.deepcopy(self.refpose)
+        self._robot_name  = robot_name
+        self._camera_name = camera_name
+        self._speed       = speed
+        self._refpose     = refposes[robot_name]
+        self._goalpose    = copy.deepcopy(self._refpose)
 
-        ## Initialize `moveit_commander`
-        self.group = moveit_commander.MoveGroupCommander(robot_name)
-
-        self.gripper_base_link = self.gripper(robot_name).base_link
-        self.gripper_tip_link  = self.gripper(robot_name).tip_link
-        self.group.set_pose_reference_frame('workspace_center')
-        self.group.set_end_effector_link(self.gripper_tip_link)
-
-        # Logging
-        print("gripper_base_link = " + self.gripper_base_link)
-        print("gripper_tip_link  = " + self.gripper_tip_link)
-        print("==== Planning frame:       %s" %
-              self.group.get_planning_frame())
-        print("==== Pose reference frame: %s" %
-              self.group.get_pose_reference_frame())
-        print("==== End effector link:    %s" %
-              self.group.get_end_effector_link())
-
-        self.listener = TransformListener()
-        now = rospy.Time.now()
-        self.listener.waitForTransform(self.gripper_base_link,
-                                       self.gripper_tip_link,
+        gripper_base_link = self.gripper(robot_name).base_link
+        gripper_tip_link  = self.gripper(robot_name).tip_link
+        now               = rospy.Time.now()
+        self.listener.waitForTransform(gripper_base_link,
+                                       gripper_tip_link,
                                        now, rospy.Duration(10))
         self.D0 = self.listener.fromTranslationRotation(
-            *self.listener.lookupTransform(self.gripper_base_link,
-                                           self.gripper_tip_link, now))
-        self.pitch = 0.0
-        self.yaw   = 0.0
+            *self.listener.lookupTransform(gripper_base_link,
+                                           gripper_tip_link, now))
+        self._pitch = 0.0
+        self._yaw   = 0.0
 
-        self.pick_pose = gmsg.PoseStamped()
-        self.pick_pose.header.frame_id = self.group.get_pose_reference_frame()
-        self.pick_pose.pose = gmsg.Pose(gmsg.Point(-0.1, 0.1, 0.01),
-                                        gmsg.Quaternion(
-                                            *tfs.quaternion_from_euler(
-                                                radians(15), 0, 0)))
-
-        self.place_pose = gmsg.PoseStamped()
-        self.place_pose.header.frame_id  = self.group.get_pose_reference_frame()
-        self.place_pose.pose = gmsg.Pose(gmsg.Point(0.1, 0, 0.01),
+        self._pick_pose = gmsg.PoseStamped()
+        self._pick_pose.header.frame_id = "workspace_center"
+        self._pick_pose.pose = gmsg.Pose(gmsg.Point(-0.1, 0.1, 0.01),
                                          gmsg.Quaternion(
                                              *tfs.quaternion_from_euler(
-                                                 0, 0, 0)))
+                                                 radians(15), 0, 0)))
 
-    @property
-    def robot_name(self):
-        return self.group.get_name()
+        self._place_pose = gmsg.PoseStamped()
+        self._place_pose.header.frame_id  = "workspace_center"
+        self._place_pose.pose = gmsg.Pose(gmsg.Point(0.1, 0, 0.01),
+                                          gmsg.Quaternion(
+                                              *tfs.quaternion_from_euler(
+                                                  0, 0, 0)))
 
     def go_home(self):
-        self.go_to_named_pose('home', self.robot_name)
-
-    def correct_end_effector_link(self):
-        D = tfs.concatenate_matrices(
-            self.listener.fromTranslationRotation(
-                (0, 0, 0), tfs.quaternion_from_euler(0, self.pitch, self.yaw)),
-            self.D0)
-        print('  trns = {}, rot = {}'.format(tfs.translation_from_matrix(D),
-                                             tfs.quaternion_from_matrix(D)))
-        rate = rospy.Rate(10.0)
-        self.broadcaster.sendTransform(
-            tfs.translation_from_matrix(D), tfs.quaternion_from_matrix(D),
-            rospy.Time.now(),
-            self.group.get_end_effector_link() + '_corrected',
-            self.gripper_base_link)
-        rate.sleep()
+        self.go_to_named_pose('home', self._robot_name)
 
     def move(self, pose):
         R = self.listener.fromTranslationRotation(
-                (0, 0, 0), tfs.quaternion_from_euler(0, self.pitch, self.yaw))
+                (0, 0, 0),
+                tfs.quaternion_from_euler(0, self._pitch, self._yaw))
         T = tfs.concatenate_matrices(
-            self.listener.fromTranslationRotation(
-                (pose[0], pose[1], pose[2]),
-                tfs.quaternion_from_euler(pose[3], pose[4], pose[5])),
-            tfs.inverse_matrix(self.D0), tfs.inverse_matrix(R), self.D0)
+                self.listener.fromTranslationRotation(
+                    (pose[0], pose[1], pose[2]),
+                    tfs.quaternion_from_euler(pose[3], pose[4], pose[5])),
+                tfs.inverse_matrix(self.D0),
+                tfs.inverse_matrix(R),
+                self.D0)
         target_pose = gmsg.PoseStamped()
-        target_pose.header.frame_id = self.group.get_pose_reference_frame()
+        target_pose.header.frame_id = "workspace_center"
         target_pose.pose = gmsg.Pose(
             gmsg.Point(*tfs.translation_from_matrix(T)),
             gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
         print("move to " + self.format_pose(target_pose))
-        (success, _, pose) = self.go_to_pose_goal(self.robot_name, target_pose,
-                                                  self.speed, move_lin=True,
+        (success, _, pose) = self.go_to_pose_goal(self._robot_name,
+                                                  target_pose,
+                                                  self._speed, move_lin=True,
                                                   high_precision=True)
         print("reached " + self.format_pose(pose))
         return success
 
     def rolling_motion(self):
-        pose = copy.deepcopy(self.goalpose)
+        pose = copy.deepcopy(self._goalpose)
         for i in range(4):
             pose[3] += radians(30)
             self.move(pose)
@@ -133,7 +102,7 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
             self.move(pose)
 
     def pitching_motion(self):
-        pose = copy.deepcopy(self.goalpose)
+        pose = copy.deepcopy(self._goalpose)
         for i in range(5):
             pose[4] += radians(6)
             self.move(pose)
@@ -145,7 +114,7 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
             self.move(pose)
 
     def yawing_motion(self):
-        pose = copy.deepcopy(self.goalpose)
+        pose = copy.deepcopy(self._goalpose)
         pose[3] = radians(-90)
         pose[5] = radians(180)
         for i in range(5):
@@ -161,7 +130,7 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
     def print_tip_link(self):
         R   = self.listener.fromTranslationRotation(
                 (0, 0, 0),
-                tfs.quaternion_from_euler(0, self.pitch, self.yaw))
+                tfs.quaternion_from_euler(0, self._pitch, self._yaw))
         D   = tfs.concatenate_matrices(R, self.D0)
         xyz = tfs.translation_from_matrix(D)
         q   = tfs.quaternion_from_matrix(D)
@@ -177,14 +146,14 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
         axis = 'Pitch'
 
         while not rospy.is_shutdown():
-            prompt = axis + '[p=' + str(degrees(self.pitch)) + \
-                            ',y=' + str(degrees(self.yaw)) + '] >> '
+            prompt = axis + '[p=' + str(degrees(self._pitch)) + \
+                            ',y=' + str(degrees(self._yaw)) + '] >> '
             key = raw_input(prompt)
 
             if key == 'q':
                 break
             elif key == 'o':
-                self.move(self.refpose)
+                self.move(self._refpose)
             elif key == 'r':
                 self.rolling_motion()
             elif key == 'p':
@@ -207,77 +176,77 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
                 axis = 'Yaw  '
             elif key == '+':
                 if axis == 'X    ':
-                    self.goalpose[0] += 0.01
+                    self._goalpose[0] += 0.01
                 elif axis == 'Y    ':
-                    self.goalpose[1] += 0.01
+                    self._goalpose[1] += 0.01
                 elif axis == 'Z    ':
-                    self.goalpose[2] += 0.01
+                    self._goalpose[2] += 0.01
                 elif axis == 'Pitch':
-                    self.pitch += radians(0.5)
+                    self._pitch += radians(0.5)
                 else:
-                    self.yaw += radians(0.5)
-                self.move(self.goalpose)
+                    self._yaw += radians(0.5)
+                self.move(self._goalpose)
             elif key == '-':
                 if axis == 'X    ':
-                    self.goalpose[0] -= 0.01
+                    self._goalpose[0] -= 0.01
                 elif axis == 'Y    ':
-                    self.goalpose[1] -= 0.01
+                    self._goalpose[1] -= 0.01
                 elif axis == 'Z    ':
-                    self.goalpose[2] -= 0.01
+                    self._goalpose[2] -= 0.01
                 elif axis == 'Pitch':
-                    self.pitch -= radians(0.5)
+                    self._pitch -= radians(0.5)
                 else:
-                    self.yaw -= radians(0.5)
-                self.move(self.goalpose)
+                    self._yaw -= radians(0.5)
+                self.move(self._goalpose)
             elif key == 'd':
                 self.print_tip_link()
             elif key == 'pregrasp':
-                self.pregrasp(self.robot_name)
+                self.pregrasp(self._robot_name)
             elif key == 'grasp':
-                self.grasp(self.robot_name)
+                self.grasp(self._robot_name)
             elif key == 'release':
-                self.release(self.robot_name)
+                self.release(self._robot_name)
             elif key == 'pick':
-                print("   pick at " + self.format_pose(self.pick_pose))
-                self.pick(self.robot_name, self.pick_pose)
+                print("   pick at " + self.format_pose(self._pick_pose))
+                self.pick(self._robot_name, self._pick_pose)
             elif key == 'place':
-                print("  place at " + self.format_pose(self.pick_pose))
-                self.place(self.robot_name, self.place_pose)
+                print("  place at " + self.format_pose(self._pick_pose))
+                self.place(self._robot_name, self._place_pose)
             elif key == 'c':
-                self.create_mask_image(self.camera_name,
+                self.create_mask_image(self._camera_name,
                                        int(raw_input("  #bins? ")))
             elif key == 's':
                 self.delete_all_markers()
                 (poses, rotipz, gscore, success) = \
-                    self.search_graspability(self.robot_name,
-                                             self.camera_name, 4, 0)
+                    self.search_graspability(self._robot_name,
+                                             self._camera_name, 4, 0)
                 for gs in gscore:
                     print(str(gs))
                 print(str(poses))
             elif key == 'push':
-                self.do_linear_push(self.robot_name, wait=False)
+                self.do_linear_push(self._robot_name, wait=False)
             elif key == 'spiral':
-                self.do_spiral_motion(self.robot_name, wait=False)
+                self.do_spiral_motion(self._robot_name, wait=False)
             elif key == 'insertion':
-                self.do_insertion(self.robot_name, wait=False)
+                self.do_insertion(self._robot_name, wait=False)
             elif key == 'hinsertion':
-                self.do_horizontal_insertion(self.robot_name, wait=False)
+                self.do_horizontal_insertion(self._robot_name, wait=False)
             elif key == 'spiral':
-                self.do_spiral_motion(self.robot_name, wait=False)
+                self.do_spiral_motion(self._robot_name, wait=False)
             elif key == 'h':
                 self.go_home()
             else:
                 if axis == 'X    ':
-                    self.goalpose[0] = float(key)
+                    self._goalpose[0] = float(key)
                 elif axis == 'Y    ':
-                    self.goalpose[1] = float(key)
+                    self._goalpose[1] = float(key)
                 elif axis == 'Z    ':
-                    self.goalpose[2] = float(key)
+                    self._goalpose[2] = float(key)
                 elif axis == 'Pitch':
-                    self.pitch = radians(float(key))
+                    self._pitch = radians(float(key))
                 else:
-                    self.yaw = radians(float(key))
-                self.move(self.goalpose)
+                    self._yaw = radians(float(key))
+                self.move(self._goalpose)
 
         # Reset pose
         self.go_home()

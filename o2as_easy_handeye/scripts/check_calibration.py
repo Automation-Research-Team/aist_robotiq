@@ -43,50 +43,39 @@ orientations = {
 class VisitRoutines(AISTBaseRoutines):
     """Wrapper of MoveGroupCommander specific for this script"""
 
-    def __init__(self, camera_name, robot_name, orientations):
+    def __init__(self, robot_name, camera_name, orientations):
         super(VisitRoutines, self).__init__()
 
-        self.camera_name = camera_name
-
-        ## Initialize `moveit_commander`
-        self.group = moveit_commander.MoveGroupCommander(robot_name)
-        self.group.set_pose_reference_frame("workspace_center")
+        self._robot_name   = robot_name
+        self._camera_name  = camera_name
+        self._orientations = orientations
 
         # Logging
-        print("==== Planning frame:       %s" %
-              self.group.get_planning_frame())
+        group = moveit_commander.MoveGroupCommander(robot_name)
+        print("==== Planning frame:       %s" % group.get_planning_frame())
         print("==== Pose reference frame: %s" %
-              self.group.get_pose_reference_frame())
-        print("==== End effector link:    %s" %
-              self.group.get_end_effector_link())
+              group.get_pose_reference_frame())
+        print("==== End effector link:    %s" % group.get_end_effector_link())
 
-        self.orientations = orientations
-
-    @property
-    def robot_name(self):
-        return self.group.get_name()
 
     def move(self, speed):
-        self.start_acquisition(self.camera_name)
-        poseStamped = rospy.wait_for_message("/aruco_tracker/pose",
-                                             gmsg.PoseStamped, 10)
-        self.stop_acquisition(self.camera_name)
+        self.start_acquisition(self._camera_name)
+        pose = rospy.wait_for_message("/aruco_tracker/pose",
+                                      gmsg.PoseStamped, 10)
+        self.stop_acquisition(self._camera_name)
 
-        poseStamped.pose.orientation \
-            = gmsg.Quaternion(*tfs.quaternion_from_euler(*self.orientations))
-        poseStamped.pose.position.z += 0.05
-        self.go_to_pose_goal(self.robot_name, poseStamped, speed, move_lin=True)
+        pose.pose.orientation \
+            = gmsg.Quaternion(*tfs.quaternion_from_euler(*self._orientations))
+        pose.pose.position.z += 0.05
+        self.go_to_pose_goal(self._robot_name, pose, speed, move_lin=True)
         rospy.sleep(1)
 
-        poseStamped.pose.position.z -= 0.05
-        self.go_to_pose_goal(self.robot_name, poseStamped, speed, move_lin=True)
-
-    def go_home(self):
-        self.go_to_named_pose("home", self.robot_name)
+        pose.pose.position.z -= 0.05
+        self.go_to_pose_goal(self._robot_name, pose, speed, move_lin=True)
 
     def run(self, speed):
-        self.stop_acquisition(self.camera_name)
-        self.go_home()
+        self.stop_acquisition(self._camera_name)
+        self.go_to_named_pose("home", self._robot_name)
 
         while True:
             try:
@@ -95,14 +84,14 @@ class VisitRoutines(AISTBaseRoutines):
                     break
                 self.move(speed)
             except Exception as ex:
-                self.stop_acquisition(self.camera_name)
+                self.stop_acquisition(self._camera_name)
                 print ex.message
             except rospy.ROSInterruptException:
                 return
             except KeyboardInterrupt:
                 return
 
-        self.go_home()
+        self.go_to_named_pose("home", self._robot_name)
 
 ######################################################################
 #  global functions                                                  #
@@ -143,7 +132,7 @@ if __name__ == '__main__':
     assert (args.camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
     assert (args.robot_name  in {"a_bot", "b_bot", "c_bot", "d_bot"})
 
-    with VisitRoutines(args.camera_name, args.robot_name,
+    with VisitRoutines(args.robot_name, args.camera_name,
                        orientations[args.config][args.robot_name]) as routines:
 
         speed = 0.05
