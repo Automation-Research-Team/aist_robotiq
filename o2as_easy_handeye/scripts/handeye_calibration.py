@@ -169,8 +169,8 @@ keyposes = {
 
             'b_bot': [
                 [0.15,  0.15, 0.16, radians( 30), radians( 25), radians(0)],
-                [0.15,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
-                [0.15, -0.15, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.15, -0.00, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.15, -0.20, 0.16, radians(  0), radians( 25), radians(0)],
 
                 # [0.15, -0.15, 0.25, radians( 30), radians( 25), radians(0)],
                 # [0.15,  0.00, 0.25, radians( 30), radians( 25), radians(0)],
@@ -180,9 +180,9 @@ keyposes = {
                 # [0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
                 # [0.40, -0.15, 0.15, radians(  0), radians( 25), radians(0)],
 
-                [0.00, -0.15, 0.16, radians(  0), radians( 25), radians(0)],
-                [0.00,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
-                [0.00,  0.20, 0.16, radians( 30), radians( 25), radians(0)],
+                [-0.10, -0.20, 0.16, radians(  0), radians( 25), radians(0)],
+                [-0.10, -0.00, 0.16, radians( 30), radians( 25), radians(0)],
+                [-0.10,  0.20, 0.16, radians( 30), radians( 25), radians(0)],
             ],
         },
 
@@ -248,14 +248,15 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
     def __init__(self, camera_name, robot_name, speed, sleep_time, needs_calib):
         super(HandEyeCalibrationRoutines, self).__init__()
 
-        self.camera_name = camera_name
-        self.speed       = speed
-        self.sleep_time  = sleep_time
+        self._robot_name  = robot_name
+        self._camera_name = camera_name
+        self._speed       = speed
+        self._sleep_time  = sleep_time
 
         if needs_calib:
             ns = "/{}_from_{}/".format(camera_name, robot_name)
             self.get_sample_list = rospy.ServiceProxy(ns + "get_sample_list",
-                                                      GetSampleList)
+                                                       GetSampleList)
             self.take_sample = rospy.ServiceProxy(ns + "take_sample", Trigger)
             self.compute_calibration = rospy.ServiceProxy(
                 ns + "compute_calibration", ComputeCalibration)
@@ -269,27 +270,11 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
             self.save_calibration    = None
             self.reset               = None
 
-        ## Initialize `moveit_commander`
-        self.group = moveit_commander.MoveGroupCommander(robot_name)
-
-        # Set `_ee_link` as end effector wrt `_base_link` of the robot
-        self.group.set_pose_reference_frame("workspace_center")
-        self.group.set_end_effector_link(robot_name + "_ee_link")
-
-        # Logging
-        print("==== Planning frame:       %s" %
-              self.group.get_planning_frame())
-        print("==== Pose reference frame: %s" %
-              self.group.get_pose_reference_frame())
-        print("==== End effector link:    %s" %
-              self.group.get_end_effector_link())
-
-    @property
-    def robot_name(self):
-        return self.group.get_name()
+    def is_eye_on_hand(self):
+        return self._camera_name == self._robot_name + "_camera"
 
     def go_home(self):
-        self.go_to_named_pose("home", self.robot_name)
+        self.go_to_named_pose("home", self._robot_name)
 
     def save_image(self, file_name):
         img_msg = rospy.wait_for_message("/aruco_tracker/result",
@@ -306,9 +291,10 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
             gmsg.Quaternion(
                 *tfs.quaternion_from_euler(pose[3], pose[4], pose[5])))
         print("  move to " + self.format_pose(poseStamped))
-        (success, _, current_pose) = self.go_to_pose_goal(
-                self.robot_name, poseStamped, self.speed,
-                end_effector_link=self.group.get_end_effector_link(),
+        (success, _, current_pose) \
+            = self.go_to_pose_goal(
+                self._robot_name, poseStamped, self._speed,
+                end_effector_link=self._robot_name + "_ee_link",
                 move_lin=True)
         print("  reached " + self.format_pose(current_pose))
         return success
@@ -317,11 +303,11 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
         if not self.move(pose):
             return False
 
-        rospy.sleep(self.sleep_time)  # Wait until the robot settles.
+        rospy.sleep(self._sleep_time)  # Wait until the robot settles.
 
-        self.start_acquisition(self.camera_name)
+        self.start_acquisition(self._camera_name)
 
-        rospy.sleep(self.sleep_time)
+        rospy.sleep(self._sleep_time)
 
         # try:
         #     self.save_image("aruco_result-{:0=2}-{:0=2}.jpeg".format(
@@ -341,7 +327,7 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
                 print "Service call failed: %s" % e
                 success = False
 
-        self.stop_acquisition(self.camera_name)
+        self.stop_acquisition(self._camera_name)
 
         return success
 
@@ -367,7 +353,7 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
             pose[4] -= radians(30)
 
     def run(self, initpose, keyposes):
-        self.stop_acquisition(self.camera_name)
+        self.stop_acquisition(self._camera_name)
 
         if self.reset:
             self.reset()
@@ -377,15 +363,14 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
         self.move(initpose)
 
         # Collect samples over pre-defined poses
-        for i, keypose in enumerate(keyposes):
-            print("\n*** Keypose [{}/{}]: Try! ***".format(
-                i + 1, len(keyposes)))
-            if self.camera_name == "a_bot_camera":
-                self.move_to(keypose, i + 1, 1)
+        for i, keypose in enumerate(keyposes, 1):
+            print("\n*** Keypose [{}/{}]: Try! ***".format(i, len(keyposes)))
+            if self.is_eye_on_hand():
+                self.move_to(keypose, i, 1)
             else:
-                self.move_to_subposes(keypose, i + 1)
-            print("*** Keypose [{}/{}]: Completed. ***".format(
-                i + 1, len(keyposes)))
+                self.move_to_subposes(keypose, i)
+            print("*** Keypose [{}/{}]: Completed. ***".format(i,
+                                                               len(keyposes)))
 
         if self.compute_calibration:
             res = self.compute_calibration()
