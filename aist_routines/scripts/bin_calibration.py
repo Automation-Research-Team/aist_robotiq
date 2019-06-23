@@ -8,11 +8,19 @@ import geometry_msgs.msg
 
 from aist_routines.base import AISTBaseRoutines
 
+def is_num(s):
+    try:
+        float(s)
+    except ValueError:
+        return False
+    else:
+        return True
+
 ######################################################################
 #  class BinCalibrationRoutines                                      #
 ######################################################################
 class BinCalibrationRoutines(AISTBaseRoutines):
-    def __init__(self, robot_name, speed):
+    def __init__(self):
         super(BinCalibrationRoutines, self).__init__()
         self._bins = {
             "bin_1_part_5",
@@ -22,39 +30,54 @@ class BinCalibrationRoutines(AISTBaseRoutines):
             "bin_2_part_7",
             "bin_2_part_8",
         }
-        self._speed     = speed
-        self.robot_name = robot_name    # set property
+        self._robot_name = "b_bot"    # set property
+        self._axis       = "Z"
+        self._offset     = (0, 0, 0)
+        self._speed      = 0.3
         rospy.loginfo("Calibration class is staring up!")
 
     @property
     def robot_name(self):
-        return self._group.get_name()
+        return self._robot_name
 
     @robot_name.setter
     def robot_name(self, name):
-        self._group = moveit_commander.MoveGroupCommander(name)
-        self._group.set_pose_reference_frame("workspace_center")
-        if self.gripper(name).type == "suction":
-            self.gripper(name).release()
-        else:
-            self.gripper(name).grasp()
+        self._robot_name = name
+
+    @property
+    def axis(self):
+        return self._axis
+
+    @axis.setter
+    def axis(self, a):
+        self._axis = a
+
+    @property
+    def prompt(self):
+        return "{}:({:.4f}, {:.4f}, {:.4f})-{} >> ".format(
+            self._robot_name,
+            self._offset[0], self._offset[1], self._offset[2], self._axis)
 
     def go_home(self):
-        raw_input("  Press `Enter` to go home >> ")
-        self.go_to_named_pose("home", self.robot_name)
+        self.go_to_named_pose("home", self._robot_name)
 
-    def go_to(self, target_frame, offset):
-        key = raw_input("  Press `Enter` to move >> ")
-        if key == "q":
-            raise Exception("Aborted!")
+    def go_to(self, target_frame, offset, interactive=True):
+        if interactive:
+            key = raw_input("  Press `Enter` to move >> ")
+            if key == "q":
+                raise Exception("Aborted!")
+        self._offset = offset
         (success, _, current_pose) \
-            = self.go_to_frame(self.robot_name, target_frame, offset,
-                               self._speed, move_lin=True)
+            = self.go_to_frame(self._robot_name, target_frame, self._offset,
+                               self._speed, move_lin=False)
+        p = self.listener.transformPose("workspace_center",
+                                        current_pose).pose.position
+        self._offset = (p.x, p.y, p.z)
         return success
 
     def touch_the_table(self):
         print("**** Calibrating between robot and table. ****")
-        self.go_to_named_pose("home", self.robot_name)
+        self.go_to_named_pose("home", self._robot_name)
         print("==== Going to 3 cm above the table. ====")
         self.go_to("workspace_center", (0, 0, 0.03))
         print("==== Going to 1 cm above the table. ====")
@@ -63,7 +86,7 @@ class BinCalibrationRoutines(AISTBaseRoutines):
 
     def bin_calibration(self):
         print("**** Calibrating bins. ****")
-        self.go_to_named_pose("home", self.robot_name)
+        self.go_to_named_pose("home", self._robot_name)
         for bin in self._bins:
             print("==== Going to 3 cm above center of bin. ====")
             self.go_to(bin, (0, 0, 0.03))
@@ -71,7 +94,7 @@ class BinCalibrationRoutines(AISTBaseRoutines):
 
     def bin_corner_calibration(self):
         print("**** Calibrating bin corners. ****")
-        self.go_to_named_pose("home", self.robot_name)
+        self.go_to_named_pose("home", self._robot_name)
         for bin in self._bins:
             print("---- " + bin + " ----")
             target_frame = bin + "_top_back_left_corner"
@@ -86,7 +109,7 @@ class BinCalibrationRoutines(AISTBaseRoutines):
 
     def workspace_calibration(self):
         print("**** Calibrating workspace. ****")
-        self.go_to_named_pose("home", self.robot_name)
+        self.go_to_named_pose("home", self._robot_name)
         self.go_to("workspace_center", ( 0,    0, 0.03))
         self.go_to("workspace_center", (-0.10, 0, 0.03))
         self.go_to("workspace_center", (-0.20, 0, 0.03))
@@ -97,19 +120,21 @@ class BinCalibrationRoutines(AISTBaseRoutines):
         self.go_to("workspace_center", ( 0.25, 0, 0.03))
         self.go_home()
 
-    def workspace_calibration_interactive(self):
-        print("*** Calibrating workspace interactively. ****")
-        x = float(raw_input("x >> "))
-        y = float(raw_input("y >> "))
-        z = float(raw_input("z >> "))
-        self.go_to("workspace_center", (x, y, z))
-
+    def move_along_axis(self, val):
+        if self._axis == "X":
+            offset = (val, self._offset[1], self._offset[2])
+        elif self._axis == "Y":
+            offset = (self._offset[0], val, self._offset[2])
+        elif self._axis == "Z":
+            offset = (self._offset[0], self._offset[1], val)
+        self.go_to("workspace_center", offset, False)
 
 if __name__ == "__main__":
-    with BinCalibrationRoutines("b_bot", 0.3) as calib:
+    with BinCalibrationRoutines() as calib:
         while not rospy.is_shutdown():
             print("============ Calibration procedures ============ ")
             print("  [A|B|C|D]: Switch to a_bot, b_bot, c_bot or d_bot")
+            print("  [X|Y|Z]: Switch to x-axis, y-axis or z-axis")
             print("  h: Go home")
             print("  t: Touch the table (workspace_center)")
             # print("  b: Bin center calibration")
@@ -117,7 +142,7 @@ if __name__ == "__main__":
             print("  w: Workspace calibration")
             print("  q: Quit")
 
-            key = raw_input(calib.robot_name + ">> ")
+            key = raw_input(calib.prompt)
             if key == 'A':
                 calib.robot_name = "a_bot"
             elif key == 'B':
@@ -126,6 +151,12 @@ if __name__ == "__main__":
                 calib.robot_name = "c_bot"
             elif key == 'D':
                 calib.robot_name = "d_bot"
+            elif key == 'X':
+                calib.axis = "X"
+            elif key == 'Y':
+                calib.axis = "Y"
+            elif key == 'Z':
+                calib.axis = "Z"
             elif key == 'h':
                 calib.go_to_named_pose("home", calib.robot_name)
             elif key == 't':
@@ -136,5 +167,8 @@ if __name__ == "__main__":
                 calib.bin_corner_calibration()
             elif key == 'w':
                 calib.workspace_calibration()
+            elif is_num(key):
+                calib.move_along_axis(float(key))
             elif key == 'q':
+                calib.go_home()
                 break
