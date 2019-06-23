@@ -12,7 +12,7 @@ from geometry_msgs import msg as gmsg
 from tf import TransformListener, transformations as tfs
 from math import radians, degrees
 from o2as_routines.base import O2ASBaseRoutines
-from aist_routines.base import AISTBaseRoutines
+from aist_routines.ur   import URRoutines
 
 refposes = {
 #    'a_bot': [-0.10, 0.00, 0.20,  radians(-90), radians(-90), radians(180)],
@@ -26,7 +26,7 @@ refposes = {
 ######################################################################
 #  class ToolCalibrationRoutines                                     #
 ######################################################################
-class ToolCalibrationRoutines(AISTBaseRoutines):
+class ToolCalibrationRoutines(URRoutines):
     def __init__(self, robot_name, camera_name, speed):
         super(ToolCalibrationRoutines, self).__init__()
 
@@ -35,16 +35,10 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
         self._speed       = speed
         self._refpose     = refposes[robot_name]
         self._goalpose    = copy.deepcopy(self._refpose)
-
-        gripper_base_link = self.gripper(robot_name).base_link
-        gripper_tip_link  = self.gripper(robot_name).tip_link
-        now               = rospy.Time.now()
-        self.listener.waitForTransform(gripper_base_link,
-                                       gripper_tip_link,
-                                       now, rospy.Duration(10))
-        self.D0 = self.listener.fromTranslationRotation(
-            *self.listener.lookupTransform(gripper_base_link,
-                                           gripper_tip_link, now))
+        self._D0           = self.listener.fromTranslationRotation(
+            *self.listener.lookupTransform(self.gripper(robot_name).base_link,
+                                           self.gripper(robot_name).tip_link,
+                                           rospy.Time(0)))
         self._pitch = 0.0
         self._yaw   = 0.0
 
@@ -73,9 +67,9 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
                 self.listener.fromTranslationRotation(
                     (pose[0], pose[1], pose[2]),
                     tfs.quaternion_from_euler(pose[3], pose[4], pose[5])),
-                tfs.inverse_matrix(self.D0),
+                tfs.inverse_matrix(self._D0),
                 tfs.inverse_matrix(R),
-                self.D0)
+                self._D0)
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = "workspace_center"
         target_pose.pose = gmsg.Pose(
@@ -131,7 +125,7 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
         R   = self.listener.fromTranslationRotation(
                 (0, 0, 0),
                 tfs.quaternion_from_euler(0, self._pitch, self._yaw))
-        D   = tfs.concatenate_matrices(R, self.D0)
+        D   = tfs.concatenate_matrices(R, self._D0)
         xyz = tfs.translation_from_matrix(D)
         q   = tfs.quaternion_from_matrix(D)
         rpy = map(degrees, tfs.euler_from_quaternion(q))

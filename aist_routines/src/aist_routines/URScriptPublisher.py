@@ -1,6 +1,7 @@
 import os, sys, rospkg, rospy, tf
 import std_msgs.msg
 import ur_msgs.msg
+from tf import transformations as tfs
 
 ######################################################################
 #  class URScriptPublisher                                           #
@@ -8,18 +9,19 @@ import ur_msgs.msg
 class URScriptPublisher(object):
     def __init__(self, robot_name):
         super(URScriptPublisher, self).__init__()
+
         self._rospack    = rospkg.RosPack()
         self._robot_name = robot_name
         self._listener   = tf.TransformListener()
         self._publisher  = rospy.Publisher("/" + robot_name +
                                            "_controller/ur_driver/URScript",
                                            std_msgs.msg.String, queue_size=1)
-        self._move_j_template \
-            = self._read_template("move_j.script")
-        self._move_lin_template \
+        self._movej_template \
+            = self._read_template("movej.script")
+        self._movel_template \
             = self._read_template("move_to_pose_lin.script")
-        self._move_lin_rel_template \
-            = self._read_template("move_lin_rel.script")
+        self._movel_rel_template \
+            = self._read_template("movel_rel.script")
         self._linear_push_template \
             = self._read_template("linear_search_short.script")
         self._spiral_motion_template \
@@ -30,51 +32,41 @@ class URScriptPublisher(object):
             = self._read_template("peginholespiral_imp_osx_y_negative.script")
 
     # Publish various scripts
-    def move_j(self, joint_positions, acceleration=0.5, velocity=0.5,
-               wait=False):
-        if not len(joint_positions) == 6:
+    def movej(self, joint_positions, acceleration, velocity, wait):
+        if len(joint_positions) != 6:
             rospy.logwarn("Joint pose vector not of the correct length")
             return False
-        return self._publish_script(self._move_j_template, wait,
-                                    joint_positions, acceleration, velocity)
-
-    def move_lin(self, target_pose, acceleration=0.5, velocity=0.03,
-                 wait=False):
-        robot_pose = self._pose_in_base_frame(target_pose)
-        if robot_pose is None:
-            return False
-
-        xyz = [robot_pose.position.x,
-               robot_pose.position.y, robot_pose.position.z]
-        q   = [robot_pose.orientation.x, robot_pose.orientation.y,
-               robot_pose.orientation.z, robot_pose.orientation.w]
-        rpy = tf.transformations.euler_from_quaternion(q)
-        # rpy needs to be in axis-angle representation
-        # http://www.zacobria.com/universal-robots-knowledge-base-tech-support-forum-hints-tips/python-code-example-of-converting-rpyeuler-angles-to-rotation-vectorangle-axis-for-universal-robots/
-        rospy.logdebug("q in robot base:")
-        rospy.logdebug(q)
-
-        # This seems to work, but it uses the ee_link TCP of the robot.
-        return self._publish_script(self._move_lin_template, wait,
-                                    rpy[0], rpy[1], rpy[2],
-                                    xyz[0], xyz[1], xyz[2],
+        return self._publish_script(self._movej_template, wait,
+                                    joint_positions[0], joint_positions[1],
+                                    joint_positions[2], joint_positions[3],
+                                    joint_positions[4], joint_positions[5],
                                     acceleration, velocity)
 
-    def move_lin_rel(self, translation, acceleration=0.5, velocity=0.03,
-                     wait=False):
-        return self._publish_script(self._move_lin_rel_template, wait,
-                                    translation.x, translation.y,
-                                    translation.z, acceleration, velockty)
+    def movel(self, target_pose, end_effector_link,
+              acceleration, velocity, wait):
+        pose = self._pose_in_base_frame(target_pose, end_effector_link)
+        if pose is None:
+            return False
 
-    def linear_push(self, max_force=10.0, force_direction="Z+",
-                    max_approach_distance=0.1, forward_speed=0.02, wait=True):
+        # This seems to work, but it uses the ee_link TCP of the robot.
+        return self._publish_script(self._movel_template, wait,
+                                    pose[0][0], pose[0][1], pose[0][2],
+                                    pose[1][0], pose[1][1], pose[1][2],
+                                    acceleration, velocity)
+
+    def movel_rel(self, translation, acceleration, velocity, wait):
+        return self._publish_script(self._movel_rel_template, wait,
+                                    translation.x, translation.y,
+                                    translation.z, acceleration, velocity)
+
+    def linear_push(self, max_force, force_direction,
+                    max_approach_distance, forward_speed, wait):
         return self._publish_script(self._linear_push_template, wait,
                                     force_direction, max_force, forward_speed,
                                     max_approach_distance)
 
-    def spiral_motion(self, acceleration=0.1, velocity=0.03,
-                      max_radius=0.0065, radius_increment=0.002,
-                      theta_increment=30, spiral_axis="Z", wait=False):
+    def spiral_motion(self, acceleration, velocity, max_radius,
+                      radius_increment, theta_increment, spiral_axis, wait):
         if (radius_increment < 0.0001) or (radius_increment > 0.005):
             rospy.logerr("radius_incr needs to be between 0.0001 and 0.005 but is " + str(radius_increment))
             return False
@@ -83,11 +75,9 @@ class URScriptPublisher(object):
                                     velocity, acceleration,
                                     spiral_axis, theta_increment)
 
-    def insertion(self, max_force=10.0, force_direction="Z+",
-                  forward_speed=0.02, max_approach_distance=0.1,
-                  max_radius=0.004, radius_increment=0.0003,
-                  max_insertion_distance=0.035, impedance_mass=10,
-                  peck_mode=False, wait=False):
+    def insertion(self, max_force, force_direction, forward_speed,
+                  max_approach_distance, max_radius, radius_increment,
+                  max_insertion_distance, impedance_mass, peck_mode, wait):
         ### Function definitions, for reference:
         ### rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 )
         ### rq_spiral_search_new(max_insertion_distance, force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False):
@@ -98,11 +88,10 @@ class URScriptPublisher(object):
                                     max_radius, radius_increment, peck_mode,
                                     impedance_mass)
 
-    def horizontal_insertion(self, max_force=10.0, force_direction="Y-",
-                             forward_speed=0.02, max_approach_distance=0.1,
-                             max_radius=0.007, radius_increment=0.0003,
-                             max_insertion_distance=0.035, impedance_mass=10,
-                             peck_mode=False, wait=False):
+    def horizontal_insertion(self, max_force, force_direction, forward_speed,
+                             max_approach_distance, max_radius,
+                             radius_increment, max_insertion_distance,
+                             impedance_mass, peck_mode, wait):
         ### Function definitions, for reference:
         ### rq_linear_search(direction="Z+",force = 10, speed = 0.004, max_distance = 0.02 )
         ### rq_spiral_search_new(max_insertion_distance, force_threshold = 3, max_radius = 5.0, radius_incr=0.3, peck_mode = False):
@@ -125,22 +114,35 @@ class URScriptPublisher(object):
                 program_line = file.read(1024)
             return template
 
-    def _pose_in_base_frame(pose):
-        rospy.logdebug("UR script lin move uses the ee_link of the robot, not the EE of the move group.")
-        rospy.logdebug("original pose:")
-        rospy.logdebug(target_pose)
+    def _pose_in_base_frame(self, target_pose, end_effector_link):
+        try:
+            # Transformation from UR effecor frame to our effector_frame.
+            eM0 = self._listener.fromTranslationRotation(
+                    *self._listener.lookupTransform(
+                        end_effector_link, self._robot_name + "_tool0",
+                        rospy.Time(0)))
 
-        # Convert target_pose to pose w.r.t. base_frame of the robot.
-        for n in range(50):
-            try:
-                return self._listener.transformPose(self._robot_name + "_base",
-                                                    target_pose).pose
-            except tf.Exception, e:
-                rospy.logdebug("Failed to transform from frame "
-                               + target_pose.header.frame_id
-                               + ". Waiting for .1 seconds")
-                rospy.sleep(.1)
-        return None
+            # Convert target_pose to pose w.r.t. robot base_frame.
+            base = self._robot_name + "_base"
+            self._listener.waitForTransform(base, target_pose.header.frame_id,
+                                            rospy.Time(0), rospy.Duration(10))
+            pose = self._listener.transformPose(base, target_pose).pose
+            bMt  = self._listener.fromTranslationRotation(
+                    (pose.position.x, pose.position.y, pose.position.z),
+                    (pose.orientation.x, pose.orientation.y,
+                     pose.orientation.z, pose.orientation,w))
+
+            # Compute pose of the UR effector_frame w.r.t. robot base frame.
+            bM0 = tfs.concatenate_matrices(bMt, eM0)
+
+            return (tfs.translation_from_matrix(bM0),
+                    tfs.euler_from_quaternion(tfs.quaternion_from_matrix(bM0)))
+
+        except Exception as e:
+            rospy.logerr("URScriptPublisher._psoe_in_base_frame(): {}"
+                         .format(e))
+            return None
+
 
     def _publish_script(self, template, wait, *args):
         rospy.loginfo("Sending UR robot program ")
