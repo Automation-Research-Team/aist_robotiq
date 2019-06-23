@@ -52,8 +52,8 @@ class GraspabilityClient(object):
     def search(self, camera_info_topic, depth_topic, normal_topic,
                gripper_type, part_id, bin_id, image_dir=""):
         part_prop = GraspabilityClient._part_props[part_id]
-        rospy.loginfo("search graspabilities for {}(id={}) in bin_{}"
-                      .format(part_prop.name, part_id, bin_id))
+        rospy.loginfo("search graspabilities for part_{}({}) in bin_{}"
+                      .format(part_id, part_prop.name, bin_id))
 
         try:
             (K, D) = self._get_camera_intrinsics(camera_info_topic)

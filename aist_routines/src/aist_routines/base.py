@@ -1,37 +1,4 @@
 #!/usr/bin/env python
-
-# Software License Agreement (BSD License)
-#
-# Copyright (c) 2013, SRI International
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-#
-#  * Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#  * Redistributions in binary form must reproduce the above
-#    copyright notice, this list of conditions and the following
-#    disclaimer in the documentation and/or other materials provided
-#    with the distribution.
-#  * Neither the name of SRI International nor the names of its
-#    contributors may be used to endorse or promote products derived
-#    from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
-#
 # Author: Toshio UESHIBA
 
 import sys
@@ -51,7 +18,6 @@ from CameraClient       import CameraClient, PhoXiCamera, RealsenseCamera
 from GraspabilityClient import GraspabilityClient
 from MarkerPublisher    import MarkerPublisher
 from PickOrPlaceAction  import PickOrPlaceAction
-from URScriptPublisher  import URScriptPublisher
 
 ######################################################################
 #  global fucntions                                                  #
@@ -87,6 +53,7 @@ def clamp(x, min_x, max_x):
 class AISTBaseRoutines(object):
     def __init__(self):
         super(AISTBaseRoutines, self).__init__()
+
         rospy.init_node("aist_routines", anonymous=True)
         moveit_commander.roscpp_initialize(sys.argv)
         self.listener = TransformListener()
@@ -104,12 +71,6 @@ class AISTBaseRoutines(object):
             self._cameras = {
                 "a_phoxi_m_camera": PhoXiCamera("a_phoxi_m_camera"),
                 "a_bot_camera":     RealsenseCamera("a_bot_camera"),
-            }
-            self._urscript_publishers = {
-                "a_bot": URScriptPublisher("a_bot"),
-                "b_bot": URScriptPublisher("b_bot"),
-                "c_bot": URScriptPublisher("c_bot"),
-                "d_bot": URScriptPublisher("d_bot"),
             }
         else:
             self._grippers = {
@@ -201,8 +162,18 @@ class AISTBaseRoutines(object):
             group.set_planning_time(10)
 
         if move_lin:
-            pose_world = self.listener.transformPose(
+            try:
+                self.listener.waitForTransform(group.get_planning_frame(),
+                                               target_pose.header.frame_id,
+                                               rospy.Time(0),
+                                               rospy.Duration(10))
+                pose_world = self.listener.transformPose(
                                 group.get_planning_frame(), target_pose).pose
+            except Exception as e:
+                rospy.logerr("AISTBaseRoutines.go_to_pose_goal(): {}"
+                             .format(e))
+                return False
+
             waypoints  = []
             waypoints.append(pose_world)
             (plan, fraction) = group.compute_cartesian_path(waypoints,
@@ -231,63 +202,6 @@ class AISTBaseRoutines(object):
         is_all_close = all_close(target_pose.pose, current_pose.pose, 0.01)
         # rospy.loginfo("reached " + self.format_pose(current_pose))
         return (success, is_all_close, current_pose)
-
-    # UR script motions
-    def do_move_j(self, robot_name,
-                  joint_positions, acceleration=0.5, velocity=0.5, wait=False):
-        pub = self._urscript_publishers[robot_name]
-        return pub.move_j(self, joint_positions, acceleration, velocity, wait)
-
-    def do_lin_move(self, robot_name,
-                    target_pose, acceleration=0.5, velocity=0.03, wait=False):
-        pub = self._urscript_publishers[robot_name]
-        return pub.lin_move(target_pose, acceleration, velocity, wait)
-
-    def do_lin_mov_rel(self, robot_name, translation,
-                       acceleration=0.5, velocity=0.03, wait=False):
-        pub = self._urscript_publishers[robot_name]
-        return pub.lin_move_rel(translation, acceleration, velocity, wait)
-
-    def do_linear_push(self, robot_name, force=10.0, wait=True, direction="Z+",
-                       max_approach_distance=0.1, forward_speed=0.02):
-        pub = self._urscript_publishers[robot_name]
-        return pub.linear_push(force, direction,
-                               max_approach_distance, forward_speed, wait)
-
-    def do_spiral_motion(self, robot_name, acceleration=0.1, velocity=0.03,
-                         max_radius=0.0065, radius_increment=0.002,
-                         theta_increment=30, spiral_axis="Z", wait=False):
-        pub = self._urscript_publishers[robot_name]
-        return pub.spiral_motion(acceleration, velocity,
-                                 max_radius, radius_increment,
-                                 theta_increment, spiral_axis, wait)
-
-    def do_insertion(self, robot_name,
-                     max_force=10.0, force_direction="Z+",
-                     forward_speed=0.02, max_approach_distance=0.1,
-                     max_radius=0.004, radius_increment=0.0003,
-                     max_insertion_distance=0.035, impedance_mass=10,
-                     peck_mode=False, wait=False):
-        pub = self._urscript_publishers[robot_name]
-        return pub.insertion(max_force, force_direction,
-                             forward_speed, max_approach_distance,
-                             max_radius, radius_increment,
-                             max_insertion_distance, impedance_mass,
-                             peck_mode, wait)
-
-    def do_horizontal_insertion(self, robot_name,
-                                max_force=10.0, force_direction="Y-",
-                                forward_speed=0.02, max_approach_distance=0.1,
-                                max_radius=0.007, radius_increment=0.0003,
-                                max_insertion_distance=0.035,
-                                impedance_mass=10,
-                                peck_mode=False, wait=False):
-        pub = self._urscript_publishers[robot_name]
-        return pub.horizontal_insertion(max_force, force_direction,
-                                        forward_speed, max_approach_distance,
-                                        max_radius, radius_increment,
-                                        max_insertion_distance,
-                                        impedance_mass, peck_mode, wait)
 
     # Gripper stuffs
     def gripper(self, robot_name):

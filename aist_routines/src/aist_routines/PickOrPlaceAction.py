@@ -53,7 +53,8 @@ class PickOrPlaceAction(object):
                                            goal.pose,
                                            (0, 0, goal.approach_offset)),
                                        goal.speed_fast if goal.pick else
-                                       goal.speed_slow, move_lin=True)
+                                       goal.speed_slow,
+                                       move_lin=True)
         self._server.publish_feedback(feedback)
 
         # Pregrasp
@@ -89,7 +90,8 @@ class PickOrPlaceAction(object):
                                                goal.pose,
                                                (0, 0, goal.approach_offset)),
                                            goal.speed_slow if goal.pick else
-                                           goal.speed_fast, move_lin=True)
+                                           goal.speed_fast,
+                                           move_lin=True)
 
         result.success = result.success and gripper_success
         self._server.set_succeeded(result)
