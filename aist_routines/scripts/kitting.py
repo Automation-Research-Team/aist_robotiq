@@ -3,7 +3,7 @@
 import os, csv, copy, time, datetime, re, collections
 import rospy, rospkg
 
-from aist_routines.base import AISTBaseRoutines
+from aist_routines.ur import URRoutines
 
 ######################################################################
 #  global variables                                                  #
@@ -17,7 +17,7 @@ number_of_attempted = 1
 ######################################################################
 #  class KittingRoutines                                             #
 ######################################################################
-class KittingRoutines(AISTBaseRoutines):
+class KittingRoutines(URRoutines):
     """Implements kitting routines for aist robot system."""
     PartProps = collections.namedtuple(
         "PartProps", "robot_name, camera_name, destination, approach_offset, grasp_offset, place_offset")
@@ -58,6 +58,7 @@ class KittingRoutines(AISTBaseRoutines):
 
     def __init__(self):
         super(KittingRoutines, self).__init__()
+
         self._bins = [
             "bin_1_part_5",
             "bin_1_part_16",
