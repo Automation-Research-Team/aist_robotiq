@@ -6,8 +6,6 @@ import yaml
 from tf import TransformBroadcaster, TransformListener, transformations as tfs
 from geometry_msgs import msg as gmsg
 from math import radians, degrees
-from easy_handeye.handeye_calibration import HandeyeCalibration
-
 
 #########################################################################
 #  local functions                                                      #
