@@ -52,8 +52,7 @@ class PickOrPlaceAction(object):
                                        routines.effector_target_pose(
                                            goal.pose,
                                            (0, 0, goal.approach_offset)),
-                                       goal.speed_fast if goal.pick else
-                                       goal.speed_slow,
+                                       goal.speed_fast,
                                        move_lin=True)
         self._server.publish_feedback(feedback)
 
@@ -62,7 +61,7 @@ class PickOrPlaceAction(object):
             gripper.pregrasp(goal.gripper_command)
 
         # Go to pick/place pose.
-        rospy.loginfo("Go to pick/place pose.")
+        rospy.loginfo("Go to {} pose.".format("pick" if goal.pick else "place"))
         target_pose = routines.effector_target_pose(goal.pose,
                                                     (0, 0, goal.grasp_offset))
         routines.publish_marker(target_pose,
@@ -73,25 +72,22 @@ class PickOrPlaceAction(object):
         self._server.publish_feedback(feedback)
 
         # Grasp or release
+        result = amsg.pickOrPlaceResult()
         if goal.pick:
-            gripper_success = gripper.grasp(goal.gripper_command)
-            rospy.loginfo("Pick {}".format("succeeded." if gripper_success else
+            result.success = gripper.grasp(goal.gripper_command)
+            rospy.loginfo("Pick {}".format("succeeded." if result.success else
                                            "failed."))
         else:
-            gripper_success = gripper.release(goal.gripper_command)
+            result.success = gripper.release(goal.gripper_command)
 
         # Go back to approach pose.
-        result = amsg.pickOrPlaceResult()
         if goal.liftup_after:
             rospy.loginfo("Go back to approach pose.")
-            (result.success, _, _) \
-                = routines.go_to_pose_goal(goal.robot_name,
-                                           routines.effector_target_pose(
-                                               goal.pose,
-                                               (0, 0, goal.approach_offset)),
-                                           goal.speed_slow if goal.pick else
-                                           goal.speed_fast,
-                                           move_lin=True)
-
-        result.success = result.success and gripper_success
+            routines.go_to_pose_goal(goal.robot_name,
+                                     routines.effector_target_pose(
+                                         goal.pose,
+                                         (0, 0, goal.approach_offset)),
+                                     goal.speed_slow if goal.pick else
+                                     goal.speed_fast,
+                                     move_lin=True)
         self._server.set_succeeded(result)

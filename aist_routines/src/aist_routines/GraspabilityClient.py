@@ -82,7 +82,7 @@ class GraspabilityClient(object):
                         gmsg.Pose(gmsg.Point(*xyz),
                                   gmsg.Quaternion(*self._get_rotation(n,
                                                                       rot)))))
-                    print("normal = {}".format(n))
+                    print("uvd = {}".format(uvd))
 
             return (poses, res.rotipz, res.gscore, res.success)
 

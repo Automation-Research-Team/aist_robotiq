@@ -4,14 +4,15 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /MotionPlanning1
         - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
         - /TF1
         - /TF1/Frames1
         - /Image1
         - /Image2
-        - /Marker1
         - /PointCloud21
+        - /MarkerArray1
       Splitter Ratio: 0.615942001
     Tree Height: 422
   - Class: rviz/Selection
@@ -705,6 +706,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          vwall1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           workbox:
             Alpha: 1
             Show Axes: false
@@ -740,7 +746,7 @@ Visualization Manager:
         Goal State Color: 250; 128; 0
         Interactive Marker Size: 0.150000006
         Joint Violation Color: 255; 0; 255
-        Planning Group: a_bot
+        Planning Group: b_bot
         Query Goal State: true
         Query Start State: false
         Show Workspace: false
@@ -1382,6 +1388,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          vwall1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           workbox:
             Alpha: 1
             Show Axes: false
@@ -1704,6 +1715,8 @@ Visualization Manager:
           Value: false
         tray_2_screw_m4_9:
           Value: false
+        vwall1:
+          Value: true
         workbox:
           Value: false
         workspace_center:
@@ -1713,8 +1726,8 @@ Visualization Manager:
       Marker Scale: 0.150000006
       Name: TF
       Show Arrows: false
-      Show Axes: true
-      Show Names: true
+      Show Axes: false
+      Show Names: false
       Tree:
         world:
           o2as_ground:
@@ -1774,6 +1787,8 @@ Visualization Manager:
                                     {}
                           b_bot_tool0:
                             {}
+            vwall1:
+              {}
             workbox:
               {}
             workspace_center:
@@ -1990,14 +2005,6 @@ Visualization Manager:
       Transport Hint: raw
       Unreliable: false
       Value: true
-    - Class: rviz/Marker
-      Enabled: true
-      Marker Topic: visualization_marker
-      Name: Marker
-      Namespaces:
-        {}
-      Queue Size: 100
-      Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -2028,6 +2035,14 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /visualization_marker
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -2053,25 +2068,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.63711798
+      Distance: 0.737906873
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.0210876465
-        Y: 0.012263
-        Z: 0.80112648
+        X: 0.234116554
+        Y: 0.126255944
+        Z: 0.802298367
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.73884654
+      Pitch: 0.966609478
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.0324193202
+      Yaw: 5.43756676
     Saved: ~
 Window Geometry:
   Displays:
