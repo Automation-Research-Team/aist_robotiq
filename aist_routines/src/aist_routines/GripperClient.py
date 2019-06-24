@@ -65,7 +65,7 @@ class Robotiq85Gripper(GripperClient):
                  force=5.0, velocity=0.1, timeout=6.0):
         super(Robotiq85Gripper, self).__init__(str(prefix) +
                                                "robotiq_85_gripper",
-                                               "two-finger",
+                                               "two_finger",
                                                str(prefix)
                                                  + "robotiq_85_base_link",
                                                str(prefix)
@@ -177,6 +177,7 @@ class SuctionGripper(GripperClient):
             rospy.loginfo(
                 "SuctionGripper: program interrupted before completion.",
                 file=sys.stderr)
+            return False
 
     def _state_callback(self, msg):
         self._suctioned = msg.data
@@ -186,9 +187,8 @@ class SuctionGripper(GripperClient):
 ######################################################################
 class PrecisionGripper(GripperClient):
     def __init__(self, prefix="a_bot_", timeout=3.0):
-        super(PrecisionGripper, self).__init__(str(prefix) +
-                                               "gripper",
-                                               "two-finger",
+        super(PrecisionGripper, self).__init__(str(prefix) + "gripper",
+                                               "two_finger",
                                                str(prefix)
                                                  + "gripper_base_link",
                                                str(prefix)

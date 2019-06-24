@@ -25,33 +25,33 @@ class KittingRoutines(URRoutines):
         4  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_4",
                        0.15, -0.002, 0.05),
         5  : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_6",
-                       0.05, -0.002, 0.03),
+                       0.15, -0.002, 0.03),
         6  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_3",
-                       0.10, 0.0, 0.05),
+                       0.15, 0.0, 0.05),
         7  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_2",
                        0.15, -0.002, 0.05),
         8  : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_1",
-                       0.05, -0.002, 0.03),
+                       0.15, -0.002, 0.03),
         9  : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_4",
-                       0.10, -0.001, 0.05),
+                       0.15, -0.001, 0.05),
         10 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_7",
-                       0.10, -0.001, 0.05),
+                       0.15, -0.001, 0.05),
         11 : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_1",
-                       0.10, 0.0, 0.05),
+                       0.15, 0.0, 0.05),
         12 : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_3",
-                       0.10, 0.0, 0.05),
+                       0.15, 0.0, 0.05),
         13 : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_5",
-                       0.10, 0.0, 0.05),
+                       0.15, 0.0, 0.05),
         14 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_2",
-                       0.10, -0.001, 0.05),
+                       0.15, -0.001, 0.05),
         15 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_5",
-                       0.10, -0.001, 0.05),
+                       0.15, -0.001, 0.05),
         16 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_8",
-                       0.10, -0.001, 0.05),
+                       0.15, -0.001, 0.05),
         17 : PartProps("a_bot", "a_phoxi_m_camera", "skrewholder_1",
-                       0.10, -0.001, 0.05),
+                       0.15, -0.001, 0.05),
         18 : PartProps("a_bot", "a_phoxi_m_camera", "skrewholder_2",
-                       0.10, -0.001, 0.05),
+                       0.15, -0.001, 0.05),
     }
     BinProps = collections.namedtuple("BinProps",
                                       "bin_id, part_id, part_props")
@@ -148,10 +148,11 @@ if __name__ == '__main__':
     with KittingRoutines() as kitting:
         while not rospy.is_shutdown():
             print("============ Kitting procedures ============ ")
-            print("  g: Create a backgroud image")
+            print("  b: Create a backgroud image")
             print("  m: Create a mask image")
             print("  s: Search graspabilities")
-            print("  a: Attempt pick and place")
+            print("  a: Attempt to pick and place")
+            print("  A: Repeat attempts to pick and place")
             print("  k: Do kitting task")
             print("  H: Move all robots to home")
             print("  B: Move all robots to back")
@@ -162,11 +163,11 @@ if __name__ == '__main__':
                 kitting.delete_all_markers()
                 if key == 'q':
                     break
-                elif key == 'h':
+                elif key == 'H':
                     kitting.go_to_named_pose("home", "all_bots")
-                elif key == 'b':
+                elif key == 'B':
                     kitting.go_to_named_pose("back", "all_bots")
-                elif key == 'g':
+                elif key == 'b':
                     kitting.create_background_image("a_phoxi_m_camera")
                 elif key == 'm':
                     kitting.create_mask_image("a_phoxi_m_camera", kitting.nbins)
@@ -175,10 +176,15 @@ if __name__ == '__main__':
                     props = item.part_props
                     kitting.search_graspability(props.robot_name,
                                                 props.camera_name,
-                                                item.part_id, item.bin_id, 0)
+                                                item.part_id, item.bin_id,
+                                                marker_lifetime=0)
                 elif key == 'a':
                     bin = raw_input("  bin name? ")
                     kitting.attempt_bin(bin, 5, 0)
+                elif key == 'A':
+                    bin = raw_input("  bin name? ")
+                    while kitting.attempt_bin(bin, 5, 0):
+                        pass
                 elif key == 'k':
                     kitting.kitting_task()
             except Exception as e:

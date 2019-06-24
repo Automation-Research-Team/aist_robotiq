@@ -31,19 +31,22 @@ class MarkerPublisher(object):
     def __init__(self):
         super(MarkerPublisher, self).__init__()
         self._pub = rospy.Publisher("visualization_marker",
-                                    vmsg.Marker, queue_size=10)
+                                    vmsg.MarkerArray, queue_size=10)
         self._nmarkers = 0
 
     def delete_all(self):
-        marker              = vmsg.Marker()
-        marker.ns           = "markers"
-        marker.action       = vmsg.Marker.DELETEALL
-        self._pub.publish(marker)
+        markers       = vmsg.MarkerArray()
+        marker        = vmsg.Marker()
+        marker.ns     = "markers"
+        marker.action = vmsg.Marker.DELETEALL
+        markers.markers.append(marker)
+        self._pub.publish(markers)
         self._nmarkers = 0
 
     def add(self, marker_pose, marker_type, text="", lifetime=15):
         marker_prop = MarkerPublisher._marker_props[marker_type]
 
+        markers             = vmsg.MarkerArray()
         marker              = vmsg.Marker()
         marker.header       = marker_pose.header
         marker.header.stamp = rospy.Time.now()
@@ -61,21 +64,21 @@ class MarkerPublisher(object):
             marker.color = smsg.ColorRGBA(1.0, 0.0, 0.0, 0.8)  # red
             marker.id    = self._nmarkers
             self._nmarkers += 1
-            self._pub.publish(marker)  # x-axis
+            markers.markers.append(copy.deepcopy(marker))  # x-axis
 
             marker.pose  = self._pose_rotated_by_rpy(marker_pose.pose,
                                                      0, 0, pi/2)
             marker.color = smsg.ColorRGBA(0.0, 1.0, 0.0, 0.8)  # green
             marker.id    = self._nmarkers
             self._nmarkers += 1
-            self._pub.publish(marker)  # y-axis
+            markers.markers.append(copy.deepcopy(marker))  # y-axis
 
             marker.pose  = self._pose_rotated_by_rpy(marker_pose.pose,
                                                      0, -pi/2, 0)
             marker.color = smsg.ColorRGBA(0.0, 0.0, 1.0, 0.8)  # blue
             marker.id    = self._nmarkers
             self._nmarkers += 1
-            self._pub.publish(marker)  # z-axis
+            markers.markers.append(copy.deepcopy(marker))  # z-axis
 
         marker.type  = vmsg.Marker.SPHERE
         marker.pose  = marker_pose.pose
@@ -83,7 +86,7 @@ class MarkerPublisher(object):
         marker.color = smsg.ColorRGBA(*marker_prop.color)
         marker.id    = self._nmarkers
         self._nmarkers += 1
-        self._pub.publish(marker)
+        markers.markers.append(copy.deepcopy(marker))
 
         if text != "":
             marker.pose.position.z -= (marker.scale.z + 0.001)
@@ -92,9 +95,9 @@ class MarkerPublisher(object):
             marker.text  = text
             marker.id    = self._nmarkers
             self._nmarkers += 1
-            self._pub.publish(marker)
+            markers.markers.append(copy.deepcopy(marker))
 
-        return True
+        self._pub.publish(markers)
 
     def _pose_rotated_by_rpy(self, pose, roll, pitch, yaw):
         pose_rotated = copy.deepcopy(pose)

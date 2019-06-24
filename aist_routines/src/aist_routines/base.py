@@ -165,19 +165,18 @@ class AISTBaseRoutines(object):
             try:
                 self.listener.waitForTransform(group.get_planning_frame(),
                                                target_pose.header.frame_id,
-                                               rospy.Time(0),
+                                               rospy.Time.now(),
                                                rospy.Duration(10))
                 pose_world = self.listener.transformPose(
                                 group.get_planning_frame(), target_pose).pose
             except Exception as e:
                 rospy.logerr("AISTBaseRoutines.go_to_pose_goal(): {}"
                              .format(e))
-                return False
-
+                return (False, False, group.get_current_pose())
             waypoints  = []
             waypoints.append(pose_world)
             (plan, fraction) = group.compute_cartesian_path(waypoints,
-                                                            0.0005,  # eef_step
+                                                            0.01,  # eef_step
                                                             0.0) # jump_threshold
             # rospy.loginfo("Compute cartesian path succeeded with " +
             #               str(fraction*100) + "%")
@@ -272,7 +271,7 @@ class AISTBaseRoutines(object):
     # Pick and place action stuffs
     def pick(self, robot_name, target_pose,
              grasp_offset=0.0, gripper_command="",
-             speed_fast=1.0, speed_slow=0.1, approach_offset=0.10,
+             speed_fast=1.0, speed_slow=0.04, approach_offset=0.10,
              liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         return self._pickOrPlaceAction.execute(
             robot_name, target_pose, True, gripper_command,
@@ -281,7 +280,7 @@ class AISTBaseRoutines(object):
 
     def place(self, robot_name, target_pose,
               place_offset=0.0, gripper_command="",
-              speed_fast=1.0, speed_slow=0.1, approach_offset=0.05,
+              speed_fast=1.0, speed_slow=0.04, approach_offset=0.05,
               liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         return self._pickOrPlaceAction.execute(
             robot_name, target_pose, False, gripper_command,
@@ -290,7 +289,7 @@ class AISTBaseRoutines(object):
 
     def pick_at_frame(self, robot_name, target_frame, offset=(0, 0, 0),
                       grasp_offset=0.0, gripper_command="",
-                      speed_fast=1.0, speed_slow=0.1, approach_offset=0.05,
+                      speed_fast=1.0, speed_slow=0.04, approach_offset=0.05,
                       liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = target_frame
@@ -303,7 +302,7 @@ class AISTBaseRoutines(object):
 
     def place_at_frame(self, robot_name, target_frame, offset=(0, 0, 0),
                        place_offset=0.0, gripper_command="",
-                       speed_fast=1.0, speed_slow=0.1, approach_offset=0.05,
+                       speed_fast=1.0, speed_slow=0.04, approach_offset=0.05,
                        liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = target_frame
@@ -339,7 +338,7 @@ class AISTBaseRoutines(object):
                     offset,
                     tfs.quaternion_from_euler(0, radians(90), 0)))
         pose = gmsg.PoseStamped()
-        pose.header.frame_id = target_pose.header.frame_id
+        pose.header = target_pose.header
         pose.pose = gmsg.Pose(gmsg.Point(*tfs.translation_from_matrix(T)),
                               gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
         return pose

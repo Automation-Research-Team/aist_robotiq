@@ -19,7 +19,7 @@ class URScriptPublisher(object):
         self._movej_template \
             = self._read_template("movej.script")
         self._movel_template \
-            = self._read_template("move_to_pose_lin.script")
+            = self._read_template("movel.script")
         self._movel_rel_template \
             = self._read_template("movel_rel.script")
         self._linear_push_template \
