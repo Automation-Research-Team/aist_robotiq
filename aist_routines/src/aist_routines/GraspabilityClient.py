@@ -43,14 +43,14 @@ class GraspabilityClient(object):
         self._searchGraspability = rospy.ServiceProxy("search_graspability",
                                                       asrv.searchGraspability)
 
-    def create_background_image(self, depth_topic, image_dir=""):
-        return self._createBackgroundImage(depth_topic, image_dir).success
+    def create_background_image(self, depth_topic):
+        return self._createBackgroundImage(depth_topic).success
 
-    def create_mask_image(self, depth_topic, nbins, image_dir=""):
-        return self._createMaskImage(depth_topic, nbins, image_dir).success
+    def create_mask_image(self, depth_topic, nbins):
+        return self._createMaskImage(depth_topic, nbins).success
 
     def search(self, camera_info_topic, depth_topic, normal_topic,
-               gripper_type, part_id, bin_id, image_dir=""):
+               gripper_type, part_id, bin_id):
         part_prop = GraspabilityClient._part_props[part_id]
         rospy.loginfo("search graspabilities for part_{}({}) in bin_{}"
                       .format(part_id, part_prop.name, bin_id))
@@ -58,7 +58,7 @@ class GraspabilityClient(object):
         try:
             (K, D) = self._get_camera_intrinsics(camera_info_topic)
             res    = self._searchGraspability(depth_topic, gripper_type,
-                                              part_id, bin_id, image_dir)
+                                              part_id, bin_id)
             poses = []
             if normal_topic == "":
                 for uvd in res.pos3D:

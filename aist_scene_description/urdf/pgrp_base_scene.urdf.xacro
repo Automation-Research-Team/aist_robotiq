@@ -76,14 +76,16 @@
 
   <!-- Spawn and attach gripper -->
   <xacro:include filename="$(find aist_scene_description)/urdf/InnerOnlyGripper.urdf.xacro" />
-  <xacro:InnerOnlyGripper prefix="a_bot_"  grippername = "gripper" parent = "a_bot_ft300_frange_link">
-    <origin xyz="0 0 0" rpy="${-pi/2} ${-0.85*pi/180} ${-0.5*pi/180}"/>
+  <xacro:InnerOnlyGripper prefix="a_bot_"
+			  grippername = "gripper"
+			  parent = "a_bot_ft300_frange_link">
+    <origin xyz="0 0 0" rpy="${-pi/2} ${-0.9*pi/180} ${-0.5*pi/180}"/>
   </xacro:InnerOnlyGripper>
 
   <xacro:include filename="$(find o2as_scene_description)/urdf/single_suction_gripper.urdf.xacro"/>
   <xacro:single_suction_gripper_o2as prefix="b_bot_"
   				     parent="b_bot_ft300_frange_link">
-    <origin xyz="0 0 0" rpy="0 ${0.2*pi/180} ${0.3*pi/180}"/>
+    <origin xyz="0 0 0" rpy="0 ${-0.5*pi/180} ${-0.3*pi/180}"/>
   </xacro:single_suction_gripper_o2as>
 
   <!-- Add virtual wall to avoid collisions-->
@@ -94,12 +96,12 @@
   <!-- Add PhoXi 3D scanner -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro"/>
   <xacro:phoxi_m_camera prefix="a_" parent="o2as_ground">
-    <origin xyz="0.571555325522
-		 -0.0254263761312
-		 1.55210350714"
-	    rpy="${-146.961510137*pi/180}
-		 ${-0.588467063736*pi/180}
-		 ${83.8809430549*pi/180}"/>
+    <origin xyz="0.564327397092
+		 -0.0280911591052
+		 1.55061967739"
+	    rpy="${-150.214133529*pi/180}
+		 ${-0.641287772221*pi/180}
+		 ${86.0074821612*pi/180}"/>
   </xacro:phoxi_m_camera>
 
   <!-- Add RealSense camera -->
