@@ -22,31 +22,6 @@ from PickOrPlaceAction  import PickOrPlaceAction
 ######################################################################
 #  global fucntions                                                  #
 ######################################################################
-def all_close(goal, actual, tolerance):
-    """
-    Convenience method for testing if a list of values are within a tolerance of their counterparts in another list
-    @param: goal       A list of floats, a Pose or a PoseStamped
-    @param: actual     A list of floats, a Pose or a PoseStamped
-    @param: tolerance  A float
-    @returns: bool
-    """
-    all_equal = True
-    if type(goal) is list:
-        for index in range(len(goal)):
-            if abs(actual[index] - goal[index]) > tolerance:
-                return False
-
-    elif type(goal) is gmsg.PoseStamped:
-        return all_close(goal.pose, actual.pose, tolerance)
-
-    elif type(goal) is gmsg.Pose:
-        return all_close(pose_to_list(goal), pose_to_list(actual), tolerance)
-
-    return True
-
-def clamp(x, min_x, max_x):
-    return min(max(min_x, x), max_x)
-
 ######################################################################
 #  class AISTBaseRoutines                                            #
 ######################################################################
@@ -153,7 +128,7 @@ class AISTBaseRoutines(object):
 
         group = moveit_commander.MoveGroupCommander(robot_name)
         group.set_end_effector_link(end_effector_link)
-        group.set_max_velocity_scaling_factor(clamp(speed, 0.0, 1.0))
+        group.set_max_velocity_scaling_factor(self._clamp(speed, 0.0, 1.0))
 
         if high_precision:
             goal_tolerance = group.get_goal_tolerance()
@@ -198,9 +173,13 @@ class AISTBaseRoutines(object):
         group.clear_pose_targets()
 
         current_pose = group.get_current_pose()
-        is_all_close = all_close(target_pose.pose, current_pose.pose, 0.01)
+        is_all_close = self._all_close(target_pose, current_pose, 0.01)
         # rospy.loginfo("reached " + self.format_pose(current_pose))
         return (success, is_all_close, current_pose)
+
+    def get_current_pose(self, robot_name):
+        group = moveit_commander.MoveGroupCommander(robot_name)
+        return group.get_current_pose()
 
     # Gripper stuffs
     def gripper(self, robot_name):
@@ -342,3 +321,15 @@ class AISTBaseRoutines(object):
         pose.pose = gmsg.Pose(gmsg.Point(*tfs.translation_from_matrix(T)),
                               gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
         return pose
+
+    # Private functions
+    def _all_close(self, goal, actual, tolerance):
+        goal_list   = pose_to_list(goal.pose)
+        actual_list = pose_to_list(actual.pose)
+        for i in range(len(goal_list)):
+            if abs(actual_list[i] - goal_list[i]) > tolerance:
+                return False
+        return True
+
+    def _clamp(self, x, min_x, max_x):
+        return min(max(min_x, x), max_x)

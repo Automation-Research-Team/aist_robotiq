@@ -58,6 +58,7 @@ class PickOrPlaceAction(object):
 
         # Pregrasp
         if goal.pick:
+            rospy.loginfo("Pregrasp.")
             gripper.pregrasp(goal.gripper_command)
 
         # Go to pick/place pose.
@@ -79,6 +80,7 @@ class PickOrPlaceAction(object):
                                            "failed."))
         else:
             result.success = gripper.release(goal.gripper_command)
+            rospy.loginfo("Place succeeded.")
 
         # Go back to approach pose.
         if goal.liftup_after:

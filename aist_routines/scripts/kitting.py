@@ -104,6 +104,9 @@ class KittingRoutines(URRoutines):
             self.go_to_named_pose("back", self._former_robot_name)
         self._former_robot_name = props.robot_name
 
+        # Go home.
+        self.go_to_named_pose("home", props.robot_name)
+
         # Move to 0.15m above the bin if the camera is mounted on the robot, or
         # move to 0.15m above the destination oterhwise.
         if self._is_eye_on_hand(props.robot_name, props.camera_name):

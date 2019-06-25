@@ -125,12 +125,13 @@ class URScriptPublisher(object):
             # Convert target_pose to pose w.r.t. robot base_frame.
             base = self._robot_name + "_base"
             self._listener.waitForTransform(base, target_pose.header.frame_id,
-                                            rospy.Time(0), rospy.Duration(10))
+                                            rospy.Time.now(),
+                                            rospy.Duration(10))
             pose = self._listener.transformPose(base, target_pose).pose
             bMt  = self._listener.fromTranslationRotation(
                     (pose.position.x, pose.position.y, pose.position.z),
                     (pose.orientation.x, pose.orientation.y,
-                     pose.orientation.z, pose.orientation,w))
+                     pose.orientation.z, pose.orientation.w))
 
             # Compute pose of the UR effector_frame w.r.t. robot base frame.
             bM0 = tfs.concatenate_matrices(bMt, eM0)
@@ -139,7 +140,7 @@ class URScriptPublisher(object):
                     tfs.euler_from_quaternion(tfs.quaternion_from_matrix(bM0)))
 
         except Exception as e:
-            rospy.logerr("URScriptPublisher._psoe_in_base_frame(): {}"
+            rospy.logerr("URScriptPublisher._pose_in_base_frame(): {}"
                          .format(e))
             return None
 
