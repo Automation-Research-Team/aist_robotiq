@@ -12,10 +12,9 @@ class PickOrPlaceAction(object):
         super(PickOrPlaceAction, self).__init__()
 
         self._routines = routines
-        self._server = actionlib.SimpleActionServer("pickOrPlace",
-                                                    amsg.pickOrPlaceAction,
-                                                    execute_cb=self._callback,
-                                                    auto_start=False)
+        self._server   = actionlib.SimpleActionServer(
+                                "pickOrPlace", amsg.pickOrPlaceAction,
+                                execute_cb=self._execute_cb, auto_start=False)
         self._server.start()
         self._client = actionlib.SimpleActionClient('pickOrPlace',
                                                     amsg.pickOrPlaceAction)
@@ -36,11 +35,14 @@ class PickOrPlaceAction(object):
         goal.speed_slow      = speed_slow
         goal.acc_fast        = acc_fast
         goal.acc_slow        = acc_slow
-        self._client.send_goal(goal)
+        self._client.send_goal(goal, feedback_cb=self._feedback_cb)
         self._client.wait_for_result()
         return self._client.get_result().success
 
-    def _callback(self, goal):
+    def _feedback_cb(self, feedback):
+        pass
+
+    def _execute_cb(self, goal):
         routines = self._routines
         gripper  = routines.gripper(goal.robot_name)
         feedback = amsg.pickOrPlaceFeedback()
