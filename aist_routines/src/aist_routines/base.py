@@ -20,9 +20,6 @@ from MarkerPublisher    import MarkerPublisher
 from PickOrPlaceAction  import PickOrPlaceAction
 
 ######################################################################
-#  global fucntions                                                  #
-######################################################################
-######################################################################
 #  class AISTBaseRoutines                                            #
 ######################################################################
 class AISTBaseRoutines(object):
@@ -148,7 +145,7 @@ class AISTBaseRoutines(object):
                 rospy.logerr("AISTBaseRoutines.go_to_pose_goal(): {}"
                              .format(e))
                 return (False, False, group.get_current_pose())
-            waypoints  = []
+            waypoints = []
             waypoints.append(pose_world)
             (plan, fraction) = group.compute_cartesian_path(waypoints,
                                                             0.0005,  # eef_step

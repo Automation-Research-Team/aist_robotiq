@@ -41,7 +41,7 @@
 
   <!-- robot arms -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/ur5.urdf.xacro"/>
-  <xacro:ur5_robot prefix="a_bot_" joint_limited="false"
+  <xacro:ur5_robot prefix="a_bot_" joint_limited="true"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
     elbow_joint_lower_limit="0.0" elbow_joint_upper_limit="${pi}"
@@ -49,7 +49,7 @@
     wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
     wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
 
-  <xacro:ur5_robot prefix="b_bot_" joint_limited="false"
+  <xacro:ur5_robot prefix="b_bot_" joint_limited="true"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
     elbow_joint_lower_limit="0.0" elbow_joint_upper_limit="${pi}"
@@ -91,7 +91,8 @@
   </xacro:single_suction_gripper_o2as>
 
   <!-- Add virtual wall to avoid collisions-->
-  <xacro:o2as_box boxname="vwall1" box_w="0.01" box_l="0.3" box_h="0.6" parent="o2as_ground">
+  <xacro:o2as_box boxname="vwall1"
+		  box_w="0.01" box_l="0.3" box_h="0.55" parent="o2as_ground">
     <origin xyz="0.45 -0.15 ${bots_z}" rpy="0 0 0"/>
   </xacro:o2as_box>
 
