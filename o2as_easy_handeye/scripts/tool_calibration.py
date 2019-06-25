@@ -87,11 +87,15 @@ class ToolCalibrationRoutines(URRoutines):
             gmsg.Point(*tfs.translation_from_matrix(T)),
             gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
         print("move to " + self.format_pose(target_pose))
-        (success, _, pose) = self.go_to_pose_goal(self._robot_name,
-                                                  target_pose,
-                                                  self._speed, move_lin=True,
-                                                  high_precision=True)
-        print("reached " + self.format_pose(pose))
+        (success, _, current_pose) = self.go_to_pose_goal(self._robot_name,
+                                                          target_pose,
+                                                          self._speed,
+                                                          move_lin=True,
+                                                          high_precision=True)
+        # (success, _, current_pose) = self.ur_movel(self._robot_name,
+        #                                            target_pose,
+        #                                            velocity=self._speed)
+        print("reached " + self.format_pose(current_pose))
         return success
 
     def rolling_motion(self):
@@ -229,15 +233,15 @@ class ToolCalibrationRoutines(URRoutines):
                     print(str(gs))
                 print(str(poses))
             elif key == 'push':
-                self.do_linear_push(self._robot_name, wait=False)
+                self.ur_linear_push(self._robot_name, wait=False)
             elif key == 'spiral':
-                self.do_spiral_motion(self._robot_name, wait=False)
+                self.ur_spiral_motion(self._robot_name, wait=False)
             elif key == 'insertion':
-                self.do_insertion(self._robot_name, wait=False)
+                self.ur_insertion(self._robot_name, wait=False)
             elif key == 'hinsertion':
-                self.do_horizontal_insertion(self._robot_name, wait=False)
+                self.ur_horizontal_insertion(self._robot_name, wait=False)
             elif key == 'spiral':
-                self.do_spiral_motion(self._robot_name, wait=False)
+                self.ur_spiral_motion(self._robot_name, wait=False)
             elif key == 'h':
                 self.go_home()
             elif is_num(key):

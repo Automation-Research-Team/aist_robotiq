@@ -160,7 +160,10 @@ class SuctionGripper(GripperClient):
         return self._send_command(True)
 
     def grasp(self, cmd=""):
-        return self._send_command(True) and self._suctioned
+        if not self._send_command(True):
+            return False
+        rospy.sleep(0.5)        # Wait until the state is updated.
+        return self._suctioned
 
     def release(self, cmd=""):
         return self._send_command(False)
