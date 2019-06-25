@@ -24,6 +24,17 @@ refposes = {
 
 
 ######################################################################
+#  global functions                                                  #
+######################################################################
+def is_num(s):
+    try:
+        float(s)
+    except ValueError:
+        return False
+    else:
+        return True
+
+######################################################################
 #  class ToolCalibrationRoutines                                     #
 ######################################################################
 class ToolCalibrationRoutines(URRoutines):
@@ -229,7 +240,7 @@ class ToolCalibrationRoutines(URRoutines):
                 self.do_spiral_motion(self._robot_name, wait=False)
             elif key == 'h':
                 self.go_home()
-            else:
+            elif is_num(key):
                 if axis == 'X    ':
                     self._goalpose[0] = float(key)
                 elif axis == 'Y    ':

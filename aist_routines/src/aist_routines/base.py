@@ -176,7 +176,7 @@ class AISTBaseRoutines(object):
             waypoints  = []
             waypoints.append(pose_world)
             (plan, fraction) = group.compute_cartesian_path(waypoints,
-                                                            0.01,  # eef_step
+                                                            0.0005,  # eef_step
                                                             0.0) # jump_threshold
             # rospy.loginfo("Compute cartesian path succeeded with " +
             #               str(fraction*100) + "%")
