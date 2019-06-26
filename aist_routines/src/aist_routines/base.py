@@ -153,12 +153,14 @@ class AISTBaseRoutines(object):
             (plan, fraction) = group.compute_cartesian_path(waypoints,
                                                             0.0005,  # eef_step
                                                             0.0) # jump_threshold
-            # rospy.loginfo("Compute cartesian path succeeded with " +
-            #               str(fraction*100) + "%")
+            rospy.loginfo("Compute cartesian path succeeded with " +
+                          str(fraction*100) + "%")
             robots  = moveit_commander.RobotCommander()
             plan    = group.retime_trajectory(robots.get_current_state(),
                                               plan, speed)
+            print("plan generated.")
             success = group.execute(plan, wait=True)
+            print("execute " + "succeeded." if success else "failed.")
         else:
             group.set_pose_target(target_pose)
             success = group.go(wait=True)
