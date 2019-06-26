@@ -17,9 +17,7 @@
 
   <!-- send robot urdf to param server -->
   <!-- In this case the "robot" is the ensemble of the 3 arms -->
-  <include file="$(find aist_scene_description)/launch/scene_upload.launch">
-    <arg name="scene" value="$(arg scene)"/>
-  </include>
+  <include file="$(find o2as_scene_description)/launch/$(arg scene)_upload.launch"/>
 
   <!-- push robot_description to factory and spawn robot in gazebo -->
   <!-- Initial pose modified on 9 July 2018 -->

@@ -68,7 +68,8 @@ class PickOrPlaceAction(object):
             gripper.pregrasp(goal.gripper_command)
 
         # Go to pick/place pose.
-        rospy.loginfo("Go to {} pose.".format("pick" if goal.pick else "place"))
+        rospy.loginfo("Go to {} pose."
+                      .format("pick" if goal.pick else "place"))
         target_pose = routines.effector_target_pose(goal.pose,
                                                     (0, 0, goal.grasp_offset))
         routines.publish_marker(target_pose,

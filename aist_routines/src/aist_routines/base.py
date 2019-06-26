@@ -155,9 +155,8 @@ class AISTBaseRoutines(object):
             robots  = moveit_commander.RobotCommander()
             plan    = group.retime_trajectory(robots.get_current_state(),
                                               plan, speed)
-            print("plan generated.")
             success = group.execute(plan, wait=True)
-            print("execute " + "succeeded." if success else "failed.")
+            print("execute {}".format("succeeded." if success else "failed."))
         else:
             group.set_pose_target(target_pose)
             success = group.go(wait=True)
