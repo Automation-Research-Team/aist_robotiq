@@ -46,8 +46,9 @@ class PickOrPlaceAction(object):
         feedback = amsg.pickOrPlaceFeedback()
 
         # Go to approach pose.
+        result = amsg.pickOrPlaceResult()
         rospy.loginfo("Go to approach pose.")
-        (_, _, feedback.current_pose) \
+        (result.success, _, feedback.current_pose) \
             = routines.go_to_pose_goal(goal.robot_name,
                                        routines.effector_target_pose(
                                            goal.pose,
@@ -55,6 +56,9 @@ class PickOrPlaceAction(object):
                                        goal.speed_fast,
                                        move_lin=True)
         self._server.publish_feedback(feedback)
+        if not result.success:
+            self._server.set_succeeded(result)
+            return
 
         # Pregrasp
         if goal.pick:
@@ -67,13 +71,15 @@ class PickOrPlaceAction(object):
                                                     (0, 0, goal.grasp_offset))
         routines.publish_marker(target_pose,
                                 "pick_pose" if goal.pick else "place_pose")
-        (_, _, feedback.current_pose) \
+        (result.success, _, feedback.current_pose) \
             = routines.go_to_pose_goal(goal.robot_name, target_pose,
                                        goal.speed_slow, move_lin=True)
         self._server.publish_feedback(feedback)
+        if not result.success:
+            self._server.set_succeeded(result)
+            return
 
         # Grasp or release
-        result = amsg.pickOrPlaceResult()
         if goal.pick:
             result.success = gripper.grasp(goal.gripper_command)
             rospy.loginfo("Pick {}".format("succeeded." if result.success else

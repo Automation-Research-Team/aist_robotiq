@@ -104,15 +104,10 @@ class KittingRoutines(URRoutines):
             self.go_to_named_pose("back", self._former_robot_name)
         self._former_robot_name = props.robot_name
 
-        # Go home.
-        self.go_to_named_pose("home", props.robot_name)
-
         # Move to 0.15m above the bin if the camera is mounted on the robot, or
         # move to 0.15m above the destination oterhwise.
         if self._is_eye_on_hand(props.robot_name, props.camera_name):
             self.go_to_frame(props.robot_name, bin, (0, 0, 0.15))
-        else:
-            self.go_to_frame(props.robot_name, props.destination, (0, 0, 0.15))
 
         # Search for graspabilities.
         (pick_poses, rotipz, gscore, success) \
@@ -137,10 +132,6 @@ class KittingRoutines(URRoutines):
             else:
                 self.release(props.robot_name)
 
-        if self._is_eye_on_hand(props.robot_name, props.camera_name):
-            self.go_to_frame(props.robot_name, bin, (0, 0, 0.15))
-        else:
-            self.go_to_frame(props.robot_name, props.destination, (0, 0, 0.15))
         return False
 
     def _is_eye_on_hand(self, robot_name, camera_name):

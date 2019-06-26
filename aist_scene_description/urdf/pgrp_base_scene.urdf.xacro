@@ -25,7 +25,7 @@
 
   <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro"/>
   <xacro:property name="table_w" value="0.9"/>
-  <xacro:property name="table_l" value="0.75"/>
+  <xacro:property name="table_l" value="1.8"/>
   <xacro:property name="table_h" value="0.01"/>
   <xacro:o2as_box boxname="workbox"
 		  box_w="${table_w}" box_l="${table_l}" box_h="${table_h}"
