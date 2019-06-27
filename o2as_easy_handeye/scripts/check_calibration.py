@@ -62,20 +62,20 @@ class VisitRoutines(AISTBaseRoutines):
         self.start_acquisition(self._camera_name)
         pose = rospy.wait_for_message("/aruco_tracker/pose",
                                       gmsg.PoseStamped, 10)
-        self.stop_acquisition(self._camera_name)
 
-        self.go_to_frame(self._robot_name, "aruco_marker_frame", (0, 0, 0.05))
-        rospy.sleep(1)
-        self.go_to_frame(self._robot_name, "aruco_marker_frame", (0, 0, 0))
-
-        # pose.pose.orientation \
-        #     = gmsg.Quaternion(*tfs.quaternion_from_euler(*self._orientations))
-        # pose.pose.position.z += 0.05
-        # self.go_to_pose_goal(self._robot_name, pose, speed, move_lin=True)
+        # self.go_to_frame(self._robot_name, "aruco_marker_frame", (0, 0, 0.05))
         # rospy.sleep(1)
+        # self.go_to_frame(self._robot_name, "aruco_marker_frame", (0, 0, 0))
 
-        # pose.pose.position.z -= 0.05
-        # self.go_to_pose_goal(self._robot_name, pose, speed, move_lin=True)
+        pose.pose.orientation \
+            = gmsg.Quaternion(*tfs.quaternion_from_euler(*self._orientations))
+        pose.pose.position.z += 0.05
+        self.go_to_pose_goal(self._robot_name, pose, speed, move_lin=True)
+        self.stop_acquisition(self._camera_name)
+        rospy.sleep(1)
+
+        pose.pose.position.z -= 0.05
+        self.go_to_pose_goal(self._robot_name, pose, speed, move_lin=True)
 
     def run(self, speed):
         self.stop_acquisition(self._camera_name)

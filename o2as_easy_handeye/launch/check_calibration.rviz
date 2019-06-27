@@ -33,7 +33,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: PointCloud2
 Toolbars:
   toolButtonStyle: 2
 Visualization Manager:
@@ -1620,7 +1620,7 @@ Visualization Manager:
         plate_center:
           Value: false
         tray_1:
-          Value: true
+          Value: false
         tray_1_divider1_1:
           Value: false
         tray_1_divider1_2:
@@ -1684,7 +1684,7 @@ Visualization Manager:
         tray_2_partition_8_pickup_2:
           Value: false
         tray_2_screw_holder:
-          Value: true
+          Value: false
         tray_2_screw_m3_1:
           Value: false
         tray_2_screw_m3_2:
@@ -1716,7 +1716,7 @@ Visualization Manager:
         tray_2_screw_m4_9:
           Value: false
         vwall1:
-          Value: true
+          Value: false
         workbox:
           Value: false
         workspace_center:
@@ -1726,8 +1726,8 @@ Visualization Manager:
       Marker Scale: 0.150000006
       Name: TF
       Show Arrows: false
-      Show Axes: false
-      Show Names: false
+      Show Axes: true
+      Show Names: true
       Tree:
         world:
           o2as_ground:
@@ -2040,7 +2040,7 @@ Visualization Manager:
       Marker Topic: /visualization_marker
       Name: MarkerArray
       Namespaces:
-        {}
+        markers: true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -2068,7 +2068,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.737906873
+      Distance: 0.586663604
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -2083,10 +2083,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.966609478
+      Pitch: 0.601609766
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.43756676
+      Yaw: 3.10256147
     Saved: ~
 Window Geometry:
   Displays:

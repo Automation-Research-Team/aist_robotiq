@@ -152,14 +152,22 @@ class AISTBaseRoutines(object):
                                                             0.0) # jump_threshold
             rospy.loginfo("Compute cartesian path succeeded with " +
                           str(fraction*100) + "%")
-            robots  = moveit_commander.RobotCommander()
-            plan    = group.retime_trajectory(robots.get_current_state(),
-                                              plan, speed)
-            success = group.execute(plan, wait=True)
-            print("execute {}".format("succeeded." if success else "failed."))
+            if fraction > 0.99:
+                rospy.loginfo("Execute generated plan...")
+                robots  = moveit_commander.RobotCommander()
+                plan    = group.retime_trajectory(robots.get_current_state(),
+                                                  plan, speed)
+                success = group.execute(plan, wait=True)
+            else:
+                rospy.loginfo("Switch to non-move-lin motion...")
+                group.set_pose_target(target_pose)
+                success = group.go(wait=True)
         else:
             group.set_pose_target(target_pose)
             success = group.go(wait=True)
+
+        rospy.loginfo("go_to_pose_goal() {}"
+                      .format("succeeded." if success else "failed."))
 
         if high_precision:
             group.set_goal_tolerance(goal_tolerance[1])
