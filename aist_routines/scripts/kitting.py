@@ -82,11 +82,15 @@ class KittingRoutines(URRoutines):
     def nbins(self):
         return len(self._bins)
 
+    @property
+    def formar_robot_name(self):
+        return self._former_robot_name
+
     def item(self, bin):
         return self._items[bin]
 
     ###----- main procedure
-    def kitting_task(self):
+    def run(self):
         self.go_to_named_pose("back", "all_bots")
         for bin in self._bins:
             if rospy.is_shutdown():
@@ -106,8 +110,7 @@ class KittingRoutines(URRoutines):
             self.go_to_named_pose("back", self._former_robot_name)
         self._former_robot_name = props.robot_name
 
-        # Move to 0.15m above the bin if the camera is mounted on the robot, or
-        # move to 0.15m above the destination oterhwise.
+        # Move to 0.15m above the bin if the camera is mounted on the robot.
         if self._is_eye_on_hand(props.robot_name, props.camera_name):
             self.go_to_frame(props.robot_name, bin, (0, 0, 0.15))
 
@@ -165,7 +168,8 @@ if __name__ == '__main__':
                 elif key == 'b':
                     kitting.create_background_image("a_phoxi_m_camera")
                 elif key == 'm':
-                    kitting.create_mask_image("a_phoxi_m_camera", kitting.nbins)
+                    kitting.create_mask_image("a_phoxi_m_camera",
+                                              kitting.nbins)
                 elif key == 's':
                     item  = kitting.item(raw_input("  bin name? "))
                     props = item.part_props
@@ -176,15 +180,13 @@ if __name__ == '__main__':
                 elif key == 'a':
                     bin = raw_input("  bin name? ")
                     kitting.attempt_bin(bin, 5, 0)
-                    kitting.go_to_named_pose(
-                        "home", kitting.item(bin).part_props.robot_name)
+                    kitting.go_to_named_pose("home", kitting.former_robot_name)
                 elif key == 'A':
                     bin = raw_input("  bin name? ")
                     while kitting.attempt_bin(bin, 5, 0):
                         pass
-                    kitting.go_to_named_pose(
-                        "home", kitting.item(bin).part_props.robot_name)
+                    kitting.go_to_named_pose("home", kitting.former_robot_name)
                 elif key == 'k':
-                    kitting.kitting_task()
+                    kitting.run()
             except Exception as e:
                 print(e)
