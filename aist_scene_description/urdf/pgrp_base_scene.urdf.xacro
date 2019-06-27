@@ -91,7 +91,7 @@
   </xacro:single_suction_gripper_o2as>
 
   <!-- Add virtual wall to avoid collisions-->
-  <xacro:o2as_box boxname="vwall1" box_w="0.01" box_l="0.3" box_h="0.55" parent="o2as_ground">
+  <xacro:o2as_box boxname="vwall1" box_w="0.01" box_l="0.3" box_h="0.5" parent="o2as_ground">
     <origin xyz="0.45 -0.15 ${bots_z}" rpy="0 0 0"/>
   </xacro:o2as_box>
 
