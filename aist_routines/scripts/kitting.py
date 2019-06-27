@@ -23,15 +23,15 @@ class KittingRoutines(URRoutines):
         "PartProps", "robot_name, camera_name, destination, approach_offset, grasp_offset, place_offset")
     _part_props = {
         4  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_4",
-                       0.15, -0.002, 0.05),
+                       0.15, -0.001, 0.05),
         5  : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_6",
-                       0.15, -0.002, 0.03),
+                       0.15, -0.001, 0.03),
         6  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_3",
                        0.15, 0.0, 0.05),
         7  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_2",
-                       0.15, -0.002, 0.05),
+                       0.15, -0.001, 0.05),
         8  : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_1",
-                       0.15, -0.002, 0.03),
+                       0.15, -0.001, 0.03),
         9  : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_4",
                        0.15, -0.001, 0.05),
         10 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_7",
@@ -95,6 +95,8 @@ class KittingRoutines(URRoutines):
         self.go_to_named_pose("home", "all_bots")
 
     def attempt_bin(self, bin, max_attempts=5, marker_lifetime=0):
+        self.delete_all_markers()
+
         item  = self._items[bin]
         props = item.part_props
 
@@ -154,7 +156,6 @@ if __name__ == '__main__':
 
             try:
                 key = raw_input(">> ")
-                kitting.delete_all_markers()
                 if key == 'q':
                     break
                 elif key == 'H':
@@ -175,10 +176,14 @@ if __name__ == '__main__':
                 elif key == 'a':
                     bin = raw_input("  bin name? ")
                     kitting.attempt_bin(bin, 5, 0)
+                    kitting.go_to_named_pose(
+                        "home", kitting.item(bin).part_props.robot_name)
                 elif key == 'A':
                     bin = raw_input("  bin name? ")
                     while kitting.attempt_bin(bin, 5, 0):
                         pass
+                    kitting.go_to_named_pose(
+                        "home", kitting.item(bin).part_props.robot_name)
                 elif key == 'k':
                     kitting.kitting_task()
             except Exception as e:

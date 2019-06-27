@@ -168,9 +168,9 @@ keyposes = {
             ],
 
             'b_bot': [
-                [0.15,  0.15, 0.16, radians( 30), radians( 25), radians(0)],
-                [0.15, -0.00, 0.16, radians( 30), radians( 25), radians(0)],
-                [0.15, -0.20, 0.16, radians(  0), radians( 25), radians(0)],
+                [0.20,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.20,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.20, -0.15, 0.16, radians(  0), radians( 25), radians(0)],
 
                 # [0.15, -0.15, 0.25, radians( 30), radians( 25), radians(0)],
                 # [0.15,  0.00, 0.25, radians( 30), radians( 25), radians(0)],
@@ -180,9 +180,9 @@ keyposes = {
                 # [0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
                 # [0.40, -0.15, 0.15, radians(  0), radians( 25), radians(0)],
 
-                [-0.10, -0.20, 0.16, radians(  0), radians( 25), radians(0)],
-                [-0.10, -0.00, 0.16, radians( 30), radians( 25), radians(0)],
-                [-0.10,  0.20, 0.16, radians( 30), radians( 25), radians(0)],
+                [-0.00, -0.15, 0.16, radians(  0), radians( 25), radians(0)],
+                [-0.00,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
+                [-0.00,  0.15, 0.16, radians( 30), radians( 25), radians(0)],
             ],
         },
 
