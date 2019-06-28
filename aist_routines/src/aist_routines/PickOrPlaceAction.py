@@ -101,4 +101,7 @@ class PickOrPlaceAction(object):
                                      goal.speed_slow if goal.pick else
                                      goal.speed_fast,
                                      move_lin=True)
+            if goal.pick and gripper.type == "suction":
+                result.success = gripper.suctioned
+
         self._server.set_succeeded(result)

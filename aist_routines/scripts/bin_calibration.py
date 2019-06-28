@@ -98,13 +98,13 @@ class BinCalibrationRoutines(AISTBaseRoutines):
         for bin in self._bins:
             print("---- " + bin + " ----")
             target_frame = bin + "_top_back_left_corner"
-            self.go_to(target_frame, (0, 0, 0.005))
+            self.go_to(target_frame, (0, 0, 0.02))
             target_frame = bin + "_top_back_right_corner"
-            self.go_to(target_frame, (0, 0, 0.005))
+            self.go_to(target_frame, (0, 0, 0.02))
             target_frame = bin + "_top_front_right_corner"
-            self.go_to(target_frame, (0, 0, 0.005))
+            self.go_to(target_frame, (0, 0, 0.02))
             target_frame = bin + "_top_front_left_corner"
-            self.go_to(target_frame, (0, 0, 0.005))
+            self.go_to(target_frame, (0, 0, 0.02))
         self.go_home()
 
     def workspace_calibration(self):

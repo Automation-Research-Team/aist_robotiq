@@ -83,7 +83,7 @@ class KittingRoutines(URRoutines):
         return len(self._bins)
 
     @property
-    def formar_robot_name(self):
+    def former_robot_name(self):
         return self._former_robot_name
 
     def item(self, bin):
