@@ -86,7 +86,7 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/single_suction_gripper.urdf.xacro"/>
   <xacro:single_suction_gripper_o2as prefix="b_bot_"
   				     parent="b_bot_ft300_frange_link">
-    <origin xyz="0 0 0" rpy="0 ${0.3*pi/180} ${-0.3*pi/180}"/>
+    <origin xyz="0 0 0" rpy="0 ${0.1*pi/180} ${-0.2*pi/180}"/>
     <!-- <origin xyz="0 0 0" rpy="0 0 0"/> -->
   </xacro:single_suction_gripper_o2as>
 
@@ -98,12 +98,12 @@
   <!-- Add PhoXi 3D scanner -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro"/>
   <xacro:phoxi_m_camera prefix="a_" parent="o2as_ground">
-    <origin xyz="0.520760383355
-		 -0.00603134128121
-		 1.43707943481"
-	    rpy="${-150.73999755*pi/180}
-		 ${0.644901804876*pi/180}
-		 ${88.2535056807*pi/180}"/>
+    <origin xyz="0.521217687458
+		 -0.00508307933619
+		 1.43718368936"
+	    rpy="${-150.749317075*pi/180}
+		 ${0.617210923766*pi/180}
+		 ${88.4045592933*pi/180}"/>
   </xacro:phoxi_m_camera>
 
   <!-- Add RealSense camera -->
