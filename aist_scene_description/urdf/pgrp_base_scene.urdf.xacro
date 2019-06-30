@@ -70,7 +70,7 @@
   </joint>
 
   <!-- Spawn and attach force sensor -->
-  <xacro:include filename="$(find o2as_scene_description)/urdf/ft300.urdf.xacro"/>
+  <xacro:include filename="$(find aist_ft300)/urdf/ft300.urdf.xacro"/>
   <xacro:ft300 prefix="a_bot_" parent="a_bot_ee_link"/>
   <xacro:ft300 prefix="b_bot_" parent="b_bot_ee_link"/>
 

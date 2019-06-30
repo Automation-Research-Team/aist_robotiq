@@ -4,6 +4,7 @@ import os, csv, copy, time, datetime, re, collections
 import rospy, rospkg
 
 from aist_routines.ur import URRoutines
+from aist_msgs        import msg as amsg
 
 ######################################################################
 #  global variables                                                  #
@@ -123,24 +124,41 @@ class KittingRoutines(URRoutines):
             return False
 
         # Attempt to pick the item.
-        for i, pose in enumerate(pick_poses):
-            if i == max_attempts:
+        nattempts = 0
+        for pose in pick_poses:
+            if nattempts == max_attempts:
                 break
 
-            if self.pick(props.robot_name, pose,
-                         grasp_offset=props.grasp_offset,
-                         approach_offset=props.approach_offset):
-                self.place_at_frame(props.robot_name, props.destination,
-                                    place_offset=props.place_offset,
-                                    approach_offset=props.approach_offset)
-                return True
-            else:
-                self.release(props.robot_name)
+            result = self.pick(props.robot_name, pose,
+                               grasp_offset=props.grasp_offset,
+                               approach_offset=props.approach_offset)
+            if result == amsg.pickOrPlaceResult.SUCCESS:
+                result = self.place_at_frame(
+                                props.robot_name, props.destination,
+                                place_offset=props.place_offset,
+                                approach_offset=props.approach_offset)
+                return result == amsg.pickOrPlaceResult.SUCCESS
+            elif result == amsg.pickOrPlaceResult.PLAN_FAILURE:
+                pass
+            elif result == amsg.pickOrPlaceResult.PICK_FAILURE:
+                nattempts += 1
+
+            self.release(props.robot_name)
 
         return False
 
     def _is_eye_on_hand(self, robot_name, camera_name):
         return camera_name == robot_name + "_camera"
+
+    def _fix_pose(pose):
+        try:
+            self.listener.waitForTransform("workspace_center",
+                                           pose.header.frame_id,
+                                           rospy.Time.now(),
+                                           rospy.Duration(10))
+            pose_world = self.listener.transformPose("workspace_center",
+                                                     pose).pose
+
 
 
 if __name__ == '__main__':
