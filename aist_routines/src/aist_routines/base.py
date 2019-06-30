@@ -150,19 +150,18 @@ class AISTBaseRoutines(object):
             (plan, fraction) = group.compute_cartesian_path(waypoints,
                                                             0.0005,  # eef_step
                                                             0.0) # jump_threshold
-            rospy.loginfo("Compute cartesian path succeeded with " +
-                          str(fraction*100) + "%")
-            rospy.loginfo("Execute generated plan...")
+            if fraction < 0.995:
+                rospy.logwarn("Computed only {}% of the total cartesian path."
+                              ,format(fraction*100))
+                group.clear_pose_targets()
+                return (False, False, group.get_current_pose())
+
+            rospy.loginfo("Execute plan with {}% computed cartesian path."
+                          .format(fraction*100))
             robots  = moveit_commander.RobotCommander()
             plan    = group.retime_trajectory(robots.get_current_state(),
                                               plan, speed)
             success = group.execute(plan, wait=True)
-            if fraction < 0.999:
-                rospy.loginfo("Add non-move-lin motion...")
-                group.clear_pose_targets()
-                return self.go_to_pose_goal(robot_name, target_pose, speed,
-                                            high_precision, end_effector_link,
-                                            move_lin=False)
         else:
             group.set_pose_target(target_pose)
             success = group.go(wait=True)

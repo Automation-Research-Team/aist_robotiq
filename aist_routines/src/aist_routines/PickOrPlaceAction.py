@@ -37,7 +37,7 @@ class PickOrPlaceAction(object):
         goal.acc_slow        = acc_slow
         self._client.send_goal(goal, feedback_cb=self._feedback_cb)
         self._client.wait_for_result()
-        return self._client.get_result().success
+        return self._client.get_result().result
 
     def _feedback_cb(self, feedback):
         pass
@@ -50,7 +50,7 @@ class PickOrPlaceAction(object):
         # Go to approach pose.
         result = amsg.pickOrPlaceResult()
         rospy.loginfo("Go to approach pose.")
-        (result.success, _, feedback.current_pose) \
+        (success, _, feedback.current_pose) \
             = routines.go_to_pose_goal(goal.robot_name,
                                        routines.effector_target_pose(
                                            goal.pose,
@@ -58,7 +58,8 @@ class PickOrPlaceAction(object):
                                        goal.speed_fast,
                                        move_lin=True)
         self._server.publish_feedback(feedback)
-        if not result.success:
+        if not success:
+            result.result = amsg.pickOrPlaceResult.PLAN_FAILURE
             self._server.set_succeeded(result)
             return
 
@@ -74,22 +75,22 @@ class PickOrPlaceAction(object):
                                                     (0, 0, goal.grasp_offset))
         routines.publish_marker(target_pose,
                                 "pick_pose" if goal.pick else "place_pose")
-        (result.success, _, feedback.current_pose) \
+        (success, _, feedback.current_pose) \
             = routines.go_to_pose_goal(goal.robot_name, target_pose,
                                        goal.speed_slow, move_lin=True)
         self._server.publish_feedback(feedback)
-        if not result.success:
+        if not success:
+            result.result = amsg.pickOrPlace.PLAN_FAILURE
             self._server.set_succeeded(result)
             return
 
         # Grasp or release
         if goal.pick:
-            result.success = gripper.grasp(goal.gripper_command)
-            rospy.loginfo("Pick {}".format("succeeded." if result.success else
-                                           "failed."))
+            success = gripper.grasp(goal.gripper_command)
+            rospy.loginfo("Pick.")
         else:
-            result.success = gripper.release(goal.gripper_command)
-            rospy.loginfo("Place succeeded.")
+            success = gripper.release(goal.gripper_command)
+            rospy.loginfo("Place.")
 
         # Go back to approach pose.
         if goal.liftup_after:
@@ -101,7 +102,9 @@ class PickOrPlaceAction(object):
                                      goal.speed_slow if goal.pick else
                                      goal.speed_fast,
                                      move_lin=True)
-            if goal.pick and gripper.type == "suction":
-                result.success = gripper.suctioned
+            if goal.pick and hasattr(gripper, "suctioned"):
+                success = gripper.suctioned
 
+        result.result = amsg.pickOrPlaceResult.SUCCESS if success else \
+                        amsg.pickOrPlaceResult.GRASP_FAILURE
         self._server.set_succeeded(result)
