@@ -307,10 +307,10 @@ class AISTBaseRoutines(object):
     def format_pose(self, poseStamped):
         pose = self.listener.transformPose("workspace_center",
                                             poseStamped).pose
-        rpy  = map(degrees, tfs.euler_from_quaternion([pose.orientation.w,
-                                                       pose.orientation.x,
+        rpy  = map(degrees, tfs.euler_from_quaternion([pose.orientation.x,
                                                        pose.orientation.y,
-                                                       pose.orientation.z]))
+                                                       pose.orientation.z,
+                                                       pose.orientation.w]))
         return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
             pose.position.x, pose.position.y, pose.position.z, *rpy)
 
