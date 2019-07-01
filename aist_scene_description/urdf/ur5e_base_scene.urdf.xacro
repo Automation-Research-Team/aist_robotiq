@@ -80,21 +80,21 @@
 					  parent="c_bot_ft300_frange_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:robotiq_85_gripper_with_tip_link>
-  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/InnerOnlyGripper.xacro" /> -->
-  <!-- <xacro:InnerOnlyGripper prefix="c_bot_"  grippername = "gripper" parent = "c_bot_ft300_frange_link"> -->
-  <!--   <origin xyz="0 0 0" rpy="0 ${90*pi/180} 0"/> -->
-  <!-- </xacro:InnerOnlyGripper> -->
 
-  <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro"/>
-  <xacro:dual_suction_gripper_o2as prefix="d_bot_"
-  				     parent="d_bot_ft300_frange_link">
-    <origin xyz="0 0 0" rpy="0 ${0.8*pi/180} ${-0.5*pi/180}"/>
-  </xacro:dual_suction_gripper_o2as>
+  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro"/> -->
+  <!-- <xacro:dual_suction_gripper_o2as prefix="d_bot_" -->
+  <!-- 				     parent="d_bot_ft300_frange_link"> -->
+  <!--   <origin xyz="0 0 0" rpy="0 ${0.8*pi/180} ${-0.5*pi/180}"/> -->
+  <!-- </xacro:dual_suction_gripper_o2as> -->
 
   <!-- Add virtual wall to avoid collisions-->
   <!-- <xacro:o2as_box boxname="vwall1" box_w="0.01" box_l="0.5" box_h="0.6" parent="o2as_ground"> -->
   <!--   <origin xyz="0.50 -0.25 ${bots_z}" rpy="0 0 0"/> -->
   <!-- </xacro:o2as_box> -->
+  <xacro:robotiq_85_gripper_with_tip_link prefix="d_bot_"
+					  parent="d_bot_ft300_frange_link">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:robotiq_85_gripper_with_tip_link>
 
   <!-- Add PhoXi 3D scanner -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro"/>

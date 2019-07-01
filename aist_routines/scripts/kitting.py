@@ -150,14 +150,14 @@ class KittingRoutines(URRoutines):
     def _is_eye_on_hand(self, robot_name, camera_name):
         return camera_name == robot_name + "_camera"
 
-    def _fix_pose(pose):
-        try:
-            self.listener.waitForTransform("workspace_center",
-                                           pose.header.frame_id,
-                                           rospy.Time.now(),
-                                           rospy.Duration(10))
-            pose_world = self.listener.transformPose("workspace_center",
-                                                     pose).pose
+    # def _fix_pose(pose):
+    #     try:
+    #         self.listener.waitForTransform("workspace_center",
+    #                                        pose.header.frame_id,
+    #                                        rospy.Time.now(),
+    #                                        rospy.Duration(10))
+    #         pose_world = self.listener.transformPose("workspace_center",
+    #                                                  pose).pose
 
 
 

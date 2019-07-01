@@ -80,7 +80,7 @@ class PickOrPlaceAction(object):
                                        goal.speed_slow, move_lin=True)
         self._server.publish_feedback(feedback)
         if not success:
-            result.result = amsg.pickOrPlace.PLAN_FAILURE
+            result.result = amsg.pickOrPlaceResult.PLAN_FAILURE
             self._server.set_succeeded(result)
             return
 
@@ -106,5 +106,5 @@ class PickOrPlaceAction(object):
                 success = gripper.suctioned
 
         result.result = amsg.pickOrPlaceResult.SUCCESS if success else \
-                        amsg.pickOrPlaceResult.GRASP_FAILURE
+                        amsg.pickOrPlaceResult.PICK_FAILURE
         self._server.set_succeeded(result)

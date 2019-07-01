@@ -4,7 +4,6 @@
  */
 #include <sys/types.h>
 #include <sys/socket.h>
-//#include <fcntl.h>
 #include <netinet/in.h>		// for struct sockaddr_in
 #include <arpa/inet.h>		// for inet_addr()
 #include <netdb.h>		// for struct hostent, gethostbyname()
@@ -21,13 +20,14 @@ static const char*
 splitd(const char* s, double& val)
 {
     for (; *s; ++s)
-	if (*s == '.' || isdigit(*s))
+	if (*s == '+' || *s == '-' || *s == '.' || isdigit(*s))
 	{
 	    char*	end;
 	    val = strtod(s, &end);
 	    return end;
 	}
 
+    throw std::runtime_error("No strings representing numeric values found.");
     return nullptr;
 }
 
@@ -46,7 +46,7 @@ class FT300
     void	run()							;
 
   private:
-    bool	connect(u_long hostname, int port)			;
+    bool	connect_socket(u_long hostname, int port)		;
 
   private:
     ros::NodeHandle		_nh;
@@ -91,22 +91,22 @@ FT300::FT300()
 	{
 	    if (!*addr_ptr)
 		throw;
-	    if (connect(*(*addr_ptr), port))
+	    if (connect_socket(*(*addr_ptr), port))
 		break;
 	}
     }
     else
     {
-	if (!connect(addr, port))
+	if (!connect_socket(addr, port))
 	    throw;
     }
 
     _nh.param<double>("frequency", _frequency, 100);
     _nh.param<std::string>("sensor_frame", _wrench.header.frame_id,
-			   "sensor_frame");
+			   "ft300_wrench_link");
     ROS_INFO_STREAM("frequency=" << _frequency
-		    << ", sensor_frame=" << _wrench.header.frame_id
-		    << "aist_ft300_wrench started.");
+		    << ", sensor_frame=" << _wrench.header.frame_id);
+    ROS_INFO_STREAM("aist_ft300_wrench started.");
 }
 
 FT300::~FT300()
@@ -131,17 +131,24 @@ FT300::run()
 	}
 	buf[nbytes] = '\0';
 
-	_wrench.header.stamp = ros::Time::now();
+	try
+	{
+	    _wrench.header.stamp = ros::Time::now();
 
-	const char*	s = buf.data();
-	s = splitd(s, _wrench.wrench.force.x);
-	s = splitd(s, _wrench.wrench.force.y);
-	s = splitd(s, _wrench.wrench.force.z);
-	s = splitd(s, _wrench.wrench.torque.x);
-	s = splitd(s, _wrench.wrench.torque.y);
-	s = splitd(s, _wrench.wrench.torque.z);
+	    const char*	s = buf.data();
+	    s = splitd(s, _wrench.wrench.force.x);
+	    s = splitd(s, _wrench.wrench.force.y);
+	    s = splitd(s, _wrench.wrench.force.z);
+	    s = splitd(s, _wrench.wrench.torque.x);
+	    s = splitd(s, _wrench.wrench.torque.y);
+	    s = splitd(s, _wrench.wrench.torque.z);
 
-	_publisher.publish(_wrench);
+	    _publisher.publish(_wrench);
+	}
+	catch (const std::exception& err)
+	{
+	    ROS_ERROR_STREAM(err.what());
+	}
 
 	ros::spinOnce();
 	rate.sleep();
@@ -149,17 +156,17 @@ FT300::run()
 }
 
 bool
-FT300::connect(u_long s_addr, int port)
+FT300::connect_socket(u_long s_addr, int port)
 {
     sockaddr_in	server;
     server.sin_family	   = AF_INET;
-    server.sin_port	   = port;
+    server.sin_port	   = htons(port);
     server.sin_addr.s_addr = s_addr;
     ROS_INFO_STREAM("trying to connect socket to "
 		    << inet_ntoa(server.sin_addr) << ':' << port << "...");
     if (::connect(_socket, (sockaddr*)&server, sizeof(server)) == 0)
     {
-	ROS_ERROR_STREAM("succeeded.");
+	ROS_INFO_STREAM("succeeded.");
 	return true;
     }
     else
