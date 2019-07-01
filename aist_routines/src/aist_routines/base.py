@@ -60,7 +60,7 @@ class AISTBaseRoutines(object):
                                        "b_bot_single_suction_gripper_base_link",
                                        "b_bot_single_suction_gripper_pad_link"),
                 "c_bot": GripperClient("c_bot_robotiq_85_gripper",
-                                       "two-finer",
+                                       "two-finger",
                                        "c_bot_robotiq_85_base_link",
                                        "c_bot_robotiq_85_tip_link"),
                 # "d_bot": GripperClient("d_bot_dual_suction_gripper",
@@ -68,7 +68,7 @@ class AISTBaseRoutines(object):
                 #                        "d_bot_dual_suction_gripper_base_link",
                 #                        "d_bot_dual_suction_gripper_pad_link")
                 "d_bot": GripperClient("d_bot_robotiq_85_gripper",
-                                       "two-finer",
+                                       "two-finger",
                                        "d_bot_robotiq_85_base_link",
                                        "d_bot_robotiq_85_tip_link"),
             }
