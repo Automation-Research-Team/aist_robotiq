@@ -38,7 +38,8 @@ class AISTBaseRoutines(object):
                 "a_bot": PrecisionGripper("a_bot_"),
                 "b_bot": SuctionGripper("b_bot_single_"),
                 "c_bot": Robotiq85Gripper("c_bot_"),
-                "d_bot": SuctionGripper("d_bot_dual_")
+                #"d_bot": SuctionGripper("d_bot_dual_")
+                "d_bot": Robotiq85Gripper("d_bot_")
             }
             self._cameras = {
                 "a_phoxi_m_camera": PhoXiCamera("a_phoxi_m_camera"),
@@ -62,10 +63,14 @@ class AISTBaseRoutines(object):
                                        "two-finer",
                                        "c_bot_robotiq_85_base_link",
                                        "c_bot_robotiq_85_tip_link"),
-                "d_bot": GripperClient("d_bot_dual_suction_gripper",
-                                       "suction",
-                                       "d_bot_dual_suction_gripper_base_link",
-                                       "d_bot_dual_suction_gripper_pad_link")
+                # "d_bot": GripperClient("d_bot_dual_suction_gripper",
+                #                        "suction",
+                #                        "d_bot_dual_suction_gripper_base_link",
+                #                        "d_bot_dual_suction_gripper_pad_link")
+                "d_bot": GripperClient("d_bot_robotiq_85_gripper",
+                                       "two-finer",
+                                       "d_bot_robotiq_85_base_link",
+                                       "d_bot_robotiq_85_tip_link"),
             }
             self._cameras = {
                 "a_phoxi_m_camera": CameraClient(
@@ -152,7 +157,7 @@ class AISTBaseRoutines(object):
                                                             0.0) # jump_threshold
             if fraction < 0.995:
                 rospy.logwarn("Computed only {}% of the total cartesian path."
-                              ,format(fraction*100))
+                              .format(fraction*100))
                 group.clear_pose_targets()
                 return (False, False, group.get_current_pose())
 

@@ -8,6 +8,6 @@
     <param name="hostname"	value="$(arg hostname)"/>
     <param name="port"		value="$(arg port)"/>
     <param name="frequency"	value="$(arg frequency)"/>
-    <param name="sensor_frame"	value="$(arg robot_name)_ft300_frame"/>
+    <param name="sensor_frame"	value="$(arg robot_name)_ft300_wrench_link"/>
   </node>
 </launch>

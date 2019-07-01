@@ -27,11 +27,19 @@
       <parent link="${parent}"/>
       <child  link="${prefix}ft300_link"/>
     </joint>
+
     <link name="${prefix}ft300_frange_link"/>
     <joint name="${prefix}ft300_frange_joint" type="fixed">
       <parent link="${prefix}ft300_link"/>
       <child  link="${prefix}ft300_frange_link"/>
       <origin xyz="${ft300_length} 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="${prefix}ft300_wrench_link"/>
+    <joint name="${prefix}ft300_wrench_joint" type="fixed">
+      <parent link="${prefix}ft300_frange_link"/>
+      <child  link="${prefix}ft300_wrench_link"/>
+      <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
     </joint>
 
   </xacro:macro>
