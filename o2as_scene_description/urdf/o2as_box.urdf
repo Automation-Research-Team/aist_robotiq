@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<robot name="aaa" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro" />
+
+  <link name ="base_link"/>
+
+  <xacro:o2as_box boxname="my_box"
+		  box_w="1" box_l="0.5" box_h="0.01"
+		  parent="base_link"/>
+</robot>

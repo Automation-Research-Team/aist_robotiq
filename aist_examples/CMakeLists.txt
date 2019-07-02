@@ -10,7 +10,6 @@ project(aist_examples)
 find_package(catkin REQUIRED
     rospy
     aist_graspability
-    aist_skills
 )
 
 ## System dependencies are found with CMake's conventions

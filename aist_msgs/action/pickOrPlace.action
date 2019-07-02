@@ -12,8 +12,11 @@ float32 acc_fast
 float32 acc_slow
 ---
 # Result
-geometry_msgs/PoseStamped current_pose
-bool success
+uint8 SUCCESS=0
+uint8 MOVE_FAILURE=1
+uint8 PICK_FAILURE=2
+
+int32 result
 ---
 # Feedback
 geometry_msgs/PoseStamped current_pose

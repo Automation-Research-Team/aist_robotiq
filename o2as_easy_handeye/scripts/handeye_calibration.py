@@ -5,7 +5,7 @@ import os
 import rospy
 import argparse
 from math import radians, degrees
-from std_srvs.srv import Empty, Trigger
+from std_srvs.srv  import Empty, Trigger
 from geometry_msgs import msg as gmsg
 from tf import TransformListener, transformations as tfs
 
@@ -42,6 +42,19 @@ initposes = {
                 0.10, -0.20, 0.35, radians(  0), radians( 90), radians(0)],
             'b_bot': [
                 0.10,  0.10, 0.35, radians(  0), radians( 90), radians(0)],
+        },
+    },
+
+    'pgrp': {
+        'a_phoxi_m_camera': {
+            'a_bot': [
+                0.10, -0.20, 0.35, radians(  0), radians( 90), radians(0)],
+            'b_bot': [
+                0.10,  0.10, 0.35, radians(  0), radians( 90), radians(0)],
+        },
+        'a_bot_camera': {
+            'a_bot': [
+                0.00, -0.20, 0.35, radians(  0), radians( 90), radians(0)],
         },
     },
 
@@ -142,6 +155,52 @@ keyposes = {
         },
     },
 
+    'pgrp': {
+        'a_phoxi_m_camera': {
+            'a_bot': [
+                [0.05, -0.10, 0.14, radians( 30), radians( 25), radians(0)],
+                [0.05,  0.00, 0.14, radians( 30), radians( 25), radians(0)],
+                [0.05,  0.10, 0.14, radians( 30), radians( 25), radians(0)],
+
+                [0.05,  0.10, 0.25, radians( 30), radians( 25), radians(0)],
+                [0.05,  0.00, 0.25, radians( 30), radians( 25), radians(0)],
+                [0.05, -0.10, 0.25, radians( 30), radians( 25), radians(0)],
+            ],
+
+            'b_bot': [
+                [0.20,  0.10, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.20,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
+                [0.20, -0.15, 0.16, radians(  0), radians( 25), radians(0)],
+
+                # [0.15, -0.15, 0.25, radians( 30), radians( 25), radians(0)],
+                # [0.15,  0.00, 0.25, radians( 30), radians( 25), radians(0)],
+                # [0.15,  0.15, 0.25, radians( 30), radians( 25), radians(0)],
+
+                # [0.40,  0.15, 0.15, radians( 30), radians( 25), radians(0)],
+                # [0.40,  0.00, 0.15, radians( 30), radians( 25), radians(0)],
+                # [0.40, -0.15, 0.15, radians(  0), radians( 25), radians(0)],
+
+                [-0.00, -0.15, 0.16, radians(  0), radians( 25), radians(0)],
+                [-0.00,  0.00, 0.16, radians( 30), radians( 25), radians(0)],
+                [-0.00,  0.15, 0.16, radians( 30), radians( 25), radians(0)],
+            ],
+        },
+
+        'a_bot_camera': {
+            'a_bot': [
+                [-0.10, -0.15, 0.35, radians(  0), radians( 60), radians(  0)],
+                [-0.07, -0.17, 0.35, radians(  0), radians( 75), radians(  0)],
+                [-0.05, -0.15, 0.35, radians(  0), radians( 90), radians(  0)],
+                [-0.05, -0.13, 0.35, radians(  0), radians(100), radians(  0)],
+                [-0.05, -0.10, 0.35, radians(  0), radians(110), radians(  0)],
+                [-0.05, -0.03, 0.35, radians(-90), radians( 70), radians(-90)],
+                [-0.05, -0.10, 0.35, radians(-90), radians( 85), radians(-90)],
+                [-0.05, -0.20, 0.35, radians(-90), radians(105), radians(-90)],
+                [-0.05, -0.30, 0.35, radians(-90), radians(120), radians(-90)],
+            ]
+        },
+    },
+
     'ur5e': {
         'a_phoxi_m_camera': {
             'c_bot': [
@@ -185,18 +244,19 @@ keyposes = {
 ######################################################################
 #  class HandEyeCalibrationRoutines                                  #
 ######################################################################
-class HandEyeCalibrationRoutines:
-    def __init__(self, routines, camera_name, robot_name, speed, sleep_time,
-                 needs_calib):
-        self.routines    = routines
-        self.camera_name = camera_name
-        self.speed       = speed
-        self.sleep_time  = sleep_time
+class HandEyeCalibrationRoutines(AISTBaseRoutines):
+    def __init__(self, camera_name, robot_name, speed, sleep_time, needs_calib):
+        super(HandEyeCalibrationRoutines, self).__init__()
+
+        self._robot_name  = robot_name
+        self._camera_name = camera_name
+        self._speed       = speed
+        self._sleep_time  = sleep_time
 
         if needs_calib:
             ns = "/{}_from_{}/".format(camera_name, robot_name)
             self.get_sample_list = rospy.ServiceProxy(ns + "get_sample_list",
-                                                      GetSampleList)
+                                                       GetSampleList)
             self.take_sample = rospy.ServiceProxy(ns + "take_sample", Trigger)
             self.compute_calibration = rospy.ServiceProxy(
                 ns + "compute_calibration", ComputeCalibration)
@@ -210,23 +270,11 @@ class HandEyeCalibrationRoutines:
             self.save_calibration    = None
             self.reset               = None
 
-        ## Initialize `moveit_commander`
-        self.group = moveit_commander.MoveGroupCommander(robot_name)
-
-        # Set `_ee_link` as end effector wrt `_base_link` of the robot
-        self.group.set_pose_reference_frame("workspace_center")
-        self.group.set_end_effector_link(robot_name + "_ee_link")
-
-        # Logging
-        print("==== Planning frame:       %s" %
-              self.group.get_planning_frame())
-        print("==== Pose reference frame: %s" %
-              self.group.get_pose_reference_frame())
-        print("==== End effector link:    %s" %
-              self.group.get_end_effector_link())
+    def is_eye_on_hand(self):
+        return self._camera_name == self._robot_name + "_camera"
 
     def go_home(self):
-        self.routines.go_to_named_pose("home", self.group.get_name())
+        self.go_to_named_pose("home", self._robot_name)
 
     def save_image(self, file_name):
         img_msg = rospy.wait_for_message("/aruco_tracker/result",
@@ -237,28 +285,29 @@ class HandEyeCalibrationRoutines:
 
     def move(self, pose):
         poseStamped = gmsg.PoseStamped()
-        poseStamped.header.frame_id = self.group.get_pose_reference_frame()
+        poseStamped.header.frame_id = "workspace_center"
         poseStamped.pose = gmsg.Pose(
             gmsg.Point(pose[0], pose[1], pose[2]),
             gmsg.Quaternion(
                 *tfs.quaternion_from_euler(pose[3], pose[4], pose[5])))
         print("  move to " + self.format_pose(poseStamped))
-        res = self.routines.go_to_pose_goal(
-                self.group.get_name(), poseStamped, self.speed,
-                end_effector_link=self.group.get_end_effector_link(),
-                move_lin=False)
-        print("  reached " + self.format_pose(res.current_pose))
-        return res.success
+        (success, _, current_pose) \
+            = self.go_to_pose_goal(
+                self._robot_name, poseStamped, self._speed,
+                end_effector_link=self._robot_name + "_ee_link",
+                move_lin=True)
+        print("  reached " + self.format_pose(current_pose))
+        return success
 
     def move_to(self, pose, keypose_num, subpose_num):
         if not self.move(pose):
             return False
 
-        rospy.sleep(self.sleep_time)  # Wait until the robot settles.
+        rospy.sleep(self._sleep_time)  # Wait until the robot settles.
 
-        self.routines.start_acquisition(self.camera_name)
+        self.start_acquisition(self._camera_name)
 
-        rospy.sleep(self.sleep_time)
+        rospy.sleep(self._sleep_time)
 
         # try:
         #     self.save_image("aruco_result-{:0=2}-{:0=2}.jpeg".format(
@@ -268,18 +317,17 @@ class HandEyeCalibrationRoutines:
         # except rospy.ROSException, e:
         #     print(e)
 
+        success = True
         if self.take_sample:
             try:
-                self.take_sample()
+                res = self.take_sample()
                 n = len(self.get_sample_list().cMo)
-                print(
-                    "  took {} (hand-world, camera-marker) samples").format(n)
-                success = True
+                print("  {} samples taken: {}").format(n, res.message)
             except rospy.ServiceException as e:
                 print "Service call failed: %s" % e
                 success = False
 
-        self.routines.stop_acquisition(self.camera_name)
+        self.stop_acquisition(self._camera_name)
 
         return success
 
@@ -304,28 +352,8 @@ class HandEyeCalibrationRoutines:
                 print("--- Subpose [{}/5]: Failed. ---".format(i + 4))
             pose[4] -= radians(30)
 
-        # ### How to define poses/positions for calibration
-        # # 1. From rostopic echo /joint_states (careful with the order of the joints)
-        # joint_pose = [-0.127, 0.556, 0.432, -1.591,  0.147, -0.285]
-
-        # # 2. From Rviz, ee frame position after planning (Open TF Frames, unfold the frame a_bot_ee_link)
-        # poseStamped.pose.position.x = -0.16815
-        # poseStamped.pose.position.y = -0.10744
-        # poseStamped.pose.position.z = 1.1898
-        # poseStamped.pose.orientation.x = -0.531
-        # poseStamped.pose.orientation.y = 0.5318
-        # poseStamped.pose.orientation.z = 0.46652
-        # poseStamped.pose.orientation.w = 0.46647
-
-        # # 3. Rotate an orientation using TF quaternions
-        # quaternion_0 = tf_conversions.transformations.quaternion_from_euler(
-        #       pose[3], pose[4], pose[5])
-        # q_rotate_30_in_y = tf_conversions.transformations.quaternion_from_euler(0, pi/6, 0)
-        # q_rotated = tf_conversions.transformations.quaternion_multiply(quaternion_0, q_rotate_30_in_y)
-        # poseStamped.pose.orientation = gmsg.Quaternion(*q_rotated)
-
     def run(self, initpose, keyposes):
-        self.routines.stop_acquisition(self.camera_name)
+        self.stop_acquisition(self._camera_name)
 
         if self.reset:
             self.reset()
@@ -335,36 +363,22 @@ class HandEyeCalibrationRoutines:
         self.move(initpose)
 
         # Collect samples over pre-defined poses
-        for i, keypose in enumerate(keyposes):
-            print("\n*** Keypose [{}/{}]: Try! ***".format(
-                i + 1, len(keyposes)))
-            if self.camera_name == "a_bot_camera":
-                self.move_to(keypose, i + 1, 1)
+        for i, keypose in enumerate(keyposes, 1):
+            print("\n*** Keypose [{}/{}]: Try! ***".format(i, len(keyposes)))
+            if self.is_eye_on_hand():
+                self.move_to(keypose, i, 1)
             else:
-                self.move_to_subposes(keypose, i + 1)
-            print("*** Keypose [{}/{}]: Completed. ***".format(
-                i + 1, len(keyposes)))
+                self.move_to_subposes(keypose, i)
+            print("*** Keypose [{}/{}]: Completed. ***".format(i,
+                                                               len(keyposes)))
 
         if self.compute_calibration:
             res = self.compute_calibration()
             print(res.message)
-            self.save_calibration()
+            res = self.save_calibration()
+            print(res.message)
 
-        # Reset pose
-        #self.move(initpose)
         self.go_home()
-
-    def format_pose(self, poseStamped):
-        listener = TransformListener()  # Should be Listener but TransformerROS
-        pose = listener.transformPose(self.group.get_pose_reference_frame(),
-                                      poseStamped).pose
-        rpy = map(
-            degrees,
-            tfs.euler_from_quaternion([pose.orientation.w, pose.orientation.x,
-                                       pose.orientation.y, pose.orientation.z]))
-        return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
-            pose.position.x, pose.position.y, pose.position.z,
-            rpy[0], rpy[1], rpy[2])
 
 
 ######################################################################
@@ -406,22 +420,14 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    try:
-        if args.config == 'o2as':
-            base_routines = O2ASBaseRoutines()
-        else:
-            base_routines = AISTBaseRoutines()
+    assert (args.camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
+    assert (args.robot_name  in {"a_bot", "b_bot", "c_bot", "d_bot"})
 
-        assert (args.camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
-        assert (args.robot_name  in {"a_bot", "b_bot", "c_bot", "d_bot"})
-
-        speed = 1
-        sleep_time = 1
-        routines = HandEyeCalibrationRoutines(base_routines,
-                                              args.camera_name,
-                                              args.robot_name,
+    speed = 1
+    sleep_time = 1
+    with HandEyeCalibrationRoutines(args.camera_name, args.robot_name,
                                               speed, sleep_time,
-                                              not args.visit)
+                                              not args.visit) as routines:
 
         print("=== Calibration started for {} + {} ===".format(
             args.camera_name, args.robot_name))
@@ -429,6 +435,3 @@ if __name__ == '__main__':
                      keyposes[ args.config][args.camera_name][args.robot_name])
         print("=== Calibration completed for {} + {} ===".format(
             args.camera_name, args.robot_name))
-
-    except Exception as ex:
-        print(ex.message)

@@ -2,9 +2,9 @@
 
   <arg name="marker_id"		default="26"/>
   <arg name="marker_size"	default="0.070"/>    <!-- in m -->
-  <arg name="reference_frame"	default=""/> 
-  <arg name="camera_frame"	default="camera_link"/>
-  <arg name="marker_frame"	default="camera_marker"/>
+  <arg name="reference_frame"	default=""/>
+  <arg name="camera_frame"	default="aruco_camera_frame"/>
+  <arg name="marker_frame"	default="aruco_marker_frame"/>
   <arg name="corner_refinement"	default="LINES"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
 
@@ -41,4 +41,3 @@
   <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
 
 </launch>
-

@@ -1,8 +1,0 @@
-# Request
-string name     # gripper name
----
-# Response
-string type
-string base_link
-string tip_link
-bool success

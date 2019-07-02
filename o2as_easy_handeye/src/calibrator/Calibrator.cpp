@@ -12,7 +12,6 @@
 #include "Calibrator.h"
 #include "HandeyeCalibration.h"
 
-#define USE_AIST_CALIBRATION
 #define DEBUG
 
 namespace o2as_easy_handeye
@@ -45,22 +44,22 @@ Calibrator::Calibrator()
 
     if (_eye_on_hand)
     {
-	_node.param<std::string>("effector_frame", _eMc.header.frame_id,
+	_node.param<std::string>("robot_effector_frame", _eMc.header.frame_id,
 				 "tool0");
-	_node.param<std::string>("world_frame",	   _wMo.header.frame_id,
+	_node.param<std::string>("robot_base_frame",	 _wMo.header.frame_id,
 				 "base_link");
     }
     else
     {
-	_node.param<std::string>("effector_frame", _wMo.header.frame_id,
+	_node.param<std::string>("robot_effector_frame", _wMo.header.frame_id,
 				 "tool0");
-	_node.param<std::string>("world_frame",	   _eMc.header.frame_id,
+	_node.param<std::string>("robot_base_frame",	 _eMc.header.frame_id,
 				 "base_link");
     }
 
-    _node.param<std::string>("camera_frame", _eMc.child_frame_id,
+    _node.param<std::string>("tracking_base_frame",   _eMc.child_frame_id,
 			     "tracking_origin");
-    _node.param<std::string>("object_frame", _wMo.child_frame_id,
+    _node.param<std::string>("tracking_marker_frame", _wMo.child_frame_id,
 			     "tracking_target");
 }
 
@@ -99,7 +98,7 @@ Calibrator::world_frame() const
 }
 
 bool
-Calibrator::get_sample_list(GetSampleList::Request&  req,
+Calibrator::get_sample_list(GetSampleList::Request&,
 			    GetSampleList::Response& res)
 {
     res.success = true;
@@ -113,7 +112,7 @@ Calibrator::get_sample_list(GetSampleList::Request&  req,
 }
 
 bool
-Calibrator::take_sample(std_srvs::Trigger::Request&  req,
+Calibrator::take_sample(std_srvs::Trigger::Request&,
 			std_srvs::Trigger::Response& res)
 {
     try
@@ -152,7 +151,7 @@ Calibrator::take_sample(std_srvs::Trigger::Request&  req,
 }
 
 bool
-Calibrator::compute_calibration(ComputeCalibration::Request&  req,
+Calibrator::compute_calibration(ComputeCalibration::Request&,
 				ComputeCalibration::Response& res)
 {
     try
@@ -168,7 +167,8 @@ Calibrator::compute_calibration(ComputeCalibration::Request&  req,
 	    wMe.emplace_back(_wMe[i].transform);
 	}
 
-	const auto	eMc = TU::cameraToEffectorDual(cMo, wMe);
+	const auto	eMc = TU::cameraToEffectorSingle(cMo, wMe);
+      //const auto	eMc = TU::cameraToEffectorDual(cMo, wMe);
 	const auto	wMo = TU::objectToWorld(cMo, wMe, eMc);
 
 	const auto	now = ros::Time::now();
@@ -207,7 +207,7 @@ Calibrator::compute_calibration(ComputeCalibration::Request&  req,
 }
 
 bool
-Calibrator::save_calibration(std_srvs::Trigger::Request&  req,
+Calibrator::save_calibration(std_srvs::Trigger::Request&,
 			     std_srvs::Trigger::Response& res)
 {
     try
@@ -216,13 +216,15 @@ Calibrator::save_calibration(std_srvs::Trigger::Request&  req,
 	emitter << YAML::BeginMap;
 	emitter << YAML::Key   << "eye_on_hand"
 		<< YAML::Value << _eye_on_hand;
-	emitter << YAML::Key   << "robot_base_frame"
-		<< YAML::Value << (_eye_on_hand ? world_frame()
-						: effector_frame());
+	emitter << YAML::Key   << (_eye_on_hand ? "robot_effector_frame"
+						: "robot_base_frame")
+		<< YAML::Value << effector_frame();
 	emitter << YAML::Key   << "tracking_base_frame"
 		<< YAML::Value << camera_frame();
 	emitter << YAML::Key   << "transformation"
-		<< YAML::Value << YAML::Flow << YAML::BeginMap
+		<< YAML::Value
+		<< YAML::Flow
+		<< YAML::BeginMap
 		<< YAML::Key   << "qw"
 		<< YAML::Value << _eMc.transform.rotation.w
 		<< YAML::Key   << "qx"
@@ -237,6 +239,30 @@ Calibrator::save_calibration(std_srvs::Trigger::Request&  req,
 		<< YAML::Value << _eMc.transform.translation.y
 		<< YAML::Key   << "z"
 		<< YAML::Value << _eMc.transform.translation.z
+		<< YAML::EndMap;
+	emitter << YAML::Key   << (_eye_on_hand ? "robot_base_frame"
+						: "robot_effector_frame")
+		<< YAML::Value << world_frame();
+	emitter << YAML::Key   << "tracking_marker_frame"
+		<< YAML::Value << object_frame();
+	emitter << YAML::Key   << "another_transformation"
+		<< YAML::Value
+		<< YAML::Flow
+		<< YAML::BeginMap
+		<< YAML::Key   << "qw"
+		<< YAML::Value << _wMo.transform.rotation.w
+		<< YAML::Key   << "qx"
+		<< YAML::Value << _wMo.transform.rotation.x
+		<< YAML::Key   << "qy"
+		<< YAML::Value << _wMo.transform.rotation.y
+		<< YAML::Key   << "qz"
+		<< YAML::Value << _wMo.transform.rotation.z
+		<< YAML::Key   << "x"
+		<< YAML::Value << _wMo.transform.translation.x
+		<< YAML::Key   << "y"
+		<< YAML::Value << _wMo.transform.translation.y
+		<< YAML::Key   << "z"
+		<< YAML::Value << _wMo.transform.translation.z
 		<< YAML::EndMap;
 	emitter << YAML::EndMap;
 
