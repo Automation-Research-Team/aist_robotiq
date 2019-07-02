@@ -245,7 +245,7 @@ class AISTBaseRoutines(object):
         gripper = self._grippers[robot_name]
         camera  = self._cameras[camera_name]
         camera.start_acquisition()
-        (poses, rotipz, gscore, success) = \
+        (poses, gscore, success) = \
             self._graspabilityClient.search(camera.camera_info_topic,
                                             camera.depth_topic,
                                             camera.normal_topic,
@@ -256,7 +256,7 @@ class AISTBaseRoutines(object):
                 self.publish_marker(pose, "graspability",
                                     "{}[{:.3f}]".format(i, gscore[i]),
                                     lifetime=marker_lifetime)
-        return (poses, rotipz, gscore, success)
+        return (poses, gscore, success)
 
     # Pick and place action stuffs
     def pick(self, robot_name, target_pose,

@@ -62,11 +62,11 @@ class GraspabilityClient(object):
             poses = []
             if normal_topic == "":
                 for uvd in res.pos3D:
-                    xyz = self._back_project_pixel(uvd, K, D)
                     poses.append(gmsg.PoseStamped(
                         res.header,
-                        gmsg.Pose(gmsg.Point(*xyz),
-                                  gmsg.Quaternion(1, 0, 0, 0))))
+                        gmsg.Pose(
+                            gmsg.Point(*self._back_project_pixel(uvd, K, D)),
+                            gmsg.Quaternion(1, 0, 0, 0))))
             else:
                 bridge  = CvBridge()
                 normals = bridge.imgmsg_to_cv2(
@@ -74,17 +74,16 @@ class GraspabilityClient(object):
                                                      smsg.Image, timeout=10.0),
                               "32FC3")
                 for i, uvd in enumerate(res.pos3D):
-                    xyz = self._back_project_pixel(uvd, K, D)
-                    n   = normals[int(uvd.y), int(uvd.x), :]
+                    nrm = normals[int(uvd.y), int(uvd.x), :]
                     rot = -radians(res.rotipz[i])
                     poses.append(gmsg.PoseStamped(
                         res.header,
-                        gmsg.Pose(gmsg.Point(*xyz),
-                                  gmsg.Quaternion(*self._get_rotation(n,
-                                                                      rot)))))
+                        gmsg.Pose(
+                            gmsg.Point(*self._back_project_pixel(uvd, K, D)),
+                            gmsg.Quaternion(*self._get_rotation(nrm, rot)))))
                     print("uvd = {}".format(uvd))
 
-            return (poses, res.rotipz, res.gscore, res.success)
+            return (poses, res.gscore, res.success)
 
         except rospy.ROSException:
             rospy.logerr("wait_for_message(): Timeout expired!")

@@ -2,23 +2,33 @@
 
 <robot name="ft300" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:property name="ft300_length" value="0.0360"/>
+  <xacro:property name="ft300_radius" value="0.0375"/>
+  <xacro:property name="ft300_length" value="0.0375"/>
 
   <xacro:macro name="ft300" params="prefix parent">
     <link name="${prefix}ft300_link">
       <visual>
-        <origin xyz="${ft300_length/2} 0 0" rpy="0 ${pi/2} 0"/>
-        <geometry>
-          <cylinder length="${ft300_length}" radius="0.0375"/>
-        </geometry>
-        <material name="Black">
-          <color rgba="0.2 0.2 0.2 1.0"/>
-        </material>
+        <origin xyz="${ft300_length} 0 0" rpy="${pi} ${pi/2} 0"/>
+	<geometry>
+          <mesh filename="package://aist_ft300/meshes/ft300.stl" scale="0.001 0.001 0.001"/>
+	</geometry>
+	<material name="Black">
+	  <color rgba="0.2 0.2 0.2 1"/>
+	</material>
       </visual>
+      <!-- <visual> -->
+      <!--   <origin xyz="${ft300_length/2} 0 0" rpy="0 ${pi/2} 0"/> -->
+      <!--   <geometry> -->
+      <!--     <cylinder length="${ft300_length}" radius="0.0375"/> -->
+      <!--   </geometry> -->
+      <!--   <material name="Black"> -->
+      <!--     <color rgba="0.2 0.2 0.2 1.0"/> -->
+      <!--   </material> -->
+      <!-- </visual> -->
       <collision>
         <origin xyz="${ft300_length/2} 0 0" rpy="0 ${pi/2} 0"/>
         <geometry>
-          <cylinder length="${ft300_length}" radius="0.0375"/>
+          <cylinder length="${ft300_length}" radius="${ft300_radius}"/>
         </geometry>
       </collision>
     </link>

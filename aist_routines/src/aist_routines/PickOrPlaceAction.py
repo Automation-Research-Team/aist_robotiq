@@ -59,7 +59,7 @@ class PickOrPlaceAction(object):
                                        move_lin=True)
         self._server.publish_feedback(feedback)
         if not success:
-            result.result = amsg.pickOrPlaceResult.PLAN_FAILURE
+            result.result = amsg.pickOrPlaceResult.MOVE_FAILURE
             self._server.set_succeeded(result)
             return
 
@@ -80,7 +80,7 @@ class PickOrPlaceAction(object):
                                        goal.speed_slow, move_lin=True)
         self._server.publish_feedback(feedback)
         if not success:
-            result.result = amsg.pickOrPlaceResult.PLAN_FAILURE
+            result.result = amsg.pickOrPlaceResult.MOVE_FAILURE
             self._server.set_succeeded(result)
             return
 
