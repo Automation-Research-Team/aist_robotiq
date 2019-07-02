@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <robot name="aaa" xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:include filename="$(find o2as_scene_description)/urdf/ft300.urdf.xacro" />
+  <xacro:include filename="$(find aist_ft300)/urdf/ft300.urdf.xacro" />
 
   <link name ="base_link"/>
 

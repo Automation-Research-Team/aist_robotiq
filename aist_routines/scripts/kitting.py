@@ -116,7 +116,7 @@ class KittingRoutines(URRoutines):
             self.go_to_frame(props.robot_name, bin, (0, 0, 0.15))
 
         # Search for graspabilities.
-        (pick_poses, rotipz, gscore, success) \
+        (pick_poses, _, success) \
             = self.search_graspability(props.robot_name, props.camera_name,
                                        item.part_id, item.bin_id,
                                        marker_lifetime)
@@ -138,7 +138,7 @@ class KittingRoutines(URRoutines):
                                 place_offset=props.place_offset,
                                 approach_offset=props.approach_offset)
                 return result == amsg.pickOrPlaceResult.SUCCESS
-            elif result == amsg.pickOrPlaceResult.PLAN_FAILURE:
+            elif result == amsg.pickOrPlaceResult.MOVE_FAILURE:
                 pass
             elif result == amsg.pickOrPlaceResult.PICK_FAILURE:
                 nattempts += 1
