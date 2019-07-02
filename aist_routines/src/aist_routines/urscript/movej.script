@@ -1,0 +1,6 @@
+def move_to_joint_pose():
+    textmsg("Move_j to a pose.")
+    target_pos=[{0}, {1}, {2}, {3}, {4}, {5}]
+    movej(target_pos, a = {6}, v = {7})
+    textmsg("Done.")
+end

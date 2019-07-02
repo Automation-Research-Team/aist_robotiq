@@ -8,11 +8,11 @@
   <arg name="robot_name"	default="d_bot"
        if="$(eval arg('config') == 'ur5e')"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
-  <arg name="world_frame"	default="workspace_center"/>
-  <!-- <arg name="world_frame"	value="$(arg robot_name)_base_link"/> -->
-  <arg name="camera_frame"	default="camera_link"/>
-  <arg name="object_frame"	default="camera_marker"/>
-  <arg name="reference_frame"	default=""/>
+
+  <arg name="robot_base_frame"	value="workspace_center"/>
+  <!-- <arg name="robot_base_frame"	value="$(arg robot_name)_base_link"/> -->
+  <arg name="camera_frame"	value="dummy_camera"/>
+  <arg name="marker_frame"	value="dummy_marker"/>
 
   <arg name="eye_on_hand"
        value="$(eval arg('camera_name') == arg('robot_name') + '_camera')"/>
@@ -21,39 +21,41 @@
   <include file="$(find o2as_easy_handeye)/launch/aruco_tracker.launch">
     <arg name="eye_on_hand"	value="$(arg eye_on_hand)"/>
     <arg name="camera_name"	value="$(arg camera_name)"/>
-    <arg name="reference_frame"	value="$(arg reference_frame)"/>
     <arg name="camera_frame"	value="$(arg camera_frame)"/>
+    <arg name="marker_frame"	value="$(arg marker_frame)"/>
   </include>
 
   <!-- Start robot controller -->
-  <include file="$(find o2as_easy_handeye)/launch/robot_controller.launch">
-    <arg name="config"	value="$(arg config)"/>
-    <arg name="scene"	value="$(arg scene)"/>
-    <arg name="sim"	value="$(arg sim)"/>
+  <include file="$(find aist_examples)/launch/connect_robots.launch">
+    <arg name="config"		value="$(arg config)"/>
+    <arg name="scene"		value="$(arg scene)"/>
+    <arg name="sim"		value="$(arg sim)"/>
     <arg name="rviz_config"
     	 value="$(find o2as_easy_handeye)/launch/o2as_easy_handeye.rviz"/>
   </include>
 
-  <!-- Dummy calibration to have a fully connected TF tree and see all frames -->
-  <node unless="$(arg eye_on_hand)"
-	name="dummy_handeye" pkg="tf" type="static_transform_publisher"
-        args="-0.425 0.45 0.88 -1.5707 0 -2.8 $(arg world_frame) $(arg camera_frame) 10" />
-  <node if="$(arg eye_on_hand)"
-	name="dummy_handeye" pkg="tf" type="static_transform_publisher"
-        args="0 0 0.05 0 0 0 $(arg effector_frame) $(arg camera_frame) 10" />
+  <!-- Dummy calibration to have a fully connected TF tree and
+       see all frames -->
+  <arg name="robot_effector_frame"	value="$(arg robot_name)_wrist_2_link"
+       if="$(arg eye_on_hand)"/>
+  <arg name="robot_effector_frame"	value="$(arg robot_name)_ee_link"
+       unless="$(arg eye_on_hand)"/>
+  <node name="dummy_handeye" pkg="tf" type="static_transform_publisher"
+        args="0 0 0.05 0 0 0 $(arg robot_effector_frame) $(arg camera_frame) 10"
+	if="$(arg eye_on_hand)"/>
+  <node name="dummy_handeye" pkg="tf" type="static_transform_publisher"
+        args="-0.425 0.45 0.88 -1.5707 0 -2.8 $(arg robot_base_frame) $(arg camera_frame) 10"
+	unless="$(arg eye_on_hand)"/>
 
   <!-- Set up namespace -->
   <arg name="namespace"	value="$(arg camera_name)_from_$(arg robot_name)"/>
 
-  <group ns="$(arg namespace)" >
+  <group ns="$(arg namespace)">
     <param name="eye_on_hand"		value="$(arg eye_on_hand)"/>
-    <param name="world_frame"		value="$(arg world_frame)"/>
-    <param name="effector_frame"	value="$(arg robot_name)_ee_link"
-           unless="$(arg eye_on_hand)"/>
-    <param name="robot_effector_frame"	value="$(arg robot_name)_wrist_2_link"
-           if="$(arg eye_on_hand)"/>
-    <param name="camera_frame"		value="$(arg camera_frame)" />
-    <param name="object_frame"		value="$(arg object_frame)" />
+    <param name="robot_base_frame"	value="$(arg robot_base_frame)"/>
+    <param name="robot_effector_frame"	value="$(arg robot_effector_frame)"/>
+    <param name="tracking_base_frame"	value="$(arg camera_frame)"/>
+    <param name="tracking_marker_frame"	value="$(arg marker_frame)"/>
   </group>
 
   <!-- Start easy_handeye calibrator -->

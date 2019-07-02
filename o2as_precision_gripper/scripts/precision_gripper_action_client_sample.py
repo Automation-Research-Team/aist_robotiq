@@ -15,6 +15,12 @@ if __name__ == '__main__':
         client = actionlib.SimpleActionClient('precision_gripper_action', o2as_msgs.msg.PrecisionGripperCommandAction)
         client.wait_for_server()
         goal = o2as_msgs.msg.PrecisionGripperCommandGoal()
+        #open
+        # goal.close_inner_gripper_fully=False
+        # goal.open_inner_gripper_fully=True
+        #close
+        goal.open_inner_gripper_fully=False
+        goal.close_inner_gripper_fully=True
         client.send_goal(goal)
         client.wait_for_result()
         result = client.get_result()
