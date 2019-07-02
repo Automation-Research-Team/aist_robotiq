@@ -7,7 +7,7 @@ from sensor_msgs       import msg as smsg
 from geometry_msgs     import msg as gmsg
 from aist_graspability import srv as asrv
 from cv_bridge         import CvBridge, CvBridgeError
-from tf                import transformations as tfs
+from tf                import TransformListener, transformations as tfs
 
 ######################################################################
 #  class GraspabilityClient                                          #
@@ -42,6 +42,7 @@ class GraspabilityClient(object):
                                                       asrv.createMaskImage)
         self._searchGraspability = rospy.ServiceProxy("search_graspability",
                                                       asrv.searchGraspability)
+        self._listener           = TransformListener()
 
     def create_background_image(self, depth_topic):
         return self._createBackgroundImage(depth_topic).success
@@ -61,12 +62,18 @@ class GraspabilityClient(object):
                                               part_id, bin_id)
             poses = []
             if normal_topic == "":
+                header = std_msgs.msg.Header()
+                header.stamp    = res.header.stamp
+                header.frame_id = "workspace_center"
+                T   = self._listener.asMatrix(res.header.frame_id, header)
+                nrm = T[0:3, 2]
                 for uvd in res.pos3D:
+                    rot = -radians(res.torpiz[i])
                     poses.append(gmsg.PoseStamped(
                         res.header,
                         gmsg.Pose(
                             gmsg.Point(*self._back_project_pixel(uvd, K, D)),
-                            gmsg.Quaternion(1, 0, 0, 0))))
+                            gmsg.Quaternion(*self._get_rotation(nrm, rot)))))
             else:
                 bridge  = CvBridge()
                 normals = bridge.imgmsg_to_cv2(
