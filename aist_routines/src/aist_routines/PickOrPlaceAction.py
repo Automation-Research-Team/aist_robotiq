@@ -43,6 +43,8 @@ class PickOrPlaceAction(object):
         pass
 
     def _execute_cb(self, goal):
+        rospy.loginfo("*** Do {} ***".format("picking" if goal.pick else
+                                             "placing"))
         routines = self._routines
         gripper  = routines.gripper(goal.robot_name)
         feedback = amsg.pickOrPlaceFeedback()

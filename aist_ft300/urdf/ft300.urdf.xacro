@@ -3,7 +3,7 @@
 <robot name="ft300" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <xacro:property name="ft300_radius" value="0.0375"/>
-  <xacro:property name="ft300_length" value="0.0375"/>
+  <xacro:property name="ft300_length" value="0.0360"/>
 
   <xacro:macro name="ft300" params="prefix parent">
     <link name="${prefix}ft300_link">
