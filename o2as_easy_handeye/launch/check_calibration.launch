@@ -2,6 +2,7 @@
 <launch>
   <arg name="config"		default="aist"/>
   <arg name="scene"		default="$(arg config)_base_scene"/>
+  <arg name="sim"		default="false"/>
   <arg name="robot_name"	default="b_bot"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
   <arg name="marker_id"		default="26"/>
@@ -18,16 +19,16 @@
   <include file="$(find o2as_easy_handeye)/launch/aruco_tracker.launch">
     <arg name="eye_on_hand"	value="$(arg eye_on_hand)"/>
     <arg name="camera_name"	value="$(arg camera_name)"/>
-    <arg name="reference_frame"	value="workspace_center"/>
     <arg name="camera_frame"
 	 value="$(arg camera_name)_from_$(arg robot_name)"/>
+    <arg name="reference_frame"	value="workspace_center"/>
   </include>
 
   <!-- Start robot controller -->
-  <include file="$(find aist_examples)/launch/robot_controller.launch">
+  <include file="$(find aist_examples)/launch/connect_robots.launch">
     <arg name="config"	value="$(arg config)"/>
     <arg name="scene"	value="$(arg scene)"/>
-    <arg name="sim"	value="false"/>
+    <arg name="sim"	value="$(arg sim)"/>
     <arg name="rviz_config"
     	 value="$(find o2as_easy_handeye)/launch/check_calibration.rviz"/>
   </include>

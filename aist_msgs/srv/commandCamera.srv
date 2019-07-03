@@ -1,6 +1,0 @@
-# Request
-string name   # camera name
-bool acquire  # True: in acquiring images, False: not in acquiring images
----
-# Response
-bool success

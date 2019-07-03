@@ -16,88 +16,64 @@ from aist_routines.base import AISTBaseRoutines
 
 orientations = {
     'o2as': {
-        'a_bot': [
-            radians(-90), radians( 90), radians(0)],
-        'b_bot': [
-            radians(  0), radians( 90), radians(0)],
-        'c_bot': [
-            radians(  0), radians( 90), radians(0)],
+        'a_bot': [radians(-90), radians( 90), radians(0)],
+        'b_bot': [radians(  0), radians( 90), radians(0)],
+        'c_bot': [radians(  0), radians( 90), radians(0)],
     },
 
     'aist': {
-        'a_bot': [
-            radians(-90), radians( 90), radians(0)],
-        'b_bot': [
-            radians(  0), radians( 90), radians(0)],
+        'a_bot': [radians(-90), radians( 90), radians(0)],
+        'b_bot': [radians(  0), radians( 90), radians(0)],
     },
 
     'pgrp': {
-        'a_bot': [
-            radians(-90), radians( 90), radians(0)],
-        'b_bot': [
-            radians(  0), radians( 90), radians(0)],
+        'a_bot': [radians(-90), radians( 90), radians(0)],
+        'b_bot': [radians(  0), radians( 90), radians(0)],
     },
 
     'ur5e': {
-        'c_bot': [
-            radians(-90), radians( 90), radians(0)],
-        'd_bot': [
-            radians(  0), radians( 90), radians(0)],
+        'c_bot': [radians(-90), radians( 90), radians(0)],
+        'd_bot': [radians(  0), radians( 90), radians(0)],
     },
 }
 
 ######################################################################
 #  class VisitRoutines                                               #
 ######################################################################
-class VisitRoutines:
+class VisitRoutines(AISTBaseRoutines):
     """Wrapper of MoveGroupCommander specific for this script"""
 
-    def __init__(self, routines, camera_name, robot_name, orientations):
-        self.routines = routines
-        self.camera_name = camera_name
+    def __init__(self, robot_name, camera_name, orientations):
+        super(VisitRoutines, self).__init__()
 
-        ## Initialize `moveit_commander`
-        self.group = moveit_commander.MoveGroupCommander(robot_name)
-        self.group.set_pose_reference_frame("workspace_center")
+        self._robot_name   = robot_name
+        self._camera_name  = camera_name
+        self._orientations = orientations
 
         # Logging
-        print("==== Planning frame:       %s" %
-              self.group.get_planning_frame())
+        group = moveit_commander.MoveGroupCommander(robot_name)
+        print("==== Planning frame:       %s" % group.get_planning_frame())
         print("==== Pose reference frame: %s" %
-              self.group.get_pose_reference_frame())
-        print("==== End effector link:    %s" %
-              self.group.get_end_effector_link())
+              group.get_pose_reference_frame())
+        print("==== End effector link:    %s" % group.get_end_effector_link())
 
-        self.orientations = orientations
 
     def move(self, speed):
-        self.routines.start_acquisition(self.camera_name)
-        position = rospy.wait_for_message("/aruco_tracker/position",
-                                          gmsg.PointStamped, 10)
-        self.routines.stop_acquisition(self.camera_name)
-
-        poseStamped = gmsg.PoseStamped()
-        poseStamped.header.frame_id = self.group.get_pose_reference_frame()
-        poseStamped.pose = gmsg.Pose(
-            position.point,
-            gmsg.Quaternion(*tfs.quaternion_from_euler(*self.orientations)))
-        poseStamped.pose.position.z += 0.05
-        self.routines.go_to_pose_goal(self.group.get_name(), poseStamped,
-                                      speed, move_lin=True)
+        self.start_acquisition(self._camera_name)
+        pose = rospy.wait_for_message("/aruco_tracker/pose",
+                                      gmsg.PoseStamped, 10)
+        self.stop_acquisition(self._camera_name)
+        self.go_to_pose_goal(self._robot_name,
+                             self.effector_target_pose(pose, (0, 0, 0.05)),
+                             speed, move_lin=True)
         rospy.sleep(1)
-
-        poseStamped.pose.position.z -= 0.05
-        print("  move to " + self.format_pose(poseStamped))
-        res = self.routines.go_to_pose_goal(self.group.get_name(), poseStamped,
-                                            speed, move_lin=True)
-        print("  reached " + self.format_pose(res.current_pose))
-
-    def go_home(self):
-        self.routines.go_to_named_pose("home", self.group.get_name())
+        self.go_to_pose_goal(self._robot_name,
+                             self.effector_target_pose(pose, (0, 0, 0)),
+                             speed, move_lin=True)
 
     def run(self, speed):
-        self.routines.stop_acquisition(self.camera_name)
-        self.go_home()
+        self.stop_acquisition(self._camera_name)
+        self.go_to_named_pose("home", self._robot_name)
 
         while True:
             try:
@@ -106,27 +82,14 @@ class VisitRoutines:
                     break
                 self.move(speed)
             except Exception as ex:
-                self.routines.stop_acquisition(self.camera_name)
+                self.stop_acquisition(self._camera_name)
                 print ex.message
             except rospy.ROSInterruptException:
                 return
             except KeyboardInterrupt:
                 return
 
-        self.go_home()
-
-    def format_pose(self, poseStamped):
-        listener = TransformListener()  # Needs Listener but TransformerROS.
-        pose = listener.transformPose(self.group.get_pose_reference_frame(),
-                                      poseStamped).pose
-        rpy = map(
-            degrees,
-            tfs.euler_from_quaternion([pose.orientation.w, pose.orientation.x,
-                                       pose.orientation.y, pose.orientation.z]))
-        return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
-            pose.position.x, pose.position.y, pose.position.z,
-            rpy[0], rpy[1], rpy[2])
-
+        self.go_to_named_pose("home", self._robot_name)
 
 ######################################################################
 #  global functions                                                  #
@@ -164,17 +127,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print(args)
 
-    if args.config == 'o2as':
-        base_routines = O2ASBaseRoutines()
-    else:
-        base_routines = AISTBaseRoutines()
-    camera_name = args.camera_name
-    robot_name = args.robot_name
+    assert (args.camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
+    assert (args.robot_name  in {"a_bot", "b_bot", "c_bot", "d_bot"})
 
-    assert (camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
-    assert (robot_name in {"a_bot", "b_bot", "c_bot", "d_bot"})
+    with VisitRoutines(args.robot_name, args.camera_name,
+                       orientations[args.config][args.robot_name]) as routines:
 
-    routines = VisitRoutines(base_routines, camera_name, robot_name,
-                             orientations[args.config][args.robot_name])
-    speed = 0.05
-    routines.run(speed)
+        speed = 0.05
+        routines.run(speed)

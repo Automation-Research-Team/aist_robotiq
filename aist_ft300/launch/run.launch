@@ -1,0 +1,13 @@
+<launch>
+  <arg name="robot_name"	default="b_bot"/>
+  <arg name="hostname"		default="$(arg robot_name)"/>
+  <arg name="port"		default="63351"/>
+  <arg name="frequency"		default="100"/>
+  <node name="$(arg robot_name)_ft300"
+	pkg="aist_ft300" type="ft300" output="screen">
+    <param name="hostname"	value="$(arg hostname)"/>
+    <param name="port"		value="$(arg port)"/>
+    <param name="frequency"	value="$(arg frequency)"/>
+    <param name="sensor_frame"	value="$(arg robot_name)_ft300_wrench_link"/>
+  </node>
+</launch>
