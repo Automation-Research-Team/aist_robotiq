@@ -75,6 +75,12 @@
     <arg name="topic" value="/c_bot_controller/ur_driver/URScript" />
   </include>
 
+  <include file="$(find robotiq_control)/launch/ur_cmodel_action_controller.launch">
+    <arg name="namespace" value="d_bot_gripper" />
+    <arg name="gripper_prefix" value="d_bot_" />
+    <arg name="topic" value="/d_bot_controller/ur_driver/URScript" />
+  </include>
+
   <!-- <include file="$(find aist_moveit_config)/launch/aist_moveit_planning_execution.launch">
     <arg name="sim" value="false" />
     <arg name="debug" value="false" />

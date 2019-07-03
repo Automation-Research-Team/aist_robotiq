@@ -5,7 +5,7 @@ project(o2as_realsense_camera)
 add_compile_options(-std=c++11 -O2 -fopenmp)
 
 find_package(catkin REQUIRED COMPONENTS
-    roscpp 
+    roscpp
     nodelet
     pluginlib
     dynamic_reconfigure
@@ -40,7 +40,7 @@ include_directories(
 )
 
 add_library(realsense_camera src/RealSenseCamera.cpp)
-target_link_libraries(realsense_camera realsense2 ${OpenCV_LIBRARIES} ${catkin_LIBRARIES})
+target_link_libraries(realsense_camera ${realsense2_LIBRARIES} ${OpenCV_LIBRARIES} ${catkin_LIBRARIES})
 add_dependencies(realsense_camera ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_library(o2as_realsense_camera_nodelet src/nodelet.cpp)

@@ -50,10 +50,7 @@
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>aist_graspability</build_depend>
-  <build_depend>aist_skills</build_depend>
   <exec_depend>aist_graspability</exec_depend>
-  <exec_depend>aist_skills</exec_depend>
-
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

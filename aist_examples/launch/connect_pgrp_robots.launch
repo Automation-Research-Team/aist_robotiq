@@ -10,7 +10,8 @@
   <!-- robot_ip: IP-address of the robot's socket-messaging server -->
   <arg name="robot_ip_a"  default="10.66.171.52"/>
   <arg name="robot_ip_b"  default="10.66.171.51"/>
-  <arg name="limited"	  default="false"/>
+  <!-- <arg name="limited"	  default="false"/> -->
+  <arg name="limited"	  default="true"/>
   <arg name="min_payload" default="0.0"/>
   <arg name="max_payload" default="1.0"/>
   <arg name="servoj_time" default="0.008" />
@@ -78,5 +79,16 @@
   <include file="$(find o2as_precision_gripper)/launch/precision_gripper.launch">
     <arg name="serial_port" default="/dev/ttyUSB0" />
   </include>
+
+  <!-- Drivers for the force sensors -->
+  <node name="a_bot_ft300" pkg ="aist_ft300" type="ft300" output="screen">
+    <param name="hostname"	value="$(arg robot_ip_a)"/>
+    <param name="sensor_frame"	value="a_bot_ft300_wrench_link"/>
+  </node>
+
+  <node name="b_bot_ft300" pkg ="aist_ft300" type="ft300" output="screen">
+    <param name="hostname"	value="$(arg robot_ip_b)"/>
+    <param name="sensor_frame"	value="b_bot_ft300_wrench_link"/>
+  </node>
 
 </launch>
