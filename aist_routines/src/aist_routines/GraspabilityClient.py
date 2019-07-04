@@ -14,7 +14,7 @@ from tf                import TransformListener, transformations as tfs
 ######################################################################
 class GraspabilityClient(object):
     PartProps = collections.namedtuple(
-        "PartProps", "name, radius obj_size, open_width, insertion_depth, ns")
+        "PartProps", "name, gripper_type, radius object_size, open_width, insertion_depth, ns")
     _part_props = {
         4  : PartProps("Geared motor",                    8, 15, 30, 1, 2),
         5  : PartProps("Pully for round belt",            6,  8, 45, 3, 2),
