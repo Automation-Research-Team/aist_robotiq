@@ -228,7 +228,7 @@ class AISTBaseRoutines(object):
         camera = self._cameras[camera_name]
         camera.start_acquisition()
         success = self._graspabilityClient.create_background_image(
-                        camera.image_topic)
+                        camera.depth_topic)
         camera.stop_acquisition()
         return success
 
