@@ -242,6 +242,7 @@ class AISTBaseRoutines(object):
 
     def search_graspability(self, robot_name, camera_name, part_id, bin_id,
                             marker_lifetime=60):
+        self.delete_all_markers()
         gripper = self._grippers[robot_name]
         camera  = self._cameras[camera_name]
         camera.start_acquisition()
