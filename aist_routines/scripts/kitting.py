@@ -100,8 +100,6 @@ class KittingRoutines(URRoutines):
         self.go_to_named_pose("home", "all_bots")
 
     def attempt_bin(self, bin, max_attempts=5, marker_lifetime=0):
-        self.delete_all_markers()
-
         item  = self._items[bin]
         props = item.part_props
 

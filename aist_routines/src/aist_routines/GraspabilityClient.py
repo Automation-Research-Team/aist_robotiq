@@ -14,23 +14,38 @@ from tf                import TransformListener, transformations as tfs
 ######################################################################
 class GraspabilityClient(object):
     PartProps = collections.namedtuple(
-        "PartProps", "name, gripper_type, radius object_size, open_width, insertion_depth, ns")
+        "PartProps", "name, radius object_size, finger_width, finger_thickness, open_width, insertion_depth, ns, detect_edge")
     _part_props = {
-        4  : PartProps("Geared motor",                    8, 15, 30, 1, 2),
-        5  : PartProps("Pully for round belt",            6,  8, 45, 3, 2),
-        6  : PartProps("Polyurethane round belt",         2,  2, 20, 5, 2),
-        7  : PartProps("Bearing wirh housing",           12, 12, 50, 1, 2),
-        8  : PartProps("Drive shaft",                     2,  4, 20, 4, 0),
-        9  : PartProps("End cap for shaft",               3,  3, 20, 1, 2),
-        10 : PartProps("Bearing spacers for inner ring",  3,  3, 30, 1, 2),
-        11 : PartProps("Pully for round belts clamping", 12, 12, 20, 1, 2),
-        12 : PartProps("Bearing spacer for inner ring",   2,  4, 20, 1, 2),
-        13 : PartProps("Idler for round belt",            2,  7, 30, 1, 2),
-        14 : PartProps("Bearing shaft screw",             2,  4, 14, 5, 0),
-        15 : PartProps("M6 hex nut",                      3,  3, 20, 1, 2),
-        16 : PartProps("M6 flat washer",                  3,  3, 15, 1, 0),
-        17 : PartProps("M4 head cap screw",               1,  1, 10, 1, 0),
-        18 : PartProps("M3 head cap scres",               1,  1, 10, 1, 0),
+        4  : PartProps("Geared motor",
+                       8, 15,  1, 5, 100, 10, 2, True),
+        5  : PartProps("Pully for round belt",
+                       6,  8,  1, 5, 45,  3,  2, True),
+        6  : PartProps("Polyurethane round belt",
+                       2,  2,  1, 5, 20,  5,  2, True),
+        7  : PartProps("Bearing wirh housing",
+                       12, 12, 1, 5, 20,  5,  2, True),
+        8  : PartProps("Drive shaft",
+                       2,  4,  1, 5, 20,  4,  0, False),
+        9  : PartProps("End cap for shaft",
+                       3,  3,  1, 5, 20,  1,  2, True),
+        10 : PartProps("Bearing spacers for inner ring",
+                       3,  3,  1, 5, 20,  1,  2, True),
+        11 : PartProps("Pully for round belts clamping",
+                       12, 12, 1, 5, 20,  1,  2, True),
+        12 : PartProps("Bearing spacer for inner ring",
+                       2,  4,  1, 5, 20,  1,  2, True),
+        13 : PartProps("Idler for round belt",
+                       2,  7,  1, 5, 30,  1,  2, True),
+        14 : PartProps("Bearing shaft screw",
+                       2,  4,  1, 5, 14,  5,  0, True),
+        15 : PartProps("M6 hex nut",
+                       3,  3,  1, 5, 20,  1,  2, True),
+        16 : PartProps("M6 flat washer",
+                       3,  3,  1, 5, 15,  1,  0, True),
+        17 : PartProps("M4 head cap screw",
+                       1,  1,  1, 5, 10,  1,  0, True),
+        18 : PartProps("M3 head cap scres",
+                       1,  1,  1, 5, 10,  1,  0, True),
     }
 
     def __init__(self):
@@ -58,8 +73,12 @@ class GraspabilityClient(object):
 
         try:
             (K, D) = self._get_camera_intrinsics(camera_info_topic)
-            res    = self._searchGraspability(depth_topic, gripper_type,
-                                              part_id, bin_id)
+            res    = self._searchGraspability(
+                        depth_topic, bin_id, gripper_type,
+                        part_prop.radius,       part_prop.object_size,
+                        part_prop.finger_width, part_prop.finger_thickness,
+                        part_prop.open_width,   part_prop.insertion_depth,
+                        part_prop.ns,           part_prop.detect_edge)
             poses = []
             if normal_topic == "":
                 header = std_msgs.msg.Header()
