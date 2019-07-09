@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<launch>
+  <arg name="config"		default="pgrp"/>
+  <arg name="scene"		default="$(arg config)_kitting"/>
+  <arg name="robot_name"	default="b_bot"/>
+  <arg name="camera_name"	default="a_phoxi_m_camera"/>
+
+  <include file="$(find o2as_easy_handeye)/launch/publish.launch">
+    <arg name="robot_name"	value="$(arg robot_name)" />
+    <arg name="camera_name"	value="$(arg camera_name)" />
+  </include>
+
+  <!-- Start robot controller -->
+  <include file="$(find aist_examples)/launch/connect_robots.launch">
+    <arg name="config"	value="$(arg config)"/>
+    <arg name="scene"	value="$(arg scene)"/>
+    <arg name="sim"	value="false"/>
+    <arg name="rviz_config"
+    	 value="$(find o2as_easy_handeye)/launch/check_calibration.rviz"/>
+  </include>
+
+  <include file="$(find aist_graspability)/launch/aist_graspability.launch"/>
+
+  <!-- Start rqt_reconfigure -->
+  <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
+</launch>
