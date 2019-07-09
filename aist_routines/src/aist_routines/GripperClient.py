@@ -61,7 +61,7 @@ class GripperClient(object):
 #  class Robotiq85Gripper                                            #
 ######################################################################
 class Robotiq85Gripper(GripperClient):
-    def __init__(self, prefix="a_bot_", grasp_offset=-0.005,
+    def __init__(self, prefix="a_bot_",
                  force=5.0, velocity=0.1, timeout=6.0):
         super(Robotiq85Gripper, self).__init__(str(prefix) +
                                                "robotiq_85_gripper",
