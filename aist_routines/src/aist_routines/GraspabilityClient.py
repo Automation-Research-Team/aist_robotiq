@@ -107,7 +107,6 @@ class GraspabilityClient(object):
                         gmsg.Pose(
                             gmsg.Point(*self._back_project_pixel(uvd, K, D)),
                             gmsg.Quaternion(*self._get_rotation(nrm, rot)))))
-                    print("graspability = {}".format(res.gscore[i]))
 
             return (poses, res.gscore, res.success)
 
