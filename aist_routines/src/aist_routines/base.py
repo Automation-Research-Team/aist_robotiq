@@ -93,8 +93,8 @@ class AISTBaseRoutines(object):
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
+        self._pickOrPlaceAction.shutdown()
         rospy.signal_shutdown("AISTBaseRoutines() completed.")
-        # rospy.spin()  # Wait for Ctrl-C pressed to shutdown the routines
         return False  # Do not forward exceptions
 
     # Basic motion stuffs

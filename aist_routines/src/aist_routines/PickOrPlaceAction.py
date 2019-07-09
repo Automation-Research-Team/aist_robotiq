@@ -20,6 +20,9 @@ class PickOrPlaceAction(object):
                                                     amsg.pickOrPlaceAction)
         self._client.wait_for_server()
 
+    def shutdown(self):
+        self._server.__del__()
+
     def execute(self, robot_name, pose_stamped, pick, gripper_command,
                 grasp_offset, approach_offset, liftup_after,
                 speed_fast, speed_slow, acc_fast, acc_slow):
