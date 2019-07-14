@@ -51,6 +51,13 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>rospy</build_depend>
   <build_depend>roscpp</build_depend>
+
+  <build_depend>pluginlib</build_depend>
+  <exec_depend>pluginlib</exec_depend>
+
+  <build_depend>nodelet</build_depend>
+  <exec_depend>nodelet</exec_depend>
+
   <build_depend>std_msgs</build_depend>
   <build_depend>geometry_msgs</build_depend>
   <build_export_depend>rospy</build_export_depend>
@@ -59,10 +66,9 @@
   <exec_depend>rospy</exec_depend>
   <exec_depend>geometry_msgs</exec_depend>
 
-
   <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <!-- Other tools can request additional information be placed here -->
-
+    <nodelet plugin="${prefix}/nodelet_description.xml"/>
   </export>
+
 </package>
