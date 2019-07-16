@@ -261,6 +261,33 @@ class AISTBaseRoutines(object):
 
         return (poses, gscore, success)
 
+    def graspability_send_goal(self, robot_name, camera_name, part_id, bin_id):
+        self.delete_all_markers()
+        gripper = self._grippers[robot_name]
+        camera  = self._cameras[camera_name]
+        camera.start_acquisition()
+        return self._graspabilityClient.send_goal(camera.camera_info_topic,
+                                                  camera.depth_topic,
+                                                  camera.normal_topic,
+                                                  gripper.type, part_id, bin_id)
+
+    def graspability_wait_for_result(self, camera_name, marker_lifetime=60):
+        (poses, gscore, success) = \
+            self._graspabilityClient.wait_for_result()
+        camera = self._cameras[camera_name]
+        camera.stop_acquisition()
+        if success:
+            for i, pose in enumerate(poses):
+                self.publish_marker(pose, "graspability",
+                                    "{}[{:.3f}]".format(i, gscore[i]),
+                                    lifetime=marker_lifetime)
+                rospy.loginfo("graspability: {}[{:.3f}]".format(i, gscore[i]))
+
+        return (poses, gscore, success)
+
+    def graspability_cancel_goal(self):
+        self._graspabilityClient.cancel_goal()
+
     # Pick and place action stuffs
     def pick(self, robot_name, target_pose,
              grasp_offset=0.0, gripper_command="",

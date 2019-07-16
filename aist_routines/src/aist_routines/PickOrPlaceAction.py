@@ -16,7 +16,7 @@ class PickOrPlaceAction(object):
                                 "pickOrPlace", amsg.pickOrPlaceAction,
                                 execute_cb=self._execute_cb, auto_start=False)
         self._server.start()
-        self._client = actionlib.SimpleActionClient('pickOrPlace',
+        self._client = actionlib.SimpleActionClient("pickOrPlace",
                                                     amsg.pickOrPlaceAction)
         self._client.wait_for_server()
 
@@ -54,7 +54,7 @@ class PickOrPlaceAction(object):
 
         # Go to approach pose.
         result = amsg.pickOrPlaceResult()
-        rospy.loginfo("Go to approach pose.")
+        rospy.loginfo("--- Go to approach pose. ---")
         (success, _, feedback.current_pose) \
             = routines.go_to_pose_goal(goal.robot_name,
                                        routines.effector_target_pose(
@@ -74,7 +74,7 @@ class PickOrPlaceAction(object):
             gripper.pregrasp(goal.gripper_command)
 
         # Go to pick/place pose.
-        rospy.loginfo("Go to {} pose."
+        rospy.loginfo("--- Go to {} pose. ---"
                       .format("pick" if goal.pick else "place"))
         target_pose = routines.effector_target_pose(goal.pose,
                                                     (0, 0, goal.grasp_offset))
@@ -92,14 +92,16 @@ class PickOrPlaceAction(object):
         # Grasp or release
         if goal.pick:
             success = gripper.grasp(goal.gripper_command)
-            rospy.loginfo("Pick.")
+            rospy.loginfo("--- Pick {}. ---".format("succeeded" if success else
+                                                    "failed"))
         else:
             success = gripper.release(goal.gripper_command)
-            rospy.loginfo("Place.")
+            rospy.loginfo("--- Place {}. ---".format("succeeded" if success else
+                                                     "failed"))
 
         # Go back to approach pose.
         if goal.liftup_after:
-            rospy.loginfo("Go back to approach pose.")
+            rospy.loginfo("--- Go back to approach pose. ---")
             routines.go_to_pose_goal(goal.robot_name,
                                      routines.effector_target_pose(
                                          goal.pose,
