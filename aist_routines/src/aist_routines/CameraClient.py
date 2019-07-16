@@ -1,11 +1,5 @@
 import rospy
-import actionlib
 import std_srvs.srv
-
-import robotiq_msgs.msg
-
-import o2as_msgs.msg
-import o2as_msgs.srv
 
 ######################################################################
 #  global functions                                                  #
