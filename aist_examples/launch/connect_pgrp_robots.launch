@@ -81,12 +81,12 @@
   </include>
 
   <!-- Drivers for the force sensors -->
-  <node name="a_bot_ft300" pkg ="aist_ft300" type="ft300" output="screen">
+  <node name="a_bot_ft300" pkg ="aist_ft300" type="aist_ft300" output="screen">
     <param name="hostname"	value="$(arg robot_ip_a)"/>
     <param name="sensor_frame"	value="a_bot_ft300_wrench_link"/>
   </node>
 
-  <node name="b_bot_ft300" pkg ="aist_ft300" type="ft300" output="screen">
+  <node name="b_bot_ft300" pkg ="aist_ft300" type="aist_ft300" output="screen">
     <param name="hostname"	value="$(arg robot_ip_b)"/>
     <param name="sensor_frame"	value="b_bot_ft300_wrench_link"/>
   </node>

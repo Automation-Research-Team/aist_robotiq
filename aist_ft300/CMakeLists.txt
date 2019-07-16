@@ -9,6 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   geometry_msgs
+  pluginlib
+  nodelet
 )
 
 ## System dependencies are found with CMake's conventions
@@ -41,11 +43,22 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(ft300
+add_executable(${PROJECT_NAME}
+  src/ft300.cpp
   src/main.cpp
 )
 
-target_link_libraries(ft300
+target_link_libraries(${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ${roscpp_LIBRARIES}
+)
+
+add_library(${PROJECT_NAME}_nodelet
+  src/ft300.cpp
+  src/nodelet.cpp
+)
+
+target_link_libraries(${PROJECT_NAME}_nodelet
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
 )
@@ -60,7 +73,7 @@ target_link_libraries(ft300
 ## Mark executables and/or libraries for installation
 install(
   TARGETS
-    ft300
+    ${PROJECT_NAME}
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

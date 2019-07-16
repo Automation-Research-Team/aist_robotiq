@@ -1,0 +1,8 @@
+<library path="lib/libaist_ft300_nodelet">
+  <class name="aist_ft300/ft300_nodelet"
+	 type="aist_ft300::ft300_nodelet"
+	 base_class_type="nodelet::Nodelet">
+    <description>
+    </description>
+  </class>
+</library>
