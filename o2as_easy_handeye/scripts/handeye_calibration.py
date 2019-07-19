@@ -256,7 +256,7 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
         if needs_calib:
             ns = "/{}_from_{}/".format(camera_name, robot_name)
             self.get_sample_list = rospy.ServiceProxy(ns + "get_sample_list",
-                                                       GetSampleList)
+                                                      GetSampleList)
             self.take_sample = rospy.ServiceProxy(ns + "take_sample", Trigger)
             self.compute_calibration = rospy.ServiceProxy(
                 ns + "compute_calibration", ComputeCalibration)
@@ -276,13 +276,6 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
     def go_home(self):
         self.go_to_named_pose("home", self._robot_name)
 
-    def save_image(self, file_name):
-        img_msg = rospy.wait_for_message("/aruco_tracker/result",
-                                         sensor_msgs.msg.Image,
-                                         timeout=10.0)
-        bridge = CvBridge()
-        cv2.imwrite(file_name, bridge.imgmsg_to_cv2(img_msg, "bgr8"))
-
     def move(self, pose):
         poseStamped = gmsg.PoseStamped()
         poseStamped.header.frame_id = "workspace_center"
@@ -300,34 +293,22 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
         return success
 
     def move_to(self, pose, keypose_num, subpose_num):
-        if not self.move(pose):
+        success = self.move(pose)
+        if not success:
             return False
 
-        rospy.sleep(self._sleep_time)  # Wait until the robot settles.
-
-        self.start_acquisition(self._camera_name)
-
-        rospy.sleep(self._sleep_time)
-
-        # try:
-        #     self.save_image("aruco_result-{:0=2}-{:0=2}.jpeg".format(
-        #         keypose_num, subpose_num))
-        # except CvBridgeError, e:
-        #     print(e)
-        # except rospy.ROSException, e:
-        #     print(e)
-
-        success = True
         if self.take_sample:
             try:
+                self.continuous_shot(self._camera_name, True)
+                rospy.sleep(self._sleep_time)
                 res = self.take_sample()
+                self.continuous_shot(self._camera_name, False)
+
                 n = len(self.get_sample_list().cMo)
                 print("  {} samples taken: {}").format(n, res.message)
             except rospy.ServiceException as e:
                 print "Service call failed: %s" % e
                 success = False
-
-        self.stop_acquisition(self._camera_name)
 
         return success
 
@@ -353,7 +334,7 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
             pose[4] -= radians(30)
 
     def run(self, initpose, keyposes):
-        self.stop_acquisition(self._camera_name)
+        self.continuous_shot(self._camera_name, False)
 
         if self.reset:
             self.reset()
@@ -424,7 +405,7 @@ if __name__ == '__main__':
     assert (args.robot_name  in {"a_bot", "b_bot", "c_bot", "d_bot"})
 
     speed = 1
-    sleep_time = 1
+    sleep_time = 2
     with HandEyeCalibrationRoutines(args.camera_name, args.robot_name,
                                               speed, sleep_time,
                                               not args.visit) as routines:

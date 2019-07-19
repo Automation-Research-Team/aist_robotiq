@@ -3,6 +3,7 @@ import rospy
 import actionlib
 import numpy as np
 import cv2
+import std_msgs
 from math              import radians, cos, sin, sqrt
 from sensor_msgs       import msg as smsg
 from geometry_msgs     import msg as gmsg
@@ -55,16 +56,15 @@ class GraspabilityClient(object):
         self._createBackgroundImage \
             = rospy.ServiceProxy("/aist_graspability/create_background_image",
                                  asrv.createBackgroundImage)
-        self._createMaskImage    = rospy.ServiceProxy("create_mask_image",
-                                                      asrv.createMaskImage)
-        self._searchGraspability = rospy.ServiceProxy("search_graspability",
-                                                      asrv.searchGraspability)
+        self._createMaskImage \
+            = rospy.ServiceProxy("create_mask_image", asrv.createMaskImage)
+        self._searchGraspability \
+            = rospy.ServiceProxy("search_graspability", asrv.searchGraspability)
         self._searchGraspabilityAction \
             = actionlib.SimpleActionClient(
                 "/aist_graspability/search_graspability",
                 amsg.searchGraspabilityAction)
-
-        self._listener           = TransformListener()
+        self._listener = TransformListener()
 
     def create_background_image(self, depth_topic):
         return self._createBackgroundImage(depth_topic).success
@@ -80,7 +80,7 @@ class GraspabilityClient(object):
 
         try:
             (self._K, self._D) = self._get_camera_intrinsics(camera_info_topic)
-            res    = self._searchGraspability(
+            res = self._searchGraspability(
                         depth_topic, bin_id, gripper_type,
                         part_prop.ns,               part_prop.detect_edge,
                         part_prop.object_size,      part_prop.radius,
@@ -94,8 +94,8 @@ class GraspabilityClient(object):
                 header.frame_id = "workspace_center"
                 T   = self._listener.asMatrix(res.header.frame_id, header)
                 nrm = T[0:3, 2]
-                for uvd in res.pos3D:
-                    rot = -radians(res.torpiz[i])
+                for i, uvd in enumerate(res.pos3D):
+                    rot = -radians(res.rotipz[i])
                     poses.append(gmsg.PoseStamped(
                         res.header,
                         gmsg.Pose(
@@ -118,8 +118,8 @@ class GraspabilityClient(object):
 
             return (poses, res.gscore, res.success)
 
-        except rospy.ROSException:
-            rospy.logerr("wait_for_message(): Timeout expired!")
+        except rospy.ROSException as e:
+            rospy.logerr(e.message)
             return (None, None, None, False)
 
         except CvBridgeError as e:
@@ -139,8 +139,9 @@ class GraspabilityClient(object):
             else:
                 self._normals = rospy.wait_for_message(normal_topic,
                                                        smsg.Image, timeout=10.0)
-        except rospy.ROSException:
-            rospy.logerr("wait_for_message(): Timeout expired!")
+        except rospy.ROSException as e:
+            rospy.logerr(e.message)
+            return
 
         goal = amsg.searchGraspabilityGoal()
         goal.depth_topic      = depth_topic
@@ -154,8 +155,8 @@ class GraspabilityClient(object):
         goal.finger_width     = part_prop.finger_width
         goal.finger_thickness = part_prop.finger_thickness
         goal.insertion_depth  = part_prop.insertion_depth
-        return self._searchGraspabilityAction.send_goal(
-                        goal, feedback_cb=self._feedback_cb)
+        self._searchGraspabilityAction.send_goal(goal,
+                                                 feedback_cb=self._feedback_cb)
 
     def wait_for_result(self):
         self._searchGraspabilityAction.wait_for_result()
@@ -168,8 +169,8 @@ class GraspabilityClient(object):
             header.frame_id = "workspace_center"
             T   = self._listener.asMatrix(result.header.frame_id, header)
             nrm = T[0:3, 2]
-            for uvd in result.pos3D:
-                rot = -radians(result.torpiz[i])
+            for i, uvd in enumerate(result.pos3D):
+                rot = -radians(result.rotipz[i])
                 poses.append(gmsg.PoseStamped(
                     result.header,
                     gmsg.Pose(gmsg.Point(*self._back_project_pixel(uvd)),

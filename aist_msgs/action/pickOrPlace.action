@@ -14,7 +14,9 @@ float32 acc_slow
 # Result
 uint8 SUCCESS=0
 uint8 MOVE_FAILURE=1
-uint8 PICK_FAILURE=2
+uint8 APPROACH_FAILURE=2
+uint8 DEPARTURE_FAILURE=3
+uint8 PICK_FAILURE=4
 
 int32 result
 ---

@@ -21,38 +21,38 @@ number_of_attempted = 1
 class KittingRoutines(URRoutines):
     """Implements kitting routines for aist robot system."""
     PartProps = collections.namedtuple(
-        "PartProps", "robot_name, camera_name, destination, approach_offset, grasp_offset, place_offset")
+        "PartProps", "robot_name, camera_name, destination, approach_offset, grasp_offset, place_offset, speed_slow, use_normals")
     _part_props = {
         4  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_4",
-                       0.15, -0.002, 0.05),
+                       0.15, -0.002, 0.05, 0.04, True),
         5  : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_6",
-                       0.15, -0.002, 0.03),
+                       0.15, -0.002, 0.03, 1.0,  True),
         6  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_3",
-                       0.15, 0.0, 0.05),
+                       0.15,  0.0,   0.05, 1.0,  False),
         7  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_2",
-                       0.15, -0.002, 0.05),
+                       0.15, -0.002, 0.05, 0.04, True),
         8  : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_1",
-                       0.15, -0.002, 0.03),
+                       0.15, -0.004, 0.03, 0.1,  False),
         9  : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_4",
-                       0.15, -0.002, 0.05),
+                       0.15, -0.002, 0.05, 1.0,  False),
         10 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_7",
-                       0.15, -0.002, 0.05),
+                       0.15, -0.002, 0.05, 1.0,  False),
         11 : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_1",
-                       0.15, 0.0, 0.05),
+                       0.15,  0.0,   0.05, 0.04, True),
         12 : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_3",
-                       0.15, 0.0, 0.05),
+                       0.15,  0.0,   0.05, 0.04, False),
         13 : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_5",
-                       0.15, 0.0, 0.05),
+                       0.15,  0.0,   0.05, 0.04, True),
         14 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_2",
-                       0.15, -0.002, 0.05),
+                       0.15, -0.002, 0.05, 1.0,  False),
         15 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_5",
-                       0.15, -0.002, 0.05),
+                       0.15, -0.002, 0.05, 1.0,  False),
         16 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_8",
-                       0.15, -0.002, 0.05),
+                       0.15, -0.002, 0.05, 1.0,  False),
         17 : PartProps("a_bot", "a_phoxi_m_camera", "skrewholder_1",
-                       0.15, -0.002, 0.05),
+                       0.15, -0.002, 0.05, 1.0,  False),
         18 : PartProps("a_bot", "a_phoxi_m_camera", "skrewholder_2",
-                       0.15, -0.002, 0.05),
+                       0.15, -0.002, 0.05, 1.0,  False),
     }
     BinProps = collections.namedtuple("BinProps",
                                       "bin_id, part_id, part_props")
@@ -77,6 +77,7 @@ class KittingRoutines(URRoutines):
                 bin_id, part_id, KittingRoutines._part_props[part_id])
 
         self._former_robot_name = None
+        self._fail_poses = []
         #self.go_to_named_pose("home", "all_bots")
 
     @property
@@ -99,8 +100,7 @@ class KittingRoutines(URRoutines):
             self.attempt_bin(bin, 1)
         self.go_to_named_pose("home", "all_bots")
 
-    def attempt_bin(self, bin,
-                    first_pick=True, max_attempts=5, marker_lifetime=0):
+    def attempt_bin(self, bin, max_attempts=5, marker_lifetime=0):
         item  = self._items[bin]
         props = item.part_props
 
@@ -115,10 +115,9 @@ class KittingRoutines(URRoutines):
             self.go_to_frame(props.robot_name, bin, (0, 0, 0.15))
 
         # Search for graspabilities.
-        if first_pick:
-            self.graspability_send_goal(props.robot_name, props.camera_name,
-                                        item.part_id, item.bin_id)
-            self._first_pick = False
+        self.graspability_send_goal(props.robot_name, props.camera_name,
+                                    item.part_id, item.bin_id,
+                                    props.use_normals)
         (pick_poses, _, success) = self.graspability_wait_for_result(
                                         props.camera_name, marker_lifetime)
         if not success:
@@ -130,19 +129,26 @@ class KittingRoutines(URRoutines):
             if nattempts == max_attempts:
                 break
 
+            if self._is_close_to_fail_poses(pose):
+                continue
+
             result = self.pick(props.robot_name, pose,
+                               speed_slow=props.speed_slow,
                                grasp_offset=props.grasp_offset,
                                approach_offset=props.approach_offset)
             if result == amsg.pickOrPlaceResult.SUCCESS:
-                self.graspability_send_goal(props.robot_name, props.camera_name,
-                                            item.part_id, item.bin_id)
                 result = self.place_at_frame(
                                 props.robot_name, props.destination,
+                                speed_slow=props.speed_slow,
                                 place_offset=props.place_offset,
                                 approach_offset=props.approach_offset)
                 return result == amsg.pickOrPlaceResult.SUCCESS
-            elif result == amsg.pickOrPlaceResult.MOVE_FAILURE:
-                pass
+            elif result == amsg.pickOrPlaceResult.MOVE_FAILURE or \
+                 result == amsg.pickOrPlaceResult.APPROACH_FAILURE:
+                self._fail_poses.append(pose)
+            elif result == amsg.pickOrPlaceResult.DEPARTURE_FAILURE:
+                self.release(props.robot_name)
+                raise RuntimeError("Failed to depart from pick/place pose")
             elif result == amsg.pickOrPlaceResult.PICK_FAILURE:
                 nattempts += 1
 
@@ -150,18 +156,17 @@ class KittingRoutines(URRoutines):
 
         return False
 
+    def clear_fail_poses(self):
+        self._fail_poses = []
+
     def _is_eye_on_hand(self, robot_name, camera_name):
         return camera_name == robot_name + "_camera"
 
-    # def _fix_pose(pose):
-    #     try:
-    #         self.listener.waitForTransform("workspace_center",
-    #                                        pose.header.frame_id,
-    #                                        rospy.Time.now(),
-    #                                        rospy.Duration(10))
-    #         pose_world = self.listener.transformPose("workspace_center",
-    #                                                  pose).pose
-
+    def _is_close_to_fail_poses(self, pose):
+        for fail_pose in self._fail_poses:
+            if self._all_close(pose, fail_pose, 0.005):
+                return True
+        return False
 
 
 if __name__ == '__main__':
@@ -200,20 +205,21 @@ if __name__ == '__main__':
                     #                             marker_lifetime=0)
                     kitting.graspability_send_goal(props.robot_name,
                                                    props.camera_name,
-                                                   item.part_id, item.bin_id)
+                                                   item.part_id, item.bin_id,
+                                                   props.use_normals)
                     kitting.graspability_wait_for_result(props.camera_name,
                                                          marker_lifetime=0)
                 elif key == 'a':
+                    kitting.attempt_bin(bin, 5, 0)
                     bin = raw_input("  bin name? ")
-                    kitting.attempt_bin(bin, True, 5, 0)
                     kitting.go_to_named_pose("home", kitting.former_robot_name)
                 elif key == 'A':
                     bin = raw_input("  bin name? ")
-                    first_pick = True
-                    while kitting.attempt_bin(bin, first_pick, 5, 0):
-                        first_pick = False
+                    kitting.clear_fail_poses()
+                    while kitting.attempt_bin(bin, 5, 0):
+                        pass
                     kitting.go_to_named_pose("home", kitting.former_robot_name)
                 elif key == 'k':
                     kitting.run()
             except Exception as e:
-                print(e)
+                print(e.message)

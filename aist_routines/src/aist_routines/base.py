@@ -209,11 +209,11 @@ class AISTBaseRoutines(object):
     def camera(self, camera_name):
         return self._cameras[camera_name]
 
-    def start_acquisition(self, camera_name):
-        return self._cameras[camera_name].start_acquisition()
+    def continuous_shot(self, camera_name, enable):
+        return self._cameras[camera_name].continuous_shot(enable)
 
-    def stop_acquisition(self, camera_name):
-        return self._cameras[camera_name].stop_acquisition()
+    def trigger_frame(self, camera_name):
+        return self._cameras[camera_name].trigger_frame()
 
     # Marker stuffs
     def delete_all_markers(self):
@@ -226,32 +226,32 @@ class AISTBaseRoutines(object):
     # Graspability stuffs
     def create_background_image(self, camera_name):
         camera = self._cameras[camera_name]
-        camera.start_acquisition()
+        camera.continuous_shot(True)
         success = self._graspabilityClient.create_background_image(
                         camera.depth_topic)
-        camera.stop_acquisition()
+        camera.continuous_shot(False)
         return success
 
     def create_mask_image(self, camera_name, nbins):
         camera = self._cameras[camera_name]
-        camera.start_acquisition()
+        camera.continuous_shot(True)
         success = self._graspabilityClient.create_mask_image(
                         camera.image_topic, nbins)
-        camera.stop_acquisition()
+        camera.continuous_shot(False)
         return success
 
     def search_graspability(self, robot_name, camera_name, part_id, bin_id,
-                            marker_lifetime=60):
+                            use_normals=True, marker_lifetime=60):
         self.delete_all_markers()
         gripper = self._grippers[robot_name]
         camera  = self._cameras[camera_name]
-        camera.start_acquisition()
+        camera.continuous_shot(True)
         (poses, gscore, success) = \
             self._graspabilityClient.search(camera.camera_info_topic,
                                             camera.depth_topic,
-                                            camera.normal_topic,
+                                            camera.normal_topic if use_normals \
+                                            else "",
                                             gripper.type, part_id, bin_id)
-        camera.stop_acquisition()
         if success:
             for i, pose in enumerate(poses):
                 self.publish_marker(pose, "graspability",
@@ -261,21 +261,23 @@ class AISTBaseRoutines(object):
 
         return (poses, gscore, success)
 
-    def graspability_send_goal(self, robot_name, camera_name, part_id, bin_id):
+    def graspability_send_goal(self, robot_name, camera_name, part_id, bin_id,
+                               use_normals=True):
         self.delete_all_markers()
         gripper = self._grippers[robot_name]
         camera  = self._cameras[camera_name]
-        camera.start_acquisition()
-        return self._graspabilityClient.send_goal(camera.camera_info_topic,
-                                                  camera.depth_topic,
-                                                  camera.normal_topic,
-                                                  gripper.type, part_id, bin_id)
+        camera.continuous_shot(True)
+        self._graspabilityClient.send_goal(camera.camera_info_topic,
+                                           camera.depth_topic,
+                                           camera.normal_topic if use_normals \
+                                           else "",
+                                           gripper.type, part_id, bin_id)
 
     def graspability_wait_for_result(self, camera_name, marker_lifetime=60):
         (poses, gscore, success) = \
             self._graspabilityClient.wait_for_result()
         camera = self._cameras[camera_name]
-        camera.stop_acquisition()
+        camera.continuous_shot(False)
         if success:
             for i, pose in enumerate(poses):
                 self.publish_marker(pose, "graspability",
