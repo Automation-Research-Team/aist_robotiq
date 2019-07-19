@@ -1,4 +1,5 @@
 import rospy
+import dynamic_reconfigure.client
 import std_srvs.srv
 
 ######################################################################
@@ -49,12 +50,11 @@ class CameraClient(object):
     def normal_topic(self):
         return self._normal_topic
 
-    def start_acquisition(self):
+    def continuous_shot(self, enable):
         return True
 
-    def stop_acquisition(self):
+    def trigger_frame(self):
         return True
-
 
 ######################################################################
 #  class PhoXiCamera                                                 #
@@ -68,18 +68,18 @@ class PhoXiCamera(CameraClient):
                                           "/" + name + "/pointcloud",
                                           "/" + name + "/depth_map",
                                           "/" + name + "/normal_map")
-        cs = "/{}/".format(self.name)
-        self._start_acquisition = rospy.ServiceProxy(cs + "start_acquisition",
-                                                     std_srvs.srv.Trigger)
-        self._stop_acquisition  = rospy.ServiceProxy(cs + "stop_acquisition",
-                                                     std_srvs.srv.Trigger)
+        cs = "/{}".format(self.name)
+        self._dyn_reconf = dynamic_reconfigure.client.Client(cs, timeout=None)
+        self._trigger_frame = rospy.ServiceProxy(cs + "/trigger_frame",
+                                                 std_srvs.srv.Trigger)
 
-    def start_acquisition(self):
-        return self._start_acquisition().success
+    def continuous_shot(self, enable):
+        self._dyn_reconf.update_configuration({"trigger_mode" :
+                                               0 if enable else 1})
+        return True
 
-    def stop_acquisition(self):
-        return self._stop_acquisition().success
-
+    def trigger_frame(self):
+        return self._trigger_frame().success
 
 ######################################################################
 #  class RealsenseCamera                                             #

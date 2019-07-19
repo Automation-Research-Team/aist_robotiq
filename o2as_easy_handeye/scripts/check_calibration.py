@@ -59,10 +59,9 @@ class VisitRoutines(AISTBaseRoutines):
 
 
     def move(self, speed):
-        self.start_acquisition(self._camera_name)
+        self.trigger_frame(self._camera_name)
         pose = rospy.wait_for_message("/aruco_tracker/pose",
                                       gmsg.PoseStamped, 10)
-        self.stop_acquisition(self._camera_name)
         self.go_to_pose_goal(self._robot_name,
                              self.effector_target_pose(pose, (0, 0, 0.05)),
                              speed, move_lin=True)
@@ -72,7 +71,7 @@ class VisitRoutines(AISTBaseRoutines):
                              speed, move_lin=True)
 
     def run(self, speed):
-        self.stop_acquisition(self._camera_name)
+        self.continuous_shot(self._camera_name, False)
         self.go_to_named_pose("home", self._robot_name)
 
         while True:
@@ -81,8 +80,7 @@ class VisitRoutines(AISTBaseRoutines):
                 if key == 'q':
                     break
                 self.move(speed)
-            except Exception as ex:
-                self.stop_acquisition(self._camera_name)
+            except rospy.ROSException as ex:
                 print ex.message
             except rospy.ROSInterruptException:
                 return

@@ -144,9 +144,8 @@ class ToolCalibrationRoutines(URRoutines):
         xyz = tfs.translation_from_matrix(D)
         q   = tfs.quaternion_from_matrix(D)
         rpy = map(degrees, tfs.euler_from_quaternion(q))
-        print(
-            '<origin xyz="{0[0]} {0[1]} {0[2]}" rpy="${{{1[0]}*pi/180}} ${{{1[1]}*pi/180}} ${{{1[2]}*pi/180}}"/>'
-            .format(xyz, rpy))
+        print('<origin xyz="{0[0]} {0[1]} {0[2]}" rpy="${{{1[0]}*pi/180}} ${{{1[1]}*pi/180}} ${{{1[2]}*pi/180}}"/>'
+              .format(xyz, rpy))
 
     def run(self):
         # Reset pose
@@ -221,10 +220,16 @@ class ToolCalibrationRoutines(URRoutines):
             elif key == 'place':
                 print("  place at " + self.format_pose(self._pick_pose))
                 self.place(self._robot_name, self._place_pose)
-            elif key == 'c':
+            elif key == 'cont':
+                self.continuous_shot(self._camera_name, True)
+            elif key == 'stopcont':
+                self.continuous_shot(self._camera_name, False)
+            elif key == 'trigger':
+                self.trigger_frame(self._camera_name)
+            elif key == 'create':
                 self.create_mask_image(self._camera_name,
                                        int(raw_input("  #bins? ")))
-            elif key == 's':
+            elif key == 'search':
                 self.delete_all_markers()
                 (poses, rotipz, gscore, success) = \
                     self.search_graspability(self._robot_name,
