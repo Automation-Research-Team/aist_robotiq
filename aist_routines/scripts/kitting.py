@@ -150,6 +150,7 @@ class KittingRoutines(URRoutines):
                 self.release(props.robot_name)
                 raise RuntimeError("Failed to depart from pick/place pose")
             elif result == amsg.pickOrPlaceResult.PICK_FAILURE:
+                self._fail_poses.append(pose)
                 nattempts += 1
 
             self.release(props.robot_name)
@@ -210,8 +211,9 @@ if __name__ == '__main__':
                     kitting.graspability_wait_for_result(props.camera_name,
                                                          marker_lifetime=0)
                 elif key == 'a':
-                    kitting.attempt_bin(bin, 5, 0)
                     bin = raw_input("  bin name? ")
+                    kitting.clear_fail_poses()
+                    kitting.attempt_bin(bin, 5, 0)
                     kitting.go_to_named_pose("home", kitting.former_robot_name)
                 elif key == 'A':
                     bin = raw_input("  bin name? ")

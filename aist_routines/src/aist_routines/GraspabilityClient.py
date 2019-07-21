@@ -86,44 +86,9 @@ class GraspabilityClient(object):
                         part_prop.object_size,      part_prop.radius,
                         part_prop.open_width,       part_prop.finger_width,
                         part_prop.finger_thickness, part_prop.insertion_depth)
-            poses = []
-            if normal_topic == "":
-                self._normals = None
-                header = std_msgs.msg.Header()
-                header.stamp    = res.header.stamp
-                header.frame_id = "workspace_center"
-                T   = self._listener.asMatrix(res.header.frame_id, header)
-                nrm = T[0:3, 2]
-                for i, uvd in enumerate(res.pos3D):
-                    rot = -radians(res.rotipz[i])
-                    poses.append(gmsg.PoseStamped(
-                        res.header,
-                        gmsg.Pose(
-                            gmsg.Point(*self._back_project_pixel(uvd)),
-                            gmsg.Quaternion(*self._get_rotation(nrm, rot)))))
-            else:
-                bridge  = CvBridge()
-                normals = bridge.imgmsg_to_cv2(
-                              rospy.wait_for_message(normal_topic,
-                                                     smsg.Image, timeout=10.0),
-                              "32FC3")
-                for i, uvd in enumerate(res.pos3D):
-                    nrm = normals[int(uvd.y), int(uvd.x), :]
-                    rot = -radians(res.rotipz[i])
-                    poses.append(gmsg.PoseStamped(
-                        res.header,
-                        gmsg.Pose(
-                            gmsg.Point(*self._back_project_pixel(uvd)),
-                            gmsg.Quaternion(*self._get_rotation(nrm, rot)))))
-
-            return (poses, res.gscore, res.success)
-
-        except rospy.ROSException as e:
+            return (self._compute_poses(res), res.gscore, res.success)
+        except Exception as e:
             rospy.logerr(e.message)
-            return (None, None, None, False)
-
-        except CvBridgeError as e:
-            rospy.logerr(e)
             return (None, None, None, False)
 
     def send_goal(self, camera_info_topic, depth_topic, normal_topic,
@@ -159,34 +124,13 @@ class GraspabilityClient(object):
                                                  feedback_cb=self._feedback_cb)
 
     def wait_for_result(self):
-        self._searchGraspabilityAction.wait_for_result()
-        result = self._searchGraspabilityAction.get_result()
-
-        poses = []
-        if self._normals is None:
-            header = std_msgs.msg.Header()
-            header.stamp    = result.header.stamp
-            header.frame_id = "workspace_center"
-            T   = self._listener.asMatrix(result.header.frame_id, header)
-            nrm = T[0:3, 2]
-            for i, uvd in enumerate(result.pos3D):
-                rot = -radians(result.rotipz[i])
-                poses.append(gmsg.PoseStamped(
-                    result.header,
-                    gmsg.Pose(gmsg.Point(*self._back_project_pixel(uvd)),
-                              gmsg.Quaternion(*self._get_rotation(nrm, rot)))))
-        else:
-            bridge  = CvBridge()
-            normals = bridge.imgmsg_to_cv2(self._normals, "32FC3")
-            for i, uvd in enumerate(result.pos3D):
-                nrm = normals[int(uvd.y), int(uvd.x), :]
-                rot = -radians(result.rotipz[i])
-                poses.append(gmsg.PoseStamped(
-                    result.header,
-                    gmsg.Pose(gmsg.Point(*self._back_project_pixel(uvd)),
-                              gmsg.Quaternion(*self._get_rotation(nrm, rot)))))
-
-        return (poses, result.gscore, result.success)
+        try:
+            self._searchGraspabilityAction.wait_for_result()
+            result = self._searchGraspabilityAction.get_result()
+            return (self._compute_poses(result), result.gscore, result.success)
+        except Exception as e:
+            rospy.logerr(e.message)
+            return (None, None, None, False)
 
     def cancel_goal(self):
         self._searchGraspabilityAction.cancel_goal()
@@ -199,6 +143,33 @@ class GraspabilityClient(object):
                                              smsg.CameraInfo, timeout=10.0)
         return (np.array(camera_info.K).reshape((3, 3)),
                 np.array(camera_info.D))
+
+    def _compute_poses(self, res):
+        header = std_msgs.msg.Header()
+        header.stamp    = res.header.stamp
+        header.frame_id = "workspace_center"
+        nrm = self._listener.asMatrix(res.header.frame_id, header)[0:3, 2]
+
+        poses = []
+        if self._normals is None:
+            for i, uvd in enumerate(res.pos3D):
+                rot = -radians(res.rotipz[i])
+                poses.append(gmsg.PoseStamped(
+                    res.header,
+                    gmsg.Pose(gmsg.Point(*self._back_project_pixel(uvd)),
+                              gmsg.Quaternion(*self._get_rotation(nrm, rot)))))
+        else:
+            bridge  = CvBridge()
+            normals = bridge.imgmsg_to_cv2(self._normals, "32FC3")
+            for i, uvd in enumerate(res.pos3D):
+                nrm = normals[int(uvd.y), int(uvd.x), :]
+                rot = -radians(res.rotipz[i])
+                poses.append(gmsg.PoseStamped(
+                    res.header,
+                    gmsg.Pose(gmsg.Point(*self._back_project_pixel(uvd)),
+                              gmsg.Quaternion(*self._get_rotation(nrm, rot)))))
+
+        return poses
 
     def _back_project_pixel(self, uvd):
         xy = cv2.undistortPoints(np.array([[[uvd.x, uvd.y]]], dtype=np.float32),
