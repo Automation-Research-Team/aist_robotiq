@@ -32,7 +32,7 @@ class KittingRoutines(URRoutines):
         7  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_2",
                        0.15, -0.002, 0.05, 0.04, True),
         8  : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_1",
-                       0.15, -0.004, 0.03, 0.1,  False),
+                       0.15, -0.004, 0.03, 0.1,  True),
         9  : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_4",
                        0.15, -0.002, 0.05, 1.0,  False),
         10 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_7",

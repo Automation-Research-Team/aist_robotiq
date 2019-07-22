@@ -4,7 +4,7 @@ import actionlib
 import numpy as np
 import cv2
 import std_msgs
-from math              import radians, cos, sin, sqrt
+from math              import radians, cos, sin, sqrt, pi
 from sensor_msgs       import msg as smsg
 from geometry_msgs     import msg as gmsg
 from aist_graspability import msg as amsg
@@ -20,35 +20,35 @@ class GraspabilityClient(object):
         "PartProps", "name, ns, detect_edge, object_size, radius, open_width, finger_width, finger_thickness, insertion_depth")
     _part_props = {
         4  : PartProps("Geared motor",
-                       2, True,  15,  8, 100, 1, 5, 10),
+                       2, True, 15,  8, 100, 1, 5, 10),
         5  : PartProps("Pully for round belt",
-                       2, True,   8,  6,  45, 1, 5,  3),
+                       2, True,  8,  6,  45, 1, 5,  3),
         6  : PartProps("Polyurethane round belt",
-                       2, True,   2,  2,  20, 1, 5,  5),
+                       2, True,  2,  2,  20, 1, 5,  5),
         7  : PartProps("Bearing wirh housing",
-                       2, True,  12, 12,  20, 1, 5,  5),
+                       2, True, 12, 12,  20, 1, 5,  5),
         8  : PartProps("Drive shaft",
-                       0, False,  4,  2,  20, 1, 5,  4),
+                       0, False, 4,  2,  20, 1, 5,  4),
         9  : PartProps("End cap for shaft",
-                       2, True,   3,  3,  20, 1, 5,  1),
+                       2, True,  3,  3,  20, 1, 5,  1),
         10 : PartProps("Bearing spacers for inner ring",
-                       2, True,   3,  3,  20, 1, 5,  1),
+                       2, True,  3,  3,  20, 1, 5,  1),
         11 : PartProps("Pully for round belts clamping",
-                       2, True,  12, 12,  20, 1, 5,  1),
+                       2, True, 12, 12,  20, 1, 5,  1),
         12 : PartProps("Bearing spacer for inner ring",
-                       2, True,   4,  2,  20, 1, 5,  1),
+                       2, True,  4,  2,  20, 1, 5,  1),
         13 : PartProps("Idler for round belt",
-                       2, True,   7,  2,  30, 1, 5,  1),
+                       2, True,  7,  2,  30, 1, 5,  1),
         14 : PartProps("Bearing shaft screw",
-                       0, True,   4,  2,  14, 1, 5,  5),
+                       0, True,  4,  2,  14, 1, 5,  5),
         15 : PartProps("M6 hex nut",
-                       2, True,   3,  3,  20, 1, 5,  1),
+                       2, True,  3,  3,  20, 1, 5,  1),
         16 : PartProps("M6 flat washer",
-                       0, True,   3,  3,  15, 1, 5,  1),
+                       0, True,  3,  3,  15, 1, 5,  1),
         17 : PartProps("M4 head cap screw",
-                       0, True,   1,  1,  10, 1, 5,  1),
+                       0, True,  1,  1,  10, 1, 5,  1),
         18 : PartProps("M3 head cap scres",
-                       0, True,   1,  1,  10, 1, 5,  1),
+                       0, True,  1,  1,  10, 1, 5,  1),
     }
 
     def __init__(self):
@@ -148,7 +148,7 @@ class GraspabilityClient(object):
         header = std_msgs.msg.Header()
         header.stamp    = res.header.stamp
         header.frame_id = "workspace_center"
-        nrm = self._listener.asMatrix(res.header.frame_id, header)[0:3, 2]
+        up = self._listener.asMatrix(res.header.frame_id, header)[0:3, 2]
 
         poses = []
         if self._normals is None:
@@ -157,12 +157,13 @@ class GraspabilityClient(object):
                 poses.append(gmsg.PoseStamped(
                     res.header,
                     gmsg.Pose(gmsg.Point(*self._back_project_pixel(uvd)),
-                              gmsg.Quaternion(*self._get_rotation(nrm, rot)))))
+                              gmsg.Quaternion(*self._get_rotation(up, rot)))))
         else:
             bridge  = CvBridge()
             normals = bridge.imgmsg_to_cv2(self._normals, "32FC3")
             for i, uvd in enumerate(res.pos3D):
-                nrm = normals[int(uvd.y), int(uvd.x), :]
+                nrm = self._fix_normal(normals[int(uvd.y), int(uvd.x), :],
+                                       up, pi/4)
                 rot = -radians(res.rotipz[i])
                 poses.append(gmsg.PoseStamped(
                     res.header,
@@ -175,6 +176,16 @@ class GraspabilityClient(object):
         xy = cv2.undistortPoints(np.array([[[uvd.x, uvd.y]]], dtype=np.float32),
                                  self._K, self._D)[0, 0]
         return np.array((xy[0]*uvd.z, xy[1]*uvd.z, uvd.z))
+
+    def _fix_normal(self, normal, up, max_slant):
+        a = np.dot(normal, up)
+        b = cos(max_slant)
+        if a < b:
+            p = sqrt((1.0 - b*b)/(1.0 - a*a))
+            q = b - a*p
+            return p*normal + q*up
+        else:
+            return normal
 
     def _get_rotation(self, normal, theta):
         c = cos(theta)
