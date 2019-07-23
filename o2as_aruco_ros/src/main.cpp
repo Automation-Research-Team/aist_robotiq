@@ -80,6 +80,7 @@ at(const sensor_msgs::PointCloud2& cloud_msg, T u, T v)
 class Simple
 {
   private:
+    using camera_info_t	= sensor_msgs::CameraInfo;
     using camera_info_p	= sensor_msgs::CameraInfoConstPtr;
     using image_t	= sensor_msgs::Image;
     using image_p	= sensor_msgs::ImageConstPtr;
@@ -92,11 +93,11 @@ class Simple
     std::ostream&	print_bins(std::ostream& out)		const	;
 
   private:
-    void	get_camera_info_cb(const camera_info_p& msg)		;
     void	reconf_cb(aruco_ros::ArucoThresholdConfig& config,
 			  uint32_t level)				;
-    void	detect_marker_cb(const image_p& image_msg,
-				 const cloud_p& cloud_msg)		;
+    void	detect_marker_cb(const camera_info_p& camera_info_msg,
+				 const image_p&	      image_msg,
+				 const cloud_p&	      cloud_msg)	;
     bool	get_transform(const std::string& refFrame,
 			      const std::string& childFrame,
 			      tf::StampedTransform& transform)	const	;
@@ -113,12 +114,6 @@ class Simple
   private:
     ros::NodeHandle					_nh;
 
-  // camera_info stuff
-    ros::Subscriber					_camera_info_sub;
-    aruco::CameraParameters				_camParam;
-    bool						_useRectifiedImages;
-    tf::StampedTransform				_rightToLeft;
-
   // transformation stuff
     const tf::TransformListener				_tfListener;
     tf::TransformBroadcaster				_tfBroadcaster;
@@ -126,17 +121,24 @@ class Simple
     std::string						_camera_frame;
     std::string						_reference_frame;
 
-  // input image/cloud stuff
+  // input camera_info/image/cloud stuff
+    message_filters::Subscriber<camera_info_t>		_camera_info_sub;
     message_filters::Subscriber<image_t>		_image_sub;
     message_filters::Subscriber<cloud_t>		_cloud_sub;
-    message_filters::TimeSynchronizer<image_t, cloud_t>	_ts;
+    message_filters::TimeSynchronizer<camera_info_t,
+				      image_t, cloud_t>	_ts;
+
+  // camera_info stuff
+    aruco::CameraParameters				_camParam;
+    bool						_useRectifiedImages;
+    tf::StampedTransform				_rightToLeft;
 
   // output image stuff
     image_transport::ImageTransport			_it;
     const image_transport::Publisher			_image_pub;
     const image_transport::Publisher			_debug_pub;
 
-  // input pointcloud stuff
+  // output cloud, pose, marker, etc. stuff
     const ros::Publisher				_cloud_pub;
     const ros::Publisher				_pose_pub;
     const ros::Publisher				_visMarker_pub;
@@ -157,19 +159,18 @@ class Simple
 
 Simple::Simple()
     :_nh("~"),
-     _camera_info_sub(_nh.subscribe("/camera_info", 1,
-				    &Simple::get_camera_info_cb, this)),
+     _camera_info_sub(_nh, "/camera_info", 1),
      _image_sub(_nh, "/image", 1),
      _cloud_sub(_nh, "/pointcloud", 1),
-     _ts(_image_sub, _cloud_sub, 10),
+     _ts(_camera_info_sub, _image_sub, _cloud_sub, 10),
      _it(_nh),
      _image_pub(_it.advertise("result", 1)),
      _debug_pub(_it.advertise("debug",  1)),
-     _cloud_pub(     _nh.advertise<cloud_t>("pointcloud", 1)),
-     _pose_pub(      _nh.advertise<geometry_msgs::PoseStamped>("pose", 100)),
-     _visMarker_pub( _nh.advertise<visualization_msgs::Marker>("marker", 10)),
-     _pixel_pub(     _nh.advertise<geometry_msgs::PointStamped>("pixel", 10)),
-     _corners_pub(   _nh.advertise<Corners>("corners", 10)),
+     _cloud_pub(    _nh.advertise<cloud_t>("pointcloud", 1)),
+     _pose_pub(     _nh.advertise<geometry_msgs::PoseStamped>("pose", 100)),
+     _visMarker_pub(_nh.advertise<visualization_msgs::Marker>("marker", 10)),
+     _pixel_pub(    _nh.advertise<geometry_msgs::PointStamped>("pixel", 10)),
+     _corners_pub(  _nh.advertise<Corners>("corners", 10)),
      _marker_id(0),
      _planarityTolerance(0.001)
 {
@@ -243,27 +244,6 @@ Simple::print_bins(std::ostream& out) const
 }
 
 void
-Simple::get_camera_info_cb(const camera_info_p& msg)
-{
-  // Truncate distortion coefficiens because aruco_ros accepts only
-  // first four parameters.
-    auto	msg_tmp = *msg;
-    msg_tmp.D.resize(4);
-    std::copy_n(std::begin(msg->D), msg_tmp.D.size(), std::begin(msg_tmp.D));
-    _camParam = aruco_ros::rosCameraInfo2ArucoCamParams(msg_tmp,
-							_useRectifiedImages);
-
-  // wait for one camerainfo, then shut down that subscriber
-  // handle cartesian offset between stereo pairs
-  // see the sensor_msgs/CamaraInfo documentation for details
-    _rightToLeft.setIdentity();
-    _rightToLeft.setOrigin(tf::Vector3(-msg->P[3]/msg->P[0],
-				       -msg->P[7]/msg->P[5],
-				       0.0));
-    _camera_info_sub.shutdown();
-}
-
-void
 Simple::reconf_cb(aruco_ros::ArucoThresholdConfig& config, uint32_t level)
 {
     _mDetector.setThresholdParams(config.param1, config.param2);
@@ -273,13 +253,29 @@ Simple::reconf_cb(aruco_ros::ArucoThresholdConfig& config, uint32_t level)
 }
 
 void
-Simple::detect_marker_cb(const image_p& image_msg, const cloud_p& cloud_msg)
+Simple::detect_marker_cb(const camera_info_p& camera_info_msg,
+			 const image_p& image_msg, const cloud_p& cloud_msg)
 {
-    if (!_camParam.isValid())
-	return;
-
     try
     {
+      // Truncate distortion coefficiens because aruco_ros accepts only
+      // first four parameters.
+	auto	msg_tmp = *camera_info_msg;
+	msg_tmp.D.resize(4);
+	std::copy_n(std::begin(camera_info_msg->D), msg_tmp.D.size(),
+		    std::begin(msg_tmp.D));
+	_camParam = aruco_ros::rosCameraInfo2ArucoCamParams(
+			msg_tmp, _useRectifiedImages);
+
+      // wait for one camerainfo, then shut down that subscriber
+      // handle cartesian offset between stereo pairs
+      // see the sensor_msgs/CamaraInfo documentation for details
+	_rightToLeft.setIdentity();
+	_rightToLeft.setOrigin(tf::Vector3(-camera_info_msg->P[3]/
+					    camera_info_msg->P[0],
+					   -camera_info_msg->P[7]/
+					    camera_info_msg->P[5],
+					   0.0));
 	auto	inImage = cv_bridge::toCvCopy(
 				*image_msg,
 				sensor_msgs::image_encodings::RGB8)->image;
