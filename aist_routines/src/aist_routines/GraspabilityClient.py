@@ -80,6 +80,11 @@ class GraspabilityClient(object):
 
         try:
             (self._K, self._D) = self._get_camera_intrinsics(camera_info_topic)
+            if normal_topic == "":
+                self._normals = None
+            else:
+                self._normals = rospy.wait_for_message(normal_topic,
+                                                       smsg.Image, timeout=10.0)
             res = self._searchGraspability(
                         depth_topic, bin_id, gripper_type,
                         part_prop.ns,               part_prop.detect_edge,
@@ -104,7 +109,7 @@ class GraspabilityClient(object):
             else:
                 self._normals = rospy.wait_for_message(normal_topic,
                                                        smsg.Image, timeout=10.0)
-        except rospy.ROSException as e:
+        except Exception as e:
             rospy.logerr(e.message)
             return
 
