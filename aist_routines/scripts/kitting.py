@@ -115,6 +115,12 @@ class KittingRoutines(URRoutines):
             self.go_to_frame(props.robot_name, bin, (0, 0, 0.15))
 
         # Search for graspabilities.
+        # (pick_poses, _, success) = self.search_graspability(props.robot_name,
+        #                                                     props.camera_name,
+        #                                                     item.part_id,
+        #                                                     item.bin_id,
+        #                                                     props.use_normals,
+        #                                                     marker_lifetime)
         self.graspability_send_goal(props.robot_name, props.camera_name,
                                     item.part_id, item.bin_id,
                                     props.use_normals)
@@ -203,6 +209,7 @@ if __name__ == '__main__':
                     # kitting.search_graspability(props.robot_name,
                     #                             props.camera_name,
                     #                             item.part_id, item.bin_id,
+                    #                             props.use_normals,
                     #                             marker_lifetime=0)
                     kitting.graspability_send_goal(props.robot_name,
                                                    props.camera_name,

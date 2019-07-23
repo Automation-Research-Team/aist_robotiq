@@ -252,6 +252,7 @@ class AISTBaseRoutines(object):
                                             camera.normal_topic if use_normals \
                                             else "",
                                             gripper.type, part_id, bin_id)
+        camera.continuous_shot(False)
         if success:
             for i, pose in enumerate(poses):
                 self.publish_marker(pose, "graspability",

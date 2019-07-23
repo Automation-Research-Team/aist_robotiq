@@ -46,7 +46,9 @@ class ToolCalibrationRoutines(URRoutines):
         self._speed       = speed
         self._refpose     = refposes[robot_name]
         self._goalpose    = copy.deepcopy(self._refpose)
-        self._D0           = self.listener.fromTranslationRotation(
+        self._T0          = self.listener.fromTranslationRotation(
+            *self.listener.lookupTransform())
+        self._D0          = self.listener.fromTranslationRotation(
             *self.listener.lookupTransform(self.gripper(robot_name).base_link,
                                            self.gripper(robot_name).tip_link,
                                            rospy.Time(0)))
@@ -66,6 +68,7 @@ class ToolCalibrationRoutines(URRoutines):
                                           gmsg.Quaternion(
                                               *tfs.quaternion_from_euler(
                                                   0, 0, 0)))
+        print(self.parent_frame(self.gripper(robot_name).base_link))
 
     def go_home(self):
         self.go_to_named_pose('home', self._robot_name)
@@ -265,6 +268,13 @@ class ToolCalibrationRoutines(URRoutines):
         # Reset pose
         self.go_home()
         self.print_tip_link()
+
+    def parent_frame(self, frame):
+        tm    = rospy.Time(0)
+        chain = self.listener.chain("workspace_center", tm, frame, tm,
+                                    "workspace_center")
+        return chain[chain.index(frame) + 1]
+
 
 ######################################################################
 #  global functions                                                  #
