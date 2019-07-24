@@ -9,10 +9,9 @@ import moveit_msgs.msg
 import moveit_commander
 from geometry_msgs import msg as gmsg
 
-from tf import TransformListener, transformations as tfs
+from tf import TransformBroadcaster, transformations as tfs
 from math import radians, degrees
-from o2as_routines.base import O2ASBaseRoutines
-from aist_routines.ur   import URRoutines
+from aist_routines.ur import URRoutines
 
 refposes = {
 #    'a_bot': [-0.10, 0.00, 0.20,  radians(-90), radians(-90), radians(180)],
@@ -53,12 +52,9 @@ class ToolCalibrationRoutines(URRoutines):
                                 self._frange_link,
                                 self.gripper(robot_name).base_link,
                                 rospy.Time(0))
-        self._D0          = self.listener.fromTranslationRotation(
-                                *self.listener.lookupTransform(
-                                    self.gripper(robot_name).base_link,
-                                    self.gripper(robot_name).tip_link,
-                                    rospy.Time(0)))
         self._rpy         = list(tfs.euler_from_quaternion(q0))
+
+        self._broadcaster = TransformBroadcaster()
 
         self._pick_pose = gmsg.PoseStamped()
         self._pick_pose.header.frame_id = "workspace_center"
@@ -78,20 +74,21 @@ class ToolCalibrationRoutines(URRoutines):
         self.go_to_named_pose('home', self._robot_name)
 
     def move(self, pose):
-        R = self.listener.fromTranslationRotation(
-                self._xyz0, tfs.quaternion_from_euler(*self._rpy))
-        T = tfs.concatenate_matrices(
-                self.listener.fromTranslationRotation(
-                    (pose[0], pose[1], pose[2]),
-                    tfs.quaternion_from_euler(pose[3], pose[4], pose[5])),
-                tfs.inverse_matrix(self._D0),
-                tfs.inverse_matrix(R),
-                self._D0)
+        T = gmsg.TransformStamped()
+        T.header.frame_id = self._frange_link
+        T.header.stamp    = rospy.Time.now()
+        T.child_frame_id  = self.gripper(self._robot_name).base_link
+        T.transform = gmsg.Transfrom(
+                        gmsg.Vector3(*self.+xyz0),
+                        gmsg.Quaternion(tfs.quaternion_from_euler(*self._rpy)))
+        self.listener.setTransform(T)
+        self._broadcaster.sendTransformMessage(T)
+
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = "workspace_center"
         target_pose.pose \
-            = gmsg.Pose(gmsg.Point(*tfs.translation_from_matrix(T)),
-                        gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
+            = gmsg.Pose(gmsg.Point(pose[0], pose[1], pose[2]),
+                        gmsg.Quaternion(pose[3], pose[4], pose[5]))
         print("move to " + self.format_pose(target_pose))
         (success, _, current_pose) = self.go_to_pose_goal(self._robot_name,
                                                           target_pose,
@@ -143,12 +140,9 @@ class ToolCalibrationRoutines(URRoutines):
             self.move(pose)
 
     def print_tip_link(self):
-        R   = self.listener.fromTranslationRotation(
-                self._xyz0,
-                tfs.quaternion_from_euler(*self._rpy))
-        D   = tfs.concatenate_matrices(R, self._D0)
-        xyz = tfs.translation_from_matrix(D)
-        q   = tfs.quaternion_from_matrix(D)
+        (xyz, q) = self.listener.lookupTransform(
+                        self._frange_link,
+                        self.gripper(robot_name).tip_link, rospy.Time(0))
         rpy = map(degrees, tfs.euler_from_quaternion(q))
         print('<origin xyz="{0[0]} {0[1]} {0[2]}" rpy="${{{1[0]}*pi/180}} ${{{1[1]}*pi/180}} ${{{1[2]}*pi/180}}"/>'
               .format(xyz, rpy))
