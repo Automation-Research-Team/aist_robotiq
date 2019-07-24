@@ -46,14 +46,19 @@ class ToolCalibrationRoutines(URRoutines):
         self._speed       = speed
         self._refpose     = refposes[robot_name]
         self._goalpose    = copy.deepcopy(self._refpose)
-        self._T0          = self.listener.fromTranslationRotation(
-            *self.listener.lookupTransform())
+
+        self._frange_link = self.parent_frame(
+                                self.gripper(robot_name).base_link)
+        (self._xyz0, q0)  = self.listener.lookupTransform(
+                                self._frange_link,
+                                self.gripper(robot_name).base_link,
+                                rospy.Time(0))
         self._D0          = self.listener.fromTranslationRotation(
-            *self.listener.lookupTransform(self.gripper(robot_name).base_link,
-                                           self.gripper(robot_name).tip_link,
-                                           rospy.Time(0)))
-        self._pitch = 0.0
-        self._yaw   = 0.0
+                                *self.listener.lookupTransform(
+                                    self.gripper(robot_name).base_link,
+                                    self.gripper(robot_name).tip_link,
+                                    rospy.Time(0)))
+        self._rpy         = list(tfs.euler_from_quaternion(q0))
 
         self._pick_pose = gmsg.PoseStamped()
         self._pick_pose.header.frame_id = "workspace_center"
@@ -63,20 +68,18 @@ class ToolCalibrationRoutines(URRoutines):
                                                  radians(15), 0, 0)))
 
         self._place_pose = gmsg.PoseStamped()
-        self._place_pose.header.frame_id  = "workspace_center"
+        self._place_pose.header.frame_id = "workspace_center"
         self._place_pose.pose = gmsg.Pose(gmsg.Point(0.1, 0, 0.01),
                                           gmsg.Quaternion(
                                               *tfs.quaternion_from_euler(
                                                   0, 0, 0)))
-        print(self.parent_frame(self.gripper(robot_name).base_link))
 
     def go_home(self):
         self.go_to_named_pose('home', self._robot_name)
 
     def move(self, pose):
         R = self.listener.fromTranslationRotation(
-                (0, 0, 0),
-                tfs.quaternion_from_euler(0, self._pitch, self._yaw))
+                self._xyz0, tfs.quaternion_from_euler(*self._rpy))
         T = tfs.concatenate_matrices(
                 self.listener.fromTranslationRotation(
                     (pose[0], pose[1], pose[2]),
@@ -86,9 +89,9 @@ class ToolCalibrationRoutines(URRoutines):
                 self._D0)
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = "workspace_center"
-        target_pose.pose = gmsg.Pose(
-            gmsg.Point(*tfs.translation_from_matrix(T)),
-            gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
+        target_pose.pose \
+            = gmsg.Pose(gmsg.Point(*tfs.translation_from_matrix(T)),
+                        gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
         print("move to " + self.format_pose(target_pose))
         (success, _, current_pose) = self.go_to_pose_goal(self._robot_name,
                                                           target_pose,
@@ -141,8 +144,8 @@ class ToolCalibrationRoutines(URRoutines):
 
     def print_tip_link(self):
         R   = self.listener.fromTranslationRotation(
-                (0, 0, 0),
-                tfs.quaternion_from_euler(0, self._pitch, self._yaw))
+                self._xyz0,
+                tfs.quaternion_from_euler(*self._rpy))
         D   = tfs.concatenate_matrices(R, self._D0)
         xyz = tfs.translation_from_matrix(D)
         q   = tfs.quaternion_from_matrix(D)
@@ -157,8 +160,9 @@ class ToolCalibrationRoutines(URRoutines):
         axis = 'Pitch'
 
         while not rospy.is_shutdown():
-            prompt = axis + '[p=' + str(degrees(self._pitch)) + \
-                            ',y=' + str(degrees(self._yaw)) + '] >> '
+            prompt = "{}[p={:.3f},y={:.3f}] >> ".format(axis,
+                                                        degrees(self._rpy[1]),
+                                                        degrees(self._rpy[2]))
             key = raw_input(prompt)
 
             if key == 'q':
@@ -193,9 +197,9 @@ class ToolCalibrationRoutines(URRoutines):
                 elif axis == 'Z    ':
                     self._goalpose[2] += 0.01
                 elif axis == 'Pitch':
-                    self._pitch += radians(0.5)
+                    self._rpy[1] += radians(0.5)
                 else:
-                    self._yaw += radians(0.5)
+                    self._rps[2] += radians(0.5)
                 self.move(self._goalpose)
             elif key == '-':
                 if axis == 'X    ':
@@ -205,9 +209,9 @@ class ToolCalibrationRoutines(URRoutines):
                 elif axis == 'Z    ':
                     self._goalpose[2] -= 0.01
                 elif axis == 'Pitch':
-                    self._pitch -= radians(0.5)
+                    self._rpy[1] -= radians(0.5)
                 else:
-                    self._yaw -= radians(0.5)
+                    self._rpy[2] -= radians(0.5)
                 self.move(self._goalpose)
             elif key == 'd':
                 self.print_tip_link()
@@ -260,9 +264,9 @@ class ToolCalibrationRoutines(URRoutines):
                 elif axis == 'Z    ':
                     self._goalpose[2] = float(key)
                 elif axis == 'Pitch':
-                    self._pitch = radians(float(key))
+                    self._rpy[1] = radians(float(key))
                 else:
-                    self._yaw = radians(float(key))
+                    self._rpy[2] = radians(float(key))
                 self.move(self._goalpose)
 
         # Reset pose
