@@ -24,7 +24,7 @@ class KittingRoutines(URRoutines):
         "PartProps", "robot_name, camera_name, destination, approach_offset, grasp_offset, place_offset, speed_slow, use_normals")
     _part_props = {
         4  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_4",
-                       0.15, -0.002, 0.05, 0.04, True),
+                       0.15, -0.002, 0.06, 0.04, True),
         5  : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_6",
                        0.15, -0.002, 0.03, 1.0,  True),
         6  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_3",
