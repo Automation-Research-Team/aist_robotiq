@@ -91,3 +91,19 @@ class RealsenseCamera(CameraClient):
                                               "/" + name + "/rgb/camera_info",
                                               "/" + name + "/rgb/image_raw",
                                               "/" + name + "/depth/points")
+
+######################################################################
+#  class MonocularCamera                                             #
+######################################################################
+class MonocularCamera(CameraClient):
+    def __init__(self, name="IIDCCamera"):
+        super(RealsenseCamera, self).__init__(
+            name, "area",
+            "/" + name + "/camera0/camera_info",
+            "/" + name + "/camera0/image")
+        self._dyn_reconf = dynamic_reconfigure.client.Client("/" + self.name,
+                                                             timeout=None)
+
+    def continuous_shot(self, enable):
+        self._dyn_reconf.update_configuration({"continuous_shot" : enable})
+        return True
