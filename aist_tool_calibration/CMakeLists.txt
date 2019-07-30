@@ -7,38 +7,24 @@ add_compile_options(-std=c++14)
 add_compile_options(-fpermissive)
 add_compile_options(-pthread)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "/usr/local/share/cmake/TU")
+
+find_package(TULibs REQUIRED)
 find_package(catkin REQUIRED
   COMPONENTS
-    dynamic_reconfigure
     geometry_msgs
     image_transport
     std_msgs
     std_srvs
-    cv_bridge
-    aruco
-    aruco_ros
-    aruco_msgs
     tf
 )
-
-find_package(OpenCV REQUIRED)
 
 ###########
 ## Build ##
 ###########
 include_directories(
   ${catkin_INCLUDE_DIRS}
-  ${OpenCV_INCLUDE_DIRS}
-)
-
-add_message_files(
-  FILES
-    Corners.msg
-)
-
-generate_messages(
-  DEPENDENCIES
-    geometry_msgs
+  ${TULIBS_INCLUDE_DIR}
 )
 
 catkin_package(
@@ -49,18 +35,17 @@ catkin_package(
     geometry_msgs
 )
 
-add_executable(o2as_single
+add_executable(aist_tool_calibration
   src/main.cpp
-  src/BinDescription.cpp
 )
 
-target_link_libraries(o2as_single
+target_link_libraries(aist_tool_calibration
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
-  ${OpenCV_LIBRARIES}
+  ${TUTOOLSPP_LIB}
 )
 
-add_dependencies(o2as_single
+add_dependencies(aist_tool_calibration
   ${PROJECT_NAME}_gencpp
   ${PROJECT_NAME}_gencfg
   ${catkin_EXPORTED_TARGETS}
@@ -71,7 +56,7 @@ add_dependencies(o2as_single
 #############
 install(
   TARGETS
-    o2as_single
+    aist_tool_calibration
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
