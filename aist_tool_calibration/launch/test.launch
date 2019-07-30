@@ -1,11 +1,11 @@
 <launch>
-  <arg name="camera_name"	default="IIDCCamera"/>
+  <arg name="camera_name"	default="V4L2Camera"/>
   <arg name="max_skew"		default="0"/>
   <arg name="convert_to_rgb"	default="false"/>
   <arg name="rate"		default="100"/>
 
   <node name="$(arg camera_name)"
-  	pkg="iidc_camera" type="iidc_camera" output="screen">
+  	pkg="v4l2_camera" type="v4l2_camera" output="screen">
     <param name="max_skew"		value="$(arg max_skew)"/>
     <param name="convert_to_rgb"	value="$(arg convert_to_rgb)"/>
     <param name="rate"			value="$(arg rate)"/>
@@ -15,7 +15,6 @@
   	pkg="aist_tool_calibration" type="aist_tool_calibration"
 	output="screen">
     <remap from="/image"	to="/$(arg camera_name)/camera0/image"/>
-    <remap from="/camera_info"	to="/$(arg camera_name)/camera0/camera_info"/>
   </node>
 
   <node name="image_view"

@@ -21,11 +21,23 @@ namespace aist_tool_calibration
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-static TU::Image<uint8_t>
+template <class T> TU::Image<T>
 msgToImage(const sensor_msgs::ImageConstPtr& msg)
 {
+    using namespace	sensor_msgs;
+
     TU::Image<uint8_t>	image(msg->width, msg->height);
     auto		data = msg->data.data();
+
+    if (msg->encoding == image_encodings::BAYER_BGGR8)
+    {
+	auto	p = msg->data.data();
+	bayerDecodeBGGR(make_range_iterator(p, image.width(), image.width()),
+			make_range_iterator(p + image.height()*image.width(),
+					    image.width(), image.width()),
+			image.begin());
+    }
+
     for (auto&& row : image)
     {
 	std::copy_n(data , row.size(), row.begin());
@@ -77,8 +89,8 @@ class Calibrator
     Calibrator();
 
   private:
-    void	camera_cb(const image_p&	image_msg,
-			  const camera_info_p&	camera_info_msg)	;
+    void	callback(const image_p&	image_msg,
+			 const camera_info_p&	camera_info_msg)	;
 
   private:
     ros::NodeHandle				_nh;
@@ -88,8 +100,8 @@ class Calibrator
 
   // image stuff
     image_transport::ImageTransport		_it;
-    image_transport::CameraSubscriber		_camera_sub;
-    const image_transport::CameraPublisher	_camera_pub;
+    image_transport::CameraSubscriber		_sub;
+    const image_transport::CameraPublisher	_pub;
 
     std::string					_reference_frame;
     std::string					_effector_frame;
@@ -99,8 +111,8 @@ Calibrator::Calibrator()
     :_nh("~"),
      _it(_nh),
      _listener(),
-     _camera_sub(_it.subscribeCamera("image", 1, &Calibrator::camera_cb, this)),
-     _camera_pub(),
+     _sub(_it.subscribeCamera("/image", 1, &Calibrator::callback, this)),
+     _pub(_it.advertiseCamera("image", 1)),
      _reference_frame("workspace_center"),
      _effector_frame("")
 {
@@ -111,8 +123,8 @@ Calibrator::Calibrator()
 }
 
 void
-Calibrator::camera_cb(const image_p& image_msg,
-		      const camera_info_p& camera_info_msg)
+Calibrator::callback(const image_p& image_msg,
+		     const camera_info_p& camera_info_msg)
 {
     try
     {
@@ -120,10 +132,12 @@ Calibrator::camera_cb(const image_p& image_msg,
 	// _listener.lookupTransform(_reference_frame, _effector_frame,
 	// 			  image_msg->header.stamp, T);
 	ROS_INFO_STREAM("image stamp = " << image_msg->header.stamp);
+	ROS_INFO_STREAM("camera_info = " << camera_info_msg->width
+			<< 'x' << camera_info_msg->height);
 	auto	image = msgToImage(image_msg);
 	auto	msg   = imageToMsg(image, camera_info_msg->header);
 
-	_camera_pub.publish(msg, camera_info_msg);
+	_pub.publish(msg, camera_info_msg);
     }
     catch (const std::runtime_error& e)
     {
