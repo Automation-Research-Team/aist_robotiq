@@ -21,36 +21,59 @@ msgToImage(const sensor_msgs::ImageConstPtr& msg)
     TU::Image<T>	image(msg->width, msg->height);
     auto		p = msg->data.data();
 
-    if (msg->encoding == image_encodings::BGR8)
+    if (msg->encoding == image_encodings::RGB8)
 	for (auto&& line : image)
 	{
+	    constexpr auto
+		N = iterator_value<pixel_iterator<const RGB*> >::npixels;
+
+	    std::copy_n(make_pixel_iterator(
+			    reinterpret_cast<const RGB*>(p)),
+			line.size()/N, make_pixel_iterator(line.begin()));
+	    p += msg->step;
+	}
+    else if (msg->encoding == image_encodings::BGR8)
+	for (auto&& line : image)
+	{
+	    constexpr auto
+		N = iterator_value<pixel_iterator<const BGR*> >::npixels;
+
 	    std::copy_n(make_pixel_iterator(
 			    reinterpret_cast<const BGR*>(p)),
-			line.size(), make_pixel_iterator(line.begin()));
+			line.size()/N, make_pixel_iterator(line.begin()));
 	    p += msg->step;
 	}
     else if (msg->encoding == image_encodings::BGRA8)
 	for (auto&& line : image)
 	{
+	    constexpr auto
+		N = iterator_value<pixel_iterator<const BGRA*> >::npixels;
+
 	    std::copy_n(make_pixel_iterator(
 			    reinterpret_cast<const BGRA*>(p)),
-			line.size(), make_pixel_iterator(line.begin()));
+			line.size()/N, make_pixel_iterator(line.begin()));
 	    p += msg->step;
 	}
     else if (msg->encoding == image_encodings::RGBA8)
 	for (auto&& line : image)
 	{
+	    constexpr auto
+		N = iterator_value<pixel_iterator<const RGBA*> >::npixels;
+
 	    std::copy_n(make_pixel_iterator(
 			    reinterpret_cast<const RGBA*>(p)),
-			line.size(), make_pixel_iterator(line.begin()));
+			line.size()/N, make_pixel_iterator(line.begin()));
 	    p += msg->step;
 	}
     else if (msg->encoding == image_encodings::YUV422)
 	for (auto&& line : image)
 	{
+	    constexpr auto
+		N = iterator_value<pixel_iterator<const YUV422*> >::npixels;
+
 	    std::copy_n(make_pixel_iterator(
 			    reinterpret_cast<const YUV422*>(p)),
-			line.size(), make_pixel_iterator(line.begin()));
+			line.size()/N, make_pixel_iterator(line.begin()));
 	    p += msg->step;
 	}
     else
@@ -145,12 +168,12 @@ Calibrator::callback(const image_p& image_msg,
 {
     try
     {
+	_listener.waitForTransform(_reference_frame, _effector_frame,
+				   image_msg->header.stamp, ros::Duration(10));
 	transform_t	T;
 	_listener.lookupTransform(_reference_frame, _effector_frame,
-				  image_msg->header.stamp, T);
+	 			  image_msg->header.stamp, T);
 	ROS_INFO_STREAM("image stamp = " << image_msg->header.stamp);
-	ROS_INFO_STREAM("camera_info = " << camera_info_msg->width
-			<< 'x' << camera_info_msg->height);
 	auto	image = msgToImage<uint8_t>(image_msg);
 	auto	msg   = imageToMsg(image, camera_info_msg->header);
 
