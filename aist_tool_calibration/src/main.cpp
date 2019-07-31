@@ -1,54 +1,71 @@
-/**
-* @file simple_single.cpp
-* @author Bence Magyar
-* @date June 2012
-* @version 0.1
-* @brief ROS version of the example named "simple" in the Aruco software package.
-*/
-#include <iostream>
-#include <limits>
-
+/*!
+ *  \file	main.cpp
+ *  \brief
+ */
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
-#include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
-#include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 #include "TU/Image++.h"
 
-namespace aist_tool_calibration
+namespace TU
 {
 /************************************************************************
 *  static functions							*
 ************************************************************************/
-template <class T> TU::Image<T>
+template <class T> Image<T>
 msgToImage(const sensor_msgs::ImageConstPtr& msg)
 {
     using namespace	sensor_msgs;
 
-    TU::Image<uint8_t>	image(msg->width, msg->height);
-    auto		data = msg->data.data();
+    TU::Image<T>	image(msg->width, msg->height);
+    auto		p = msg->data.data();
 
-    if (msg->encoding == image_encodings::BAYER_BGGR8)
-    {
-	auto	p = msg->data.data();
-	bayerDecodeBGGR(make_range_iterator(p, image.width(), image.width()),
-			make_range_iterator(p + image.height()*image.width(),
-					    image.width(), image.width()),
-			image.begin());
-    }
-
-    for (auto&& row : image)
-    {
-	std::copy_n(data , row.size(), row.begin());
-	data += msg->step;
-    }
+    if (msg->encoding == image_encodings::BGR8)
+	for (auto&& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(
+			    reinterpret_cast<const BGR*>(p)),
+			line.size(), make_pixel_iterator(line.begin()));
+	    p += msg->step;
+	}
+    else if (msg->encoding == image_encodings::BGRA8)
+	for (auto&& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(
+			    reinterpret_cast<const BGRA*>(p)),
+			line.size(), make_pixel_iterator(line.begin()));
+	    p += msg->step;
+	}
+    else if (msg->encoding == image_encodings::RGBA8)
+	for (auto&& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(
+			    reinterpret_cast<const RGBA*>(p)),
+			line.size(), make_pixel_iterator(line.begin()));
+	    p += msg->step;
+	}
+    else if (msg->encoding == image_encodings::YUV422)
+	for (auto&& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(
+			    reinterpret_cast<const YUV422*>(p)),
+			line.size(), make_pixel_iterator(line.begin()));
+	    p += msg->step;
+	}
+    else
+	for (auto&& line : image)
+	{
+	    std::copy_n(make_pixel_iterator(p), line.size(),
+			make_pixel_iterator(line.begin()));
+	    p += msg->step;
+	}
 
     return image;
 }
 
 static sensor_msgs::ImagePtr
-imageToMsg(const TU::Image<uint8_t>& image, const std_msgs::Header& header)
+imageToMsg(const Image<uint8_t>& image, const std_msgs::Header& header)
 {
     using namespace	sensor_msgs;
 
@@ -128,13 +145,13 @@ Calibrator::callback(const image_p& image_msg,
 {
     try
     {
-	// transform_t	T;
-	// _listener.lookupTransform(_reference_frame, _effector_frame,
-	// 			  image_msg->header.stamp, T);
+	transform_t	T;
+	_listener.lookupTransform(_reference_frame, _effector_frame,
+				  image_msg->header.stamp, T);
 	ROS_INFO_STREAM("image stamp = " << image_msg->header.stamp);
 	ROS_INFO_STREAM("camera_info = " << camera_info_msg->width
 			<< 'x' << camera_info_msg->height);
-	auto	image = msgToImage(image_msg);
+	auto	image = msgToImage<uint8_t>(image_msg);
 	auto	msg   = imageToMsg(image, camera_info_msg->header);
 
 	_pub.publish(msg, camera_info_msg);
@@ -145,7 +162,7 @@ Calibrator::callback(const image_p& image_msg,
     }
 }
 
-}	// namespace aist_tool_calibration
+}	// namespace TU
 
 int
 main(int argc, char** argv)
@@ -156,7 +173,7 @@ main(int argc, char** argv)
 
     try
     {
-	aist_tool_calibration::Calibrator	node;
+	TU::Calibrator	node;
 	ros::spin();
     }
     catch (const std::exception& err)
