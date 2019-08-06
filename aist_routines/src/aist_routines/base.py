@@ -41,7 +41,7 @@ class AISTBaseRoutines(object):
 ####                #"d_bot": SuctionGripper("d_bot_dual_")
 ####                "d_bot": Robotiq85Gripper("d_bot_")
             }
-            _dict = rospy.get_param("/aist_kittings/grippers/no_real_robot")
+            _dict = rospy.get_param("/aist_kitting/grippers/no_real_robot")
             for key in _dict.keys():
                 self._grippers[key] = globals()[_dict[key]['class']](
                                                         **_dict[key]['kwarg'])
@@ -49,7 +49,7 @@ class AISTBaseRoutines(object):
 ####                "a_phoxi_m_camera": PhoXiCamera("a_phoxi_m_camera"),
 ####                "a_bot_camera":     RealsenseCamera("a_bot_camera"),
             }
-            _dict = rospy.get_param("/aist_kittings/cameras/no_real_robot")
+            _dict = rospy.get_param("/aist_kitting/cameras/no_real_robot")
             for key in _dict.keys():
                 self._cameras[key] = globals()[_dict[key]['class']](
                                                         **_dict[key]['kwarg'])
@@ -80,7 +80,7 @@ class AISTBaseRoutines(object):
 ####                                       "d_bot_robotiq_85_base_link",
 ####                                       "d_bot_robotiq_85_tip_link"),
             }
-            _dict = rospy.get_param("/aist_kittings/grippers/real_robot")
+            _dict = rospy.get_param("/aist_kitting/grippers/real_robot")
             for key in _dict.keys():
                 self._grippers[key] = globals()[_dict[key]['class']](
                                                         **_dict[key]['kwarg'])
@@ -96,7 +96,7 @@ class AISTBaseRoutines(object):
 ####                                        "/a_bot_camera/rgb/camera_info",
 ####                                        "/a_bot_camera/depth/points"),
             }
-            _dict = rospy.get_param("/aist_kittings/cameras/real_robot")
+            _dict = rospy.get_param("/aist_kitting/cameras/real_robot")
             for key in _dict.keys():
                 self._cameras[key] = globals()[_dict[key]['class']](
                                                         **_dict[key]['kwarg'])
