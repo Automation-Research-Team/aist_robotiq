@@ -1,0 +1,269 @@
+aist_kittings:
+  part_props: {
+    typename: "PartProps",
+    field_names : "robot_name, camera_name, destination, approach_offset, grasp_offset, place_offset, speed_slow, use_normals",
+
+    _4: {
+      robot_name: "b_bot",
+      camera_name: "a_phoxi_m_camera",
+      destination: "tray_1_partition_4",
+      approach_offset: 0.15,
+      grasp_offset: -0.002,
+      place_offset: 0.06,
+      speed_slow: 0.04,
+      use_normals: True
+    },
+    _5: {
+      robot_name: "b_bot",
+      camera_name: "a_phoxi_m_camera",
+      destination: "tray_2_partition_6",
+      approach_offset: 0.15,
+      grasp_offset: -0.002,
+      place_offset: 0.03,
+      speed_slow: 1.0,
+      use_normals: True
+    },
+    _6: {
+      robot_name: "b_bot",
+      camera_name: "a_phoxi_m_camera",
+      destination: "tray_1_partition_3",
+      approach_offset: 0.15,
+      grasp_offset: 0.0,
+      place_offset: 0.05,
+      speed_slow: 1.0,
+      use_normals: False
+    },
+    _7: {
+      robot_name: "b_bot",
+      camera_name: "a_phoxi_m_camera",
+      destination: "tray_1_partition_2",
+      approach_offset: 0.15,
+      grasp_offset: -0.002,
+      place_offset: 0.05,
+      speed_slow: 0.04,
+      use_normals: True
+    },
+    _8: {
+      robot_name: "b_bot",
+      camera_name: "a_phoxi_m_camera",
+      destination: "tray_2_partition_1",
+      approach_offset: 0.15,
+      grasp_offset: -0.004,
+      place_offset: 0.03,
+      speed_slow: 0.1,
+      use_normals: True
+    },
+    _9: {
+      robot_name: "a_bot",
+      camera_name: "a_phoxi_m_camera",
+      destination: "tray_2_partition_4",
+      approach_offset: 0.15,
+      grasp_offset: -0.002,
+      place_offset: 0.05,
+      speed_slow: 1.0,
+      use_normals: False
+    },
+    _10: {
+      robot_name: "a_bot",
+      camera_name: "a_phoxi_m_camera",
+      destination: "tray_2_partition_7",
+      approach_offset: 0.15,
+      grasp_offset: -0.002,
+      place_offset: 0.05,
+      speed_slow: 1.0,
+      use_normals: False
+    },
+    _11: {
+      robot_name: "b_bot",
+      camera_name: "a_phoxi_m_camera",
+      destination: "tray_1_partition_1",
+      approach_offset: 0.15,
+      grasp_offset: 0.0,
+      place_offset: 0.05,
+      speed_slow: 0.04,
+      use_normals: True
+    },
+    _12: {
+      robot_name: "b_bot",
+      camera_name: "a_phoxi_m_camera",
+      destination: "tray_2_partition_3",
+      approach_offset: 0.15,
+      grasp_offset: 0.0,
+      place_offset: 0.05,
+      speed_slow: 0.04,
+      use_normals: False
+    },
+    _13: {
+      robot_name: "b_bot",
+      camera_name: "a_phoxi_m_camera",
+      destination: "tray_1_partition_5",
+      approach_offset: 0.15,
+      grasp_offset: 0.0,
+      place_offset: 0.05,
+      speed_slow: 0.04,
+      use_normals: True
+    },
+    _14: {
+      robot_name: "a_bot",
+      camera_name: "a_phoxi_m_camera",
+      destination: "tray_2_partition_2",
+      approach_offset: 0.15,
+      grasp_offset: -0.002,
+      place_offset: 0.05,
+      speed_slow: 1.0,
+      use_normals: False
+    },
+    _15: {
+      robot_name: "a_bot",
+      camera_name: "a_phoxi_m_camera",
+      destination: "tray_2_partition_5",
+      approach_offset: 0.15,
+      grasp_offset: -0.002,
+      place_offset: 0.05,
+      speed_slow: 1.0,
+      use_normals: False
+    },
+    _16: {
+      robot_name: "a_bot",
+      camera_name: "a_phoxi_m_camera",
+      destination: "tray_2_partition_8",
+      approach_offset: 0.15,
+      grasp_offset: -0.002,
+      place_offset: 0.05,
+      speed_slow: 1.0,
+      use_normals: False
+    },
+    _17: {
+      robot_name: "a_bot",
+      camera_name: "a_phoxi_m_camera",
+      destination: "skrewholder_1",
+      approach_offset: 0.15,
+      grasp_offset: -0.002,
+      place_offset: 0.05,
+      speed_slow: 1.0,
+      use_normals: False
+    },
+    _18: {
+      robot_name: "a_bot",
+      camera_name: "a_phoxi_m_camera",
+      destination: "skrewholder_2",
+      approach_offset: 0.15,
+      grasp_offset: -0.002,
+      place_offset: 0.05,
+      speed_slow: 1.0,
+      use_normals: False
+    }
+  }
+
+  bins:
+    - "bin_1_part_5"
+    - "bin_1_part_16"
+    - "bin_1_part_17"
+    - "bin_2_part_4"
+    - "bin_2_part_7"
+    - "bin_2_part_8"
+
+  grippers: {
+    no_real_robot: {
+      a_bot: {
+        class: "PrecisionGripper",
+        kwarg: {
+          prefix: "a_bot_"
+        }
+      },
+      b_bot: {
+        class: "SuctionGripper",
+        kwarg: {
+          prefix: "b_bot_single_"
+        }
+      },
+      c_bot: {
+        class: "Robotiq85Gripper",
+        kwarg: {
+          prefix: "c_bot_"
+        }
+      },
+      d_bot: {
+        class: "Robotiq85Gripper",
+        kwarg: {
+          prefix: "d_bot_"
+        }
+      }
+    },
+    real_robot: {
+      a_bot: {
+        class: "GripperClient",
+        kwarg: {
+          name: "a_bot_gripper",
+          type: "two_finger",
+          base_link: "a_bot_gripper_base_link",
+          tip_link: "a_bot_gripper_tip_link"
+        }
+      },
+      b_bot: {
+        class: "GripperClient",
+        kwarg: {
+          name: "b_bot_single_suction_gripper",
+          type: "suction",
+          base_link: "b_bot_single_suction_gripper_base_link",
+          tip_link: "b_bot_single_suction_gripper_pad_link"
+        }
+      },
+      c_bot: {
+        class: "GripperClient",
+        kwarg: {
+          name: "c_bot_robotiq_85_gripper",
+          type: "two_finger",
+          base_link: "c_bot_robotiq_85_base_link",
+          tip_link: "c_bot_robotiq_85_tip_link"
+        }
+      },
+      d_bot: {
+        class: "GripperClient",
+        kwarg: {
+          name: "d_bot_robotiq_85_gripper",
+          type: "two_finger",
+          base_link: "d_bot_robotiq_85_base_link",
+          tip_link: "d_bot_robotiq_85_tip_link"
+        }
+      }
+    }
+  }
+
+  cameras: {
+    no_real_robot: {
+      a_phoxi_m_camera: {
+        class: "PhoXiCamera",
+        kwarg: {
+          name: "a_phoxi_m_camera"
+        }
+      },
+      a_bot_camera: {
+        class: "RealsenseCamera",
+        kwarg: {
+          name: "a_bot_camera"
+        }
+      }
+    },
+    real_robot: {
+      a_phoxi_m_camera: {
+        class: "CameraClient",
+        kwarg: {
+          name: "a_phoxi_m_camera",
+          type: "depth",
+          camera_info_topic: "/a_phoxi_m_camera/camera_info",
+          image_topic: "/a_phoxi_m_camera/depth_map"
+        }
+      },
+      a_bot_camera: {
+        class: "CameraClient",
+        kwarg: {
+          name: "a_bot_camera",
+          type: "depth",
+          camera_info_topic: "/a_bot_camera/rgb/camera_info",
+          image_topic: "/a_bot_camera/depth/points"
+        }
+      }
+    }
+  }
+
