@@ -20,54 +20,67 @@ number_of_attempted = 1
 ######################################################################
 class KittingRoutines(URRoutines):
     """Implements kitting routines for aist robot system."""
-    PartProps = collections.namedtuple(
-        "PartProps", "robot_name, camera_name, destination, approach_offset, grasp_offset, place_offset, speed_slow, use_normals")
+####    PartProps = collections.namedtuple(
+####        "PartProps", "robot_name, camera_name, destination, approach_offset, grasp_offset, place_offset, speed_slow, use_normals")
+
+    _dict = rospy.get_param("/aist_kittings/part_props")
+    PartProps = collections.namedtuple(_dict['typename'], _dict['field_names'])
+
     _part_props = {
-        4  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_4",
-                       0.15, -0.002, 0.06, 0.04, True),
-        5  : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_6",
-                       0.15, -0.002, 0.03, 1.0,  True),
-        6  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_3",
-                       0.15,  0.0,   0.05, 1.0,  False),
-        7  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_2",
-                       0.15, -0.002, 0.05, 0.04, True),
-        8  : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_1",
-                       0.15, -0.004, 0.03, 0.1,  True),
-        9  : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_4",
-                       0.15, -0.002, 0.05, 1.0,  False),
-        10 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_7",
-                       0.15, -0.002, 0.05, 1.0,  False),
-        11 : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_1",
-                       0.15,  0.0,   0.05, 0.04, True),
-        12 : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_3",
-                       0.15,  0.0,   0.05, 0.04, False),
-        13 : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_5",
-                       0.15,  0.0,   0.05, 0.04, True),
-        14 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_2",
-                       0.15, -0.002, 0.05, 1.0,  False),
-        15 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_5",
-                       0.15, -0.002, 0.05, 1.0,  False),
-        16 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_8",
-                       0.15, -0.002, 0.05, 1.0,  False),
-        17 : PartProps("a_bot", "a_phoxi_m_camera", "skrewholder_1",
-                       0.15, -0.002, 0.05, 1.0,  False),
-        18 : PartProps("a_bot", "a_phoxi_m_camera", "skrewholder_2",
-                       0.15, -0.002, 0.05, 1.0,  False),
+####        4  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_4",
+####                       0.15, -0.002, 0.06, 0.04, True),
+####        5  : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_6",
+####                       0.15, -0.002, 0.03, 1.0,  True),
+####        6  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_3",
+####                       0.15,  0.0,   0.05, 1.0,  False),
+####        7  : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_2",
+####                       0.15, -0.002, 0.05, 0.04, True),
+####        8  : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_1",
+####                       0.15, -0.004, 0.03, 0.1,  True),
+####        9  : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_4",
+####                       0.15, -0.002, 0.05, 1.0,  False),
+####        10 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_7",
+####                       0.15, -0.002, 0.05, 1.0,  False),
+####        11 : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_1",
+####                       0.15,  0.0,   0.05, 0.04, True),
+####        12 : PartProps("b_bot", "a_phoxi_m_camera", "tray_2_partition_3",
+####                       0.15,  0.0,   0.05, 0.04, False),
+####        13 : PartProps("b_bot", "a_phoxi_m_camera", "tray_1_partition_5",
+####                       0.15,  0.0,   0.05, 0.04, True),
+####        14 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_2",
+####                       0.15, -0.002, 0.05, 1.0,  False),
+####        15 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_5",
+####                       0.15, -0.002, 0.05, 1.0,  False),
+####        16 : PartProps("a_bot", "a_phoxi_m_camera", "tray_2_partition_8",
+####                       0.15, -0.002, 0.05, 1.0,  False),
+####        17 : PartProps("a_bot", "a_phoxi_m_camera", "skrewholder_1",
+####                       0.15, -0.002, 0.05, 1.0,  False),
+####        18 : PartProps("a_bot", "a_phoxi_m_camera", "skrewholder_2",
+####                       0.15, -0.002, 0.05, 1.0,  False),
     }
+
+    for key in _dict.keys():
+        if key == 'typename' or key == 'field_names':
+            continue
+        if '_' in key:
+            part_id = int(key.split('_')[1])
+            _part_props[part_id] = PartProps(**_dict[key])
+
     BinProps = collections.namedtuple("BinProps",
                                       "bin_id, part_id, part_props")
 
     def __init__(self):
         super(KittingRoutines, self).__init__()
 
-        self._bins = [
-            "bin_1_part_5",
-            "bin_1_part_16",
-            "bin_1_part_17",
-            "bin_2_part_4",
-            "bin_2_part_7",
-            "bin_2_part_8",
-        ]
+####        self._bins = [
+####            "bin_1_part_5",
+####            "bin_1_part_16",
+####            "bin_1_part_17",
+####            "bin_2_part_4",
+####            "bin_2_part_7",
+####            "bin_2_part_8",
+####        ]
+        self._bins = rospy.get_param("/aist_kittings/bins")
 
         # Assign part information to each bin.
         self._items = {}
