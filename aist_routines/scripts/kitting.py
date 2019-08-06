@@ -23,7 +23,7 @@ class KittingRoutines(URRoutines):
 ####    PartProps = collections.namedtuple(
 ####        "PartProps", "robot_name, camera_name, destination, approach_offset, grasp_offset, place_offset, speed_slow, use_normals")
 
-    _dict = rospy.get_param("/aist_kittings/part_props")
+    _dict = rospy.get_param("/aist_kitting/part_props")
     PartProps = collections.namedtuple(_dict['typename'], _dict['field_names'])
 
     _part_props = {
@@ -80,7 +80,7 @@ class KittingRoutines(URRoutines):
 ####            "bin_2_part_7",
 ####            "bin_2_part_8",
 ####        ]
-        self._bins = rospy.get_param("/aist_kittings/bins")
+        self._bins = rospy.get_param("/aist_kitting/bins")
 
         # Assign part information to each bin.
         self._items = {}
