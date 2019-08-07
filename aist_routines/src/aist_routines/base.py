@@ -33,70 +33,24 @@ class AISTBaseRoutines(object):
 
         # Grippers and cameras
         if rospy.get_param("use_real_robot", False):
-            self._grippers = {
-####                # "a_bot": Robotiq85Gripper("a_bot_"),
-####                "a_bot": PrecisionGripper("a_bot_"),
-####                "b_bot": SuctionGripper("b_bot_single_"),
-####                "c_bot": Robotiq85Gripper("c_bot_"),
-####                #"d_bot": SuctionGripper("d_bot_dual_")
-####                "d_bot": Robotiq85Gripper("d_bot_")
-            }
-            _dict = rospy.get_param("/aist_kittings/grippers/no_real_robot")
+            self._grippers = { }
+            _dict = rospy.get_param("/aist_kitting/grippers/no_real_robot")
             for key in _dict.keys():
                 self._grippers[key] = globals()[_dict[key]['class']](
                                                         **_dict[key]['kwarg'])
-            self._cameras = {
-####                "a_phoxi_m_camera": PhoXiCamera("a_phoxi_m_camera"),
-####                "a_bot_camera":     RealsenseCamera("a_bot_camera"),
-            }
-            _dict = rospy.get_param("/aist_kittings/cameras/no_real_robot")
+            self._cameras = { }
+            _dict = rospy.get_param("/aist_kitting/cameras/no_real_robot")
             for key in _dict.keys():
                 self._cameras[key] = globals()[_dict[key]['class']](
                                                         **_dict[key]['kwarg'])
         else:
-            self._grippers = {
-####                # "a_bot": GripperClient("a_bot_robotiq_85_gripper",
-####                #                        "two_finger",
-####                #                        "a_bot_robotiq_85_base_link",
-####                #                        "a_bot_robotiq_85_tip_link"),
-####                "a_bot": GripperClient("a_bot_gripper",
-####                                       "two_finger",
-####                                       "a_bot_gripper_base_link",
-####                                       "a_bot_gripper_tip_link"),
-####                "b_bot": GripperClient("b_bot_single_suction_gripper",
-####                                       "suction",
-####                                       "b_bot_single_suction_gripper_base_link",
-####                                       "b_bot_single_suction_gripper_pad_link"),
-####                "c_bot": GripperClient("c_bot_robotiq_85_gripper",
-####                                       "two_finger",
-####                                       "c_bot_robotiq_85_base_link",
-####                                       "c_bot_robotiq_85_tip_link"),
-####                # "d_bot": GripperClient("d_bot_dual_suction_gripper",
-####                #                        "suction",
-####                #                        "d_bot_dual_suction_gripper_base_link",
-####                #                        "d_bot_dual_suction_gripper_pad_link")
-####                "d_bot": GripperClient("d_bot_robotiq_85_gripper",
-####                                       "two_finger",
-####                                       "d_bot_robotiq_85_base_link",
-####                                       "d_bot_robotiq_85_tip_link"),
-            }
-            _dict = rospy.get_param("/aist_kittings/grippers/real_robot")
+            self._grippers = { }
+            _dict = rospy.get_param("/aist_kitting/grippers/real_robot")
             for key in _dict.keys():
                 self._grippers[key] = globals()[_dict[key]['class']](
                                                         **_dict[key]['kwarg'])
-            self._cameras = {
-####                "a_phoxi_m_camera": CameraClient(
-####                                        "a_phoxi_m_camera",
-####                                        "depth",
-####                                        "/a_phoxi_m_camera/camera_info",
-####                                        "/a_phoxi_m_camera/depth_map"),
-####                "a_bot_camera":     CameraClient(
-####                                        "a_bot_camera",
-####                                        "depth",
-####                                        "/a_bot_camera/rgb/camera_info",
-####                                        "/a_bot_camera/depth/points"),
-            }
-            _dict = rospy.get_param("/aist_kittings/cameras/real_robot")
+            self._cameras = { }
+            _dict = rospy.get_param("/aist_kitting/cameras/real_robot")
             for key in _dict.keys():
                 self._cameras[key] = globals()[_dict[key]['class']](
                                                         **_dict[key]['kwarg'])

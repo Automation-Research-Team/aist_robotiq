@@ -16,40 +16,18 @@ from tf                import TransformListener, transformations as tfs
 #  class GraspabilityClient                                          #
 ######################################################################
 class GraspabilityClient(object):
-    PartProps = collections.namedtuple(
-        "PartProps", "name, ns, detect_edge, object_size, radius, open_width, finger_width, finger_thickness, insertion_depth")
-    _part_props = {
-        4  : PartProps("Geared motor",
-                       2, True, 15,  8, 100, 1, 5, 10),
-        5  : PartProps("Pully for round belt",
-                       2, True,  8,  6,  45, 1, 5,  3),
-        6  : PartProps("Polyurethane round belt",
-                       2, True,  2,  2,  20, 1, 5,  5),
-        7  : PartProps("Bearing wirh housing",
-                       2, True, 12, 12,  20, 1, 5,  5),
-        8  : PartProps("Drive shaft",
-                       0, False, 4,  2,  20, 1, 5,  4),
-        9  : PartProps("End cap for shaft",
-                       2, True,  3,  3,  20, 1, 5,  1),
-        10 : PartProps("Bearing spacers for inner ring",
-                       2, True,  3,  3,  20, 1, 5,  1),
-        11 : PartProps("Pully for round belts clamping",
-                       2, True, 12, 12,  20, 1, 5,  1),
-        12 : PartProps("Bearing spacer for inner ring",
-                       2, True,  4,  2,  20, 1, 5,  1),
-        13 : PartProps("Idler for round belt",
-                       2, True,  7,  2,  30, 1, 5,  1),
-        14 : PartProps("Bearing shaft screw",
-                       0, True,  4,  2,  14, 1, 5,  5),
-        15 : PartProps("M6 hex nut",
-                       2, True,  3,  3,  20, 1, 5,  1),
-        16 : PartProps("M6 flat washer",
-                       0, True,  3,  3,  15, 1, 5,  1),
-        17 : PartProps("M4 head cap screw",
-                       0, True,  1,  1,  10, 1, 5,  1),
-        18 : PartProps("M3 head cap scres",
-                       0, True,  1,  1,  10, 1, 5,  1),
-    }
+
+    _dict = rospy.get_param("/aist_kitting/graspability/part_props")
+    PartProps = collections.namedtuple(_dict['typename'], _dict['field_names'])
+
+    _part_props = { }
+
+    for key in _dict.keys():
+        if key == 'typename' or key == 'field_names':
+            continue
+        if '_' in key:
+            part_id = int(key.split('_')[1])
+            _part_props[part_id] = PartProps(**_dict[key])
 
     def __init__(self):
         super(GraspabilityClient, self).__init__()
