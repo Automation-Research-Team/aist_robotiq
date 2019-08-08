@@ -1,0 +1,139 @@
+part_props:
+  typename: PartProps
+  field_names : "robot_name, camera_name, destination, approach_offset, grasp_offset, place_offset, speed_slow, use_normals"
+
+  _4:
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_1_partition_4
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.06
+    speed_slow: 0.04
+    use_normals: True
+  _5:
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_2_partition_6
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.03
+    speed_slow: 1.0
+    use_normals: True
+  _6:
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_1_partition_3
+    approach_offset: 0.15
+    grasp_offset: 0.0
+    place_offset: 0.05
+    speed_slow: 1.0
+    use_normals: False
+  _7:
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_1_partition_2
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.05
+    speed_slow: 0.04
+    use_normals: True
+  _8:
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_2_partition_1
+    approach_offset: 0.15
+    grasp_offset: -0.004
+    place_offset: 0.03
+    speed_slow: 0.1
+    use_normals: True
+  _9:
+    robot_name: a_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_2_partition_4
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.05
+    speed_slow: 1.0
+    use_normals: False
+  _10:
+    robot_name: a_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_2_partition_7
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.05
+    speed_slow: 1.0
+    use_normals: False
+  _11:
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_1_partition_1
+    approach_offset: 0.15
+    grasp_offset: 0.0
+    place_offset: 0.05
+    speed_slow: 0.04
+    use_normals: True
+  _12:
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_2_partition_3
+    approach_offset: 0.15
+    grasp_offset: 0.0
+    place_offset: 0.05
+    speed_slow: 0.04
+    use_normals: False
+  _13:
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_1_partition_5
+    approach_offset: 0.15
+    grasp_offset: 0.0
+    place_offset: 0.05
+    speed_slow: 0.04
+    use_normals: True
+  _14:
+    robot_name: a_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_2_partition_2
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.05
+    speed_slow: 1.0
+    use_normals: False
+  _15:
+    robot_name: a_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_2_partition_5
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.05
+    speed_slow: 1.0
+    use_normals: False
+  _16:
+    robot_name: a_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_2_partition_8
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.05
+    speed_slow: 1.0
+    use_normals: False
+  _17:
+    robot_name: a_bot
+    camera_name: a_phoxi_m_camera
+    destination: skrewholder_1
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.05
+    speed_slow: 1.0
+    use_normals: False
+  _18:
+    robot_name: a_bot
+    camera_name: a_phoxi_m_camera
+    destination: skrewholder_2
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.05
+    speed_slow: 1.0
+    use_normals: False

@@ -21,7 +21,7 @@ number_of_attempted = 1
 class KittingRoutines(URRoutines):
     """Implements kitting routines for aist robot system."""
 
-    _dict = rospy.get_param("/aist_kitting/part_props")
+    _dict = rospy.get_param("/part_props")
     PartProps = collections.namedtuple(_dict['typename'], _dict['field_names'])
 
     _part_props = { }
@@ -39,7 +39,7 @@ class KittingRoutines(URRoutines):
     def __init__(self):
         super(KittingRoutines, self).__init__()
 
-        self._bins = rospy.get_param("/aist_kitting/bins")
+        self._bins = rospy.get_param("/bins")
 
         # Assign part information to each bin.
         self._items = {}
