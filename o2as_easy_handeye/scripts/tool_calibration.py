@@ -45,6 +45,7 @@ class ToolCalibrationRoutines(URRoutines):
         self._speed       = speed
         self._refpose     = refposes[robot_name]
         self._goalpose    = copy.deepcopy(self._refpose)
+        self._ur_movel    = False
 
         (self._xyz0, q0)  = self.listener.lookupTransform(
                                 self.parent_frame(
@@ -91,14 +92,16 @@ class ToolCalibrationRoutines(URRoutines):
             = gmsg.Pose(gmsg.Point(*tfs.translation_from_matrix(T)),
                         gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
         print("move to " + self.format_pose(target_pose))
-        (success, _, current_pose) = self.go_to_pose_goal(self._robot_name,
-                                                          target_pose,
-                                                          self._speed,
-                                                          move_lin=True,
-                                                          high_precision=True)
-        # (success, _, current_pose) = self.ur_movel(self._robot_name,
-        #                                            target_pose,
-        #                                            velocity=self._speed)
+        if self._ur_movel:
+            (success, _, current_pose) = self.ur_movel(self._robot_name,
+                                                       target_pose,
+                                                       velocity=self._speed)
+        else:
+            (success, _, current_pose) = self.go_to_pose_goal(
+                                                self._robot_name, target_pose,
+                                                self._speed,
+                                                move_lin=True,
+                                                high_precision=True)
         print("reached " + self.format_pose(current_pose))
         return success
 
@@ -157,9 +160,9 @@ class ToolCalibrationRoutines(URRoutines):
         axis = 'Pitch'
 
         while not rospy.is_shutdown():
-            prompt = "{}[p={:.3f},y={:.3f}] >> ".format(axis,
-                                                        degrees(self._rpy[1]),
-                                                        degrees(self._rpy[2]))
+            prompt = "{:>5}[p={:.3f},y={:.3f}]{:>9}>> " \
+                   .format(axis, degrees(self._rpy[1]), degrees(self._rpy[2]),
+                           "urscript" if self._ur_movel else "moveit")
             key = raw_input(prompt)
 
             if key == 'q':
@@ -177,21 +180,21 @@ class ToolCalibrationRoutines(URRoutines):
                 self.pitching_motion()
                 self.yawing_motion()
             elif key == 'X':
-                axis = 'X    '
+                axis = 'X'
             elif key == 'Y':
-                axis = 'Y    '
+                axis = 'Y'
             elif key == 'Z':
-                axis = 'Z    '
+                axis = 'Z'
             elif key == 'P':
                 axis = 'Pitch'
             elif key == 'W':
-                axis = 'Yaw  '
+                axis = 'Yaw'
             elif key == '+':
-                if axis == 'X    ':
+                if axis == 'X':
                     self._goalpose[0] += 0.01
-                elif axis == 'Y    ':
+                elif axis == 'Y':
                     self._goalpose[1] += 0.01
-                elif axis == 'Z    ':
+                elif axis == 'Z':
                     self._goalpose[2] += 0.01
                 elif axis == 'Pitch':
                     self._rpy[1] += radians(0.5)
@@ -199,17 +202,31 @@ class ToolCalibrationRoutines(URRoutines):
                     self._rps[2] += radians(0.5)
                 self.move(self._goalpose)
             elif key == '-':
-                if axis == 'X    ':
+                if axis == 'X':
                     self._goalpose[0] -= 0.01
-                elif axis == 'Y    ':
+                elif axis == 'Y':
                     self._goalpose[1] -= 0.01
-                elif axis == 'Z    ':
+                elif axis == 'Z':
                     self._goalpose[2] -= 0.01
                 elif axis == 'Pitch':
                     self._rpy[1] -= radians(0.5)
                 else:
                     self._rpy[2] -= radians(0.5)
                 self.move(self._goalpose)
+            elif is_num(key):
+                if axis == 'X':
+                    self._goalpose[0] = float(key)
+                elif axis == 'Y':
+                    self._goalpose[1] = float(key)
+                elif axis == 'Z':
+                    self._goalpose[2] = float(key)
+                elif axis == 'Pitch':
+                    self._rpy[1] = radians(float(key))
+                else:
+                    self._rpy[2] = radians(float(key))
+                self.move(self._goalpose)
+            elif key == 'ur':
+                self._ur_movel = not self._ur_movel
             elif key == 'd':
                 self.print_tip_link()
             elif key == 'pregrasp':
@@ -253,18 +270,6 @@ class ToolCalibrationRoutines(URRoutines):
                 self.ur_spiral_motion(self._robot_name, wait=False)
             elif key == 'h':
                 self.go_home()
-            elif is_num(key):
-                if axis == 'X    ':
-                    self._goalpose[0] = float(key)
-                elif axis == 'Y    ':
-                    self._goalpose[1] = float(key)
-                elif axis == 'Z    ':
-                    self._goalpose[2] = float(key)
-                elif axis == 'Pitch':
-                    self._rpy[1] = radians(float(key))
-                else:
-                    self._rpy[2] = radians(float(key))
-                self.move(self._goalpose)
 
         # Reset pose
         self.go_home()

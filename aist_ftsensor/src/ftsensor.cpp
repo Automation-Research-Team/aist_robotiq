@@ -7,20 +7,16 @@
 namespace aist_ftsensor
 {
 
-ros::Publisher	ftsensor::_publisher;
-ros::Subscriber	ftsensor::_subscriber;
-std::string	ftsensor::_frame;
-
 /************************************************************************
 *  class ftsensor								*
 ************************************************************************/
 ftsensor::ftsensor(const std::string& name)
     :_nh(name),
+     _publisher(_nh.advertise<wrench_t>("ftsensor_wrench", 100)),
+     _subscriber(_nh.subscribe("/wrench", 100,
+			       &ftsensor::wrench_callback, this)),
      _rate(100)
 {
-    _publisher = _nh.advertise<wrench_t>("ftsensor_wrench", 100);
-    _subscriber = _nh.subscribe("wrench", 100, ftsensor::wrench_callback);
-
     _nh.param<std::string>("sensor_frame", _frame, "ftsensor_wrench_link");
     _nh.param<double>("rate", _rate, 100);
     ROS_INFO_STREAM("sensor_frame=" << _frame << ", rate=" << _rate);
@@ -45,19 +41,17 @@ ftsensor::run()
 }
 
 void
-ftsensor::wrench_callback(const geometry_msgs::WrenchStamped& msg)
+ftsensor::wrench_callback(const geometry_msgs::WrenchStampedConstPtr& msg)
 {
-    ROS_INFO("#Callback# sec - %d", msg.header.stamp.sec);
+    ROS_INFO("#Callback# sec - %d", msg->header.stamp.sec);
 
     try
     {
 	wrench_p	wrench(new wrench_t);
-	wrench->header = msg.header;
-	wrench->wrench = msg.wrench;
+	wrench->header = msg->header;
+	wrench->wrench = msg->wrench;
 	wrench->header.frame_id = _frame;
-#if 0
-	wrench->header.stamp    = ros::Time::now();
-#endif
+
 	_publisher.publish(wrench);
     }
     catch (const std::exception& err)
