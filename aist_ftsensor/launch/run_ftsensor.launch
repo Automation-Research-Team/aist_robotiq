@@ -3,11 +3,9 @@
   <arg name="rate"              default="100"/>
   <node name="$(arg robot_name)_ftsensor"
         pkg="aist_ftsensor" type="aist_ftsensor" output="screen">
-    <param name="sensor_frame"    type="str"
+    <param name="sensor_frame"
            value="$(arg robot_name)_ftsensor_wrench_link" />
-    <param name="rate"            type="double" value="$(arg
-						       rate)" />
-    <remap from="$(arg robot_name)_ftsensor/wrench"
-           to="$(arg robot_name)_controller/wrench"/>
+    <param name="rate" value="$(arg rate)" />
+    <remap from="/wrench" to="/$(arg robot_name)_controller/wrench"/>
   </node>
 </launch>
