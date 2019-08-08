@@ -7,7 +7,7 @@
            value="$(arg robot_name)_ftsensor_wrench_link" />
     <param name="rate"            type="double" value="$(arg
 						       rate)" />
-    <remap from="$(arg robot_name)_controller/wrench"
-	   to="$(arg robot_name)_ftsensor/wrench"/>
+    <remap from="$(arg robot_name)_ftsensor/wrench"
+           to="$(arg robot_name)_controller/wrench"/>
   </node>
 </launch>
