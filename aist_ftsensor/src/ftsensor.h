@@ -23,14 +23,14 @@ class ftsensor
     void	run()							;
     double	rate()						const	;
 
-    static void	wrench_callback(const geometry_msgs::WrenchStamped& msg);
+    void	wrench_callback(const geometry_msgs::WrenchStampedConstPtr& msg);
 
   private:
-    ros::NodeHandle		_nh;
-    static ros::Publisher	_publisher;
-    static ros::Subscriber	_subscriber;
-    static std::string		_frame;
-    double			_rate;
+    ros::NodeHandle	_nh;
+    ros::Publisher	_publisher;
+    ros::Subscriber	_subscriber;
+    std::string		_frame;
+    double		_rate;
 };
 
 }	// namespace aist_ftsensor
