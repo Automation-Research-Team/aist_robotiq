@@ -1,0 +1,36 @@
+/*!
+ *  \file	ftsensor.h
+ *  \brief	header file for a class for controlling FT300 force sensors
+ */
+#include <ros/ros.h>
+#include <geometry_msgs/WrenchStamped.h>
+
+namespace aist_ftsensor
+{
+/************************************************************************
+*  class ftsensor								*
+************************************************************************/
+class ftsensor
+{
+  private:
+    using wrench_t = geometry_msgs::WrenchStamped;
+    using wrench_p = geometry_msgs::WrenchStampedPtr;
+
+  public:
+		ftsensor(const std::string& name)			;
+		~ftsensor()						;
+
+    void	run()							;
+    double	rate()						const	;
+
+    static void	wrench_callback(const geometry_msgs::WrenchStamped& msg);
+
+  private:
+    ros::NodeHandle		_nh;
+    static ros::Publisher	_publisher;
+    static ros::Subscriber	_subscriber;
+    static std::string		_frame;
+    double			_rate;
+};
+
+}	// namespace aist_ftsensor
