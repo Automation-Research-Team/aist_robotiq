@@ -17,7 +17,7 @@ from tf                import TransformListener, transformations as tfs
 ######################################################################
 class GraspabilityClient(object):
 
-    _dict = rospy.get_param("/aist_kitting/graspability/part_props")
+    _dict = rospy.get_param("/graspability/part_props")
     PartProps = collections.namedtuple(_dict['typename'], _dict['field_names'])
 
     _part_props = { }
