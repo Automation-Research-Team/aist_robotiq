@@ -24,8 +24,8 @@ class Calibrator
     using transformMsg_t	= geometry_msgs::TransformStamped;
 
   public:
-		Calibrator();
-		~Calibrator();
+		Calibrator()						;
+		~Calibrator()						;
 
     void	spin();
 
@@ -61,6 +61,8 @@ class Calibrator
     std::vector<transformMsg_t>	_wMe;	//!< in:  world  <- effector transform
     transformMsg_t		_eMc;	//!< out: effector <- camera transform
     transformMsg_t		_wMo;	//!< out: world    <- object transform
+
+    bool			_use_dual_quaternion;
 
     bool			_eye_on_hand;
     double			_timeout;

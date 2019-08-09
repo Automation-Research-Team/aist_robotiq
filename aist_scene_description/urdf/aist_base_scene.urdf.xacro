@@ -84,7 +84,7 @@
   <xacro:include filename="$(find o2as_scene_description)/urdf/single_suction_gripper.urdf.xacro"/>
   <xacro:single_suction_gripper_o2as prefix="b_bot_"
   				     parent="b_bot_ft300_frange_link">
-    <origin xyz="0 0 0" rpy="0 ${0.7*pi/180} ${-0.9*pi/180}"/>
+    <origin xyz="0 0 0" rpy="0 ${0.4*pi/180} ${-1.1*pi/180}"/>
     <!-- <origin xyz="0 0 0" rpy="0 0 0"/> -->
   </xacro:single_suction_gripper_o2as>
 
@@ -96,12 +96,12 @@
   <!-- Add PhoXi 3D scanner -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro"/>
   <xacro:phoxi_m_camera prefix="a_" parent="o2as_ground">
-    <origin xyz="0.547941636523
-		 -0.00827443204237
-		 1.67030171767"
-	    rpy="${-151.493605482*pi/180}
-		 ${0.698490882792*pi/180}
-		 ${85.0482907121*pi/180}"/>
+    <origin xyz="0.480002181393
+		 -0.0102469021884
+		 1.40147194843"
+	    rpy="${-152.32508021*pi/180}
+		 ${-0.53545059011*pi/180}
+		 ${86.2439460292*pi/180}"/>
   </xacro:phoxi_m_camera>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
