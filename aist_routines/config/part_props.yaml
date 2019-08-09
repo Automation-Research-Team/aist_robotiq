@@ -1,6 +1,6 @@
 part_props:
   typename: PartProps
-  field_names : "robot_name, camera_name, destination, approach_offset, grasp_offset, place_offset, speed_slow, use_normals"
+  field_names : robot_name, camera_name, destination, approach_offset, grasp_offset, place_offset, speed_slow, use_normals
 
   _4:
     robot_name: b_bot
