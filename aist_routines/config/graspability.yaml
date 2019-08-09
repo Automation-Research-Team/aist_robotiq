@@ -1,10 +1,10 @@
 graspability:
   part_props:
     typename: PartProps
-    field_names : "name, ns, detect_edge, object_size, radius, open_width, finger_width, finger_thickness, insertion_depth"
+    field_names : name, ns, detect_edge, object_size, radius, open_width, finger_width, finger_thickness, insertion_depth
 
     _4:
-      name: "Geared motor"
+      name: Geared motor
       ns: 2
       detect_edge: True
       object_size: 15
@@ -14,7 +14,7 @@ graspability:
       finger_thickness: 5
       insertion_depth: 10
     _5:
-      name: "Pully for round belt"
+      name: Pully for round belt
       ns: 2
       detect_edge: True
       object_size: 8
@@ -24,7 +24,7 @@ graspability:
       finger_thickness: 5
       insertion_depth: 3
     _6:
-      name: "Polyurethane round belt"
+      name: Polyurethane round belt
       ns: 2
       detect_edge: True
       object_size: 2
@@ -34,7 +34,7 @@ graspability:
       finger_thickness: 5
       insertion_depth: 5
     _7:
-      name: "Bearing wirh housing"
+      name: Bearing wirh housing
       ns: 2
       detect_edge: True
       object_size: 12
@@ -44,7 +44,7 @@ graspability:
       finger_thickness: 5
       insertion_depth: 5
     _8:
-      name: "Drive shaft"
+      name: Drive shaft
       ns: 0
       detect_edge: False
       object_size: 4
@@ -54,7 +54,7 @@ graspability:
       finger_thickness: 5
       insertion_depth: 4
     _9:
-      name: "End cap for shaft"
+      name: End cap for shaft
       ns: 2
       detect_edge: True
       object_size: 3
@@ -64,7 +64,7 @@ graspability:
       finger_thickness: 5
       insertion_depth: 1
     _10:
-      name: "Bearing spacers for inner ring"
+      name: Bearing spacers for inner ring
       ns: 2
       detect_edge: True
       object_size: 3
@@ -74,7 +74,7 @@ graspability:
       finger_thickness: 5
       insertion_depth: 1
     _11:
-      name: "Pully for round belts clamping"
+      name: Pully for round belts clamping
       ns: 2
       detect_edge: True
       object_size: 12
@@ -84,7 +84,7 @@ graspability:
       finger_thickness: 5
       insertion_depth: 1
     _12:
-      name: "Bearing spacer for inner ring"
+      name: Bearing spacer for inner ring
       ns: 2
       detect_edge: True
       object_size: 4
@@ -94,7 +94,7 @@ graspability:
       finger_thickness: 5
       insertion_depth: 1
     _13:
-      name: "Idler for round belt"
+      name: Idler for round belt
       ns: 2
       detect_edge: True
       object_size: 7
@@ -104,7 +104,7 @@ graspability:
       finger_thickness: 5
       insertion_depth: 1
     _14:
-      name: "Bearing shaft screw"
+      name: Bearing shaft screw
       ns: 0
       detect_edge: True
       object_size: 4
@@ -114,7 +114,7 @@ graspability:
       finger_thickness: 5
       insertion_depth: 5
     _15:
-      name: "M6 hex nut"
+      name: M6 hex nut
       ns: 2
       detect_edge: True
       object_size: 3
@@ -124,7 +124,7 @@ graspability:
       finger_thickness: 5
       insertion_depth: 1
     _16:
-      name: "M6 flat washer"
+      name: M6 flat washer
       ns: 0
       detect_edge: True
       object_size: 3
@@ -134,7 +134,7 @@ graspability:
       finger_thickness: 5
       insertion_depth: 1
     _17:
-      name: "M4 head cap screw"
+      name: M4 head cap screw
       ns: 0
       detect_edge: True
       object_size: 1
@@ -144,7 +144,7 @@ graspability:
       finger_thickness: 5
       insertion_depth: 1
     _18:
-      name: "M3 head cap scres"
+      name: M3 head cap scres
       ns: 0
       detect_edge: True
       object_size: 1
