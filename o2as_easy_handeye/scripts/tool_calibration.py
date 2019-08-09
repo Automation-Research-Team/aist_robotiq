@@ -47,17 +47,18 @@ class ToolCalibrationRoutines(URRoutines):
         self._goalpose    = copy.deepcopy(self._refpose)
         self._ur_movel    = False
 
-        (self._xyz0, q0)  = self.listener.lookupTransform(
-                                self.parent_frame(
-                                    self.gripper(robot_name).base_link),
-                                self.gripper(robot_name).base_link,
-                                rospy.Time(0))
+        self._R0          = self.listener.fromTranslationRotation(
+                                *self.listener.lookupTransform(
+                                    self.parent_frame(
+                                        self.gripper(robot_name).base_link),
+                                    self.gripper(robot_name).base_link,
+                                    rospy.Time(0)))
         self._D0          = self.listener.fromTranslationRotation(
                                 *self.listener.lookupTransform(
                                     self.gripper(robot_name).base_link,
                                     self.gripper(robot_name).tip_link,
                                     rospy.Time(0)))
-        self._rpy         = list(tfs.euler_from_quaternion(q0))
+        self._rpy         = list(tfs.euler_from_matrix(self._R0))
 
         self._pick_pose = gmsg.PoseStamped()
         self._pick_pose.header.frame_id = "workspace_center"
@@ -78,13 +79,15 @@ class ToolCalibrationRoutines(URRoutines):
 
     def move(self, pose):
         R = self.listener.fromTranslationRotation(
-                self._xyz0, tfs.quaternion_from_euler(*self._rpy))
+                tfs.translation_from_matrix(self._R0),
+                tfs.quaternion_from_euler(*self._rpy))
         T = tfs.concatenate_matrices(
                 self.listener.fromTranslationRotation(
                     (pose[0], pose[1], pose[2]),
                     tfs.quaternion_from_euler(pose[3], pose[4], pose[5])),
                 tfs.inverse_matrix(self._D0),
                 tfs.inverse_matrix(R),
+                self._R0,
                 self._D0)
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = "workspace_center"
@@ -145,7 +148,8 @@ class ToolCalibrationRoutines(URRoutines):
 
     def print_tip_link(self):
         R   = self.listener.fromTranslationRotation(
-                self._xyz0, tfs.quaternion_from_euler(*self._rpy))
+                tfs.translation_from_matrix(self._R0),
+                tfs.quaternion_from_euler(*self._rpy))
         D   = tfs.concatenate_matrices(R, self._D0)
         xyz = tfs.translation_from_matrix(D)
         q   = tfs.quaternion_from_matrix(D)

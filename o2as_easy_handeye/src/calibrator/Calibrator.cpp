@@ -35,11 +35,13 @@ Calibrator::Calibrator()
 				&Calibrator::save_calibration, this)),
      _reset_srv(_node.advertiseService("reset", &Calibrator::reset, this)),
      _listener(),
+     _use_dual_quaternion(false),
      _eye_on_hand(true),
      _timeout(5.0)
 {
     ROS_INFO_STREAM("initializing calibrator...");
 
+    _node.param<bool>("use_dual_quaternion", _use_dual_quaternion, false);
     _node.param<bool>("eye_on_hand", _eye_on_hand, true);
 
     if (_eye_on_hand)
@@ -158,7 +160,10 @@ Calibrator::compute_calibration(ComputeCalibration::Request&,
     {
 	using transform_t	= TU::Transform<double>;
 
-	ROS_INFO_STREAM("compute_calibration(): computing...");
+	ROS_INFO_STREAM("compute_calibration(): computing with "
+			<< (_use_dual_quaternion ? "DUAL quaternion"
+						 : "SINGLE quaternion")
+			<< " algorithm...");
 
 	std::vector<transform_t>	cMo, wMe;
 	for (size_t i = 0; i < _cMo.size(); ++i)
@@ -167,8 +172,9 @@ Calibrator::compute_calibration(ComputeCalibration::Request&,
 	    wMe.emplace_back(_wMe[i].transform);
 	}
 
-	const auto	eMc = TU::cameraToEffectorSingle(cMo, wMe);
-      //const auto	eMc = TU::cameraToEffectorDual(cMo, wMe);
+	const auto	eMc = (_use_dual_quaternion ?
+			       TU::cameraToEffectorDual(cMo, wMe) :
+			       TU::cameraToEffectorSingle(cMo, wMe));
 	const auto	wMo = TU::objectToWorld(cMo, wMe, eMc);
 
 	const auto	now = ros::Time::now();
