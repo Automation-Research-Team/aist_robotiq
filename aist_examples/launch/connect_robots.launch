@@ -5,12 +5,8 @@
   <arg name="sim"		default="false"/>
   <arg name="rviz_config"
        default = "$(find aist_moveit_config)/launch/moveit.rviz"/>
-  <arg name="config_dir"        default="$(find o2as_fastening_tools)/config"/>
-  <arg name="suction_control"   default="suction_control"/>
-  <arg name="operation_mode"    default="operation_mode"/>
 
   <param name="use_real_robot"	value="$(eval not arg('sim'))"/>
-
   <rosparam file="$(find aist_routines)/config/$(arg config)_config.yaml"
 	    command="load"/>
 
