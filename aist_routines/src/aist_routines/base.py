@@ -1,5 +1,6 @@
 import sys
 import copy
+import collections
 import rospy
 from math import pi, radians, degrees
 
@@ -17,6 +18,22 @@ from MarkerPublisher    import MarkerPublisher
 from PickOrPlaceAction  import PickOrPlaceAction
 
 ######################################################################
+#  global functions                                                  #
+######################################################################
+def paramtuples(d):
+    fields = set()
+    for params in d.values():
+        for field in params.keys():
+            fields.add(field)
+    ParamTuple = collections.namedtuple("ParamTuple", " ".join(fields))
+
+    params = {}
+    for key, param in d.items():
+        id = int(key.split('_')[1])
+        params[id] = ParamTuple(**param)
+    return params
+
+######################################################################
 #  class AISTBaseRoutines                                            #
 ######################################################################
 class AISTBaseRoutines(object):
@@ -29,44 +46,18 @@ class AISTBaseRoutines(object):
         rospy.sleep(1.0)        # Necessary for listner spinning up
 
         # Grippers and cameras
-        self._grippers = {
-            # "a_bot": self._create_device(Robotiq85Gripper("a_bot_")),
-            "a_bot": self._create_device(PrecisionGripper("a_bot_")),
-            "b_bot": self._create_device(SuctionGripper("b_bot_single_")),
-            "c_bot": self._create_device(Robotiq85Gripper("c_bot_")),
-            #"d_bot": self._create_device(SuctionGripper("d_bot_dual_")),
-            "d_bot": self._create_device(Robotiq85Gripper("d_bot_")),
-        }
-        self._cameras = {
-            "a_phoxi_m_camera":
-                self._create_device(PhoXiCamera("a_phoxi_m_camera")),
-            "a_bot_camera":
-                self._create_device(RealsenseCamera("a_bot_camera")),
-        }
-
-        # Grippers and cameras
-        # if rospy.get_param("use_real_robot", False):
-        #     self._grippers = { }
-        #     _dict = rospy.get_param("/aist_kitting/grippers/no_real_robot")
-        #     for key in _dict.keys():
-        #         self._grippers[key] = globals()[_dict[key]['class']](
-        #                                                 **_dict[key]['kwarg'])
-        #     self._cameras = { }
-        #     _dict = rospy.get_param("/aist_kitting/cameras/no_real_robot")
-        #     for key in _dict.keys():
-        #         self._cameras[key] = globals()[_dict[key]['class']](
-        #                                                 **_dict[key]['kwarg'])
-        # else:
-        #     self._grippers = { }
-        #     _dict = rospy.get_param("/aist_kitting/grippers/real_robot")
-        #     for key in _dict.keys():
-        #         self._grippers[key] = globals()[_dict[key]['class']](
-        #                                                 **_dict[key]['kwarg'])
-        #     self._cameras = { }
-        #     _dict = rospy.get_param("/aist_kitting/cameras/real_robot")
-        #     for key in _dict.keys():
-        #         self._cameras[key] = globals()[_dict[key]['class']](
-        #                                                 **_dict[key]['kwarg'])
+        d = rospy.get_param("grippers")
+        self._grippers = {}
+        for robot_name, gripper in d.items():
+            self._grippers[robot_name] = self._create_device(gripper["class"],
+                                                             gripper["args"])
+        d = rospy.get_param("cameras")
+        self._cameras = {}
+        for camera_name, camera in d.items():
+            self._cameras[camera_name] = self._create_device(camera["class"],
+                                                             camera["args"])
+        print(str(self._grippers))
+        print(str(self._cameras))
 
         self._markerPublisher    = MarkerPublisher()
         self._graspabilityClient = GraspabilityClient()
@@ -350,11 +341,12 @@ class AISTBaseRoutines(object):
         return pose
 
     # Private functions
-    def _create_device(self, dev):
+    def _create_device(self, class_name, kwargs):
+        Device = globals()[class_name]
         if rospy.get_param("use_real_robot", False):
-            return dev
+            return Device(**kwargs)
         else:
-            return dev.base()
+            return Device.base(**kwargs)
 
     def _all_close(self, goal, actual, tolerance):
         goal_list   = pose_to_list(goal.pose)
