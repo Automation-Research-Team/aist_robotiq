@@ -1,9 +1,10 @@
 import sys, os, collections
-import rospy
+import rospy, rospkg, rosparam
 import actionlib
 import numpy as np
 import cv2
 import std_msgs
+import base
 from math              import radians, cos, sin, sqrt, pi
 from sensor_msgs       import msg as smsg
 from geometry_msgs     import msg as gmsg
@@ -17,55 +18,13 @@ from tf                import TransformListener, transformations as tfs
 ######################################################################
 class GraspabilityClient(object):
 
-    PartProps = collections.namedtuple(
-        "PartProps", "name, ns, detect_edge, object_size, radius, open_width, finger_width, finger_thickness, insertion_depth")
-    _part_props = {
-        4  : PartProps("Geared motor",
-                       2, True, 15,  8, 100, 1, 5, 10),
-        5  : PartProps("Pully for round belt",
-                       2, True,  8,  6,  45, 1, 5,  3),
-        6  : PartProps("Polyurethane round belt",
-                       2, True,  2,  2,  20, 1, 5,  5),
-        7  : PartProps("Bearing wirh housing",
-                       2, True, 12, 12,  20, 1, 5,  5),
-        8  : PartProps("Drive shaft",
-                       0, False, 4,  2,  20, 1, 5,  4),
-        9  : PartProps("End cap for shaft",
-                       2, True,  3,  3,  20, 1, 5,  1),
-        10 : PartProps("Bearing spacers for inner ring",
-                       2, True,  3,  3,  20, 1, 5,  1),
-        11 : PartProps("Pully for round belts clamping",
-                       2, True, 12, 12,  20, 1, 5,  1),
-        12 : PartProps("Bearing spacer for inner ring",
-                       2, True,  4,  2,  20, 1, 5,  1),
-        13 : PartProps("Idler for round belt",
-                       2, True,  7,  2,  30, 1, 5,  1),
-        14 : PartProps("Bearing shaft screw",
-                       0, True,  4,  2,  14, 1, 5,  5),
-        15 : PartProps("M6 hex nut",
-                       2, True,  3,  3,  20, 1, 5,  1),
-        16 : PartProps("M6 flat washer",
-                       0, True,  3,  3,  15, 1, 5,  1),
-        17 : PartProps("M4 head cap screw",
-                       0, True,  1,  1,  10, 1, 5,  1),
-        18 : PartProps("M3 head cap scres",
-                       0, True,  1,  1,  10, 1, 5,  1),
-    }
-
-    # _dict = rospy.get_param("/graspability/part_props")
-    # PartProps = collections.namedtuple(_dict['typename'], _dict['field_names'])
-
-    # _part_props = { }
-
-    # for key in _dict.keys():
-    #     if key == 'typename' or key == 'field_names':
-    #         continue
-    #     if '_' in key:
-    #         part_id = int(key.split('_')[1])
-    #         _part_props[part_id] = PartProps(**_dict[key])
-
     def __init__(self):
         super(GraspabilityClient, self).__init__()
+
+        rospack = rospkg.RosPack()
+        d = rosparam.load_file(rospack.get_path("aist_routines") +
+                               "/config/graspability_parameters.yaml")[0][0]
+        self._params = base.paramtuples(d["graspability_parameters"])
         self._createBackgroundImage \
             = rospy.ServiceProxy("/aist_graspability/create_background_image",
                                  asrv.createBackgroundImage)
@@ -87,9 +46,9 @@ class GraspabilityClient(object):
 
     def search(self, camera_info_topic, depth_topic, normal_topic,
                gripper_type, part_id, bin_id):
-        part_prop = GraspabilityClient._part_props[part_id]
+        param = self._params[part_id]
         rospy.loginfo("search graspabilities for part_{}({}) in bin_{}"
-                      .format(part_id, part_prop.name, bin_id))
+                      .format(part_id, param.name, bin_id))
 
         try:
             (self._K, self._D) = self._get_camera_intrinsics(camera_info_topic)
@@ -100,10 +59,10 @@ class GraspabilityClient(object):
                                                        smsg.Image, timeout=10.0)
             res = self._searchGraspability(
                         depth_topic, bin_id, gripper_type,
-                        part_prop.ns,               part_prop.detect_edge,
-                        part_prop.object_size,      part_prop.radius,
-                        part_prop.open_width,       part_prop.finger_width,
-                        part_prop.finger_thickness, part_prop.insertion_depth)
+                        param.ns,               param.detect_edge,
+                        param.object_size,      param.radius,
+                        param.open_width,       param.finger_width,
+                        param.finger_thickness, param.insertion_depth)
             return (self._compute_poses(res), res.gscore, res.success)
         except Exception as e:
             rospy.logerr(e.message)
@@ -111,9 +70,9 @@ class GraspabilityClient(object):
 
     def send_goal(self, camera_info_topic, depth_topic, normal_topic,
                   gripper_type, part_id, bin_id):
-        part_prop = GraspabilityClient._part_props[part_id]
+        param = self._params[part_id]
         rospy.loginfo("search graspabilities for part_{}({}) in bin_{}"
-                      .format(part_id, part_prop.name, bin_id))
+                      .format(part_id, param.name, bin_id))
 
         try:
             (self._K, self._D) = self._get_camera_intrinsics(camera_info_topic)
@@ -130,14 +89,14 @@ class GraspabilityClient(object):
         goal.depth_topic      = depth_topic
         goal.bin_id           = bin_id
         goal.gripper_type     = gripper_type
-        goal.ns               = part_prop.ns
-        goal.detect_edge      = part_prop.detect_edge
-        goal.object_size      = part_prop.object_size
-        goal.radius           = part_prop.radius
-        goal.open_width       = part_prop.open_width
-        goal.finger_width     = part_prop.finger_width
-        goal.finger_thickness = part_prop.finger_thickness
-        goal.insertion_depth  = part_prop.insertion_depth
+        goal.ns               = param.ns
+        goal.detect_edge      = param.detect_edge
+        goal.object_size      = param.object_size
+        goal.radius           = param.radius
+        goal.open_width       = param.open_width
+        goal.finger_width     = param.finger_width
+        goal.finger_thickness = param.finger_thickness
+        goal.insertion_depth  = param.insertion_depth
         self._searchGraspabilityAction.send_goal(goal,
                                                  feedback_cb=self._feedback_cb)
 

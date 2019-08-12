@@ -76,14 +76,23 @@
   </include>
 
   <!-- Drivers for the force sensors -->
-  <node name="a_bot_ft300" pkg ="aist_ft300" type="aist_ft300" output="screen">
-    <param name="hostname"	value="$(arg robot_ip_a)"/>
-    <param name="sensor_frame"	value="a_bot_ft300_wrench_link"/>
-  </node>
+  <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch">
+    <arg name="robot_name"	value="a_bot"/>
+    <arg name="sensor_frame"	value="a_bot_ft300_wrench_link"/>
+  </include>
 
-  <node name="b_bot_ft300" pkg ="aist_ft300" type="aist_ft300" output="screen">
-    <param name="hostname"	value="$(arg robot_ip_b)"/>
-    <param name="sensor_frame"	value="b_bot_ft300_wrench_link"/>
+  <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch">
+    <arg name="robot_name"	value="b_bot"/>
+    <arg name="sensor_frame"	value="b_bot_ft300_wrench_link"/>
+  </include>
+
+  <!-- Launch fastening tools -->
+  <node name="suction_controller" pkg="o2as_fastening_tools"
+	type="suction_controller.py" output="screen"
+	unless="$(eval arg('sim'))">
+    <param name="config_dir"      type="string" value="$(arg config_dir)"/>
+    <param name="suction_control" type="string" value="$(arg suction_control)"/>
+    <param name="operation_mode"  type="string" value="$(arg operation_mode)"/>
   </node>
 
 </launch>

@@ -63,14 +63,8 @@ class GripperClient(object):
 class Robotiq85Gripper(GripperClient):
     def __init__(self, prefix="a_bot_",
                  force=5.0, velocity=0.1, timeout=6.0):
-        super(Robotiq85Gripper, self).__init__(str(prefix) +
-                                               "robotiq_85_gripper",
-                                               "two_finger",
-                                               str(prefix)
-                                                 + "robotiq_85_base_link",
-                                               str(prefix)
-                                                 + "robotiq_85_tip_link",
-                                               timeout)
+        super(Robotiq85Gripper, self) \
+            .__init__(*Robotiq85Gripper._initargs(prefix, timeout))
         self._client = actionlib.SimpleActionClient(
                            str(prefix) + "gripper/gripper_action_controller",
                            robotiq_msgs.msg.CModelCommandAction)
@@ -78,6 +72,17 @@ class Robotiq85Gripper(GripperClient):
         self._goal.force    = force
         self._goal.velocity = velocity
         self._goal.position = 0.0
+
+    @staticmethod
+    def base(prefix, force, velocity, timeout):
+        return GripperClient(*Robotiq85Gripper._initargs(prefix, force,
+                                                         velocity, timeout))
+
+    @staticmethod
+    def _initargs(prefix, force, velocity, timeout):
+        return (prefix + "robotiq_85_gripper", "two_finger",
+                prefix + "robotiq_85_base_link",
+                prefix + "robotiq_85_tip_link", timeout)
 
     @property
     def force(self):
@@ -124,13 +129,8 @@ class Robotiq85Gripper(GripperClient):
 class SuctionGripper(GripperClient):
     def __init__(self, prefix="b_bot_single_", eject=False,
                  timeout=2.0):
-        super(SuctionGripper, self).__init__(str(prefix) + "suction_gripper",
-                                             "suction",
-                                             str(prefix)
-                                               + "suction_gripper_base_link",
-                                             str(prefix)
-                                               + "suction_gripper_pad_link",
-                                             timeout)
+        super(SuctionGripper, self) \
+            .__init__(*SuctionGripper._initargs(prefix, timeout))
         self._client    = actionlib.SimpleActionClient(
                               "o2as_fastening_tools/suction_control",
                               o2as_msgs.msg.SuctionControlAction)
@@ -143,6 +143,16 @@ class SuctionGripper(GripperClient):
         self._goal.fastening_tool_name = "suction_tool"
         self._goal.turn_suction_on     = False
         self._goal.eject_screw         = False
+
+    @staticmethod
+    def base(prefix, eject, timeout):
+        return GripperClient(*SuctionGripper._initargs(prefix, eject, timeout))
+
+    @staticmethod
+    def _initargs(prefix, eject, timeout):
+        return (prefix + "suction_gripper", "suction",
+                prefix + "suction_gripper_base_link",
+                prefix + "suction_gripper_pad_link", timeout)
 
     @property
     def eject(self):
@@ -190,13 +200,8 @@ class SuctionGripper(GripperClient):
 ######################################################################
 class PrecisionGripper(GripperClient):
     def __init__(self, prefix="a_bot_", timeout=3.0):
-        super(PrecisionGripper, self).__init__(str(prefix) + "gripper",
-                                               "two_finger",
-                                               str(prefix)
-                                                 + "gripper_base_link",
-                                               str(prefix)
-                                                 + "gripper_tip_link",
-                                               timeout)
+        super(PrecisionGripper, self) \
+            .__init__(*PrecisionGripper._initargs(prefix, timeout))
         self._client = actionlib.SimpleActionClient(
                            "precision_gripper_action",
                            # str(prefix) + "gripper/gripper_action_controller",
@@ -212,6 +217,17 @@ class PrecisionGripper(GripperClient):
         self._goal.outer_gripper_opening_width  = 0.0
         self._goal.inner_gripper_opening_width  = 0.0
         self._goal.slight_opening_width         = 0.0
+
+    @staticmethod
+    def base(prefix, timeout):
+        return GripperClient(*PrecisionGripper._initargs(prefix, timeout))
+
+    @staticmethod
+    def _initargs(prefix, timeout):
+        return (prefix + "gripper", "two_finger",
+                prefix + "gripper_base_link",
+                prefix + "gripper_tip_link",
+                timeout)
 
     @property
     def linear_motor_position(self):

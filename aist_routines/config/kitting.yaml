@@ -1,441 +1,159 @@
-aist_kitting:
-  part_props: {
-    typename: "PartProps",
-    field_names : "robot_name, camera_name, destination, approach_offset, grasp_offset, place_offset, speed_slow, use_normals",
+bins:
+  - bin_1_part_5
+  - bin_1_part_16
+  - bin_1_part_17
+  - bin_2_part_4
+  - bin_2_part_7
+  - bin_2_part_8
 
-    _4: {
-      robot_name: "b_bot",
-      camera_name: "a_phoxi_m_camera",
-      destination: "tray_1_partition_4",
-      approach_offset: 0.15,
-      grasp_offset: -0.002,
-      place_offset: 0.06,
-      speed_slow: 0.04,
-      use_normals: True
-    },
-    _5: {
-      robot_name: "b_bot",
-      camera_name: "a_phoxi_m_camera",
-      destination: "tray_2_partition_6",
-      approach_offset: 0.15,
-      grasp_offset: -0.002,
-      place_offset: 0.03,
-      speed_slow: 1.0,
-      use_normals: True
-    },
-    _6: {
-      robot_name: "b_bot",
-      camera_name: "a_phoxi_m_camera",
-      destination: "tray_1_partition_3",
-      approach_offset: 0.15,
-      grasp_offset: 0.0,
-      place_offset: 0.05,
-      speed_slow: 1.0,
-      use_normals: False
-    },
-    _7: {
-      robot_name: "b_bot",
-      camera_name: "a_phoxi_m_camera",
-      destination: "tray_1_partition_2",
-      approach_offset: 0.15,
-      grasp_offset: -0.002,
-      place_offset: 0.05,
-      speed_slow: 0.04,
-      use_normals: True
-    },
-    _8: {
-      robot_name: "b_bot",
-      camera_name: "a_phoxi_m_camera",
-      destination: "tray_2_partition_1",
-      approach_offset: 0.15,
-      grasp_offset: -0.004,
-      place_offset: 0.03,
-      speed_slow: 0.1,
-      use_normals: True
-    },
-    _9: {
-      robot_name: "a_bot",
-      camera_name: "a_phoxi_m_camera",
-      destination: "tray_2_partition_4",
-      approach_offset: 0.15,
-      grasp_offset: -0.002,
-      place_offset: 0.05,
-      speed_slow: 1.0,
-      use_normals: False
-    },
-    _10: {
-      robot_name: "a_bot",
-      camera_name: "a_phoxi_m_camera",
-      destination: "tray_2_partition_7",
-      approach_offset: 0.15,
-      grasp_offset: -0.002,
-      place_offset: 0.05,
-      speed_slow: 1.0,
-      use_normals: False
-    },
-    _11: {
-      robot_name: "b_bot",
-      camera_name: "a_phoxi_m_camera",
-      destination: "tray_1_partition_1",
-      approach_offset: 0.15,
-      grasp_offset: 0.0,
-      place_offset: 0.05,
-      speed_slow: 0.04,
-      use_normals: True
-    },
-    _12: {
-      robot_name: "b_bot",
-      camera_name: "a_phoxi_m_camera",
-      destination: "tray_2_partition_3",
-      approach_offset: 0.15,
-      grasp_offset: 0.0,
-      place_offset: 0.05,
-      speed_slow: 0.04,
-      use_normals: False
-    },
-    _13: {
-      robot_name: "b_bot",
-      camera_name: "a_phoxi_m_camera",
-      destination: "tray_1_partition_5",
-      approach_offset: 0.15,
-      grasp_offset: 0.0,
-      place_offset: 0.05,
-      speed_slow: 0.04,
-      use_normals: True
-    },
-    _14: {
-      robot_name: "a_bot",
-      camera_name: "a_phoxi_m_camera",
-      destination: "tray_2_partition_2",
-      approach_offset: 0.15,
-      grasp_offset: -0.002,
-      place_offset: 0.05,
-      speed_slow: 1.0,
-      use_normals: False
-    },
-    _15: {
-      robot_name: "a_bot",
-      camera_name: "a_phoxi_m_camera",
-      destination: "tray_2_partition_5",
-      approach_offset: 0.15,
-      grasp_offset: -0.002,
-      place_offset: 0.05,
-      speed_slow: 1.0,
-      use_normals: False
-    },
-    _16: {
-      robot_name: "a_bot",
-      camera_name: "a_phoxi_m_camera",
-      destination: "tray_2_partition_8",
-      approach_offset: 0.15,
-      grasp_offset: -0.002,
-      place_offset: 0.05,
-      speed_slow: 1.0,
-      use_normals: False
-    },
-    _17: {
-      robot_name: "a_bot",
-      camera_name: "a_phoxi_m_camera",
-      destination: "skrewholder_1",
-      approach_offset: 0.15,
-      grasp_offset: -0.002,
-      place_offset: 0.05,
-      speed_slow: 1.0,
-      use_normals: False
-    },
-    _18: {
-      robot_name: "a_bot",
-      camera_name: "a_phoxi_m_camera",
-      destination: "skrewholder_2",
-      approach_offset: 0.15,
-      grasp_offset: -0.002,
-      place_offset: 0.05,
-      speed_slow: 1.0,
-      use_normals: False
-    }
-  }
-
-  bins:
-    - "bin_1_part_5"
-    - "bin_1_part_16"
-    - "bin_1_part_17"
-    - "bin_2_part_4"
-    - "bin_2_part_7"
-    - "bin_2_part_8"
-
-  grippers: {
-    no_real_robot: {
-      a_bot: {
-        class: "PrecisionGripper",
-        kwarg: {
-          prefix: "a_bot_"
-        }
-      },
-      b_bot: {
-        class: "SuctionGripper",
-        kwarg: {
-          prefix: "b_bot_single_"
-        }
-      },
-      c_bot: {
-        class: "Robotiq85Gripper",
-        kwarg: {
-          prefix: "c_bot_"
-        }
-      },
-      d_bot: {
-        class: "Robotiq85Gripper",
-        kwarg: {
-          prefix: "d_bot_"
-        }
-      }
-    },
-    real_robot: {
-      a_bot: {
-        class: "GripperClient",
-        kwarg: {
-          name: "a_bot_gripper",
-          type: "two_finger",
-          base_link: "a_bot_gripper_base_link",
-          tip_link: "a_bot_gripper_tip_link"
-        }
-      },
-      b_bot: {
-        class: "GripperClient",
-        kwarg: {
-          name: "b_bot_single_suction_gripper",
-          type: "suction",
-          base_link: "b_bot_single_suction_gripper_base_link",
-          tip_link: "b_bot_single_suction_gripper_pad_link"
-        }
-      },
-      c_bot: {
-        class: "GripperClient",
-        kwarg: {
-          name: "c_bot_robotiq_85_gripper",
-          type: "two_finger",
-          base_link: "c_bot_robotiq_85_base_link",
-          tip_link: "c_bot_robotiq_85_tip_link"
-        }
-      },
-      d_bot: {
-        class: "GripperClient",
-        kwarg: {
-          name: "d_bot_robotiq_85_gripper",
-          type: "two_finger",
-          base_link: "d_bot_robotiq_85_base_link",
-          tip_link: "d_bot_robotiq_85_tip_link"
-        }
-      }
-    }
-  }
-
-  cameras: {
-    no_real_robot: {
-      a_phoxi_m_camera: {
-        class: "PhoXiCamera",
-        kwarg: {
-          name: "a_phoxi_m_camera"
-        }
-      },
-      a_bot_camera: {
-        class: "RealsenseCamera",
-        kwarg: {
-          name: "a_bot_camera"
-        }
-      }
-    },
-    real_robot: {
-      a_phoxi_m_camera: {
-        class: "CameraClient",
-        kwarg: {
-          name: "a_phoxi_m_camera",
-          type: "depth",
-          camera_info_topic: "/a_phoxi_m_camera/camera_info",
-          image_topic: "/a_phoxi_m_camera/depth_map"
-        }
-      },
-      a_bot_camera: {
-        class: "CameraClient",
-        kwarg: {
-          name: "a_bot_camera",
-          type: "depth",
-          camera_info_topic: "/a_bot_camera/rgb/camera_info",
-          image_topic: "/a_bot_camera/depth/points"
-        }
-      }
-    }
-  }
-
-  graspability: {
-    part_props: {
-      typename: "PartProps",
-      field_names : "name, ns, detect_edge, object_size, radius, open_width, finger_width, finger_thickness, insertion_depth",
-
-      _4: {
-        "name": "Geared motor",
-        "ns": 2,
-        "detect_edge": True,
-        "object_size": 15,
-        "radius": 8,
-        "open_width": 100,
-        "finger_width": 1,
-        "finger_thickness": 5,
-        "insertion_depth": 10
-      },
-      _5: {
-        "name": "Pully for round belt",
-        "ns": 2,
-        "detect_edge": True,
-        "object_size": 8,
-        "radius": 6,
-        "open_width": 45,
-        "finger_width": 1,
-        "finger_thickness": 5,
-        "insertion_depth": 3
-      },
-      _6: {
-        "name": "Polyurethane round belt",
-        "ns": 2,
-        "detect_edge": True,
-        "object_size": 2,
-        "radius": 2,
-        "open_width": 20,
-        "finger_width": 1,
-        "finger_thickness": 5,
-        "insertion_depth": 5
-      },
-      _7: {
-        "name": "Bearing wirh housing",
-        "ns": 2,
-        "detect_edge": True,
-        "object_size": 12,
-        "radius": 12,
-        "open_width": 20,
-        "finger_width": 1,
-        "finger_thickness": 5,
-        "insertion_depth": 5
-      },
-      _8: {
-        "name": "Drive shaft",
-        "ns": 0,
-        "detect_edge": False,
-        "object_size": 4,
-        "radius": 2,
-        "open_width": 20,
-        "finger_width": 1,
-        "finger_thickness": 5,
-        "insertion_depth": 4
-      },
-      _9: {
-        "name": "End cap for shaft",
-        "ns": 2,
-        "detect_edge": True,
-        "object_size": 3,
-        "radius": 3,
-        "open_width": 20,
-        "finger_width": 1,
-        "finger_thickness": 5,
-        "insertion_depth": 1
-      },
-      _10: {
-        "name": "Bearing spacers for inner ring",
-        "ns": 2,
-        "detect_edge": True,
-        "object_size": 3,
-        "radius": 3,
-        "open_width": 20,
-        "finger_width": 1,
-        "finger_thickness": 5,
-        "insertion_depth": 1
-      },
-      _11: {
-        "name": "Pully for round belts clamping",
-        "ns": 2,
-        "detect_edge": True,
-        "object_size": 12,
-        "radius": 12,
-        "open_width": 20,
-        "finger_width": 1,
-        "finger_thickness": 5,
-        "insertion_depth": 1
-      },
-      _12: {
-        "name": "Bearing spacer for inner ring",
-        "ns": 2,
-        "detect_edge": True,
-        "object_size": 4,
-        "radius": 2,
-        "open_width": 20,
-        "finger_width": 1,
-        "finger_thickness": 5,
-        "insertion_depth": 1
-      },
-      _13: {
-        "name": "Idler for round belt",
-        "ns": 2,
-        "detect_edge": True,
-        "object_size": 7,
-        "radius": 2,
-        "open_width": 30,
-        "finger_width": 1,
-        "finger_thickness": 5,
-        "insertion_depth": 1
-      },
-      _14: {
-        "name": "Bearing shaft screw",
-        "ns": 0,
-        "detect_edge": True,
-        "object_size": 4,
-        "radius": 2,
-        "open_width": 14,
-        "finger_width": 1,
-        "finger_thickness": 5,
-        "insertion_depth": 5
-      },
-      _15: {
-        "name": "M6 hex nut",
-        "ns": 2,
-        "detect_edge": True,
-        "object_size": 3,
-        "radius": 3,
-        "open_width": 20,
-        "finger_width": 1,
-        "finger_thickness": 5,
-        "insertion_depth": 1
-      },
-      _16: {
-        "name": "M6 flat washer",
-        "ns": 0,
-        "detect_edge": True,
-        "object_size": 3,
-        "radius": 3,
-        "open_width": 15,
-        "finger_width": 1,
-        "finger_thickness": 5,
-        "insertion_depth": 1
-      },
-      _17: {
-        "name": "M4 head cap screw",
-        "ns": 0,
-        "detect_edge": True,
-        "object_size": 1,
-        "radius": 1,
-        "open_width": 10,
-        "finger_width": 1,
-        "finger_thickness": 5,
-        "insertion_depth": 1
-      },
-      _18: {
-        "name": "M3 head cap scres",
-        "ns": 0,
-        "detect_edge": True,
-        "object_size": 1,
-        "radius": 1,
-        "open_width": 10,
-        "finger_width": 1,
-        "finger_thickness": 5,
-        "insertion_depth": 1
-      }
-    }
-  }
+part_props:
+  _4:
+    name: Geared motor
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_1_partition_4
+    approach_offset: 0.15
+    grasp_offset: -0.004
+    place_offset: 0.06
+    speed_slow: 0.04
+    use_normals: true
+  _5:
+    name: Pully for round belt
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_2_partition_6
+    approach_offset: 0.15
+    grasp_offset: -0.003
+    place_offset: 0.03
+    speed_slow: 1.0
+    use_normals: true
+  _6:
+    name: Polyurethane round belt
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_1_partition_3
+    approach_offset: 0.15
+    grasp_offset: 0.0
+    place_offset: 0.05
+    speed_slow: 1.0
+    use_normals: false
+  _7:
+    name: Bearing with housing
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_1_partition_2
+    approach_offset: 0.15
+    grasp_offset: -0.004
+    place_offset: 0.05
+    speed_slow: 0.04
+    use_normals: true
+  _8:
+    name: Drive shaft
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_2_partition_1
+    approach_offset: 0.15
+    grasp_offset: -0.004
+    place_offset: 0.03
+    speed_slow: 0.1
+    use_normals: true
+  _9:
+    name: End cap for shaft
+    robot_name: a_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_2_partition_4
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.05
+    speed_slow: 1.0
+    use_normals: false
+  _10:
+    name: Bearing spacers for inner ring
+    robot_name: a_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_2_partition_7
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.05
+    speed_slow: 1.0
+    use_normals: false
+  _11:
+    name: Pully for round belts clamping
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_1_partition_1
+    approach_offset: 0.15
+    grasp_offset: 0.0
+    place_offset: 0.05
+    speed_slow: 0.04
+    use_normals: true
+  _12:
+    name: Bearing spacer for inner ring
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_2_partition_3
+    approach_offset: 0.15
+    grasp_offset: 0.0
+    place_offset: 0.05
+    speed_slow: 0.04
+    use_normals: false
+  _13:
+    name: Idler for round belt
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_1_partition_5
+    approach_offset: 0.15
+    grasp_offset: 0.0
+    place_offset: 0.05
+    speed_slow: 0.04
+    use_normals: true
+  _14:
+    name: Bearing shaft screw
+    robot_name: a_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_2_partition_2
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.05
+    speed_slow: 1.0
+    use_normals: false
+  _15:
+    name: M6 hex nut
+    robot_name: a_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_2_partition_5
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.05
+    speed_slow: 1.0
+    use_normals: false
+  _16:
+    name: M6 flat washer
+    robot_name: a_bot
+    camera_name: a_phoxi_m_camera
+    destination: tray_2_partition_8
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.05
+    speed_slow: 1.0
+    use_normals: false
+  _17:
+    name: M4 head cap screw
+    robot_name: a_bot
+    camera_name: a_phoxi_m_camera
+    destination: skrewholder_1
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.05
+    speed_slow: 1.0
+    use_normals: false
+  _18:
+    name: M3 head cap screw
+    robot_name: a_bot
+    camera_name: a_phoxi_m_camera
+    destination: skrewholder_2
+    approach_offset: 0.15
+    grasp_offset: -0.002
+    place_offset: 0.05
+    speed_slow: 1.0
+    use_normals: false

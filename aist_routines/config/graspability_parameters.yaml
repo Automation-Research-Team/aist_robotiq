@@ -1,0 +1,151 @@
+graspability_parameters:
+  _4:
+    name: Geared motor
+    ns: 2
+    detect_edge: true
+    object_size: 15
+    radius: 8
+    open_width: 100
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 10
+  _5:
+    name: Pully for round belt
+    ns: 2
+    detect_edge: true
+    object_size: 8
+    radius: 6
+    open_width: 45
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 3
+  _6:
+    name: Polyurethane round belt
+    ns: 2
+    detect_edge: true
+    object_size: 2
+    radius: 2
+    open_width: 20
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 5
+  _7:
+    name: Bearing with housing
+    ns: 2
+    detect_edge: true
+    object_size: 12
+    radius: 12
+    open_width: 20
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 5
+  _8:
+    name: Drive shaft
+    ns: 0
+    detect_edge: false
+    object_size: 4
+    radius: 2
+    open_width: 20
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 4
+  _9:
+    name: End cap for shaft
+    ns: 2
+    detect_edge: true
+    object_size: 3
+    radius: 3
+    open_width: 20
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
+  _10:
+    name: Bearing spacers for inner ring
+    ns: 2
+    detect_edge: true
+    object_size: 3
+    radius: 3
+    open_width: 20
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
+  _11:
+    name: Pully for round belts clamping
+    ns: 2
+    detect_edge: true
+    object_size: 12
+    radius: 12
+    open_width: 20
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
+  _12:
+    name: Bearing spacer for inner ring
+    ns: 2
+    detect_edge: true
+    object_size: 4
+    radius: 2
+    open_width: 20
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
+  _13:
+    name: Idler for round belt
+    ns: 2
+    detect_edge: true
+    object_size: 7
+    radius: 2
+    open_width: 30
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
+  _14:
+    name: Bearing shaft screw
+    ns: 0
+    detect_edge: true
+    object_size: 4
+    radius: 2
+    open_width: 14
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 5
+  _15:
+    name: M6 hex nut
+    ns: 2
+    detect_edge: true
+    object_size: 3
+    radius: 3
+    open_width: 20
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
+  _16:
+    name: M6 flat washer
+    ns: 0
+    detect_edge: true
+    object_size: 3
+    radius: 3
+    open_width: 15
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
+  _17:
+    name: M4 head cap screw
+    ns: 0
+    detect_edge: true
+    object_size: 1
+    radius: 1
+    open_width: 10
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
+  _18:
+    name: M3 head cap screw
+    ns: 0
+    detect_edge: true
+    object_size: 1
+    radius: 1
+    open_width: 10
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
