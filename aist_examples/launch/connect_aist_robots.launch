@@ -21,6 +21,11 @@
   <!-- The max_velocity parameter is only used for debugging in the ur_driver. It's not related to actual velocity limits -->
   <arg name="max_velocity" default="10.0"/> <!-- [rad/s] -->
 
+  <!-- suction controller parameters -->
+  <arg name="config_dir"        default="$(find o2as_fastening_tools)/config"/>
+  <arg name="suction_control"   default="suction_control"/>
+  <arg name="operation_mode"    default="operation_mode"/>
+
   <!-- a_bot realsense parameters -->
   <arg name="trigger_mode" default="false"/>
   <arg name="send_color"   default="true"/>
