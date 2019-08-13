@@ -12,8 +12,8 @@ namespace aist_ftsensor
 ************************************************************************/
 ftsensor::ftsensor(const std::string& name)
     :_nh(name),
-     _publisher(_nh.advertise<wrench_t>("ftsensor_wrench", 100)),
-     _subscriber(_nh.subscribe("/wrench", 100,
+     _publisher(_nh.advertise<wrench_t>("wrench", 100)),
+     _subscriber(_nh.subscribe("/wrench_in", 100,
 			       &ftsensor::wrench_callback, this)),
      _rate(100)
 {
@@ -25,7 +25,6 @@ ftsensor::ftsensor(const std::string& name)
 
 ftsensor::~ftsensor()
 {
-    ;
 }
 
 void
@@ -43,7 +42,7 @@ ftsensor::run()
 void
 ftsensor::wrench_callback(const geometry_msgs::WrenchStampedConstPtr& msg)
 {
-    ROS_INFO("#Callback# sec - %d", msg->header.stamp.sec);
+    // ROS_INFO("#Callback# sec - %d", msg->header.stamp.sec);
 
     try
     {
