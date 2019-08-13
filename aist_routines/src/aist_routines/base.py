@@ -49,12 +49,12 @@ class AISTBaseRoutines(object):
         d = rospy.get_param("grippers")
         self._grippers = {}
         for robot_name, gripper in d.items():
-            self._grippers[robot_name] = self._create_device(gripper["class"],
+            self._grippers[robot_name] = self._create_device(gripper["type"],
                                                              gripper["args"])
         d = rospy.get_param("cameras")
         self._cameras = {}
         for camera_name, camera in d.items():
-            self._cameras[camera_name] = self._create_device(camera["class"],
+            self._cameras[camera_name] = self._create_device(camera["type"],
                                                              camera["args"])
 
         self._markerPublisher    = MarkerPublisher()
@@ -339,8 +339,8 @@ class AISTBaseRoutines(object):
         return pose
 
     # Private functions
-    def _create_device(self, class_name, kwargs):
-        Device = globals()[class_name]
+    def _create_device(self, type_name, kwargs):
+        Device = globals()[type_name]
         if rospy.get_param("use_real_robot", False):
             return Device(**kwargs)
         else:

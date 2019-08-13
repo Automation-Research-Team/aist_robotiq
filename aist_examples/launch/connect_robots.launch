@@ -7,8 +7,10 @@
        default = "$(find aist_moveit_config)/launch/moveit.rviz"/>
 
   <param name="use_real_robot"	value="$(eval not arg('sim'))"/>
-  <rosparam file="$(find aist_routines)/config/$(arg config)_config.yaml"
-	    command="load"/>
+  <rosparam command="delete" param="grippers"/>
+  <rosparam command="delete" param="cameras"/>
+  <rosparam command="load"
+	    file="$(find aist_routines)/config/$(arg config)_config.yaml"/>
 
   <!-- Launch real robots if "sim" == "false" -->
   <include file="$(find aist_examples)/launch/connect_$(arg config)_robots.launch"
