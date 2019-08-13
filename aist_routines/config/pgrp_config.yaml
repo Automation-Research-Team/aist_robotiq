@@ -1,11 +1,11 @@
 grippers:
   a_bot:
-    class: PrecisionGripper
+    type: PrecisionGripper
     args:
       prefix: a_bot_
       timeout: 3.0
   b_bot:
-    class: SuctionGripper
+    type: SuctionGripper
     args:
       prefix: b_bot_single_
       eject: false
@@ -13,10 +13,10 @@ grippers:
 
 cameras:
   a_phoxi_m_camera:
-    class: PhoXiCamera
+    type: PhoXiCamera
     args:
       name: a_phoxi_m_camera
   a_bot_camera:
-    class: RealsenseCamera
+    type: RealsenseCamera
     args:
       name: a_bot_camera

@@ -1,13 +1,13 @@
 grippers:
   a_bot:
-    class: Robotiq85Gripper
+    type: Robotiq85Gripper
     args:
       prefix: a_bot_
       force: 5.0
       velocity: 0.1
       timeout: 6.0
   b_bot:
-    class: SuctionGripper
+    type: SuctionGripper
     args:
       prefix: b_bot_single_
       eject: false
@@ -15,10 +15,10 @@ grippers:
 
 cameras:
   a_phoxi_m_camera:
-    class: PhoXiCamera
+    type: PhoXiCamera
     args:
       name: a_phoxi_m_camera
   a_bot_camera:
-    class: RealsenseCamera
+    type: RealsenseCamera
     args:
       name: a_bot_camera
