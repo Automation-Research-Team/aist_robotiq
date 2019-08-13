@@ -11,8 +11,8 @@ add_compile_options(-std=c++14)
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   roscpp
-  rospy
   std_msgs
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -153,7 +153,11 @@ include_directories(
 # )
 
 add_executable(${PROJECT_NAME} src/ftsensor.cpp src/main.cpp)
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+
+target_link_libraries(${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ${roscpp_LIBRARIES}
+)
 
 #############
 ## Install ##

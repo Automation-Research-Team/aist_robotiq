@@ -15,11 +15,19 @@ ftsensor::ftsensor(const std::string& name)
      _publisher(_nh.advertise<wrench_t>("wrench", 100)),
      _subscriber(_nh.subscribe("/wrench_in", 100,
 			       &ftsensor::wrench_callback, this)),
+     _listener(),
+     _reference_frame("workspace_center"),
+     _sensor_frame("ftsensor_wrench_link"),
      _rate(100)
 {
-    _nh.param<std::string>("sensor_frame", _frame, "ftsensor_wrench_link");
+    _nh.param<std::string>("reference_frame", _reference_frame,
+			   "workspace_center");
+    _nh.param<std::string>("sensor_frame", _sensor_frame,
+			   "ftsensor_wrench_link");
     _nh.param<double>("rate", _rate, 100);
-    ROS_INFO_STREAM("sensor_frame=" << _frame << ", rate=" << _rate);
+
+    ROS_INFO_STREAM("reference_frame=" << _reference_frame <<
+		    "sensor_frame=" << _sensor_frame << ", rate=" << _rate);
     ROS_INFO_STREAM("aist_ftsensor started.");
 }
 
@@ -40,16 +48,22 @@ ftsensor::run()
 }
 
 void
-ftsensor::wrench_callback(const geometry_msgs::WrenchStampedConstPtr& msg)
+ftsensor::wrench_callback(const const_wrench_p& wrench_msg)
 {
-    // ROS_INFO("#Callback# sec - %d", msg->header.stamp.sec);
+    // ROS_INFO("#Callback# sec - %d", wrench_msg->header.stamp.sec);
 
     try
     {
+	_listener.waitForTransform(_reference_frame, _sensor_frame,
+				   wrench_msg->header.stamp, ros::Duration(10));
+	transform_t	T;
+	_listener.lookupTransform(_reference_frame, _sensor_frame,
+	 			  wrench_msg->header.stamp, T);
+
 	wrench_p	wrench(new wrench_t);
-	wrench->header = msg->header;
-	wrench->wrench = msg->wrench;
-	wrench->header.frame_id = _frame;
+	wrench->header = wrench_msg->header;
+	wrench->wrench = wrench_msg->wrench;
+	wrench->header.frame_id = _sensor_frame;
 
 	_publisher.publish(wrench);
     }
