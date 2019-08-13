@@ -26,11 +26,11 @@ class ftsensor
     void	wrench_callback(const geometry_msgs::WrenchStampedConstPtr& msg);
 
   private:
-    ros::NodeHandle	_nh;
-    ros::Publisher	_publisher;
-    ros::Subscriber	_subscriber;
-    std::string		_frame;
-    double		_rate;
+    ros::NodeHandle		_nh;
+    const ros::Publisher	_publisher;
+    const ros::Subscriber	_subscriber;
+    std::string			_frame;
+    double			_rate;
 };
 
 }	// namespace aist_ftsensor
