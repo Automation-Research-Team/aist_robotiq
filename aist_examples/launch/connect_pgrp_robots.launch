@@ -98,8 +98,7 @@
 
   <!-- Launch fastening tools -->
   <node name="suction_controller" pkg="o2as_fastening_tools"
-	type="suction_controller.py" output="screen"
-	unless="$(eval arg('sim'))">
+	type="suction_controller.py" output="screen">
     <param name="config_dir"	  type="string"	value="$(arg config_dir)"/>
     <param name="suction_control" type="string"	value="$(arg suction_control)"/>
     <param name="operation_mode"  type="string"	value="$(arg operation_mode)"/>

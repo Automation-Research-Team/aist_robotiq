@@ -76,7 +76,7 @@ class InteractiveRoutines(URRoutines):
             current_pose = self.get_current_pose(self._robot_name)
             prompt = "{:>5}".format(axis) \
                    + self.format_pose(current_pose) \
-                   + " urscript" if _self._ur_movel else "   moveit"
+                   + " urscript" if self._ur_movel else "   moveit" \
                    + ">> "
             key = raw_input(prompt)
 

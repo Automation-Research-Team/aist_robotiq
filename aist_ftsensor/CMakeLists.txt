@@ -152,8 +152,8 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
-add_executable(aist_ftsensor src/ftsensor.cpp src/main.cpp)
-target_link_libraries(aist_ftsensor ${catkin_LIBRARIES})
+add_executable(${PROJECT_NAME} src/ftsensor.cpp src/main.cpp)
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 #############
 ## Install ##

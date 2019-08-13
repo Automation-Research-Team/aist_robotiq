@@ -6,6 +6,6 @@
         pkg="aist_ftsensor" type="aist_ftsensor" output="screen">
     <param name="sensor_frame"	value="$(arg sensor_frame)" />
     <param name="rate"		value="$(arg rate)" />
-    <remap from="/wrench" to="/$(arg robot_name)_controller/wrench"/>
+    <remap from="/wrench_in" to="/$(arg robot_name)_controller/wrench"/>
   </node>
 </launch>

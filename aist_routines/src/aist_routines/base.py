@@ -56,8 +56,6 @@ class AISTBaseRoutines(object):
         for camera_name, camera in d.items():
             self._cameras[camera_name] = self._create_device(camera["class"],
                                                              camera["args"])
-        print(str(self._grippers))
-        print(str(self._cameras))
 
         self._markerPublisher    = MarkerPublisher()
         self._graspabilityClient = GraspabilityClient()

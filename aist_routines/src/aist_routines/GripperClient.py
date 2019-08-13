@@ -64,7 +64,8 @@ class Robotiq85Gripper(GripperClient):
     def __init__(self, prefix="a_bot_",
                  force=5.0, velocity=0.1, timeout=6.0):
         super(Robotiq85Gripper, self) \
-            .__init__(*Robotiq85Gripper._initargs(prefix, timeout))
+            .__init__(*Robotiq85Gripper._initargs(prefix, force, velocity,
+                                                  timeout))
         self._client = actionlib.SimpleActionClient(
                            str(prefix) + "gripper/gripper_action_controller",
                            robotiq_msgs.msg.CModelCommandAction)
@@ -130,7 +131,7 @@ class SuctionGripper(GripperClient):
     def __init__(self, prefix="b_bot_single_", eject=False,
                  timeout=2.0):
         super(SuctionGripper, self) \
-            .__init__(*SuctionGripper._initargs(prefix, timeout))
+            .__init__(*SuctionGripper._initargs(prefix, eject, timeout))
         self._client    = actionlib.SimpleActionClient(
                               "o2as_fastening_tools/suction_control",
                               o2as_msgs.msg.SuctionControlAction)
