@@ -1,0 +1,24 @@
+grippers:
+  a_bot:
+    type: Robotiq85Gripper
+    args:
+      prefix: a_bot_
+      force: 5.0
+      velocity: 0.1
+      timeout: 6.0
+  b_bot:
+    type: SuctionGripper
+    args:
+      prefix: b_bot_single_
+      eject: false
+      timeout: 2.0
+
+cameras:
+  a_phoxi_m_camera:
+    type: PhoXiCamera
+    args:
+      name: a_phoxi_m_camera
+  a_bot_camera:
+    type: RealsenseCamera
+    args:
+      name: a_bot_camera

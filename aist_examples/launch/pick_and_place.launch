@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-  <include file="$(find o2as_phoxi_camera)/launch/o2as_phoxi_camera.launch"/>
-  <node pkg="aist_graspability" type="aist_graspability_server.py" name="aist_graspability"/>
-  <node pkg="aist_skills" type="aist_skill_server.py" name="aist_skills"/>
-</launch>

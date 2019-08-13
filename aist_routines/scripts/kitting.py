@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 import os, csv, copy, time, datetime, re, collections
-import rospy, rospkg
-
-from aist_routines.ur import URRoutines
-from aist_msgs        import msg as amsg
+import rospy, rospkg, rosparam
+import aist_routines.base as base
+from aist_routines.ur   import URRoutines
+from aist_msgs          import msg as amsg
 
 ######################################################################
 #  global variables                                                  #
@@ -21,32 +21,24 @@ number_of_attempted = 1
 class KittingRoutines(URRoutines):
     """Implements kitting routines for aist robot system."""
 
-    _dict = rospy.get_param("/part_props")
-    PartProps = collections.namedtuple(_dict['typename'], _dict['field_names'])
-
-    _part_props = { }
-
-    for key in _dict.keys():
-        if key == 'typename' or key == 'field_names':
-            continue
-        if '_' in key:
-            part_id = int(key.split('_')[1])
-            _part_props[part_id] = PartProps(**_dict[key])
-
-    BinProps = collections.namedtuple("BinProps",
-                                      "bin_id, part_id, part_props")
+    BinProps = collections.namedtuple("BinProps", "bin_id part_id part_props")
 
     def __init__(self):
         super(KittingRoutines, self).__init__()
 
-        self._bins = rospy.get_param("/bins")
+        rospack = rospkg.RosPack()
+        d = rosparam.load_file(rospack.get_path("aist_routines") +
+                               "/config/kitting.yaml")[0][0]
+        self._bins = d["bins"]
+        part_props = base.paramtuples(d["part_props"])
 
         # Assign part information to each bin.
         self._items = {}
         for bin_id, bin in enumerate(self._bins, 1):
             part_id = int(re.search("[0-9]+$", bin).group())
-            self._items[bin] = KittingRoutines.BinProps(
-                bin_id, part_id, KittingRoutines._part_props[part_id])
+            self._items[bin] \
+                = KittingRoutines.BinProps(bin_id, part_id,
+                                           part_props[part_id])
 
         self._former_robot_name = None
         self._fail_poses = []
