@@ -36,12 +36,10 @@ class ftsensor
     std::string			_reference_frame;
     std::string			_sensor_frame;
     double			_rate;
-    double			_end_effector;
-    double			_gravity;
     tf::Vector3			_mg;
     tf::Vector3			_f_offset;
     tf::Vector3			_m_offset;
-    tf::Matrix3x3		_r_offset;
+    tf::Vector3			_r_offset;
 };
 
 }	// namespace aist_ftsensor
