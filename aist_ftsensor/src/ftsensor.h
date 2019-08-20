@@ -26,7 +26,7 @@ class ftsensor
     void	run()							;
     double	rate()						const	;
 
-    void	wrench_callback(const const_wrench_p& wrench_msg);
+    void	wrench_callback(const const_wrench_p& wrench_msg)       ;
 
   private:
     ros::NodeHandle		_nh;
@@ -36,6 +36,12 @@ class ftsensor
     std::string			_reference_frame;
     std::string			_sensor_frame;
     double			_rate;
+    double			_end_effector;
+    double			_gravity;
+    tf::Vector3			_mg;
+    tf::Vector3			_f_offset;
+    tf::Vector3			_m_offset;
+    tf::Matrix3x3		_r_offset;
 };
 
 }	// namespace aist_ftsensor
