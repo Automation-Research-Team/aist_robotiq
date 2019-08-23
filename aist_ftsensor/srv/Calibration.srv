@@ -1,0 +1,5 @@
+int8    Mode
+string  FilePath
+---
+int8    Status
+

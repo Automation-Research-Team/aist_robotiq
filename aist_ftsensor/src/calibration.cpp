@@ -1,30 +1,25 @@
 /*!
- *  \file	ftsensor.cpp
+ *  \file	calibration.cpp
  *  \brief	source file for a class for controlling FT300 force sensors
  */
-#include "ftsensor.h"
+#include "calibration.h"
 
 namespace aist_ftsensor
 {
 
 /************************************************************************
-*  class ftsensor								*
+*  class calibration								*
 ************************************************************************/
-ftsensor::ftsensor(const std::string& name)
+calibration::calibration(const std::string& name)
     :_nh(name),
-     _publisher(_nh.advertise<wrench_t>("wrench", 100)),
      _subscriber(_nh.subscribe("/wrench_in", 100,
-			       &ftsensor::wrench_callback, this)),
+			       &calibration::wrench_callback, this)),
      _service(_nh.advertiseService("calibration",
-				   &ftsensor::service_callback, this)),
+			       &calibration::service_callback, this)),
      _listener(),
      _reference_frame("workspace_center"),
      _sensor_frame("ftsensor_wrench_link"),
      _rate(100),
-     _mg(0, 0, 0),
-     _f_offset(0, 0, 0),
-     _m_offset(0, 0, 0),
-     _r_offset(0, 0, 0),
      _get_sample(false),
      _Atranspose_A(Eigen::Matrix4f::Zero()),
      _Atranspose_b(Eigen::Vector4f::Zero()),
@@ -39,57 +34,15 @@ ftsensor::ftsensor(const std::string& name)
     ROS_INFO_STREAM("reference_frame=" << _reference_frame <<
 		    ", sensor_frame=" << _sensor_frame << ", rate=" << _rate);
 
-    double	effector_mass;
-    _nh.param<double>("effector_mass", effector_mass, 0);
-    if (effector_mass > 0)
-	_mg = tf::Vector3(0, 0, -9.8 * effector_mass);
-    ROS_INFO_STREAM("mg=[" << _mg.x() << "," << _mg.y() << "," << _mg.z());
-
-    std::vector<double> vec;
-    if (_nh.getParam("f_offset", vec))
-    {
-	if (vec.size() >= 3)
-	{
-	    for (int i = 0; i < 3; i++)
-		_f_offset.m_floats[i] = vec[i];
-	}
-    }
-    ROS_INFO_STREAM("f_offset[" << _f_offset.x() << "," <<
-		    _f_offset.y() << "," << _f_offset.z() << "]");
-
-    vec.clear();
-    if (_nh.getParam("m_offset", vec))
-    {
-	if (vec.size() >= 3)
-	{
-	    for (int i = 0; i < 3; i++)
-		_m_offset.m_floats[i] = vec[i];
-	}
-    }
-    ROS_INFO_STREAM("m_offset[" << _m_offset.x() << "," <<
-		    _m_offset.y() << "," << _m_offset.z() << "]");
-
-    vec.clear();
-    if (_nh.getParam("r_offset", vec))
-    {
-	if (vec.size() >= 3)
-	{
-	    for (int i = 0; i < 3; i++)
-		_r_offset.m_floats[i] = vec[i];
-	}
-    }
-    ROS_INFO_STREAM("r_offset[" << _r_offset.x() << "," <<
-		    _r_offset.y() << "," << _r_offset.z() << "]");
-
-    ROS_INFO_STREAM("aist_ftsensor started.");
+    ROS_INFO_STREAM("aist_ftsensor(calibration) started.");
 }
 
-ftsensor::~ftsensor()
+calibration::~calibration()
 {
 }
 
 void
-ftsensor::run()
+calibration::run()
 {
     ros::Rate	rate(_rate);
 
@@ -101,9 +54,12 @@ ftsensor::run()
 }
 
 void
-ftsensor::wrench_callback(const const_wrench_p& wrench_msg)
+calibration::wrench_callback(const const_wrench_p& wrench_msg)
 {
-    // ROS_INFO("#Callback# sec - %d", wrench_msg->header.stamp.sec);
+    ROS_INFO("#wrench_callback# sec=%d, get_sample=%d",
+		wrench_msg->header.stamp.sec, _get_sample);
+    if (! _get_sample)
+	return;
 
     try
     {
@@ -112,29 +68,8 @@ ftsensor::wrench_callback(const const_wrench_p& wrench_msg)
 	transform_t	T;
 	_listener.lookupTransform(_sensor_frame, _reference_frame,
 	 			  wrench_msg->header.stamp, T);
+	take_sample(T.getBasis(), wrench_msg->wrench.force);
 
-	if (_get_sample)
-	{
-	    take_sample(T.getBasis(), wrench_msg->wrench.force);
-	}
-
-	wrench_p	wrench(new wrench_t);
-	wrench->header = wrench_msg->header;
-	wrench->wrench = wrench_msg->wrench;
-	wrench->header.frame_id = _sensor_frame;
-
-	tf::Matrix3x3 Rt = T.getBasis();
-	tf::Vector3   force  = Rt * _mg + _f_offset;
-	tf::Vector3   torque = _r_offset.cross(Rt * _mg) + _m_offset;
-
-	wrench->wrench.force.x  = wrench_msg->wrench.force.x  - force.x();
-	wrench->wrench.force.y  = wrench_msg->wrench.force.y  - force.y();
-	wrench->wrench.force.z  = wrench_msg->wrench.force.z  - force.z();
-	wrench->wrench.torque.x = wrench_msg->wrench.torque.x - torque.x();
-	wrench->wrench.torque.y = wrench_msg->wrench.torque.y - torque.y();
-	wrench->wrench.torque.z = wrench_msg->wrench.torque.z - torque.z();
-
-	_publisher.publish(wrench);
     }
     catch (const std::exception& err)
     {
@@ -143,7 +78,7 @@ ftsensor::wrench_callback(const const_wrench_p& wrench_msg)
 }
 
 void
-ftsensor::take_sample(
+calibration::take_sample(
 		const tf::Matrix3x3& Rt, const geometry_msgs::Vector3& f)
 {
 #ifdef __MY_DEBUG__
@@ -175,7 +110,7 @@ ftsensor::take_sample(
 }
 
 void
-ftsensor::compute_calibration()
+calibration::compute_calibration()
 {
     _calibration_result = _Atranspose_A.inverse() * _Atranspose_b;
 #ifdef __MY_DEBUG__
@@ -187,7 +122,7 @@ ftsensor::compute_calibration()
 }
 
 void
-ftsensor::save_calibration(const std::string& filepath)
+calibration::save_calibration(const std::string& filepath)
 {
     std::ofstream f(filepath);
     f << "f_offset:\n" <<
@@ -198,7 +133,7 @@ ftsensor::save_calibration(const std::string& filepath)
 }
 
 bool
-ftsensor::service_callback(
+calibration::service_callback(
 		aist_ftsensor::Calibration::Request  &req,
 		aist_ftsensor::Calibration::Response &res
 		)
@@ -235,7 +170,7 @@ ftsensor::service_callback(
 }
 
 double
-ftsensor::rate() const
+calibration::rate() const
 {
     return _rate;
 }
