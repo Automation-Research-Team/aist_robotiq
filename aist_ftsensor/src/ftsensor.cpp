@@ -3,6 +3,7 @@
  *  \brief	source file for a class for controlling FT300 force sensors
  */
 #include "ftsensor.h"
+#include <ros/package.h>
 
 namespace aist_ftsensor
 {
@@ -15,8 +16,14 @@ ftsensor::ftsensor(const std::string& name)
      _publisher(_nh.advertise<wrench_t>("wrench", 100)),
      _subscriber(_nh.subscribe("/wrench_in", 100,
 			       &ftsensor::wrench_callback, this)),
-     _service(_nh.advertiseService("calibration",
-				   &ftsensor::service_callback, this)),
+     _take_sample(_nh.advertiseService("take_sample",
+				       &ftsensor::take_sample_callback, this)),
+     _compute_calibration(_nh.advertiseService(
+			      "compute_calibration",
+			      &ftsensor::compute_calibration_callback, this)),
+     _save_calibration(_nh.advertiseService(
+			   "save_calibration",
+			   &ftsensor::save_calibration_callback, this)),
      _listener(),
      _reference_frame("workspace_center"),
      _sensor_frame("ftsensor_wrench_link"),
@@ -116,6 +123,7 @@ ftsensor::wrench_callback(const const_wrench_p& wrench_msg)
 	if (_get_sample)
 	{
 	    take_sample(T.getBasis(), wrench_msg->wrench.force);
+	    _get_sample = false;
 	}
 
 	wrench_p	wrench(new wrench_t);
@@ -143,8 +151,7 @@ ftsensor::wrench_callback(const const_wrench_p& wrench_msg)
 }
 
 void
-ftsensor::take_sample(
-		const tf::Matrix3x3& Rt, const geometry_msgs::Vector3& f)
+ftsensor::take_sample(const tf::Matrix3x3& Rt, const geometry_msgs::Vector3& f)
 {
 #ifdef __MY_DEBUG__
     showMatrix3x3("Rt", Rt);
@@ -152,10 +159,10 @@ ftsensor::take_sample(
 #endif /* __MY_DEBUG__ */
 
     Eigen::Matrix4f Atranspose_A;
-    Atranspose_A <<            1,            0,            0, -1*Rt[2].x(),
-                               0,            1,            0, -1*Rt[2].y(),
-                               0,            0,            1, -1*Rt[2].z(),
-                    -1*Rt[2].x(), -1*Rt[2].y(), -1*Rt[2].z(),            1;
+    Atranspose_A <<          1,          0,          0, -Rt[2].x(),
+                             0,          1,          0, -Rt[2].y(),
+                             0,          0,          1, -Rt[2].z(),
+                    -Rt[2].x(), -Rt[2].y(), -Rt[2].z(),          1;
     _Atranspose_A += Atranspose_A;
 #ifdef __MY_DEBUG__
     ROS_INFO_STREAM("Atranspose_A\n" << Atranspose_A);
@@ -164,18 +171,29 @@ ftsensor::take_sample(
 
     Eigen::Vector4f Atranspose_b;
     Atranspose_b << f.x, f.y, f.z,
-                   -1*Rt[2].x()*f.x+Rt[2].y()*f.y+Rt[2].z()*f.z;
+		    -(Rt[2].x()*f.x + Rt[2].y()*f.y + Rt[2].z()*f.z);
     _Atranspose_b += Atranspose_b;
 #ifdef __MY_DEBUG__
     ROS_INFO_STREAM("Atranspose_b\n" <<  Atranspose_b);
     ROS_INFO_STREAM("_Atranspose_b\n" << _Atranspose_b);
 #endif /* __MY_DEBUG__ */
-
-    _get_sample = false;
 }
 
-void
-ftsensor::compute_calibration()
+bool
+ftsensor::take_sample_callback(std_srvs::Trigger::Request  &req,
+			       std_srvs::Trigger::Response &res)
+{
+    _get_sample = true;
+    res.success = true;
+    res.message = "take_sample succeeded.";
+    ROS_INFO_STREAM(res.message);
+    
+    return true;
+}
+    
+bool
+ftsensor::compute_calibration_callback(std_srvs::Trigger::Request  &req,
+				       std_srvs::Trigger::Response &res)
 {
     _calibration_result = _Atranspose_A.inverse() * _Atranspose_b;
 #ifdef __MY_DEBUG__
@@ -184,56 +202,34 @@ ftsensor::compute_calibration()
     ROS_INFO_STREAM("_Atranspose_b\n" << _Atranspose_b);
     ROS_INFO_STREAM("_calibration_result\n" << _calibration_result);
 #endif /* __MY_DEBUG__ */
-}
 
-void
-ftsensor::save_calibration(const std::string& filepath)
+    res.success = true;
+    res.message = "compute_calibration succeeded.";
+    ROS_INFO_STREAM(res.message);
+    
+    return true;
+}
+    
+bool
+ftsensor::save_calibration_callback(std_srvs::Trigger::Request  &req,
+				    std_srvs::Trigger::Response &res)
 {
+    const auto	filepath = ros::package::getPath("aist_ftsensor")
+			 + "/config/" + _nh.getNamespace() + ".yaml";
     std::ofstream f(filepath);
     f << "f_offset:\n" <<
 	"    " << _calibration_result(0) << "\n"
 	"    " << _calibration_result(1) << "\n"
 	"    " << _calibration_result(2) << "\n";
     f << "mg: " << _calibration_result(3) << "\n";
-}
 
-bool
-ftsensor::service_callback(
-		aist_ftsensor::Calibration::Request  &req,
-		aist_ftsensor::Calibration::Response &res
-		)
-{
-    _get_sample = false;
-    res.Status = 9;
-
-    ROS_INFO("#service_callback# request Mode=%d filePath=%s",
-		req.Mode, req.FilePath.c_str());
-    switch (req.Mode)
-    {
-    case 1: // take sample
-        res.Status = 0;
-	_get_sample = true;
-	break;
-    case 2: // compute calibration
-	compute_calibration();
-	res.Status = 0;
-	break;
-    case 3: // save calibration
-	save_calibration(req.FilePath);
-        res.Status = 0;
-	break;
-    case 4: // show samples
-	ROS_INFO_STREAM("_Atranspose_A\n" << _Atranspose_A);
-	ROS_INFO_STREAM("_Atranspose_b\n" << _Atranspose_b);
-        res.Status = 0;
-	break;
-    default:
-	break;
-    }
-    ROS_INFO("#service_callback# response.Status=%d", res.Status);
+    res.success = true;
+    res.message = "save_calibration succeeded.";
+    ROS_INFO_STREAM(res.message);
+    
     return true;
 }
-
+    
 double
 ftsensor::rate() const
 {

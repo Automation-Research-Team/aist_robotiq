@@ -11,8 +11,8 @@ add_compile_options(-std=c++14)
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   roscpp
+  roslib
   std_msgs
-  message_generation
   tf
 )
 
@@ -57,10 +57,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  Calibration.srv
-)
+#add_service_files(
+#  FILES
+#  Calibration.srv
+#)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -161,10 +161,6 @@ target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
 )
-
-add_executable(calibration_server
-                src/calibration.cpp src/calibration_server.cpp)
-target_link_libraries(calibration_server ${catkin_LIBRARIES})
 
 #############
 ## Install ##

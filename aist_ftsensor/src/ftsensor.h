@@ -5,11 +5,11 @@
 #include <ros/ros.h>
 #include <geometry_msgs/WrenchStamped.h>
 #include <tf/transform_listener.h>
+#include <std_srvs/Trigger.h>
 
 #include <fstream>
 #include <Eigen/Dense>
 
-#include "aist_ftsensor/Calibration.h"
 
 namespace aist_ftsensor
 {
@@ -32,10 +32,14 @@ class ftsensor
     double	rate()						const	;
 
     void	wrench_callback(const const_wrench_p& wrench_msg)	;
-    bool	service_callback(
-			aist_ftsensor::Calibration::Request  &req,
-			aist_ftsensor::Calibration::Response &res
-			)						;
+    bool	take_sample_callback(std_srvs::Trigger::Request  &req,
+				     std_srvs::Trigger::Response &res)	;
+    bool	compute_calibration_callback(
+			std_srvs::Trigger::Request  &req,
+			std_srvs::Trigger::Response &res)		;
+    bool	save_calibration_callback(
+			std_srvs::Trigger::Request  &req,
+			std_srvs::Trigger::Response &res)		;
 
   private:
     ros::NodeHandle		_nh;
@@ -50,18 +54,16 @@ class ftsensor
     tf::Vector3			_m_offset;
     tf::Vector3			_r_offset;
 
-    const ros::ServiceServer	_service;
+    const ros::ServiceServer	_take_sample;
+    const ros::ServiceServer	_compute_calibration;
+    const ros::ServiceServer	_save_calibration;
     bool			_get_sample;
     Eigen::Matrix4f		_Atranspose_A;
     Eigen::Vector4f		_Atranspose_b;
     Eigen::Vector4f		_calibration_result;
 
-    void	take_sample(
-			const tf::Matrix3x3& Rt,
-			const geometry_msgs::Vector3& f
-		)							;
-    void	compute_calibration()					;
-    void	save_calibration(const std::string& filepath)		;
+    void	take_sample(const tf::Matrix3x3& Rt,
+			    const geometry_msgs::Vector3& f)		;
 
 #ifdef __MY_DEBUG__
     void showMatrix3x3(const std::string& msg, const tf::Matrix3x3& m)
