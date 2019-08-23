@@ -1,5 +1,5 @@
 /*!
- *  \file	ftsensor.h
+ *  \file	calibration.h
  *  \brief	header of a ROS node class for controlling force sensors
  */
 #include <ros/ros.h>
@@ -13,10 +13,11 @@
 
 namespace aist_ftsensor
 {
+
 /************************************************************************
-*  class ftsensor							*
+*  class calibration							*
 ************************************************************************/
-class ftsensor
+class calibration
 {
   private:
     using wrench_t	 = geometry_msgs::WrenchStamped;
@@ -25,8 +26,8 @@ class ftsensor
     using transform_t	 = tf::StampedTransform;
 
   public:
-		ftsensor(const std::string& name)			;
-		~ftsensor()						;
+		calibration(const std::string& name)			;
+		~calibration()						;
 
     void	run()							;
     double	rate()						const	;
@@ -35,22 +36,17 @@ class ftsensor
     bool	service_callback(
 			aist_ftsensor::Calibration::Request  &req,
 			aist_ftsensor::Calibration::Response &res
-			)						;
+		);
 
   private:
     ros::NodeHandle		_nh;
-    const ros::Publisher	_publisher;
     const ros::Subscriber	_subscriber;
+    const ros::ServiceServer	_service;
     const tf::TransformListener	_listener;
     std::string			_reference_frame;
     std::string			_sensor_frame;
     double			_rate;
-    tf::Vector3			_mg;
-    tf::Vector3			_f_offset;
-    tf::Vector3			_m_offset;
-    tf::Vector3			_r_offset;
 
-    const ros::ServiceServer	_service;
     bool			_get_sample;
     Eigen::Matrix4f		_Atranspose_A;
     Eigen::Vector4f		_Atranspose_b;

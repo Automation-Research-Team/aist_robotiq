@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   roscpp
   std_msgs
+  message_generation
   tf
 )
 
@@ -56,11 +57,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  FILES
+  Calibration.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -70,10 +70,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   geometry_msgs#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  geometry_msgs#   std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -120,6 +120,7 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  /usr/include/eigen3
 )
 
 ## Declare a C++ library
@@ -152,12 +153,18 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
+add_definitions(-D__MY_DEBUG__)
+
 add_executable(${PROJECT_NAME} src/ftsensor.cpp src/main.cpp)
 
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
 )
+
+add_executable(calibration_server
+                src/calibration.cpp src/calibration_server.cpp)
+target_link_libraries(calibration_server ${catkin_LIBRARIES})
 
 #############
 ## Install ##
