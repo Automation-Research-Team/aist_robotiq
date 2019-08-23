@@ -194,7 +194,7 @@ ftsensor::save_calibration(const std::string& filepath)
 	"    " << _calibration_result(0) << "\n"
 	"    " << _calibration_result(1) << "\n"
 	"    " << _calibration_result(2) << "\n";
-    f << "mg: " << _calibration_result(2) << "\n";
+    f << "mg: " << _calibration_result(3) << "\n";
 }
 
 bool
