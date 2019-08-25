@@ -10,7 +10,7 @@
       <visual>
         <origin xyz="${ft300_length} 0 0" rpy="${pi} ${pi/2} 0"/>
 	<geometry>
-          <mesh filename="package://aist_ft300/meshes/ft300.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://aist_ftsensor/meshes/ft300.stl" scale="0.001 0.001 0.001"/>
 	</geometry>
 	<material name="Black">
 	  <color rgba="0.2 0.2 0.2 1"/>
