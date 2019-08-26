@@ -73,6 +73,8 @@ class ToolCalibrationRoutines(URRoutines):
                                           gmsg.Quaternion(
                                               *tfs.quaternion_from_euler(
                                                   0, 0, 0)))
+        group = moveit_commander.MoveGroupCommander(robot_name)
+        print("=== End effector: %s" % group.get_end_effector_link())
 
     def go_home(self):
         self.go_to_named_pose('home', self._robot_name)
