@@ -24,6 +24,8 @@ class ftsensor
     using const_wrench_p = geometry_msgs::WrenchStampedConstPtr;
     using transform_t	 = tf::StampedTransform;
 
+    constexpr static float	G = 9.8;
+
   public:
 		ftsensor(const std::string& name)			;
 		~ftsensor()						;
@@ -40,6 +42,7 @@ class ftsensor
     bool	save_calibration_callback(
 			std_srvs::Trigger::Request  &req,
 			std_srvs::Trigger::Response &res)		;
+    std::string	filepath()					const	;
 
   private:
     ros::NodeHandle		_nh;
@@ -50,17 +53,16 @@ class ftsensor
     std::string			_sensor_frame;
     double			_rate;
     tf::Vector3			_mg;
-    tf::Vector3			_f_offset;
-    tf::Vector3			_m_offset;
-    tf::Vector3			_r_offset;
+    tf::Vector3			_f0;
+    tf::Vector3			_m0;
+    tf::Vector3			_r0;
 
     const ros::ServiceServer	_take_sample;
     const ros::ServiceServer	_compute_calibration;
     const ros::ServiceServer	_save_calibration;
     bool			_get_sample;
-    Eigen::Matrix4f		_Atranspose_A;
-    Eigen::Vector4f		_Atranspose_b;
-    Eigen::Vector4f		_calibration_result;
+    Eigen::Matrix4f		_At_A;
+    Eigen::Vector4f		_At_b;
 
     void	take_sample(const tf::Matrix3x3& Rt,
 			    const geometry_msgs::Vector3& f)		;
