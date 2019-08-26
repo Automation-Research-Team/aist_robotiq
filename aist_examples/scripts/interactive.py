@@ -74,10 +74,13 @@ class InteractiveRoutines(URRoutines):
 
         while not rospy.is_shutdown():
             current_pose = self.get_current_pose(self._robot_name)
-            prompt = "{:>5}".format(axis) \
-                   + self.format_pose(current_pose) \
-                   + " urscript" if self._ur_movel else "   moveit" \
-                   + ">> "
+            prompt = "{:>5}{}{:>9}>> " \
+                   .format(axis, self.format_pose(current_pose),
+                           "urscript" if self._ur_movel else "moveit")
+            # prompt = "{}".format(axis) \
+            #        + " urscript" if self._ur_movel else "   moveit" \
+            #        + ">> "
+                   # + self.format_pose(current_pose)
             key = raw_input(prompt)
 
             if key == 'q':
