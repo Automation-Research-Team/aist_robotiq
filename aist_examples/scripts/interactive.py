@@ -7,6 +7,8 @@ import rospy
 import argparse
 from geometry_msgs import msg as gmsg
 
+import moveit_commander
+
 from tf import transformations as tfs
 from math import radians, degrees
 from aist_routines.ur import URRoutines
@@ -26,6 +28,13 @@ def is_num(s):
 #  class InteractiveRoutines                                         #
 ######################################################################
 class InteractiveRoutines(URRoutines):
+    refposes = {
+        'a_bot': [0.00, 0.00, 0.15, radians(  0), radians( 80), radians( 90)],
+        'b_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians(-90)],
+        'c_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians( 90)],
+        'd_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians(  0)],
+    }
+
     def __init__(self, robot_name, camera_name, speed):
         super(InteractiveRoutines, self).__init__()
 
@@ -33,6 +42,8 @@ class InteractiveRoutines(URRoutines):
         self._camera_name  = camera_name
         self._speed        = speed
         self._ur_movel     = False
+        group = moveit_commander.MoveGroupCommander(robot_name)
+        print("=== End effector: %s" % group.get_end_effector_link())
 
     def go_home(self):
         self.go_to_named_pose('home', self._robot_name)
@@ -41,19 +52,22 @@ class InteractiveRoutines(URRoutines):
         self.go_to_named_pose('back', self._robot_name)
 
     def move(self, pose):
-        poseStamped = gmsg.PoseStamped()
-        poseStamped.header.frame_id = "workspace_center"
-        poseStamped.pose = gmsg.Pose(
+        target_pose = gmsg.PoseStamped()
+        target_pose.header.frame_id = "workspace_center"
+        target_pose.pose = gmsg.Pose(
             gmsg.Point(pose[0], pose[1], pose[2]),
             gmsg.Quaternion(
                 *tfs.quaternion_from_euler(pose[3], pose[4], pose[5])))
+        print("move to " + self.format_pose(target_pose))
         if self._ur_movel:
-            (success, _, _) = self.ur_movel(self._robot_name, poseStamped,
-                                            velocity=self._speed)
+            (success, _, current_pose) = self.ur_movel(self._robot_name,
+                                                       target_pose,
+                                                       velocity=self._speed)
         else:
-            (success, _, _) = self.go_to_pose_goal(self._robot_name,
-                                                   poseStamped,
-                                                   self._speed, move_lin=True)
+            (success, _, current_pose) = self.go_to_pose_goal(
+                                                self._robot_name, target_pose,
+                                                self._speed, move_lin=True)
+        print("reached " + self.format_pose(current_pose))
         return success
 
     def xyz_rpy(self, poseStamped):
@@ -73,14 +87,14 @@ class InteractiveRoutines(URRoutines):
         axis = 'Y'
 
         while not rospy.is_shutdown():
+            group = moveit_commander.MoveGroupCommander(self._robot_name)
+            print("=== End effector: %s" % group.get_end_effector_link())
+
             current_pose = self.get_current_pose(self._robot_name)
             prompt = "{:>5}{}{:>9}>> " \
                    .format(axis, self.format_pose(current_pose),
                            "urscript" if self._ur_movel else "moveit")
-            # prompt = "{}".format(axis) \
-            #        + " urscript" if self._ur_movel else "   moveit" \
-            #        + ">> "
-                   # + self.format_pose(current_pose)
+
             key = raw_input(prompt)
 
             if key == 'q':
@@ -177,6 +191,8 @@ class InteractiveRoutines(URRoutines):
                 self.ur_horizontal_insertion(self._robot_name, wait=False)
             elif key == 'spiral':
                 self.ur_spiral_motion(self._robot_name, wait=False)
+            elif key == 'r':
+                self.move(InteractiveRoutines.refposes[self._robot_name])
             elif key == 'h':
                 self.go_home()
             elif key == 'b':
