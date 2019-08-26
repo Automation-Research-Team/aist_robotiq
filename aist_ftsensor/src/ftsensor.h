@@ -8,7 +8,7 @@
 #include <std_srvs/Trigger.h>
 
 #include <fstream>
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
 
 
 namespace aist_ftsensor
