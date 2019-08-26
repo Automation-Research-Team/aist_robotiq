@@ -4,6 +4,7 @@
  */
 #include "ftsensor.h"
 #include <ros/package.h>
+#include <yaml-cpp/yaml.h>
 
 namespace aist_ftsensor
 {
@@ -44,48 +45,50 @@ ftsensor::ftsensor(const std::string& name)
     ROS_INFO_STREAM("reference_frame=" << _reference_frame <<
 		    ", sensor_frame=" << _sensor_frame << ", rate=" << _rate);
 
-    double	effector_mass;
-    _nh.param<double>("effector_mass", effector_mass, 0);
-    if (effector_mass > 0)
-	_mg = tf::Vector3(0, 0, -G * effector_mass);
-    ROS_INFO_STREAM("mg=[" << _mg.x() << "," << _mg.y() << "," << _mg.z()
-		    << ']');
-
-    std::vector<double> vec;
-    if (_nh.getParam("f_offset", vec))
+    try
     {
+	YAML::Node yaml_node = YAML::LoadFile(filepath());
+
+	double	effector_mass = yaml_node["effector_mass"].as<double>();
+	if (effector_mass > 0)
+	    _mg = tf::Vector3(0, 0, -G * effector_mass);
+	ROS_INFO_STREAM("mg=[" << _mg.x() << "," << _mg.y() << "," << _mg.z()
+			<< ']');
+
+	std::vector<double> vec;
+	vec = yaml_node["f_offset"].as<std::vector<double> >();
 	if (vec.size() >= 3)
 	{
 	    for (int i = 0; i < 3; i++)
 		_f0.m_floats[i] = vec[i];
 	}
-    }
-    ROS_INFO_STREAM("f_offset[" << _f0.x() << "," <<
-		    _f0.y() << "," << _f0.z() << "]");
+	ROS_INFO_STREAM("f_offset[" << _f0.x() << "," <<
+			_f0.y() << "," << _f0.z() << "]");
 
-    vec.clear();
-    if (_nh.getParam("m_offset", vec))
-    {
+	vec.clear();
+	vec = yaml_node["m_offset"].as<std::vector<double> >();
 	if (vec.size() >= 3)
 	{
 	    for (int i = 0; i < 3; i++)
 		_m0.m_floats[i] = vec[i];
 	}
-    }
-    ROS_INFO_STREAM("m_offset[" << _m0.x() << "," <<
-		    _m0.y() << "," << _m0.z() << "]");
+	ROS_INFO_STREAM("m_offset[" << _m0.x() << "," <<
+			_m0.y() << "," << _m0.z() << "]");
 
-    vec.clear();
-    if (_nh.getParam("r_offset", vec))
-    {
+	vec.clear();
+	vec = yaml_node["r_offset"].as<std::vector<double> >();
 	if (vec.size() >= 3)
 	{
 	    for (int i = 0; i < 3; i++)
 		_r0.m_floats[i] = vec[i];
 	}
+	ROS_INFO_STREAM("r_offset[" << _r0.x() << "," <<
+			_r0.y() << "," << _r0.z() << "]");
     }
-    ROS_INFO_STREAM("r_offset[" << _r0.x() << "," <<
-		    _r0.y() << "," << _r0.z() << "]");
+    catch (const std::exception& err)
+    {
+	ROS_ERROR_STREAM(err.what());
+    }
 
     ROS_INFO_STREAM("aist_ftsensor started.");
 }
@@ -217,16 +220,31 @@ bool
 ftsensor::save_calibration_callback(std_srvs::Trigger::Request  &req,
 				    std_srvs::Trigger::Response &res)
 {
-    std::ofstream f(filepath());
-    f << "f_offset:\n" <<
-	"    " << _f0.x() << "\n"
-	"    " << _f0.y() << "\n"
-	"    " << _f0.z() << "\n";
-    f << "effector_mass: " << _mg.z()/G << "\n";
+    try
+    {
+	YAML::Emitter emitter;
+	emitter << YAML::BeginMap;
+	emitter << YAML::Key << "effector_mass" << YAML::Value << _mg.z()/G;
+	emitter << YAML::Key << "f_offset" << YAML::Value
+		<< YAML::BeginSeq
+		<< _f0.x() << _f0.y() << _f0.z()
+		<< YAML::EndSeq;
+	emitter << YAML::EndMap;
 
-    res.success = true;
-    res.message = "save_calibration succeeded.";
-    ROS_INFO_STREAM(res.message);
+	std::ofstream f(filepath());
+	f << emitter.c_str() << std::endl;
+
+	res.success = true;
+	res.message = "save_calibration succeeded.";
+	ROS_INFO_STREAM(res.message);
+    }
+    catch (const std::exception& err)
+    {
+	res.success = false;
+	res.message = "save_calibration failed.";
+	res.message += err.what();
+	ROS_ERROR_STREAM(res.message);
+    }
 
     return true;
 }

@@ -120,7 +120,6 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
-  /usr/include/eigen3
 )
 
 ## Declare a C++ library
@@ -160,6 +159,7 @@ add_executable(${PROJECT_NAME} src/ftsensor.cpp src/main.cpp)
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
+  yaml-cpp
 )
 
 #############
