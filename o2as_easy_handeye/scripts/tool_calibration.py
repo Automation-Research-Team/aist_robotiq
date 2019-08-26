@@ -6,21 +6,11 @@ import copy
 import rospy
 import argparse
 import moveit_msgs.msg
-import moveit_commander
 from geometry_msgs import msg as gmsg
 
 from tf import transformations as tfs
 from math import radians, degrees
 from aist_routines.ur import URRoutines
-
-refposes = {
-#    'a_bot': [-0.10, 0.00, 0.20,  radians(-90), radians(-90), radians(180)],
-    'a_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians( 90)],
-    'b_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians(-90)],
-    'c_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians( 90)],
-    'd_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians(  0)],
-}
-
 
 ######################################################################
 #  global functions                                                  #
@@ -37,13 +27,21 @@ def is_num(s):
 #  class ToolCalibrationRoutines                                     #
 ######################################################################
 class ToolCalibrationRoutines(URRoutines):
+    refposes = {
+        #    'a_bot': [-0.10, 0.00, 0.20,  radians(-90), radians(-90), radians(180)],
+        'a_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians( 90)],
+        'b_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians(-90)],
+        'c_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians( 90)],
+        'd_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians(  0)],
+    }
+
     def __init__(self, robot_name, camera_name, speed):
         super(ToolCalibrationRoutines, self).__init__()
 
         self._robot_name  = robot_name
         self._camera_name = camera_name
         self._speed       = speed
-        self._refpose     = refposes[robot_name]
+        self._refpose     = ToolCalibrationRoutines.refposes[robot_name]
         self._goalpose    = copy.deepcopy(self._refpose)
         self._ur_movel    = False
 
@@ -73,11 +71,12 @@ class ToolCalibrationRoutines(URRoutines):
                                           gmsg.Quaternion(
                                               *tfs.quaternion_from_euler(
                                                   0, 0, 0)))
-        group = moveit_commander.MoveGroupCommander(robot_name)
-        print("=== End effector: %s" % group.get_end_effector_link())
 
     def go_home(self):
         self.go_to_named_pose('home', self._robot_name)
+
+    def go_back(self):
+        self.go_to_named_pose('back', self._robot_name)
 
     def move(self, pose):
         R = self.listener.fromTranslationRotation(
@@ -166,7 +165,7 @@ class ToolCalibrationRoutines(URRoutines):
         axis = 'Pitch'
 
         while not rospy.is_shutdown():
-            prompt = "{:>5}[p={:.3f},y={:.3f}]{:>9}>> " \
+            prompt = "{:>5}:[p={:.3f},y={:.3f}]{:>9}>> " \
                    .format(axis, degrees(self._rpy[1]), degrees(self._rpy[2]),
                            "urscript" if self._ur_movel else "moveit")
             key = raw_input(prompt)
@@ -276,6 +275,8 @@ class ToolCalibrationRoutines(URRoutines):
                 self.ur_spiral_motion(self._robot_name, wait=False)
             elif key == 'h':
                 self.go_home()
+            elif key == 'b':
+                self.go_back()
 
         # Reset pose
         self.go_home()

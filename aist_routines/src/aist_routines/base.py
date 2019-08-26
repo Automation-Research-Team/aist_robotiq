@@ -160,8 +160,11 @@ class AISTBaseRoutines(object):
         # rospy.loginfo("reached " + self.format_pose(current_pose))
         return (success, is_all_close, current_pose)
 
-    def get_current_pose(self, robot_name):
+    def get_current_pose(self, robot_name, end_effector_link=""):
+        if end_effector_link == "":
+            end_effector_link = self._grippers[robot_name].tip_link
         group = moveit_commander.MoveGroupCommander(robot_name)
+        group.set_end_effector_link(end_effector_link)
         return group.get_current_pose()
 
     # Gripper stuffs
