@@ -28,13 +28,15 @@ ftsensor::ftsensor(const std::string& name)
      _reference_frame("workspace_center"),
      _sensor_frame("ftsensor_wrench_link"),
      _rate(100),
-     _m(0),
-     _f0(Eigen::Vector3f::Zero()),
-     _m0(Eigen::Vector3f::Zero()),
-     _r0(Eigen::Vector3f::Zero()),
      _get_sample(false),
-     _At_A(Eigen::Matrix4f::Zero()),
-     _At_b(Eigen::Vector4f::Zero())
+     _m(0),
+     _f0(Eigen::Matrix<double, 3, 1>::Zero()),
+     _m0(Eigen::Matrix<double, 3, 1>::Zero()),
+     _r0(Eigen::Matrix<double, 3, 1>::Zero()),
+     _At_A(Eigen::Matrix<double, 4, 4>::Zero()),
+     _At_b(Eigen::Matrix<double, 4, 1>::Zero()),
+     _Ct_C(Eigen::Matrix<double, 6, 6>::Zero()),
+     _Ct_d(Eigen::Matrix<double, 6, 1>::Zero())
 {
     _nh.param<std::string>("reference_frame", _reference_frame,
 			   "workspace_center");
@@ -117,11 +119,11 @@ ftsensor::wrench_callback(const const_wrench_p& wrench_msg)
 	transform_t	T;
 	_listener.lookupTransform(_sensor_frame, _reference_frame,
 	 			  wrench_msg->header.stamp, T);
-	Eigen::Vector3f	k(
+	Eigen::Matrix<double, 3, 1> k(
 		T.getBasis()[2].x(), T.getBasis()[2].y(), T.getBasis()[2].z());
 	if (_get_sample)
 	{
-	    take_sample(k, wrench_msg->wrench.force);
+	    take_sample(k, wrench_msg->wrench.force, wrench_msg->wrench.torque);
 	    _get_sample = false;
 	}
 
@@ -130,8 +132,8 @@ ftsensor::wrench_callback(const const_wrench_p& wrench_msg)
 	wrench->wrench = wrench_msg->wrench;
 	wrench->header.frame_id = _sensor_frame;
 
-	Eigen::Vector3f force  = _m*G*k + _f0;
-	Eigen::Vector3f torque = _r0.cross(_m*G*k) + _m0;
+	Eigen::Matrix<double, 3, 1> force  = _m*G*k + _f0;
+	Eigen::Matrix<double, 3, 1> torque = _r0.cross(_m*G*k) + _m0;
 
 	wrench->wrench.force.x  = wrench_msg->wrench.force.x  - force(0);
 	wrench->wrench.force.y  = wrench_msg->wrench.force.y  - force(1);
@@ -149,30 +151,48 @@ ftsensor::wrench_callback(const const_wrench_p& wrench_msg)
 }
 
 void
-ftsensor::take_sample(const Eigen::Vector3f& k, const geometry_msgs::Vector3& f)
+ftsensor::take_sample(const Eigen::Matrix<double, 3, 1>& k,
+		      const geometry_msgs::Vector3& f,
+		      const geometry_msgs::Vector3& m)
 {
-#ifdef __MY_DEBUG__
-    ROS_INFO_STREAM("k\n" << k);
-    showVector3("f", f);
-#endif /* __MY_DEBUG__ */
-
-    Eigen::Matrix4f At_A;
+    // force
+    Eigen::Matrix<double, 4, 4> At_A;
     At_A <<     1,     0,     0, -k(0),
                 0,     1,     0, -k(1),
                 0,     0,     1, -k(2),
             -k(0), -k(1), -k(2),     1;
     _At_A += At_A;
-#ifdef __MY_DEBUG__
-    ROS_INFO_STREAM("At_A\n" << At_A);
-    ROS_INFO_STREAM("_At_A\n" << _At_A);
-#endif /* __MY_DEBUG__ */
 
-    Eigen::Vector4f At_b;
+    Eigen::Matrix<double, 4, 1> At_b;
     At_b << f.x, f.y, f.z, -(k(0)*f.x + k(1)*f.y + k(2)*f.z);
     _At_b += At_b;
+
+    // torque
+    Eigen::Matrix<double, 6, 6> Ct_C;
+    Ct_C <<     1,     0,     0,     0, -k(2),  k(1),
+                0,     1,     0,  k(2),     0, -k(0),
+                0,     0,     1, -k(1),  k(0),     0,
+                0,  k(2), -k(1),     1,     0,     0,
+            -k(2),     0,  k(0),     0,     1,     0,
+             k(1), -k(0),     0,     0,     0,     1;
+    _Ct_C += Ct_C;
+
+    Eigen::Matrix<double, 6, 1> Ct_d;
+    Ct_d << m.x, m.y, m.z,
+	    k(2)*m.y - k(1)*m.z, k(0)*m.z - k(2)*m.x, k(1)*m.x - k(0)*m.y;
+
 #ifdef __MY_DEBUG__
-    ROS_INFO_STREAM("At_b\n" <<  At_b);
+    ROS_INFO_STREAM("k\n" << k);
+    ROS_INFO_STREAM("f\n" << f.x << f.y << f.z);
+    ROS_INFO_STREAM("m\n" << m.x << m.y << m.z);
+    ROS_INFO_STREAM(" At_A\n" <<  At_A);
+    ROS_INFO_STREAM("_At_A\n" << _At_A);
+    ROS_INFO_STREAM(" At_b\n" <<  At_b);
     ROS_INFO_STREAM("_At_b\n" << _At_b);
+    ROS_INFO_STREAM(" Ct_C\n" <<  Ct_C);
+    ROS_INFO_STREAM("_Ct_C\n" << _Ct_C);
+    ROS_INFO_STREAM(" Ct_d\n" <<  Ct_d);
+    ROS_INFO_STREAM("_Ct_d\n" << _Ct_d);
 #endif /* __MY_DEBUG__ */
 }
 
@@ -192,18 +212,30 @@ bool
 ftsensor::compute_calibration_callback(std_srvs::Trigger::Request  &req,
 				       std_srvs::Trigger::Response &res)
 {
-    const auto	result = _At_A.inverse() * _At_b;
+    const Eigen::Matrix<double, 4, 1> result_f = _At_A.inverse() * _At_b;
+    _f0 << result_f(0), result_f(1), result_f(2);
+    _m  = result_f(3)/G;
+
+    const Eigen::Matrix<double, 6, 1> result_t = _Ct_C.inverse() * _Ct_d;
+    _m0 << result_t(0), result_t(1), result_t(2);
+    double mg = _m * G;
+    _r0 << result_t(4)/mg, result_t(5)/mg, result_t(6)/mg;
+
 #ifdef __MY_DEBUG__
     ROS_INFO_STREAM("_At_A\n" << _At_A);
-    ROS_INFO_STREAM("(_At_A)inverse\n" << _At_A.inverse());
+    ROS_INFO_STREAM("_At_A(inverse)\n" << _At_A.inverse());
     ROS_INFO_STREAM("_At_b\n" << _At_b);
-    ROS_INFO_STREAM("_calibration_result\n" << result);
+    ROS_INFO_STREAM("result(force)\n" << result_f);
+    ROS_INFO_STREAM("_Ct_C\n" << _Ct_C);
+    ROS_INFO_STREAM("_Ct_C(inverse)\n" << _Ct_C.inverse());
+    ROS_INFO_STREAM("_Ct_d\n" << _Ct_d);
+    ROS_INFO_STREAM("result(torque)\n" << result_t);
 #endif /* __MY_DEBUG__ */
-    _f0 << result(0), result(1), result(2);
-    _m  = result(3)/G;
 
-    _At_A = Eigen::Matrix4f::Zero();
-    _At_b = Eigen::Vector4f::Zero();
+    _At_A = Eigen::Matrix<double, 4, 4>::Zero();
+    _At_b = Eigen::Matrix<double, 4, 1>::Zero();
+    _Ct_C = Eigen::Matrix<double, 6, 6>::Zero();
+    _Ct_d = Eigen::Matrix<double, 6, 1>::Zero();
 
     res.success = true;
     res.message = "compute_calibration succeeded.";
@@ -223,7 +255,15 @@ ftsensor::save_calibration_callback(std_srvs::Trigger::Request  &req,
 	emitter << YAML::Key << KEY_EFFECTOR_MASS << YAML::Value << _m;
 	emitter << YAML::Key << KEY_F_OFFSET      << YAML::Value
 		<< YAML::BeginSeq
-		<< _f0.x() << _f0.y() << _f0.z()
+		<< _f0(0) << _f0(1) << _f0(2)
+		<< YAML::EndSeq;
+	emitter << YAML::Key << KEY_M_OFFSET      << YAML::Value
+		<< YAML::BeginSeq
+		<< _m0(0) << _m0(1) << _m0(2)
+		<< YAML::EndSeq;
+	emitter << YAML::Key << KEY_R_OFFSET      << YAML::Value
+		<< YAML::BeginSeq
+		<< _r0(0) << _r0(1) << _r0(2)
 		<< YAML::EndSeq;
 	emitter << YAML::EndMap;
 
