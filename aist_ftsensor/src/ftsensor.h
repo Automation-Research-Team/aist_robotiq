@@ -52,10 +52,10 @@ class ftsensor
     std::string			_reference_frame;
     std::string			_sensor_frame;
     double			_rate;
-    tf::Vector3			_mg;
-    tf::Vector3			_f0;
-    tf::Vector3			_m0;
-    tf::Vector3			_r0;
+    double			_m;
+    Eigen::Vector3f		_f0;
+    Eigen::Vector3f		_m0;
+    Eigen::Vector3f		_r0;
 
     const ros::ServiceServer	_take_sample;
     const ros::ServiceServer	_compute_calibration;
@@ -64,7 +64,7 @@ class ftsensor
     Eigen::Matrix4f		_At_A;
     Eigen::Vector4f		_At_b;
 
-    void	take_sample(const tf::Matrix3x3& Rt,
+    void	take_sample(const Eigen::Vector3f& k,
 			    const geometry_msgs::Vector3& f)		;
 
 #ifdef __MY_DEBUG__
