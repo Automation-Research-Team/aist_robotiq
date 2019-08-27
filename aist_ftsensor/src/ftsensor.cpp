@@ -49,37 +49,37 @@ ftsensor::ftsensor(const std::string& name)
     {
 	YAML::Node yaml_node = YAML::LoadFile(filepath());
 
-	double effector_mass = yaml_node["effector_mass"].as<double>();
+	double effector_mass = yaml_node[KEY_EFFECTOR_MASS].as<double>();
 	if (effector_mass > 0)
 	    _m = effector_mass;
-	ROS_INFO_STREAM("effector_mass=" << _m);
+	ROS_INFO_STREAM(KEY_EFFECTOR_MASS << "=" << _m);
 
 	std::vector<double> vec;
-	vec = yaml_node["f_offset"].as<std::vector<double> >();
+	vec = yaml_node[KEY_F_OFFSET].as<std::vector<double> >();
 	if (vec.size() >= 3)
 	{
 	    for (int i = 0; i < 3; i++)
 		_f0(i) = vec[i];
 	}
-	ROS_INFO_STREAM("f_offset\n" << _f0);
+	ROS_INFO_STREAM(KEY_F_OFFSET << "\n" << _f0);
 
 	vec.clear();
-	vec = yaml_node["m_offset"].as<std::vector<double> >();
+	vec = yaml_node[KEY_M_OFFSET].as<std::vector<double> >();
 	if (vec.size() >= 3)
 	{
 	    for (int i = 0; i < 3; i++)
 		_m0(i) = vec[i];
 	}
-	ROS_INFO_STREAM("m_offset\n" << _m0);
+	ROS_INFO_STREAM(KEY_M_OFFSET << "\n" << _m0);
 
 	vec.clear();
-	vec = yaml_node["r_offset"].as<std::vector<double> >();
+	vec = yaml_node[KEY_R_OFFSET].as<std::vector<double> >();
 	if (vec.size() >= 3)
 	{
 	    for (int i = 0; i < 3; i++)
 		_r0(i) = vec[i];
 	}
-	ROS_INFO_STREAM("r_offset\n" << _r0);
+	ROS_INFO_STREAM(KEY_R_OFFSET << "\n" << _r0);
     }
     catch (const std::exception& err)
     {
@@ -220,8 +220,8 @@ ftsensor::save_calibration_callback(std_srvs::Trigger::Request  &req,
     {
 	YAML::Emitter emitter;
 	emitter << YAML::BeginMap;
-	emitter << YAML::Key << "effector_mass" << YAML::Value << _m;
-	emitter << YAML::Key << "f_offset" << YAML::Value
+	emitter << YAML::Key << KEY_EFFECTOR_MASS << YAML::Value << _m;
+	emitter << YAML::Key << KEY_F_OFFSET      << YAML::Value
 		<< YAML::BeginSeq
 		<< _f0.x() << _f0.y() << _f0.z()
 		<< YAML::EndSeq;

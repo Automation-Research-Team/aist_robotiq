@@ -25,6 +25,10 @@ class ftsensor
     using transform_t	 = tf::StampedTransform;
 
     constexpr static float	G = 9.8;
+    constexpr static auto&	KEY_EFFECTOR_MASS = "effector_mass";
+    constexpr static auto&	KEY_F_OFFSET	   = "f_offset";
+    constexpr static auto&	KEY_M_OFFSET	   = "m_offset";
+    constexpr static auto&	KEY_R_OFFSET	   = "r_offset";
 
   public:
 		ftsensor(const std::string& name)			;
