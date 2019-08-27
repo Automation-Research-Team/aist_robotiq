@@ -28,10 +28,10 @@ ftsensor::ftsensor(const std::string& name)
      _reference_frame("workspace_center"),
      _sensor_frame("ftsensor_wrench_link"),
      _rate(100),
-     _mg(0, 0, 0),
-     _f0(0, 0, 0),
-     _m0(0, 0, 0),
-     _r0(0, 0, 0),
+     _m(0),
+     _f0(Eigen::Vector3f::Zero()),
+     _m0(Eigen::Vector3f::Zero()),
+     _r0(Eigen::Vector3f::Zero()),
      _get_sample(false),
      _At_A(Eigen::Matrix4f::Zero()),
      _At_b(Eigen::Vector4f::Zero())
@@ -49,41 +49,37 @@ ftsensor::ftsensor(const std::string& name)
     {
 	YAML::Node yaml_node = YAML::LoadFile(filepath());
 
-	double	effector_mass = yaml_node["effector_mass"].as<double>();
+	double effector_mass = yaml_node["effector_mass"].as<double>();
 	if (effector_mass > 0)
-	    _mg = tf::Vector3(0, 0, -G * effector_mass);
-	ROS_INFO_STREAM("mg=[" << _mg.x() << "," << _mg.y() << "," << _mg.z()
-			<< ']');
+	    _m = effector_mass;
+	ROS_INFO_STREAM("effector_mass=" << _m);
 
 	std::vector<double> vec;
 	vec = yaml_node["f_offset"].as<std::vector<double> >();
 	if (vec.size() >= 3)
 	{
 	    for (int i = 0; i < 3; i++)
-		_f0.m_floats[i] = vec[i];
+		_f0(i) = vec[i];
 	}
-	ROS_INFO_STREAM("f_offset[" << _f0.x() << "," <<
-			_f0.y() << "," << _f0.z() << "]");
+	ROS_INFO_STREAM("f_offset\n" << _f0);
 
 	vec.clear();
 	vec = yaml_node["m_offset"].as<std::vector<double> >();
 	if (vec.size() >= 3)
 	{
 	    for (int i = 0; i < 3; i++)
-		_m0.m_floats[i] = vec[i];
+		_m0(i) = vec[i];
 	}
-	ROS_INFO_STREAM("m_offset[" << _m0.x() << "," <<
-			_m0.y() << "," << _m0.z() << "]");
+	ROS_INFO_STREAM("m_offset\n" << _m0);
 
 	vec.clear();
 	vec = yaml_node["r_offset"].as<std::vector<double> >();
 	if (vec.size() >= 3)
 	{
 	    for (int i = 0; i < 3; i++)
-		_r0.m_floats[i] = vec[i];
+		_r0(i) = vec[i];
 	}
-	ROS_INFO_STREAM("r_offset[" << _r0.x() << "," <<
-			_r0.y() << "," << _r0.z() << "]");
+	ROS_INFO_STREAM("r_offset\n" << _r0);
     }
     catch (const std::exception& err)
     {
@@ -121,10 +117,11 @@ ftsensor::wrench_callback(const const_wrench_p& wrench_msg)
 	transform_t	T;
 	_listener.lookupTransform(_sensor_frame, _reference_frame,
 	 			  wrench_msg->header.stamp, T);
-
+	Eigen::Vector3f	k(
+		T.getBasis()[2].x(), T.getBasis()[2].y(), T.getBasis()[2].z());
 	if (_get_sample)
 	{
-	    take_sample(T.getBasis(), wrench_msg->wrench.force);
+	    take_sample(k, wrench_msg->wrench.force);
 	    _get_sample = false;
 	}
 
@@ -133,16 +130,15 @@ ftsensor::wrench_callback(const const_wrench_p& wrench_msg)
 	wrench->wrench = wrench_msg->wrench;
 	wrench->header.frame_id = _sensor_frame;
 
-	tf::Matrix3x3 Rt = T.getBasis();
-	tf::Vector3   force  = Rt * _mg + _f0;
-	tf::Vector3   torque = _r0.cross(Rt * _mg) + _m0;
+	Eigen::Vector3f force  = _m*G*k + _f0;
+	Eigen::Vector3f torque = _r0.cross(_m*G*k) + _m0;
 
-	wrench->wrench.force.x  = wrench_msg->wrench.force.x  - force.x();
-	wrench->wrench.force.y  = wrench_msg->wrench.force.y  - force.y();
-	wrench->wrench.force.z  = wrench_msg->wrench.force.z  - force.z();
-	wrench->wrench.torque.x = wrench_msg->wrench.torque.x - torque.x();
-	wrench->wrench.torque.y = wrench_msg->wrench.torque.y - torque.y();
-	wrench->wrench.torque.z = wrench_msg->wrench.torque.z - torque.z();
+	wrench->wrench.force.x  = wrench_msg->wrench.force.x  - force(0);
+	wrench->wrench.force.y  = wrench_msg->wrench.force.y  - force(1);
+	wrench->wrench.force.z  = wrench_msg->wrench.force.z  - force(2);
+	wrench->wrench.torque.x = wrench_msg->wrench.torque.x - torque(0);
+	wrench->wrench.torque.y = wrench_msg->wrench.torque.y - torque(1);
+	wrench->wrench.torque.z = wrench_msg->wrench.torque.z - torque(2);
 
 	_publisher.publish(wrench);
     }
@@ -153,18 +149,18 @@ ftsensor::wrench_callback(const const_wrench_p& wrench_msg)
 }
 
 void
-ftsensor::take_sample(const tf::Matrix3x3& Rt, const geometry_msgs::Vector3& f)
+ftsensor::take_sample(const Eigen::Vector3f& k, const geometry_msgs::Vector3& f)
 {
 #ifdef __MY_DEBUG__
-    showMatrix3x3("Rt", Rt);
+    ROS_INFO_STREAM("k\n" << k);
     showVector3("f", f);
 #endif /* __MY_DEBUG__ */
 
     Eigen::Matrix4f At_A;
-    At_A <<           1,          0,          0, -Rt[2].x(),
-                      0,          1,          0, -Rt[2].y(),
-                      0,          0,          1, -Rt[2].z(),
-             -Rt[2].x(), -Rt[2].y(), -Rt[2].z(),          1;
+    At_A <<     1,     0,     0, -k(0),
+                0,     1,     0, -k(1),
+                0,     0,     1, -k(2),
+            -k(0), -k(1), -k(2),     1;
     _At_A += At_A;
 #ifdef __MY_DEBUG__
     ROS_INFO_STREAM("At_A\n" << At_A);
@@ -172,7 +168,7 @@ ftsensor::take_sample(const tf::Matrix3x3& Rt, const geometry_msgs::Vector3& f)
 #endif /* __MY_DEBUG__ */
 
     Eigen::Vector4f At_b;
-    At_b << f.x, f.y, f.z, -(Rt[2].x()*f.x + Rt[2].y()*f.y + Rt[2].z()*f.z);
+    At_b << f.x, f.y, f.z, -(k(0)*f.x + k(1)*f.y + k(2)*f.z);
     _At_b += At_b;
 #ifdef __MY_DEBUG__
     ROS_INFO_STREAM("At_b\n" <<  At_b);
@@ -203,8 +199,8 @@ ftsensor::compute_calibration_callback(std_srvs::Trigger::Request  &req,
     ROS_INFO_STREAM("_At_b\n" << _At_b);
     ROS_INFO_STREAM("_calibration_result\n" << result);
 #endif /* __MY_DEBUG__ */
-    _f0 = tf::Vector3(result(0), result(1), result(2));
-    _mg = tf::Vector3(0, 0, result(3));
+    _f0 << result(0), result(1), result(2);
+    _m  = result(3)/G;
 
     _At_A = Eigen::Matrix4f::Zero();
     _At_b = Eigen::Vector4f::Zero();
@@ -224,7 +220,7 @@ ftsensor::save_calibration_callback(std_srvs::Trigger::Request  &req,
     {
 	YAML::Emitter emitter;
 	emitter << YAML::BeginMap;
-	emitter << YAML::Key << "effector_mass" << YAML::Value << _mg.z()/G;
+	emitter << YAML::Key << "effector_mass" << YAML::Value << _m;
 	emitter << YAML::Key << "f_offset" << YAML::Value
 		<< YAML::BeginSeq
 		<< _f0.x() << _f0.y() << _f0.z()
