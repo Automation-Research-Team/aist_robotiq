@@ -119,8 +119,8 @@ ftsensor::wrench_callback(const const_wrench_p& wrench_msg)
 	transform_t	T;
 	_listener.lookupTransform(_sensor_frame, _reference_frame,
 	 			  wrench_msg->header.stamp, T);
-	Eigen::Matrix<double, 3, 1> k(
-		T.getBasis()[2].x(), T.getBasis()[2].y(), T.getBasis()[2].z());
+	Eigen::Matrix<double, 3, 1> k;
+	k << T.getBasis()[2].x(), T.getBasis()[2].y(), T.getBasis()[2].z();
 	if (_get_sample)
 	{
 	    take_sample(k, wrench_msg->wrench.force, wrench_msg->wrench.torque);
@@ -168,13 +168,21 @@ ftsensor::take_sample(const Eigen::Matrix<double, 3, 1>& k,
     _At_b += At_b;
 
     // torque
+    Eigen::Matrix<double, 3, 3> Ka; // antisymmetric matrix of k
+    Ka <<     0, -k(2),  k(1),
+           k(2),     0, -k(0),
+          -k(1),  k(0),     0;
+    Eigen::Matrix<double, 3, 3> Kat = Ka.transpose();
+    Eigen::Matrix<double, 3, 3> Kat_Ka = Kat * Ka;
+
     Eigen::Matrix<double, 6, 6> Ct_C;
-    Ct_C <<     1,     0,     0,     0, -k(2),  k(1),
-                0,     1,     0,  k(2),     0, -k(0),
-                0,     0,     1, -k(1),  k(0),     0,
-                0,  k(2), -k(1),     1,     0,     0,
-            -k(2),     0,  k(0),     0,     1,     0,
-             k(1), -k(0),     0,     0,     0,     1;
+    Ct_C <<
+	       1,        0,        0,    Ka(0, 0),    Ka(0, 1),    Ka(0, 2),
+	       0,        1,        0,    Ka(1, 0),    Ka(1, 1),    Ka(1, 1),
+	       0,        0,        1,    Ka(2, 0),    Ka(2, 1),    Ka(2, 2),
+	Kat(0,0), Kat(0,1), Kat(0,2), Kat_Ka(0,0), Kat_Ka(0,1), Kat_Ka(0,2),
+	Kat(1,0), Kat(1,1), Kat(1,2), Kat_Ka(1,0), Kat_Ka(1,1), Kat_Ka(1,2),
+	Kat(2,0), Kat(2,1), Kat(2,2), Kat_Ka(2,0), Kat_Ka(2,1), Kat_Ka(2,2);
     _Ct_C += Ct_C;
 
     Eigen::Matrix<double, 6, 1> Ct_d;
