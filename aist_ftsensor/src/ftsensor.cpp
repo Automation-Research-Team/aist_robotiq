@@ -119,8 +119,9 @@ ftsensor::wrench_callback(const const_wrench_p& wrench_msg)
 	transform_t	T;
 	_listener.lookupTransform(_sensor_frame, _reference_frame,
 	 			  wrench_msg->header.stamp, T);
+	const auto	colz = T.getBasis().getColumn(2);
 	Eigen::Matrix<double, 3, 1> k;
-	k << T.getBasis()[2].x(), T.getBasis()[2].y(), T.getBasis()[2].z();
+	k << colz.x(), colz.y(), colz.z();
 	if (_get_sample)
 	{
 	    take_sample(k, wrench_msg->wrench.force, wrench_msg->wrench.torque);
@@ -132,8 +133,8 @@ ftsensor::wrench_callback(const const_wrench_p& wrench_msg)
 	wrench->wrench = wrench_msg->wrench;
 	wrench->header.frame_id = _sensor_frame;
 
-	Eigen::Matrix<double, 3, 1> force  = _m*G*k + _f0;
-	Eigen::Matrix<double, 3, 1> torque = _r0.cross(_m*G*k) + _m0;
+	Eigen::Matrix<double, 3, 1> force  = -_m*G*k + _f0;
+	Eigen::Matrix<double, 3, 1> torque = -_r0.cross(_m*G*k) + _m0;
 
 	wrench->wrench.force.x  = wrench_msg->wrench.force.x  - force(0);
 	wrench->wrench.force.y  = wrench_msg->wrench.force.y  - force(1);
@@ -188,6 +189,7 @@ ftsensor::take_sample(const Eigen::Matrix<double, 3, 1>& k,
     Eigen::Matrix<double, 6, 1> Ct_d;
     Ct_d << m.x, m.y, m.z,
 	    k(2)*m.y - k(1)*m.z, k(0)*m.z - k(2)*m.x, k(1)*m.x - k(0)*m.y;
+    _Ct_d += Ct_d;
 
 #ifdef __MY_DEBUG__
     ROS_INFO_STREAM("k\n" << k);
@@ -197,10 +199,10 @@ ftsensor::take_sample(const Eigen::Matrix<double, 3, 1>& k,
     ROS_INFO_STREAM("_At_A\n" << _At_A);
     ROS_INFO_STREAM(" At_b\n" <<  At_b);
     ROS_INFO_STREAM("_At_b\n" << _At_b);
-    ROS_INFO_STREAM(" Ct_C\n" <<  Ct_C);
-    ROS_INFO_STREAM("_Ct_C\n" << _Ct_C);
-    ROS_INFO_STREAM(" Ct_d\n" <<  Ct_d);
-    ROS_INFO_STREAM("_Ct_d\n" << _Ct_d);
+    // ROS_INFO_STREAM(" Ct_C\n" <<  Ct_C);
+    // ROS_INFO_STREAM("_Ct_C\n" << _Ct_C);
+    // ROS_INFO_STREAM(" Ct_d\n" <<  Ct_d);
+    // ROS_INFO_STREAM("_Ct_d\n" << _Ct_d);
 #endif /* __MY_DEBUG__ */
 }
 
@@ -227,17 +229,17 @@ ftsensor::compute_calibration_callback(std_srvs::Trigger::Request  &req,
     const Eigen::Matrix<double, 6, 1> result_t = _Ct_C.inverse() * _Ct_d;
     _m0 << result_t(0), result_t(1), result_t(2);
     double mg = _m * G;
-    _r0 << result_t(4)/mg, result_t(5)/mg, result_t(6)/mg;
+    _r0 << result_t(3)/mg, result_t(4)/mg, result_t(5)/mg;
 
 #ifdef __MY_DEBUG__
     ROS_INFO_STREAM("_At_A\n" << _At_A);
     ROS_INFO_STREAM("_At_A(inverse)\n" << _At_A.inverse());
     ROS_INFO_STREAM("_At_b\n" << _At_b);
     ROS_INFO_STREAM("result(force)\n" << result_f);
-    ROS_INFO_STREAM("_Ct_C\n" << _Ct_C);
-    ROS_INFO_STREAM("_Ct_C(inverse)\n" << _Ct_C.inverse());
-    ROS_INFO_STREAM("_Ct_d\n" << _Ct_d);
-    ROS_INFO_STREAM("result(torque)\n" << result_t);
+    // ROS_INFO_STREAM("_Ct_C\n" << _Ct_C);
+    // ROS_INFO_STREAM("_Ct_C(inverse)\n" << _Ct_C.inverse());
+    // ROS_INFO_STREAM("_Ct_d\n" << _Ct_d);
+    // ROS_INFO_STREAM("result(torque)\n" << result_t);
 #endif /* __MY_DEBUG__ */
 
     _At_A = Eigen::Matrix<double, 4, 4>::Zero();
