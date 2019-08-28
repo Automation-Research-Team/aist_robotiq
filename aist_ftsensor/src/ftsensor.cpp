@@ -193,8 +193,8 @@ ftsensor::take_sample(const Eigen::Matrix<double, 3, 1>& k,
 
 #ifdef __MY_DEBUG__
     ROS_INFO_STREAM("k\n" << k);
-    ROS_INFO_STREAM("f\n" << f.x << f.y << f.z);
-    ROS_INFO_STREAM("m\n" << m.x << m.y << m.z);
+    ROS_INFO_STREAM("f\n" << f.x << " " << f.y << " " << f.z);
+    ROS_INFO_STREAM("m\n" << m.x << " " << m.y << " " << m.z);
     ROS_INFO_STREAM(" At_A\n" <<  At_A);
     ROS_INFO_STREAM("_At_A\n" << _At_A);
     ROS_INFO_STREAM(" At_b\n" <<  At_b);
@@ -203,6 +203,22 @@ ftsensor::take_sample(const Eigen::Matrix<double, 3, 1>& k,
     // ROS_INFO_STREAM("_Ct_C\n" << _Ct_C);
     // ROS_INFO_STREAM(" Ct_d\n" <<  Ct_d);
     // ROS_INFO_STREAM("_Ct_d\n" << _Ct_d);
+
+    if (_to_dump)
+    {
+	try
+	{
+	    std::ofstream dump(DBG_DUMP_FILE);
+	    dump << f.x  << " " << f.y  << " " << f.z  << " "
+	         << m.x  << " " << m.y  << " " << m.z  << " "
+	         << k(0) << " " << k(1) << " " << k(2) << "\n";
+	    dump.close();
+	}
+	catch (const std::exception& err)
+	{
+	    ROS_ERROR_STREAM(err.what());
+	}
+    }
 #endif /* __MY_DEBUG__ */
 }
 
@@ -279,6 +295,7 @@ ftsensor::save_calibration_callback(std_srvs::Trigger::Request  &req,
 
 	std::ofstream f(filepath());
 	f << emitter.c_str() << std::endl;
+	f.close();
 
 	res.success = true;
 	res.message = "save_calibration succeeded.";

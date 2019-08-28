@@ -162,6 +162,14 @@ target_link_libraries(${PROJECT_NAME}
   yaml-cpp
 )
 
+add_executable(my_debug src/ftsensor.cpp src/my_debug.cpp)
+
+target_link_libraries(my_debug
+  ${catkin_LIBRARIES}
+  ${roscpp_LIBRARIES}
+  yaml-cpp
+)
+
 #############
 ## Install ##
 #############

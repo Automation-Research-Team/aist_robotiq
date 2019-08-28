@@ -73,6 +73,20 @@ class ftsensor
     void	take_sample(const Eigen::Matrix<double, 3, 1>& k,
 			    const geometry_msgs::Vector3& f,
 			    const geometry_msgs::Vector3& m)		;
+
+#ifdef __MY_DEBUG__
+  public:
+    constexpr static auto&	DBG_DUMP_FILE	   = "/tmp/debug_fmk.dump";
+    void	dbg_take_sample(const Eigen::Matrix<double, 3, 1>& k,
+			    const geometry_msgs::Vector3& f,
+			    const geometry_msgs::Vector3& m)
+    {
+	_to_dump = false;
+	take_sample(k, f, m);
+    }
+  private:
+    bool _to_dump = true;
+#endif /* __MY_DEBUG__ */
 };
 
 }	// namespace aist_ftsensor
