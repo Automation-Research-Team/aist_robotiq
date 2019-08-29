@@ -158,14 +158,14 @@ ftsensor::take_sample(const Eigen::Matrix<double, 3, 1>& k,
 {
     // force
     Eigen::Matrix<double, 4, 4> At_A;
-    At_A <<     1,     0,     0, -k(0),
-                0,     1,     0, -k(1),
-                0,     0,     1, -k(2),
-            -k(0), -k(1), -k(2),     1;
+    At_A <<    1,    0,    0, k(0),
+               0,    1,    0, k(1),
+               0,    0,    1, k(2),
+            k(0), k(1), k(2),    1;
     _At_A += At_A;
 
     Eigen::Matrix<double, 4, 1> At_b;
-    At_b << f.x, f.y, f.z, -(k(0)*f.x + k(1)*f.y + k(2)*f.z);
+    At_b << f.x, f.y, f.z, (k(0)*f.x + k(1)*f.y + k(2)*f.z);
     _At_b += At_b;
 
     // torque
@@ -241,7 +241,7 @@ ftsensor::compute_calibration_callback(std_srvs::Trigger::Request  &req,
 {
     const Eigen::Matrix<double, 4, 1> result_f = _At_A.inverse() * _At_b;
     _f0 << result_f(0), result_f(1), result_f(2);
-    _m  = result_f(3)/G;
+    _m  = -result_f(3)/G;
 
     const Eigen::Matrix<double, 6, 1> result_t = _Ct_C.inverse() * _Ct_d;
     _m0 << result_t(0), result_t(1), result_t(2);
