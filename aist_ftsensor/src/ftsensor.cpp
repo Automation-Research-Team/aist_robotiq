@@ -204,21 +204,22 @@ ftsensor::take_sample(const Eigen::Matrix<double, 3, 1>& k,
     // ROS_INFO_STREAM(" Ct_d\n" <<  Ct_d);
     // ROS_INFO_STREAM("_Ct_d\n" << _Ct_d);
 
+#if __MY_DEBUG__ > 1
     if (_to_dump)
     {
 	try
 	{
-	    std::ofstream dump(DBG_DUMP_FILE);
+	    std::ofstream dump(DBG_DUMP_FILE, std::ios::app);
 	    dump << f.x  << " " << f.y  << " " << f.z  << " "
 	         << m.x  << " " << m.y  << " " << m.z  << " "
 	         << k(0) << " " << k(1) << " " << k(2) << "\n";
-	    dump.close();
 	}
 	catch (const std::exception& err)
 	{
 	    ROS_ERROR_STREAM(err.what());
 	}
     }
+#endif /* __MY_DEBUG__ > 1 */
 #endif /* __MY_DEBUG__ */
 }
 
@@ -295,7 +296,6 @@ ftsensor::save_calibration_callback(std_srvs::Trigger::Request  &req,
 
 	std::ofstream f(filepath());
 	f << emitter.c_str() << std::endl;
-	f.close();
 
 	res.success = true;
 	res.message = "save_calibration succeeded.";

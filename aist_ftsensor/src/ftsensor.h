@@ -74,9 +74,9 @@ class ftsensor
 			    const geometry_msgs::Vector3& f,
 			    const geometry_msgs::Vector3& m)		;
 
-#ifdef __MY_DEBUG__
+#if defined(__MY_DEBUG__) && ( __MY_DEBUG__ > 1 )
   public:
-    constexpr static auto&	DBG_DUMP_FILE	   = "/tmp/debug_fmk.dump";
+    constexpr static auto& DBG_DUMP_FILE = "/tmp/aist_ftsensor_dbg.dump";
     void	dbg_take_sample(const Eigen::Matrix<double, 3, 1>& k,
 			    const geometry_msgs::Vector3& f,
 			    const geometry_msgs::Vector3& m)

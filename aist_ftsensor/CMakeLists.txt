@@ -70,10 +70,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  geometry_msgs#   std_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   geometry_msgs#   std_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -152,7 +152,7 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
-add_definitions(-D__MY_DEBUG__)
+add_definitions(-D__MY_DEBUG__=2)
 
 add_executable(${PROJECT_NAME} src/ftsensor.cpp src/main.cpp)
 
@@ -162,8 +162,8 @@ target_link_libraries(${PROJECT_NAME}
   yaml-cpp
 )
 
+## only __MY_DEBUG__=2
 add_executable(my_debug src/ftsensor.cpp src/my_debug.cpp)
-
 target_link_libraries(my_debug
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}

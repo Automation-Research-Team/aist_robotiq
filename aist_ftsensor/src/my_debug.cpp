@@ -49,7 +49,6 @@ main(int argc, char* argv[])
 
 	    node.dbg_take_sample(k, f, m);
 	}
-	dump.close();
 	std_srvs::Trigger::Request  req;    // dummy
 	std_srvs::Trigger::Response res;    // dummy
 	node.compute_calibration_callback(req, res);
