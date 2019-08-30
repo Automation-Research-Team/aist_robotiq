@@ -109,6 +109,8 @@ ftsensor::tick()
 	s = splitd(s, wrench->wrench.torque.z);
 
 	transform_t     T;
+	_listener.waitForTransform(_sensor_frame, _reference_frame,
+				   wrench->header.stamp, ros::Duration(1.0));
 	_listener.lookupTransform(_sensor_frame, _reference_frame,
 				  wrench->header.stamp, T);
 	const auto	colz = T.getBasis().getColumn(2);
