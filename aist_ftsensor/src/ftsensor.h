@@ -31,10 +31,19 @@ class ftsensor
     constexpr static auto&	KEY_R_OFFSET	   = "r_offset";
 
   public:
-		ftsensor(const std::string& name)			;
+    enum InputWrenchType
+    {
+	SUBSCRIBE = 0,
+	SOCKET,
+    };
+
+  public:
+		ftsensor(const std::string& name,
+		    const InputWrenchType iwrench=InputWrenchType::SUBSCRIBE);
 		~ftsensor()						;
 
     void	run()							;
+    void	tick()							;
     double	rate()						const	;
 
     void	wrench_callback(const const_wrench_p& wrench_msg)	;
@@ -50,6 +59,8 @@ class ftsensor
 
   private:
     ros::NodeHandle		_nh;
+    const InputWrenchType	_iwrench;
+    const int			_socket;
     const ros::Publisher	_publisher;
     const ros::Subscriber	_subscriber;
     const tf::TransformListener	_listener;
@@ -69,6 +80,10 @@ class ftsensor
     Eigen::Matrix<double, 4, 1>	_At_b;	    // force
     Eigen::Matrix<double, 6, 6>	_Ct_C;	    // torque
     Eigen::Matrix<double, 6, 1>	_Ct_d;	    // torque
+
+    void	up_socket()						;
+    void	down_socket()						;
+    bool	connect_socket(u_long hostname, int port)		;
 
     void	take_sample(const Eigen::Matrix<double, 3, 1>& k,
 			    const geometry_msgs::Vector3& f,

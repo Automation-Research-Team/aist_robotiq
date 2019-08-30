@@ -3,11 +3,23 @@
   <arg name="reference_frame"	default="workspace_center"/>
   <arg name="sensor_frame"	default="$(arg robot_name)_ft300_wrench_link"/>
   <arg name="rate"              default="100"/>
+
+  <!--
+  <arg name="input_wrench_type" default="subscribe"/>
+  -->
+  <!-- for socket -->
+  <arg name="input_wrench_type" default="socket"/>
+  <arg name="hostname" default="$(arg robot_name)"/>
+  <arg name="port"      default="63351"/>
+
   <node name="$(arg robot_name)_ftsensor"
         pkg="aist_ftsensor" type="aist_ftsensor" output="screen">
     <param name="reference_frame"	value="$(arg reference_frame)" />
     <param name="sensor_frame"		value="$(arg sensor_frame)" />
     <param name="rate"			value="$(arg rate)" />
+    <param name="input_wrench_type"	value="$(arg input_wrench_type)" />
+    <param name="hostname"  value="$(arg hostname)"/>
+    <param name="port"      value="$(arg port)"/>
     <remap from="/wrench_in" to="/$(arg robot_name)_controller/wrench"/>
     <rosparam command="load"
               file="$(find aist_ftsensor)/config/ftsensor.yaml"/>
