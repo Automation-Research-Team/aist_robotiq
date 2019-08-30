@@ -4,6 +4,8 @@
  */
 #include "ftsensor.h"
 #include <ros/package.h>
+#include <ros/param.h>
+#include <string.h>
 
 /************************************************************************
 *  global functions							*
@@ -17,7 +19,22 @@ main(int argc, char* argv[])
 
     try
     {
-	aist_ftsensor::ftsensor	node("~");
+	aist_ftsensor::ftsensor::InputWrenchType iwrench =
+			aist_ftsensor::ftsensor::InputWrenchType::SUBSCRIBE;
+	std::string input_wrench_type;
+	if (ros::param::get("~input_wrench_type", input_wrench_type))
+	{
+	    if (! strcasecmp(input_wrench_type.c_str(), "socket"))
+		iwrench = aist_ftsensor::ftsensor::InputWrenchType::SOCKET;
+#if 0	/* same to default */
+	    if (! strcasecmp(input_wrench_type.c_str(), "subscribe"))
+		iwrench = aist_ftsensor::ftsensor::InputWrenchType::SUBSCRIBE;
+#endif
+	}
+	ROS_INFO_STREAM("input_wrench_type[" << input_wrench_type << "]["
+			<< iwrench << "]");
+
+	aist_ftsensor::ftsensor	node("~", iwrench);
 
 	std::ifstream dump(node.DBG_DUMP_FILE);
 	ROS_INFO_STREAM("load file=" << node.DBG_DUMP_FILE);

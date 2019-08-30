@@ -6,16 +6,23 @@
 #include <ros/package.h>
 #include <yaml-cpp/yaml.h>
 
+#include <sys/types.h>
+#include <sys/socket.h>
+
 namespace aist_ftsensor
 {
 /************************************************************************
 *  class ftsensor							*
 ************************************************************************/
-ftsensor::ftsensor(const std::string& name)
+ftsensor::ftsensor(const std::string& name, const InputWrenchType iwrench)
     :_nh(name),
+     _iwrench(iwrench),
      _publisher(_nh.advertise<wrench_t>("wrench", 100)),
-     _subscriber(_nh.subscribe("/wrench_in", 100,
-			       &ftsensor::wrench_callback, this)),
+     _subscriber(iwrench == InputWrenchType::SUBSCRIBE ?
+	    _nh.subscribe("/wrench_in", 100, &ftsensor::wrench_callback, this):
+	    ros::Subscriber()),
+     _socket(iwrench == InputWrenchType::SOCKET ?
+	    socket(AF_INET, SOCK_STREAM, 0): 0),
      _take_sample(_nh.advertiseService("take_sample",
 				       &ftsensor::take_sample_callback, this)),
      _compute_calibration(_nh.advertiseService(
@@ -46,6 +53,13 @@ ftsensor::ftsensor(const std::string& name)
 
     ROS_INFO_STREAM("reference_frame=" << _reference_frame <<
 		    ", sensor_frame=" << _sensor_frame << ", rate=" << _rate);
+
+    ROS_INFO_STREAM("input wrench type=" << _iwrench);
+    ROS_INFO_STREAM("subscriber topic[" << _subscriber.getTopic() <<"]");
+    ROS_INFO_STREAM("socket=" << _socket);
+
+    if (_iwrench == InputWrenchType::SOCKET)
+	up_socket();
 
     try
     {
@@ -93,6 +107,8 @@ ftsensor::ftsensor(const std::string& name)
 
 ftsensor::~ftsensor()
 {
+    if (_iwrench == InputWrenchType::SOCKET)
+	down_socket();
 }
 
 void
@@ -102,6 +118,8 @@ ftsensor::run()
 
     while (ros::ok())
     {
+	if (_iwrench == InputWrenchType::SOCKET)
+	    tick();
 	ros::spinOnce();
 	rate.sleep();
     }
