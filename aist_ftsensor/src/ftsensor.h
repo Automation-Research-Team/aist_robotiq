@@ -31,22 +31,22 @@ class ftsensor
     constexpr static auto&	KEY_R_OFFSET	   = "r_offset";
 
   public:
-    enum InputWrenchType
+    enum Input
     {
-	SUBSCRIBE = 0,
+	TOPIC = 0,
 	SOCKET,
     };
 
   public:
 		ftsensor(const std::string& name,
-		    const InputWrenchType iwrench=InputWrenchType::SUBSCRIBE);
+			 const Input input=Input::TOPIC)		;
 		~ftsensor()						;
 
     void	run()							;
     void	tick()							;
     double	rate()						const	;
 
-    void	wrench_callback(const const_wrench_p& wrench_msg)	;
+    void	wrench_callback(const const_wrench_p& wrench)		;
     bool	take_sample_callback(std_srvs::Trigger::Request  &req,
 				     std_srvs::Trigger::Response &res)	;
     bool	compute_calibration_callback(
@@ -59,7 +59,7 @@ class ftsensor
 
   private:
     ros::NodeHandle		_nh;
-    const InputWrenchType	_iwrench;
+    const Input			_input;
     const int			_socket;
     const ros::Publisher	_publisher;
     const ros::Subscriber	_subscriber;
