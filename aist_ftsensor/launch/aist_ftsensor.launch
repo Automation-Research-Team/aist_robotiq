@@ -5,10 +5,10 @@
   <arg name="rate"              default="100"/>
 
   <!--
-  <arg name="input_wrench_type" default="subscribe"/>
+  <arg name="input" default="topic"/>
   -->
   <!-- for socket -->
-  <arg name="input_wrench_type" default="socket"/>
+  <arg name="input"		default="socket"/>
   <arg name="hostname"		default="$(arg robot_name)"/>
   <arg name="port"		default="63351"/>
 
@@ -17,9 +17,9 @@
     <param name="reference_frame"	value="$(arg reference_frame)" />
     <param name="sensor_frame"		value="$(arg sensor_frame)" />
     <param name="rate"			value="$(arg rate)" />
-    <param name="input_wrench_type"	value="$(arg input_wrench_type)" />
-    <param name="hostname"  value="$(arg hostname)"/>
-    <param name="port"      value="$(arg port)"/>
+    <param name="input"			value="$(arg input)" />
+    <param name="hostname"		value="$(arg hostname)"/>
+    <param name="port"			value="$(arg port)"/>
     <remap from="/wrench_in" to="/$(arg robot_name)_controller/wrench"/>
     <rosparam command="load"
               file="$(find aist_ftsensor)/config/ftsensor.yaml"/>
