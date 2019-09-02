@@ -190,6 +190,28 @@ ftsensor::up_socket()
     }
 }
 
+bool
+ftsensor::connect_socket(u_long s_addr, int port)
+{
+    sockaddr_in	server;
+    server.sin_family	   = AF_INET;
+    server.sin_port	   = htons(port);
+    server.sin_addr.s_addr = s_addr;
+    ROS_INFO_STREAM("trying to connect socket to "
+		    << inet_ntoa(server.sin_addr) << ':'
+		    << port << "...");
+    if (::connect(_socket, (sockaddr*)&server, sizeof(server)) == 0)
+    {
+	ROS_INFO_STREAM("succeeded.");
+	return true;
+    }
+    else
+    {
+	ROS_ERROR_STREAM("failed: " << strerror(errno));
+	return false;
+    }
+}
+
 void
 ftsensor::down_socket()
 {
@@ -209,41 +231,18 @@ ftsensor::tick()
     }
     buf[nbytes] = '\0';
 
-    try
-    {
-	wrench_p	wrench(new wrench_t);
-	wrench->header.stamp    = ros::Time::now();
+    wrench_p	wrench(new wrench_t);
+    wrench->header.stamp = ros::Time::now();
 
-	const char*	s = buf.data();
-	s = splitd(s, wrench->wrench.force.x);
-	s = splitd(s, wrench->wrench.force.y);
-	s = splitd(s, wrench->wrench.force.z);
-	s = splitd(s, wrench->wrench.torque.x);
-	s = splitd(s, wrench->wrench.torque.y);
-	s = splitd(s, wrench->wrench.torque.z);
-
-	wrench_callback(wrench);
-}
-
-bool
-ftsensor::connect_socket(u_long s_addr, int port)
-{
-    sockaddr_in	server;
-    server.sin_family	   = AF_INET;
-    server.sin_port	   = htons(port);
-    server.sin_addr.s_addr = s_addr;
-    ROS_INFO_STREAM("trying to connect socket to "
-		    << inet_ntoa(server.sin_addr) << ':' << port << "...");
-    if (::connect(_socket, (sockaddr*)&server, sizeof(server)) == 0)
-    {
-	ROS_INFO_STREAM("succeeded.");
-	return true;
-    }
-    else
-    {
-	ROS_ERROR_STREAM("failed: " << strerror(errno));
-	return false;
-    }
+    const char*	s = buf.data();
+    s = splitd(s, wrench->wrench.force.x);
+    s = splitd(s, wrench->wrench.force.y);
+    s = splitd(s, wrench->wrench.force.z);
+    s = splitd(s, wrench->wrench.torque.x);
+    s = splitd(s, wrench->wrench.torque.y);
+    s = splitd(s, wrench->wrench.torque.z);
+    
+    wrench_callback(wrench);
 }
 
 void
@@ -255,7 +254,8 @@ ftsensor::wrench_callback(const const_wrench_p& wrench)
     {
 	transform_t	T;
 	_listener.waitForTransform(_sensor_frame, _reference_frame,
-				   wrench->header.stamp, ros::Duration(10));
+				   wrench->header.stamp,
+				   ros::Duration(10));
 	_listener.lookupTransform(_sensor_frame, _reference_frame,
 	 			  wrench->header.stamp, T);
 	const auto	colz = T.getBasis().getColumn(2);
@@ -267,19 +267,20 @@ ftsensor::wrench_callback(const const_wrench_p& wrench)
 	    _get_sample = false;
 	}
 
-	wrench->header.frame_id = _sensor_frame;
-
 	Eigen::Matrix<double, 3, 1> force  = -_m*G*k + _f0;
 	Eigen::Matrix<double, 3, 1> torque = -_r0.cross(_m*G*k) + _m0;
 
-	wrench->wrench.force.x  -= force(0);
-	wrench->wrench.force.y  -= force(1);
-	wrench->wrench.force.z  -= force(2);
-	wrench->wrench.torque.x -= torque(0);
-	wrench->wrench.torque.y -= torque(1);
-	wrench->wrench.torque.z -= torque(2);
+	wrench_p	wrench_fixed(new wrench_t);
+	wrench_fixed->header.stamp    = wrench->header.stamp;
+	wrench_fixed->header.frame_id = _sensor_frame;
+	wrench_fixed->wrench.force.x  = wrench->wrench.force.x  - force(0);
+	wrench_fixed->wrench.force.y  = wrench->wrench.force.y  - force(1);
+	wrench_fixed->wrench.force.z  = wrench->wrench.force.z  - force(2);
+	wrench_fixed->wrench.torque.x = wrench->wrench.torque.x - torque(0);
+	wrench_fixed->wrench.torque.y = wrench->wrench.torque.y - torque(1);
+	wrench_fixed->wrench.torque.z = wrench->wrench.torque.z - torque(2);
 
-	_publisher.publish(wrench);
+	_publisher.publish(wrench_fixed);
     }
     catch (const std::exception& err)
     {
