@@ -339,5 +339,12 @@
       <child link="${prefix}tool0"/>
     </joint>
 
+    <link name="${prefix}wrench_link"/>
+    <joint name="${prefix}wrench_joint" type="fixed">
+      <parent link="${prefix}ee_link"/>
+      <child  link="${prefix}wrench_link"/>
+      <origin xyz="0 0 0" rpy="${-pi/2} 0 ${pi/2}"/>
+    </joint>
+
   </xacro:macro>
 </robot>
