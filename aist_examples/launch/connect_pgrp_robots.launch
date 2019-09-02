@@ -86,13 +86,13 @@
   </include>
 
   <!-- Drivers for the force sensors -->
-  <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch">
-    <arg name="robot_name"	value="a_bot"/>
-  </include>
+  <!-- <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch"> -->
+  <!--   <arg name="robot_name"	value="a_bot"/> -->
+  <!-- </include> -->
 
-  <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch">
-    <arg name="robot_name"	value="b_bot"/>
-  </include>
+  <!-- <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch"> -->
+  <!--   <arg name="robot_name"	value="b_bot"/> -->
+  <!-- </include> -->
 
   <!-- Launch fastening tools -->
   <node name="suction_controller" pkg="o2as_fastening_tools"
