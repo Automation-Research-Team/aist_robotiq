@@ -48,6 +48,7 @@ class ftsensor
 		~ftsensor()						;
 
     void	run()							;
+    void	tick()							;
     double	rate()						const	;
     bool	take_sample_callback(std_srvs::Trigger::Request&  req,
 				     std_srvs::Trigger::Response& res)	;
@@ -62,7 +63,6 @@ class ftsensor
     void	up_socket()						;
     void	down_socket()						;
     bool	connect_socket(u_long hostname, int port)		;
-    void	tick()							;
     void	wrench_callback(const const_wrench_p& wrench)		;
     void	take_sample(const vector3_t& k,
 			    const geometry_msgs::Vector3& f,
