@@ -83,13 +83,15 @@
 
   <!-- Drivers for the force sensors -->
   <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch">
+    <arg name="input"		value="topic"/>
     <arg name="robot_name"	value="c_bot"/>
-    <arg name="sensor_frame"	value="c_bot_ee_link"/>
+    <arg name="sensor_frame"	value="c_bot_wrench_link"/>
   </include>
 
   <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch">
+    <arg name="input"		value="topic"/>
     <arg name="robot_name"	value="d_bot"/>
-    <arg name="sensor_frame"	value="d_bot_ee_link"/>
+    <arg name="sensor_frame"	value="d_bot_wrench_link"/>
   </include>
 
 </launch>

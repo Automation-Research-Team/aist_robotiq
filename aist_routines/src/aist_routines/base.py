@@ -31,7 +31,7 @@ def paramtuples(d):
     for key, param in d.items():
         id = int(key.split('_')[1])
         params[id] = ParamTuple(**param)
-    return params
+    return param
 
 ######################################################################
 #  class AISTBaseRoutines                                            #
@@ -46,12 +46,12 @@ class AISTBaseRoutines(object):
         rospy.sleep(1.0)        # Necessary for listner spinning up
 
         # Grippers and cameras
-        d = rospy.get_param("grippers")
+        d = rospy.get_param("grippers", {})
         self._grippers = {}
         for robot_name, gripper in d.items():
             self._grippers[robot_name] = self._create_device(gripper["type"],
                                                              gripper["args"])
-        d = rospy.get_param("cameras")
+        d = rospy.get_param("cameras", {})
         self._cameras = {}
         for camera_name, camera in d.items():
             self._cameras[camera_name] = self._create_device(camera["type"],
