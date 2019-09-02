@@ -16,7 +16,6 @@
 
 namespace aist_ftsensor
 {
-
 /************************************************************************
 *  static functions							*
 ************************************************************************/
@@ -41,10 +40,11 @@ splitd(const char* s, double& val)
 ftsensor::ftsensor(const std::string& name, const Input input)
     :_nh(name),
      _input(input),
-     _publisher(_nh.advertise<wrench_t>("wrench", 100)),
      _subscriber(input == Input::TOPIC ?
 	    _nh.subscribe("/wrench_in", 100, &ftsensor::wrench_callback, this):
 	    ros::Subscriber()),
+     _publisher_org(_nh.advertise<wrench_t>("wrench_org", 100)),
+     _publisher_fixed(_nh.advertise<wrench_t>("wrench", 100)),
      _socket(input == Input::SOCKET ? socket(AF_INET, SOCK_STREAM, 0): 0),
      _take_sample(_nh.advertiseService("take_sample",
 				       &ftsensor::take_sample_callback, this)),
@@ -60,13 +60,13 @@ ftsensor::ftsensor(const std::string& name, const Input input)
      _rate(100),
      _get_sample(false),
      _m(0),
-     _f0(Eigen::Matrix<double, 3, 1>::Zero()),
-     _m0(Eigen::Matrix<double, 3, 1>::Zero()),
-     _r0(Eigen::Matrix<double, 3, 1>::Zero()),
-     _At_A(Eigen::Matrix<double, 4, 4>::Zero()),
-     _At_b(Eigen::Matrix<double, 4, 1>::Zero()),
-     _Ct_C(Eigen::Matrix<double, 6, 6>::Zero()),
-     _Ct_d(Eigen::Matrix<double, 6, 1>::Zero())
+     _f0(vector3_t::Zero()),
+     _m0(vector3_t::Zero()),
+     _r0(vector3_t::Zero()),
+     _At_A(matrix44_t::Zero()),
+     _At_b(vector4_t::Zero()),
+     _Ct_C(matrix66_t::Zero()),
+     _Ct_d(vector6_t::Zero())
 {
     _nh.param<std::string>("reference_frame", _reference_frame,
 			   "workspace_center");
@@ -94,31 +94,31 @@ ftsensor::ftsensor(const std::string& name, const Input input)
 	ROS_INFO_STREAM(KEY_EFFECTOR_MASS << "=" << _m);
 
 	std::vector<double> vec;
-	vec = yaml_node[KEY_F_OFFSET].as<std::vector<double> >();
+	vec = yaml_node[KEY_FORCE_OFFSET].as<std::vector<double> >();
 	if (vec.size() >= 3)
 	{
 	    for (int i = 0; i < 3; i++)
 		_f0(i) = vec[i];
 	}
-	ROS_INFO_STREAM(KEY_F_OFFSET << "\n" << _f0);
+	ROS_INFO_STREAM(KEY_FORCE_OFFSET << "\n" << _f0);
 
 	vec.clear();
-	vec = yaml_node[KEY_M_OFFSET].as<std::vector<double> >();
+	vec = yaml_node[KEY_TORQUE_OFFSET].as<std::vector<double> >();
 	if (vec.size() >= 3)
 	{
 	    for (int i = 0; i < 3; i++)
 		_m0(i) = vec[i];
 	}
-	ROS_INFO_STREAM(KEY_M_OFFSET << "\n" << _m0);
+	ROS_INFO_STREAM(KEY_TORQUE_OFFSET << "\n" << _m0);
 
 	vec.clear();
-	vec = yaml_node[KEY_R_OFFSET].as<std::vector<double> >();
+	vec = yaml_node[KEY_MASS_CENTER].as<std::vector<double> >();
 	if (vec.size() >= 3)
 	{
 	    for (int i = 0; i < 3; i++)
 		_r0(i) = vec[i];
 	}
-	ROS_INFO_STREAM(KEY_R_OFFSET << "\n" << _r0);
+	ROS_INFO_STREAM(KEY_MASS_CENTER << "\n" << _r0);
     }
     catch (const std::exception& err)
     {
@@ -146,6 +146,101 @@ ftsensor::run()
 	ros::spinOnce();
 	rate.sleep();
     }
+}
+
+double
+ftsensor::rate() const
+{
+    return _rate;
+}
+
+bool
+ftsensor::take_sample_callback(std_srvs::Trigger::Request  &req,
+			       std_srvs::Trigger::Response &res)
+{
+    _get_sample = true;
+    res.success = true;
+    res.message = "take_sample succeeded.";
+    ROS_INFO_STREAM(res.message);
+
+    return true;
+}
+
+bool
+ftsensor::compute_calibration_callback(std_srvs::Trigger::Request  &req,
+				       std_srvs::Trigger::Response &res)
+{
+    const vector4_t	result_f = _At_A.inverse() * _At_b;
+    _f0 << result_f(0), result_f(1), result_f(2);
+    _m  = -result_f(3)/G;
+
+    const vector6_t result_t = _Ct_C.inverse() * _Ct_d;
+    _m0 << result_t(0), result_t(1), result_t(2);
+    const double	mg = _m * G;
+    _r0 << result_t(3)/mg, result_t(4)/mg, result_t(5)/mg;
+
+#ifdef __MY_DEBUG__
+    ROS_INFO_STREAM("_At_A\n" << _At_A);
+    ROS_INFO_STREAM("_At_A(inverse)\n" << _At_A.inverse());
+    ROS_INFO_STREAM("_At_b\n" << _At_b);
+    ROS_INFO_STREAM("result(force)\n" << result_f);
+    // ROS_INFO_STREAM("_Ct_C\n" << _Ct_C);
+    // ROS_INFO_STREAM("_Ct_C(inverse)\n" << _Ct_C.inverse());
+    // ROS_INFO_STREAM("_Ct_d\n" << _Ct_d);
+    // ROS_INFO_STREAM("result(torque)\n" << result_t);
+#endif /* __MY_DEBUG__ */
+
+    _At_A = matrix44_t::Zero();
+    _At_b = vector4_t::Zero();
+    _Ct_C = matrix66_t::Zero();
+    _Ct_d = vector6_t::Zero();
+
+    res.success = true;
+    res.message = "compute_calibration succeeded.";
+    ROS_INFO_STREAM(res.message);
+
+    return true;
+}
+
+bool
+ftsensor::save_calibration_callback(std_srvs::Trigger::Request  &req,
+				    std_srvs::Trigger::Response &res)
+{
+    try
+    {
+	YAML::Emitter emitter;
+	emitter << YAML::BeginMap;
+	emitter << YAML::Key << KEY_EFFECTOR_MASS << YAML::Value << _m;
+	emitter << YAML::Key << KEY_FORCE_OFFSET  << YAML::Value << YAML::Flow
+		<< YAML::BeginSeq
+		<< _f0(0) << _f0(1) << _f0(2)
+		<< YAML::EndSeq;
+	emitter << YAML::Key << KEY_TORQUE_OFFSET << YAML::Value << YAML::Flow
+		<< YAML::BeginSeq
+		<< _m0(0) << _m0(1) << _m0(2)
+		<< YAML::EndSeq;
+	emitter << YAML::Key << KEY_MASS_CENTER   << YAML::Value << YAML::Flow
+		<< YAML::BeginSeq
+		<< _r0(0) << _r0(1) << _r0(2)
+		<< YAML::EndSeq;
+	emitter << YAML::EndMap;
+
+	std::ofstream f(filepath());
+	f << emitter.c_str() << std::endl;
+
+	res.success = true;
+	res.message = "save_calibration succeeded.";
+	ROS_INFO_STREAM(res.message);
+    }
+    catch (const std::exception& err)
+    {
+	res.success = false;
+	res.message = "save_calibration failed.";
+	res.message += err.what();
+	ROS_ERROR_STREAM(res.message);
+    }
+
+    return true;
 }
 
 void
@@ -190,6 +285,13 @@ ftsensor::up_socket()
     }
 }
 
+void
+ftsensor::down_socket()
+{
+    if (_socket >= 0)
+	close(_socket);
+}
+
 bool
 ftsensor::connect_socket(u_long s_addr, int port)
 {
@@ -210,13 +312,6 @@ ftsensor::connect_socket(u_long s_addr, int port)
 	ROS_ERROR_STREAM("failed: " << strerror(errno));
 	return false;
     }
-}
-
-void
-ftsensor::down_socket()
-{
-    if (_socket >= 0)
-	close(_socket);
 }
 
 void
@@ -248,18 +343,16 @@ ftsensor::tick()
 void
 ftsensor::wrench_callback(const const_wrench_p& wrench)
 {
-    // ROS_INFO("#Callback# sec - %d", wrench->header.stamp.sec);
-
     try
     {
 	transform_t	T;
 	_listener.waitForTransform(_sensor_frame, _reference_frame,
 				   wrench->header.stamp,
-				   ros::Duration(10));
+				   ros::Duration(1.0));
 	_listener.lookupTransform(_sensor_frame, _reference_frame,
 	 			  wrench->header.stamp, T);
 	const auto	colz = T.getBasis().getColumn(2);
-	Eigen::Matrix<double, 3, 1> k;
+	vector3_t k;
 	k << colz.x(), colz.y(), colz.z();
 	if (_get_sample)
 	{
@@ -267,8 +360,8 @@ ftsensor::wrench_callback(const const_wrench_p& wrench)
 	    _get_sample = false;
 	}
 
-	Eigen::Matrix<double, 3, 1> force  = -_m*G*k + _f0;
-	Eigen::Matrix<double, 3, 1> torque = -_r0.cross(_m*G*k) + _m0;
+	vector3_t force  = -_m*G*k + _f0;
+	vector3_t torque = -_r0.cross(_m*G*k) + _m0;
 
 	wrench_p	wrench_fixed(new wrench_t);
 	wrench_fixed->header.stamp    = wrench->header.stamp;
@@ -280,7 +373,8 @@ ftsensor::wrench_callback(const const_wrench_p& wrench)
 	wrench_fixed->wrench.torque.y = wrench->wrench.torque.y - torque(1);
 	wrench_fixed->wrench.torque.z = wrench->wrench.torque.z - torque(2);
 
-	_publisher.publish(wrench_fixed);
+	_publisher_org.publish(wrench);
+	_publisher_fixed.publish(wrench_fixed);
     }
     catch (const std::exception& err)
     {
@@ -289,19 +383,19 @@ ftsensor::wrench_callback(const const_wrench_p& wrench)
 }
 
 void
-ftsensor::take_sample(const Eigen::Matrix<double, 3, 1>& k,
+ftsensor::take_sample(const vector3_t& k,
 		      const geometry_msgs::Vector3& f,
 		      const geometry_msgs::Vector3& m)
 {
     // force
-    Eigen::Matrix<double, 4, 4> At_A;
+    matrix44_t At_A;
     At_A <<    1,    0,    0, k(0),
                0,    1,    0, k(1),
                0,    0,    1, k(2),
             k(0), k(1), k(2),    1;
     _At_A += At_A;
 
-    Eigen::Matrix<double, 4, 1> At_b;
+    vector4_t At_b;
     At_b << f.x, f.y, f.z, (k(0)*f.x + k(1)*f.y + k(2)*f.z);
     _At_b += At_b;
 
@@ -313,7 +407,7 @@ ftsensor::take_sample(const Eigen::Matrix<double, 3, 1>& k,
     Eigen::Matrix<double, 3, 3> Kat = Ka.transpose();
     Eigen::Matrix<double, 3, 3> Kat_Ka = Kat * Ka;
 
-    Eigen::Matrix<double, 6, 6> Ct_C;
+    matrix66_t Ct_C;
     Ct_C <<
 	       1,        0,        0,    Ka(0, 0),    Ka(0, 1),    Ka(0, 2),
 	       0,        1,        0,    Ka(1, 0),    Ka(1, 1),    Ka(1, 1),
@@ -323,7 +417,7 @@ ftsensor::take_sample(const Eigen::Matrix<double, 3, 1>& k,
 	Kat(2,0), Kat(2,1), Kat(2,2), Kat_Ka(2,0), Kat_Ka(2,1), Kat_Ka(2,2);
     _Ct_C += Ct_C;
 
-    Eigen::Matrix<double, 6, 1> Ct_d;
+    vector6_t Ct_d;
     Ct_d << m.x, m.y, m.z,
 	    k(2)*m.y - k(1)*m.z, k(0)*m.z - k(2)*m.x, k(1)*m.x - k(0)*m.y;
     _Ct_d += Ct_d;
@@ -360,106 +454,11 @@ ftsensor::take_sample(const Eigen::Matrix<double, 3, 1>& k,
 #endif /* __MY_DEBUG__ */
 }
 
-bool
-ftsensor::take_sample_callback(std_srvs::Trigger::Request  &req,
-			       std_srvs::Trigger::Response &res)
-{
-    _get_sample = true;
-    res.success = true;
-    res.message = "take_sample succeeded.";
-    ROS_INFO_STREAM(res.message);
-
-    return true;
-}
-
-bool
-ftsensor::compute_calibration_callback(std_srvs::Trigger::Request  &req,
-				       std_srvs::Trigger::Response &res)
-{
-    const Eigen::Matrix<double, 4, 1> result_f = _At_A.inverse() * _At_b;
-    _f0 << result_f(0), result_f(1), result_f(2);
-    _m  = -result_f(3)/G;
-
-    const Eigen::Matrix<double, 6, 1> result_t = _Ct_C.inverse() * _Ct_d;
-    _m0 << result_t(0), result_t(1), result_t(2);
-    double mg = _m * G;
-    _r0 << result_t(3)/mg, result_t(4)/mg, result_t(5)/mg;
-
-#ifdef __MY_DEBUG__
-    ROS_INFO_STREAM("_At_A\n" << _At_A);
-    ROS_INFO_STREAM("_At_A(inverse)\n" << _At_A.inverse());
-    ROS_INFO_STREAM("_At_b\n" << _At_b);
-    ROS_INFO_STREAM("result(force)\n" << result_f);
-    // ROS_INFO_STREAM("_Ct_C\n" << _Ct_C);
-    // ROS_INFO_STREAM("_Ct_C(inverse)\n" << _Ct_C.inverse());
-    // ROS_INFO_STREAM("_Ct_d\n" << _Ct_d);
-    // ROS_INFO_STREAM("result(torque)\n" << result_t);
-#endif /* __MY_DEBUG__ */
-
-    _At_A = Eigen::Matrix<double, 4, 4>::Zero();
-    _At_b = Eigen::Matrix<double, 4, 1>::Zero();
-    _Ct_C = Eigen::Matrix<double, 6, 6>::Zero();
-    _Ct_d = Eigen::Matrix<double, 6, 1>::Zero();
-
-    res.success = true;
-    res.message = "compute_calibration succeeded.";
-    ROS_INFO_STREAM(res.message);
-
-    return true;
-}
-
-bool
-ftsensor::save_calibration_callback(std_srvs::Trigger::Request  &req,
-				    std_srvs::Trigger::Response &res)
-{
-    try
-    {
-	YAML::Emitter emitter;
-	emitter << YAML::BeginMap;
-	emitter << YAML::Key << KEY_EFFECTOR_MASS << YAML::Value << _m;
-	emitter << YAML::Key << KEY_F_OFFSET      << YAML::Value
-		<< YAML::BeginSeq
-		<< _f0(0) << _f0(1) << _f0(2)
-		<< YAML::EndSeq;
-	emitter << YAML::Key << KEY_M_OFFSET      << YAML::Value
-		<< YAML::BeginSeq
-		<< _m0(0) << _m0(1) << _m0(2)
-		<< YAML::EndSeq;
-	emitter << YAML::Key << KEY_R_OFFSET      << YAML::Value
-		<< YAML::BeginSeq
-		<< _r0(0) << _r0(1) << _r0(2)
-		<< YAML::EndSeq;
-	emitter << YAML::EndMap;
-
-	std::ofstream f(filepath());
-	f << emitter.c_str() << std::endl;
-
-	res.success = true;
-	res.message = "save_calibration succeeded.";
-	ROS_INFO_STREAM(res.message);
-    }
-    catch (const std::exception& err)
-    {
-	res.success = false;
-	res.message = "save_calibration failed.";
-	res.message += err.what();
-	ROS_ERROR_STREAM(res.message);
-    }
-
-    return true;
-}
-
 std::string
 ftsensor::filepath() const
 {
     return ros::package::getPath("aist_ftsensor")
 	 + "/config/" + _nh.getNamespace() + ".yaml";
-}
-
-double
-ftsensor::rate() const
-{
-    return _rate;
 }
 
 }	// namespace aist_ftsensor
