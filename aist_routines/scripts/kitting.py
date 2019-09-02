@@ -157,6 +157,9 @@ if __name__ == '__main__':
             try:
                 key = raw_input(">> ")
                 if key == 'q':
+                    if kitting.former_robot_name != None:
+                        kitting.go_to_named_pose("home",
+                                                 kitting.former_robot_name)
                     break
                 elif key == 'H':
                     kitting.go_to_named_pose("home", "all_bots")

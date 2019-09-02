@@ -9,8 +9,8 @@
   -->
   <!-- for socket -->
   <arg name="input_wrench_type" default="socket"/>
-  <arg name="hostname" default="$(arg robot_name)"/>
-  <arg name="port"      default="63351"/>
+  <arg name="hostname"		default="$(arg robot_name)"/>
+  <arg name="port"		default="63351"/>
 
   <node name="$(arg robot_name)_ftsensor"
         pkg="aist_ftsensor" type="aist_ftsensor" output="screen">
