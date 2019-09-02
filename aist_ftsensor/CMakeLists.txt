@@ -162,6 +162,14 @@ target_link_libraries(${PROJECT_NAME}
   yaml-cpp
 )
 
+add_library(${PROJECT_NAME}_nodelet src/ftsensor.cpp src/nodelet.cpp)
+
+target_link_libraries(${PROJECT_NAME}_nodelet
+  ${catkin_LIBRARIES}
+  ${roscpp_LIBRARIES}
+  yaml-cpp
+)
+
 ## only __MY_DEBUG__=2
 add_executable(my_debug src/ftsensor.cpp src/my_debug.cpp)
 target_link_libraries(my_debug

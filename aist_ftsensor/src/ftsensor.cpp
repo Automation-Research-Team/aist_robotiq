@@ -1,6 +1,6 @@
 /*!
  *  \file	ftsensor.cpp
- *  \brief	source file for a class for controlling FT300 force sensors
+ *  \brief	source file for a class for controlling force-torque sensors
  */
 #include <ros/package.h>
 #include <yaml-cpp/yaml.h>
@@ -141,11 +141,39 @@ ftsensor::run()
 
     while (ros::ok())
     {
-	if (_input == Input::SOCKET)
-	    tick();
+	tick();
 	ros::spinOnce();
 	rate.sleep();
     }
+}
+
+void
+ftsensor::tick()
+{
+    if (_input != Input::SOCKET)
+	return;
+    
+    std::array<char, 1024>	buf;
+    const auto		nbytes = read(_socket, buf.data(), buf.size());
+    if (nbytes < 0)
+    {
+	ROS_ERROR_STREAM("failed to read from socket.");
+	throw;
+    }
+    buf[nbytes] = '\0';
+
+    wrench_p	wrench(new wrench_t);
+    wrench->header.stamp = ros::Time::now();
+
+    const char*	s = buf.data();
+    s = splitd(s, wrench->wrench.force.x);
+    s = splitd(s, wrench->wrench.force.y);
+    s = splitd(s, wrench->wrench.force.z);
+    s = splitd(s, wrench->wrench.torque.x);
+    s = splitd(s, wrench->wrench.torque.y);
+    s = splitd(s, wrench->wrench.torque.z);
+    
+    wrench_callback(wrench);
 }
 
 double
@@ -312,32 +340,6 @@ ftsensor::connect_socket(u_long s_addr, int port)
 	ROS_ERROR_STREAM("failed: " << strerror(errno));
 	return false;
     }
-}
-
-void
-ftsensor::tick()
-{
-    std::array<char, 1024>	buf;
-    const auto		nbytes = read(_socket, buf.data(), buf.size());
-    if (nbytes < 0)
-    {
-	ROS_ERROR_STREAM("failed to read from socket.");
-	throw;
-    }
-    buf[nbytes] = '\0';
-
-    wrench_p	wrench(new wrench_t);
-    wrench->header.stamp = ros::Time::now();
-
-    const char*	s = buf.data();
-    s = splitd(s, wrench->wrench.force.x);
-    s = splitd(s, wrench->wrench.force.y);
-    s = splitd(s, wrench->wrench.force.z);
-    s = splitd(s, wrench->wrench.torque.x);
-    s = splitd(s, wrench->wrench.torque.y);
-    s = splitd(s, wrench->wrench.torque.z);
-    
-    wrench_callback(wrench);
 }
 
 void
