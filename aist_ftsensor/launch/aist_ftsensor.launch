@@ -21,7 +21,5 @@
     <param name="hostname"		value="$(arg hostname)"/>
     <param name="port"			value="$(arg port)"/>
     <remap from="/wrench_in" to="/$(arg robot_name)_controller/wrench"/>
-    <rosparam command="load"
-              file="$(find aist_ftsensor)/config/ftsensor.yaml"/>
   </node>
 </launch>
