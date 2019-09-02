@@ -18,22 +18,21 @@ main(int argc, char* argv[])
 
     try
     {
-	aist_ftsensor::ftsensor::InputWrenchType iwrench =
-			aist_ftsensor::ftsensor::InputWrenchType::SUBSCRIBE;
-        std::string input_wrench_type;
-	if (ros::param::get("~input_wrench_type", input_wrench_type))
+	aist_ftsensor::ftsensor::Input input =
+				    aist_ftsensor::ftsensor::Input::TOPIC;
+        std::string param_input;
+	if (ros::param::get("~input", param_input))
 	{
-	    if (! strcasecmp(input_wrench_type.c_str(), "socket"))
-		iwrench = aist_ftsensor::ftsensor::InputWrenchType::SOCKET;
+	    if (! strcasecmp(param_input.c_str(), "socket"))
+		input = aist_ftsensor::ftsensor::Input::SOCKET;
 #if 0	/* same to default */
-	    if (! strcasecmp(input_wrench_type.c_str(), "subscribe"))
-		iwrench = aist_ftsensor::ftsensor::InputWrenchType::SUBSCRIBE;
+	    if (! strcasecmp(param_input.c_str(), "topic"))
+		input = aist_ftsensor::ftsensor::Input::TOPIC;
 #endif
         }
-	ROS_INFO_STREAM("input_wrench_type[" << input_wrench_type << "]["
-			<< iwrench << "]");
+	ROS_INFO_STREAM("input[" << param_input << "][" << input << "]");
 
-	aist_ftsensor::ftsensor	node("~", iwrench);
+	aist_ftsensor::ftsensor	node("~", input);
 	node.run();
     }
     catch (const std::exception& err)
