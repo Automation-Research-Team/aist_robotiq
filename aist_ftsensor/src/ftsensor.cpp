@@ -344,10 +344,12 @@ ftsensor::connect_socket(u_long s_addr, int port)
 }
 
 void
-ftsensor::wrench_callback(const const_wrench_p& wrench)
+ftsensor::wrench_callback(const wrench_p& wrench)
 {
     try
     {
+	_publisher_org.publish(wrench);
+	
 	transform_t	T;
 	_listener.waitForTransform(_sensor_frame, _reference_frame,
 				   wrench->header.stamp,
@@ -366,18 +368,15 @@ ftsensor::wrench_callback(const const_wrench_p& wrench)
 	const vector3_t	force  = -_mass*G*k + _f0;
 	const vector3_t	torque = -_r0.cross(_mass*G*k) + _m0;
 
-	wrench_p	wrench_fixed(new wrench_t);
-	wrench_fixed->header.stamp    = wrench->header.stamp;
-	wrench_fixed->header.frame_id = _sensor_frame;
-	wrench_fixed->wrench.force.x  = wrench->wrench.force.x  - force(0);
-	wrench_fixed->wrench.force.y  = wrench->wrench.force.y  - force(1);
-	wrench_fixed->wrench.force.z  = wrench->wrench.force.z  - force(2);
-	wrench_fixed->wrench.torque.x = wrench->wrench.torque.x - torque(0);
-	wrench_fixed->wrench.torque.y = wrench->wrench.torque.y - torque(1);
-	wrench_fixed->wrench.torque.z = wrench->wrench.torque.z - torque(2);
+	wrench->header.frame_id  = _sensor_frame;
+	wrench->wrench.force.x  -= force(0);
+	wrench->wrench.force.y  -= force(1);
+	wrench->wrench.force.z  -= force(2);
+	wrench->wrench.torque.x -= torque(0);
+	wrench->wrench.torque.y -= torque(1);
+	wrench->wrench.torque.z -= torque(2);
 
-	_publisher_org.publish(wrench);
-	_publisher.publish(wrench_fixed);
+	_publisher.publish(wrench);
     }
     catch (const std::exception& err)
     {
@@ -403,12 +402,12 @@ ftsensor::take_sample(const vector3_t& k,
     _At_b += At_b;
 
     // torque
-    Eigen::Matrix<double, 3, 3> Ka; // antisymmetric matrix of k
+    matrix33_t	Ka; // antisymmetric matrix of k
     Ka <<     0, -k(2),  k(1),
            k(2),     0, -k(0),
           -k(1),  k(0),     0;
-    Eigen::Matrix<double, 3, 3> Kat = Ka.transpose();
-    Eigen::Matrix<double, 3, 3> Kat_Ka = Kat * Ka;
+    matrix33_t	Kat = Ka.transpose();
+    matrix33_t	Kat_Ka = Kat * Ka;
 
     matrix66_t Ct_C;
     Ct_C <<
