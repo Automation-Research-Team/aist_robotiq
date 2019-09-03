@@ -6,8 +6,6 @@
 #include <geometry_msgs/WrenchStamped.h>
 #include <tf/transform_listener.h>
 #include <std_srvs/Trigger.h>
-
-#include <fstream>
 #include <eigen3/Eigen/Dense>
 
 
@@ -75,12 +73,13 @@ class ftsensor
     const int			_socket;
     const ros::Subscriber	_subscriber;
     const ros::Publisher	_publisher_org;
-    const ros::Publisher	_publisher_fixed;
+    const ros::Publisher	_publisher;
     const tf::TransformListener	_listener;
     std::string			_reference_frame;
     std::string			_sensor_frame;
     double			_rate;
-    double			_m;		// effector mass
+
+    double			_mass;		// effector mass
     vector3_t			_f0;		// force offset
     vector3_t			_m0;		// torque offset
     vector3_t			_r0;		// mass center
