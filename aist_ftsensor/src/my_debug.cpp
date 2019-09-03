@@ -6,6 +6,7 @@
 #include <ros/package.h>
 #include <ros/param.h>
 #include <string.h>
+#include <fstream>
 
 /************************************************************************
 *  global functions							*

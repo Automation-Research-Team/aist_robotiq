@@ -11,6 +11,7 @@
 #include <arpa/inet.h>		// for inet_addr()
 #include <netdb.h>		// for struct hostent, gethostbyname()
 #include <errno.h>
+#include <fstream>
 
 #include "ftsensor.h"
 
@@ -44,7 +45,7 @@ ftsensor::ftsensor(const std::string& name, const Input input)
 	    _nh.subscribe("/wrench_in", 100, &ftsensor::wrench_callback, this):
 	    ros::Subscriber()),
      _publisher_org(_nh.advertise<wrench_t>("wrench_org", 100)),
-     _publisher_fixed(_nh.advertise<wrench_t>("wrench", 100)),
+     _publisher(_nh.advertise<wrench_t>("wrench", 100)),
      _socket(input == Input::SOCKET ? socket(AF_INET, SOCK_STREAM, 0): 0),
      _take_sample(_nh.advertiseService("take_sample",
 				       &ftsensor::take_sample_callback, this)),
@@ -59,7 +60,7 @@ ftsensor::ftsensor(const std::string& name, const Input input)
      _sensor_frame("ftsensor_wrench_link"),
      _rate(100),
      _get_sample(false),
-     _m(0),
+     _mass(0),
      _f0(vector3_t::Zero()),
      _m0(vector3_t::Zero()),
      _r0(vector3_t::Zero()),
@@ -90,8 +91,8 @@ ftsensor::ftsensor(const std::string& name, const Input input)
 
 	double effector_mass = yaml_node[KEY_EFFECTOR_MASS].as<double>();
 	if (effector_mass > 0)
-	    _m = effector_mass;
-	ROS_INFO_STREAM(KEY_EFFECTOR_MASS << "=" << _m);
+	    _mass = effector_mass;
+	ROS_INFO_STREAM(KEY_EFFECTOR_MASS << "=" << _mass);
 
 	std::vector<double> vec;
 	vec = yaml_node[KEY_FORCE_OFFSET].as<std::vector<double> >();
@@ -200,11 +201,11 @@ ftsensor::compute_calibration_callback(std_srvs::Trigger::Request  &req,
 {
     const vector4_t	result_f = _At_A.inverse() * _At_b;
     _f0 << result_f(0), result_f(1), result_f(2);
-    _m  = -result_f(3)/G;
+    _mass  = -result_f(3)/G;
 
     const vector6_t result_t = _Ct_C.inverse() * _Ct_d;
     _m0 << result_t(0), result_t(1), result_t(2);
-    const double	mg = _m * G;
+    const double	mg = _mass * G;
     _r0 << result_t(3)/mg, result_t(4)/mg, result_t(5)/mg;
 
 #ifdef __MY_DEBUG__
@@ -238,7 +239,7 @@ ftsensor::save_calibration_callback(std_srvs::Trigger::Request  &req,
     {
 	YAML::Emitter emitter;
 	emitter << YAML::BeginMap;
-	emitter << YAML::Key << KEY_EFFECTOR_MASS << YAML::Value << _m;
+	emitter << YAML::Key << KEY_EFFECTOR_MASS << YAML::Value << _mass;
 	emitter << YAML::Key << KEY_FORCE_OFFSET  << YAML::Value << YAML::Flow
 		<< YAML::BeginSeq
 		<< _f0(0) << _f0(1) << _f0(2)
@@ -354,7 +355,7 @@ ftsensor::wrench_callback(const const_wrench_p& wrench)
 	_listener.lookupTransform(_sensor_frame, _reference_frame,
 	 			  wrench->header.stamp, T);
 	const auto	colz = T.getBasis().getColumn(2);
-	vector3_t k;
+	vector3_t	k;
 	k << colz.x(), colz.y(), colz.z();
 	if (_get_sample)
 	{
@@ -362,8 +363,8 @@ ftsensor::wrench_callback(const const_wrench_p& wrench)
 	    _get_sample = false;
 	}
 
-	vector3_t force  = -_m*G*k + _f0;
-	vector3_t torque = -_r0.cross(_m*G*k) + _m0;
+	const vector3_t	force  = -_mass*G*k + _f0;
+	const vector3_t	torque = -_r0.cross(_mass*G*k) + _m0;
 
 	wrench_p	wrench_fixed(new wrench_t);
 	wrench_fixed->header.stamp    = wrench->header.stamp;
@@ -376,7 +377,7 @@ ftsensor::wrench_callback(const const_wrench_p& wrench)
 	wrench_fixed->wrench.torque.z = wrench->wrench.torque.z - torque(2);
 
 	_publisher_org.publish(wrench);
-	_publisher_fixed.publish(wrench_fixed);
+	_publisher.publish(wrench_fixed);
     }
     catch (const std::exception& err)
     {
