@@ -35,10 +35,12 @@ keyposes = {
             [0.00, 0.00, 0.3, radians(  0), radians( 90), radians(-90)],
             [0.00, 0.00, 0.3, radians(  0), radians( 45), radians(-90)],
             [0.00, 0.00, 0.3, radians(  0), radians(  0), radians(-90)],
+            [0.00, 0.00, 0.3, radians( 45), radians(  0), radians(-90)],
             [0.00, 0.00, 0.3, radians( 90), radians(  0), radians(-90)],
             [0.00, 0.00, 0.3, radians( 90), radians( 45), radians(-90)],
             [0.00, 0.00, 0.3, radians( 90), radians( 90), radians(-90)],
             [0.00, 0.00, 0.3, radians( 90), radians(135), radians(-90)],
+            [0.00, 0.00, 0.3, radians( 45), radians(135), radians(-90)],
             [0.00, 0.00, 0.3, radians(  0), radians(135), radians(-90)],
         ],
         'c_bot': [
@@ -187,4 +189,3 @@ if __name__ == '__main__':
         routines.run(keyposes[ args.config][args.robot_name])
         print("=== Calibration completed for {} ===".format(
                      args.robot_name))
-
