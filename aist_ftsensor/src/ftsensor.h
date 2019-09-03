@@ -6,10 +6,7 @@
 #include <geometry_msgs/WrenchStamped.h>
 #include <tf/transform_listener.h>
 #include <std_srvs/Trigger.h>
-
-#include <fstream>
 #include <eigen3/Eigen/Dense>
-
 
 namespace aist_ftsensor
 {
@@ -28,9 +25,9 @@ class ftsensor
   private:
     using wrench_t		= geometry_msgs::WrenchStamped;
     using wrench_p		= geometry_msgs::WrenchStampedPtr;
-    using const_wrench_p	= geometry_msgs::WrenchStampedConstPtr;
     using transform_t		= tf::StampedTransform;
     using vector3_t		= Eigen::Matrix<double, 3, 1>;
+    using matrix33_t		= Eigen::Matrix<double, 3, 3>;
     using vector4_t		= Eigen::Matrix<double, 4, 1>;
     using matrix44_t		= Eigen::Matrix<double, 4, 4>;
     using vector6_t		= Eigen::Matrix<double, 6, 1>;
@@ -63,7 +60,7 @@ class ftsensor
     void	up_socket()						;
     void	down_socket()						;
     bool	connect_socket(u_long hostname, int port)		;
-    void	wrench_callback(const const_wrench_p& wrench)		;
+    void	wrench_callback(const wrench_p& wrench)			;
     void	take_sample(const vector3_t& k,
 			    const geometry_msgs::Vector3& f,
 			    const geometry_msgs::Vector3& m)		;
@@ -75,12 +72,13 @@ class ftsensor
     const int			_socket;
     const ros::Subscriber	_subscriber;
     const ros::Publisher	_publisher_org;
-    const ros::Publisher	_publisher_fixed;
+    const ros::Publisher	_publisher;
     const tf::TransformListener	_listener;
     std::string			_reference_frame;
     std::string			_sensor_frame;
     double			_rate;
-    double			_m;		// effector mass
+
+    double			_mass;		// effector mass
     vector3_t			_f0;		// force offset
     vector3_t			_m0;		// torque offset
     vector3_t			_r0;		// mass center
