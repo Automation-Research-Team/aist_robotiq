@@ -30,6 +30,15 @@ keyposes = {
     'pgrp' : {
         'a_bot': [
             [0.00, 0.00, 0.3, radians(  0), radians( 90), radians( 90)],
+            [0.00, 0.00, 0.3, radians(  0), radians( 45), radians( 90)],
+            [0.00, 0.00, 0.3, radians(  0), radians(  0), radians( 90)],
+            [0.00, 0.00, 0.3, radians( 45), radians(  0), radians( 90)],
+            [0.00, 0.00, 0.3, radians( 90), radians(  0), radians( 90)],
+            [0.00, 0.00, 0.3, radians( 90), radians( 45), radians( 90)],
+            [0.00, 0.00, 0.3, radians( 90), radians( 90), radians( 90)],
+            [0.00, 0.00, 0.3, radians( 90), radians(135), radians( 90)],
+            [0.00, 0.00, 0.3, radians( 45), radians(135), radians( 90)],
+            [0.00, 0.00, 0.3, radians(  0), radians(135), radians( 90)],
         ],
         'b_bot': [
             [0.00, 0.00, 0.3, radians(  0), radians( 90), radians(-90)],
