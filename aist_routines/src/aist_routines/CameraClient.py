@@ -3,13 +3,7 @@ import dynamic_reconfigure.client
 import std_srvs.srv
 
 ######################################################################
-#  global functions                                                  #
-######################################################################
-def clamp(x, x_min, x_max):
-    return min(max(x, x_min), x_max)
-
-######################################################################
-#  class CameraClient                                                 #
+#  class CameraClient                                                #
 ######################################################################
 class CameraClient(object):
     def __init__(self, name, type, camera_info_topic, image_topic,

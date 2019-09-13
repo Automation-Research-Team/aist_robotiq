@@ -7,6 +7,7 @@
        default = "$(find aist_moveit_config)/launch/moveit.rviz"/>
 
   <param name="use_real_robot"	value="$(eval not arg('sim'))"/>
+  <rosparam command="delete" param="groups"/>
   <rosparam command="delete" param="grippers"/>
   <rosparam command="delete" param="cameras"/>
   <rosparam command="load"
