@@ -1,3 +1,8 @@
+groups:
+  - c_bot
+  - d_bot
+  - all_bots
+
 grippers:
   c_bot:
     type: Robotiq85Gripper

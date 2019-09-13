@@ -15,11 +15,10 @@
     <arg name="verbose"    value="true"/>
   </include>
 
-  <!-- send robot urdf to param server -->
-  <!-- In this case the "robot" is the ensemble of the 3 arms -->
-  <include file="$(find aist_scene_description)/launch/scene_upload.launch">
-    <arg name="scene" value="$(arg scene)"/>
-  </include>
+  <!-- Load robot urdf to param "robot_description". -->
+  <param name="robot_description"
+	 command="$(find xacro)/xacro '$(find
+		  aist_scene_description)/urdf/$(arg scene).urdf.xacro'"/>
 
   <!-- push robot_description to factory and spawn robot in gazebo -->
   <!-- Initial pose modified on 9 July 2018 -->

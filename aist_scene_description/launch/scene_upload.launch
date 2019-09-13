@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-  <arg name="scene" default="aist_base_scene"/>
-  <param name="robot_description"
-	 command="$(find xacro)/xacro --inorder
-		  '$(find aist_scene_description)/urdf/$(arg scene).urdf.xacro'"/>
-</launch>

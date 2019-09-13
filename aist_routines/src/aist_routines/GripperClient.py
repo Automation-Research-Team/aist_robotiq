@@ -7,11 +7,7 @@ import robotiq_msgs.msg
 import o2as_msgs.msg
 import o2as_msgs.srv
 
-######################################################################
-#  global functions                                                  #
-######################################################################
-def clamp(x, x_min, x_max):
-    return min(max(x, x_min), x_max)
+from numpy import clip
 
 ######################################################################
 #  class GripperClient                                               #
@@ -112,7 +108,7 @@ class Robotiq85Gripper(GripperClient):
 
     def move(self, position):
         try:
-            self._goal.position = clamp(position, 0.0, 0.085)
+            self._goal.position = clip(position, 0.0, 0.085)
             self._client.send_goal(self._goal)
             # This sleep is necessary for robotiq gripper to work just as intended.
             rospy.sleep(.5)

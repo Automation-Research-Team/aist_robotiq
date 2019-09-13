@@ -1,3 +1,8 @@
+groups:
+  - a_bot
+  - b_bot
+  - all_bots
+
 grippers:
   a_bot:
     type: PrecisionGripper
@@ -20,3 +25,15 @@ cameras:
     type: RealsenseCamera
     args:
       name: a_bot_camera
+
+ftsensor:
+  a_bot:
+    thresholds:
+      force:
+        min: [ -5, -5, -5 ]
+        max: [ 10, 10, 10 ]
+  b_bot:
+    thresholds:
+      force:
+        min: [ -5, -5, -10 ]
+        max: [ 10, 10, 10 ]

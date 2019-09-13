@@ -3,6 +3,7 @@ import copy
 import collections
 import rospy
 from math import pi, radians, degrees
+from numpy import clip
 
 from tf import TransformListener, transformations as tfs
 import moveit_commander
@@ -45,12 +46,21 @@ class AISTBaseRoutines(object):
         self.listener = TransformListener()
         rospy.sleep(1.0)        # Necessary for listner spinning up
 
-        # Grippers and cameras
+        # MoveIt groups
+        d = rospy.get_param("groups", {})
+        self._groups = {}
+        for group_name in d:
+            self._groups[group_name] \
+                = moveit_commander.MoveGroupCommander(group_name)
+
+        # Grippers
         d = rospy.get_param("grippers", {})
         self._grippers = {}
         for robot_name, gripper in d.items():
             self._grippers[robot_name] = self._create_device(gripper["type"],
                                                              gripper["args"])
+
+        # Cameras
         d = rospy.get_param("cameras", {})
         self._cameras = {}
         for camera_name, camera in d.items():
@@ -71,7 +81,7 @@ class AISTBaseRoutines(object):
 
     # Basic motion stuffs
     def go_to_named_pose(self, named_pose, group_name):
-        group = moveit_commander.MoveGroupCommander(group_name)
+        group = self._groups[group_name]
         group.set_named_target(named_pose)
         group.set_max_velocity_scaling_factor(1.0)
         success = group.go(wait=True)
@@ -100,9 +110,9 @@ class AISTBaseRoutines(object):
         if end_effector_link == "":
             end_effector_link = self._grippers[robot_name].tip_link
 
-        group = moveit_commander.MoveGroupCommander(robot_name)
+        group = self._groups[robot_name]
         group.set_end_effector_link(end_effector_link)
-        group.set_max_velocity_scaling_factor(self._clamp(speed, 0.0, 1.0))
+        group.set_max_velocity_scaling_factor(clip(speed, 0.0, 1.0))
 
         if high_precision:
             goal_tolerance = group.get_goal_tolerance()
@@ -160,10 +170,15 @@ class AISTBaseRoutines(object):
         # rospy.loginfo("reached " + self.format_pose(current_pose))
         return (success, is_all_close, current_pose)
 
+    def stop(self, robot_name):
+        group = self._groups[robot_name]
+        group.stop()
+        group.clear_pose_targets()
+
     def get_current_pose(self, robot_name, end_effector_link=""):
         if end_effector_link == "":
             end_effector_link = self._grippers[robot_name].tip_link
-        group = moveit_commander.MoveGroupCommander(robot_name)
+        group = self._groups[robot_name]
         group.set_end_effector_link(end_effector_link)
         return group.get_current_pose()
 
@@ -336,7 +351,7 @@ class AISTBaseRoutines(object):
                     offset,
                     tfs.quaternion_from_euler(0, radians(90), 0)))
         pose = gmsg.PoseStamped()
-        pose.header = target_pose.header
+        pose.header.frame_id = target_pose.header.frame_id
         pose.pose = gmsg.Pose(gmsg.Point(*tfs.translation_from_matrix(T)),
                               gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
         return pose
@@ -356,6 +371,3 @@ class AISTBaseRoutines(object):
             if abs(actual_list[i] - goal_list[i]) > tolerance:
                 return False
         return True
-
-    def _clamp(self, x, min_x, max_x):
-        return min(max(min_x, x), max_x)

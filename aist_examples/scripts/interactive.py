@@ -61,7 +61,8 @@ class InteractiveRoutines(URRoutines):
         else:
             (success, _, current_pose) = self.go_to_pose_goal(
                                                 self._robot_name, target_pose,
-                                                self._speed, move_lin=True)
+                                                self._speed,
+                                                move_lin=True, wait=False)
         return success
 
     def xyz_rpy(self, poseStamped):
@@ -147,6 +148,8 @@ class InteractiveRoutines(URRoutines):
                 else:
                     goal_pose[5] = radians(float(key))
                 self.move(goal_pose)
+            elif key == 's':
+                self.stop(self._robot_name)
             elif key == 'pregrasp':
                 self.pregrasp(self._robot_name)
             elif key == 'grasp':
