@@ -11,7 +11,7 @@
   </include>
 
   <!-- Start robot controller -->
-  <include file="$(find aist_examples)/launch/connect_robots.launch">
+  <include file="$(find aist_routines)/launch/connect_robots.launch">
     <arg name="config"	value="$(arg config)"/>
     <arg name="scene"	value="$(arg scene)"/>
     <arg name="sim"	value="false"/>

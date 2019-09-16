@@ -103,7 +103,7 @@ class AISTBaseRoutines(object):
 
     def go_to_pose_goal(self, robot_name, target_pose, speed=1.0,
                         high_precision=False, end_effector_link="",
-                        move_lin=True):
+                        move_lin=True, wait=True):
         # rospy.loginfo("move to " + self.format_pose(target_pose))
         self.publish_marker(target_pose, "pose")
 
@@ -148,10 +148,10 @@ class AISTBaseRoutines(object):
             robots  = moveit_commander.RobotCommander()
             plan    = group.retime_trajectory(robots.get_current_state(),
                                               plan, speed)
-            success = group.execute(plan, wait=True)
+            success = group.execute(plan, wait=wait)
         else:
             group.set_pose_target(target_pose)
-            success = group.go(wait=True)
+            success = group.go(wait=wait)
 
         rospy.loginfo("go_to_pose_goal() {}"
                       .format("succeeded." if success else "failed."))
