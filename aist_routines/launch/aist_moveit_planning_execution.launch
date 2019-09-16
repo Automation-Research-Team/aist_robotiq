@@ -1,0 +1,10 @@
+<launch>
+  <arg name="rviz_config"	default=""/>
+  <arg name="debug"		default="false"/>
+
+  <include file="$(find aist_routines)/launch/moveit_planning_execution.launch">
+    <arg name="moveit_config"	value="$(find aist_moveit_config)"/>
+    <arg name="rviz_config"	value="$(arg rviz_config)"/>
+    <arg name="debug"		value="$(arg debug)"/>
+  </include>
+</launch>

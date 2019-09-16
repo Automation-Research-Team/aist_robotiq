@@ -6,6 +6,6 @@ moveit_setup_assistant_config:
   SRDF:
     relative_path: config/aist_base_scene.srdf
   CONFIG:
-    author_name: Yuma Hijioka
-    author_email: yuma.hijioka@aist.go.jp
-    generated_timestamp: 1562044435
+    author_name: Toshio UESHIBA
+    author_email: t.ueshiba@aist.go.jp
+    generated_timestamp: 1568589645

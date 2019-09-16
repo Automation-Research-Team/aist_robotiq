@@ -1,7 +1,7 @@
 import rospy
 import actionlib
 from geometry_msgs import msg as gmsg
-from aist_msgs     import msg as amsg
+from aist_routines import msg as amsg
 from tf            import transformations as tfs
 
 ######################################################################
