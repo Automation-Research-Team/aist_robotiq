@@ -150,7 +150,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          a_bot_ft300_frange_link:
+          a_bot_ft300_flange_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -238,7 +238,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          b_bot_ft300_frange_link:
+          b_bot_ft300_flange_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -417,7 +417,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          a_bot_ft300_frange_link:
+          a_bot_ft300_flange_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -505,7 +505,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          b_bot_ft300_frange_link:
+          b_bot_ft300_flange_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -613,7 +613,7 @@ Visualization Manager:
           Value: false
         a_bot_forearm_link:
           Value: false
-        a_bot_ft300_frange_link:
+        a_bot_ft300_flange_link:
           Value: false
         a_bot_ft300_link:
           Value: false
@@ -653,7 +653,7 @@ Visualization Manager:
           Value: false
         b_bot_forearm_link:
           Value: false
-        b_bot_ft300_frange_link:
+        b_bot_ft300_flange_link:
           Value: false
         b_bot_ft300_link:
           Value: false
@@ -721,7 +721,7 @@ Visualization Manager:
                         a_bot_wrist_3_link:
                           a_bot_ee_link:
                             a_bot_ft300_link:
-                              a_bot_ft300_frange_link:
+                              a_bot_ft300_flange_link:
                                 a_bot_gripper_base_link:
                                   a_bot_ar_marker:
                                     {}
@@ -746,7 +746,7 @@ Visualization Manager:
                         b_bot_wrist_3_link:
                           b_bot_ee_link:
                             b_bot_ft300_link:
-                              b_bot_ft300_frange_link:
+                              b_bot_ft300_flange_link:
                                 b_bot_single_suction_gripper_base_link:
                                   b_bot_ar_marker:
                                     {}

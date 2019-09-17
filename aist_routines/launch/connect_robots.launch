@@ -22,7 +22,7 @@
   <!-- Load robot urdf to param "robot_description" and launch
        real robots if "sim" == "false". -->
   <param name="robot_description"
-	 command="$(find xacro)/xacro '$(find
+	 command="$(find xacro)/xacro --inorder '$(find
                   aist_scene_description)/urdf/$(arg scene).urdf.xacro'"
 	 unless="$(arg sim)"/>
   <include file="$(find aist_routines)/launch/connect_$(arg config)_robots.launch"

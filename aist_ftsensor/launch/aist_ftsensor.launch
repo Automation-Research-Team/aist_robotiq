@@ -2,7 +2,7 @@
   <arg name="robot_name"        default="b_bot"/>
   <arg name="reference_frame"	default="workspace_center"/>
   <arg name="sensor_frame"	default="$(arg robot_name)_ft300_wrench_link"/>
-  <arg name="rate"              default="100"/>
+  <arg name="rate"              default="125"/>
 
   <!--
   <arg name="input" default="topic"/>
