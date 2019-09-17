@@ -1,7 +1,7 @@
 <launch>
   <arg name="moveit_config"/>
   <arg name="sim"	  default="false"/>
-  <arg name="rviz_config" default="$(arg moveit_config)/launch/moveit.rviz"/>
+  <arg name="rviz_config" default=""/>
   <arg name="debug"	  default="false"/>
 
   <!-- Remap follow_joint_trajectory -->
@@ -18,7 +18,7 @@
   <arg unless="$(arg debug)" name="launch_prefix" value="" />
   <arg     if="$(arg debug)" name="launch_prefix" value="gdb --ex run --args" />
   <arg if="$(eval arg('rviz_config') == '')"
-       name="command_args" value=""/>
+       name="command_args" value="-d $(arg moveit_config)/launch/moveit.rviz"/>
   <arg unless="$(eval arg('rviz_config') == '')"
        name="command_args" value="-d $(arg rviz_config)"/>
 

@@ -71,19 +71,23 @@
 
   <!-- Spawn and attach force sensor -->
   <xacro:include filename="$(find aist_ftsensor)/urdf/ft300.urdf.xacro"/>
-  <xacro:ft300 prefix="a_bot_" parent="a_bot_ee_link"/>
-  <xacro:ft300 prefix="b_bot_" parent="b_bot_ee_link"/>
+  <xacro:ft300 prefix="a_bot_" parent="a_bot_ee_link">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:ft300>
+  <xacro:ft300 prefix="b_bot_" parent="b_bot_ee_link">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:ft300>
 
   <!-- Spawn and attach gripper -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_85_gripper_with_tip_link.urdf.xacro"/>
   <xacro:robotiq_85_gripper_with_tip_link prefix="a_bot_"
-					  parent="a_bot_ft300_frange_link">
+					  parent="a_bot_ft300_flange_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:robotiq_85_gripper_with_tip_link>
 
   <xacro:include filename="$(find o2as_scene_description)/urdf/single_suction_gripper.urdf.xacro"/>
   <xacro:single_suction_gripper_o2as prefix="b_bot_"
-  				     parent="b_bot_ft300_frange_link">
+  				     parent="b_bot_ft300_flange_link">
     <origin xyz="0 0 0" rpy="0 ${0.4*pi/180} ${-1.1*pi/180}"/>
     <!-- <origin xyz="0 0 0" rpy="0 0 0"/> -->
   </xacro:single_suction_gripper_o2as>
