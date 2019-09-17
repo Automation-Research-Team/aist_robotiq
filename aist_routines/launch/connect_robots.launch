@@ -14,22 +14,27 @@
   	    file="$(find aist_routines)/config/$(arg config)_config.yaml"/>
 
   <!-- Launch gazebo if "sim == true". -->
-  <include file="$(find aist_gazebo)/launch/$(arg config)_gazebo.launch"
-  	   if="$(arg sim)">
+  <include if="$(arg sim)"
+	   file="$(find aist_gazebo)/launch/$(arg config)_gazebo.launch">
     <arg name="scene"	value="$(arg scene)"/>
   </include>
 
-  <!-- Load robot urdf to param "robot_description" and launch
-       real robots if "sim" == "false". -->
-  <param name="robot_description"
+  <!-- Load robot urdf to param "robot_description", spawn
+       robot_state_publisher and launch real robots if "sim" == "false". -->
+  <param unless="$(arg sim)"
+	 name="robot_description"
 	 command="$(find xacro)/xacro --inorder '$(find
-                  aist_scene_description)/urdf/$(arg scene).urdf.xacro'"
-	 unless="$(arg sim)"/>
-  <include file="$(find aist_routines)/launch/connect_$(arg config)_robots.launch"
-	   unless="$(arg sim)"/>
+		  aist_scene_description)/urdf/$(arg scene).urdf.xacro'"/>
+  <node unless="$(arg sim)"
+	name="robot_state_publisher"
+	pkg="robot_state_publisher" type="robot_state_publisher"/>
+  <include unless="$(arg sim)"
+	   file="$(find
+		 aist_routines)/launch/connect_$(arg config)_robots.launch"/>
 
   <!-- Launch planner -->
   <include file="$(find aist_routines)/launch/$(arg config)_moveit_planning_execution.launch">
+    <arg name="sim"		value="$(arg sim)"/>
     <arg name="rviz_config"	value="$(arg rviz_config)"/>
     <arg name="debug"		value="$(arg debug)"/>
   </include>

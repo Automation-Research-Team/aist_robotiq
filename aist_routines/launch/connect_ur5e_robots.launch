@@ -24,12 +24,6 @@
   <arg name="send_depth"   default="true"/>
   <arg name="send_cloud"   default="true"/>
 
-
-  <!-- The three lines below are commented out because it is annoying to restart the robot. They are required for Gazebo, however. -->
-  <!-- Publish robot model -->
-  <!-- <include file="$(find o2as_scene_description)/launch/o2as_base_scene_upload.launch" /> -->
-  <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" /> -->
-
   <!-- Drivers for the robots -->
   <node name="c_bot_ur_driver"
 	pkg="ur_modern_driver" type="ur_driver"
