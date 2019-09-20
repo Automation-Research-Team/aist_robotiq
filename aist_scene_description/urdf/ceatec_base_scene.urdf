@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<robot name="aaa" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find aist_scene_description)/urdf/ceatec_base_scene.urdf.xacro"/>
+
+  <link name="base_link"/>
+</robot>
+

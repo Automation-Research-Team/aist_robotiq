@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<robot name="aaa" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find aist_scene_description)/urdf/aist_box.xacro" />
+
+  <link name ="base_link"/>
+
+  <xacro:aist_box name="aaa"
+		  width="0.1" length="0.2" height="0.3"
+		  parent="base_link">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:aist_box>
+
+</robot>

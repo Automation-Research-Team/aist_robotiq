@@ -24,6 +24,6 @@ cameras:
     args:
       name: a_phoxi_m_camera
   a_bot_camera:
-    type: RealsenseCamera
+    type: DepthCamera
     args:
       name: a_bot_camera
