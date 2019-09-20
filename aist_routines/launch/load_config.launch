@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<launch>
+  <arg name="config"	default="aist"/>
+
+  <rosparam command="delete" param="groups"/>
+  <rosparam command="delete" param="grippers"/>
+  <rosparam command="delete" param="cameras"/>
+  <rosparam command="load"
+  	    file="$(find aist_routines)/config/$(arg config)_config.yaml"/>
+</launch>

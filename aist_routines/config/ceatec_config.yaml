@@ -1,0 +1,17 @@
+groups:
+  - arm
+  - gripper
+
+grippers:
+  arm:
+    type: FetchGripper
+    args:
+      prefix: ""
+      max_effort: 5.0
+      timeout: 6.0
+
+cameras:
+  head_camera:
+    type: DepthCamera
+    args:
+      name: head_camera

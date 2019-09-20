@@ -7,11 +7,9 @@
   <arg name="debug"		default="false"/>
 
   <param name="use_real_robot"	value="$(eval not arg('sim'))"/>
-  <rosparam command="delete" param="groups"/>
-  <rosparam command="delete" param="grippers"/>
-  <rosparam command="delete" param="cameras"/>
-  <rosparam command="load"
-  	    file="$(find aist_routines)/config/$(arg config)_config.yaml"/>
+  <include file="$(find aist_routines)/launch/load_config.launch">
+    <arg name="config"	value="$(arg config)"/>
+  </include>
 
   <!-- Launch gazebo if "sim == true". -->
   <include if="$(arg sim)"

@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!--
+  This file is supposed to launch the drivers of the real robots instead of the simulation.
+-->
+<launch>
+
+</launch>
