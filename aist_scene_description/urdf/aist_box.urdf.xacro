@@ -14,7 +14,7 @@
           <box size="${width} ${length} ${height}"/>
         </geometry>
         <material name="Grey">
-          <color rgba="0.7 0.7 0.7 1.0"/>
+          <color rgba="1.0 1.0 1.0 1.0"/>
         </material>
       </visual>
       <collision>
@@ -34,7 +34,7 @@
       </inertial>
     </link>
     <gazebo reference="${name}">
-      <material>Gazebo/Grey</material>
+      <material>Gazebo/White</material>
     </gazebo>
 
     <joint name="${name}" type="fixed">
