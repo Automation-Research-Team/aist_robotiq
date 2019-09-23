@@ -107,16 +107,13 @@
   <!--   <origin xyz="${(b_table_width/2 - tray_width)/2} 0.03 0" rpy="0 0 0"/> -->
   <!-- </xacro:tray> -->
 
-  <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
-  <!-- <joint name="ground_base_joint" type="planar"> -->
-  <!--   <parent link="ground"/> -->
-  <!--   <child  link="base_link"/> -->
-  <!--   <origin xyz="0 -0.5 0" rpy="0 0 0"/> -->
-  <!-- </joint> -->
-
-  <joint name="base_ground_joint" type="planar">
-    <parent link="base_link"/>
+  <!-- I would like to remove the "world" link definition, but
+       apparently it is necessary for Gazebo -->
+  <link name="world"/>
+  <joint name="world_ground_joint" type="fixed">
+    <parent link="world"/>
     <child  link="ground"/>
-    <origin xyz="0 0.5 0" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
+
 </robot>

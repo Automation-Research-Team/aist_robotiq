@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <launch>
 
-  <arg name="robot"	default="fetch"/>
   <arg name="scene"	default="ceatec_base_scene"/>
   <arg name="debug"	default="false"/>
   <arg name="gui"	default="true"/>
@@ -11,6 +10,7 @@
   <arg name="y"		default="0.0" />
   <arg name="z"		default="0.0" />
   <arg name="yaw"	default="0.0" />
+  <arg name="yr"	value="$(eval arg('y') - 0.5)" />
 
   <!-- Start Gazebo with a blank world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -19,16 +19,14 @@
     <arg name="paused"		value="$(arg paused)"/>
     <arg name="use_sim_time"	value="true"/>
     <arg name="headless"	value="$(arg headless)"/>
+    <!-- <arg name="world_name"	value="$(find -->
+    <!-- 				       aist_scene_description)/urdf/$(arg -->
+    <!-- 				       scene).urdf"/> -->
   </include>
 
   <!-- Setup controllers -->
   <rosparam file="$(find fetch_gazebo)/config/default_controllers.yaml"
 	    command="load"/>
-
-  <!-- Load robot urdf to param "robot_description". -->
-  <param name="robot_description"
-	 command="$(find xacro)/xacro '$(find
-		  aist_scene_description)/urdf/$(arg scene).urdf.xacro'"/>
 
   <!-- Start robot_state_publisher -->
   <node name="robot_state_publisher"
@@ -40,18 +38,25 @@
   <param name="robot/serial"	value="ABCDEFGHIJKLMNOPQRSTUVWX"/>
   <param name="robot/version"	value="0.0.1"/>
 
+  <!-- Load robot urdf to param "robot_description". -->
   <!-- Put a robot in gazebo, make it look pretty -->
-  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
+  <param name="robot_description"
+  	 command="$(find xacro)/xacro --inorder '$(find
+  		  fetch_gazebo)/robots/fetch.gazebo.xacro'"/>
+  <node name="robot_spawner" pkg="gazebo_ros" type="spawn_model"
   	respawn="false" output="screen"
-        args="-urdf -param robot_description -model fetch
-  	      -x $(arg x) -y $(arg y) -z $(arg z) -Y $(arg yaw)"/>
-  <!-- <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" -->
-  <!-- 	respawn="false" output="screen" -->
-  <!--       args="-urdf -file '$(find aist_scene_description)/urdf/$(arg scene).urdf.xacro' -->
-  <!-- 	      -model fetch -->
-  <!-- 	      -x $(arg x) -y $(arg y) -z $(arg z) -Y $(arg yaw)"/> -->
-  <!-- <node name="prepare_robot" -->
-  <!-- 	pkg="fetch_gazebo" type="prepare_simulated_robot.py"/> -->
+        args="-urdf -param robot_description -model robot
+  	      -x $(arg x) -y $(arg yr) -z $(arg z)"/>
+  <node name="prepare_robot"
+  	pkg="fetch_gazebo" type="prepare_simulated_robot.py"/>
+
+  <param name="scene_description"
+  	 command="$(find xacro)/xacro --inorder '$(find
+  		  aist_scene_description)/urdf/$(arg scene).urdf.xacro'"/>
+  <node name="scene_spawner" pkg="gazebo_ros" type="spawn_model"
+  	respawn="false" output="screen"
+        args="-urdf -param scene_description -model scene
+  	      -x $(arg x) -y $(arg y) -z $(arg z)"/>
 
   <!-- Head Camera Pipeline -->
   <include file="$(find fetch_gazebo)/launch/include/head_camera.launch.xml" />
@@ -68,8 +73,8 @@
     <remap from="mux" to="cmd_vel_mux" />
   </node>
 
-  <include file="$(find fetch_navigation)/launch/fetch_nav.launch">
-    <arg name="map_file"  value="$(find cps_cvs_maps)/maps/cps_cvs.yaml"/>
-  </include>
+  <!-- <include file="$(find fetch_navigation)/launch/fetch_nav.launch"> -->
+  <!--   <arg name="map_file"  value="$(find fetch_gazebo_demo)/maps/test_zone.yaml"/> -->
+  <!-- </include> -->
 
 </launch>
