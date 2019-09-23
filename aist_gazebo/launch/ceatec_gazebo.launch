@@ -45,7 +45,7 @@
   		  fetch_gazebo)/robots/fetch.gazebo.xacro'"/>
   <node name="robot_spawner" pkg="gazebo_ros" type="spawn_model"
   	respawn="false" output="screen"
-        args="-urdf -param robot_description -model robot
+        args="-urdf -param robot_description -model robot -unpause
   	      -x $(arg x) -y $(arg yr) -z $(arg z)"/>
   <node name="prepare_robot"
   	pkg="fetch_gazebo" type="prepare_simulated_robot.py"/>
@@ -55,7 +55,7 @@
   		  aist_scene_description)/urdf/$(arg scene).urdf.xacro'"/>
   <node name="scene_spawner" pkg="gazebo_ros" type="spawn_model"
   	respawn="false" output="screen"
-        args="-urdf -param scene_description -model scene
+        args="-urdf -param scene_description -model scene -unpause
   	      -x $(arg x) -y $(arg y) -z $(arg z)"/>
 
   <!-- Head Camera Pipeline -->
