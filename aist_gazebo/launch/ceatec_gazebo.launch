@@ -10,6 +10,7 @@
   <arg name="y"		default="0.0" />
   <arg name="z"		default="0.0" />
   <arg name="yaw"	default="0.0" />
+  <arg name="xr"	value="$(eval arg('x') - 0.5)" />
   <arg name="yr"	value="$(eval arg('y') - 0.5)" />
 
   <!-- Start Gazebo with a blank world -->
@@ -19,9 +20,6 @@
     <arg name="paused"		value="$(arg paused)"/>
     <arg name="use_sim_time"	value="true"/>
     <arg name="headless"	value="$(arg headless)"/>
-    <!-- <arg name="world_name"	value="$(find -->
-    <!-- 				       aist_scene_description)/urdf/$(arg -->
-    <!-- 				       scene).urdf"/> -->
   </include>
 
   <!-- Setup controllers -->
@@ -41,18 +39,19 @@
   <!-- Load robot urdf to param "robot_description". -->
   <!-- Put a robot in gazebo, make it look pretty -->
   <param name="robot_description"
-  	 command="$(find xacro)/xacro '$(find
+  	 command="$(find xacro)/xacro --inorder '$(find
   		  fetch_gazebo)/robots/fetch.gazebo.xacro'"/>
   <node name="robot_spawner" pkg="gazebo_ros" type="spawn_model"
   	respawn="false" output="screen"
         args="-urdf -param robot_description -model robot -unpause
-  	      -x $(arg x) -y $(arg yr) -z $(arg z)"/>
+  	      -x $(arg xr) -y $(arg yr) -z $(arg z)"/>
   <node name="prepare_robot"
   	pkg="fetch_gazebo" type="prepare_simulated_robot.py"/>
 
+  <!-- Load environment urdf to param "environment_description". -->
   <param name="environment_description"
-  	 command="$(find xacro)/xacro '$(find
-  		  aist_scene_description)/urdf/$(arg scene)_without_fetch.urdf.xacro'"/>
+  	 command="$(find xacro)/xacro --inorder '$(find
+  		  aist_scene_description)/urdf/$(arg scene)_environment.urdf.xacro'"/>
   <node name="environment_spawner" pkg="gazebo_ros" type="spawn_model"
   	respawn="false" output="screen"
         args="-urdf -param environment_description -model environment -unpause

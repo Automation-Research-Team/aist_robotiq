@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro"
-       name="ceatec_base_scene" >
+       name="ceatec_base_scene_environment" >
 
   <xacro:property name="workspace_width"	value="3.000"/>
   <xacro:property name="workspace_length"	value="2.000"/>
@@ -23,9 +23,6 @@
 
   <!-- Main workspace -->
   <link name="ground"/>
-
-  <!-- Fetch robot -->
-  <!-- <xacro:include filename="$(find fetch_gazebo)/robots/fetch.gazebo.xacro"/> -->
 
   <!-- Table -->
   <xacro:include filename="$(find

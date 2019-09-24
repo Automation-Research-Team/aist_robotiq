@@ -1,19 +1,34 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro"
-       name="ceatec_base_scene_with_fetch" >
+       name="ceatec_base_scene" >
 
   <!-- Fetch robot -->
   <xacro:include filename="$(find fetch_gazebo)/robots/fetch.gazebo.xacro"/>
 
   <!-- CEATEC base scene -->
-  <xacro:include filename="$(find aist_scene_description)/urdf/ceatec_base_scene_without_fetch.urdf.xacro"/>
+  <xacro:include filename="$(find aist_scene_description)/urdf/ceatec_base_scene_environment.urdf.xacro"/>
 
   <!-- I would like to remove the "world" link definition, but
        apparently it is necessary for Gazebo -->
-  <joint name="world_base_joint" type="planar">
-    <parent link="world"/>
+  <!-- <link  name="map"/> -->
+  <link  name="odom"/>
+  <!-- <joint name="map_odom_joint" type="planar"> -->
+  <!--   <parent link="map"/> -->
+  <!--   <child  link="odom"/> -->
+  <!--   <origin xyz="0 0 0" rpy="0 0 0"/> -->
+  <!--   <axis   xyz="0 0 1"/> -->
+  <!-- </joint> -->
+  <joint name="odom_base_joint" type="planar">
+    <parent link="odom"/>
     <child  link="base_link"/>
-    <origin xyz="0 -0.5 0" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis   xyz="0 0 1"/>
+  </joint>
+
+  <joint name="odom_world_joint" type="planar">
+    <parent link="odom"/>
+    <child  link="world"/>
+    <origin xyz="0.5 0.5 0" rpy="0 0 0"/>
   </joint>
 
 </robot>
