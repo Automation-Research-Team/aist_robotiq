@@ -32,7 +32,7 @@ def paramtuples(d):
     for key, param in d.items():
         id = int(key.split('_')[1])
         params[id] = ParamTuple(**param)
-    return param
+    return params
 
 ######################################################################
 #  class AISTBaseRoutines                                            #
