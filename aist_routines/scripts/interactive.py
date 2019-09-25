@@ -62,7 +62,7 @@ class InteractiveRoutines(URRoutines):
             (success, _, current_pose) = self.go_to_pose_goal(
                                                 self._robot_name, target_pose,
                                                 self._speed,
-                                                move_lin=True, wait=False)
+                                                move_lin=True)
         return success
 
     def xyz_rpy(self, poseStamped):
