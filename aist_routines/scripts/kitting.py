@@ -135,9 +135,18 @@ class KittingRoutines(URRoutines):
 
     def _is_close_to_fail_poses(self, pose):
         for fail_pose in self._fail_poses:
-            if self._all_close(pose, fail_pose, 0.005):
+            if self._is_close_to_fail_pose(pose, fail_pose, 0.005):
                 return True
         return False
+
+    def _is_close_to_fail_pose(self, pose, fail_pose, tolerance):
+        position      = pose.pose.position
+        fail_position = fail_pose.pose.position
+        if abs(position.x - fail_position.x) > tolerance or \
+           abs(position.y - fail_position.y) > tolerance or \
+           abs(position.z - fail_position.z) > tolerance:
+            return False
+        return True
 
 
 if __name__ == '__main__':
