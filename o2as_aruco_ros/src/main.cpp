@@ -10,7 +10,6 @@
 
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
-#include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
@@ -18,6 +17,7 @@
 #include <dynamic_reconfigure/server.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
+#include <cv_bridge/cv_bridge.h>
 #include <o2as_aruco_ros/Corners.h>
 
 #include <aruco/aruco.h>
@@ -40,7 +40,7 @@ val(const sensor_msgs::Image& image_msg, int u, int v)
     return *reinterpret_cast<const T*>(image_msg.data.data() + v*image_msg.step
 							     + u*sizeof(T));
 }
-    
+
 /************************************************************************
 *  class Simple								*
 ************************************************************************/
@@ -68,7 +68,8 @@ class Simple
 			      tf::StampedTransform& transform)	const	;
     tf::Transform
 		get_marker_transform(const aruco::Marker& marker,
-				     const image_t& depth_msg)	const	;
+				     const image_t& depth_msg,
+				     cv::Mat& image)		const	;
     template <class T> cv::Vec<T, 3>
 		view_vector(T u, T v)				const	;
     template <class T> cv::Vec<T, 3>
@@ -76,7 +77,8 @@ class Simple
     template <class T> cv::Vec<T, 3>
 		at(const image_t& depth_msg, T u, T v)		const	;
     void	publish_marker_info(const aruco::Marker& marker,
-				    const image_t& depth_msg)		;
+				    const image_t& depth_msg,
+				    cv::Mat& image)			;
     void	publish_image_info(const cv::Mat& image,
 				   const ros::Time& stamp)		;
 
@@ -244,7 +246,8 @@ Simple::detect_marker_cb(const camera_info_p& camera_info_msg,
 					    camera_info_msg->P[5],
 					   0.0));
 	auto	image = cv_bridge::toCvCopy(*image_msg,
-					    sensor_msgs::image_encodings::RGB8)->image;
+					    sensor_msgs::image_encodings::RGB8)
+		      ->image;
 
       //detection results will go into "markers"
 	std::vector<aruco::Marker>	markers;
@@ -261,9 +264,10 @@ Simple::detect_marker_cb(const camera_info_p& camera_info_msg,
 	    {
 		if (_marker_id == 0)
 		    _bins.emplace_back(marker.id,
-				       get_marker_transform(marker, *depth_msg));
+				       get_marker_transform(marker,
+							    *depth_msg, image));
 		else if (marker.id == _marker_id)
-		    publish_marker_info(marker, *depth_msg);
+		    publish_marker_info(marker, *depth_msg, image);
 	    }
 	    catch (const std::runtime_error& e)
 	    {
@@ -322,7 +326,7 @@ Simple::get_transform(const std::string& refFrame,
 
 tf::Transform
 Simple::get_marker_transform(const aruco::Marker& marker,
-			     const image_t& depth_msg) const
+			     const image_t& depth_msg, cv::Mat& image) const
 {
     using value_t	= float;
     using point_t	= cv::Vec<value_t, 3>;
@@ -360,8 +364,12 @@ Simple::get_marker_transform(const aruco::Marker& marker,
 	{
 	    const auto	point = at<value_t>(depth_msg, u, v);
 
-	    if (point(2) != value_t(0) && plane.distance(point) < _planarityTolerance)
+	    if (point(2) != value_t(0) &&
+		plane.distance(point) < _planarityTolerance)
+	    {
 		points.push_back(point);
+		image.at<uint32_t>(v, u) &= 0x00ffff;
+	    }
 	}
 
   // Fit a plane to seleceted inliers.
@@ -439,6 +447,7 @@ Simple::at(const image_t& depth_msg, int u, int v) const
 {
     const auto	xyz = view_vector<T>(u, v);
     const auto	d   = val<T>(depth_msg, u, v);
+
     return {xyz[0]*d, xyz[1]*d, d};
 }
 
@@ -461,7 +470,8 @@ Simple::at(const image_t& depth_msg, T u, T v) const
 }
 
 void
-Simple::publish_marker_info(const aruco::Marker& marker, const image_t& depth_msg)
+Simple::publish_marker_info(const aruco::Marker& marker,
+			    const image_t& depth_msg, cv::Mat& image)
 {
     const auto	stamp = depth_msg.header.stamp;
 #ifdef DEBUG
@@ -469,7 +479,8 @@ Simple::publish_marker_info(const aruco::Marker& marker, const image_t& depth_ms
 	tf::Transform		transform = aruco_ros::arucoMarker2Tf(marker);
 	tf::StampedTransform	cameraToReference;
 	tf::StampedTransform	stampedTransform(transform, stamp,
-						 _reference_frame, _marker_frame);
+						 _reference_frame,
+						 _marker_frame);
 	_tfBroadcaster.sendTransform(stampedTransform);
 	geometry_msgs::TransformStamped transformMsg;
 	tf::transformStampedTFToMsg(stampedTransform, transformMsg);
@@ -477,7 +488,8 @@ Simple::publish_marker_info(const aruco::Marker& marker, const image_t& depth_ms
     }
 #endif
     const tf::StampedTransform	stampedTransform(
-				    get_marker_transform(marker, depth_msg),
+				    get_marker_transform(marker, depth_msg,
+							 image),
 				    stamp, _reference_frame, _marker_frame);
     _tfBroadcaster.sendTransform(stampedTransform);
 
@@ -544,7 +556,8 @@ int
 main(int argc, char** argv)
 {
     ros::init(argc, argv, "o2as_single");
-    ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
+    ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME,
+				   ros::console::levels::Debug);
 
     try
     {
