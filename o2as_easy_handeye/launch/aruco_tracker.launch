@@ -19,21 +19,21 @@
 	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/image"	to="/$(arg camera_name)/texture"
 	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
-    <remap from="/pointcloud"	to="/$(arg camera_name)/pointcloud"
+    <remap from="/depth"	to="/$(arg camera_name)/depth_map"
     	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
 
     <remap from="/camera_info"	to="/$(arg camera_name)/camera_info"
 	   if="$(eval arg('camera_name') == 'b_phoxi_m_camera')"/>
     <remap from="/image"	to="/$(arg camera_name)/texture"
 	   if="$(eval arg('camera_name') == 'b_phoxi_m_camera')"/>
-    <remap from="/pointcloud"	to="/$(arg camera_name)/pointcloud"
+    <remap from="/depth"	to="/$(arg camera_name)/depth_map"
     	   if="$(eval arg('camera_name') == 'b_phoxi_m_camera')"/>
 
     <remap from="/camera_info"	to="/$(arg camera_name)/rgb/camera_info"
 	   if="$(eval arg('camera_name') == 'a_bot_camera')"/>
     <remap from="/image"	to="/$(arg camera_name)/rgb/image_raw"
 	   if="$(eval arg('camera_name') == 'a_bot_camera')"/>
-    <remap from="/pointcloud"	to="/$(arg camera_name)/depth/points"
+    <remap from="/depth"	to="/$(arg camera_name)/depth/image_raw"
     	   if="$(eval arg('camera_name') == 'a_bot_camera')"/>
 
     <!-- Other parameters -->

@@ -18,6 +18,7 @@
 	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/depth"	to="/$(arg camera_name)/depth_map"
 	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
+
     <remap from="/camera_info"	to="/$(arg camera_name)/rgb/camera_info"
 	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/image"	to="/$(arg camera_name)/rgb/image_raw"
