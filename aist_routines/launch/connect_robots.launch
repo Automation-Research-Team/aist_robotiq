@@ -22,6 +22,7 @@
        robot_state_publisher and launch real robots if "sim" ==
        "false". -->
   <group unless="$(arg sim)">
+    <rosparam command="delete" param="robot_description"/>
     <param name="robot_description"
   	   command="$(find xacro)/xacro --inorder '$(find
   		    aist_scene_description)/urdf/$(arg scene).urdf.xacro'"/>
