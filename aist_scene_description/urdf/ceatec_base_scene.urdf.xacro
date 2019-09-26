@@ -25,7 +25,7 @@
     <axis   xyz="0 0 1"/>
   </joint>
 
-  <joint name="odom_world_joint" type="planar">
+  <joint name="odom_world_joint" type="fixed">
     <parent link="odom"/>
     <child  link="world"/>
     <origin xyz="0.5 0.5 0" rpy="0 0 0"/>
