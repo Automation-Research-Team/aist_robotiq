@@ -33,7 +33,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: PointCloud2
+    SyncSource: ""
 Toolbars:
   toolButtonStyle: 2
 Visualization Manager:
@@ -152,6 +152,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          a_bot_ft300_wrench_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_bot_gripper_base_link:
             Alpha: 1
             Show Axes: false
@@ -235,6 +239,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          b_bot_ft300_wrench_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_bot_shoulder_link:
             Alpha: 1
             Show Axes: false
@@ -834,6 +842,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          a_bot_ft300_wrench_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_bot_gripper_base_link:
             Alpha: 1
             Show Axes: false
@@ -917,6 +929,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          b_bot_ft300_wrench_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_bot_shoulder_link:
             Alpha: 1
             Show Axes: false
@@ -1445,6 +1461,8 @@ Visualization Manager:
           Value: false
         a_bot_ft300_link:
           Value: false
+        a_bot_ft300_wrench_link:
+          Value: true
         a_bot_gripper_base_link:
           Value: false
         a_bot_gripper_screw_pickup:
@@ -1487,6 +1505,8 @@ Visualization Manager:
           Value: false
         b_bot_ft300_link:
           Value: false
+        b_bot_ft300_wrench_link:
+          Value: true
         b_bot_shoulder_link:
           Value: false
         b_bot_single_suction_gripper_base_link:
@@ -1757,6 +1777,8 @@ Visualization Manager:
                           a_bot_ee_link:
                             a_bot_ft300_link:
                               a_bot_ft300_flange_link:
+                                a_bot_ft300_wrench_link:
+                                  {}
                                 a_bot_gripper_base_link:
                                   a_bot_gripper_tip_link:
                                     a_bot_gripper_screw_pickup:
@@ -1782,6 +1804,8 @@ Visualization Manager:
                               {}
                             b_bot_ft300_link:
                               b_bot_ft300_flange_link:
+                                b_bot_ft300_wrench_link:
+                                  {}
                                 b_bot_single_suction_gripper_base_link:
                                   b_bot_single_suction_gripper_pad_link:
                                     {}
@@ -2040,7 +2064,7 @@ Visualization Manager:
       Marker Topic: /visualization_marker
       Name: MarkerArray
       Namespaces:
-        markers: true
+        {}
       Queue Size: 100
       Value: true
   Enabled: true
@@ -2068,25 +2092,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.586663604
+      Distance: 0.414967299
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.234116554
-        Y: 0.126255944
-        Z: 0.802298367
+        X: 0.186262339
+        Y: 0.0543206632
+        Z: 0.836231589
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.601609766
+      Pitch: 1.10663962
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.10256147
+      Yaw: 0.274528593
     Saved: ~
 Window Geometry:
   Displays:
