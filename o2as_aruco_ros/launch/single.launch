@@ -2,8 +2,10 @@
 
   <arg name="marker_id"		default="26"/>
   <arg name="marker_size"	default="0.070"/>    <!-- in m -->
-  <arg name="reference_frame"	default=""/>
-  <arg name="camera_frame"	default="aruco_camera_frame"/>
+  <!-- <arg name="reference_frame"	default=""/> -->
+  <arg name="reference_frame"	default="a_phoxi_m_camera_from_b_bot"/>
+  <!-- <arg name="camera_frame"	default="aruco_camera_frame"/> -->
+  <arg name="camera_frame"	default="a_phoxi_m_camera_from_b_bot"/>
   <arg name="marker_frame"	default="aruco_marker_frame"/>
   <arg name="corner_refinement"	default="LINES"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
@@ -14,13 +16,14 @@
 	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/image"	to="/$(arg camera_name)/texture"
 	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
-    <remap from="/pointcloud"	to="/$(arg camera_name)/pointcloud"
+    <remap from="/depth"	to="/$(arg camera_name)/depth_map"
 	   if="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
+
     <remap from="/camera_info"	to="/$(arg camera_name)/rgb/camera_info"
 	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
     <remap from="/image"	to="/$(arg camera_name)/rgb/image_raw"
 	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
-    <remap from="/pointcloud"	to="/$(arg camera_name)/depth/points"
+    <remap from="/depth"	to="/$(arg camera_name)/depth/image_raw"
 	   unless="$(eval arg('camera_name') == 'a_phoxi_m_camera')"/>
 
     <!-- Other parameters -->
