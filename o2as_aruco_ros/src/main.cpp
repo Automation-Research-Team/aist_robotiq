@@ -10,16 +10,14 @@
 
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
-#include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <sensor_msgs/point_cloud2_iterator.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 #include <visualization_msgs/Marker.h>
 #include <dynamic_reconfigure/server.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
+#include <cv_bridge/cv_bridge.h>
 #include <o2as_aruco_ros/Corners.h>
 
 #include <aruco/aruco.h>
@@ -34,44 +32,13 @@
 namespace o2as_aruco_ros
 {
 /************************************************************************
-*  geometry functions							*
+*  global functions							*
 ************************************************************************/
-template <class T> cv::Vec<T, 3>
-at(const sensor_msgs::PointCloud2& cloud_msg, int u, int v)
+template <class T> T
+val(const sensor_msgs::Image& image_msg, int u, int v)
 {
-    using iterator_t = sensor_msgs::PointCloud2ConstIterator<T>;
-
-    iterator_t	xyz(cloud_msg, "x");
-    xyz += (cloud_msg.width * v + u);
-
-    return {xyz[0], xyz[1], xyz[2]};
-
-}
-
-template <class T> cv::Vec<T, 3>
-at(const sensor_msgs::PointCloud2& cloud_msg, T u, T v)
-{
-    using iterator_t = sensor_msgs::PointCloud2ConstIterator<T>;
-
-    constexpr auto	NaN = std::numeric_limits<T>::quiet_NaN();
-    const int		u0 = std::floor(u);
-    const int		v0 = std::floor(v);
-    const int		u1 = std::ceil(u);
-    const int		v1 = std::ceil(v);
-    for (auto vv = v0; vv <= v1; ++vv)
-    {
-	iterator_t	xyz(cloud_msg, "x");
-	xyz += (cloud_msg.width * vv + u0);
-
-	for (auto uu = u0; uu <= u1; ++uu)
-	{
-	    if (!std::isnan(xyz[2]))
-		return {xyz[0], xyz[1], xyz[2]};
-	    ++xyz;
-	}
-    }
-
-    return {NaN, NaN, NaN};
+    return *reinterpret_cast<const T*>(image_msg.data.data() + v*image_msg.step
+							     + u*sizeof(T));
 }
 
 /************************************************************************
@@ -84,8 +51,6 @@ class Simple
     using camera_info_p	= sensor_msgs::CameraInfoConstPtr;
     using image_t	= sensor_msgs::Image;
     using image_p	= sensor_msgs::ImageConstPtr;
-    using cloud_t	= sensor_msgs::PointCloud2;
-    using cloud_p	= sensor_msgs::PointCloud2ConstPtr;
 
   public:
     Simple();
@@ -97,17 +62,23 @@ class Simple
 			  uint32_t level)				;
     void	detect_marker_cb(const camera_info_p& camera_info_msg,
 				 const image_p&	      image_msg,
-				 const cloud_p&	      cloud_msg)	;
+				 const image_p&	      depth_msg)	;
     bool	get_transform(const std::string& refFrame,
 			      const std::string& childFrame,
 			      tf::StampedTransform& transform)	const	;
     tf::Transform
 		get_marker_transform(const aruco::Marker& marker,
-				     const cloud_t& cloud_msg)	const	;
+				     const image_t& depth_msg,
+				     cv::Mat& image)		const	;
     template <class T> cv::Vec<T, 3>
 		view_vector(T u, T v)				const	;
+    template <class T> cv::Vec<T, 3>
+		at(const image_t& depth_msg, int u, int v)	const	;
+    template <class T> cv::Vec<T, 3>
+		at(const image_t& depth_msg, T u, T v)		const	;
     void	publish_marker_info(const aruco::Marker& marker,
-				    const cloud_t& cloud_msg)		;
+				    const image_t& depth_msg,
+				    cv::Mat& image)			;
     void	publish_image_info(const cv::Mat& image,
 				   const ros::Time& stamp)		;
 
@@ -121,12 +92,12 @@ class Simple
     std::string						_camera_frame;
     std::string						_reference_frame;
 
-  // input camera_info/image/cloud stuff
+  // input camera_info/image stuff
     message_filters::Subscriber<camera_info_t>		_camera_info_sub;
     message_filters::Subscriber<image_t>		_image_sub;
-    message_filters::Subscriber<cloud_t>		_cloud_sub;
+    message_filters::Subscriber<image_t>		_depth_sub;
     message_filters::TimeSynchronizer<camera_info_t,
-				      image_t, cloud_t>	_ts;
+				      image_t, image_t>	_ts;
 
   // camera_info stuff
     aruco::CameraParameters				_camParam;
@@ -139,7 +110,6 @@ class Simple
     const image_transport::Publisher			_debug_pub;
 
   // output cloud, pose, marker, etc. stuff
-    const ros::Publisher				_cloud_pub;
     const ros::Publisher				_pose_pub;
     const ros::Publisher				_visMarker_pub;
     const ros::Publisher				_pixel_pub;
@@ -161,12 +131,11 @@ Simple::Simple()
     :_nh("~"),
      _camera_info_sub(_nh, "/camera_info", 1),
      _image_sub(_nh, "/image", 1),
-     _cloud_sub(_nh, "/pointcloud", 1),
-     _ts(_camera_info_sub, _image_sub, _cloud_sub, 10),
+     _depth_sub(_nh, "/depth", 1),
+     _ts(_camera_info_sub, _image_sub, _depth_sub, 10),
      _it(_nh),
      _image_pub(_it.advertise("result", 1)),
      _debug_pub(_it.advertise("debug",  1)),
-     _cloud_pub(    _nh.advertise<cloud_t>("pointcloud", 1)),
      _pose_pub(     _nh.advertise<geometry_msgs::PoseStamped>("pose", 100)),
      _visMarker_pub(_nh.advertise<visualization_msgs::Marker>("marker", 10)),
      _pixel_pub(    _nh.advertise<geometry_msgs::PointStamped>("pixel", 10)),
@@ -254,7 +223,7 @@ Simple::reconf_cb(aruco_ros::ArucoThresholdConfig& config, uint32_t level)
 
 void
 Simple::detect_marker_cb(const camera_info_p& camera_info_msg,
-			 const image_p& image_msg, const cloud_p& cloud_msg)
+			 const image_p& image_msg, const image_p& depth_msg)
 {
     try
     {
@@ -276,13 +245,13 @@ Simple::detect_marker_cb(const camera_info_p& camera_info_msg,
 					   -camera_info_msg->P[7]/
 					    camera_info_msg->P[5],
 					   0.0));
-	auto	inImage = cv_bridge::toCvCopy(
-				*image_msg,
-				sensor_msgs::image_encodings::RGB8)->image;
+	auto	image = cv_bridge::toCvCopy(*image_msg,
+					    sensor_msgs::image_encodings::RGB8)
+		      ->image;
 
       //detection results will go into "markers"
 	std::vector<aruco::Marker>	markers;
-	_mDetector.detect(inImage, markers, _camParam, _marker_size, false);
+	_mDetector.detect(image, markers, _camParam, _marker_size, false);
 
 	if (markers.size() == 0)
 	    throw std::runtime_error("No markers detected!");
@@ -296,9 +265,9 @@ Simple::detect_marker_cb(const camera_info_p& camera_info_msg,
 		if (_marker_id == 0)
 		    _bins.emplace_back(marker.id,
 				       get_marker_transform(marker,
-							    *cloud_msg));
+							    *depth_msg, image));
 		else if (marker.id == _marker_id)
-		    publish_marker_info(marker, *cloud_msg);
+		    publish_marker_info(marker, *depth_msg, image);
 	    }
 	    catch (const std::runtime_error& e)
 	    {
@@ -306,14 +275,14 @@ Simple::detect_marker_cb(const camera_info_p& camera_info_msg,
 	    }
 
 	  // but drawing all the detected markers
-	    marker.draw(inImage, cv::Scalar(0, 0, 255), 2);
+	    marker.draw(image, cv::Scalar(0, 0, 255), 2);
 	}
 
 	if (_marker_size != -1)
 	    for (auto& marker : markers)
-		aruco::CvDrawingUtils::draw3dAxis(inImage, marker, _camParam);
+		aruco::CvDrawingUtils::draw3dAxis(image, marker, _camParam);
 
-	publish_image_info(inImage, image_msg->header.stamp);
+	publish_image_info(image, image_msg->header.stamp);
     }
     catch (const std::runtime_error& e)
     {
@@ -357,11 +326,10 @@ Simple::get_transform(const std::string& refFrame,
 
 tf::Transform
 Simple::get_marker_transform(const aruco::Marker& marker,
-			     const cloud_t& cloud_msg) const
+			     const image_t& depth_msg, cv::Mat& image) const
 {
+    struct rgb_t	{ uint8_t r, g, b; };
     using value_t	= float;
-    using iterator_t	= sensor_msgs::PointCloud2ConstIterator<value_t>;
-    using rgbiterator_t	= sensor_msgs::PointCloud2Iterator<uint32_t>;
     using point_t	= cv::Vec<value_t, 3>;
     using plane_t	= o2as::Plane<value_t, 3>;
 
@@ -372,9 +340,9 @@ Simple::get_marker_transform(const aruco::Marker& marker,
     std::vector<point_t>	points;
     for (const auto& corner : marker)
     {
-	const auto	point = at<value_t>(cloud_msg, corner.x, corner.y);
+	const auto	point = at<value_t>(depth_msg, corner.x, corner.y);
 
-	if (!std::isnan(point(2)))
+	if (point(2) != value_t(0))
 	    points.push_back(point);
     }
 
@@ -392,59 +360,21 @@ Simple::get_marker_transform(const aruco::Marker& marker,
 
   // Select 3D points close to the initial plane within the bounding box.
     points.clear();
-    try
-    {
-	rgbiterator_t	rgb(const_cast<cloud_t&>(cloud_msg), "rgb");
-
-	for (auto v = v0; v <= v1; ++v)
+    for (auto v = v0; v <= v1; ++v)
+	for (auto u = u0; u <= u1; ++u)
 	{
-	    iterator_t		xyz(cloud_msg, "x");
-	    rgbiterator_t	rgb(const_cast<cloud_t&>(cloud_msg), "rgb");
-	    const auto		idx = cloud_msg.width * v + u0;
-	    xyz += idx;
-	    rgb += idx;
+	    const auto	point = at<value_t>(depth_msg, u, v);
 
-	    for (auto u = u0; u <= u1; ++u)
+	    if (point(2) != value_t(0) &&
+		plane.distance(point) < _planarityTolerance)
 	    {
-		const auto	point = at<value_t>(cloud_msg, u, v);
-
-		if (!std::isnan(point(2)) && plane.distance(point) <
-		    _planarityTolerance)
-		{
-		    points.push_back(point);
-		    *rgb = 0xff0000;
-		}
-
-		++xyz;
-		++rgb;
+		points.push_back(point);
+		image.at<rgb_t>(v, u).b = 0;
 	    }
 	}
-    }
-    catch (const std::exception& err)
-    {
-	for (auto v = v0; v <= v1; ++v)
-	{
-	    iterator_t	xyz(cloud_msg, "x");
-	    const auto	idx = cloud_msg.width * v + u0;
-	    xyz += idx;
 
-	    for (auto u = u0; u <= u1; ++u)
-	    {
-		const auto	point = at<value_t>(cloud_msg, u, v);
-
-		if (!std::isnan(point(2)) && plane.distance(point) <
-		    _planarityTolerance)
-		    points.push_back(point);
-
-		++xyz;
-	    }
-	}
-    }
-
-  // Fit a plane to seleceted inliers and then publish.
+  // Fit a plane to seleceted inliers.
     plane.fit(points.cbegin(), points.cend());
-
-    _cloud_pub.publish(cloud_msg);
 
   // Compute 3D coordinates of marker corners and then publish.
     point_t	corners[4];
@@ -455,7 +385,7 @@ Simple::get_marker_transform(const aruco::Marker& marker,
     for (const auto& corner: corners)
     {
 	geometry_msgs::PointStamped	pointStamped;
-	pointStamped.header = cloud_msg.header;
+	pointStamped.header  = depth_msg.header;
 	pointStamped.point.x = corner(0);
 	pointStamped.point.y = corner(1);
 	pointStamped.point.z = corner(2);
@@ -513,11 +443,38 @@ Simple::view_vector(T u, T v) const
     return {xy[0][0], xy[0][1], T(1)};
 }
 
+template <class T> cv::Vec<T, 3>
+Simple::at(const image_t& depth_msg, int u, int v) const
+{
+    const auto	xyz = view_vector<T>(u, v);
+    const auto	d   = val<T>(depth_msg, u, v);
+
+    return {xyz[0]*d, xyz[1]*d, d};
+}
+
+template <class T> cv::Vec<T, 3>
+Simple::at(const image_t& depth_msg, T u, T v) const
+{
+    const int	u0 = std::floor(u);
+    const int	v0 = std::floor(v);
+    const int	u1 = std::ceil(u);
+    const int	v1 = std::ceil(v);
+    for (auto vv = v0; vv <= v1; ++vv)
+	for (auto uu = u0; uu <= u1; ++uu)
+	{
+	    const auto	xyz = at<T>(depth_msg, uu, vv);
+	    if (xyz[2] != T(0))
+		return xyz;
+	}
+
+    return {T(0), T(0), T(0)};
+}
+
 void
 Simple::publish_marker_info(const aruco::Marker& marker,
-			    const cloud_t& cloud_msg)
+			    const image_t& depth_msg, cv::Mat& image)
 {
-    const auto	stamp = cloud_msg.header.stamp;
+    const auto	stamp = depth_msg.header.stamp;
 #ifdef DEBUG
     {
 	tf::Transform		transform = aruco_ros::arucoMarker2Tf(marker);
@@ -532,7 +489,8 @@ Simple::publish_marker_info(const aruco::Marker& marker,
     }
 #endif
     const tf::StampedTransform	stampedTransform(
-				    get_marker_transform(marker, cloud_msg),
+				    get_marker_transform(marker, depth_msg,
+							 image),
 				    stamp, _reference_frame, _marker_frame);
     _tfBroadcaster.sendTransform(stampedTransform);
 
@@ -599,7 +557,8 @@ int
 main(int argc, char** argv)
 {
     ros::init(argc, argv, "o2as_single");
-    ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
+    ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME,
+				   ros::console::levels::Debug);
 
     try
     {
