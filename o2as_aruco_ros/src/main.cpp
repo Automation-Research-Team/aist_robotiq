@@ -328,6 +328,7 @@ tf::Transform
 Simple::get_marker_transform(const aruco::Marker& marker,
 			     const image_t& depth_msg, cv::Mat& image) const
 {
+    struct rgb_t	{ uint8_t r, g, b; };
     using value_t	= float;
     using point_t	= cv::Vec<value_t, 3>;
     using plane_t	= o2as::Plane<value_t, 3>;
@@ -368,7 +369,7 @@ Simple::get_marker_transform(const aruco::Marker& marker,
 		plane.distance(point) < _planarityTolerance)
 	    {
 		points.push_back(point);
-		image.at<uint32_t>(v, u) &= 0x00ffff;
+		image.at<rgb_t>(v, u).b = 0;
 	    }
 	}
 
