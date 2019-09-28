@@ -45,18 +45,9 @@ class InteractiveRoutines(FetchRoutines):
                                         self._speed, move_lin=True)
         return success
 
-    def xyz_rpy(self, poseStamped):
-        pose = self.listener.transformPose("base_link",
-                                           poseStamped).pose
-        rpy  = tfs.euler_from_quaternion([pose.orientation.x,
-                                          pose.orientation.y,
-                                          pose.orientation.z,
-                                          pose.orientation.w])
-        return [pose.position.x, pose.position.y, pose.position.z,
-                rpy[0], rpy[1], rpy[2]]
-
     def go_home(self):
-        self.go_to_named_pose('tucking', self._robot_name)
+        self.move_head(0, 0)
+        self.go_to_named_pose('ready', self._robot_name)
 
     def run(self):
         # Reset pose
@@ -154,8 +145,10 @@ class InteractiveRoutines(FetchRoutines):
                 for gs in gscore:
                     print(str(gs))
                 print(str(poses))
+            elif key == 'tucking':
+                self.go_to_named_pose('tucking', self._robot_name)
             elif key == 'home':
-                self.go_home()
+                self.go_to_named_pose('ready', self._robot_name)
             elif key == 'ready':
                 self.go_to_named_pose('ready', self._robot_name)
             elif key == 'pick_ready':
