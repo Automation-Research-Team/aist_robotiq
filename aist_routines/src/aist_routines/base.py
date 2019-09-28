@@ -45,6 +45,11 @@ class AISTBaseRoutines(object):
         self.listener = TransformListener()
         rospy.sleep(1.0)        # Necessary for listner spinning up
 
+        # MoveIt planning parameters
+        self._reference_frame = rospy.get_param("moveit_pose_reference_frame",
+                                                "workspace_center")
+        self._eef_step        = rospy.get_param("moveit_eef_step", 0.0005)
+
         # MoveIt groups
         d = rospy.get_param("groups", {})
         self._groups = {}
@@ -135,7 +140,7 @@ class AISTBaseRoutines(object):
             waypoints = []
             waypoints.append(pose_world)
             (plan, fraction) = group.compute_cartesian_path(waypoints,
-                                                            0.01,  # eef_step
+                                                            self._eef_step,
                                                             0.0) # jump_threshold
             if fraction < 0.995:
                 rospy.logwarn("Computed only {}% of the total cartesian path."
@@ -327,15 +332,30 @@ class AISTBaseRoutines(object):
                           liftup_after, acc_fast, acc_slow)
 
     # Utility functions
+    def xyz_rpy(self, poseStamped):
+        try:
+            self.listener.waitForTransform(self._reference_frame,
+                                           poseStamped.header.frame_id,
+                                           rospy.Time.now(),
+                                           rospy.Duration(10))
+            pose = self.listener.transformPose(self._reference_frame,
+                                               poseStamped).pose
+        except Exception as e:
+            rospy.logerr("AISTBaseRoutines.xyz_rpy(): {}".format(e))
+            raise e
+
+        rpy = tfs.euler_from_quaternion([pose.orientation.x,
+                                         pose.orientation.y,
+                                         pose.orientation.z,
+                                         pose.orientation.w])
+        return [pose.position.x, pose.position.y, pose.position.z,
+                rpy[0], rpy[1], rpy[2]]
+
     def format_pose(self, poseStamped):
-        pose = self.listener.transformPose("base_link",
-                                            poseStamped).pose
-        rpy  = map(degrees, tfs.euler_from_quaternion([pose.orientation.x,
-                                                       pose.orientation.y,
-                                                       pose.orientation.z,
-                                                       pose.orientation.w]))
+        xyzrpy = self.xyz_rpy(poseStamped)
         return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
-            pose.position.x, pose.position.y, pose.position.z, *rpy)
+            xyzrpy[0], xyzrpy[1], xyzrpy[2],
+            degrees(xyzrpy[3]), degrees(xyzrpy[4]), degrees(xyzrpy[5]))
 
     def effector_target_pose(self, target_pose, offset):
         T = tfs.concatenate_matrices(
