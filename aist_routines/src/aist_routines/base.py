@@ -332,14 +332,14 @@ class AISTBaseRoutines(object):
                           liftup_after, acc_fast, acc_slow)
 
     # Utility functions
-    def xyz_rpy(self, poseStamped):
+    def xyz_rpy(self, target_pose):
         try:
             self.listener.waitForTransform(self._reference_frame,
-                                           poseStamped.header.frame_id,
+                                           target_pose.header.frame_id,
                                            rospy.Time.now(),
                                            rospy.Duration(10))
             pose = self.listener.transformPose(self._reference_frame,
-                                               poseStamped).pose
+                                               target_pose).pose
         except Exception as e:
             rospy.logerr("AISTBaseRoutines.xyz_rpy(): {}".format(e))
             raise e
@@ -351,8 +351,8 @@ class AISTBaseRoutines(object):
         return [pose.position.x, pose.position.y, pose.position.z,
                 rpy[0], rpy[1], rpy[2]]
 
-    def format_pose(self, poseStamped):
-        xyzrpy = self.xyz_rpy(poseStamped)
+    def format_pose(self, target_pose):
+        xyzrpy = self.xyz_rpy(target_pose)
         return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
             xyzrpy[0], xyzrpy[1], xyzrpy[2],
             degrees(xyzrpy[3]), degrees(xyzrpy[4]), degrees(xyzrpy[5]))

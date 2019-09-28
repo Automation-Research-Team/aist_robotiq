@@ -20,8 +20,10 @@ class FreightRoutines(AISTBaseRoutines):
 
         self._move_base = actionlib.SimpleActionClient("/move_base",
                                                        MoveBaseAction)
-        self._move_base.wait_for_server()
-        rospy.loginfo("Connected to move_base.")
+        if self._move_base.wait_for_server(rospy.Duration(10)):
+            rospy.loginfo("Connected to move_base.")
+        else:
+            rospy.logerr("FreightRoutines::__init()__: failed to connect /move_base action server")
 
         self._odom_sub          = rospy.Subscriber("/odom", Odometry,
                                                    self._odom_callback)
