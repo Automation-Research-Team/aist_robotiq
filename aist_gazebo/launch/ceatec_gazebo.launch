@@ -39,7 +39,7 @@
   <!-- Load robot urdf to param "robot_description". -->
   <!-- Put a robot in gazebo, make it look pretty -->
   <param name="robot_description"
-  	 command="$(find xacro)/xacro --inorder '$(find
+  	 command="$(find xacro)/xacro '$(find
   		  fetch_gazebo)/robots/fetch.gazebo.xacro'"/>
   <node name="robot_spawner" pkg="gazebo_ros" type="spawn_model"
   	respawn="false" output="screen"
@@ -50,15 +50,16 @@
 
   <!-- Load environment urdf to param "environment_description". -->
   <param name="environment_description"
-  	 command="$(find xacro)/xacro --inorder '$(find
-  		  aist_scene_description)/urdf/$(arg scene)_environment.urdf.xacro'"/>
+  	 command="$(find xacro)/xacro '$(find
+  		  aist_scene_description)/urdf/$(arg
+		  scene)_environment.urdf.xacro'"/>
   <node name="environment_spawner" pkg="gazebo_ros" type="spawn_model"
   	respawn="false" output="screen"
         args="-urdf -param environment_description -model environment -unpause
   	      -x $(arg x) -y $(arg y) -z $(arg z)"/>
 
   <!-- Head Camera Pipeline -->
-  <include file="$(find fetch_gazebo)/launch/include/head_camera.launch.xml" />
+  <include file="$(find fetch_gazebo)/launch/include/head_camera.launch.xml"/>
 
   <!-- Publish base_scan_raw if anything subscribes to it -->
   <node name="publish_base_scan_raw"
@@ -71,9 +72,5 @@
   	respawn="true" args="base_controller/command /cmd_vel /teleop/cmd_vel">
     <remap from="mux" to="cmd_vel_mux" />
   </node>
-
-  <!-- <include file="$(find fetch_navigation)/launch/fetch_nav.launch"> -->
-  <!--   <arg name="map_file"  value="$(find fetch_gazebo_demo)/maps/test_zone.yaml"/> -->
-  <!-- </include> -->
 
 </launch>
