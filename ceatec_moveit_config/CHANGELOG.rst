@@ -2,34 +2,10 @@
 Changelog for package fetch_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.8.2 (2019-08-06)
-------------------
-* Fixed chomp configuration for porting to moveit melodic-devel (`#124 <https://github.com/fetchrobotics/fetch_ros/issues/124>`_)
-* Merge pull request `#122 <https://github.com/fetchrobotics/fetch_ros/issues/122>`_ from dekent/melodic-devel
-  Much more collision checking = much safer robot with minimal planning time increases
-* Merge pull request `#116 <https://github.com/fetchrobotics/fetch_ros/issues/116>`_ from umhan35/moveit-costomap
-  [moveit_config] allow moveit octomap params to be overridden
-* add default moveit_octomap_sensor_params_file to move_group.launch
-* allow moveit octomap params to be overridden
-* Contributors: Carl Saldanha, David Kent, Yuma Hijioka, Zhao Han
-
-0.8.1 (2019-04-04)
-------------------
-* sync cmake_minimum_required: 2.8.12
-* Merge pull request `#107 <https://github.com/fetchrobotics/fetch_ros/issues/107>`_ from moriarty/update-ikfast-plugin
-  [IKFast Plugin] Regenerate fetch_ikfast_plugin
-  Fixes `#103 <https://github.com/fetchrobotics/fetch_ros/issues/103>`_
-* Contributors: Alexander Moriarty, Carl Saldanha
-
-0.8.0 (2019-02-13)
-------------------
-* [package.xml] REP-140 package format 2 (`#104 <https://github.com/fetchrobotics/fetch_ros/issues/104>`_)
-  closes `#83 <https://github.com/fetchrobotics/fetch_ros/issues/83>`_
-* [MoveIt][Melodic]: MoveGroupExecuteService -> MoveGroupExecuteTrajectoryAction (`#94 <https://github.com/fetchrobotics/fetch_ros/issues/94>`_)
-* [Docs] Add URL tags to package for wiki.ros.org (`#90 <https://github.com/fetchrobotics/fetch_ros/issues/90>`_)
-  The <url> tag is required to automatically fill in at least some info
-  on the wiki pages. The extra tags will create links to our docs.
-* Contributors: Alex Moriarty, ivandariojr
+0.7.15 (2019-03-26)
+-------------------
+* [Docs] Add URL tags to package for wiki.ros.org (backport) (`#91 <https://github.com/fetchrobotics/fetch_ros/issues/91>`_)
+* Contributors: Alexander Moriarty
 
 0.7.14 (2018-07-10)
 -------------------

@@ -10,7 +10,7 @@ ceatec_base_scene:
 # Settings for ros_control hardware interface
   hardware_interface:
     joints:
-      - odom_base_joint
+      - map_odom_joint
       - odom_base_joint
       - l_wheel_joint
       - r_wheel_joint
@@ -34,35 +34,4 @@ ceatec_base_scene:
     type: joint_state_controller/JointStateController
     publish_rate: 50
   controller_list:
-    - name: arm_controller
-      action_ns: follow_joint_trajectory
-      default: True
-      type: FollowJointTrajectory
-      joints:
-        - shoulder_pan_joint
-        - shoulder_lift_joint
-        - upperarm_roll_joint
-        - elbow_flex_joint
-        - forearm_roll_joint
-        - wrist_flex_joint
-        - wrist_roll_joint
-    - name: arm_with_torso_controller
-      action_ns: follow_joint_trajectory
-      default: True
-      type: FollowJointTrajectory
-      joints:
-        - torso_lift_joint
-        - shoulder_pan_joint
-        - shoulder_lift_joint
-        - upperarm_roll_joint
-        - elbow_flex_joint
-        - forearm_roll_joint
-        - wrist_flex_joint
-        - wrist_roll_joint
-    - name: gripper_controller
-      action_ns: follow_joint_trajectory
-      default: True
-      type: FollowJointTrajectory
-      joints:
-        - l_gripper_finger_joint
-        - r_gripper_finger_joint
+    []

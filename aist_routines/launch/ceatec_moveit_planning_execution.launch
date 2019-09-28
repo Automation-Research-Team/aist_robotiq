@@ -1,4 +1,5 @@
 <launch>
+
   <arg name="sim"		default="false"/>
   <arg name="rviz_config"	default=""/>
   <arg name="debug"		default="false"/>
@@ -7,8 +8,8 @@
   	 command="$(find xacro)/xacro --inorder '$(find
   		  aist_scene_description)/urdf/ceatec_base_scene.urdf.xacro'"/>
 
-  <node name="odom_world" pkg="tf" type="static_transform_publisher"
-        args="0.5 0.5 0 0 0 0 odom world 10"/>
+  <node name="map_world" pkg="tf" type="static_transform_publisher"
+        args="0.5 0.5 0 0 0 0 map world 10"/>
 
   <include file="$(find aist_routines)/launch/moveit_planning_execution.launch">
     <arg name="moveit_config"	value="$(find ceatec_moveit_config)"/>
@@ -16,6 +17,5 @@
     <arg name="rviz_config"	value="$(arg rviz_config)"/>
     <arg name="debug"		value="$(arg debug)"/>
   </include>
-
 
 </launch>

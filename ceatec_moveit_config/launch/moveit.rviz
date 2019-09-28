@@ -4,16 +4,10 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Global Options1
-        - /MotionPlanning1
         - /MotionPlanning1/Planning Request1
-        - /MotionPlanning1/Planning Metrics1
         - /MotionPlanning1/Planned Path1
-        - /TF1
         - /TF1/Frames1
-        - /Image1
-        - /InteractiveMarkers1
-      Splitter Ratio: 0.559701502
+      Splitter Ratio: 0.742560029
     Tree Height: 251
   - Class: rviz/Help
     Name: Help
@@ -276,6 +270,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          map:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           odom:
             Alpha: 1
             Show Axes: false
@@ -349,13 +347,13 @@ Visualization Manager:
         Colliding Link Color: 255; 0; 0
         Goal State Alpha: 1
         Goal State Color: 250; 128; 0
-        Interactive Marker Size: 0
+        Interactive Marker Size: 0.300000012
         Joint Violation Color: 255; 0; 255
         Planning Group: arm
         Query Goal State: true
         Query Start State: false
         Show Workspace: false
-        Start State Alpha: 0.300000012
+        Start State Alpha: 0.5
         Start State Color: 0; 255; 0
       Planning Scene Topic: move_group/monitored_planning_scene
       Robot Description: robot_description
@@ -575,6 +573,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          map:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           odom:
             Alpha: 1
             Show Axes: false
@@ -638,65 +640,71 @@ Visualization Manager:
       Frames:
         All Enabled: false
         a_cabinet_ar_marker:
-          Value: true
+          Value: false
         a_cabinet_back:
-          Value: true
+          Value: false
         a_cabinet_base:
-          Value: true
+          Value: false
         a_cabinet_base_origin:
-          Value: true
+          Value: false
         a_cabinet_base_origin_center:
-          Value: true
+          Value: false
         a_cabinet_shelf1:
-          Value: true
+          Value: false
         a_cabinet_shelf1_origin:
           Value: true
         a_cabinet_shelf1_origin_center:
           Value: true
         a_cabinet_shelf2:
-          Value: true
+          Value: false
         a_cabinet_shelf3:
-          Value: true
+          Value: false
         a_table_ar_marker:
-          Value: true
+          Value: false
         a_table_leg0:
-          Value: true
+          Value: false
         a_table_leg1:
-          Value: true
+          Value: false
         a_table_leg2:
-          Value: true
+          Value: false
         a_table_leg3:
-          Value: true
+          Value: false
         a_table_top:
-          Value: true
+          Value: false
         a_table_top_origin:
           Value: true
         a_table_top_origin_center:
           Value: true
         b_table_leg0:
-          Value: true
+          Value: false
         b_table_leg1:
-          Value: true
+          Value: false
         b_table_leg2:
-          Value: true
+          Value: false
         b_table_leg3:
-          Value: true
+          Value: false
         b_table_top:
-          Value: true
+          Value: false
         b_table_top_origin:
           Value: true
         b_table_top_origin_center:
           Value: true
         base_link:
-          Value: true
+          Value: false
+        bellows_link:
+          Value: false
         bellows_link2:
           Value: false
+        elbow_flex_link:
+          Value: false
         estop_link:
+          Value: false
+        forearm_roll_link:
           Value: false
         gripper_link:
           Value: true
         ground:
-          Value: true
+          Value: false
         head_camera_depth_frame:
           Value: false
         head_camera_depth_optical_frame:
@@ -707,18 +715,38 @@ Visualization Manager:
           Value: false
         head_camera_rgb_optical_frame:
           Value: false
+        head_pan_link:
+          Value: true
         head_tilt_link:
+          Value: true
+        l_gripper_finger_link:
+          Value: false
+        l_wheel_link:
           Value: false
         laser_link:
           Value: false
+        map:
+          Value: true
         odom:
           Value: true
+        r_gripper_finger_link:
+          Value: false
+        r_wheel_link:
+          Value: false
+        shoulder_lift_link:
+          Value: false
+        shoulder_pan_link:
+          Value: false
         torso_fixed_link:
           Value: false
         torso_lift_link:
           Value: false
+        upperarm_roll_link:
+          Value: false
         world:
-          Value: true
+          Value: false
+        wrist_flex_link:
+          Value: false
         wrist_roll_link:
           Value: false
       Marker Scale: 0.5
@@ -727,7 +755,87 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        map:
+          odom:
+            base_link:
+              estop_link:
+                {}
+              l_wheel_link:
+                {}
+              laser_link:
+                {}
+              r_wheel_link:
+                {}
+              torso_fixed_link:
+                {}
+              torso_lift_link:
+                bellows_link:
+                  {}
+                bellows_link2:
+                  {}
+                head_pan_link:
+                  head_tilt_link:
+                    head_camera_link:
+                      head_camera_depth_frame:
+                        head_camera_depth_optical_frame:
+                          {}
+                      head_camera_rgb_frame:
+                        head_camera_rgb_optical_frame:
+                          {}
+                shoulder_pan_link:
+                  shoulder_lift_link:
+                    upperarm_roll_link:
+                      elbow_flex_link:
+                        forearm_roll_link:
+                          wrist_flex_link:
+                            wrist_roll_link:
+                              gripper_link:
+                                l_gripper_finger_link:
+                                  {}
+                                r_gripper_finger_link:
+                                  {}
+          world:
+            ground:
+              a_cabinet_base:
+                a_cabinet_back:
+                  {}
+                a_cabinet_base_origin:
+                  a_cabinet_base_origin_center:
+                    {}
+                a_cabinet_shelf1:
+                  a_cabinet_shelf1_origin:
+                    a_cabinet_ar_marker:
+                      {}
+                    a_cabinet_shelf1_origin_center:
+                      {}
+                a_cabinet_shelf2:
+                  {}
+                a_cabinet_shelf3:
+                  {}
+              a_table_leg0:
+                a_table_leg1:
+                  {}
+                a_table_leg2:
+                  {}
+                a_table_leg3:
+                  {}
+                a_table_top:
+                  a_table_top_origin:
+                    a_table_ar_marker:
+                      {}
+                    a_table_top_origin_center:
+                      {}
+              b_table_leg0:
+                b_table_leg1:
+                  {}
+                b_table_leg2:
+                  {}
+                b_table_leg3:
+                  {}
+                b_table_top:
+                  b_table_top_origin:
+                    b_table_top_origin_center:
+                      {}
       Update Interval: 0
       Value: true
     - Class: rviz/Image
@@ -742,20 +850,11 @@ Visualization Manager:
       Transport Hint: raw
       Unreliable: false
       Value: true
-    - Class: rviz/InteractiveMarkers
-      Enable Transparency: true
-      Enabled: true
-      Name: InteractiveMarkers
-      Show Axes: false
-      Show Descriptions: true
-      Show Visual Aids: false
-      Update Topic: ""
-      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: world
+    Fixed Frame: map
     Frame Rate: 30
   Name: root
   Tools:
@@ -763,30 +862,29 @@ Visualization Manager:
       Hide Inactive Objects: true
     - Class: rviz/MoveCamera
     - Class: rviz/Select
-    - Class: rviz/FocusCamera
   Value: true
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 2.75194192
+      Distance: 2.41431117
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.217896819
-        Y: -0.531218052
-        Z: 0
+        X: 0.113567002
+        Y: 0.105920002
+        Z: 2.23518001e-07
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.533951461
-      Target Frame: odom
+      Pitch: 0.929796994
+      Target Frame: map
       Value: XYOrbit (rviz)
-      Yaw: 4.73072958
+      Yaw: 4.84994984
     Saved: ~
 Window Geometry:
   Displays:

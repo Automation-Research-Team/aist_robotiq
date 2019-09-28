@@ -11,9 +11,8 @@ from moveit_commander.conversions import pose_to_list
 
 from geometry_msgs import msg as gmsg
 
-from GripperClient      import GripperClient, Robotiq85Gripper, \
-                               SuctionGripper, PrecisionGripper
-from CameraClient       import CameraClient, PhoXiCamera, RealsenseCamera
+from GripperClient      import GripperClient
+from CameraClient       import CameraClient
 from GraspabilityClient import GraspabilityClient
 from MarkerPublisher    import MarkerPublisher
 from PickOrPlaceAction  import PickOrPlaceAction
@@ -57,19 +56,20 @@ class AISTBaseRoutines(object):
         d = rospy.get_param("grippers", {})
         self._grippers = {}
         for robot_name, gripper in d.items():
-            self._grippers[robot_name] = self._create_device(gripper["type"],
-                                                             gripper["args"])
+            self._grippers[robot_name] = GripperClient.create(gripper["type"],
+                                                              gripper["args"])
 
         # Cameras
         d = rospy.get_param("cameras", {})
         self._cameras = {}
         for camera_name, camera in d.items():
-            self._cameras[camera_name] = self._create_device(camera["type"],
+            self._cameras[camera_name] = CameraClient.create(camera["type"],
                                                              camera["args"])
 
         self._markerPublisher    = MarkerPublisher()
         self._graspabilityClient = GraspabilityClient()
         self._pickOrPlaceAction  = PickOrPlaceAction(self)
+        rospy.loginfo("AISTBaseRoutines initialized.")
 
     def __enter__(self):
         return self
@@ -135,7 +135,7 @@ class AISTBaseRoutines(object):
             waypoints = []
             waypoints.append(pose_world)
             (plan, fraction) = group.compute_cartesian_path(waypoints,
-                                                            0.0005,  # eef_step
+                                                            0.01,  # eef_step
                                                             0.0) # jump_threshold
             if fraction < 0.995:
                 rospy.logwarn("Computed only {}% of the total cartesian path."
@@ -328,7 +328,7 @@ class AISTBaseRoutines(object):
 
     # Utility functions
     def format_pose(self, poseStamped):
-        pose = self.listener.transformPose("workspace_center",
+        pose = self.listener.transformPose("base_link",
                                             poseStamped).pose
         rpy  = map(degrees, tfs.euler_from_quaternion([pose.orientation.x,
                                                        pose.orientation.y,

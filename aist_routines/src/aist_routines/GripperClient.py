@@ -342,7 +342,7 @@ class FetchGripper(GripperClient):
         self._goal = GripperCommandGoal()
         self._goal.command.max_effort = max_effort
         self._timeout = timeout
-        print("FetchGripper initialized.")
+        rospy.loginfo("{} initialized.".format(self.name))
 
     @staticmethod
     def base(prefix, max_effort, timeout):
