@@ -157,6 +157,16 @@ class InteractiveRoutines(FetchRoutines):
                 pan  = radians(float(raw_input("  head pan  = ")))
                 tilt = radians(float(raw_input("  head tilt = ")))
                 self.move_head(pan, tilt)
+            elif key == 'move_base':
+                x     = float(raw_input("  base x     = "))
+                y     = float(raw_input("  base y     = "))
+                theta = radians(float(raw_input("  base theta = ")))
+                self.move_base(x, y, theta)
+            elif key == 'shake_head':
+                self.shake_head(radians(30), radians(30))
+            elif key == 'gaze':
+                self.gaze_frame(raw_input("  frame = "))
+
         # Reset pose
         self.go_home()
 
