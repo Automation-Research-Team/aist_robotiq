@@ -17,4 +17,4 @@ cameras:
       name: head_camera
 
 moveit_pose_reference_frame: "base_link"
-moveit_eef_step: 0.01
+moveit_eef_step: 0.05

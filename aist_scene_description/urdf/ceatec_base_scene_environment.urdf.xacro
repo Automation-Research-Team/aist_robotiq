@@ -1,108 +1,160 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro"
-       name="ceatec_base_scene_environment" >
+       name="ceatec_base_scene_environment">
 
-  <xacro:property name="workspace_width"	value="3.000"/>
-  <xacro:property name="workspace_length"	value="2.000"/>
-  <xacro:property name="a_table_width"		value="0.530"/>
-  <xacro:property name="a_table_length"		value="0.315"/>
-  <xacro:property name="a_table_height"		value="0.600"/>
-  <xacro:property name="b_table_width"		value="0.900"/>
-  <xacro:property name="b_table_length"		value="0.900"/>
-  <xacro:property name="b_table_height"		value="0.720"/>
-  <xacro:property name="cabinet_width"		value="0.925"/>
-  <xacro:property name="cabinet_length"		value="0.420"/>
-  <xacro:property name="cabinet_base_height"	value="0.180"/>
-  <xacro:property name="cabinet_shelf1_height"	value="0.742"/>
-  <xacro:property name="cabinet_shelf2_height"	value="0.990"/>
-  <xacro:property name="cabinet_shelf3_height"	value="1.460"/>
-  <xacro:property name="cabinet_back_height"	value="1.711"/>
-  <xacro:property name="tray_width"		value="0.340"/>
-  <xacro:property name="tray_length"		value="0.250"/>
-  <xacro:property name="tray_height"		value="0.062"/>
+  <xacro:property name="workspace_width" value="3.000"/>
+  <xacro:property name="workspace_length" value="2.000"/>
+  <xacro:property name="a_table_width" value="0.530"/>
+  <xacro:property name="a_table_length" value="0.315"/>
+  <xacro:property name="a_table_height" value="0.540"/>
+  <xacro:property name="b_table_width" value="0.700"/>
+  <xacro:property name="b_table_length" value="0.350"/>
+  <xacro:property name="b_table_height" value="0.600"/>
+  <xacro:property name="cabinet_width" value="0.925"/>
+  <xacro:property name="cabinet_length" value="0.420"/>
+  <xacro:property name="cabinet_base_height" value="0.180"/>
+  <xacro:property name="cabinet_shelf1_height" value="0.443"/>
+  <xacro:property name="cabinet_shelf2_height" value="0.743"/>
+  <xacro:property name="cabinet_shelf3_height" value="1.043"/>
+  <xacro:property name="cabinet_shelf4_height" value="1.366"/>
+  <xacro:property name="cabinet_back_height" value="1.711"/>
+  <xacro:property name="tray_width" value="0.340"/>
+  <xacro:property name="tray_length" value="0.250"/>
+  <xacro:property name="tray_height" value="0.062"/>
 
   <!-- Main workspace -->
   <link name="ground"/>
 
   <!-- Table -->
-  <xacro:include filename="$(find
-			   aist_scene_description)/urdf/table.urdf.xacro"/>
+  <xacro:include filename="$(find aist_scene_description)/urdf/table.urdf.xacro"/>
   <xacro:table prefix="a_"
-  	       width="${a_table_width}"
-  	       length="${a_table_length}"
-  	       height="${a_table_height}"
-  	       parent="ground">
-    <origin xyz="${workspace_width/2  - cabinet_length - a_table_width - 0.2}
+	       width="${a_table_width}"
+	       length="${a_table_length}"
+	       height="${a_table_height}"
+	       parent="ground">
+    <!-- <origin xyz="${workspace_width/2  - cabinet_length - a_table_width - 0.2}
 		 ${workspace_length/2 - a_table_length - 0.2}
+		 0" rpy="0 0 0"/> -->
+    <origin xyz="${workspace_width/2 - cabinet_length - 0.86}
+		 ${0.6 - (workspace_length/2 - cabinet_width/2)}
 		 0"
-	    rpy="0 0 0"/>
-  </xacro:table>
-  <xacro:table prefix="b_"
-  	       width="${b_table_width}"
-  	       length="${b_table_length}"
-  	       height="${b_table_height}"
-  	       parent="ground">
-    <origin xyz="${-workspace_width/2}
-		 ${workspace_length/2 - b_table_length}
-		 0"
-	    rpy="0 0 0"/>
+	    rpy="0 0 ${-pi/6}"/>
   </xacro:table>
 
+  <!-- Frame to put box on a_table -->
+  <xacro:property name="box_width"	value="0.340" />
+  <xacro:property name="box_length"	value="0.250" />
+  <xacro:property name="box_height"	value="0.065" />
+  <link name="box_on_pedestral" />
+  <joint name="box_on_pedestral_joint" type="fixed">
+    <parent link="a_table_top_origin_center" />
+    <child link="box_on_pedestral" />
+    <origin xyz="0 ${-box_length/2} ${box_height}" rpy="0 ${pi/2} 0" />
+  </joint>
+
+  <xacro:table prefix="b_"
+	       width="${b_table_width}"
+	       length="${b_table_length}"
+	       height="${b_table_height}"
+	       parent="ground">
+    <origin xyz="${-b_table_width/2-(1.0-0.2)}
+		 ${-b_table_length/2+(0.78-0.5)}
+		 0"
+	    rpy="0 0 0"/>
+  </xacro:table>
+  <!-- Frame to put box on b_table -->
+  <link name="box1_on_b_table" />
+  <joint name="box1_on_b_table_joint" type="fixed">
+    <parent link="b_table_top_origin_center" />
+    <child  link="box1_on_b_table" />
+    <origin xyz="${-(box_width/2+0.05)} ${-box_length/2}
+		 ${box_height}"
+	    rpy="0 ${pi/2} 0"/>
+  </joint>
+  <link name="box0_on_b_table" />
+  <joint name="box0_on_b_table_joint" type="fixed">
+    <parent link="b_table_top_origin_center" />
+    <child link="box0_on_b_table" />
+    <origin xyz="${(box_width/2+0.05)} ${-box_length/2} ${box_height}" rpy="0 ${pi/2} 0"/>
+  </joint>
+
+
   <!-- Cabinet -->
-  <xacro:include filename="$(find
-			   aist_scene_description)/urdf/cabinet.urdf.xacro"/>
-  <xacro:cabinet prefix="a_"
-		 width="${cabinet_width}"
-		 length="${cabinet_length}"
-		 base_height="${cabinet_base_height}"
-		 shelf1_height="${cabinet_shelf1_height}"
-		 shelf2_height="${cabinet_shelf2_height}"
-		 shelf3_height="${cabinet_shelf3_height}"
-		 back_height="${cabinet_back_height}"
-		 parent="ground">
+  <xacro:include filename="$(find aist_scene_description)/urdf/cabinet.urdf.xacro"/>
+  <xacro:cabinet prefix="a_" width="${cabinet_width}" length="${cabinet_length}" base_height="${cabinet_base_height}" shelf1_height="${cabinet_shelf1_height}" shelf2_height="${cabinet_shelf2_height}" shelf3_height="${cabinet_shelf3_height}" shelf4_height="${cabinet_shelf4_height}" back_height="${cabinet_back_height}" parent="ground">
     <origin xyz="${workspace_width/2   - cabinet_length}
 		 ${-workspace_length/2 + cabinet_width}
-		 0"
-	    rpy="0 0 ${-pi/2}"/>
+		 0" rpy="0 0 ${-pi/2}"/>
   </xacro:cabinet>
+
+  <!-- Frames to put noodles on cabinet -->
+  <!-- Have to be described abstractly -->
+  <!-- <xacro:property name="a_noodle_x_origin" value="-0.065" />
+  <xacro:property name="a_noodle_y_origin" value="-${cabinet_length/4-0.002}" />
+  <xacro:property name="a_noodle_z_origin" value="0.100" />
+  <xacro:property name="a_noodle_x_offset" value="-0.130" />
+  <xacro:property name="a_noodle_y_offset" value="0.000" />
+  <xacro:property name="a_noodle_z_offset" value="0.000" />
+  <link name="a_noodle1" />
+  <joint name="a_noodle1_joint" type="fixed">
+    <parent link="a_cabinet_shelf1_origin_center" />
+    <child link="a_noodle1" />
+    <origin rpy="0 0 ${pi/2}" xyz="${a_noodle_x_origin} ${a_noodle_y_origin} ${a_noodle_z_origin}" />
+  </joint>
+  <link name="a_noodle2" />
+  <joint name="a_noodle2_joint" type="fixed">
+    <parent link="a_cabinet_shelf1_origin_center" />
+    <child link="a_noodle2" />
+    <origin rpy="0 0 ${pi/2}" xyz="${a_noodle_x_origin + a_noodle_x_offset*1} ${a_noodle_y_origin + a_noodle_y_offset*1} ${a_noodle_z_origin + a_noodle_z_offset*1}" />
+  </joint>
+  <link name="a_noodle3" />
+  <joint name="a_noodle3_joint" type="fixed">
+    <parent link="a_cabinet_shelf1_origin_center" />
+    <child link="a_noodle3" />
+    <origin rpy="0 0 ${pi/2}" xyz="${a_noodle_x_origin + a_noodle_x_offset*2} ${a_noodle_y_origin + a_noodle_y_offset*2} ${a_noodle_z_origin + a_noodle_z_offset*2}" />
+  </joint>
+  <xacro:property name="b_noodle_x_origin" value="0.065" />
+  <xacro:property name="b_noodle_y_origin" value="-${cabinet_length/4-0.002}" />
+  <xacro:property name="b_noodle_z_origin" value="0.100" />
+  <xacro:property name="b_noodle_x_offset" value="0.130" />
+  <xacro:property name="b_noodle_y_offset" value="0.000" />
+  <xacro:property name="b_noodle_z_offset" value="0.000" />
+  <link name="b_noodle1" />
+  <joint name="b_noodle1_joint" type="fixed">
+    <parent link="a_cabinet_shelf1_origin_center" />
+    <child link="b_noodle1" />
+    <origin rpy="0 0 ${pi/2}" xyz="${b_noodle_x_origin} ${b_noodle_y_origin} ${b_noodle_z_origin}" />
+  </joint>
+  <link name="b_noodle2" />
+  <joint name="b_noodle2_joint" type="fixed">
+    <parent link="a_cabinet_shelf1_origin_center" />
+    <child link="b_noodle2" />
+    <origin rpy="0 0 ${pi/2}" xyz="${b_noodle_x_origin + b_noodle_x_offset*1} ${b_noodle_y_origin + b_noodle_y_offset*1} ${b_noodle_z_origin + b_noodle_z_offset*1}" />
+  </joint>
+  <link name="b_noodle3" />
+  <joint name="b_noodle3_joint" type="fixed">
+    <parent link="a_cabinet_shelf1_origin_center" />
+    <child link="b_noodle3" />
+    <origin rpy="0 0 ${pi/2}" xyz="${b_noodle_x_origin + b_noodle_x_offset*2} ${b_noodle_y_origin + b_noodle_y_offset*2} ${b_noodle_z_origin + b_noodle_z_offset*2}" />
+  </joint> -->
 
   <!-- AR markers -->
   <xacro:include filename="$(find aist_gazebo)/urdf/ar_marker.urdf.xacro"/>
-  <xacro:ar_marker prefix="a_cabinet_"
-  		   parent="a_cabinet_shelf1_origin"
-  		   marker_id="17"
-		   size="0.1"
-		   thickness="0.001">
+
+  <xacro:ar_marker prefix="a_cabinet_" parent="a_cabinet_shelf1_origin" marker_id="17" size="0.1" thickness="0.001">
     <origin xyz="${cabinet_width - 0.05} 0.05 0.001" rpy="0 0 0"/>
   </xacro:ar_marker>
-  <xacro:ar_marker prefix="a_table_"
-  		   parent="a_table_top_origin"
-  		   marker_id="26"
-		   size="0.1"
-		   thickness="0.001">
+
+  <xacro:ar_marker prefix="a_table_" parent="a_table_top_origin" marker_id="26" size="0.1" thickness="0.001">
     <origin xyz="0.05 0.05 0.001" rpy="0 0 0"/>
   </xacro:ar_marker>
 
-  <!-- Trays -->
-  <!-- <xacro:include filename="$(find -->
-  <!-- 			   aist_scene_description)/urdf/tray.urdf.xacro"/> -->
-  <!-- <xacro:tray prefix="a_" -->
-  <!-- 	      width="${tray_width}" -->
-  <!-- 	      length="${tray_length}" -->
-  <!-- 	      height="${tray_height}" -->
-  <!-- 	      parent="a_table_top_origin"> -->
-  <!--   <origin xyz="${(a_table_width  - tray_width)/2} -->
-  <!-- 		 ${(a_table_length - tray_length)/2} -->
-  <!-- 		 0" -->
-  <!-- 	    rpy="0 0 0"/> -->
-  <!-- </xacro:tray> -->
-  <!-- <xacro:tray prefix="b_" -->
-  <!-- 	      width="${tray_width}" -->
-  <!-- 	      length="${tray_length}" -->
-  <!-- 	      height="${tray_height}" -->
-  <!-- 	      parent="b_table_top_origin"> -->
-  <!--   <origin xyz="${(b_table_width/2 - tray_width)/2} 0.03 0" rpy="0 0 0"/> -->
-  <!-- </xacro:tray> -->
+  <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
+  <!-- <joint name="ground_base_joint" type="planar"> -->
+  <!--   <parent link="ground"/> -->
+  <!--   <child link="base_link"/> -->
+  <!--   <origin xyz="0 -0.5 0" rpy="0 0 0"/> -->
+  <!-- </joint> -->
 
   <!-- I would like to remove the "world" link definition, but
        apparently it is necessary for Gazebo -->
