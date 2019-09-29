@@ -49,6 +49,8 @@ class AISTBaseRoutines(object):
         self._reference_frame = rospy.get_param("moveit_pose_reference_frame",
                                                 "workspace_center")
         self._eef_step        = rospy.get_param("moveit_eef_step", 0.0005)
+        rospy.loginfo("reference_frame = {}, eef_step = {}"
+                      .format(self._reference_frame, self._eef_step))
 
         # MoveIt groups
         d = rospy.get_param("groups", {})
@@ -288,8 +290,8 @@ class AISTBaseRoutines(object):
 
     # Pick and place action stuffs
     def pick(self, robot_name, target_pose,
-             grasp_offset=0.0, gripper_command="",
-             speed_fast=1.0, speed_slow=0.04, approach_offset=0.10,
+             grasp_offset=(0.0, 0.0, 0.0), gripper_command="",
+             speed_fast=1.0, speed_slow=0.04, approach_offset=(0.0, 0.0, 0.10),
              liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         return self._pickOrPlaceAction.execute(
             robot_name, target_pose, True, gripper_command,
@@ -297,8 +299,9 @@ class AISTBaseRoutines(object):
             speed_fast, speed_slow, acc_fast, acc_slow)
 
     def place(self, robot_name, target_pose,
-              place_offset=0.0, gripper_command="",
-              speed_fast=1.0, speed_slow=0.04, approach_offset=0.05,
+              place_offset=(0.0, 0.0, 0.0), gripper_command="",
+              speed_fast=1.0, speed_slow=0.04,
+              approach_offset=(0.0, 0.0, 0.05),
               liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         return self._pickOrPlaceAction.execute(
             robot_name, target_pose, False, gripper_command,
@@ -306,8 +309,9 @@ class AISTBaseRoutines(object):
             speed_fast, speed_slow, acc_fast, acc_slow)
 
     def pick_at_frame(self, robot_name, target_frame, offset=(0, 0, 0),
-                      grasp_offset=0.0, gripper_command="",
-                      speed_fast=1.0, speed_slow=0.04, approach_offset=0.05,
+                      grasp_offset=(0.0, 0.0, 0.0), gripper_command="",
+                      speed_fast=1.0, speed_slow=0.04,
+                      approach_offset=(0.0, 0.0, 0.05),
                       liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = target_frame
@@ -319,8 +323,9 @@ class AISTBaseRoutines(object):
                          liftup_after, acc_fast, acc_slow)
 
     def place_at_frame(self, robot_name, target_frame, offset=(0, 0, 0),
-                       place_offset=0.0, gripper_command="",
-                       speed_fast=1.0, speed_slow=0.04, approach_offset=0.05,
+                       place_offset=(0.0, 0,0, 0.0), gripper_command="",
+                       speed_fast=1.0, speed_slow=0.04,
+                       approach_offset=(0.0, 0.0, 0.05),
                        liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = target_frame
