@@ -61,6 +61,37 @@
         <joint name="wrist_flex_joint" value="0.9905" />
         <joint name="wrist_roll_joint" value="-0.006" />
     </group_state>
+
+    <group_state name="tucking" group="arm_with_torso">
+        <joint name="elbow_flex_joint" value="1.72" />
+        <joint name="forearm_roll_joint" value="0" />
+        <joint name="shoulder_lift_joint" value="1.4" />
+        <joint name="shoulder_pan_joint" value="1.32" />
+        <joint name="torso_lift_joint" value="0" />
+        <joint name="upperarm_roll_joint" value="-0.2" />
+        <joint name="wrist_flex_joint" value="1.66" />
+        <joint name="wrist_roll_joint" value="0" />
+    </group_state>
+    <group_state name="ready" group="arm_with_torso">
+        <joint name="elbow_flex_joint" value="1.72" />
+        <joint name="forearm_roll_joint" value="0" />
+        <joint name="shoulder_lift_joint" value="0" />
+        <joint name="shoulder_pan_joint" value="1.32" />
+        <joint name="torso_lift_joint" value="0" />
+        <joint name="upperarm_roll_joint" value="-1.4" />
+        <joint name="wrist_flex_joint" value="1.66" />
+        <joint name="wrist_roll_joint" value="0" />
+    </group_state>
+    <group_state name="pick_ready" group="arm_with_torso">
+        <joint name="elbow_flex_joint" value="-2.1018" />
+        <joint name="forearm_roll_joint" value="0" />
+        <joint name="shoulder_lift_joint" value="1.0943" />
+        <joint name="shoulder_pan_joint" value="0" />
+        <joint name="torso_lift_joint" value="0" />
+        <joint name="upperarm_roll_joint" value="0" />
+        <joint name="wrist_flex_joint" value="0.9905" />
+        <joint name="wrist_roll_joint" value="-0.006" />
+    </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="gripper" parent_link="wrist_roll_link" group="gripper" />
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->

@@ -3,26 +3,33 @@
        name="table">
 
   <xacro:include filename="$(find aist_scene_description)/urdf/aist_box.urdf.xacro"/>
-  <xacro:include filename="$(find aist_scene_description)/urdf/aist_floating_box.urdf.xacro"/>
 
   <xacro:macro name="tray"
 	       params="prefix width length height parent *origin">
 
     <xacro:property name="tray_thickness"	value="0.005" />
+    <xacro:property name="item_radius"		value="0.04" />
 
-    <xacro:aist_floating_box name="${prefix}tray"
-			     width="${width}"
-			     length="${length}"
-			     height="${tray_thickness}"
-			     parent="${parent}">
+    <link name="${prefix}tray"/>
+    <joint name="${prefix}tray" type="floating">
+      <parent link="${parent}" />
+      <child  link="${prefix}tray" />
       <xacro:insert_block name="origin"/>
-    </xacro:aist_floating_box>
+    </joint>
+
+    <xacro:aist_box name="${prefix}tray_bottom"
+		    width="${width}"
+		    length="${length}"
+		    height="${tray_thickness}"
+		    parent="${parent}">
+      <origin xyz="${-width/2} ${-tray_thickness/2} 0" rpy="0 0 0"/>
+    </xacro:aist_box>
 
     <xacro:aist_box name="${prefix}tray_wall0"
 		    width="${width}"
 		    length="${tray_thickness}"
 		    height="${height - tray_thickness}"
-		    parent="${prefix}tray">
+		    parent="${prefix}tray_bottom">
       <origin xyz="0 0 ${tray_thickness}" rpy="0 0 0"/>
     </xacro:aist_box>
 
@@ -30,7 +37,7 @@
 		    width="${tray_thickness}"
 		    length="${length - 2*tray_thickness}"
 		    height="${height - tray_thickness}"
-		    parent="${prefix}tray">
+		    parent="${prefix}tray_bottom">
       <origin xyz="0 ${tray_thickness} ${tray_thickness}" rpy="0 0 0"/>
     </xacro:aist_box>
 
@@ -38,7 +45,7 @@
 		    width="${width}"
 		    length="${tray_thickness}"
 		    height="${height - tray_thickness}"
-		    parent="${prefix}tray">
+		    parent="${prefix}tray_bottom">
       <origin xyz="0 ${length - tray_thickness} ${tray_thickness}" rpy="0 0 0"/>
     </xacro:aist_box>
 
@@ -46,29 +53,55 @@
 		    width="${tray_thickness}"
 		    length="${length - 2*tray_thickness}"
 		    height="${height - tray_thickness}"
-		    parent="${prefix}tray">
+		    parent="${prefix}tray_bottom">
       <origin xyz="${width - tray_thickness} ${tray_thickness} ${tray_thickness}"
 	      rpy="0 0 0"/>
     </xacro:aist_box>
 
-    <xacro:macro name="auxiliary_frame" params="parent framename *origin">
-      <joint name="${parent}_${framename}" type="fixed">
-	<parent link="${parent}" />
-	<child link = "${parent}_${framename}"/>
-	<xacro:insert_block name="origin"/>
-      </joint>
-      <link name="${parent}_${framename}"/>
-    </xacro:macro>
+    <link name="b_item_on_${prefix}tray"/>
+    <joint name="b_item_on_${prefix}tray_joint" type="fixed">
+      <parent link ="${prefix}tray_bottom"/>
+      <child  link="b_item_on_${prefix}tray"/>
+      <origin xyz="${width/2}
+		   ${length/2}
+		   ${tray_thickness + item_radius}"
+    	      rpy="0 0 ${-pi/2}"/>
+    </joint>
 
-    <xacro:auxiliary_frame parent="${prefix}tray" framename="origin">
-      <origin xyz="${tray_thickness} ${tray_thickness} ${tray_thickness}"
-	      rpy="0 0 0"/>
-    </xacro:auxiliary_frame>
+    <link name="a_item_on_${prefix}tray"/>
+    <joint name="a_item_on_${prefix}tray_joint" type="fixed">
+      <parent link ="b_item_on_${prefix}tray"/>
+      <child  link="a_item_on_${prefix}tray"/>
+      <origin xyz="0 ${-width/4 + tray_thickness/2} 0" rpy="0 0 0"/>
+    </joint>
 
-    <xacro:auxiliary_frame parent="${prefix}tray_origin" framename="center">
-      <origin xyz="${width/2 - tray_thickness} ${length/2 - tray_thickness} 0"
-	      rpy="0 0 0"/>
-    </xacro:auxiliary_frame>
+    <link name="c_item_on_${prefix}tray"/>
+    <joint name="c_item_on_${prefix}tray_joint" type="fixed">
+      <parent link ="b_item_on_${prefix}tray"/>
+      <child  link="c_item_on_${prefix}tray"/>
+      <origin xyz="0 ${width/4 - tray_thickness/2} 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="d_item_on_${prefix}tray"/>
+    <joint name="d_item_on_${prefix}tray_joint" type="fixed">
+      <parent link ="a_item_on_${prefix}tray"/>
+      <child  link="d_item_on_${prefix}tray"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="e_item_on_${prefix}tray"/>
+    <joint name="e_item_on_${prefix}tray_joint" type="fixed">
+      <parent link ="b_item_on_${prefix}tray"/>
+      <child  link="e_item_on_${prefix}tray"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="f_item_on_${prefix}tray"/>
+    <joint name="f_item_on_${prefix}tray_joint" type="fixed">
+      <parent link ="c_item_on_${prefix}tray"/>
+      <child  link="f_item_on_${prefix}tray"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
 
   </xacro:macro>
 </robot>

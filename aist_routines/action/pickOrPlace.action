@@ -4,7 +4,7 @@ geometry_msgs/PoseStamped pose
 bool pick
 string gripper_command
 geometry_msgs/Vector3 grasp_offset
-geoemtry_msgs/Vector3 approach_offset
+geometry_msgs/Vector3 approach_offset
 bool liftup_after
 float32 speed_fast
 float32 speed_slow
