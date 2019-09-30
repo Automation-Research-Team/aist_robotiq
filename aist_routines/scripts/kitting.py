@@ -4,7 +4,7 @@ import os, csv, copy, time, datetime, re, collections
 import rospy, rospkg, rosparam
 import aist_routines.base as base
 from aist_routines.ur   import URRoutines
-from aist_msgs          import msg as amsg
+from aist_routines      import msg as amsg
 
 ######################################################################
 #  global variables                                                  #
