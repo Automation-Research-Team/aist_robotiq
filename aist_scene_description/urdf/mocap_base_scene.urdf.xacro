@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
+        name="mocap_base_scene" >
+
+
+  <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
+  <xacro:property name="c_bot_x" value="0"/>
+  <xacro:property name="c_bot_y" value="-0.4875"/>
+  <!-- <xacro:property name="c_bot_theta" value="${pi}"/> -->
+
+  <xacro:property name="bots_z" value="0.77"/>
+
+  <!-- This is the main file defining our robot arrangement and physical environment. -->
+
+  <!-- common stuff -->
+  <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro"/>
+  <xacro:include filename="$(find aist_gazebo)/urdf/aist_base_scene.gazebo"/>
+
+  <!-- Main workspace -->
+  <!-- The surface is 0.01 m below the robot bases and the "workspace_center" frame. -->
+  <link name="o2as_ground"/>
+
+  <xacro:include filename="$(find o2as_scene_description)/urdf/o2as_box.xacro"/>
+  <xacro:property name="table_w" value="0.9"/>
+  <xacro:property name="table_l" value="0.75"/>
+  <xacro:property name="table_h" value="0.01"/>
+  <xacro:o2as_box boxname="workbox"
+		  box_w="${table_w}" box_l="${table_l}" box_h="${table_h}"
+		  parent="o2as_ground">
+    <origin xyz="${-table_w/2} ${-table_l/2} ${bots_z - table_h}" rpy="0 0 0"/>
+  </xacro:o2as_box>
+  <link name="workspace_center"/>
+  <joint name="world_to_workspace" type="fixed">
+    <parent link="o2as_ground"/>
+    <child link="workspace_center"/>
+    <origin xyz="0 0 ${bots_z}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- robot arms -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/ur5e.urdf.xacro"/>
+  <xacro:ur5e_robot prefix="c_bot_" joint_limited="false"
+    shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
+    shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
+    elbow_joint_lower_limit="0.0" elbow_joint_upper_limit="${pi}"
+    wrist_1_lower_limit="${-pi}" wrist_1_upper_limit="${pi}"
+    wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
+    wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
+
+  <joint name="world_c_bot_joint" type="fixed">
+    <parent link="o2as_ground"/>
+    <child  link= "c_bot_base_link"/>
+    <origin xyz="${c_bot_x} ${c_bot_y} ${bots_z}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Spawn and attach gripper -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/robotiq_85_gripper_with_tip_link.urdf.xacro"/>
+  <xacro:robotiq_85_gripper_with_tip_link prefix="c_bot_"
+					  parent="c_bot_ee_link">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:robotiq_85_gripper_with_tip_link>
+
+  <!-- Add PhoXi 3D scanner -->
+  <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro"/>
+  <xacro:phoxi_m_camera prefix="b_" parent="o2as_ground">
+    <origin xyz="0.547941636523
+		 -0.00827443204237
+		 1.67030171767"
+	    rpy="${-151.493605482*pi/180}
+		 ${0.698490882792*pi/180}
+		 ${85.0482907121*pi/180}"/>
+  </xacro:phoxi_m_camera>
+
+  <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
+  <link name="world"/>
+  <joint name="world_o2as_joint" type="fixed">
+    <parent link="world"/>
+    <child link="o2as_ground"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+</robot>
