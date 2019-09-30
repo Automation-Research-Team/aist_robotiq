@@ -28,8 +28,8 @@
   		    aist_scene_description)/urdf/$(arg scene).urdf.xacro'"/>
     <node name="robot_state_publisher"
   	  pkg="robot_state_publisher" type="robot_state_publisher"/>
-    <include file="$(find aist_routines)/launch/connect_$(arg
-		   config)_robots.launch"/>
+    <include file="$(find aist_routines)/launch/$(arg
+		   config)_connect_robots.launch"/>
   </group>
 
   <!-- Launch planner -->
