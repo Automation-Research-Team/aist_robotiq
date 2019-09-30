@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!--
+  This file is supposed to launch the drivers of the real robots instead of the simulation.
+-->
+<launch>
+
+  <!-- robot_ip: IP-address of the robot's socket-messaging server -->
+  <arg name="robot_ip_c"  default="10.66.171.53"/>
+  <arg name="limited"     default="false"/>
+  <arg name="min_payload" default="0.0"/>
+  <arg name="max_payload" default="1.0"/>
+  <arg name="servoj_time" default="0.008" />
+  <arg name="shutdown_on_disconnect" default="true" />
+  <!-- require_activation defines when the service /ur_driver/robot_enable needs to be called. -->
+  <arg name="require_activation" default="Never" /> <!-- Never, Always, OnStartup -->
+
+  <!-- The max_velocity parameter is only used for debugging in the ur_driver. It's not related to actual velocity limits -->
+  <arg name="max_velocity" default="10.0"/> <!-- [rad/s] -->
+
+  <!-- a_bot realsense parameters -->
+  <arg name="trigger_mode" default="false"/>
+  <arg name="send_color"   default="true"/>
+  <arg name="send_depth"   default="true"/>
+  <arg name="send_cloud"   default="true"/>
+
+  <!-- Drivers for the robots -->
+  <node name="c_bot_ur_driver"
+	pkg="ur_modern_driver" type="ur_driver"
+	output="screen" ns="c_bot_controller">
+    <param name="prefix"	   type="str" value="c_bot_" />
+    <param name="robot_ip_address" type="str"    value="$(arg robot_ip_c)" />
+    <param name="reverse_port"     type="int"    value="50004" />
+    <param name="min_payload"      type="double" value="$(arg min_payload)" />
+    <param name="max_payload"      type="double" value="$(arg max_payload)" />
+    <param name="max_velocity"     type="double" value="$(arg max_velocity)" />
+    <param name="servoj_time"      type="double" value="$(arg servoj_time)" />
+    <param name="base_frame"       type="str"    value="c_bot_base" />
+    <param name="tool_frame"       type="str"    value="c_bot_tool0_controller" />
+    <param name="require_activation"     type="str"  value="$(arg require_activation)" />
+    <param name="shutdown_on_disconnect" type="bool" value="$(arg shutdown_on_disconnect)"/>
+    <remap from="joint_states" to="/joint_states"/>
+  </node>
+
+  <!-- Drivers for the grippers -->
+  <include file="$(find robotiq_control)/launch/ur_cmodel_action_controller.launch">
+    <arg name="namespace" value="c_bot_gripper" />
+    <arg name="gripper_prefix" value="c_bot_" />
+    <arg name="topic" value="/c_bot_controller/ur_driver/URScript" />
+  </include>
+
+  <!-- Drivers for the force sensors -->
+  <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch">
+    <arg name="input"		value="topic"/>
+    <arg name="robot_name"	value="c_bot"/>
+    <arg name="sensor_frame"	value="c_bot_wrench_link"/>
+  </include>
+
+</launch>
