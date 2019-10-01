@@ -153,6 +153,9 @@ class InteractiveRoutines(FetchRoutines):
                 self.go_to_named_pose('ready', self._robot_name)
             elif key == 'pick_ready':
                 self.go_to_named_pose('pick_ready', self._robot_name)
+            elif key == 'torso':
+                position = float(raw_input("  position = "))
+                self.move_torso(position)
             elif key == 'head':
                 pan  = radians(float(raw_input("  head pan  = ")))
                 tilt = radians(float(raw_input("  head tilt = ")))
