@@ -10,7 +10,7 @@
   <arg name="y"		default="0.0" />
   <arg name="z"		default="0.0" />
   <arg name="yaw"	default="0.0" />
-  <arg name="xr"	value="$(eval arg('x') - 0.5)" />
+  <arg name="xr"	value="$(eval arg('x') - 0.3)" />
   <arg name="yr"	value="$(eval arg('y') - 0.5)" />
 
   <!-- Start Gazebo with a blank world -->
@@ -60,17 +60,5 @@
 
   <!-- Head Camera Pipeline -->
   <include file="$(find fetch_gazebo)/launch/include/head_camera.launch.xml"/>
-
-  <!-- Publish base_scan_raw if anything subscribes to it -->
-  <node name="publish_base_scan_raw"
-  	pkg="topic_tools" type="relay" args="base_scan base_scan_raw" >
-    <param name="lazy" type="bool" value="True"/>
-  </node>
-
-  <!-- Start a mux between application and teleop -->
-  <node pkg="topic_tools" type="mux" name="cmd_vel_mux"
-  	respawn="true" args="base_controller/command /cmd_vel /teleop/cmd_vel">
-    <remap from="mux" to="cmd_vel_mux" />
-  </node>
 
 </launch>

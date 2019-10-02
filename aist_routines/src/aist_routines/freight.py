@@ -42,6 +42,9 @@ class FreightRoutines(AISTBaseRoutines):
             *tfs.quaternion_from_euler(0, 0, theta))
         return self._move_base.send_goal_and_wait(goal)
 
+    def move_base_to_frame(self, target_frame):
+        return self.move_base(0, 0, 0, target_frame)
+
     def _odom_callback(self, odom):
         self._odom_recv_event.clear()
         self._current_base_pose = copy.deepcopy(odom.pose)
