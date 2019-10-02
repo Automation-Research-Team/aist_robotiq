@@ -19,8 +19,7 @@
   </include>
 
   <!-- Load robot urdf to param "robot_description", spawn
-       robot_state_publisher and launch real robots if "sim" ==
-       "false". -->
+       robot_state_publisher and launch real robots if "sim" == "false". -->
   <group unless="$(arg sim)">
     <rosparam command="delete" param="robot_description"/>
     <param name="robot_description"

@@ -1,22 +1,23 @@
 <?xml version="1.0"?>
 <launch>
 
-  <arg name="nav"		default="true"/>
   <arg name="no_static_map"	default="true"/>
 
   <!-- Start navigation stack -->
-  <!-- <include file="$(find	fetch_navigation)/launch/fetch_nav.launch" -->
-  <!-- 	   if="$(arg nav)"> -->
-  <!--   <arg name="map_file" -->
-  <!-- 	 value="$(find fetch_gazebo_demo)/maps/test_zone.yaml"/> -->
-  <!-- </include> -->
-  <include file="$(find	aist_navigation)/launch/move_base.launch"
-	   if="$(arg nav)">
+  <include file="$(find	aist_navigation)/launch/move_base.launch">
     <arg name="no_static_map" value="$(arg no_static_map)"/>
   </include>
 
-  <node unless="$(arg nav)"
-	name="map_odom" pkg="tf" type="static_transform_publisher"
-        args="0 0 0 0 0 0 map odom 10"/>
+  <!-- Publish base_scan_raw if anything subscribes to it -->
+  <node name="publish_base_scan_raw"
+  	pkg="topic_tools" type="relay" args="base_scan base_scan_raw" >
+    <param name="lazy" type="bool" value="True"/>
+  </node>
+
+  <!-- Start a mux between application and teleop -->
+  <node name="cmd_vel_mux" pkg="topic_tools" type="mux"
+  	respawn="true" args="base_controller/command /cmd_vel /teleop/cmd_vel">
+    <remap from="mux" to="cmd_vel_mux" />
+  </node>
 
 </launch>

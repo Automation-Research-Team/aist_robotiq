@@ -116,7 +116,7 @@
   <joint name="a_cabinet_standpoint_joint" type="fixed">
     <parent link="a_cabinet_base" />
     <child  link="a_cabinet_standpoint" />
-    <origin xyz="${cabinet_width/2} -0.6 0" rpy="0 0 ${pi/2}" />
+    <origin xyz="${cabinet_width/2} -0.9 0" rpy="0 0 ${pi/2}" />
   </joint>
 
   <!-- Frames to place items on cabinet -->
