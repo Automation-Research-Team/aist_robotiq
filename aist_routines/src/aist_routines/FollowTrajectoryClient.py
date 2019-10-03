@@ -36,14 +36,7 @@ class FollowTrajectoryClient(object):
         trajectory.points[0].time_from_start = rospy.Duration(duration)
         goal = FollowJointTrajectoryGoal()
         goal.trajectory = trajectory
-        self._client.send_goal(goal)
-
-        self._client.wait_for_result()
-        res = self._client.get_result()
-        if res.error_code != 0:
-            rospy.logerr(res.error_code)
-            return False
-        return True
+        return self._client.send_goal_and_wait(goal)
 
     def follow(self, positions_list, duration):
         time_step  = duration/len(positions_list)
@@ -58,11 +51,4 @@ class FollowTrajectoryClient(object):
                                                         (i + 1)*time_step)
         goal = FollowJointTrajectoryGoal()
         goal.trajectory = trajectory
-        self._client.send_goal(goal)
-
-        self._client.wait_for_result()
-        res = self._client.get_result()
-        if res.error_code != 0:
-            rospy.logerr(res.error_code)
-            return False
-        return True
+        return self._client.send_goal_and_wait(goal)

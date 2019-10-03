@@ -4,7 +4,7 @@ groups:
 
 grippers:
   arm:
-    type: TwoFingerGripper
+    type: FetchGripper
     args:
       prefix: ""
       max_effort: 5.0
