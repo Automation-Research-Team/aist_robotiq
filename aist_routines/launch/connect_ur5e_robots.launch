@@ -61,15 +61,16 @@
 
   <!-- Drivers for the grippers -->
   <include file="$(find robotiq_control)/launch/ur_cmodel_action_controller.launch">
-    <arg name="namespace" value="c_bot_gripper" />
-    <arg name="gripper_prefix" value="c_bot_" />
-    <arg name="topic" value="/c_bot_controller/ur_driver/URScript" />
+    <arg name="namespace"	value="c_bot_gripper"/>
+    <arg name="gripper_prefix"	value="c_bot_"/>
+    <arg name="topic"		value="/c_bot_controller/ur_driver/URScript"/>
   </include>
 
   <include file="$(find robotiq_control)/launch/ur_cmodel_action_controller.launch">
-    <arg name="namespace" value="d_bot_gripper" />
-    <arg name="gripper_prefix" value="d_bot_" />
-    <arg name="topic" value="/d_bot_controller/ur_driver/URScript" />
+    <arg name="namespace"	value="d_bot_gripper"/>
+    <arg name="gripper_prefix"	value="d_bot_"/>
+    <arg name="topic"		value="/d_bot_controller/ur_driver/URScript"/>
+    <arg name="config"		value="cmodel_action_controller_hande"/>
   </include>
 
   <!-- Drivers for the force sensors -->
