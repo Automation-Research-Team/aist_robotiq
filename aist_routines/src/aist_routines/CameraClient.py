@@ -16,8 +16,13 @@ class CameraClient(object):
         self._depth_topic       = depth_topic
         self._normal_topic      = normal_topic
 
-    def base(self):
-        return self
+    @staticmethod
+    def create(type_name, kwargs):
+        ClientClass = globals()[type_name]
+        if rospy.get_param("use_real_robot", False):
+            return ClientClass(**kwargs)
+        else:
+            return ClientClass.base(**kwargs)
 
     @property
     def name(self):
@@ -70,9 +75,9 @@ class PhoXiCamera(CameraClient):
 
     @staticmethod
     def _initargs(name):
-        return (name, "depth",             "/" + name + "/camera_info",
-                "/" + name + "/texture",   "/" + name + "/pointcloud",
-                "/" + name + "/depth_map", "/" + name + "/normal_map")
+        return (name, "depth",       name + "/camera_info",
+                name + "/texture",   name + "/pointcloud",
+                name + "/depth_map", name + "/normal_map")
 
     def continuous_shot(self, enable):
         self._dyn_reconf.update_configuration({"trigger_mode" :
@@ -83,20 +88,20 @@ class PhoXiCamera(CameraClient):
         return self._trigger_frame().success
 
 ######################################################################
-#  class RealsenseCamera                                             #
+#  class DepthCamera                                                 #
 ######################################################################
-class RealsenseCamera(CameraClient):
+class DepthCamera(CameraClient):
     def __init__(self, name="a_bot_camera"):
-        super(RealsenseCamera, self).__init__(*RealsenseCamera._initargs(name))
+        super(DepthCamera, self).__init__(*DepthCamera._initargs(name))
 
     @staticmethod
     def base(name):
-        return CameraClient(*RealsenseCamera._initargs(name))
+        return CameraClient(*DepthCamera._initargs(name))
 
     @staticmethod
     def _initargs(name):
-        return (name, "depth",                 "/" + name + "/rgb/camera_info",
-                "/" + name + "/rgb/image_raw", "/" + name + "/depth/points")
+        return (name, "depth",           name + "/rgb/camera_info",
+                name + "/rgb/image_raw", name + "/depth/points")
 
 ######################################################################
 #  class MonocularCamera                                             #

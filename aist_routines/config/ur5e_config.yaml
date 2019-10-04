@@ -5,16 +5,16 @@ groups:
 
 grippers:
   c_bot:
-    type: Robotiq85Gripper
+    type: RobotiqGripper
     args:
       prefix: c_bot_
+      product: "85"
       force: 5.0
       velocity: 0.1
-      timeout: 6.0
   d_bot:
-    type: Robotiq85Gripper
+    type: RobotiqGripper
     args:
       prefix: d_bot_
+      product: hande
       force: 5.0
       velocity: 0.1
-      timeout: 6.0

@@ -4,9 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /MotionPlanning1
-        - /MotionPlanning1/Planning Request1
-        - /TF1
+        - /TF1/Frames1
       Splitter Ratio: 0.742560029
     Tree Height: 433
   - Class: rviz/Help
@@ -202,52 +200,22 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          d_bot_robotiq_85_base_link:
+          d_bot_robotiq_hande_base_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          d_bot_robotiq_85_left_finger_link:
+          d_bot_robotiq_hande_left_finger:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          d_bot_robotiq_85_left_finger_tip_link:
+          d_bot_robotiq_hande_right_finger:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          d_bot_robotiq_85_left_inner_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_85_left_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_85_right_finger_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_85_right_finger_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_85_right_inner_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_85_right_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_85_tip_link:
+          d_bot_robotiq_hande_tip_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -301,7 +269,7 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-        Loop Animation: true
+        Loop Animation: false
         Robot Alpha: 0.5
         Robot Color: 150; 50; 150
         Show Robot Collision: false
@@ -479,52 +447,22 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          d_bot_robotiq_85_base_link:
+          d_bot_robotiq_hande_base_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          d_bot_robotiq_85_left_finger_link:
+          d_bot_robotiq_hande_left_finger:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          d_bot_robotiq_85_left_finger_tip_link:
+          d_bot_robotiq_hande_right_finger:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          d_bot_robotiq_85_left_inner_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_85_left_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_85_right_finger_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_85_right_finger_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_85_right_inner_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_85_right_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_85_tip_link:
+          d_bot_robotiq_hande_tip_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -625,6 +563,8 @@ Visualization Manager:
           Value: false
         c_bot_tool0:
           Value: false
+        c_bot_tool0_controller:
+          Value: true
         c_bot_upper_arm_link:
           Value: false
         c_bot_wrench_link:
@@ -643,30 +583,20 @@ Visualization Manager:
           Value: true
         d_bot_forearm_link:
           Value: false
-        d_bot_robotiq_85_base_link:
+        d_bot_robotiq_hande_base_link:
           Value: false
-        d_bot_robotiq_85_left_finger_link:
+        d_bot_robotiq_hande_left_finger:
           Value: false
-        d_bot_robotiq_85_left_finger_tip_link:
+        d_bot_robotiq_hande_right_finger:
           Value: false
-        d_bot_robotiq_85_left_inner_knuckle_link:
-          Value: false
-        d_bot_robotiq_85_left_knuckle_link:
-          Value: false
-        d_bot_robotiq_85_right_finger_link:
-          Value: false
-        d_bot_robotiq_85_right_finger_tip_link:
-          Value: false
-        d_bot_robotiq_85_right_inner_knuckle_link:
-          Value: false
-        d_bot_robotiq_85_right_knuckle_link:
-          Value: false
-        d_bot_robotiq_85_tip_link:
+        d_bot_robotiq_hande_tip_link:
           Value: true
         d_bot_shoulder_link:
           Value: false
         d_bot_tool0:
           Value: false
+        d_bot_tool0_controller:
+          Value: true
         d_bot_upper_arm_link:
           Value: false
         d_bot_wrench_link:
@@ -699,7 +629,8 @@ Visualization Manager:
                   {}
             c_bot_base_link:
               c_bot_base:
-                {}
+                c_bot_tool0_controller:
+                  {}
               c_bot_shoulder_link:
                 c_bot_upper_arm_link:
                   c_bot_forearm_link:
@@ -728,7 +659,8 @@ Visualization Manager:
                             {}
             d_bot_base_link:
               d_bot_base:
-                {}
+                d_bot_tool0_controller:
+                  {}
               d_bot_shoulder_link:
                 d_bot_upper_arm_link:
                   d_bot_forearm_link:
@@ -736,20 +668,12 @@ Visualization Manager:
                       d_bot_wrist_2_link:
                         d_bot_wrist_3_link:
                           d_bot_ee_link:
-                            d_bot_robotiq_85_base_link:
-                              d_bot_robotiq_85_left_inner_knuckle_link:
-                                d_bot_robotiq_85_left_finger_tip_link:
-                                  {}
-                              d_bot_robotiq_85_left_knuckle_link:
-                                d_bot_robotiq_85_left_finger_link:
-                                  {}
-                              d_bot_robotiq_85_right_inner_knuckle_link:
-                                d_bot_robotiq_85_right_finger_tip_link:
-                                  {}
-                              d_bot_robotiq_85_right_knuckle_link:
-                                d_bot_robotiq_85_right_finger_link:
-                                  {}
-                              d_bot_robotiq_85_tip_link:
+                            d_bot_robotiq_hande_base_link:
+                              d_bot_robotiq_hande_left_finger:
+                                {}
+                              d_bot_robotiq_hande_right_finger:
+                                {}
+                              d_bot_robotiq_hande_tip_link:
                                 {}
                             d_bot_wrench_link:
                               {}
@@ -773,6 +697,7 @@ Visualization Manager:
       Hide Inactive Objects: true
     - Class: rviz/MoveCamera
     - Class: rviz/Select
+    - Class: rviz/FocusCamera
   Value: true
   Views:
     Current:
@@ -792,10 +717,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.824796736
+      Pitch: 0.909796298
       Target Frame: world
       Value: XYOrbit (rviz)
-      Yaw: 0.196765721
+      Yaw: 0.111766078
     Saved: ~
 Window Geometry:
   Displays:
