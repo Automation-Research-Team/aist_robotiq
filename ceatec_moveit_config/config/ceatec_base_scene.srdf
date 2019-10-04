@@ -61,7 +61,6 @@
         <joint name="wrist_flex_joint" value="0.9905" />
         <joint name="wrist_roll_joint" value="-0.006" />
     </group_state>
-
     <group_state name="tucking" group="arm_with_torso">
         <joint name="elbow_flex_joint" value="1.72" />
         <joint name="forearm_roll_joint" value="0" />
@@ -97,6 +96,8 @@
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
     <virtual_joint name="map_odom_joint" type="planar" parent_frame="map" child_link="odom" />
     <virtual_joint name="odom_base_joint" type="planar" parent_frame="odom" child_link="base_link" />
+    <virtual_joint name="a_tray_joint" type="floating" parent_frame="a_tray_on_a_table" child_link="a_tray" />
+    <virtual_joint name="b_tray_joint" type="floating" parent_frame="b_tray_on_b_table" child_link="b_tray" />
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="a_cabinet_ar_marker" link2="a_cabinet_back" reason="Never" />
     <disable_collisions link1="a_cabinet_ar_marker" link2="a_cabinet_base" reason="Never" />

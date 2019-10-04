@@ -6,9 +6,10 @@ Panels:
       Expanded:
         - /MotionPlanning1/Planning Request1
         - /MotionPlanning1/Planned Path1
+        - /TF1
         - /TF1/Frames1
       Splitter Ratio: 0.742560029
-    Tree Height: 251
+    Tree Height: 309
   - Class: rviz/Help
     Name: Help
   - Class: rviz/Views
@@ -110,11 +111,40 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          a_cabinet_shelf2_origin:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_cabinet_shelf2_origin_center:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_cabinet_shelf3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          a_cabinet_shelf4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_cabinet_standpoint:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_item_in_cabinet:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_item_on_a_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_item_on_b_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_table_ar_marker:
             Alpha: 1
             Show Axes: false
@@ -140,6 +170,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          a_table_standpoint:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_table_top:
             Alpha: 1
             Show Axes: false
@@ -150,6 +184,55 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
           a_table_top_origin_center:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_tray_bottom:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_tray_on_a_table:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_tray_on_b_table:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_tray_wall0:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_tray_wall1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_tray_wall2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_tray_wall3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          b_item_in_cabinet:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_item_on_a_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_item_on_b_tray:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -173,6 +256,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          b_table_standpoint:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_table_top:
             Alpha: 1
             Show Axes: false
@@ -186,6 +273,43 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          b_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_tray_bottom:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          b_tray_on_a_table:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_tray_on_b_table:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_tray_wall0:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          b_tray_wall1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          b_tray_wall2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          b_tray_wall3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           base_link:
             Alpha: 1
             Show Axes: false
@@ -201,6 +325,42 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          c_item_in_cabinet:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_item_on_a_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_item_on_b_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          d_item_in_cabinet:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          d_item_on_a_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          d_item_on_b_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          e_item_in_cabinet:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          e_item_on_a_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          e_item_on_b_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           elbow_flex_link:
             Alpha: 1
             Show Axes: false
@@ -211,6 +371,18 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          f_item_in_cabinet:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          f_item_on_a_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          f_item_on_b_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           forearm_roll_link:
             Alpha: 1
             Show Axes: false
@@ -413,11 +585,40 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          a_cabinet_shelf2_origin:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_cabinet_shelf2_origin_center:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_cabinet_shelf3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          a_cabinet_shelf4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_cabinet_standpoint:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_item_in_cabinet:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_item_on_a_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_item_on_b_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_table_ar_marker:
             Alpha: 1
             Show Axes: false
@@ -443,6 +644,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          a_table_standpoint:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_table_top:
             Alpha: 1
             Show Axes: false
@@ -453,6 +658,55 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
           a_table_top_origin_center:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_tray_bottom:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_tray_on_a_table:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_tray_on_b_table:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_tray_wall0:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_tray_wall1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_tray_wall2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_tray_wall3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          b_item_in_cabinet:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_item_on_a_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_item_on_b_tray:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -476,6 +730,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          b_table_standpoint:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_table_top:
             Alpha: 1
             Show Axes: false
@@ -489,6 +747,43 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          b_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_tray_bottom:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          b_tray_on_a_table:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_tray_on_b_table:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          b_tray_wall0:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          b_tray_wall1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          b_tray_wall2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          b_tray_wall3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           base_link:
             Alpha: 1
             Show Axes: false
@@ -504,6 +799,42 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          c_item_in_cabinet:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_item_on_a_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          c_item_on_b_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          d_item_in_cabinet:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          d_item_on_a_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          d_item_on_b_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          e_item_in_cabinet:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          e_item_on_a_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          e_item_on_b_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           elbow_flex_link:
             Alpha: 1
             Show Axes: false
@@ -514,6 +845,18 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          f_item_in_cabinet:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          f_item_on_a_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          f_item_on_b_tray:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           forearm_roll_link:
             Alpha: 1
             Show Axes: false
@@ -657,8 +1000,22 @@ Visualization Manager:
           Value: true
         a_cabinet_shelf2:
           Value: false
+        a_cabinet_shelf2_origin:
+          Value: true
+        a_cabinet_shelf2_origin_center:
+          Value: true
         a_cabinet_shelf3:
           Value: false
+        a_cabinet_shelf4:
+          Value: true
+        a_cabinet_standpoint:
+          Value: true
+        a_item_in_cabinet:
+          Value: true
+        a_item_on_a_tray:
+          Value: true
+        a_item_on_b_tray:
+          Value: true
         a_table_ar_marker:
           Value: false
         a_table_leg0:
@@ -669,11 +1026,33 @@ Visualization Manager:
           Value: false
         a_table_leg3:
           Value: false
+        a_table_standpoint:
+          Value: true
         a_table_top:
           Value: false
         a_table_top_origin:
           Value: true
         a_table_top_origin_center:
+          Value: true
+        a_tray_bottom:
+          Value: true
+        a_tray_on_a_table:
+          Value: true
+        a_tray_on_b_table:
+          Value: true
+        a_tray_wall0:
+          Value: true
+        a_tray_wall1:
+          Value: true
+        a_tray_wall2:
+          Value: true
+        a_tray_wall3:
+          Value: true
+        b_item_in_cabinet:
+          Value: true
+        b_item_on_a_tray:
+          Value: true
+        b_item_on_b_tray:
           Value: true
         b_table_leg0:
           Value: false
@@ -683,22 +1062,62 @@ Visualization Manager:
           Value: false
         b_table_leg3:
           Value: false
+        b_table_standpoint:
+          Value: true
         b_table_top:
           Value: false
         b_table_top_origin:
           Value: true
         b_table_top_origin_center:
           Value: true
+        b_tray_bottom:
+          Value: true
+        b_tray_on_a_table:
+          Value: true
+        b_tray_on_b_table:
+          Value: true
+        b_tray_wall0:
+          Value: true
+        b_tray_wall1:
+          Value: true
+        b_tray_wall2:
+          Value: true
+        b_tray_wall3:
+          Value: true
         base_link:
-          Value: false
+          Value: true
         bellows_link:
           Value: false
         bellows_link2:
           Value: false
+        c_item_in_cabinet:
+          Value: true
+        c_item_on_a_tray:
+          Value: true
+        c_item_on_b_tray:
+          Value: true
+        d_item_in_cabinet:
+          Value: true
+        d_item_on_a_tray:
+          Value: true
+        d_item_on_b_tray:
+          Value: true
+        e_item_in_cabinet:
+          Value: true
+        e_item_on_a_tray:
+          Value: true
+        e_item_on_b_tray:
+          Value: true
         elbow_flex_link:
           Value: false
         estop_link:
           Value: false
+        f_item_in_cabinet:
+          Value: true
+        f_item_on_a_tray:
+          Value: true
+        f_item_on_b_tray:
+          Value: true
         forearm_roll_link:
           Value: false
         gripper_link:
@@ -808,9 +1227,22 @@ Visualization Manager:
                       {}
                     a_cabinet_shelf1_origin_center:
                       {}
+                    a_item_in_cabinet:
+                      b_item_in_cabinet:
+                        c_item_in_cabinet:
+                          d_item_in_cabinet:
+                            e_item_in_cabinet:
+                              f_item_in_cabinet:
+                                {}
                 a_cabinet_shelf2:
-                  {}
+                  a_cabinet_shelf2_origin:
+                    a_cabinet_shelf2_origin_center:
+                      {}
                 a_cabinet_shelf3:
+                  {}
+                a_cabinet_shelf4:
+                  {}
+                a_cabinet_standpoint:
                   {}
               a_table_leg0:
                 a_table_leg1:
@@ -819,12 +1251,34 @@ Visualization Manager:
                   {}
                 a_table_leg3:
                   {}
+                a_table_standpoint:
+                  {}
                 a_table_top:
                   a_table_top_origin:
                     a_table_ar_marker:
                       {}
                     a_table_top_origin_center:
-                      {}
+                      a_tray_on_a_table:
+                        a_tray_bottom:
+                          a_tray_wall0:
+                            {}
+                          a_tray_wall1:
+                            {}
+                          a_tray_wall2:
+                            {}
+                          a_tray_wall3:
+                            {}
+                          b_item_on_a_tray:
+                            a_item_on_a_tray:
+                              d_item_on_a_tray:
+                                {}
+                            c_item_on_a_tray:
+                              f_item_on_a_tray:
+                                {}
+                            e_item_on_a_tray:
+                              {}
+                      b_tray_on_a_table:
+                        {}
               b_table_leg0:
                 b_table_leg1:
                   {}
@@ -832,10 +1286,32 @@ Visualization Manager:
                   {}
                 b_table_leg3:
                   {}
+                b_table_standpoint:
+                  {}
                 b_table_top:
                   b_table_top_origin:
                     b_table_top_origin_center:
-                      {}
+                      a_tray_on_b_table:
+                        {}
+                      b_tray_on_b_table:
+                        b_tray_bottom:
+                          b_item_on_b_tray:
+                            a_item_on_b_tray:
+                              d_item_on_b_tray:
+                                {}
+                            c_item_on_b_tray:
+                              f_item_on_b_tray:
+                                {}
+                            e_item_on_b_tray:
+                              {}
+                          b_tray_wall0:
+                            {}
+                          b_tray_wall1:
+                            {}
+                          b_tray_wall2:
+                            {}
+                          b_tray_wall3:
+                            {}
       Update Interval: 0
       Value: true
     - Class: rviz/Image
@@ -874,23 +1350,23 @@ Visualization Manager:
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.113567002
-        Y: 0.105920002
-        Z: 2.23518001e-07
+        X: 0.127823472
+        Y: 0.0428428054
+        Z: 3.42727276e-07
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.689796209
+      Pitch: 0.524796546
       Target Frame: map
       Value: XYOrbit (rviz)
-      Yaw: 5.89495277
+      Yaw: 4.6499486
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 965
+  Height: 1176
   Help:
     collapsed: false
   Hide Left Dock: false
@@ -901,9 +1377,9 @@ Window Geometry:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000002ad0000037ffc0200000008fb000000100044006900730070006c00610079007301000000280000013c000000d700fffffffb0000000800480065006c00700000000342000000bb0000007300fffffffb0000000a0056006900650077007300000003b0000000b0000000ad00fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004a00fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e0067010000016a0000018e0000018300fffffffb0000000a0049006d00610067006501000002fe000000a90000001600ffffff000004710000037f00000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000100000000000002ad00000439fc0200000008fb000000100044006900730070006c006100790073010000004100000176000000d700fffffffb0000000800480065006c00700000000342000000bb0000007300fffffffb0000000a0056006900650077007300000003b0000000b0000000ad00fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004a00fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e006701000001bd000001f00000018300fffffffb0000000a0049006d00610067006501000003b3000000c70000001600ffffff000004cd0000043900000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
-  Width: 1828
-  X: 92
-  Y: 62
+  Width: 1920
+  X: 0
+  Y: 24
