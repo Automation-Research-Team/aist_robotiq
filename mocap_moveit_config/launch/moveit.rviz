@@ -4,9 +4,11 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /MotionPlanning1/Planned Path1
         - /TF1/Frames1
+        - /WrenchStamped1
       Splitter Ratio: 0.742560029
-    Tree Height: 433
+    Tree Height: 505
   - Class: rviz/Help
     Name: Help
   - Class: rviz/Views
@@ -177,77 +179,6 @@ Visualization Manager:
             Show Trail: false
             Value: true
           c_bot_wrist_3_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_base:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          d_bot_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_ee_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_forearm_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_hande_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_hande_left_finger:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_hande_right_finger:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_hande_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          d_bot_shoulder_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_tool0:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          d_bot_upper_arm_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_wrench_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          d_bot_wrist_1_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_wrist_2_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_wrist_3_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -428,77 +359,6 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          d_bot_base:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          d_bot_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_ee_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_forearm_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_hande_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_hande_left_finger:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_hande_right_finger:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_robotiq_hande_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          d_bot_shoulder_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_tool0:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          d_bot_upper_arm_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_wrench_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          d_bot_wrist_1_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_wrist_2_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          d_bot_wrist_3_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           o2as_ground:
             Alpha: 1
             Show Axes: false
@@ -536,7 +396,7 @@ Visualization Manager:
         c_bot_base_link:
           Value: false
         c_bot_ee_link:
-          Value: true
+          Value: false
         c_bot_forearm_link:
           Value: false
         c_bot_robotiq_85_base_link:
@@ -564,7 +424,7 @@ Visualization Manager:
         c_bot_tool0:
           Value: false
         c_bot_tool0_controller:
-          Value: true
+          Value: false
         c_bot_upper_arm_link:
           Value: false
         c_bot_wrench_link:
@@ -574,38 +434,6 @@ Visualization Manager:
         c_bot_wrist_2_link:
           Value: false
         c_bot_wrist_3_link:
-          Value: false
-        d_bot_base:
-          Value: false
-        d_bot_base_link:
-          Value: false
-        d_bot_ee_link:
-          Value: true
-        d_bot_forearm_link:
-          Value: false
-        d_bot_robotiq_hande_base_link:
-          Value: false
-        d_bot_robotiq_hande_left_finger:
-          Value: false
-        d_bot_robotiq_hande_right_finger:
-          Value: false
-        d_bot_robotiq_hande_tip_link:
-          Value: true
-        d_bot_shoulder_link:
-          Value: false
-        d_bot_tool0:
-          Value: false
-        d_bot_tool0_controller:
-          Value: true
-        d_bot_upper_arm_link:
-          Value: false
-        d_bot_wrench_link:
-          Value: false
-        d_bot_wrist_1_link:
-          Value: false
-        d_bot_wrist_2_link:
-          Value: false
-        d_bot_wrist_3_link:
           Value: false
         o2as_ground:
           Value: false
@@ -657,33 +485,24 @@ Visualization Manager:
                               {}
                           c_bot_tool0:
                             {}
-            d_bot_base_link:
-              d_bot_base:
-                d_bot_tool0_controller:
-                  {}
-              d_bot_shoulder_link:
-                d_bot_upper_arm_link:
-                  d_bot_forearm_link:
-                    d_bot_wrist_1_link:
-                      d_bot_wrist_2_link:
-                        d_bot_wrist_3_link:
-                          d_bot_ee_link:
-                            d_bot_robotiq_hande_base_link:
-                              d_bot_robotiq_hande_left_finger:
-                                {}
-                              d_bot_robotiq_hande_right_finger:
-                                {}
-                              d_bot_robotiq_hande_tip_link:
-                                {}
-                            d_bot_wrench_link:
-                              {}
-                          d_bot_tool0:
-                            {}
             workbox:
               {}
             workspace_center:
               {}
       Update Interval: 0
+      Value: true
+    - Alpha: 1
+      Arrow Width: 0.5
+      Class: rviz/WrenchStamped
+      Enabled: true
+      Force Arrow Scale: 0.0299999993
+      Force Color: 204; 51; 51
+      History Length: 1
+      Name: WrenchStamped
+      Topic: /c_bot_ftsensor/wrench
+      Torque Arrow Scale: 1
+      Torque Color: 204; 204; 51
+      Unreliable: false
       Value: true
   Enabled: true
   Global Options:
@@ -697,12 +516,11 @@ Visualization Manager:
       Hide Inactive Objects: true
     - Class: rviz/MoveCamera
     - Class: rviz/Select
-    - Class: rviz/FocusCamera
   Value: true
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 2.99650002
+      Distance: 5.12986326
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -717,15 +535,15 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.909796298
+      Pitch: 0.129797474
       Target Frame: world
       Value: XYOrbit (rviz)
-      Yaw: 0.111766078
+      Yaw: 3.07992816
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1056
+  Height: 1148
   Help:
     collapsed: false
   Hide Left Dock: false
@@ -734,9 +552,9 @@ Window Geometry:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000002ad000003dafc0200000007fb000000100044006900730070006c006100790073010000002800000246000000d700fffffffb0000000800480065006c00700000000342000000bb0000007300fffffffb0000000a0056006900650077007300000003b0000000b0000000ad00fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004a00fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e006701000002740000018e0000018300ffffff000004cd000003da00000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000100000000000002ad00000436fc0200000007fb000000100044006900730070006c00610079007301000000280000028e000000d700fffffffb0000000800480065006c00700000000342000000bb0000007300fffffffb0000000a0056006900650077007300000003b0000000b0000000ad00fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004a00fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e006701000002bc000001a20000018300ffffff000004710000043600000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
-  Width: 1920
-  X: 2560
-  Y: 24
+  Width: 1828
+  X: 65
+  Y: 501

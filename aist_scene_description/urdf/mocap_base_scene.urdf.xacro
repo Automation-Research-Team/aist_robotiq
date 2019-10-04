@@ -1,15 +1,12 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro"
-        name="ur5e_base_scene" >
+        name="mocap_base_scene" >
 
 
   <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
   <xacro:property name="c_bot_x" value="0"/>
   <xacro:property name="c_bot_y" value="-0.4875"/>
   <!-- <xacro:property name="c_bot_theta" value="${pi}"/> -->
-  <xacro:property name="d_bot_x" value="0"/>
-  <xacro:property name="d_bot_y" value="0.4875"/>
-  <xacro:property name="d_bot_theta" value="${pi}"/>
 
   <xacro:property name="bots_z" value="0.77"/>
 
@@ -49,24 +46,10 @@
     wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
     wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
 
-  <xacro:ur5e_robot prefix="d_bot_" joint_limited="false"
-    shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
-    shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
-    elbow_joint_lower_limit="0.0" elbow_joint_upper_limit="${pi}"
-    wrist_1_lower_limit="${-pi}" wrist_1_upper_limit="${pi}"
-    wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
-    wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"/>
-
   <joint name="world_c_bot_joint" type="fixed">
     <parent link="o2as_ground"/>
     <child  link= "c_bot_base_link"/>
     <origin xyz="${c_bot_x} ${c_bot_y} ${bots_z}" rpy="0 0 0"/>
-  </joint>
-
-  <joint name="world_d_bot_joint" type="fixed">
-    <parent link="o2as_ground"/>
-    <child  link= "d_bot_base_link"/>
-    <origin xyz="${d_bot_x} ${d_bot_y} ${bots_z}" rpy="0 0 ${d_bot_theta}"/>
   </joint>
 
   <!-- Spawn and attach gripper -->
@@ -75,25 +58,6 @@
 					  parent="c_bot_ee_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:robotiq_85_gripper_with_tip_link>
-
-  <!-- <xacro:include filename="$(find o2as_scene_description)/urdf/dual_suction_gripper.urdf.xacro"/> -->
-  <!-- <xacro:dual_suction_gripper_o2as prefix="d_bot_" -->
-  <!-- 				     parent="d_bot_ee_link"> -->
-  <!--   <origin xyz="0 0 0" rpy="0 ${0.8*pi/180} ${-0.5*pi/180}"/> -->
-  <!-- </xacro:dual_suction_gripper_o2as> -->
-
-  <!-- Add virtual wall to avoid collisions-->
-  <!-- <xacro:o2as_box boxname="vwall1" box_w="0.01" box_l="0.5" box_h="0.6" parent="o2as_ground"> -->
-  <!--   <origin xyz="0.50 -0.25 ${bots_z}" rpy="0 0 0"/> -->
-  <!-- </xacro:o2as_box> -->
-  <!-- <xacro:robotiq_85_gripper_with_tip_link prefix="d_bot_" -->
-  <!-- 					  parent="d_bot_ee_link"> -->
-  <!--   <origin xyz="0 0 0" rpy="0 0 0"/> -->
-  <!-- </xacro:robotiq_85_gripper_with_tip_link> -->
-  <xacro:include filename="$(find aist_scene_description)/urdf/robotiq_hande_with_tip_link.urdf.xacro"/>
-  <xacro:robotiq_hande_with_tip_link prefix="d_bot_" parent="d_bot_ee_link">
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-  </xacro:robotiq_hande_with_tip_link>
 
   <!-- Add PhoXi 3D scanner -->
   <xacro:include filename="$(find o2as_scene_description)/urdf/phoxi_m_camera.urdf.xacro"/>

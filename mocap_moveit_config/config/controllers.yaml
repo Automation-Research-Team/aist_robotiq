@@ -1,0 +1,11 @@
+controller_list:
+  - name: c_bot_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    joints:
+      - c_bot_shoulder_pan_joint
+      - c_bot_shoulder_lift_joint
+      - c_bot_elbow_joint
+      - c_bot_wrist_1_joint
+      - c_bot_wrist_2_joint
+      - c_bot_wrist_3_joint
