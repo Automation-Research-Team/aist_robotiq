@@ -6,10 +6,12 @@
 <robot name="robotiq_hande_with_tip_link"
        xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:macro name="robotiq_hande_with_tip_link" params="prefix parent *origin">
+  <xacro:macro name="robotiq_hande_with_tip_link"
+	       params="prefix parent *origin">
     <xacro:include filename="$(find robotiq_description)/urdf/robotiq_hande.urdf.xacro"/>
 
-    <xacro:robotiq_hande prefix="${prefix}" parent="${parent}" MAC="_000000000004">
+    <xacro:robotiq_hande prefix="${prefix}" parent="${parent}"
+			 MAC="_000000000004">
       <xacro:insert_block name="origin"/>
     </xacro:robotiq_hande>
 

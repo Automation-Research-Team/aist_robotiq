@@ -135,14 +135,16 @@
     <virtual_joint name="world_to_o2as" type="fixed" parent_frame="o2as_ground" child_link="world" />
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="b_phoxi_m_camera" link2="c_bot_base_link" reason="Adjacent" />
-    <disable_collisions link1="b_phoxi_m_camera" link2="c_bot_ee_link" reason="Never" />
     <disable_collisions link1="b_phoxi_m_camera" link2="c_bot_forearm_link" reason="Never" />
+    <disable_collisions link1="b_phoxi_m_camera" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_phoxi_m_camera" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="b_phoxi_m_camera" link2="c_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="b_phoxi_m_camera" link2="c_bot_upper_arm_link" reason="Never" />
     <disable_collisions link1="b_phoxi_m_camera" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="b_phoxi_m_camera" link2="d_bot_base_link" reason="Adjacent" />
     <disable_collisions link1="b_phoxi_m_camera" link2="d_bot_ee_link" reason="Never" />
     <disable_collisions link1="b_phoxi_m_camera" link2="d_bot_forearm_link" reason="Never" />
+    <disable_collisions link1="b_phoxi_m_camera" link2="d_bot_robotiq_hande_right_finger" reason="Never" />
     <disable_collisions link1="b_phoxi_m_camera" link2="d_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="b_phoxi_m_camera" link2="d_bot_upper_arm_link" reason="Never" />
     <disable_collisions link1="b_phoxi_m_camera" link2="d_bot_wrist_1_link" reason="Never" />
@@ -151,11 +153,11 @@
     <disable_collisions link1="c_bot_base_link" link2="d_bot_base_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_base_link" link2="d_bot_ee_link" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="d_bot_forearm_link" reason="Never" />
+    <disable_collisions link1="c_bot_base_link" link2="d_bot_robotiq_hande_left_finger" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="d_bot_robotiq_hande_right_finger" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="d_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="d_bot_upper_arm_link" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="d_bot_wrist_1_link" reason="Never" />
-    <disable_collisions link1="c_bot_base_link" link2="d_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="d_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="c_bot_base_link" link2="workbox" reason="Adjacent" />
     <disable_collisions link1="c_bot_ee_link" link2="c_bot_robotiq_85_base_link" reason="Adjacent" />
@@ -172,7 +174,7 @@
     <disable_collisions link1="c_bot_ee_link" link2="c_bot_wrist_3_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_ee_link" link2="d_bot_base_link" reason="Never" />
     <disable_collisions link1="c_bot_ee_link" link2="d_bot_ee_link" reason="Never" />
-    <disable_collisions link1="c_bot_ee_link" link2="d_bot_forearm_link" reason="Never" />
+    <disable_collisions link1="c_bot_ee_link" link2="d_bot_robotiq_hande_base_link" reason="Never" />
     <disable_collisions link1="c_bot_ee_link" link2="d_bot_robotiq_hande_left_finger" reason="Never" />
     <disable_collisions link1="c_bot_ee_link" link2="d_bot_robotiq_hande_right_finger" reason="Never" />
     <disable_collisions link1="c_bot_ee_link" link2="d_bot_shoulder_link" reason="Never" />
@@ -195,7 +197,11 @@
     <disable_collisions link1="c_bot_robotiq_85_base_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_base_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_base_link" link2="c_bot_wrist_3_link" reason="Default" />
+    <disable_collisions link1="c_bot_robotiq_85_base_link" link2="d_bot_ee_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_base_link" link2="d_bot_robotiq_hande_left_finger" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_base_link" link2="d_bot_robotiq_hande_right_finger" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_base_link" link2="d_bot_shoulder_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_base_link" link2="d_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="c_bot_robotiq_85_left_finger_tip_link" reason="Default" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Adjacent" />
@@ -206,10 +212,11 @@
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="d_bot_base_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="d_bot_ee_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="d_bot_robotiq_hande_base_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="d_bot_robotiq_hande_right_finger" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="d_bot_wrist_1_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="d_bot_wrist_2_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_finger_link" link2="d_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="c_bot_robotiq_85_left_inner_knuckle_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
@@ -220,7 +227,7 @@
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="c_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="d_bot_ee_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="d_bot_robotiq_hande_left_finger" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="d_bot_robotiq_hande_base_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_finger_tip_link" link2="d_bot_robotiq_hande_right_finger" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_robotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
@@ -231,8 +238,11 @@
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="c_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="d_bot_ee_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="d_bot_robotiq_hande_base_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="d_bot_robotiq_hande_left_finger" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="d_bot_robotiq_hande_right_finger" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="d_bot_wrist_2_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_inner_knuckle_link" link2="d_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="c_bot_robotiq_85_right_finger_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
@@ -242,28 +252,35 @@
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="c_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="d_bot_base_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="d_bot_ee_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="d_bot_forearm_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="d_bot_robotiq_hande_base_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="d_bot_robotiq_hande_left_finger" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="d_bot_robotiq_hande_right_finger" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="d_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="d_bot_wrist_2_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_left_knuckle_link" link2="d_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="c_bot_robotiq_85_right_finger_tip_link" reason="Default" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="c_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="d_bot_base_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="d_bot_ee_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="d_bot_robotiq_hande_base_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="d_bot_robotiq_hande_left_finger" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="d_bot_robotiq_hande_right_finger" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="d_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_link" link2="d_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="c_bot_robotiq_85_right_inner_knuckle_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="c_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="d_bot_base_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="d_bot_ee_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="d_bot_robotiq_hande_left_finger" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="d_bot_robotiq_hande_right_finger" reason="Never" />
-    <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="d_bot_wrist_2_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="d_bot_shoulder_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_finger_tip_link" link2="d_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="c_bot_wrist_2_link" reason="Never" />
@@ -271,48 +288,43 @@
     <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="d_bot_ee_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="d_bot_robotiq_hande_left_finger" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="d_bot_robotiq_hande_right_finger" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="d_bot_shoulder_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="d_bot_wrist_1_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_inner_knuckle_link" link2="d_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="c_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="c_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="c_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="d_bot_base_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="d_bot_ee_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="d_bot_forearm_link" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="d_bot_robotiq_hande_left_finger" reason="Never" />
     <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="d_bot_robotiq_hande_right_finger" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="d_bot_shoulder_link" reason="Never" />
+    <disable_collisions link1="c_bot_robotiq_85_right_knuckle_link" link2="d_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="c_bot_upper_arm_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_shoulder_link" link2="d_bot_base_link" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="d_bot_ee_link" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="d_bot_forearm_link" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="d_bot_robotiq_hande_base_link" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="d_bot_robotiq_hande_left_finger" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="d_bot_robotiq_hande_right_finger" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="d_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="d_bot_upper_arm_link" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="d_bot_wrist_1_link" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="d_bot_wrist_2_link" reason="Never" />
-    <disable_collisions link1="c_bot_shoulder_link" link2="d_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="c_bot_shoulder_link" link2="workbox" reason="Never" />
     <disable_collisions link1="c_bot_upper_arm_link" link2="d_bot_base_link" reason="Never" />
-    <disable_collisions link1="c_bot_upper_arm_link" link2="d_bot_ee_link" reason="Never" />
     <disable_collisions link1="c_bot_upper_arm_link" link2="d_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="c_bot_wrist_1_link" link2="c_bot_wrist_2_link" reason="Adjacent" />
     <disable_collisions link1="c_bot_wrist_1_link" link2="c_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="c_bot_wrist_1_link" link2="d_bot_base_link" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="d_bot_ee_link" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="d_bot_robotiq_hande_base_link" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="d_bot_robotiq_hande_left_finger" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="d_bot_robotiq_hande_right_finger" reason="Never" />
     <disable_collisions link1="c_bot_wrist_1_link" link2="d_bot_shoulder_link" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="d_bot_wrist_2_link" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_1_link" link2="d_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="c_bot_wrist_2_link" link2="c_bot_wrist_3_link" reason="Adjacent" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="d_bot_ee_link" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="d_bot_robotiq_hande_base_link" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="d_bot_robotiq_hande_left_finger" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="d_bot_robotiq_hande_right_finger" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="d_bot_wrist_1_link" reason="Never" />
-    <disable_collisions link1="c_bot_wrist_2_link" link2="d_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_2_link" link2="d_bot_base_link" reason="Never" />
     <disable_collisions link1="c_bot_wrist_3_link" link2="d_bot_base_link" reason="Never" />
     <disable_collisions link1="c_bot_wrist_3_link" link2="d_bot_ee_link" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_3_link" link2="d_bot_robotiq_hande_left_finger" reason="Never" />
     <disable_collisions link1="c_bot_wrist_3_link" link2="d_bot_robotiq_hande_right_finger" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_3_link" link2="d_bot_shoulder_link" reason="Never" />
+    <disable_collisions link1="c_bot_wrist_3_link" link2="d_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="d_bot_base_link" link2="d_bot_shoulder_link" reason="Adjacent" />
     <disable_collisions link1="d_bot_base_link" link2="workbox" reason="Adjacent" />
     <disable_collisions link1="d_bot_ee_link" link2="d_bot_robotiq_hande_base_link" reason="Adjacent" />
