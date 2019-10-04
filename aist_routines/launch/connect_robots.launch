@@ -30,7 +30,7 @@
 	pkg="robot_state_publisher" type="robot_state_publisher"/>
   <include unless="$(arg sim)"
 	   file="$(find
-		 aist_routines)/launch/connect_$(arg config)_robots.launch"/>
+		 aist_routines)/launch/$(arg config)_connect_robots.launch"/>
 
   <!-- Launch planner -->
   <include file="$(find aist_routines)/launch/$(arg config)_moveit_planning_execution.launch">
