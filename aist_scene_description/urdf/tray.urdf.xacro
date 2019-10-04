@@ -11,7 +11,7 @@
     <xacro:property name="item_radius"		value="0.04" />
 
     <link name="${prefix}tray"/>
-    <joint name="${prefix}tray" type="floating">
+    <joint name="${prefix}tray_joint" type="floating">
       <parent link="${parent}" />
       <child  link="${prefix}tray" />
       <xacro:insert_block name="origin"/>
