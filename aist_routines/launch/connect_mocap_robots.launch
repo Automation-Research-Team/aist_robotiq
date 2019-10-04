@@ -6,7 +6,6 @@
 
   <!-- robot_ip: IP-address of the robot's socket-messaging server -->
   <arg name="robot_ip_c"  default="10.66.171.53"/>
-  <arg name="robot_ip_d"  default="10.66.171.54"/>
   <arg name="limited"     default="false"/>
   <arg name="min_payload" default="0.0"/>
   <arg name="max_payload" default="1.0"/>
@@ -42,35 +41,11 @@
     <remap from="joint_states" to="/joint_states"/>
   </node>
 
-  <node name="d_bot_ur_driver"
-	pkg="ur_modern_driver" type="ur_driver"
-	output="screen" ns="d_bot_controller">
-    <param name="prefix"	   type="str"    value="d_bot_" />
-    <param name="robot_ip_address" type="str"    value="$(arg robot_ip_d)" />
-    <param name="reverse_port"     type="int"    value="50005" />
-    <param name="min_payload"      type="double" value="$(arg min_payload)" />
-    <param name="max_payload"      type="double" value="$(arg max_payload)" />
-    <param name="max_velocity"     type="double" value="$(arg max_velocity)" />
-    <param name="servoj_time"      type="double" value="$(arg servoj_time)" />
-    <param name="base_frame"       type="str"    value="d_bot_base" />
-    <param name="tool_frame"       type="str"    value="d_bot_tool0_controller" />
-    <param name="require_activation"     type="str"  value="$(arg require_activation)" />
-    <param name="shutdown_on_disconnect" type="bool" value="$(arg shutdown_on_disconnect)"/>
-    <remap from="joint_states" to="/joint_states"/>
-  </node>
-
   <!-- Drivers for the grippers -->
   <include file="$(find robotiq_control)/launch/ur_cmodel_action_controller.launch">
-    <arg name="namespace"	value="c_bot_gripper"/>
-    <arg name="gripper_prefix"	value="c_bot_"/>
-    <arg name="topic"		value="/c_bot_controller/ur_driver/URScript"/>
-  </include>
-
-  <include file="$(find robotiq_control)/launch/ur_cmodel_action_controller.launch">
-    <arg name="namespace"	value="d_bot_gripper"/>
-    <arg name="gripper_prefix"	value="d_bot_"/>
-    <arg name="topic"		value="/d_bot_controller/ur_driver/URScript"/>
-    <arg name="config"		value="cmodel_action_controller_hande"/>
+    <arg name="namespace" value="c_bot_gripper" />
+    <arg name="gripper_prefix" value="c_bot_" />
+    <arg name="topic" value="/c_bot_controller/ur_driver/URScript" />
   </include>
 
   <!-- Drivers for the force sensors -->
@@ -78,12 +53,6 @@
     <arg name="input"		value="topic"/>
     <arg name="robot_name"	value="c_bot"/>
     <arg name="sensor_frame"	value="c_bot_wrench_link"/>
-  </include>
-
-  <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch">
-    <arg name="input"		value="topic"/>
-    <arg name="robot_name"	value="d_bot"/>
-    <arg name="sensor_frame"	value="d_bot_wrench_link"/>
   </include>
 
 </launch>

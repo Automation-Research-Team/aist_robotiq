@@ -8,7 +8,6 @@ grippers:
     args:
       prefix: ""
       max_effort: 5.0
-      timeout: 6.0
 
 cameras:
   head_camera:
