@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="paused"		default="true"/>
+  <arg name="gui"		default="true"/>
+  <arg name="use_sim_time"	default="true"/>
+  <arg name="headless"		default="false"/>
+  <arg name="debug"		default="false"/>
+  <arg name="scene"		default="dtorobo_base_scene"/>
+  <!-- Gazebo needs to start up paused in order for us to be able to set the initial joint configurations.
+       This is a known bug as of July 2018. -->
+
+  <!-- startup simulated world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name"	value="$(find torobo_gazebo)/worlds/ground_plane.world"/>
+    <arg name="paused"		value="$(arg paused)"/>
+    <arg name="gui"		value="$(arg gui)"/>
+    <arg name="use_sim_time"	value="$(arg use_sim_time)"/>
+    <arg name="headless"	value="$(arg headless)"/>
+    <arg name="debug"		value="$(arg debug)" />
+    <arg name="verbose"		value="false"/>
+  </include>
+
+  <group ns="torobo">
+    <!-- load rosparam -->
+    <rosparam param="robot_config"
+	      command="load"
+	      file="$(find torobo_description)/config/products/$(optenv
+		    PRODUCT default).yaml"/>
+
+    <!-- Load robot urdf to param "robot_description". -->
+    <param name="robot_description"
+    	 command="$(find xacro)/xacro '$(find
+    		  aist_scene_description)/urdf/$(arg
+    		  scene).urdf.xacro' path:=$(find
+    		  torobo_description)/config/products/$(optenv
+    		  PRODUCT default).yaml"/>
+
+    <!-- The semantic description SRDF -->
+    <!-- In order to switch yaml, python code is in param's command. The launching sequence works synchronously with this param tag's command. -->
+    <param name="robot_description_semantic"
+  	   command="$(find torobo_description)/scripts/load_srdf.py
+  		    --model_dir=$(find torobo_description)/config/models
+  		    --srdf=torobo.srdf
+  		    --robot_config=$(find
+  		    torobo_description)/config/products/$(optenv
+  		    PRODUCT default).yaml
+  		    --dump_file=/tmp/torobo_rosparam_home_position.yaml" />
+
+    <!-- load home_position from semantic description SRDF -->
+    <rosparam command="load" file="/tmp/torobo_rosparam_home_position.yaml" />
+
+    <!-- load controller_config -->
+    <param name="/dummy"
+	   command="$(find torobo_description)/scripts/load_controller_config.py
+		    --model_dir=$(find torobo_description)/config/models
+		    --yaml=controllers.yaml
+		    --robot_config=$(find
+		    torobo_description)/config/products/$(optenv
+		    PRODUCT default).yaml
+		    --dump_file=/tmp/torobo_rosparam_controller_config.yaml" />
+    <rosparam command="load"
+	      file="/tmp/torobo_rosparam_controller_config.yaml" />
+  </group>
+
+  <!-- Run a python script to the send a service call to gazebo_ros
+       to spawn a URDF robot -->
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
+	respawn="false" output="screen"
+	args="-urdf -model torobo -param /torobo/robot_description"/>
+
+
+</launch>
