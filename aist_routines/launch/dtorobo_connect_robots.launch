@@ -1,0 +1,58 @@
+<launch>
+
+  <arg name="sim" default="true"/>
+  <arg name="mock" default="false"/>
+  <arg name="core" default="true"/>
+  <arg name="rqt" default="true"/>
+  <arg name="rviz" default="true"/>
+
+  <group ns="torobo">
+    <include file="$(find torobo_description)/launch/load_robot_config.launch"/>
+  </group>
+
+  <!-- launch nodelet manager -->
+  <group ns="torobo">
+    <node name="torobo_nodelet_manager" pkg="nodelet" type="nodelet"
+	  args="manager"  output="screen"/>
+  </group>
+
+  <!-- launch torobo driver -->
+  <include file="$(find torobo_driver)/launch/torobo_driver.launch">
+    <arg name="mock" value="$(arg mock)"/>
+  </include>
+
+  <!-- launch torobo dynamics -->
+  <include file="$(find torobo_dynamics)/launch/torobo_dynamics.launch">
+    <arg name="sim" value="$(arg sim)"/>
+  </include>
+
+  <!-- launch torobo control -->
+  <include file="$(find torobo_control)/launch/torobo_control.launch">
+    <arg name="sim" value="$(arg sim)"/>
+  </include>
+
+  <!-- launch moveit_config -->
+  <group ns="torobo">
+    <include file="$(find torobo_moveit_config)/launch/torobo_moveit_config.launch">
+      <arg name="sim_in_moveit" value="false"/>
+    </include>
+  </group>
+
+  <!-- launch torobo operation -->
+  <include file="$(find torobo_operation)/launch/torobo_operation.launch"/>
+
+  <!-- launch torobo collision detector -->
+  <include file="$(find torobo_collision_detector)/launch/torobo_collision_detector.launch"/>
+  <include file="$(find torobo_collision_detector)/launch/current_state_self_collision_checker.launch">
+    <arg name="sim" value="$(arg sim)"/>
+  </include>
+
+
+  <!-- launch rqt gui -->
+  <group if="$(arg rqt)">
+    <include unless="$(arg sim)" file="$(find torobo_gui)/launch/torobo_state_viewer.launch"/>
+    <include file="$(find torobo_gui)/launch/torobo_joint_controller.launch"/>
+    <!--<include unless="$(arg sim)" file="$(find torobo_gui)/launch/torobo_whole_body_manager.launch"/>-->
+  </group>
+
+</launch>

@@ -1,0 +1,9 @@
+groups:
+  - a_torobo
+  - b_torobo
+
+cameras:
+  b_phoxi_m_camera:
+    type: PhoXiCamera
+    args:
+      name: b_phoxi_m_camera
