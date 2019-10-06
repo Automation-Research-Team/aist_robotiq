@@ -7,15 +7,15 @@
   <xacro:macro name="torobo_arm" params="prefix">
     <xacro:property name="COL_K" value="1.2"/>
 
-    <link name="${prefix}/base"/>
+    <link name="${prefix}base"/>
     <!-- =============== Link & Joint =============== -->
-    <joint name="${prefix}/arm/root" type="fixed">
+    <joint name="${prefix}arm/root" type="fixed">
       <origin xyz="0 0 0"/>
-      <parent link="${prefix}/base"/>
-      <child link="${prefix}/arm/link_0"/>
+      <parent link="${prefix}base"/>
+      <child link="${prefix}arm/link_0"/>
     </joint>
 
-    <link name="${prefix}/arm/link_0">
+    <link name="${prefix}arm/link_0">
       <visual>
 	<geometry>
           <mesh filename="package://torobo_resources/TRBA-R-002-7/meshes/link0.dae" scale="0.01 0.01 0.01"/>
@@ -37,15 +37,15 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}/arm/joint_1" type="revolute">
-      <parent link="${prefix}/arm/link_0"/>
-      <child link="${prefix}/arm/link_1"/>
+    <joint name="${prefix}arm/joint_1" type="revolute">
+      <parent link="${prefix}arm/link_0"/>
+      <child link="${prefix}arm/link_1"/>
       <origin xyz="0 0 0.220" rpy="0 0 0"/>
       <axis xyz="0 0 1"/>
       <limit lower="${-170*M_PI/180}" upper="${170*M_PI/180}" effort="110" velocity="${100*M_PI/180}"/>
     </joint>
 
-    <link name="${prefix}/arm/link_1">
+    <link name="${prefix}arm/link_1">
       <visual>
 	<geometry>
           <mesh filename="package://torobo_resources/TRBA-R-002-7/meshes/link1.dae" scale="0.01 0.01 0.01"/>
@@ -65,15 +65,15 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}/arm/joint_2" type="revolute">
-      <parent link="${prefix}/arm/link_1"/>
-      <child link="${prefix}/arm/link_2"/>
+    <joint name="${prefix}arm/joint_2" type="revolute">
+      <parent link="${prefix}arm/link_1"/>
+      <child link="${prefix}arm/link_2"/>
       <origin xyz="0 0 0" rpy="${-90*M_PI/180} 0 0"/>
       <axis xyz="0 0 1"/>
       <limit lower="${-110*M_PI/180}" upper="${110*M_PI/180}" effort="110" velocity="${100*M_PI/180}"/>
     </joint>
 
-    <link name="${prefix}/arm/link_2">
+    <link name="${prefix}arm/link_2">
       <visual>
 	<geometry>
           <mesh filename="package://torobo_resources/TRBA-R-002-7/meshes/link2.dae" scale="0.01 0.01 0.01"/>
@@ -93,15 +93,15 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}/arm/joint_3" type="revolute">
-      <parent link="${prefix}/arm/link_2"/>
-      <child link="${prefix}/arm/link_3"/>
+    <joint name="${prefix}arm/joint_3" type="revolute">
+      <parent link="${prefix}arm/link_2"/>
+      <child link="${prefix}arm/link_3"/>
       <origin xyz="0 -0.3 0" rpy="${90*M_PI/180} 0 0"/>
       <axis xyz="0 0 1"/>
       <limit lower="${-165*M_PI/180}" upper="${165*M_PI/180}" effort="70" velocity="${120*M_PI/180}"/>
     </joint>
 
-    <link name="${prefix}/arm/link_3">
+    <link name="${prefix}arm/link_3">
       <visual>
 	<geometry>
           <mesh filename="package://torobo_resources/TRBA-R-002-7/meshes/link3.dae" scale="0.01 0.01 0.01"/>
@@ -121,15 +121,15 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}/arm/joint_4" type="revolute">
-      <parent link="${prefix}/arm/link_3"/>
-      <child link="${prefix}/arm/link_4"/>
+    <joint name="${prefix}arm/joint_4" type="revolute">
+      <parent link="${prefix}arm/link_3"/>
+      <child link="${prefix}arm/link_4"/>
       <origin xyz="0 0 0" rpy="${-90*M_PI/180} 0 0"/>
       <axis xyz="0 0 1"/>
       <limit lower="${-125*M_PI/180}" upper="${125*M_PI/180}" effort="70" velocity="${120*M_PI/180}"/>
     </joint>
 
-    <link name="${prefix}/arm/link_4">
+    <link name="${prefix}arm/link_4">
       <visual>
 	<geometry>
           <mesh filename="package://torobo_resources/TRBA-R-002-7/meshes/link4.dae" scale="0.01 0.01 0.01"/>
@@ -149,15 +149,15 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}/arm/joint_5" type="revolute">
-      <parent link="${prefix}/arm/link_4"/>
-      <child link="${prefix}/arm/link_5"/>
+    <joint name="${prefix}arm/joint_5" type="revolute">
+      <parent link="${prefix}arm/link_4"/>
+      <child link="${prefix}arm/link_5"/>
       <origin xyz="0 -0.3 0" rpy="${90*M_PI/180} 0 0"/>
       <axis xyz="0 0 1"/>
       <limit lower="${-165*M_PI/180}" upper="${165*M_PI/180}" effort="30" velocity="${160*M_PI/180}"/>
     </joint>
 
-    <link name="${prefix}/arm/link_5">
+    <link name="${prefix}arm/link_5">
       <visual>
 	<geometry>
           <mesh filename="package://torobo_resources/TRBA-R-002-7/meshes/link5.dae" scale="0.01 0.01 0.01"/>
@@ -177,15 +177,15 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}/arm/joint_6" type="revolute">
-      <parent link="${prefix}/arm/link_5"/>
-      <child link="${prefix}/arm/link_6"/>
+    <joint name="${prefix}arm/joint_6" type="revolute">
+      <parent link="${prefix}arm/link_5"/>
+      <child link="${prefix}arm/link_6"/>
       <origin xyz="0 0 0" rpy="${-90*M_PI/180} 0 0"/>
       <axis xyz="0 0 1"/>
       <limit lower="${-120*M_PI/180}" upper="${120*M_PI/180}" effort="30" velocity="${160*M_PI/180}"/>
     </joint>
 
-    <link name="${prefix}/arm/link_6">
+    <link name="${prefix}arm/link_6">
       <visual>
 	<geometry>
           <mesh filename="package://torobo_resources/TRBA-R-002-7/meshes/link6.dae" scale="0.01 0.01 0.01"/>
@@ -205,15 +205,15 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}/arm/joint_7" type="revolute">
-      <parent link="${prefix}/arm/link_6"/>
-      <child link="${prefix}/arm/link_7"/>
+    <joint name="${prefix}arm/joint_7" type="revolute">
+      <parent link="${prefix}arm/link_6"/>
+      <child link="${prefix}arm/link_7"/>
       <origin xyz="0 -0.170 0" rpy="${90*M_PI/180} 0 0"/>
       <axis xyz="0 0 1"/>
       <limit lower="${-170*M_PI/180}" upper="${170*M_PI/180}" effort="15" velocity="${240*M_PI/180}"/>
     </joint>
 
-    <link name="${prefix}/arm/link_7">
+    <link name="${prefix}arm/link_7">
       <visual>
 	<geometry>
           <mesh filename="package://torobo_resources/TRBA-R-002-7/meshes/link7.dae" scale="0.01 0.01 0.01"/>
@@ -234,52 +234,52 @@
     </link>
 
     <!-- =============== Transmission =============== -->
-    <simple_transmission name="${prefix}/arm/joint_1" reduction="1"/>
-    <simple_transmission name="${prefix}/arm/joint_2" reduction="1"/>
-    <simple_transmission name="${prefix}/arm/joint_3" reduction="1"/>
-    <simple_transmission name="${prefix}/arm/joint_4" reduction="1"/>
-    <simple_transmission name="${prefix}/arm/joint_5" reduction="1"/>
-    <simple_transmission name="${prefix}/arm/joint_6" reduction="1"/>
-    <simple_transmission name="${prefix}/arm/joint_7" reduction="1"/>
+    <simple_transmission name="${prefix}arm/joint_1" reduction="1"/>
+    <simple_transmission name="${prefix}arm/joint_2" reduction="1"/>
+    <simple_transmission name="${prefix}arm/joint_3" reduction="1"/>
+    <simple_transmission name="${prefix}arm/joint_4" reduction="1"/>
+    <simple_transmission name="${prefix}arm/joint_5" reduction="1"/>
+    <simple_transmission name="${prefix}arm/joint_6" reduction="1"/>
+    <simple_transmission name="${prefix}arm/joint_7" reduction="1"/>
 
     <!-- Link1 -->
-    <gazebo reference="${prefix}/arm/link_1">
+    <gazebo reference="${prefix}arm/link_1">
       <mu1>0.2</mu1>
       <mu2>0.2</mu2>
     </gazebo>
 
     <!-- Link2 -->
-    <gazebo reference="${prefix}/arm/link_2">
+    <gazebo reference="${prefix}arm/link_2">
       <mu1>0.2</mu1>
       <mu2>0.2</mu2>
     </gazebo>
 
     <!-- Link3 -->
-    <gazebo reference="${prefix}/arm/link_3">
+    <gazebo reference="${prefix}arm/link_3">
       <mu1>0.2</mu1>
       <mu2>0.2</mu2>
     </gazebo>
 
     <!-- Link4 -->
-    <gazebo reference="${prefix}/arm/link_4">
+    <gazebo reference="${prefix}arm/link_4">
       <mu1>0.2</mu1>
       <mu2>0.2</mu2>
     </gazebo>
 
     <!-- Link5 -->
-    <gazebo reference="${prefix}/arm/link_5">
+    <gazebo reference="${prefix}arm/link_5">
       <mu1>0.2</mu1>
       <mu2>0.2</mu2>
     </gazebo>
 
     <!-- Link6 -->
-    <gazebo reference="${prefix}/arm/link_6">
+    <gazebo reference="${prefix}arm/link_6">
       <mu1>0.2</mu1>
       <mu2>0.2</mu2>
     </gazebo>
 
     <!-- Link7 -->
-    <gazebo reference="${prefix}/arm/link_7">
+    <gazebo reference="${prefix}arm/link_7">
       <mu1>0.2</mu1>
       <mu2>0.2</mu2>
     </gazebo>
@@ -292,17 +292,17 @@
 
   <xacro:macro name="torobo_arm_gripper" params="prefix">
     <xacro:torobo_arm prefix="${prefix}"/>
-    <xacro:gripper_macro prefix="${prefix}/gripper/"
-			 attach_link="${prefix}/arm/link_7"
+    <xacro:gripper_macro prefix="${prefix}gripper/"
+			 attach_link="${prefix}arm/link_7"
 			 attach_xyz="0 0 0"
 			 attach_rpy="0 0 0" />
-    <xacro:gripper_gazebo_macro prefix="${prefix}/gripper/"
+    <xacro:gripper_gazebo_macro prefix="${prefix}gripper/"
 				use_graspfix="false"/>
 
-    <link  name="${prefix}/gripper/tip_link"/>
-    <joint name="${prefix}/gripper/tip_joint" type="fixed">
-      <parent link="${prefix}/gripper/grasping_frame"/>
-      <child  link="${prefix}/gripper/tip_link"/>
+    <link  name="${prefix}gripper/tip_link"/>
+    <joint name="${prefix}gripper/tip_joint" type="fixed">
+      <parent link="${prefix}gripper/grasping_frame"/>
+      <child  link="${prefix}gripper/tip_link"/>
       <origin xyz="0 0 0" rpy="0 ${-M_PI/2} 0"/>
     </joint>
   </xacro:macro>

@@ -29,22 +29,22 @@
 
     <!-- Load robot urdf to param "robot_description". -->
     <param name="robot_description"
-    	 command="$(find xacro)/xacro '$(find
-    		  aist_scene_description)/urdf/$(arg
-    		  scene).urdf.xacro' path:=$(find
-    		  torobo_description)/config/products/$(optenv
-    		  PRODUCT default).yaml"/>
+    	   command="$(find xacro)/xacro '$(find
+    		    aist_scene_description)/urdf/$(arg
+    		    scene).urdf.xacro' path:=$(find
+    		    torobo_description)/config/products/$(optenv
+    		    PRODUCT default).yaml"/>
 
     <!-- The semantic description SRDF -->
     <!-- In order to switch yaml, python code is in param's command. The launching sequence works synchronously with this param tag's command. -->
     <param name="robot_description_semantic"
-  	   command="$(find torobo_description)/scripts/load_srdf.py
-  		    --model_dir=$(find torobo_description)/config/models
-  		    --srdf=torobo.srdf
-  		    --robot_config=$(find
-  		    torobo_description)/config/products/$(optenv
-  		    PRODUCT default).yaml
-  		    --dump_file=/tmp/torobo_rosparam_home_position.yaml" />
+    	   command="$(find torobo_description)/scripts/load_srdf.py
+    		    --model_dir=$(find dtorobo_moveit_config)/config/models
+    		    --srdf=$(arg scene).srdf
+    		    --robot_config=$(find
+    		    torobo_description)/config/products/$(optenv
+    		    PRODUCT default).yaml
+    		    --dump_file=/tmp/torobo_rosparam_home_position.yaml" />
 
     <!-- load home_position from semantic description SRDF -->
     <rosparam command="load" file="/tmp/torobo_rosparam_home_position.yaml" />
@@ -60,13 +60,13 @@
 		    --dump_file=/tmp/torobo_rosparam_controller_config.yaml" />
     <rosparam command="load"
 	      file="/tmp/torobo_rosparam_controller_config.yaml" />
+
+    <!-- Run a python script to the send a service call to gazebo_ros
+	 to spawn a URDF robot -->
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
+	  respawn="false" output="screen"
+	  args="-urdf -model torobo -param robot_description"/>
+
   </group>
-
-  <!-- Run a python script to the send a service call to gazebo_ros
-       to spawn a URDF robot -->
-  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
-	respawn="false" output="screen"
-	args="-urdf -model torobo -param /torobo/robot_description"/>
-
 
 </launch>
