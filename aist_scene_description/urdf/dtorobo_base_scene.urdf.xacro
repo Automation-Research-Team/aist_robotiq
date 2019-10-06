@@ -2,16 +2,12 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro"
         name="dtorobo_base_scene" >
 
-
   <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
   <xacro:property name="a_torobo_x" value="0"/>
   <xacro:property name="a_torobo_y" value="-0.4875"/>
-  <!-- <xacro:property name="a_torobo_theta" value="${pi}"/> -->
   <xacro:property name="b_torobo_x" value="0"/>
   <xacro:property name="b_torobo_y" value="0.4875"/>
-  <xacro:property name="b_torobo_theta" value="${pi}"/>
-
-  <xacro:property name="bots_z" value="0.785"/>
+  <xacro:property name="bots_z"	    value="0.785"/>
 
   <!-- common stuff -->
   <xacro:include filename="$(find aist_gazebo)/urdf/aist_base_scene.gazebo"/>
@@ -27,30 +23,29 @@
   <xacro:o2as_box boxname="workbox"
 		  box_w="${table_w}" box_l="${table_l}" box_h="${table_h}"
 		  parent="o2as_ground">
-    <origin xyz="${-table_w/2} ${-table_l/2} ${bots_z - table_h}" rpy="0 0 0"/>
+    <origin xyz="${-table_w/2} ${-table_l/2} ${bots_z -table_h}" rpy="0 0 0"/>
   </xacro:o2as_box>
   <link name="workspace_center"/>
   <joint name="world_to_workspace" type="fixed">
     <parent link="o2as_ground"/>
-    <child link="workspace_center"/>
+    <child  link="workspace_center"/>
     <origin xyz="0 0 ${bots_z}" rpy="0 0 0"/>
   </joint>
 
   <!-- robot arms -->
   <xacro:include filename="$(find aist_scene_description)/urdf/torobo_arm.urdf.xacro"/>
-  <xacro:torobo_arm_gripper prefix="a_torobo"/>
+  <xacro:torobo_arm_gripper prefix="a_torobo_"/>
   <joint name="world_a_torobo_joint" type="fixed">
     <parent link="o2as_ground"/>
-    <child  link= "a_torobo/base"/>
-    <origin xyz="${a_torobo_x} ${a_torobo_y} ${bots_z}" rpy="0 0 0"/>
+    <child  link= "a_torobo_base"/>
+    <origin xyz="${a_torobo_x} ${a_torobo_y} ${bots_z}" rpy="0 0 ${pi/2}"/>
   </joint>
 
-  <xacro:torobo_arm_gripper prefix="b_torobo"/>
+  <xacro:torobo_arm_gripper prefix="b_torobo_"/>
   <joint name="world_b_torobo_joint" type="fixed">
     <parent link="o2as_ground"/>
-    <child  link= "b_torobo/base"/>
-    <origin xyz="${b_torobo_x} ${b_torobo_y} ${bots_z}"
-	    rpy="0 0 ${b_torobo_theta}"/>
+    <child  link= "b_torobo_base"/>
+    <origin xyz="${b_torobo_x} ${b_torobo_y} ${bots_z}" rpy="0 0 ${-pi/2}"/>
   </joint>
 
   <!-- Add PhoXi 3D scanner -->

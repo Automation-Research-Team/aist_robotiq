@@ -1,0 +1,32 @@
+<launch>
+
+  <!-- load rosparam -->
+  <rosparam param="robot_config"
+	    command="load"
+	    file="$(find torobo_description)/config/products/$(optenv
+		  PRODUCT default).yaml"/>
+
+  <!-- load robot description URDF -->
+  <param name="robot_description"
+	 command="$(find xacro)/xacro --inorder
+		  '$(find aist_scene_description)/urdf/dtorobo_base_scene.urdf.xacro'" />
+
+  <!-- The semantic description SRDF -->
+  <!-- In order to switch yaml, python code is in param's command. The launching sequence works synchronously with this param tag's command. -->
+  <param name="robot_description_semantic"
+    	 command="$(find torobo_description)/scripts/load_srdf.py
+    		  --model_dir=$(find dtorobo_moveit_config)/config/models
+    		  --srdf=dtorobo_base_scene.srdf
+    		  --robot_config=$(find
+    		  torobo_description)/config/products/$(optenv
+    		  PRODUCT default).yaml
+    		  --dump_file=/tmp/torobo_rosparam_home_position.yaml" />
+
+  <!-- load home_position from semantic description SRDF -->
+  <rosparam command="load" file="/tmp/torobo_rosparam_home_position.yaml" />
+
+  <!-- load controller_config -->
+  <rosparam file="$(find dtorobo_moveit_config)/config/controllers.yaml"/>
+  <!-- <rosparam file="/home/ueshiba/work/torobo_rosparam_controller_config.yaml"/> -->
+
+</launch>

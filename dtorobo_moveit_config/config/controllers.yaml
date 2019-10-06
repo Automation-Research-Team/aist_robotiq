@@ -1,0 +1,67 @@
+controller_list:
+  - joint_state_controller
+  - a_torobo_arm_controller
+  - b_torobo_arm_controller
+  - a_torobo_gripper_controller
+  - b_torobo_gripper_controller
+a_torobo_arm_controller:
+  action_default: true
+  action_ns: follow_joint_trajectory
+  action_type: FollowJointTrajectory
+  allow_partial_joints_goal: true
+  joints:
+    - a_torobo_arm/joint_1
+    - a_torobo_arm/joint_2
+    - a_torobo_arm/joint_3
+    - a_torobo_arm/joint_4
+    - a_torobo_arm/joint_5
+    - a_torobo_arm/joint_6
+    - a_torobo_arm/joint_7
+  type: position_controllers/JointTrajectoryController
+b_torobo_arm_controller:
+  action_default: true
+  action_ns: follow_joint_trajectory
+  action_type: FollowJointTrajectory
+  allow_partial_joints_goal: true
+  joints:
+    - b_torobo_arm/joint_1
+    - b_torobo_arm/joint_2
+    - b_torobo_arm/joint_3
+    - b_torobo_arm/joint_4
+    - b_torobo_arm/joint_5
+    - b_torobo_arm/joint_6
+    - b_torobo_arm/joint_7
+  type: position_controllers/JointTrajectoryController
+a_torobo_gripper_controller:
+  action_default: true
+  action_ns: gripper_cmd
+  action_type: GripperCommand
+  gains:
+    a_torobo_gripper/finger_joint:
+      d: 1
+      i: 5
+      i_clamp: 1
+      p: 200
+  goal_tolerance: 0.01
+  joint: a_torobo_gripper/finger_joint
+  stall_timeout: 0.2
+  stalled_velocity_threshold: 0.01
+  type: position_controllers/ToroboGripperActionController
+b_torobo_gripper_controller:
+  action_default: true
+  action_ns: gripper_cmd
+  action_type: GripperCommand
+  gains:
+    b_torobo_gripper/finger_joint:
+      d: 1
+      i: 5
+      i_clamp: 1
+      p: 200
+  goal_tolerance: 0.01
+  joint: b_torobo_gripper/finger_joint
+  stall_timeout: 0.2
+  stalled_velocity_threshold: 0.01
+  type: position_controllers/ToroboGripperActionController
+joint_state_controller:
+  publish_rate: 500
+  type: joint_state_controller/JointStateController

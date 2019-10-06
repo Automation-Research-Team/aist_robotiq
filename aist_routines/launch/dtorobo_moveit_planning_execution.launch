@@ -3,10 +3,31 @@
   <arg name="rviz_config"	default=""/>
   <arg name="debug"		default="false"/>
 
-  <include file="$(find aist_routines)/launch/moveit_planning_execution.launch">
-    <arg name="moveit_config"	value="$(find dtorobo_moveit_config)"/>
-    <arg name="sim"		value="$(arg sim)"/>
-    <arg name="rviz_config"	value="$(arg rviz_config)"/>
-    <arg name="debug"		value="$(arg debug)"/>
-  </include>
+  <!-- Remap follow_joint_trajectory -->
+  <remap if  ="$(arg sim)"
+	 from="/follow_joint_trajectory"
+	 to  ="/arm_controller/follow_joint_trajectory"/>
+
+  <!-- Launch moveit -->
+  <group ns="torobo">
+    <include file="$(find dtorobo_moveit_config)/launch/dtorobo_base_scene_moveit_config.launch">
+      <arg name="sim_in_moveit" value="false"/>
+      <arg name="debug"	value="$(arg debug)"/>
+    </include>
+  </group>
+
+  <!-- Launch rviz with appropriate launch-prefix and config file. -->
+  <arg unless="$(arg debug)" name="launch_prefix" value="" />
+  <arg     if="$(arg debug)" name="launch_prefix" value="gdb --ex run --args" />
+  <arg if="$(eval arg('rviz_config') == '')"
+       name="command_args" value="-d $(find dtorobo_moveit_config)/launch/moveit.rviz"/>
+  <arg unless="$(eval arg('rviz_config') == '')"
+       name="command_args" value="-d $(arg rviz_config)"/>
+
+  <node name="$(anon rviz)" launch-prefix="$(arg launch_prefix)"
+	pkg="rviz" type="rviz" respawn="false"
+	args="$(arg command_args)" output="screen">
+    <rosparam command="load"
+	      file="$(find dtorobo_moveit_config)/config/kinematics.yaml"/>
+  </node>
 </launch>

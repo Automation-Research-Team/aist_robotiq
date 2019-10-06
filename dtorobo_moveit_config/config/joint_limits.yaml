@@ -2,63 +2,73 @@
 # Specific joint properties can be changed with the keys [max_position, min_position, max_velocity, max_acceleration]
 # Joint limits can be turned off with [has_velocity_limits, has_acceleration_limits]
 joint_limits:
-  a_torobo/arm/joint_1:
+  a_torobo_arm/joint_1:
     has_velocity_limits: true
     max_velocity: 1.74532925199
     has_acceleration_limits: false
     max_acceleration: 0
-  a_torobo/arm/joint_2:
+  a_torobo_arm/joint_2:
     has_velocity_limits: true
     max_velocity: 1.74532925199
     has_acceleration_limits: false
     max_acceleration: 0
-  a_torobo/arm/joint_3:
+  a_torobo_arm/joint_3:
     has_velocity_limits: true
     max_velocity: 2.09439510239
     has_acceleration_limits: false
     max_acceleration: 0
-  a_torobo/arm/joint_4:
+  a_torobo_arm/joint_4:
     has_velocity_limits: true
     max_velocity: 2.09439510239
     has_acceleration_limits: false
     max_acceleration: 0
-  a_torobo/arm/joint_5:
+  a_torobo_arm/joint_5:
     has_velocity_limits: true
     max_velocity: 2.79252680319
     has_acceleration_limits: false
     max_acceleration: 0
-  a_torobo/arm/joint_6:
+  a_torobo_arm/joint_6:
     has_velocity_limits: true
     max_velocity: 2.79252680319
     has_acceleration_limits: false
     max_acceleration: 0
-  b_torobo/arm/joint_1:
+  a_torobo_arm/joint_7:
+    has_velocity_limits: true
+    max_velocity: 4.18879020479
+    has_acceleration_limits: false
+    max_acceleration: 0
+  b_torobo_arm/joint_1:
     has_velocity_limits: true
     max_velocity: 1.74532925199
     has_acceleration_limits: false
     max_acceleration: 0
-  b_torobo/arm/joint_2:
+  b_torobo_arm/joint_2:
     has_velocity_limits: true
     max_velocity: 1.74532925199
     has_acceleration_limits: false
     max_acceleration: 0
-  b_torobo/arm/joint_3:
+  b_torobo_arm/joint_3:
     has_velocity_limits: true
     max_velocity: 2.09439510239
     has_acceleration_limits: false
     max_acceleration: 0
-  b_torobo/arm/joint_4:
+  b_torobo_arm/joint_4:
     has_velocity_limits: true
     max_velocity: 2.09439510239
     has_acceleration_limits: false
     max_acceleration: 0
-  b_torobo/arm/joint_5:
+  b_torobo_arm/joint_5:
     has_velocity_limits: true
     max_velocity: 2.79252680319
     has_acceleration_limits: false
     max_acceleration: 0
-  b_torobo/arm/joint_6:
+  b_torobo_arm/joint_6:
     has_velocity_limits: true
     max_velocity: 2.79252680319
+    has_acceleration_limits: false
+    max_acceleration: 0
+  b_torobo_arm/joint_7:
+    has_velocity_limits: true
+    max_velocity: 4.18879020479
     has_acceleration_limits: false
     max_acceleration: 0

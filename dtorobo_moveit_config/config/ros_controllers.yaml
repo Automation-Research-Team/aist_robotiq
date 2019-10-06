@@ -1,4 +1,4 @@
-storobo_base_scene:
+dtorobo_base_scene:
 # MoveIt-specific simulation settings
   moveit_sim_hw_interface:
     joint_model_group: controllers_initial_group_
@@ -10,22 +10,22 @@ storobo_base_scene:
 # Settings for ros_control hardware interface
   hardware_interface:
     joints:
-      - a_torobo/arm/joint_1
-      - a_torobo/arm/joint_2
-      - a_torobo/arm/joint_3
-      - a_torobo/arm/joint_4
-      - a_torobo/arm/joint_5
-      - a_torobo/arm/joint_6
-      - a_torobo/arm/joint_7
-      - a_torobo/gripper/finger_joint
-      - b_torobo/arm/joint_1
-      - b_torobo/arm/joint_2
-      - b_torobo/arm/joint_3
-      - b_torobo/arm/joint_4
-      - b_torobo/arm/joint_5
-      - b_torobo/arm/joint_6
-      - b_torobo/arm/joint_7
-      - b_torobo/gripper/finger_joint
+      - a_torobo_arm/joint_1
+      - a_torobo_arm/joint_2
+      - a_torobo_arm/joint_3
+      - a_torobo_arm/joint_4
+      - a_torobo_arm/joint_5
+      - a_torobo_arm/joint_6
+      - a_torobo_arm/joint_7
+      - a_torobo_gripper/finger_joint
+      - b_torobo_arm/joint_1
+      - b_torobo_arm/joint_2
+      - b_torobo_arm/joint_3
+      - b_torobo_arm/joint_4
+      - b_torobo_arm/joint_5
+      - b_torobo_arm/joint_6
+      - b_torobo_arm/joint_7
+      - b_torobo_gripper/finger_joint
     sim_control_mode: 1  # 0: position, 1: velocity
 # Publish all joint states
 # Creates the /joint_states topic necessary in ROS
@@ -33,4 +33,56 @@ storobo_base_scene:
     type: joint_state_controller/JointStateController
     publish_rate: 50
   controller_list:
-    []
+    - name: a_torobo_arm_controller
+      action_ns: follow_joint_trajectory
+      default: True
+      type: FollowJointTrajectory
+      joints:
+        - a_torobo_arm/joint_1
+        - a_torobo_arm/joint_2
+        - a_torobo_arm/joint_3
+        - a_torobo_arm/joint_4
+        - a_torobo_arm/joint_5
+        - a_torobo_arm/joint_6
+        - a_torobo_arm/joint_7
+    - name: b_torobo_arm_controller
+      action_ns: follow_joint_trajectory
+      default: True
+      type: FollowJointTrajectory
+      joints:
+        - b_torobo_arm/joint_1
+        - b_torobo_arm/joint_2
+        - b_torobo_arm/joint_3
+        - b_torobo_arm/joint_4
+        - b_torobo_arm/joint_5
+        - b_torobo_arm/joint_6
+        - b_torobo_arm/joint_7
+    - name: all_torobos_arm_controller
+      action_ns: follow_joint_trajectory
+      default: True
+      type: FollowJointTrajectory
+      joints:
+        - a_torobo_arm/joint_1
+        - a_torobo_arm/joint_2
+        - a_torobo_arm/joint_3
+        - a_torobo_arm/joint_4
+        - a_torobo_arm/joint_5
+        - a_torobo_arm/joint_6
+        - a_torobo_arm/joint_7
+        - b_torobo_arm/joint_1
+        - b_torobo_arm/joint_2
+        - b_torobo_arm/joint_3
+        - b_torobo_arm/joint_4
+        - b_torobo_arm/joint_5
+        - b_torobo_arm/joint_6
+        - b_torobo_arm/joint_7
+    - name: a_torobo_gripper_controller
+      action_ns: gripper_cmd
+      default: True
+      type: GripperCommand
+      joint: a_torobo_gripper/finger_joint
+    - name: b_torobo_gripper_controller
+      action_ns: gripper_cmd
+      default: True
+      type: GripperCommand
+      joint: b_torobo_gripper/finger_joint
