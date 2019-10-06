@@ -30,7 +30,7 @@ class CeatecDemoRoutines(FetchRoutines):
         d = rosparam.load_file(rospack.get_path("aist_routines") +
                                "/config/ceatec_demo.yaml")[0][0]
         self._bins = d["bins"]
-        part_props = base.paramtuples(d["part_props"])
+        item_props = base.paramtuples(d["item_props"])
 
         # Assign part information to each bin.
         self._items = {}
@@ -38,7 +38,7 @@ class CeatecDemoRoutines(FetchRoutines):
             part_id = int(re.search("[0-9]+$", bin).group())
             self._items[bin] \
                 = CeatecDemoRoutines.BinProps(bin_id, part_id,
-                                           part_props[part_id])
+                                              item_props[part_id])
 
         self._fail_poses = []
         #self.go_to_named_pose("home", "all_bots")
@@ -47,8 +47,8 @@ class CeatecDemoRoutines(FetchRoutines):
     def nbins(self):
         return len(self._bins)
 
-    def item(self, bin):
-        return self._items[bin]
+    def item(self, item_name):
+        return self._items[item_name]
 
     ###----- main procedure
     def run(self):
@@ -145,7 +145,7 @@ class CeatecDemoRoutines(FetchRoutines):
 
 
 if __name__ == '__main__':
-    with CeatecDemoRoutines() as kitting:
+    with CeatecDemoRoutines() as demo:
         while not rospy.is_shutdown():
             print("============ CeatecDemo procedures ============ ")
             print("  b: Create a backgroud image")
@@ -153,7 +153,7 @@ if __name__ == '__main__':
             print("  s: Search graspabilities")
             print("  a: Attempt to pick and place")
             print("  A: Repeat attempts to pick and place")
-            print("  k: Do kitting task")
+            print("  k: Do demo task")
             print("  H: Move all robots to home")
             print("  B: Move all robots to back")
             print("  q: Quit")
@@ -161,45 +161,44 @@ if __name__ == '__main__':
             try:
                 key = raw_input(">> ")
                 if key == 'q':
-                    if kitting.former_robot_name != None:
-                        kitting.go_to_named_pose("home",
-                                                 kitting.former_robot_name)
+                    if demo.former_robot_name != None:
+                        demo.go_to_named_pose("home",
+                                                 demo.former_robot_name)
                     break
                 elif key == 'H':
-                    kitting.go_to_named_pose("home", "all_bots")
+                    demo.go_to_named_pose("ready", "arm")
                 elif key == 'B':
-                    kitting.go_to_named_pose("back", "all_bots")
+                    demo.go_to_named_pose("tucking", "arm")
                 elif key == 'b':
-                    kitting.create_background_image("a_phoxi_m_camera")
+                    demo.create_background_image("head_camera")
                 elif key == 'm':
-                    kitting.create_mask_image("a_phoxi_m_camera",
-                                              kitting.nbins)
+                    demo.create_mask_image("head_camera", demo.nbins)
                 elif key == 's':
-                    item  = kitting.item(raw_input("  bin name? "))
-                    props = item.part_props
-                    # kitting.search_graspability(props.robot_name,
+                    item  = demo.item(raw_input("  item name? "))
+                    props = item.item_props
+                    # demo.search_graspability(props.robot_name,
                     #                             props.camera_name,
                     #                             item.part_id, item.bin_id,
                     #                             props.use_normals,
                     #                             marker_lifetime=0)
-                    kitting.graspability_send_goal(props.robot_name,
-                                                   props.camera_name,
-                                                   item.part_id, item.bin_id,
-                                                   props.use_normals)
-                    kitting.graspability_wait_for_result(props.camera_name,
-                                                         marker_lifetime=0)
+                    demo.graspability_send_goal(props.robot_name,
+                                                props.camera_name,
+                                                item.part_id, item.bin_id,
+                                                props.use_normals)
+                    demo.graspability_wait_for_result(props.camera_name,
+                                                      marker_lifetime=0)
                 elif key == 'a':
                     bin = raw_input("  bin name? ")
-                    kitting.clear_fail_poses()
-                    kitting.attempt_bin(bin, 5, 0)
-                    kitting.go_to_named_pose("home", kitting.former_robot_name)
+                    demo.clear_fail_poses()
+                    demo.attempt_bin(bin, 5, 0)
+                    demo.go_to_named_pose("home", demo.former_robot_name)
                 elif key == 'A':
                     bin = raw_input("  bin name? ")
-                    kitting.clear_fail_poses()
-                    while kitting.attempt_bin(bin, 5, 0):
+                    demo.clear_fail_poses()
+                    while demo.attempt_bin(bin, 5, 0):
                         pass
-                    kitting.go_to_named_pose("home", kitting.former_robot_name)
+                    demo.go_to_named_pose("home", demo.former_robot_name)
                 elif key == 'k':
-                    kitting.run()
+                    demo.run()
             except Exception as e:
                 print(e.message)

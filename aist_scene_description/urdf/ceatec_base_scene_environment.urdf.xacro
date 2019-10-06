@@ -124,37 +124,37 @@
   <joint name="a_item_in_cabinet_joint" type="fixed">
     <parent link="a_cabinet_shelf1_origin" />
     <child  link="a_item_in_cabinet" />
-    <origin xyz="${cabinet_width/12} 0.1 0.08" rpy="${pi/2} ${pi/2} 0" />
+    <origin xyz="${cabinet_width/12} 0.1 0.08" rpy="${pi/2} ${-pi/2} 0"/>
   </joint>
   <link name="b_item_in_cabinet"/>
   <joint name="b_item_in_cabinet_joint" type="fixed">
     <parent link="a_item_in_cabinet" />
     <child  link="b_item_in_cabinet" />
-    <origin xyz="0 ${cabinet_width/6} 0" rpy="0 0 0" />
+    <origin xyz="0 ${-cabinet_width/6} 0" rpy="0 0 0" />
   </joint>
   <link name="c_item_in_cabinet"/>
   <joint name="c_item_in_cabinet_joint" type="fixed">
     <parent link="b_item_in_cabinet" />
     <child  link="c_item_in_cabinet" />
-    <origin xyz="0 ${cabinet_width/6} 0" rpy="0 0 0" />
+    <origin xyz="0 ${-cabinet_width/6} 0" rpy="0 0 0" />
   </joint>
   <link name="d_item_in_cabinet"/>
   <joint name="d_item_in_cabinet_joint" type="fixed">
     <parent link="c_item_in_cabinet" />
     <child  link="d_item_in_cabinet" />
-    <origin xyz="0 ${cabinet_width/6} 0" rpy="0 0 0" />
+    <origin xyz="0 ${-cabinet_width/6} 0" rpy="0 0 0" />
   </joint>
   <link name="e_item_in_cabinet"/>
   <joint name="e_item_in_cabinet_joint" type="fixed">
     <parent link="d_item_in_cabinet" />
     <child  link="e_item_in_cabinet" />
-    <origin xyz="0 ${cabinet_width/6} 0" rpy="0 0 0" />
+    <origin xyz="0 ${-cabinet_width/6} 0" rpy="0 0 0" />
   </joint>
   <link name="f_item_in_cabinet"/>
   <joint name="f_item_in_cabinet_joint" type="fixed">
     <parent link="e_item_in_cabinet" />
     <child  link="f_item_in_cabinet" />
-    <origin xyz="0 ${cabinet_width/6} 0" rpy="0 0 0" />
+    <origin xyz="0 ${-cabinet_width/6} 0" rpy="0 0 0" />
   </joint>
 
   <!-- AR markers -->
@@ -186,7 +186,7 @@
 	      parent="b_tray_on_b_table">
     <origin xyz="${-tray_width/2} 0 0" rpy="0 0 0"/>
   </xacro:tray>
-  
+
   <!-- I would like to remove the "world" link definition, but
        apparently it is necessary for Gazebo -->
   <link name="world"/>

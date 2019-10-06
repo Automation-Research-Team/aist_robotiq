@@ -65,21 +65,21 @@
       <origin xyz="${width/2}
 		   ${length/2}
 		   ${tray_thickness + item_radius}"
-    	      rpy="0 0 ${-pi/2}"/>
+    	      rpy="0 0 ${pi/2}"/>
     </joint>
 
     <link name="a_item_on_${prefix}tray"/>
     <joint name="a_item_on_${prefix}tray_joint" type="fixed">
       <parent link ="b_item_on_${prefix}tray"/>
       <child  link="a_item_on_${prefix}tray"/>
-      <origin xyz="0 ${-width/3 + tray_thickness/2} 0" rpy="0 0 0"/>
+      <origin xyz="0 ${width/3 + tray_thickness/2} 0" rpy="0 0 0"/>
     </joint>
 
     <link name="c_item_on_${prefix}tray"/>
     <joint name="c_item_on_${prefix}tray_joint" type="fixed">
       <parent link ="b_item_on_${prefix}tray"/>
       <child  link="c_item_on_${prefix}tray"/>
-      <origin xyz="0 ${width/3 - tray_thickness/2} 0" rpy="0 0 0"/>
+      <origin xyz="0 ${-width/3 - tray_thickness/2} 0" rpy="0 0 0"/>
     </joint>
 
     <link name="d_item_on_${prefix}tray"/>
