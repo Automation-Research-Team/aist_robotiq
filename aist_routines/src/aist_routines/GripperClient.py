@@ -199,10 +199,8 @@ class FetchGripper(GripperClient):
     def move(self, position):
         try:
             self._goal.command.position = clip(position, 0.0, 0.1)
-            self._client.send_goal(self._goal)
-            self._client.wait_for_result(rospy.Duration(5.0))
-            result = self._client.get_result()
-            return result.reached_goal
+            return self._client.send_goal_and_wait(self._goal,
+                                                   rospy.Duration(5.0)) == actionlib.GoalStatus.SUCCEEDED
         except rospy.ROSInterruptException:
             rospy.logerr('Gripper: program interrupted before completion.')
 
