@@ -30,7 +30,7 @@ class KittingRoutines(URRoutines):
         d = rosparam.load_file(rospack.get_path("aist_routines") +
                                "/config/kitting.yaml")[0][0]
         self._bins = d["bins"]
-        part_props = base.paramtuples(d["part_props"])
+        part_props = KittingRoutines.paramtuples(d["part_props"])
 
         # Assign part information to each bin.
         self._items = {}

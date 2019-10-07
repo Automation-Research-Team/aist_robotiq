@@ -308,7 +308,7 @@ class AISTBaseRoutines(object):
             place_offset, approach_offset, liftup_after,
             speed_fast, speed_slow, acc_fast, acc_slow)
 
-    def pick_at_frame(self, robot_name, target_frame, offset=(0, 0, 0),
+    def pick_at_frame(self, robot_name, target_frame, offset=(0.0, 0.0, 0.0),
                       grasp_offset=(0.0, 0.0, 0.0), gripper_command="",
                       speed_fast=1.0, speed_slow=0.04,
                       approach_offset=(0.0, 0.0, 0.05),
@@ -322,8 +322,8 @@ class AISTBaseRoutines(object):
                          speed_fast, speed_slow, approach_offset,
                          liftup_after, acc_fast, acc_slow)
 
-    def place_at_frame(self, robot_name, target_frame, offset=(0, 0, 0),
-                       place_offset=(0.0, 0,0, 0.0), gripper_command="",
+    def place_at_frame(self, robot_name, target_frame, offset=(0.0, 0.0, 0.0),
+                       place_offset=(0.0, 0.0, 0.0), gripper_command="",
                        speed_fast=1.0, speed_slow=0.04,
                        approach_offset=(0.0, 0.0, 0.05),
                        liftup_after=True, acc_fast=1.0, acc_slow=0.5):
