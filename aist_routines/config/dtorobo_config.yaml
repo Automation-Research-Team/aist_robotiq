@@ -1,6 +1,7 @@
 groups:
   - a_torobo
   - b_torobo
+  - all_torobos
 
 cameras:
   b_phoxi_m_camera:

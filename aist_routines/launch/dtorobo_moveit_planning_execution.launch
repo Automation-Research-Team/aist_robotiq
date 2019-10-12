@@ -3,28 +3,28 @@
   <arg name="debug"		default="false"/>
   <arg name="rqt"		default="true"/>
 
-  <!-- Launch moveit -->
-  <group ns="torobo">
-    <!-- load controller_config -->
-    <rosparam file="$(find
-		    dtorobo_moveit_config)/config/controller_config.yaml"/>
-    <include file="$(find dtorobo_moveit_config)/launch/dtorobo_base_scene_moveit_config.launch">
-      <arg name="sim_in_moveit" value="false"/>
-      <arg name="debug"		value="$(arg debug)"/>
-    </include>
+  <!-- launch rqt gui -->
+  <group if="$(arg rqt)">
+    <include file="$(find torobo_gui)/launch/torobo_joint_controller.launch"/>
   </group>
 
-  <!-- launch rqt gui -->
-  <!-- <group if="$(arg rqt)"> -->
-  <!--   <include unless="$(arg sim)" -->
-  <!--            file="$(find torobo_gui)/launch/torobo_state_viewer.launch"/> -->
-  <!--   <include file="$(find torobo_gui)/launch/torobo_joint_controller.launch"/> -->
-  <!-- </group> -->
-
-  <!-- launch rviz gui -->
+  <!-- Launch moveit -->
   <group ns="torobo">
-    <include file="$(find dtorobo_moveit_config)/launch/moveit_rviz.launch">
-      <arg name="config" value="true" />
+    <!-- Given the published joint states, publish tf for the robot links -->
+    <node name="robot_state_publisher"
+	  pkg="robot_state_publisher" type="robot_state_publisher"
+	  respawn="true" output="screen">
+      <remap from="joint_states" to="joint_state_server/joint_states"/>
+    </node>
+
+    <!-- load controller_config -->
+    <rosparam file="$(find
+    		    dtorobo_moveit_config)/config/controller_config.yaml"/>
+
+    <include file="$(find aist_routines)/launch/moveit_planning_execution.launch">
+      <arg name="moveit_config"	value="$(find dtorobo_moveit_config)"/>
+      <arg name="rviz_config"	value="$(arg rviz_config)"/>
+      <arg name="debug"		value="$(arg debug)"/>
     </include>
   </group>
 
