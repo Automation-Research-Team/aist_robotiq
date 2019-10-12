@@ -1,47 +1,47 @@
 <?xml version="1.0"?>
 <launch>
 
-  <arg name="paused"		default="true"/>
-  <arg name="gui"		default="true"/>
+  <!-- these are the arguments you can pass this launch file, for example paused:=true -->
+  <arg name="scene"		default="dtorobo_base_scene"/>
+  <arg name="paused"		default="false"/>
   <arg name="use_sim_time"	default="true"/>
+  <arg name="gui"		default="true"/>
   <arg name="headless"		default="false"/>
   <arg name="debug"		default="false"/>
-  <arg name="scene"		default="dtorobo_base_scene"/>
-  <!-- Gazebo needs to start up paused in order for us to be able to set the initial joint configurations.
-       This is a known bug as of July 2018. -->
 
-  <!-- startup simulated world -->
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name"	value="$(find torobo_gazebo)/worlds/ground_plane.world"/>
     <arg name="paused"		value="$(arg paused)"/>
-    <arg name="gui"		value="$(arg gui)"/>
     <arg name="use_sim_time"	value="$(arg use_sim_time)"/>
+    <arg name="gui"		value="$(arg gui)" />
     <arg name="headless"	value="$(arg headless)"/>
     <arg name="debug"		value="$(arg debug)" />
-    <arg name="verbose"		value="false"/>
   </include>
 
   <group ns="torobo">
     <!-- load robot description URDF -->
     <param name="robot_description"
-	   command="$(find xacro)/xacro --inorder
-		    '$(find aist_scene_description)/urdf/$(arg
-		    scene).urdf.xacro'"/>
+  	   command="$(find xacro)/xacro --inorder
+  		    '$(find aist_scene_description)/urdf/$(arg
+  		    scene).urdf.xacro'"/>
+  </group>
 
-    <!-- Run a python script to the send a service call to gazebo_ros
-	 to spawn a URDF robot -->
-    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
-	  respawn="false" output="screen"
-	  args="-urdf -model dtorobo -param robot_description"/>
+  <!-- Run a python script to the send a service call to gazebo_ros
+       to spawn a URDF robot -->
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
+	respawn="false" output="screen"
+	args="-urdf -model dtorobo -param torobo/robot_description"/>
 
+  <group ns="torobo">
     <!-- launch nodelet manager -->
     <node name="torobo_nodelet_manager" pkg="nodelet" type="nodelet"
       	  args="manager" output="screen"/>
-
-    <!-- launch torobo control -->
-    <include file="$(find torobo_control)/launch/torobo_control.launch">
-      <arg name="sim" value="true"/>
-    </include>
   </group>
+
+  <!-- launch torobo control -->
+  <include file="$(find torobo_control)/launch/torobo_control.launch">
+    <arg name="sim" value="true"/>
+  </include>
 
 </launch>
