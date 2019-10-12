@@ -22,9 +22,9 @@
   </include>
 
   <!-- launch torobo dynamics -->
-  <include file="$(find torobo_dynamics)/launch/torobo_dynamics.launch">
-    <arg name="sim" value="$(arg sim)"/>
-  </include>
+  <!-- <include file="$(find torobo_dynamics)/launch/torobo_dynamics.launch"> -->
+  <!--   <arg name="sim" value="$(arg sim)"/> -->
+  <!-- </include> -->
 
   <!-- launch torobo control -->
   <include file="$(find torobo_control)/launch/torobo_control.launch">

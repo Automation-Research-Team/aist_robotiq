@@ -7,10 +7,9 @@
   <arg name="headless"		default="false"/>
   <arg name="debug"		default="false"/>
 
-
   <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find torobo_gazebo)/worlds/ground_plane.world"/>
+    <arg name="world_name"	value="$(find torobo_gazebo)/worlds/ground_plane.world"/>
     <arg name="debug"		value="$(arg debug)" />
     <arg name="gui"		value="$(arg gui)" />
     <arg name="paused"		value="$(arg paused)"/>
@@ -18,15 +17,9 @@
     <arg name="headless"	value="$(arg headless)"/>
   </include>
 
-
-  <!-- Load the URDF into the ROS Parameter Server -->
-  <include file="$(find aist_routines)/launch/load_robot_config.launch"
-	   ns="torobo"/>
-
   <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
 	respawn="false" output="screen"
-	args="-urdf -model torobo -param /torobo/robot_description"/>
-
+	args="-urdf -model dtorobo -param /torobo/robot_description"/>
 
 </launch>

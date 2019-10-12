@@ -221,8 +221,6 @@ if __name__ == '__main__':
                         metavar=None)
     args = parser.parse_args()
 
-    assert (args.robot_name in {'a_bot', 'b_bot', 'c_bot', 'd_bot'})
-
     speed = 0.1
     with InteractiveRoutines(args.robot_name,
                              args.camera_name, speed) as routines:
