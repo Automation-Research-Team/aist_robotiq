@@ -4,6 +4,11 @@
   <!-- =============== Constants =============== -->
   <xacro:property name="M_PI" value="3.1415926535897931"/>
 
+  <!-- =============== Load Dependencies =============== -->
+  <xacro:include filename="$(find torobo_description)/urdf/torobo.gazebo"/>
+  <xacro:include filename="$(find
+			   torobo_description)/urdf/torobo.transmission.xacro"/>
+	
   <xacro:macro name="torobo_arm" params="prefix">
     <xacro:property name="COL_K" value="1.2"/>
 

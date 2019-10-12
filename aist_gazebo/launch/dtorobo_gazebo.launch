@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <launch>
+
   <arg name="paused"		default="true"/>
   <arg name="gui"		default="true"/>
   <arg name="use_sim_time"	default="true"/>
@@ -21,52 +22,26 @@
   </include>
 
   <group ns="torobo">
-    <!-- load rosparam -->
-    <rosparam param="robot_config"
-	      command="load"
-	      file="$(find torobo_description)/config/products/$(optenv
-		    PRODUCT default).yaml"/>
-
-    <!-- Load robot urdf to param "robot_description". -->
+    <!-- load robot description URDF -->
     <param name="robot_description"
-    	   command="$(find xacro)/xacro '$(find
-    		    aist_scene_description)/urdf/$(arg
-    		    scene).urdf.xacro' path:=$(find
-    		    torobo_description)/config/products/$(optenv
-    		    PRODUCT default).yaml"/>
-
-    <!-- The semantic description SRDF -->
-    <!-- In order to switch yaml, python code is in param's command. The launching sequence works synchronously with this param tag's command. -->
-    <param name="robot_description_semantic"
-    	   command="$(find torobo_description)/scripts/load_srdf.py
-    		    --model_dir=$(find dtorobo_moveit_config)/config/models
-    		    --srdf=$(arg scene).srdf
-    		    --robot_config=$(find
-    		    torobo_description)/config/products/$(optenv
-    		    PRODUCT default).yaml
-    		    --dump_file=/tmp/torobo_rosparam_home_position.yaml" />
-
-    <!-- load home_position from semantic description SRDF -->
-    <rosparam command="load" file="/tmp/torobo_rosparam_home_position.yaml" />
-
-    <!-- load controller_config -->
-    <param name="/dummy"
-	   command="$(find torobo_description)/scripts/load_controller_config.py
-		    --model_dir=$(find torobo_description)/config/models
-		    --yaml=controllers.yaml
-		    --robot_config=$(find
-		    torobo_description)/config/products/$(optenv
-		    PRODUCT default).yaml
-		    --dump_file=/tmp/torobo_rosparam_controller_config.yaml" />
-    <rosparam command="load"
-	      file="/tmp/torobo_rosparam_controller_config.yaml" />
+	   command="$(find xacro)/xacro --inorder
+		    '$(find aist_scene_description)/urdf/$(arg
+		    scene).urdf.xacro'"/>
 
     <!-- Run a python script to the send a service call to gazebo_ros
 	 to spawn a URDF robot -->
     <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
 	  respawn="false" output="screen"
-	  args="-urdf -model torobo -param robot_description"/>
+	  args="-urdf -model dtorobo -param robot_description"/>
 
+    <!-- launch nodelet manager -->
+    <node name="torobo_nodelet_manager" pkg="nodelet" type="nodelet"
+      	  args="manager" output="screen"/>
+
+    <!-- launch torobo control -->
+    <include file="$(find torobo_control)/launch/torobo_control.launch">
+      <arg name="sim" value="true"/>
+    </include>
   </group>
 
 </launch>

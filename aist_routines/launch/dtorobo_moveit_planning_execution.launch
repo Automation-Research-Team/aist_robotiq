@@ -1,33 +1,31 @@
 <launch>
-  <arg name="sim"		default="false"/>
   <arg name="rviz_config"	default=""/>
   <arg name="debug"		default="false"/>
-
-  <!-- Remap follow_joint_trajectory -->
-  <remap if  ="$(arg sim)"
-	 from="/follow_joint_trajectory"
-	 to  ="/arm_controller/follow_joint_trajectory"/>
+  <arg name="rqt"		default="true"/>
 
   <!-- Launch moveit -->
   <group ns="torobo">
+    <!-- load controller_config -->
+    <rosparam file="$(find
+		    dtorobo_moveit_config)/config/controller_config.yaml"/>
     <include file="$(find dtorobo_moveit_config)/launch/dtorobo_base_scene_moveit_config.launch">
       <arg name="sim_in_moveit" value="false"/>
-      <arg name="debug"	value="$(arg debug)"/>
+      <arg name="debug"		value="$(arg debug)"/>
     </include>
   </group>
 
-  <!-- Launch rviz with appropriate launch-prefix and config file. -->
-  <arg unless="$(arg debug)" name="launch_prefix" value="" />
-  <arg     if="$(arg debug)" name="launch_prefix" value="gdb --ex run --args" />
-  <arg if="$(eval arg('rviz_config') == '')"
-       name="command_args" value="-d $(find dtorobo_moveit_config)/launch/moveit.rviz"/>
-  <arg unless="$(eval arg('rviz_config') == '')"
-       name="command_args" value="-d $(arg rviz_config)"/>
+  <!-- launch rqt gui -->
+  <!-- <group if="$(arg rqt)"> -->
+  <!--   <include unless="$(arg sim)" -->
+  <!--            file="$(find torobo_gui)/launch/torobo_state_viewer.launch"/> -->
+  <!--   <include file="$(find torobo_gui)/launch/torobo_joint_controller.launch"/> -->
+  <!-- </group> -->
 
-  <node name="$(anon rviz)" launch-prefix="$(arg launch_prefix)"
-	pkg="rviz" type="rviz" respawn="false"
-	args="$(arg command_args)" output="screen">
-    <rosparam command="load"
-	      file="$(find dtorobo_moveit_config)/config/kinematics.yaml"/>
-  </node>
+  <!-- launch rviz gui -->
+  <group ns="torobo">
+    <include file="$(find dtorobo_moveit_config)/launch/moveit_rviz.launch">
+      <arg name="config" value="true" />
+    </include>
+  </group>
+
 </launch>
