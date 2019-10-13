@@ -207,6 +207,65 @@ class FetchGripper(GripperClient):
             rospy.logerr('Gripper: program interrupted before completion.')
 
 ######################################################################
+#  class ToroboGripper                                               #
+######################################################################
+class ToroboGripper(GripperClient):
+    def __init__(self, prefix="a_torobo_", max_effort=5.0):
+        from control_msgs.msg import GripperCommandAction, GripperCommandGoal
+
+        super(ToroboGripper, self) \
+            .__init__(prefix + "gripper", "two_finger",
+                      prefix + "gripper/base_link",
+                      prefix + "gripper/tip_link")
+        self._client = actionlib.SimpleActionClient(
+            "/torobo/" + prefix + "gripper_controller/gripper_cmd",
+            GripperCommandAction)
+        self._client.wait_for_server(rospy.Duration(10.0))
+        self._goal = GripperCommandGoal()
+        self._goal.command.max_effort = max_effort
+        self._open_position = 0.1
+        rospy.loginfo("{} initialized.".format(self.name))
+
+    @staticmethod
+    def base(prefix, max_effort):
+        return ToroboGripper(prefix, max_effort)
+
+    @property
+    def open_position(self):
+        return self._open_position
+
+    @open_position.setter
+    def open_position(self, position):
+        self._open_position = clip(position, 0.0, 0.1)
+
+    @property
+    def max_effort(self):
+        return self._goal.command.max_effort
+
+    @max_effort.setter
+    def max_effort(self, max_effort):
+        self._goal.command.max_effort = max_effort
+
+    def pregrasp(self, cmd=""):
+        return self.release(cmd)
+
+    def grasp(self, cmd=""):
+        return self.move(0.0)
+
+    def release(self, cmd=""):
+        return self.move(self._open_position)
+
+    def move(self, position):
+        try:
+            self._goal.command.position = clip(position, 0.0, 0.1)
+            self._client.send_goal(self._goal)
+            self._client.wait_for_result(rospy.Duration(5.0))
+            result = self._client.get_result()
+            return result.reached_goal
+        except rospy.ROSInterruptException:
+            rospy.logerr('Gripper: program interrupted before completion.')
+
+######################################################################
 #  class SuctionGripper                                              #
 ######################################################################
 class SuctionGripper(GripperClient):

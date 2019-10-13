@@ -1,7 +1,14 @@
-groups:
-  - a_torobo
-  - b_torobo
-  - all_torobos
+grippers:
+  a_torobo:
+    type: ToroboGripper
+    args:
+      prefix: a_torobo_
+      max_effort: 5.0
+  b_torobo:
+    type: ToroboGripper
+    args:
+      prefix: b_torobo_
+      max_effort: 5.0
 
 cameras:
   b_phoxi_m_camera:

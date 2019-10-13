@@ -6,31 +6,8 @@
     <!-- load robot description URDF -->
     <param name="robot_description"
   	   command="$(find xacro)/xacro --inorder
-  		    '$(find aist_scene_description)/urdf/$(arg
-  		    scene).urdf.xacro'"/>
-
-    <!-- launch nodelet manager -->
-    <node name="torobo_nodelet_manager" pkg="nodelet" type="nodelet"
-      	  args="manager" output="screen"/>
+  		    '$(find aist_scene_description)/urdf/$(arg scene
+		    ).urdf.xacro'"/>
   </group>
-
-  <!-- launch torobo control -->
-  <include file="$(find torobo_control)/launch/torobo_control.launch">
-    <arg name="sim" value="false"/>
-  </include>
-
-  <!-- launch torobo dynamics -->
-  <include file="$(find torobo_dynamics)/launch/torobo_dynamics.launch">
-    <arg name="sim" value="false"/>
-  </include>
-
-  <!-- launch torobo operation -->
-  <include file="$(find torobo_operation)/launch/torobo_operation.launch"/>
-
-  <!-- launch torobo collision detector -->
-  <include file="$(find torobo_collision_detector)/launch/torobo_collision_detector.launch"/>
-  <include file="$(find torobo_collision_detector)/launch/current_state_self_collision_checker.launch">
-    <arg name="sim" value="false"/>
-  </include>
 
 </launch>

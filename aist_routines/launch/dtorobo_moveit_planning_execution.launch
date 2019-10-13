@@ -1,12 +1,44 @@
 <launch>
+  <arg name="sim"		default="false"/>
   <arg name="rviz_config"	default=""/>
   <arg name="debug"		default="false"/>
-  <arg name="rqt"		default="true"/>
+  <arg name="rqt"		default="false"/>
+
+  <group ns="torobo">
+    <rosparam param="robot_config"
+	      file="$(find torobo_description
+		    )/config/products/$(optenv PRODUCT default).yaml"/>
+
+    <!-- launch nodelet manager -->
+    <node name="torobo_nodelet_manager" pkg="nodelet" type="nodelet"
+      	  args="manager" output="screen"/>
+  </group>
+
+  <!-- launch torobo dynamics -->
+  <include unless="$(arg sim)"
+	   file="$(find torobo_dynamics)/launch/torobo_dynamics.launch">
+    <arg name="sim" value="$(arg sim)"/>
+  </include>
+
+  <!-- launch torobo control -->
+  <include file="$(find torobo_control)/launch/torobo_control.launch">
+    <arg name="sim" value="$(arg sim)"/>
+  </include>
+
+  <!-- launch torobo collision detector -->
+  <include file="$(find torobo_collision_detector
+		 )/launch/torobo_collision_detector.launch"/>
+  <include file="$(find torobo_collision_detector
+		 )/launch/current_state_self_collision_checker.launch">
+    <arg name="sim" value="$(arg sim)"/>
+  </include>
+
+  <!-- launch torobo operation -->
+  <!-- <include file="$(find torobo_operation)/launch/torobo_operation.launch"/> -->
 
   <!-- launch rqt gui -->
-  <group if="$(arg rqt)">
-    <include file="$(find torobo_gui)/launch/torobo_joint_controller.launch"/>
-  </group>
+  <include file="$(find torobo_gui)/launch/torobo_joint_controller.launch"
+  	   if="$(arg rqt)"/>
 
   <!-- Launch moveit -->
   <group ns="torobo">
@@ -21,7 +53,8 @@
     <rosparam file="$(find
     		    dtorobo_moveit_config)/config/controller_config.yaml"/>
 
-    <include file="$(find aist_routines)/launch/moveit_planning_execution.launch">
+    <include file="$(find
+		   aist_routines)/launch/moveit_planning_execution.launch">
       <arg name="moveit_config"	value="$(find dtorobo_moveit_config)"/>
       <arg name="rviz_config"	value="$(arg rviz_config)"/>
       <arg name="debug"		value="$(arg debug)"/>
