@@ -1,7 +1,3 @@
-groups:
-  - arm
-  - gripper
-
 grippers:
   arm:
     type: FetchGripper
