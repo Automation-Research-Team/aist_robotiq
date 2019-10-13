@@ -1,4 +1,5 @@
 <launch>
+  <arg name="sim"		default="false"/>
   <arg name="rviz_config"	default=""/>
   <arg name="debug"		default="false"/>
 

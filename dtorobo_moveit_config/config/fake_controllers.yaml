@@ -1,5 +1,5 @@
 controller_list:
-  - name: fake_a_torobo_arm_controller
+  - name: fake_a_torobo_controller
     joints:
       - a_torobo_arm/joint_1
       - a_torobo_arm/joint_2
@@ -8,7 +8,7 @@ controller_list:
       - a_torobo_arm/joint_5
       - a_torobo_arm/joint_6
       - a_torobo_arm/joint_7
-  - name: fake_b_torobo_arm_controller
+  - name: fake_b_torobo_controller
     joints:
       - b_torobo_arm/joint_1
       - b_torobo_arm/joint_2
@@ -17,7 +17,7 @@ controller_list:
       - b_torobo_arm/joint_5
       - b_torobo_arm/joint_6
       - b_torobo_arm/joint_7
-  - name: fake_all_torobos_arm_controller
+  - name: fake_all_torobos_controller
     joints:
       - a_torobo_arm/joint_1
       - a_torobo_arm/joint_2
@@ -33,7 +33,3 @@ controller_list:
       - b_torobo_arm/joint_5
       - b_torobo_arm/joint_6
       - b_torobo_arm/joint_7
-  - name: fake_a_torobo_gripper_controller
-    joint: a_torobo_gripper/finger_joint
-  - name: fake_b_torobo_gripper_controller
-    joint: b_torobo_gripper/finger_joint

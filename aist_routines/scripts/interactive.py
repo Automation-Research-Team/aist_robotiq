@@ -33,8 +33,8 @@ class InteractiveRoutines(URRoutines):
         'd_bot': [0.00, 0.00, 0.3, radians(  0), radians( 90), radians(  0)],
     }
 
-    def __init__(self, robot_name, camera_name, speed):
-        super(InteractiveRoutines, self).__init__()
+    def __init__(self, robot_name, camera_name, speed, robot_description, ns):
+        super(InteractiveRoutines, self).__init__(robot_description, ns)
 
         self._robot_name   = robot_name
         self._camera_name  = camera_name
@@ -219,9 +219,28 @@ if __name__ == '__main__':
                         choices=None,
                         help='camera name',
                         metavar=None)
+    parser.add_argument('-d',
+                        '--robot_description',
+                        action='store',
+                        nargs='?',
+                        default='robot_description',
+                        type=str,
+                        choices=None,
+                        help='parameter name of robot_description',
+                        metavar=None)
+    parser.add_argument('-n',
+                        '--ns',
+                        action='store',
+                        nargs='?',
+                        default='',
+                        type=str,
+                        choices=None,
+                        help='namespace',
+                        metavar=None)
     args = parser.parse_args()
 
     speed = 0.1
     with InteractiveRoutines(args.robot_name,
-                             args.camera_name, speed) as routines:
+                             args.camera_name, speed,
+                             args.robot_description, args.ns) as routines:
         routines.run()

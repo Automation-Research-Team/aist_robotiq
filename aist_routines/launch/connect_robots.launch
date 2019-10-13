@@ -7,7 +7,6 @@
   <arg name="debug"		default="false"/>
 
   <param name="use_real_robot"	value="$(eval not arg('sim'))"/>
-  <rosparam command="delete" param="groups"/>
   <rosparam command="delete" param="grippers"/>
   <rosparam command="delete" param="cameras"/>
   <rosparam command="load"
@@ -22,7 +21,7 @@
     <remap from="/follow_joint_trajectory"
 	   to  ="/arm_controller/follow_joint_trajectory"/>
   </group>
-  
+
   <!-- Load robot urdf to param "robot_description", spawn
        robot_state_publisher and launch real robots if "sim" == "false". -->
   <group unless="$(arg sim)">
@@ -38,6 +37,7 @@
   <!-- Launch planner -->
   <include file="$(find aist_routines)/launch/$(arg
 		 config)_moveit_planning_execution.launch">
+    <arg name="sim"		value="$(arg sim)"/>
     <arg name="rviz_config"	value="$(arg rviz_config)"/>
     <arg name="debug"		value="$(arg debug)"/>
   </include>
