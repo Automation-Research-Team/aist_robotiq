@@ -1,0 +1,13 @@
+<launch>
+
+  <arg name="scene"	default="dtorobo_base_scene"/>
+
+  <group ns="torobo">
+    <!-- load robot description URDF -->
+    <param name="robot_description"
+  	   command="$(find xacro)/xacro --inorder
+  		    '$(find aist_scene_description)/urdf/$(arg scene
+		    ).urdf.xacro'"/>
+  </group>
+
+</launch>
