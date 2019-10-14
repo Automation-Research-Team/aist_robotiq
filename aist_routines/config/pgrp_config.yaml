@@ -3,11 +3,13 @@ grippers:
     type: PrecisionGripper
     args:
       prefix: a_bot_
+      timeout: 3.0
   b_bot:
     type: SuctionGripper
     args:
       prefix: b_bot_single_
       eject: false
+      timeout: 2.0
 
 cameras:
   a_phoxi_m_camera:
