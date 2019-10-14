@@ -6,11 +6,13 @@ grippers:
       product: "85"
       force: 5.0
       velocity: 0.1
+      timeout: 6.0
   b_bot:
     type: SuctionGripper
     args:
       prefix: b_bot_single_
       eject: false
+      timeout: 2.0
 
 cameras:
   a_phoxi_m_camera:
