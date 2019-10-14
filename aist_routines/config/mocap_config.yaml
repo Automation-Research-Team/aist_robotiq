@@ -1,6 +1,3 @@
-groups:
-  - c_bot
-
 grippers:
   c_bot:
     type: RobotiqGripper
