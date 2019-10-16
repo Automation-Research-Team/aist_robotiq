@@ -1,13 +1,25 @@
 grippers:
   a_torobo:
-    type: ToroboGripper
+    type: GenericGripper
     args:
-      prefix: a_torobo_
+      name: a_torobo_gripper
+      action_ns: /torobo/a_torobo_gripper_controller/gripper_cmd
+      base_link: a_torobo_gripper/base_link
+      tip_link: a_torobo_gripper/tip_link
+      timeout: 10.0
+      min_gap: 0.0
+      max_gap: 0.1
       max_effort: 5.0
   b_torobo:
-    type: ToroboGripper
+    type: GenericGripper
     args:
-      prefix: b_torobo_
+      name: b_torobo_gripper
+      action_ns: /torobo/b_torobo_gripper_controller/gripper_cmd
+      base_link: b_torobo_gripper/base_link
+      tip_link: b_torobo_gripper/tip_link
+      timeout: 10.0
+      min_gap: 0.0
+      max_gap: 0.1
       max_effort: 5.0
 
 cameras:

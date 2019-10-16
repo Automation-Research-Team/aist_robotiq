@@ -15,8 +15,8 @@ from base                import AISTBaseRoutines
 #  class FreightRoutines                                             #
 ######################################################################
 class FreightRoutines(AISTBaseRoutines):
-    def __init__(self):
-        super(FreightRoutines, self).__init__()
+    def __init__(self, ns=""):
+        super(FreightRoutines, self).__init__(ns)
 
         self._move_base = actionlib.SimpleActionClient("move_base",
                                                        MoveBaseAction)

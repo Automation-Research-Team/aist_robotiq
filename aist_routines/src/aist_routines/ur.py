@@ -6,8 +6,8 @@ from URScriptPublisher import URScriptPublisher
 #  class URRoutines                                                  #
 ######################################################################
 class URRoutines(AISTBaseRoutines):
-    def __init__(self, robot_description="robot_description", ns=""):
-        super(URRoutines, self).__init__(robot_description, ns)
+    def __init__(self, ns=""):
+        super(URRoutines, self).__init__(ns)
 
         if rospy.get_param("use_real_robot", False):
             self._urscript_publishers = {
