@@ -1,13 +1,7 @@
 <launch>
   <arg name="moveit_config"/>
-  <arg name="sim"	  default="false"/>
   <arg name="rviz_config" default=""/>
   <arg name="debug"	  default="false"/>
-
-  <!-- Remap follow_joint_trajectory -->
-  <remap if  ="$(arg sim)"
-	 from="/follow_joint_trajectory"
-	 to  ="/arm_controller/follow_joint_trajectory"/>
 
   <!-- Launch moveit -->
   <include file="$(arg moveit_config)/launch/move_group.launch">

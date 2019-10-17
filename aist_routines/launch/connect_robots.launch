@@ -7,33 +7,36 @@
   <arg name="debug"		default="false"/>
 
   <param name="use_real_robot"	value="$(eval not arg('sim'))"/>
-  <rosparam command="delete" param="groups"/>
   <rosparam command="delete" param="grippers"/>
   <rosparam command="delete" param="cameras"/>
   <rosparam command="load"
   	    file="$(find aist_routines)/config/$(arg config)_config.yaml"/>
 
-  <!-- Launch gazebo if "sim == true". -->
-  <include if="$(arg sim)"
-	   file="$(find aist_gazebo)/launch/$(arg config)_gazebo.launch">
-    <arg name="scene"	value="$(arg scene)"/>
-  </include>
+  <!-- Launch gazebo and remap follow_joint_trajectory if "sim
+       == true". -->
+  <group if="$(arg sim)">
+    <include file="$(find aist_gazebo)/launch/$(arg config)_gazebo.launch">
+      <arg name="scene"	value="$(arg scene)"/>
+    </include>
+    <remap from="/follow_joint_trajectory"
+	   to  ="/arm_controller/follow_joint_trajectory"/>
+  </group>
 
   <!-- Load robot urdf to param "robot_description", spawn
        robot_state_publisher and launch real robots if "sim" == "false". -->
-  <param unless="$(arg sim)"
-	 name="robot_description"
-	 command="$(find xacro)/xacro --inorder '$(find
-		  aist_scene_description)/urdf/$(arg scene).urdf.xacro'"/>
-  <node unless="$(arg sim)"
-	name="robot_state_publisher"
-	pkg="robot_state_publisher" type="robot_state_publisher"/>
-  <include unless="$(arg sim)"
-	   file="$(find
-		 aist_routines)/launch/$(arg config)_connect_robots.launch"/>
+  <group unless="$(arg sim)">
+    <param name="robot_description"
+	   command="$(find xacro)/xacro --inorder '$(find
+		    aist_scene_description)/urdf/$(arg scene).urdf.xacro'"/>
+    <node name="robot_state_publisher"
+	  pkg="robot_state_publisher" type="robot_state_publisher"/>
+    <include file="$(find aist_routines)/launch/$(arg
+		   config)_connect_robots.launch"/>
+  </group>
 
   <!-- Launch planner -->
-  <include file="$(find aist_routines)/launch/$(arg config)_moveit_planning_execution.launch">
+  <include file="$(find aist_routines)/launch/$(arg
+		 config)_moveit_planning_execution.launch">
     <arg name="sim"		value="$(arg sim)"/>
     <arg name="rviz_config"	value="$(arg rviz_config)"/>
     <arg name="debug"		value="$(arg debug)"/>

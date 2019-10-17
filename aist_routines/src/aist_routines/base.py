@@ -37,7 +37,7 @@ def paramtuples(d):
 #  class AISTBaseRoutines                                            #
 ######################################################################
 class AISTBaseRoutines(object):
-    def __init__(self):
+    def __init__(self, ns=""):
         super(AISTBaseRoutines, self).__init__()
 
         rospy.init_node("aist_routines", anonymous=True)
@@ -52,12 +52,10 @@ class AISTBaseRoutines(object):
         rospy.loginfo("reference_frame = {}, eef_step = {}"
                       .format(self._reference_frame, self._eef_step))
 
-        # MoveIt groups
-        d = rospy.get_param("groups", {})
-        self._groups = {}
-        for group_name in d:
-            self._groups[group_name] \
-                = moveit_commander.MoveGroupCommander(group_name)
+        # MoveIt RobotCommander
+        robot_description \
+            = "robot_description" if ns == "" else ns + "/robot_description"
+        self._cmd = moveit_commander.RobotCommander(robot_description, ns)
 
         # Grippers
         d = rospy.get_param("grippers", {})
@@ -88,7 +86,7 @@ class AISTBaseRoutines(object):
 
     # Basic motion stuffs
     def go_to_named_pose(self, named_pose, group_name):
-        group = self._groups[group_name]
+        group = self._cmd.get_group(group_name)
         group.set_named_target(named_pose)
         group.set_max_velocity_scaling_factor(1.0)
         success = group.go(wait=True)
@@ -117,7 +115,7 @@ class AISTBaseRoutines(object):
         if end_effector_link == "":
             end_effector_link = self._grippers[robot_name].tip_link
 
-        group = self._groups[robot_name]
+        group = self._cmd.get_group(robot_name)
         group.set_end_effector_link(end_effector_link)
         group.set_max_velocity_scaling_factor(clip(speed, 0.0, 1.0))
 
@@ -152,8 +150,7 @@ class AISTBaseRoutines(object):
 
             rospy.loginfo("Execute plan with {}% computed cartesian path."
                           .format(fraction*100))
-            robots  = moveit_commander.RobotCommander()
-            plan    = group.retime_trajectory(robots.get_current_state(),
+            plan    = group.retime_trajectory(self._cmd.get_current_state(),
                                               plan, speed)
             success = group.execute(plan, wait=True)
         else:
@@ -178,14 +175,14 @@ class AISTBaseRoutines(object):
         return (success, is_all_close, current_pose)
 
     def stop(self, robot_name):
-        group = self._groups[robot_name]
+        group = self._cmd.get_group(robot_name)
         group.stop()
         group.clear_pose_targets()
 
     def get_current_pose(self, robot_name, end_effector_link=""):
         if end_effector_link == "":
             end_effector_link = self._grippers[robot_name].tip_link
-        group = self._groups[robot_name]
+        group = self._cmd.get_group(robot_name)
         group.set_end_effector_link(end_effector_link)
         return group.get_current_pose()
 
@@ -290,8 +287,8 @@ class AISTBaseRoutines(object):
 
     # Pick and place action stuffs
     def pick(self, robot_name, target_pose,
-             grasp_offset=0.0, gripper_command="",
-             speed_fast=1.0, speed_slow=0.04, approach_offset=0.10,
+             grasp_offset=(0.0, 0.0, 0.0), gripper_command="",
+             speed_fast=1.0, speed_slow=0.04, approach_offset=(0.0, 0.0, 0.10),
              liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         return self._pickOrPlaceAction.execute(
             robot_name, target_pose, True, gripper_command,
@@ -299,17 +296,19 @@ class AISTBaseRoutines(object):
             speed_fast, speed_slow, acc_fast, acc_slow)
 
     def place(self, robot_name, target_pose,
-              place_offset=0.0, gripper_command="",
-              speed_fast=1.0, speed_slow=0.04, approach_offset=0.05,
+              place_offset=(0.0, 0.0, 0.0), gripper_command="",
+              speed_fast=1.0, speed_slow=0.04,
+              approach_offset=(0.0, 0.0, 0.05),
               liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         return self._pickOrPlaceAction.execute(
             robot_name, target_pose, False, gripper_command,
             place_offset, approach_offset, liftup_after,
             speed_fast, speed_slow, acc_fast, acc_slow)
 
-    def pick_at_frame(self, robot_name, target_frame, offset=(0, 0, 0),
-                      grasp_offset=0.0, gripper_command="",
-                      speed_fast=1.0, speed_slow=0.04, approach_offset=0.05,
+    def pick_at_frame(self, robot_name, target_frame, offset=(0.0, 0.0, 0.0),
+                      grasp_offset=(0.0, 0.0, 0.0), gripper_command="",
+                      speed_fast=1.0, speed_slow=0.04,
+                      approach_offset=(0.0, 0.0, 0.05),
                       liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = target_frame
@@ -320,9 +319,10 @@ class AISTBaseRoutines(object):
                          speed_fast, speed_slow, approach_offset,
                          liftup_after, acc_fast, acc_slow)
 
-    def place_at_frame(self, robot_name, target_frame, offset=(0, 0, 0),
-                       place_offset=0.0, gripper_command="",
-                       speed_fast=1.0, speed_slow=0.04, approach_offset=0.05,
+    def place_at_frame(self, robot_name, target_frame, offset=(0.0, 0.0, 0.0),
+                       place_offset=(0.0, 0.0, 0.0), gripper_command="",
+                       speed_fast=1.0, speed_slow=0.04,
+                       approach_offset=(0.0, 0.0, 0.05),
                        liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = target_frame

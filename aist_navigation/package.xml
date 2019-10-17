@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>aist_navigation</name>
+    <version>0.1.0</version>
+    <description>The aist_navigation package</description>
+    <license>BSD</license>
+
+    <maintainer email="yuma.hijioka@aist.go.jp">Yuma Hijioka</maintainer>
+    <author>Yuma Hijioka</author>
+
+    <buildtool_depend>catkin</buildtool_depend>
+    <exec_depend>move_base</exec_depend>
+    <exec_depend>navfn</exec_depend>
+    <exec_depend>base_local_planner</exec_depend>
+    <exec_depend>dwa_local_planner</exec_depend>
+    <exec_depend>actionlib</exec_depend>
+    <exec_depend>tf</exec_depend>
+    <exec_depend>cv_bridge</exec_depend>
+    <exec_depend>geometry_msgs</exec_depend>
+    <exec_depend>control_msgs</exec_depend>
+    <exec_depend>nav_msgs</exec_depend>
+    <exec_depend>trajectory_msgs</exec_depend>
+    <exec_depend>sensor_msgs</exec_depend>
+</package>

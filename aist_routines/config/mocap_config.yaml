@@ -1,6 +1,3 @@
-groups:
-  - c_bot
-
 grippers:
   c_bot:
     type: RobotiqGripper
@@ -9,3 +6,4 @@ grippers:
       product: "85"
       force: 5.0
       velocity: 0.1
+      timeout: 6.0

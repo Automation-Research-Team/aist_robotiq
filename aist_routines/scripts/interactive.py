@@ -33,8 +33,8 @@ class InteractiveRoutines(URRoutines):
         'd_bot': [0.00, 0.00, 0.3, radians(  0), radians( 90), radians(  0)],
     }
 
-    def __init__(self, robot_name, camera_name, speed):
-        super(InteractiveRoutines, self).__init__()
+    def __init__(self, robot_name, camera_name, speed, ns):
+        super(InteractiveRoutines, self).__init__(ns)
 
         self._robot_name   = robot_name
         self._camera_name  = camera_name
@@ -64,16 +64,6 @@ class InteractiveRoutines(URRoutines):
                                                 self._speed,
                                                 move_lin=True)
         return success
-
-    def xyz_rpy(self, poseStamped):
-        pose = self.listener.transformPose("workspace_center",
-                                           poseStamped).pose
-        rpy  = tfs.euler_from_quaternion([pose.orientation.x,
-                                          pose.orientation.y,
-                                          pose.orientation.z,
-                                          pose.orientation.w])
-        return [pose.position.x, pose.position.y, pose.position.z,
-                rpy[0], rpy[1], rpy[2]]
 
     def run(self):
         # Reset pose
@@ -219,11 +209,18 @@ if __name__ == '__main__':
                         choices=None,
                         help='camera name',
                         metavar=None)
+    parser.add_argument('-n',
+                        '--ns',
+                        action='store',
+                        nargs='?',
+                        default='',
+                        type=str,
+                        choices=None,
+                        help='namespace',
+                        metavar=None)
     args = parser.parse_args()
-
-    assert (args.robot_name in {'a_bot', 'b_bot', 'c_bot', 'd_bot'})
 
     speed = 0.1
     with InteractiveRoutines(args.robot_name,
-                             args.camera_name, speed) as routines:
+                             args.camera_name, speed, args.ns) as routines:
         routines.run()

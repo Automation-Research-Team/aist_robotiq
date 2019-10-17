@@ -12,9 +12,9 @@ part_props:
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
     destination: tray_1_partition_4
-    approach_offset: 0.15
-    grasp_offset: -0.004
-    place_offset: 0.06
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.004]
+    place_offset: [0.0, 0.0, 0.06]
     speed_slow: 0.04
     use_normals: true
   _5:
@@ -22,9 +22,9 @@ part_props:
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_6
-    approach_offset: 0.15
-    grasp_offset: -0.003
-    place_offset: 0.03
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.003]
+    place_offset: [0.0, 0.0, 0.03]
     speed_slow: 1.0
     use_normals: true
   _6:
@@ -32,9 +32,9 @@ part_props:
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
     destination: tray_1_partition_3
-    approach_offset: 0.15
-    grasp_offset: 0.0
-    place_offset: 0.05
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, 0.0]
+    place_offset: [0.0, 0.0, 0.05]
     speed_slow: 1.0
     use_normals: false
   _7:
@@ -42,9 +42,9 @@ part_props:
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
     destination: tray_1_partition_2
-    approach_offset: 0.15
-    grasp_offset: -0.004
-    place_offset: 0.05
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.004]
+    place_offset: [0.0, 0.0, 0.05]
     speed_slow: 0.04
     use_normals: true
   _8:
@@ -52,8 +52,8 @@ part_props:
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_1
-    approach_offset: 0.15
-    grasp_offset: -0.004
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.004]
     place_offset: 0.03
     speed_slow: 0.1
     use_normals: true
@@ -62,9 +62,9 @@ part_props:
     robot_name: a_bot
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_4
-    approach_offset: 0.15
-    grasp_offset: -0.002
-    place_offset: 0.05
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.002]
+    place_offset: [0.0, 0.0, 0.05]
     speed_slow: 1.0
     use_normals: false
   _10:
@@ -72,9 +72,9 @@ part_props:
     robot_name: a_bot
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_7
-    approach_offset: 0.15
-    grasp_offset: -0.002
-    place_offset: 0.05
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.002]
+    place_offset: [0.0, 0.0, 0.05]
     speed_slow: 1.0
     use_normals: false
   _11:
@@ -82,9 +82,9 @@ part_props:
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
     destination: tray_1_partition_1
-    approach_offset: 0.15
-    grasp_offset: 0.0
-    place_offset: 0.05
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, 0,0]
+    place_offset: [0.0, 0.0, 0.05]
     speed_slow: 0.04
     use_normals: true
   _12:
@@ -92,9 +92,9 @@ part_props:
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_3
-    approach_offset: 0.15
-    grasp_offset: 0.0
-    place_offset: 0.05
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, 0.0]
+    place_offset: [0.0, 0.0, 0.05]
     speed_slow: 0.04
     use_normals: false
   _13:
@@ -102,9 +102,9 @@ part_props:
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
     destination: tray_1_partition_5
-    approach_offset: 0.15
-    grasp_offset: 0.0
-    place_offset: 0.05
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, 0.0]
+    place_offset: [0.0, 0.0, 0.05]
     speed_slow: 0.04
     use_normals: true
   _14:
@@ -112,9 +112,9 @@ part_props:
     robot_name: a_bot
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_2
-    approach_offset: 0.15
-    grasp_offset: -0.002
-    place_offset: 0.05
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.002]
+    place_offset: [0.0, 0.0, 0.05]
     speed_slow: 1.0
     use_normals: false
   _15:
@@ -122,9 +122,9 @@ part_props:
     robot_name: a_bot
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_5
-    approach_offset: 0.15
-    grasp_offset: -0.002
-    place_offset: 0.05
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.002]
+    place_offset: [0.0, 0.0, 0.05]
     speed_slow: 1.0
     use_normals: false
   _16:
@@ -132,9 +132,9 @@ part_props:
     robot_name: a_bot
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_8
-    approach_offset: 0.15
-    grasp_offset: -0.002
-    place_offset: 0.05
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.002]
+    place_offset: [0.0, 0.0, 0.05]
     speed_slow: 1.0
     use_normals: false
   _17:
@@ -142,9 +142,9 @@ part_props:
     robot_name: a_bot
     camera_name: a_phoxi_m_camera
     destination: skrewholder_1
-    approach_offset: 0.15
-    grasp_offset: -0.002
-    place_offset: 0.05
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.002]
+    place_offset: [0.0, 0.0, 0.05]
     speed_slow: 1.0
     use_normals: false
   _18:
@@ -152,8 +152,8 @@ part_props:
     robot_name: a_bot
     camera_name: a_phoxi_m_camera
     destination: skrewholder_2
-    approach_offset: 0.15
-    grasp_offset: -0.002
-    place_offset: 0.05
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.002]
+    place_offset: [0.0, 0.0, 0.05]
     speed_slow: 1.0
     use_normals: false

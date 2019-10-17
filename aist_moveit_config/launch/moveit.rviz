@@ -96,43 +96,6 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          a_bot_camera_depth_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_depth_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_fisheye_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_fisheye_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_left_ir_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_left_ir_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_camera_right_ir_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_right_ir_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           a_bot_ee_link:
             Alpha: 1
             Show Axes: false
@@ -143,7 +106,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          a_bot_ft300_frange_link:
+          a_bot_ft300_flange_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -152,16 +115,56 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          a_bot_gripper_base_link:
+          a_bot_ft300_wrench_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_robotiq_85_base_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          a_bot_gripper_screw_pickup:
+          a_bot_robotiq_85_left_finger_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          a_bot_gripper_tip_link:
+            Value: true
+          a_bot_robotiq_85_left_finger_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_bot_robotiq_85_left_inner_knuckle_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_bot_robotiq_85_left_knuckle_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_bot_robotiq_85_right_finger_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_bot_robotiq_85_right_finger_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_bot_robotiq_85_right_inner_knuckle_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_bot_robotiq_85_right_knuckle_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_bot_robotiq_85_tip_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -226,7 +229,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          b_bot_ft300_frange_link:
+          b_bot_ft300_flange_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -235,6 +238,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          b_bot_ft300_wrench_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_bot_shoulder_link:
             Alpha: 1
             Show Axes: false
@@ -273,444 +280,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          bin_1_part_16:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          bin_1_part_16_bottom_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_16_bottom_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_16_bottom_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_16_bottom_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_16_top_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_16_top_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_16_top_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_16_top_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_17:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          bin_1_part_17_bottom_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_17_bottom_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_17_bottom_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_17_bottom_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_17_top_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_17_top_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_17_top_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_17_top_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          bin_1_part_5_bottom_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_5_bottom_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_5_bottom_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_5_bottom_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_5_top_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_5_top_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_5_top_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_5_top_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          bin_2_part_4_bottom_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_4_bottom_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_4_bottom_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_4_bottom_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_4_top_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_4_top_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_4_top_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_4_top_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_7:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          bin_2_part_7_bottom_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_7_bottom_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_7_bottom_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_7_bottom_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_7_top_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_7_top_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_7_top_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_7_top_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_8:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          bin_2_part_8_bottom_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_8_bottom_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_8_bottom_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_8_bottom_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_8_top_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_8_top_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_8_top_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_8_top_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           o2as_ground:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          plate:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          plate_center:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_1_divider1_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_1_divider1_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_1_partition_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_1_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_2_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_3_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_4_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_5_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_2_divider2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_2_partition_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_1_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_2_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_3_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_4_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_5_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_6_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_7:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_7_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_8:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_8_pickup_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_8_pickup_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_holder:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_2_screw_m3_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_7:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_8:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_9:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          vwall1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           workbox:
             Alpha: 1
             Show Axes: false
@@ -778,43 +351,6 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          a_bot_camera_depth_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_depth_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_fisheye_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_fisheye_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_left_ir_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_left_ir_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_bot_camera_right_ir_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_right_ir_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           a_bot_ee_link:
             Alpha: 1
             Show Axes: false
@@ -825,7 +361,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          a_bot_ft300_frange_link:
+          a_bot_ft300_flange_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -834,16 +370,56 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          a_bot_gripper_base_link:
+          a_bot_ft300_wrench_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_robotiq_85_base_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          a_bot_gripper_screw_pickup:
+          a_bot_robotiq_85_left_finger_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          a_bot_gripper_tip_link:
+            Value: true
+          a_bot_robotiq_85_left_finger_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_bot_robotiq_85_left_inner_knuckle_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_bot_robotiq_85_left_knuckle_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_bot_robotiq_85_right_finger_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_bot_robotiq_85_right_finger_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_bot_robotiq_85_right_inner_knuckle_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_bot_robotiq_85_right_knuckle_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_bot_robotiq_85_tip_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -908,7 +484,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          b_bot_ft300_frange_link:
+          b_bot_ft300_flange_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -917,6 +493,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          b_bot_ft300_wrench_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_bot_shoulder_link:
             Alpha: 1
             Show Axes: false
@@ -955,444 +535,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          bin_1_part_16:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          bin_1_part_16_bottom_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_16_bottom_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_16_bottom_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_16_bottom_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_16_top_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_16_top_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_16_top_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_16_top_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_17:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          bin_1_part_17_bottom_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_17_bottom_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_17_bottom_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_17_bottom_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_17_top_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_17_top_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_17_top_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_17_top_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          bin_1_part_5_bottom_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_5_bottom_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_5_bottom_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_5_bottom_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_5_top_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_5_top_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_5_top_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_1_part_5_top_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          bin_2_part_4_bottom_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_4_bottom_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_4_bottom_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_4_bottom_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_4_top_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_4_top_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_4_top_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_4_top_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_7:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          bin_2_part_7_bottom_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_7_bottom_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_7_bottom_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_7_bottom_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_7_top_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_7_top_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_7_top_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_7_top_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_8:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          bin_2_part_8_bottom_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_8_bottom_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_8_bottom_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_8_bottom_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_8_top_back_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_8_top_back_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_8_top_front_left_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          bin_2_part_8_top_front_right_corner:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           o2as_ground:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          plate:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          plate_center:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_1_divider1_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_1_divider1_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_1_partition_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_1_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_2_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_3_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_4_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_1_partition_5_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_2_divider2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_2_partition_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_1_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_2_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_3_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_4_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_5_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_6_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_7:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_7_pickup:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_8:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_8_pickup_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_partition_8_pickup_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_holder:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          tray_2_screw_m3_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m3_6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_7:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_8:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          tray_2_screw_m4_9:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          vwall1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           workbox:
             Alpha: 1
             Show Axes: false
@@ -1419,37 +565,35 @@ Visualization Manager:
           Value: false
         a_bot_base_link:
           Value: false
-        a_bot_camera_depth_frame:
-          Value: false
-        a_bot_camera_depth_optical_frame:
-          Value: true
-        a_bot_camera_fisheye_frame:
-          Value: false
-        a_bot_camera_fisheye_optical_frame:
-          Value: false
-        a_bot_camera_left_ir_frame:
-          Value: false
-        a_bot_camera_left_ir_optical_frame:
-          Value: false
-        a_bot_camera_link:
-          Value: false
-        a_bot_camera_right_ir_frame:
-          Value: false
-        a_bot_camera_right_ir_optical_frame:
-          Value: false
         a_bot_ee_link:
           Value: false
         a_bot_forearm_link:
           Value: false
-        a_bot_ft300_frange_link:
-          Value: false
+        a_bot_ft300_flange_link:
+          Value: true
         a_bot_ft300_link:
           Value: false
-        a_bot_gripper_base_link:
-          Value: false
-        a_bot_gripper_screw_pickup:
-          Value: false
-        a_bot_gripper_tip_link:
+        a_bot_ft300_wrench_link:
+          Value: true
+        a_bot_robotiq_85_base_link:
+          Value: true
+        a_bot_robotiq_85_left_finger_link:
+          Value: true
+        a_bot_robotiq_85_left_finger_tip_link:
+          Value: true
+        a_bot_robotiq_85_left_inner_knuckle_link:
+          Value: true
+        a_bot_robotiq_85_left_knuckle_link:
+          Value: true
+        a_bot_robotiq_85_right_finger_link:
+          Value: true
+        a_bot_robotiq_85_right_finger_tip_link:
+          Value: true
+        a_bot_robotiq_85_right_inner_knuckle_link:
+          Value: true
+        a_bot_robotiq_85_right_knuckle_link:
+          Value: true
+        a_bot_robotiq_85_tip_link:
           Value: true
         a_bot_shoulder_link:
           Value: false
@@ -1477,10 +621,12 @@ Visualization Manager:
           Value: false
         b_bot_forearm_link:
           Value: false
-        b_bot_ft300_frange_link:
-          Value: false
+        b_bot_ft300_flange_link:
+          Value: true
         b_bot_ft300_link:
           Value: false
+        b_bot_ft300_wrench_link:
+          Value: true
         b_bot_shoulder_link:
           Value: false
         b_bot_single_suction_gripper_base_link:
@@ -1497,217 +643,7 @@ Visualization Manager:
           Value: false
         b_bot_wrist_3_link:
           Value: false
-        bin_1_part_16:
-          Value: true
-        bin_1_part_16_bottom_back_left_corner:
-          Value: false
-        bin_1_part_16_bottom_back_right_corner:
-          Value: false
-        bin_1_part_16_bottom_front_left_corner:
-          Value: false
-        bin_1_part_16_bottom_front_right_corner:
-          Value: false
-        bin_1_part_16_top_back_left_corner:
-          Value: false
-        bin_1_part_16_top_back_right_corner:
-          Value: false
-        bin_1_part_16_top_front_left_corner:
-          Value: false
-        bin_1_part_16_top_front_right_corner:
-          Value: false
-        bin_1_part_17:
-          Value: true
-        bin_1_part_17_bottom_back_left_corner:
-          Value: false
-        bin_1_part_17_bottom_back_right_corner:
-          Value: false
-        bin_1_part_17_bottom_front_left_corner:
-          Value: false
-        bin_1_part_17_bottom_front_right_corner:
-          Value: false
-        bin_1_part_17_top_back_left_corner:
-          Value: false
-        bin_1_part_17_top_back_right_corner:
-          Value: false
-        bin_1_part_17_top_front_left_corner:
-          Value: false
-        bin_1_part_17_top_front_right_corner:
-          Value: false
-        bin_1_part_5:
-          Value: true
-        bin_1_part_5_bottom_back_left_corner:
-          Value: false
-        bin_1_part_5_bottom_back_right_corner:
-          Value: false
-        bin_1_part_5_bottom_front_left_corner:
-          Value: false
-        bin_1_part_5_bottom_front_right_corner:
-          Value: false
-        bin_1_part_5_top_back_left_corner:
-          Value: false
-        bin_1_part_5_top_back_right_corner:
-          Value: false
-        bin_1_part_5_top_front_left_corner:
-          Value: false
-        bin_1_part_5_top_front_right_corner:
-          Value: false
-        bin_2_part_4:
-          Value: true
-        bin_2_part_4_bottom_back_left_corner:
-          Value: false
-        bin_2_part_4_bottom_back_right_corner:
-          Value: false
-        bin_2_part_4_bottom_front_left_corner:
-          Value: false
-        bin_2_part_4_bottom_front_right_corner:
-          Value: false
-        bin_2_part_4_top_back_left_corner:
-          Value: false
-        bin_2_part_4_top_back_right_corner:
-          Value: false
-        bin_2_part_4_top_front_left_corner:
-          Value: false
-        bin_2_part_4_top_front_right_corner:
-          Value: false
-        bin_2_part_7:
-          Value: true
-        bin_2_part_7_bottom_back_left_corner:
-          Value: false
-        bin_2_part_7_bottom_back_right_corner:
-          Value: false
-        bin_2_part_7_bottom_front_left_corner:
-          Value: false
-        bin_2_part_7_bottom_front_right_corner:
-          Value: false
-        bin_2_part_7_top_back_left_corner:
-          Value: false
-        bin_2_part_7_top_back_right_corner:
-          Value: false
-        bin_2_part_7_top_front_left_corner:
-          Value: false
-        bin_2_part_7_top_front_right_corner:
-          Value: false
-        bin_2_part_8:
-          Value: true
-        bin_2_part_8_bottom_back_left_corner:
-          Value: false
-        bin_2_part_8_bottom_back_right_corner:
-          Value: false
-        bin_2_part_8_bottom_front_left_corner:
-          Value: false
-        bin_2_part_8_bottom_front_right_corner:
-          Value: false
-        bin_2_part_8_top_back_left_corner:
-          Value: false
-        bin_2_part_8_top_back_right_corner:
-          Value: false
-        bin_2_part_8_top_front_left_corner:
-          Value: false
-        bin_2_part_8_top_front_right_corner:
-          Value: false
         o2as_ground:
-          Value: false
-        plate:
-          Value: false
-        plate_center:
-          Value: false
-        tray_1:
-          Value: true
-        tray_1_divider1_1:
-          Value: false
-        tray_1_divider1_2:
-          Value: false
-        tray_1_partition_1:
-          Value: true
-        tray_1_partition_1_pickup:
-          Value: false
-        tray_1_partition_2:
-          Value: true
-        tray_1_partition_2_pickup:
-          Value: false
-        tray_1_partition_3:
-          Value: true
-        tray_1_partition_3_pickup:
-          Value: false
-        tray_1_partition_4:
-          Value: true
-        tray_1_partition_4_pickup:
-          Value: false
-        tray_1_partition_5:
-          Value: true
-        tray_1_partition_5_pickup:
-          Value: false
-        tray_2:
-          Value: true
-        tray_2_divider2:
-          Value: false
-        tray_2_partition_1:
-          Value: true
-        tray_2_partition_1_pickup:
-          Value: false
-        tray_2_partition_2:
-          Value: true
-        tray_2_partition_2_pickup:
-          Value: false
-        tray_2_partition_3:
-          Value: true
-        tray_2_partition_3_pickup:
-          Value: false
-        tray_2_partition_4:
-          Value: true
-        tray_2_partition_4_pickup:
-          Value: false
-        tray_2_partition_5:
-          Value: true
-        tray_2_partition_5_pickup:
-          Value: false
-        tray_2_partition_6:
-          Value: true
-        tray_2_partition_6_pickup:
-          Value: false
-        tray_2_partition_7:
-          Value: true
-        tray_2_partition_7_pickup:
-          Value: false
-        tray_2_partition_8:
-          Value: true
-        tray_2_partition_8_pickup_1:
-          Value: false
-        tray_2_partition_8_pickup_2:
-          Value: false
-        tray_2_screw_holder:
-          Value: false
-        tray_2_screw_m3_1:
-          Value: false
-        tray_2_screw_m3_2:
-          Value: false
-        tray_2_screw_m3_3:
-          Value: false
-        tray_2_screw_m3_4:
-          Value: false
-        tray_2_screw_m3_5:
-          Value: false
-        tray_2_screw_m3_6:
-          Value: false
-        tray_2_screw_m4_1:
-          Value: false
-        tray_2_screw_m4_2:
-          Value: false
-        tray_2_screw_m4_3:
-          Value: false
-        tray_2_screw_m4_4:
-          Value: false
-        tray_2_screw_m4_5:
-          Value: false
-        tray_2_screw_m4_6:
-          Value: false
-        tray_2_screw_m4_7:
-          Value: false
-        tray_2_screw_m4_8:
-          Value: false
-        tray_2_screw_m4_9:
-          Value: false
-        vwall1:
           Value: false
         workbox:
           Value: false
@@ -1731,27 +667,27 @@ Visualization Manager:
                   a_bot_forearm_link:
                     a_bot_wrist_1_link:
                       a_bot_wrist_2_link:
-                        a_bot_camera_link:
-                          a_bot_camera_depth_frame:
-                            a_bot_camera_depth_optical_frame:
-                              {}
-                            a_bot_camera_fisheye_frame:
-                              a_bot_camera_fisheye_optical_frame:
-                                {}
-                            a_bot_camera_left_ir_frame:
-                              a_bot_camera_left_ir_optical_frame:
-                                {}
-                            a_bot_camera_right_ir_frame:
-                              a_bot_camera_right_ir_optical_frame:
-                                {}
                         a_bot_wrist_3_link:
                           a_bot_ee_link:
                             a_bot_ft300_link:
-                              a_bot_ft300_frange_link:
-                                a_bot_gripper_base_link:
-                                  a_bot_gripper_tip_link:
-                                    a_bot_gripper_screw_pickup:
+                              a_bot_ft300_flange_link:
+                                a_bot_ft300_wrench_link:
+                                  {}
+                                a_bot_robotiq_85_base_link:
+                                  a_bot_robotiq_85_left_inner_knuckle_link:
+                                    a_bot_robotiq_85_left_finger_tip_link:
                                       {}
+                                  a_bot_robotiq_85_left_knuckle_link:
+                                    a_bot_robotiq_85_left_finger_link:
+                                      {}
+                                  a_bot_robotiq_85_right_inner_knuckle_link:
+                                    a_bot_robotiq_85_right_finger_tip_link:
+                                      {}
+                                  a_bot_robotiq_85_right_knuckle_link:
+                                    a_bot_robotiq_85_right_finger_link:
+                                      {}
+                                  a_bot_robotiq_85_tip_link:
+                                    {}
                           a_bot_tool0:
                             {}
             a_phoxi_m_camera:
@@ -1769,202 +705,18 @@ Visualization Manager:
                         b_bot_wrist_3_link:
                           b_bot_ee_link:
                             b_bot_ft300_link:
-                              b_bot_ft300_frange_link:
+                              b_bot_ft300_flange_link:
+                                b_bot_ft300_wrench_link:
+                                  {}
                                 b_bot_single_suction_gripper_base_link:
                                   b_bot_single_suction_gripper_pad_link:
                                     {}
                           b_bot_tool0:
                             {}
-            vwall1:
-              {}
             workbox:
               {}
             workspace_center:
-              plate:
-                plate_center:
-                  bin_1_part_16:
-                    bin_1_part_16_bottom_back_left_corner:
-                      {}
-                    bin_1_part_16_bottom_back_right_corner:
-                      {}
-                    bin_1_part_16_bottom_front_left_corner:
-                      {}
-                    bin_1_part_16_bottom_front_right_corner:
-                      {}
-                    bin_1_part_16_top_back_left_corner:
-                      {}
-                    bin_1_part_16_top_back_right_corner:
-                      {}
-                    bin_1_part_16_top_front_left_corner:
-                      {}
-                    bin_1_part_16_top_front_right_corner:
-                      {}
-                  bin_1_part_17:
-                    bin_1_part_17_bottom_back_left_corner:
-                      {}
-                    bin_1_part_17_bottom_back_right_corner:
-                      {}
-                    bin_1_part_17_bottom_front_left_corner:
-                      {}
-                    bin_1_part_17_bottom_front_right_corner:
-                      {}
-                    bin_1_part_17_top_back_left_corner:
-                      {}
-                    bin_1_part_17_top_back_right_corner:
-                      {}
-                    bin_1_part_17_top_front_left_corner:
-                      {}
-                    bin_1_part_17_top_front_right_corner:
-                      {}
-                  bin_1_part_5:
-                    bin_1_part_5_bottom_back_left_corner:
-                      {}
-                    bin_1_part_5_bottom_back_right_corner:
-                      {}
-                    bin_1_part_5_bottom_front_left_corner:
-                      {}
-                    bin_1_part_5_bottom_front_right_corner:
-                      {}
-                    bin_1_part_5_top_back_left_corner:
-                      {}
-                    bin_1_part_5_top_back_right_corner:
-                      {}
-                    bin_1_part_5_top_front_left_corner:
-                      {}
-                    bin_1_part_5_top_front_right_corner:
-                      {}
-                  bin_2_part_4:
-                    bin_2_part_4_bottom_back_left_corner:
-                      {}
-                    bin_2_part_4_bottom_back_right_corner:
-                      {}
-                    bin_2_part_4_bottom_front_left_corner:
-                      {}
-                    bin_2_part_4_bottom_front_right_corner:
-                      {}
-                    bin_2_part_4_top_back_left_corner:
-                      {}
-                    bin_2_part_4_top_back_right_corner:
-                      {}
-                    bin_2_part_4_top_front_left_corner:
-                      {}
-                    bin_2_part_4_top_front_right_corner:
-                      {}
-                  bin_2_part_7:
-                    bin_2_part_7_bottom_back_left_corner:
-                      {}
-                    bin_2_part_7_bottom_back_right_corner:
-                      {}
-                    bin_2_part_7_bottom_front_left_corner:
-                      {}
-                    bin_2_part_7_bottom_front_right_corner:
-                      {}
-                    bin_2_part_7_top_back_left_corner:
-                      {}
-                    bin_2_part_7_top_back_right_corner:
-                      {}
-                    bin_2_part_7_top_front_left_corner:
-                      {}
-                    bin_2_part_7_top_front_right_corner:
-                      {}
-                  bin_2_part_8:
-                    bin_2_part_8_bottom_back_left_corner:
-                      {}
-                    bin_2_part_8_bottom_back_right_corner:
-                      {}
-                    bin_2_part_8_bottom_front_left_corner:
-                      {}
-                    bin_2_part_8_bottom_front_right_corner:
-                      {}
-                    bin_2_part_8_top_back_left_corner:
-                      {}
-                    bin_2_part_8_top_back_right_corner:
-                      {}
-                    bin_2_part_8_top_front_left_corner:
-                      {}
-                    bin_2_part_8_top_front_right_corner:
-                      {}
-                  tray_1:
-                    tray_1_divider1_1:
-                      {}
-                    tray_1_divider1_2:
-                      {}
-                    tray_1_partition_1:
-                      tray_1_partition_1_pickup:
-                        {}
-                    tray_1_partition_2:
-                      tray_1_partition_2_pickup:
-                        {}
-                    tray_1_partition_3:
-                      tray_1_partition_3_pickup:
-                        {}
-                    tray_1_partition_4:
-                      tray_1_partition_4_pickup:
-                        {}
-                    tray_1_partition_5:
-                      tray_1_partition_5_pickup:
-                        {}
-                  tray_2:
-                    tray_2_divider2:
-                      {}
-                    tray_2_partition_1:
-                      tray_2_partition_1_pickup:
-                        {}
-                    tray_2_partition_2:
-                      tray_2_partition_2_pickup:
-                        {}
-                    tray_2_partition_3:
-                      tray_2_partition_3_pickup:
-                        {}
-                    tray_2_partition_4:
-                      tray_2_partition_4_pickup:
-                        {}
-                    tray_2_partition_5:
-                      tray_2_partition_5_pickup:
-                        {}
-                    tray_2_partition_6:
-                      tray_2_partition_6_pickup:
-                        {}
-                    tray_2_partition_7:
-                      tray_2_partition_7_pickup:
-                        {}
-                    tray_2_partition_8:
-                      tray_2_partition_8_pickup_1:
-                        {}
-                      tray_2_partition_8_pickup_2:
-                        {}
-                    tray_2_screw_holder:
-                      {}
-                    tray_2_screw_m3_1:
-                      {}
-                    tray_2_screw_m3_2:
-                      {}
-                    tray_2_screw_m3_3:
-                      {}
-                    tray_2_screw_m3_4:
-                      {}
-                    tray_2_screw_m3_5:
-                      {}
-                    tray_2_screw_m3_6:
-                      {}
-                    tray_2_screw_m4_1:
-                      {}
-                    tray_2_screw_m4_2:
-                      {}
-                    tray_2_screw_m4_3:
-                      {}
-                    tray_2_screw_m4_4:
-                      {}
-                    tray_2_screw_m4_5:
-                      {}
-                    tray_2_screw_m4_6:
-                      {}
-                    tray_2_screw_m4_7:
-                      {}
-                    tray_2_screw_m4_8:
-                      {}
-                    tray_2_screw_m4_9:
-                      {}
+              {}
       Update Interval: 0
       Value: true
     - Class: rviz/MarkerArray
@@ -2015,10 +767,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.14251184
+      Pitch: 1.20751178
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.0180255324
+      Yaw: 0.118025675
     Saved: ~
 Window Geometry:
   Displays:
