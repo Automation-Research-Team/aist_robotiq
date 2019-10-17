@@ -31,8 +31,8 @@ class PickOrPlaceAction(object):
         goal.pose            = pose_stamped
         goal.pick            = pick
         goal.gripper_command = gripper_command
-        goal.grasp_offset    = grasp_offset
-        goal.approach_offset = approach_offset
+        goal.grasp_offset    = gmsg.Vector3(*grasp_offset)
+        goal.approach_offset = gmsg.Vector3(*approach_offset)
         goal.liftup_after    = liftup_after
         goal.speed_fast      = speed_fast
         goal.speed_slow      = speed_slow
@@ -59,7 +59,9 @@ class PickOrPlaceAction(object):
             = routines.go_to_pose_goal(goal.robot_name,
                                        routines.effector_target_pose(
                                            goal.pose,
-                                           (0, 0, goal.approach_offset)),
+                                           (goal.approach_offset.x,
+                                            goal.approach_offset.y,
+                                            goal.approach_offset.z)),
                                        goal.speed_fast if goal.pick else
                                        goal.speed_slow,
                                        move_lin=True)
@@ -78,7 +80,9 @@ class PickOrPlaceAction(object):
         rospy.loginfo("--- Go to {} pose. ---"
                       .format("pick" if goal.pick else "place"))
         target_pose = routines.effector_target_pose(goal.pose,
-                                                    (0, 0, goal.grasp_offset))
+                                                    (goal.grasp_offset.x,
+                                                     goal.grasp_offset.y,
+                                                     goal.grasp_offset.z))
         routines.publish_marker(target_pose,
                                 "pick_pose" if goal.pick else "place_pose")
         (success, _, feedback.current_pose) \
@@ -111,7 +115,9 @@ class PickOrPlaceAction(object):
                 = routines.go_to_pose_goal(goal.robot_name,
                                            routines.effector_target_pose(
                                                goal.pose,
-                                               (0, 0, goal.approach_offset)),
+                                               (goal.approach_offset.x,
+                                                goal.approach_offset.y,
+                                                goal.approach_offset.z)),
                                            goal.speed_slow if goal.pick else
                                            goal.speed_fast,
                                            move_lin=True)

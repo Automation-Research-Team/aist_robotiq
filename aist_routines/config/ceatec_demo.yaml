@@ -1,0 +1,17 @@
+item_props:
+  cup_noodle_in_cabinet:
+    robot_name: arm
+    camera_name: head_camera
+    approach_offset: [0.02, 0.0, 0.25]
+    grasp_offset: [0.0, 0.0, -0.01]
+    place_offset: [0.0, 0.0, 0.07]
+    speed_slow: 0.1
+    use_normals: false
+  cup_noodle_on_tray:
+    robot_name: arm
+    camera_name: head_camera
+    approach_offset: [0.0, 0.0, 0.25]
+    grasp_offset: [0.0, 0.0, -0.01]
+    place_offset: [0.0, 0.0, 0.07]
+    speed_slow: 0.1
+    use_normals: false

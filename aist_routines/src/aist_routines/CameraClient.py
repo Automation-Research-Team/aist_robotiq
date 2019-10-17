@@ -64,9 +64,8 @@ class CameraClient(object):
 class PhoXiCamera(CameraClient):
     def __init__(self, name="a_phoxi_m_camera"):
         super(PhoXiCamera, self).__init__(*PhoXiCamera._initargs(name))
-        cs = "/{}".format(self.name)
-        self._dyn_reconf = dynamic_reconfigure.client.Client(cs, timeout=None)
-        self._trigger_frame = rospy.ServiceProxy(cs + "/trigger_frame",
+        self._dyn_reconf = dynamic_reconfigure.client.Client(name, timeout=None)
+        self._trigger_frame = rospy.ServiceProxy(name + "/trigger_frame",
                                                  std_srvs.srv.Trigger)
 
     @staticmethod
@@ -109,8 +108,7 @@ class DepthCamera(CameraClient):
 class MonocularCamera(CameraClient):
     def __init__(self, name="IIDCCamera"):
         super(RealsenseCamera, self).__init__(*MonocularCamera._initargs(name))
-        self._dyn_reconf = dynamic_reconfigure.client.Client("/" + self.name,
-                                                             timeout=None)
+        self._dyn_reconf = dynamic_reconfigure.client.Client(name, timeout=None)
 
     @staticmethod
     def base(name):
@@ -118,8 +116,8 @@ class MonocularCamera(CameraClient):
 
     @staticmethod
     def _initargs(name):
-        return (name, "area", "/" + name + "/camera0/camera_info",
-                              "/" + name + "/camera0/image")
+        return (name, "area",
+                name + "/camera0/camera_info", name + "/camera0/image")
 
     def continuous_shot(self, enable):
         self._dyn_reconf.update_configuration({"continuous_shot" : enable})

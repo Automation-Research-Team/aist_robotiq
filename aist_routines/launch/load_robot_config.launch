@@ -1,0 +1,11 @@
+<launch>
+
+  <!-- load robot description URDF -->
+  <param name="robot_description"
+	 command="$(find xacro)/xacro --inorder
+		  '$(find aist_scene_description)/urdf/dtorobo_base_scene.urdf.xacro'" />
+
+  <!-- load controller_config -->
+  <rosparam file="$(find dtorobo_moveit_config)/config/controller_config.yaml"/>
+
+</launch>

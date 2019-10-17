@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
+       name="ceatec_base_scene" >
+
+  <!-- Fetch robot -->
+  <xacro:include filename="$(find fetch_gazebo)/robots/fetch.gazebo.xacro"/>
+
+  <!-- CEATEC base scene -->
+  <xacro:include filename="$(find aist_scene_description)/urdf/ceatec_base_scene_environment.urdf.xacro"/>
+
+  <!-- I would like to remove the "world" link definition, but
+       apparently it is necessary for Gazebo -->
+  <link  name="map"/>
+  <link  name="odom"/>
+  <joint name="map_odom_joint" type="planar">
+    <parent link="map"/>
+    <child  link="odom"/>
+    <axis   xyz="0 0 1"/>
+  </joint>
+  <joint name="odom_base_joint" type="planar">
+    <parent link="odom"/>
+    <child  link="base_link"/>
+    <axis   xyz="0 0 1"/>
+  </joint>
+
+  <joint name="map_world_joint" type="fixed">
+    <parent link="map"/>
+    <child  link="world"/>
+    <origin xyz="0.3 0.5 0" rpy="0 0 0"/>
+  </joint>
+
+</robot>
