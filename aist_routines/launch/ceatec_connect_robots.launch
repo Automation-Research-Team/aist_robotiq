@@ -4,9 +4,7 @@
   <arg name="no_static_map"	default="true"/>
 
   <!-- Start navigation stack -->
-  <!-- <include file="$(find	aist_navigation)/launch/move_base.launch"> -->
-  <!--   <arg name="no_static_map" value="$(arg no_static_map)"/> -->
-  <!-- </include> -->
+  <!-- <include file="$(find	aist_navigation)/launch/move_base_mapless.launch"/> -->
 
   <!-- Publish base_scan_raw if anything subscribes to it -->
   <node name="publish_base_scan_raw"
