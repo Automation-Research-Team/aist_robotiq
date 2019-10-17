@@ -64,7 +64,7 @@ class CameraClient(object):
 class PhoXiCamera(CameraClient):
     def __init__(self, name="a_phoxi_m_camera"):
         super(PhoXiCamera, self).__init__(*PhoXiCamera._initargs(name))
-        self._dyn_reconf = dynamic_reconfigure.client.Client(cs, timeout=None)
+        self._dyn_reconf = dynamic_reconfigure.client.Client(name, timeout=None)
         self._trigger_frame = rospy.ServiceProxy(name + "/trigger_frame",
                                                  std_srvs.srv.Trigger)
 

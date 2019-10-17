@@ -232,7 +232,7 @@ class SuctionGripper(GripperClient):
         import o2as_msgs.msg
 
         super(SuctionGripper, self) \
-            .__init__(*SuctionGripper._initargs(prefix, eject))
+            .__init__(*SuctionGripper._initargs(prefix, eject, timeout))
         self._client    = actionlib.SimpleActionClient(
                               "o2as_fastening_tools/suction_control",
                               o2as_msgs.msg.SuctionControlAction)
