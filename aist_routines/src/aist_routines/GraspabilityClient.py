@@ -29,7 +29,7 @@ class GraspabilityClient(object):
             = rospy.ServiceProxy("/aist_graspability/create_background_image",
                                  asrv.createBackgroundImage)
         self._createMaskImage \
-            = rospy.ServiceProxy("create_mask_image", asrv.createMaskImage)
+            = rospy.ServiceProxy("/aist_graspability/create_mask_image", asrv.createMaskImage)
         self._searchGraspability \
             = rospy.ServiceProxy("search_graspability", asrv.searchGraspability)
         self._searchGraspabilityAction \
