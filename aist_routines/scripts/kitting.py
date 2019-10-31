@@ -159,6 +159,8 @@ if __name__ == '__main__':
             print("  a: Attempt to pick and place")
             print("  A: Repeat attempts to pick and place")
             print("  k: Do kitting task")
+            print("  g: Grasp")
+            print("  r: Release")
             print("  H: Move all robots to home")
             print("  B: Move all robots to back")
             print("  q: Quit")
@@ -206,5 +208,11 @@ if __name__ == '__main__':
                     kitting.go_to_named_pose("home", kitting.former_robot_name)
                 elif key == 'k':
                     kitting.run()
+                elif key == 'g':
+                    if kitting.former_robot_name != None:
+                        kitting.grasp(kitting.former_robot_name)
+                elif key == 'r':
+                    if kitting.former_robot_name != None:
+                        kitting.release(kitting.former_robot_name)
             except Exception as e:
                 print(e.message)
