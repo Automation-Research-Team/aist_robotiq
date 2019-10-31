@@ -54,7 +54,7 @@ part_props:
     destination: tray_2_partition_1
     approach_offset: [0.0, 0.0, 0.15]
     grasp_offset: [0.0, 0.0, -0.004]
-    place_offset: 0.03
+    place_offset: [0.0, 0.0, 0.03]
     speed_slow: 0.1
     use_normals: true
   _9:
