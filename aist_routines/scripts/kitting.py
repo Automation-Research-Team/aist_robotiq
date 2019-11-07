@@ -69,7 +69,7 @@ class KittingRoutines(URRoutines):
         props = item.part_props
 
         # If using a different robot from the former, move it back to home.
-        if self._former_robot_name != None and \
+        if self._former_robot_name is not None and \
            self._former_robot_name != props.robot_name:
             self.go_to_named_pose("back", self._former_robot_name)
         self._former_robot_name = props.robot_name
@@ -168,7 +168,7 @@ if __name__ == '__main__':
             try:
                 key = raw_input(">> ")
                 if key == 'q':
-                    if kitting.former_robot_name != None:
+                    if kitting.former_robot_name is not None:
                         kitting.go_to_named_pose("home",
                                                  kitting.former_robot_name)
                     break
@@ -209,10 +209,10 @@ if __name__ == '__main__':
                 elif key == 'k':
                     kitting.run()
                 elif key == 'g':
-                    if kitting.former_robot_name != None:
+                    if kitting.former_robot_name is not None:
                         kitting.grasp(kitting.former_robot_name)
                 elif key == 'r':
-                    if kitting.former_robot_name != None:
+                    if kitting.former_robot_name is not None:
                         kitting.release(kitting.former_robot_name)
             except Exception as e:
                 print(e.message)
