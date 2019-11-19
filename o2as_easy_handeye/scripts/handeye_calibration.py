@@ -10,8 +10,6 @@ from geometry_msgs import msg as gmsg
 from tf import TransformListener, transformations as tfs
 
 from o2as_easy_handeye.srv import GetSampleList, ComputeCalibration
-
-from o2as_routines.base import O2ASBaseRoutines
 from aist_routines.base import AISTBaseRoutines
 
 # http://wiki.ros.org/cv_bridge/Tutorials/ConvertingBetweenROSImagesAndOpenCVImagesPython
