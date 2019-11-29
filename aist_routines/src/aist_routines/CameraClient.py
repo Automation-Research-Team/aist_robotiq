@@ -90,17 +90,27 @@ class PhoXiCamera(CameraClient):
 #  class DepthCamera                                                 #
 ######################################################################
 class DepthCamera(CameraClient):
-    def __init__(self, name="a_bot_camera"):
-        super(DepthCamera, self).__init__(*DepthCamera._initargs(name))
+    def __init__(self, name="a_bot_camera",
+                 camera_info_topic="color/camera_info",
+                 image_topic="color/image_raw",
+                 pointcloud_topic="depth/color/points",
+                 depth_topic="depth/image_rect_raw"):
+        super(DepthCamera, self).__init__(*DepthCamera._initargs(
+            name, camera_info_topic,
+            image_topic, pointcloud_topic, depth_topic))
 
     @staticmethod
     def base(name):
         return CameraClient(*DepthCamera._initargs(name))
 
     @staticmethod
-    def _initargs(name):
-        return (name, "depth",           name + "/rgb/camera_info",
-                name + "/rgb/image_raw", name + "/depth/points")
+    def _initargs(name, camera_info_topic,
+                  image_topic, pointcloud_topic, depth_topic):
+        return (name, "depth",
+                name + "/" + camera_info_topic,
+                name + "/" + image_topic,
+                name + "/" + pointcloud_topic,
+                name + "/" + depth_topic)
 
 ######################################################################
 #  class MonocularCamera                                             #
