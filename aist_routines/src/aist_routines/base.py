@@ -72,7 +72,7 @@ class AISTBaseRoutines(object):
                                                              camera["args"])
 
         self._markerPublisher    = MarkerPublisher()
-        self._graspabilityClient = GraspabilityClient()
+        self._graspabilityClient = GraspabilityClient(self._reference_frame)
         self._pickOrPlaceAction  = PickOrPlaceAction(self)
         rospy.loginfo("AISTBaseRoutines initialized.")
 
