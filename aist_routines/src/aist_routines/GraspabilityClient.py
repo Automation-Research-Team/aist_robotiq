@@ -18,7 +18,7 @@ from tf                import TransformListener, transformations as tfs
 ######################################################################
 class GraspabilityClient(object):
 
-    def __init__(self):
+    def __init__(self, reference_frame):
         super(GraspabilityClient, self).__init__()
 
         rospack = rospkg.RosPack()
@@ -36,7 +36,8 @@ class GraspabilityClient(object):
             = actionlib.SimpleActionClient(
                 "/aist_graspability/search_graspability",
                 amsg.searchGraspabilityAction)
-        self._listener = TransformListener()
+        self._listener        = TransformListener()
+        self._reference_frame = reference_frame
 
     def create_background_image(self, depth_topic):
         return self._createBackgroundImage(depth_topic).success
@@ -124,7 +125,7 @@ class GraspabilityClient(object):
     def _compute_poses(self, res):
         header = std_msgs.msg.Header()
         header.stamp    = res.header.stamp
-        header.frame_id = "workspace_center"
+        header.frame_id = self._reference_frame
         up = self._listener.asMatrix(res.header.frame_id, header)[0:3, 2]
 
         poses = []

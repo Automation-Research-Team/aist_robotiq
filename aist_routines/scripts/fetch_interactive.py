@@ -134,14 +134,17 @@ class InteractiveRoutines(FetchRoutines):
                 self.continuous_shot(self._camera_name, False)
             elif key == 'trigger':
                 self.trigger_frame(self._camera_name)
+            elif key == 'bg':
+                self.create_background_image(self._camera_name)
             elif key == 'mask':
                 self.create_mask_image(self._camera_name,
                                        int(raw_input("  #bins? ")))
             elif key == 'search':
                 self.delete_all_markers()
-                (poses, rotipz, gscore, success) = \
-                    self.search_graspability(self._robot_name,
-                                             self._camera_name, 4, 0)
+                self.graspability_send_goal(self._robot_name,
+                                            self._camera_name, 4, 0, True)
+                (poses, gscore, success) = \
+                    self.graspability_wait_for_result(self._camera_name, 0)
                 for gs in gscore:
                     print(str(gs))
                 print(str(poses))
@@ -194,7 +197,7 @@ if __name__ == '__main__':
                         '--camera_name',
                         action='store',
                         nargs='?',
-                        default='a_phoxi_m_camera',
+                        default='head_camera',
                         type=str,
                         choices=None,
                         help='camera name',

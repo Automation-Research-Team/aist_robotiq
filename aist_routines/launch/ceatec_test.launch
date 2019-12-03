@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<launch>
+  <arg name="config"		default="ceatec"/>
+  <arg name="scene"		default="fetch_trial_base_scene"/>
+
+  <!-- Start robot controller -->
+  <include file="$(find aist_routines)/launch/connect_robots.launch">
+    <arg name="config"	value="$(arg config)"/>
+    <arg name="scene"	value="$(arg scene)"/>
+    <arg name="sim"	value="false"/>
+  </include>
+
+  <include file="$(find aist_graspability)/launch/aist_graspability.launch">
+    <arg name="server_name"	value="aist_graspability"/>
+  </include>
+
+</launch>
