@@ -1,12 +1,11 @@
-/**
-* @file simple_single.cpp
-* @author Bence Magyar
-* @date June 2012
-* @version 0.1
-* @brief ROS version of the example named "simple" in the Aruco software package.
+/*!
+* \file		main.cpp
+* \author	Toshio UESHIBA
+* \brief	ARuCo marker detector using depth image as well as intensity
 */
 #include <iostream>
 #include <limits>
+#include <cstdint>
 
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
@@ -34,11 +33,18 @@ namespace o2as_aruco_ros
 /************************************************************************
 *  global functions							*
 ************************************************************************/
-template <class T> T
+template <class T> inline T
 val(const sensor_msgs::Image& image_msg, int u, int v)
 {
-    return *reinterpret_cast<const T*>(image_msg.data.data() + v*image_msg.step
-							     + u*sizeof(T));
+    using namespace	sensor_msgs;
+    
+    if (image_msg.encoding == image_encodings::TYPE_16UC1)
+	return T(0.001) * *reinterpret_cast<const uint16_t*>(
+				image_msg.data.data() + v*image_msg.step
+						      + u*sizeof(uint16_t));
+    else
+	return *reinterpret_cast<const T*>(image_msg.data.data()
+					   + v*image_msg.step + u*sizeof(T));
 }
 
 /************************************************************************
