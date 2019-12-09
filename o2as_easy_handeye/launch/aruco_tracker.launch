@@ -29,11 +29,12 @@
     <remap from="/depth"	to="/$(arg camera_name)/depth_map"
     	   if="$(eval arg('camera_name') == 'b_phoxi_m_camera')"/>
 
-    <remap from="/camera_info"	to="/$(arg camera_name)/rgb/camera_info"
+    <remap from="/camera_info"	to="/$(arg camera_name)/color/camera_info"
 	   if="$(eval arg('camera_name') == 'a_bot_camera')"/>
-    <remap from="/image"	to="/$(arg camera_name)/rgb/image_raw"
+    <remap from="/image"	to="/$(arg camera_name)/color/image_raw"
 	   if="$(eval arg('camera_name') == 'a_bot_camera')"/>
-    <remap from="/depth"	to="/$(arg camera_name)/depth/image_raw"
+    <remap from="/depth"
+	   to="/$(arg camera_name)/aligned_depth_to_color/image_raw"
     	   if="$(eval arg('camera_name') == 'a_bot_camera')"/>
 
     <!-- Other parameters -->

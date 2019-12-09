@@ -94,7 +94,7 @@ class DepthCamera(CameraClient):
                  camera_info_topic="color/camera_info",
                  image_topic="color/image_raw",
                  pointcloud_topic="depth/color/points",
-                 depth_topic="depth/image_rect_raw"):
+                 depth_topic="aligned_depth_to_color/image_raw"):
         super(DepthCamera, self).__init__(*DepthCamera._initargs(
             name, camera_info_topic,
             image_topic, pointcloud_topic, depth_topic))
@@ -111,6 +111,10 @@ class DepthCamera(CameraClient):
                 name + "/" + image_topic,
                 name + "/" + pointcloud_topic,
                 name + "/" + depth_topic)
+
+    def continuous_shot(self, enable):
+        self._dyn_reconf.update_configuration({"emitter_enabled" : enable})
+        return True
 
 ######################################################################
 #  class MonocularCamera                                             #
