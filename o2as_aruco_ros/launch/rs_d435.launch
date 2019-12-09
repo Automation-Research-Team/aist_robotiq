@@ -9,9 +9,10 @@
   <arg name="corner_refinement"	default="LINES"/>
 
   <include file="$(find realsense2_camera)/launch/rs_camera.launch">
-    <arg name="camera"			value="$(arg camera_name)"/>
-    <arg name="align_depth"		value="true"/>
-    <arg name="enable_pointcloud"	value="true"/>
+    <arg name="camera"		value="$(arg camera_name)"/>
+    <arg name="enable_infra1"	value="false"/>
+    <arg name="enable_infra2"	value="false"/>
+    <arg name="align_depth"	value="true"/>
   </include>
 
   <group ns="$(arg camera_name)">
