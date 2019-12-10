@@ -15,7 +15,8 @@
 #include <visualization_msgs/Marker.h>
 #include <dynamic_reconfigure/server.h>
 #include <message_filters/subscriber.h>
-#include <message_filters/time_synchronizer.h>
+#include <message_filters/synchronizer.h>
+#include <message_filters/sync_policies/approximate_time.h>
 #include <cv_bridge/cv_bridge.h>
 #include <o2as_aruco_ros/Corners.h>
 
@@ -48,18 +49,20 @@ val(const sensor_msgs::Image& image_msg, int u, int v)
 }
 
 /************************************************************************
-*  class Simple								*
+*  class Detector							*
 ************************************************************************/
-class Simple
+class Detector
 {
   private:
     using camera_info_t	= sensor_msgs::CameraInfo;
     using camera_info_p	= sensor_msgs::CameraInfoConstPtr;
     using image_t	= sensor_msgs::Image;
     using image_p	= sensor_msgs::ImageConstPtr;
+    using sync_policy_t	= message_filters::sync_policies::
+			      ApproximateTime<camera_info_t, image_t, image_t>;
 
   public:
-    Simple();
+    Detector();
 
     std::ostream&	print_bins(std::ostream& out)		const	;
 
@@ -102,8 +105,7 @@ class Simple
     message_filters::Subscriber<camera_info_t>		_camera_info_sub;
     message_filters::Subscriber<image_t>		_image_sub;
     message_filters::Subscriber<image_t>		_depth_sub;
-    message_filters::TimeSynchronizer<camera_info_t,
-				      image_t, image_t>	_ts;
+    message_filters::Synchronizer<sync_policy_t>	_sync;
 
   // camera_info stuff
     aruco::CameraParameters				_camParam;
@@ -133,12 +135,12 @@ class Simple
     float						_planarityTolerance;
 };
 
-Simple::Simple()
+Detector::Detector()
     :_nh("~"),
      _camera_info_sub(_nh, "/camera_info", 1),
      _image_sub(_nh, "/image", 1),
      _depth_sub(_nh, "/depth", 1),
-     _ts(_camera_info_sub, _image_sub, _depth_sub, 10),
+     _sync(sync_policy_t(10), _camera_info_sub, _image_sub, _depth_sub),
      _it(_nh),
      _image_pub(_it.advertise("result", 1)),
      _debug_pub(_it.advertise("debug",  1)),
@@ -151,7 +153,7 @@ Simple::Simple()
 {
     using	aruco::MarkerDetector;
 
-    _ts.registerCallback(&Simple::detect_marker_cb, this);
+    _sync.registerCallback(&Detector::detect_marker_cb, this);
 
     std::string refinementMethod;
     _nh.param("corner_refinement", refinementMethod, std::string("LINES"));
@@ -196,11 +198,12 @@ Simple::Simple()
 		    << _reference_frame << " as parent and "
 		    << _marker_frame << " as child.");
 
-    _dyn_rec_server.setCallback(boost::bind(&Simple::reconf_cb, this, _1, _2));
+    _dyn_rec_server.setCallback(boost::bind(&Detector::reconf_cb,
+					    this, _1, _2));
 }
 
 std::ostream&
-Simple::print_bins(std::ostream& out) const
+Detector::print_bins(std::ostream& out) const
 {
     out << "<?xml version=\"1.0\"?>\n"
 	<< "<robot xmlns:xacro=\"http://www.ros.org/wiki/xacro\" name=\"kitting_scene\">\n"
@@ -219,7 +222,7 @@ Simple::print_bins(std::ostream& out) const
 }
 
 void
-Simple::reconf_cb(aruco_ros::ArucoThresholdConfig& config, uint32_t level)
+Detector::reconf_cb(aruco_ros::ArucoThresholdConfig& config, uint32_t level)
 {
     _mDetector.setThresholdParams(config.param1, config.param2);
 
@@ -228,7 +231,7 @@ Simple::reconf_cb(aruco_ros::ArucoThresholdConfig& config, uint32_t level)
 }
 
 void
-Simple::detect_marker_cb(const camera_info_p& camera_info_msg,
+Detector::detect_marker_cb(const camera_info_p& camera_info_msg,
 			 const image_p& image_msg, const image_p& depth_msg)
 {
     try
@@ -301,7 +304,7 @@ Simple::detect_marker_cb(const camera_info_p& camera_info_msg,
 }
 
 bool
-Simple::get_transform(const std::string& refFrame,
+Detector::get_transform(const std::string& refFrame,
 		      const std::string& childFrame,
 		      tf::StampedTransform& transform) const
 {
@@ -331,7 +334,7 @@ Simple::get_transform(const std::string& refFrame,
 }
 
 tf::Transform
-Simple::get_marker_transform(const aruco::Marker& marker,
+Detector::get_marker_transform(const aruco::Marker& marker,
 			     const image_t& depth_msg, cv::Mat& image) const
 {
     struct rgb_t	{ uint8_t r, g, b; };
@@ -441,7 +444,7 @@ Simple::get_marker_transform(const aruco::Marker& marker,
 }
 
 template <class T> cv::Vec<T, 3>
-Simple::view_vector(T u, T v) const
+Detector::view_vector(T u, T v) const
 {
     std::vector<cv::Vec<T, 2> >	uv{{u, v}}, xy;
     cv::undistortPoints(uv, xy, _camParam.CameraMatrix, _camParam.Distorsion);
@@ -450,7 +453,7 @@ Simple::view_vector(T u, T v) const
 }
 
 template <class T> cv::Vec<T, 3>
-Simple::at(const image_t& depth_msg, int u, int v) const
+Detector::at(const image_t& depth_msg, int u, int v) const
 {
     const auto	xyz = view_vector<T>(u, v);
     const auto	d   = val<T>(depth_msg, u, v);
@@ -459,7 +462,7 @@ Simple::at(const image_t& depth_msg, int u, int v) const
 }
 
 template <class T> cv::Vec<T, 3>
-Simple::at(const image_t& depth_msg, T u, T v) const
+Detector::at(const image_t& depth_msg, T u, T v) const
 {
     const int	u0 = std::floor(u);
     const int	v0 = std::floor(v);
@@ -477,7 +480,7 @@ Simple::at(const image_t& depth_msg, T u, T v) const
 }
 
 void
-Simple::publish_marker_info(const aruco::Marker& marker,
+Detector::publish_marker_info(const aruco::Marker& marker,
 			    const image_t& depth_msg, cv::Mat& image)
 {
     const auto	stamp = depth_msg.header.stamp;
@@ -533,7 +536,7 @@ Simple::publish_marker_info(const aruco::Marker& marker,
 }
 
 void
-Simple::publish_image_info(const cv::Mat& image, const ros::Time& stamp)
+Detector::publish_image_info(const cv::Mat& image, const ros::Time& stamp)
 {
     if (_image_pub.getNumSubscribers() > 0)
     {
@@ -568,7 +571,7 @@ main(int argc, char** argv)
 
     try
     {
-	o2as_aruco_ros::Simple	node;
+	o2as_aruco_ros::Detector	node;
 	ros::spin();
 
 	node.print_bins(std::cout);
