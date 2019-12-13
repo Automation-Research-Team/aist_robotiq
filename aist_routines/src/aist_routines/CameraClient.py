@@ -98,6 +98,7 @@ class DepthCamera(CameraClient):
         super(DepthCamera, self).__init__(*DepthCamera._initargs(
             name, camera_info_topic,
             image_topic, pointcloud_topic, depth_topic))
+        self._dyn_reconf = dynamic_reconfigure.client.Client(name, timeout=None)
 
     @staticmethod
     def base(name):
