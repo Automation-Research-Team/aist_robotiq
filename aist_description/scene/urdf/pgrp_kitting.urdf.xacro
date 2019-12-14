@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="pgrp_kitting">
+  <xacro:include filename="$(find aist_description)/scene/urdf/pgrp_base_scene.urdf.xacro"/>
+
+  <xacro:property name="plate_w" value="0.68"/>
+  <xacro:property name="plate_l" value="0.42"/>
+  <xacro:property name="plate_h" value="0.015"/>
+
+  <!-- front plate -->
+  <xacro:include filename="$(find aist_description)/object/urdf/aist_box.xacro"/>
+  <xacro:aist_box boxname="plate"
+		  box_w="${plate_w}"
+		  box_l="${plate_l}"
+		  box_h="${plate_h}"
+		  parent="workspace_center">
+    <origin xyz="${table_w/2 - plate_w - 0.14} ${-plate_l/2} 0"
+	    rpy="0 0 0"/>
+  </xacro:aist_box>
+  <link name="plate_center"/>
+  <joint name="plate_to_plate_center" type="fixed">
+    <parent link="plate"/>
+    <child  link="plate_center"/>
+    <origin xyz="${plate_w/2} ${plate_l/2} ${plate_h}" rpy="0 0 0"/>
+  </joint>
+
+  <xacro:include filename="$(find aist_description)/object/urdf/kitting_bins.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/object/urdf/kitting_trays.urdf.xacro"/>
+
+  <!-- bin_1_definition -->
+  <xacro:property name="bin_1_width"		value="0.125"/>
+  <xacro:property name="bin_1_length"		value="0.128"/>
+  <xacro:property name="z_origin_offset_1"	value="-.005"/>
+
+  <!-- bin_2_definition -->
+  <xacro:property name="bin_2_width"		value="0.112"/>
+  <xacro:property name="bin_2_length"		value="0.201"/>
+  <xacro:property name="z_origin_offset_2"	value="-.008"/>
+
+  <!-- bin_3_definition -->
+  <xacro:property name="bin_3_width"		value="0.192"/>
+  <xacro:property name="bin_3_length"		value="0.285"/>
+  <xacro:property name="z_origin_offset_3"	value="-.004"/>
+
+  <!-- A row of bin1 -->
+  <xacro:property name="set1_x"	value="0"/>
+  <xacro:property name="set1_y" value="0.096"/>
+  <xacro:property name="set1_z" value="0"/>
+  <!-- A row of bin2 -->
+  <xacro:property name="set2_x" value="0.25"/>
+  <xacro:property name="set2_y" value="0.096"/>
+  <xacro:property name="set2_z" value="0"/>
+
+  <!--bin_1_part_15_-->
+  <xacro:kitting_bin_1 binname	      ="bin_1_part_5"
+		       parent	      ="plate_center"
+		       z_origin_offset="${z_origin_offset_1}">
+    <origin xyz="${plate_w/2 - bin_1_length/2}
+		 ${bin_1_width}
+		 ${-z_origin_offset_1}"
+	    rpy="0 0 0"/>
+  </xacro:kitting_bin_1>
+  <!--bin_1_part_16_-->
+  <xacro:kitting_bin_1 binname	      ="bin_1_part_16"
+		       parent	      ="plate_center"
+		       z_origin_offset="${z_origin_offset_1}">
+    <origin xyz="${plate_w/2 - bin_1_length/2}
+		 0
+		 ${-z_origin_offset_1}"
+	    rpy="0 0 0"/>
+  </xacro:kitting_bin_1>
+  <!--bin_1_part_17_-->
+  <xacro:kitting_bin_1 binname	      ="bin_1_part_17"
+  		       parent	      ="plate_center"
+  		       z_origin_offset="${z_origin_offset_1}">
+    <origin xyz="${plate_w/2 - bin_1_length/2}
+		 ${-bin_1_width}
+		 ${-z_origin_offset_1}"
+	    rpy="0 0 0"/>
+  </xacro:kitting_bin_1>
+
+  <!-- bin_2_part_4_ -->
+  <xacro:kitting_bin_2 binname	      ="bin_2_part_4"
+		       parent	      ="plate_center"
+		       z_origin_offset="${z_origin_offset_2}">
+    <origin xyz="${plate_w/2 - bin_1_length - bin_2_length/2}
+		 ${bin_2_width}
+		 ${-z_origin_offset_2}"
+	    rpy="0 0 0"/>
+  </xacro:kitting_bin_2>
+  <!--bin_2_part_7_-->
+  <xacro:kitting_bin_2 binname	      ="bin_2_part_7"
+		       parent	      ="plate_center"
+		       z_origin_offset="${z_origin_offset_2}">
+    <origin xyz="${plate_w/2 - bin_1_length - bin_2_length/2}
+		 0
+		 ${-z_origin_offset_2}"
+	    rpy="0 0 0"/>
+  </xacro:kitting_bin_2>
+  <!--bin_2_part_8_-->
+  <xacro:kitting_bin_2 binname	      ="bin_2_part_8"
+  		       parent	      ="plate_center"
+  		       z_origin_offset="${z_origin_offset_2}">
+    <origin xyz="${plate_w/2 - bin_1_length - bin_2_length/2}
+		 ${-bin_2_width}
+		 ${-z_origin_offset_2}"
+	    rpy="0 0 0"/>
+  </xacro:kitting_bin_2>
+
+
+  <!-- tray_1 -->
+  <xacro:kitting_tray_1 trayname="tray_1" parent="plate_center">
+    <origin xyz="${plate_w/2 - bin_1_length - bin_2_length - tray_width}
+		 ${tray_length}
+		 0"
+	    rpy="0 0 ${-pi/2}"/>
+  </xacro:kitting_tray_1>
+
+  <!-- tray_2 -->
+  <xacro:kitting_tray_2 trayname="tray_2" parent="plate_center">
+    <origin xyz="${plate_w/2 - bin_1_length - bin_2_length}
+		 ${-tray_length}
+		 0"
+	    rpy="0 0 ${pi/2}"/>
+  </xacro:kitting_tray_2>
+
+</robot>
