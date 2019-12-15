@@ -3,23 +3,17 @@
   <xacro:include filename="$(find aist_description)/scene/urdf/ur5e_base_scene.urdf.xacro"/>
 
   <!-- Add AR markers -->
-  <xacro:include filename="$(find aist_gazebo)/urdf/aist_ar_marker.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/object/urdf/ar_markers.urdf.xacro"/>
 
-  <xacro:aist_ar_marker prefix="c_bot_"
-			parent="c_bot_robotiq_85_tip_link"
-			marker_id="26">
+  <xacro:ar_marker_70_5_5 prefix="c_bot_"
+			  parent="c_bot_robotiq_85_tip_link"
+			  marker_id="26">
     <origin xyz="0.0 0.0 0.0185" rpy="0 0 0"/>
-  </xacro:aist_ar_marker>
+  </xacro:ar_marker_70_5_5>
 
-  <xacro:aist_ar_marker prefix="d_bot_"
-  			parent="d_bot_dual_suction_gripper_base_link"
-  			marker_id="26">
+  <xacro:ar_marker_70_5_5 prefix="d_bot_"
+  			  parent="d_bot_dual_suction_gripper_base_link"
+  			  marker_id="26">
     <origin xyz="0.063 0.0 0.0215" rpy="0 0 0"/>
-  </xacro:aist_ar_marker>
-
-  <!-- <xacro:aist_ar_marker_16cm prefix="workspace_" -->
-  <!-- 			     parent="workspace_center" -->
-  <!-- 			     marker_id="32"> -->
-  <!--   <origin xyz="0.0 0.0 0.005" rpy="0 0 0"/> -->
-  <!-- </xacro:aist_ar_marker_16cm> -->
+  </xacro:ar_marker_70_5_5>
 </robot>

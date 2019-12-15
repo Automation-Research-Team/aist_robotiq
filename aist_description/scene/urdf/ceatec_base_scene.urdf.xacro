@@ -5,7 +5,7 @@
   <!-- Fetch robot -->
   <xacro:include filename="$(find fetch_gazebo)/robots/fetch.gazebo.xacro"/>
 
-  <!-- CEATEC base scene -->
+  <!-- Environment of CEATEC base scene -->
   <xacro:include filename="$(find aist_description)/scene/urdf/ceatec_base_scene_environment.urdf.xacro"/>
 
   <!-- I would like to remove the "world" link definition, but

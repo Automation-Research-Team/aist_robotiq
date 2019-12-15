@@ -1,11 +1,9 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
-        name="ur5e_base_scene" >
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="ur5e_base_scene" >
 
   <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
   <xacro:property name="c_bot_x" value="0"/>
   <xacro:property name="c_bot_y" value="-0.4875"/>
-  <!-- <xacro:property name="c_bot_theta" value="${pi}"/> -->
   <xacro:property name="d_bot_x" value="0"/>
   <xacro:property name="d_bot_y" value="0.4875"/>
   <xacro:property name="d_bot_theta" value="${pi}"/>
@@ -13,10 +11,6 @@
   <xacro:property name="bots_z" value="0.77"/>
 
   <!-- This is the main file defining our robot arrangement and physical environment. -->
-
-  <!-- common stuff -->
-  <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro"/>
-  <xacro:include filename="$(find aist_gazebo)/urdf/aist_base_scene.gazebo"/>
 
   <!-- Main workspace -->
   <!-- The surface is 0.01 m below the robot bases and the "workspace_center" frame. -->
@@ -39,6 +33,7 @@
   </joint>
 
   <!-- robot arms -->
+  <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro"/>
   <xacro:include filename="$(find aist_description)/device/urdf/ur5e.urdf.xacro"/>
   <xacro:ur5e_robot prefix="c_bot_" joint_limited="false"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
