@@ -9,9 +9,6 @@
   <xacro:property name="b_torobo_y" value="0.4875"/>
   <xacro:property name="bots_z"	    value="0.785"/>
 
-  <!-- common stuff -->
-  <xacro:include filename="$(find aist_gazebo)/urdf/aist_base_scene.gazebo"/>
-
   <!-- Main workspace -->
   <!-- The surface is 0.01 m below the robot bases and the "workspace_center" frame. -->
   <link name="world"/>

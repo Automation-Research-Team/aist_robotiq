@@ -14,10 +14,6 @@
 
   <!-- This is the main file defining our robot arrangement and physical environment. -->
 
-  <!-- common stuff -->
-  <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro"/>
-  <xacro:include filename="$(find aist_gazebo)/urdf/aist_base_scene.gazebo"/>
-
   <!-- Main workspace -->
   <!-- The surface is 0.01 m below the robot bases and the "workspace_center" frame. -->
   <link name="world"/>
@@ -39,6 +35,7 @@
   </joint>
 
   <!-- robot arms -->
+  <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro"/>
   <xacro:include filename="$(find aist_description)/device/urdf/ur5.urdf.xacro"/>
   <xacro:ur5_robot prefix="a_bot_" joint_limited="false"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
@@ -58,13 +55,13 @@
 
   <joint name="world_a_bot_joint" type="fixed">
     <parent link="world"/>
-    <child  link= "a_bot_base_link"/>
+    <child  link="a_bot_base_link"/>
     <origin xyz="${a_bot_x} ${a_bot_y} ${bots_z}" rpy="0 0 0"/>
   </joint>
 
   <joint name="world_b_bot_joint" type="fixed">
     <parent link="world"/>
-    <child  link= "b_bot_base_link"/>
+    <child  link="b_bot_base_link"/>
     <origin xyz="${b_bot_x} ${b_bot_y} ${bots_z}" rpy="0 0 ${b_bot_theta}"/>
   </joint>
 
