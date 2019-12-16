@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <robot name="aaa" xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:include filename="$(find aist_object_description)/urdf/precision_gripper.urdf.xacro" />
+  <xacro:include filename="$(find o2as_precision_gripper)/urdf/precision_gripper.urdf.xacro" />
 
   <link name ="base_link"/>
 

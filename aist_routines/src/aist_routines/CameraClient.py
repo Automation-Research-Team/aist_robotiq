@@ -98,11 +98,16 @@ class DepthCamera(CameraClient):
         super(DepthCamera, self).__init__(*DepthCamera._initargs(
             name, camera_info_topic,
             image_topic, pointcloud_topic, depth_topic))
-        self._dyn_reconf = dynamic_reconfigure.client.Client(name, timeout=None)
+#        self._dyn_reconf = dynamic_reconfigure.client.Client(name, timeout=None)
 
     @staticmethod
-    def base(name):
-        return CameraClient(*DepthCamera._initargs(name))
+    def base(name,
+             camera_info_topic, image_topic, pointcloud_topic, depth_topic):
+        return CameraClient(*DepthCamera._initargs(name,
+                                                   camera_info_topic,
+                                                   image_topic,
+                                                   pointcloud_topic,
+                                                   depth_topic))
 
     @staticmethod
     def _initargs(name, camera_info_topic,
@@ -113,9 +118,9 @@ class DepthCamera(CameraClient):
                 name + "/" + pointcloud_topic,
                 name + "/" + depth_topic)
 
-    def continuous_shot(self, enable):
-        self._dyn_reconf.update_configuration({"emitter_enabled" : enable})
-        return True
+ #   def continuous_shot(self, enable):
+ #       self._dyn_reconf.update_configuration({"emitter_enabled" : enable})
+ #       return True
 
 ######################################################################
 #  class MonocularCamera                                             #

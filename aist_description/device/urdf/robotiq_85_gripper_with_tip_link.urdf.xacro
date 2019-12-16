@@ -4,12 +4,12 @@
 <!-- The position of the TF frame has not been measured at all and needs to be calibrated. -->
 
 <robot name="robotiq_85_gripper_with_tip_link"
-       xmlns:xacro="http://www.ros.org/wiki/xacro">
+       xmlns:xacro="http://wiki.ros.org/xacro">
 
   <xacro:macro name="robotiq_85_gripper_with_tip_link"
 	       params="prefix parent *origin">
     <xacro:include filename="$(find robotiq_description)/urdf/robotiq_85_gripper.urdf.xacro"/>
-    
+
     <xacro:robotiq_85_gripper prefix="${prefix}" parent="${parent}">
       <xacro:insert_block name="origin"/>
     </xacro:robotiq_85_gripper>
@@ -22,5 +22,5 @@
       <origin rpy="0.0 0.0 0.0" xyz=".163 0.0 0.0"/>
     </joint>
   </xacro:macro>
-  
+
 </robot>

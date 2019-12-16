@@ -4,7 +4,7 @@
 <!-- The position of the TF frame has not been measured at all and needs to be calibrated. -->
 
 <robot name="robotiq_hande_with_tip_link"
-       xmlns:xacro="http://www.ros.org/wiki/xacro">
+       xmlns:xacro="http://wiki.ros.org/xacro">
 
   <xacro:macro name="robotiq_hande_with_tip_link"
 	       params="prefix parent *origin">

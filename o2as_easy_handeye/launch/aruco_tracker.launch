@@ -5,12 +5,14 @@
   <arg name="camera_frame"	default="aruco_camera_frame"/>
   <arg name="marker_frame"	default="aruco_marker_frame"/>
   <arg name="reference_frame"	default=""/>
+  <arg name="sim"		default="false"/>
 
   <arg name="marker_id"		value="26"	unless="$(arg eye_on_hand)"/>
   <arg name="marker_id"		value="32"	if    ="$(arg eye_on_hand)"/>
 
   <arg name="marker_size"	value="0.07"	unless="$(arg eye_on_hand)"/>
   <arg name="marker_size"	value="0.16"	if    ="$(arg eye_on_hand)"/>
+
 
   <!-- <node name="aruco_tracker" pkg="aruco_ros" type="single"> -->
   <node name="aruco_tracker" pkg="o2as_aruco_ros" type="o2as_single"

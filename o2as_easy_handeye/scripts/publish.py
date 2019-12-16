@@ -93,7 +93,7 @@ class CalibrationPublisher:
                                     dict['another_transformation']['qz'],
                                     dict['another_transformation']['qw']))
 
-        root_frame = X.header.frame_id if eye_on_hand else 'o2as_ground'
+        root_frame = X.header.frame_id if eye_on_hand else 'ground'
 
         return (X, Y, root_frame)
 

@@ -18,6 +18,12 @@
   <arg name="eye_on_hand"
        value="$(eval arg('camera_name') == arg('robot_name') + '_camera')"/>
 
+  <!-- Start camera -->
+  <include file="$(find aist_routines)/launch/connect_camera.launch"
+	   unless="$(arg sim)">
+    <arg name="camera_name"	value="$(arg camera_name)"/>
+  </include>
+
   <!-- Start ArUco -->
   <include file="$(find o2as_easy_handeye)/launch/aruco_tracker.launch">
     <arg name="eye_on_hand"	value="$(arg eye_on_hand)"/>

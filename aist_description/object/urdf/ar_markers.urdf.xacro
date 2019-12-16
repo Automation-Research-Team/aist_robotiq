@@ -1,6 +1,5 @@
 <?xml version="1.0" ?>
-
-<robot name="ar_marker" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="ar_marker" xmlns:xacro="http://wiki.ros.org/xacro">
 
   <xacro:macro name="ar_marker"
 	       params="prefix parent marker_id size margin thickness *origin">
@@ -30,37 +29,37 @@
          aist_gazebo/media/material. You also need to export
          gazebo_media_path in package.xml. -->
     <gazebo reference="${prefix}ar_marker">
-      <material>Aruco/marker-${marker_id}-${1000*size}-${1000*margin}</material>
+      <material>Aruco/marker-${marker_id}-${int(1000*size)}-${int(1000*margin)}</material>
     </gazebo>
 
   </xacro:macro>
 
-  <xacro:macro name="ar_marker_70_5_5"
-	       params="prefix parent marker_id *origin">
+  <xacro:macro name="ar_marker_70_5"
+	       params="prefix parent marker_id thickness *origin">
 
     <xacro:ar_marker prefix="${prefix}" parent="${parent}"
 		     marker_id="${marker_id}" size="0.07"
-		     margin="0.005" thickness="0.005">
+		     margin="0.005" thickness="${thickness}">
       <xacro:insert_block name="origin"/>
     </xacro:ar_marker>
   </xacro:macro>
 
-  <xacro:macro name="ar_marker_80_10_5"
-	       params="prefix parent marker_id *origin">
+  <xacro:macro name="ar_marker_80_10"
+	       params="prefix parent marker_id thickness *origin">
 
     <xacro:ar_marker prefix="${prefix}" parent="${parent}"
 		     marker_id="${marker_id}" size="0.08"
-		     margin="0.01" thickness="0.005">
+		     margin="0.01" thickness="${thickness}">
       <xacro:insert_block name="origin"/>
     </xacro:ar_marker>
   </xacro:macro>
 
-  <xacro:macro name="ar_marker_160_10_1"
-	       params="prefix parent marker_id *origin">
+  <xacro:macro name="ar_marker_160_10"
+	       params="prefix parent marker_id thickness *origin">
 
     <xacro:ar_marker prefix="${prefix}" parent="${parent}"
 		     marker_id="${marker_id}" size="0.16"
-		     margin="0.01" thickness="0.001">
+		     margin="0.01" thickness="${thickness}">
       <xacro:insert_block name="origin"/>
     </xacro:ar_marker>
   </xacro:macro>

@@ -1,6 +1,5 @@
 <?xml version="1.0" ?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro"
-       name="table">
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="table">
 
   <xacro:include filename="$(find aist_description)/object/urdf/aist_box.urdf.xacro"/>
 

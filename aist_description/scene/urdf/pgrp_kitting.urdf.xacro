@@ -7,11 +7,11 @@
   <xacro:property name="plate_h" value="0.015"/>
 
   <!-- front plate -->
-  <xacro:include filename="$(find aist_description)/object/urdf/aist_box.xacro"/>
-  <xacro:aist_box boxname="plate"
-		  box_w="${plate_w}"
-		  box_l="${plate_l}"
-		  box_h="${plate_h}"
+  <xacro:include filename="$(find aist_description)/object/urdf/aist_box.urdf.xacro"/>
+  <xacro:aist_box name="plate"
+		  width="${plate_w}"
+		  length="${plate_l}"
+		  height="${plate_h}"
 		  parent="workspace_center">
     <origin xyz="${table_w/2 - plate_w - 0.14} ${-plate_l/2} 0"
 	    rpy="0 0 0"/>

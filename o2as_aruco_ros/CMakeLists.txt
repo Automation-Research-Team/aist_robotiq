@@ -51,7 +51,6 @@ catkin_package(
 
 add_executable(o2as_single
   src/main.cpp
-  src/BinDescription.cpp
 )
 
 target_link_libraries(o2as_single

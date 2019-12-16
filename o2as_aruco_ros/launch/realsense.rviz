@@ -58,7 +58,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /a_bot_camera/aruco_tracker/result
+      Image Topic: /aruco_tracker/result
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -89,10 +89,6 @@ Visualization Manager:
           Value: false
         a_bot_camera_infra1_optical_frame:
           Value: false
-        a_bot_camera_infra2_frame:
-          Value: false
-        a_bot_camera_infra2_optical_frame:
-          Value: false
         a_bot_camera_link:
           Value: false
         aruco_marker_frame:
@@ -118,9 +114,6 @@ Visualization Manager:
               {}
           a_bot_camera_infra1_frame:
             {}
-          a_bot_camera_infra2_frame:
-            a_bot_camera_infra2_optical_frame:
-              {}
       Update Interval: 0
       Value: true
     - Class: rviz/Image
@@ -213,10 +206,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: -1.40479648
+      Pitch: -1.41979647
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.69331646
+      Yaw: 4.673316
     Saved: ~
 Window Geometry:
   Displays:
