@@ -5,15 +5,17 @@
   <!-- Add AR markers -->
   <xacro:include filename="$(find aist_description)/object/urdf/ar_markers.urdf.xacro"/>
 
-  <xacro:ar_marker_70_5_5 prefix="c_bot_"
-			  parent="c_bot_robotiq_85_tip_link"
-			  marker_id="26">
+  <xacro:ar_marker_70_5 prefix="c_bot_"
+			parent="c_bot_robotiq_85_tip_link"
+			marker_id="26"
+			thickness="0.005">
     <origin xyz="0.0 0.0 0.0185" rpy="0 0 0"/>
-  </xacro:ar_marker_70_5_5>
+  </xacro:ar_marker_70_5>
 
-  <xacro:ar_marker_70_5_5 prefix="d_bot_"
-  			  parent="d_bot_dual_suction_gripper_base_link"
-  			  marker_id="26">
+  <xacro:ar_marker_70_5 prefix="d_bot_"
+  			parent="d_bot_dual_suction_gripper_base_link"
+  			marker_id="26"
+			thickness="0.005">
     <origin xyz="0.063 0.0 0.0215" rpy="0 0 0"/>
-  </xacro:ar_marker_70_5_5>
+  </xacro:ar_marker_70_5>
 </robot>

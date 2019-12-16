@@ -1,7 +1,7 @@
 moveit_setup_assistant_config:
   URDF:
-    package: aist_scene_description
-    relative_path: urdf/dtorobo_base_scene.urdf.xacro
+    package: aist_description
+    relative_path: scene/urdf/dtorobo_base_scene.urdf.xacro
     xacro_args: ""
   SRDF:
     relative_path: config/dtorobo_base_scene.srdf

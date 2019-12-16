@@ -8,7 +8,7 @@ This is the URDF model for the Intel RealSense 430 camera, in it's
 aluminum peripherial evaluation case.
 -->
 
-<robot name="sensor_r430" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="sensor_r430" xmlns:xacro="http://wiki.ros.org/xacro">
   <xacro:property name="M_PI" value="3.1415926535897931" />
 
   <!-- The following values are approximate, and the camera node
@@ -18,7 +18,7 @@ aluminum peripherial evaluation case.
   <xacro:property name="r430_cam_depth_to_fisheye_offset" value="0.042"/>
 
   <!-- The following values model the aluminum peripherial case for the
-    R430 camera, with the camera joint represented by the actual 
+    R430 camera, with the camera joint represented by the actual
     peripherial camera tripod mount -->
   <xacro:property name="r430_cam_width" value="0.105"/>
   <xacro:property name="r430_cam_height" value="0.039"/>
@@ -66,7 +66,7 @@ aluminum peripherial evaluation case.
         <inertia ixx="0.003881243" ixy="0.0" ixz="0.0" iyy="0.000498940" iyz="0.0" izz="0.003879257" />
       </inertial>
     </link>
-   
+
     <!-- camera depth joints and links -->
     <joint name="${prefix}camera_depth_joint" type="fixed">
       <origin xyz="${r430_cam_depth_px} ${r430_cam_depth_py} ${r430_cam_depth_pz}" rpy="0 0 0"/>
@@ -81,7 +81,7 @@ aluminum peripherial evaluation case.
       <child link="${prefix}camera_depth_optical_frame" />
     </joint>
     <link name="${prefix}camera_depth_optical_frame"/>
-      
+
     <!-- camera left IR joints and links -->
     <joint name="${prefix}camera_left_ir_joint" type="fixed">
       <origin xyz="0 ${r430_cam_depth_to_left_ir_offset} 0" rpy="0 0 0" />

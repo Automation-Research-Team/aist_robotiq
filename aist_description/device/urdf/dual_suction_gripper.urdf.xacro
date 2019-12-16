@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot name="dual_suction_gripper"
-       xmlns:xacro="http://ros.org/wiki/xacro">
+       xmlns:xacro="http://wiki.ros.org/xacro">
   <xacro:macro name="dual_suction_gripper"
 	       params="prefix parent *origin">
 

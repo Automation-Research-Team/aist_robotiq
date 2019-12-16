@@ -1,8 +1,8 @@
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="precision_gripper">
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="precision_gripper">
   <xacro:macro name="precision_gripper"
 	       params="prefix grippername parent *origin">
     <xacro:property name="mesh_file"
-		    value="package://aist_object_description/meshes/precision_gripper.stl"/>
+		    value="package://o2as_precision_gripper/meshes/precision_gripper.stl"/>
 
     <link name="${prefix}${grippername}_base_link">
       <inertial>

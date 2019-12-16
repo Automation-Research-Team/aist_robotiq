@@ -39,7 +39,7 @@
   <!-- Load robot urdf to param "robot_description". -->
   <!-- Put a robot in gazebo, make it look pretty -->
   <param name="robot_description"
-  	 command="$(find xacro)/xacro '$(find
+  	 command="$(find xacro)/xacro --inorder '$(find
   		  fetch_gazebo)/robots/fetch.gazebo.xacro'"/>
   <node name="robot_spawner" pkg="gazebo_ros" type="spawn_model"
   	respawn="false" output="screen"
@@ -50,8 +50,8 @@
 
   <!-- Load environment urdf to param "environment_description". -->
   <param name="environment_description"
-  	 command="$(find xacro)/xacro '$(find
-  		  aist_scene_description)/urdf/$(arg
+  	 command="$(find xacro)/xacro --inorder '$(find
+  		  aist_description)/scene/urdf/$(arg
 		  scene)_environment.urdf.xacro'"/>
   <node name="environment_spawner" pkg="gazebo_ros" type="spawn_model"
   	respawn="false" output="screen"

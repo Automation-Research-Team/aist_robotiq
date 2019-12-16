@@ -27,7 +27,6 @@
 #include <aruco_ros/aruco_ros_utils.h>
 
 #include "Plane.h"
-#include "BinDescription.h"
 
 namespace o2as_aruco_ros
 {
@@ -38,7 +37,7 @@ template <class T> inline T
 val(const sensor_msgs::Image& image_msg, int u, int v)
 {
     using namespace	sensor_msgs;
-    
+
     if (image_msg.encoding == image_encodings::TYPE_16UC1)
 	return T(0.001) * *reinterpret_cast<const uint16_t*>(
 				image_msg.data.data() + v*image_msg.step
@@ -63,8 +62,6 @@ class Detector
 
   public:
     Detector();
-
-    std::ostream&	print_bins(std::ostream& out)		const	;
 
   private:
     void	reconf_cb(aruco_ros::ArucoThresholdConfig& config,
@@ -129,8 +126,6 @@ class Detector
     aruco::MarkerDetector				_mDetector;
     double						_marker_size;
     int							_marker_id;
-
-    std::vector<o2as::BinDescription>			_bins;
 
     float						_planarityTolerance;
 };
@@ -202,25 +197,6 @@ Detector::Detector()
 					    this, _1, _2));
 }
 
-std::ostream&
-Detector::print_bins(std::ostream& out) const
-{
-    out << "<?xml version=\"1.0\"?>\n"
-	<< "<robot xmlns:xacro=\"http://www.ros.org/wiki/xacro\" name=\"kitting_scene\">\n"
-	<< "  <xacro:include filename=\"$(find o2as_scene_description)/urdf/kitting_bin_macros.xacro\"/>"
-	<< std::endl;
-
-    for (const auto& bin : _bins)
-	bin.print_pose(out) << std::endl;
-
-    out << "</robot>" << std::endl;
-
-    for (const auto& bin : _bins)
-	bin.print_part(out) << std::endl;
-
-    return out;
-}
-
 void
 Detector::reconf_cb(aruco_ros::ArucoThresholdConfig& config, uint32_t level)
 {
@@ -258,24 +234,19 @@ Detector::detect_marker_cb(const camera_info_p& camera_info_msg,
 					    sensor_msgs::image_encodings::RGB8)
 		      ->image;
 
-      //detection results will go into "markers"
+      // detection results will go into "markers"
 	std::vector<aruco::Marker>	markers;
 	_mDetector.detect(image, markers, _camParam, _marker_size, false);
 
 	if (markers.size() == 0)
 	    throw std::runtime_error("No markers detected!");
 
-      //for each marker, draw info and its boundaries in the image
-	_bins.clear();
+      // for each marker, draw info and its boundaries in the image
 	for (const auto& marker : markers)
 	{
 	    try
 	    {
-		if (_marker_id == 0)
-		    _bins.emplace_back(marker.id,
-				       get_marker_transform(marker,
-							    *depth_msg, image));
-		else if (marker.id == _marker_id)
+		if (_marker_id == 0 || marker.id == _marker_id)
 		    publish_marker_info(marker, *depth_msg, image);
 	    }
 	    catch (const std::runtime_error& e)
@@ -484,23 +455,13 @@ Detector::publish_marker_info(const aruco::Marker& marker,
 			    const image_t& depth_msg, cv::Mat& image)
 {
     const auto	stamp = depth_msg.header.stamp;
-#ifdef DEBUG
-    {
-	tf::Transform		transform = aruco_ros::arucoMarker2Tf(marker);
-	tf::StampedTransform	cameraToReference;
-	tf::StampedTransform	stampedTransform(transform, stamp,
-						 _reference_frame,
-						 _marker_frame);
-	_tfBroadcaster.sendTransform(stampedTransform);
-	geometry_msgs::TransformStamped transformMsg;
-	tf::transformStampedTFToMsg(stampedTransform, transformMsg);
-	_transform_pub.publish(transformMsg);
-    }
-#endif
+    auto	marker_frame = _marker_frame;
+    if (_marker_id == 0)
+	(marker_frame += '_') += std::to_string(marker.id);
     const tf::StampedTransform	stampedTransform(
 				    get_marker_transform(marker, depth_msg,
 							 image),
-				    stamp, _reference_frame, _marker_frame);
+				    stamp, _reference_frame, marker_frame);
     _tfBroadcaster.sendTransform(stampedTransform);
 
     geometry_msgs::PoseStamped	poseMsg;
@@ -510,7 +471,7 @@ Detector::publish_marker_info(const aruco::Marker& marker,
     _pose_pub.publish(poseMsg);
 
     geometry_msgs::PointStamped	pixelMsg;
-    pixelMsg.header.frame_id = _marker_frame;
+    pixelMsg.header.frame_id = marker_frame;
     pixelMsg.header.stamp    = stamp;
     pixelMsg.point.x	     = marker.getCenter().x;
     pixelMsg.point.y	     = marker.getCenter().y;
@@ -573,8 +534,6 @@ main(int argc, char** argv)
     {
 	o2as_aruco_ros::Detector	node;
 	ros::spin();
-
-	node.print_bins(std::cout);
     }
     catch (const std::exception& err)
     {

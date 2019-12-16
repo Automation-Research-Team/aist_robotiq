@@ -23,7 +23,7 @@
     <!-- load robot description URDF -->
     <param name="robot_description"
   	   command="$(find xacro)/xacro --inorder
-  		    '$(find aist_scene_description)/urdf/$(arg scene
+  		    '$(find aist_description)/scene/urdf/$(arg scene
 		    ).urdf.xacro'"/>
   </group>
 
