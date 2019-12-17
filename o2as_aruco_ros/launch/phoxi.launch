@@ -1,5 +1,5 @@
+<?xml version="1.0" ?>
 <launch>
-
   <arg name="marker_id"		default="0"/>
   <arg name="marker_size"	default="0.070"/>    <!-- in meters -->
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
@@ -34,5 +34,4 @@
 	respawn="false" args="$(arg command_args)" output="screen"/>
 
   <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
-
 </launch>

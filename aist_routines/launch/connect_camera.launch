@@ -2,28 +2,27 @@
 <launch>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
 
-  <include file="$(find o2as_phoxi_camera)/launch/o2as_phoxi_camera.launch"
-	   if="$(eval camera_name == 'a_phoxi_m_camera')">
+  <include if="$(eval camera_name == 'a_phoxi_m_camera')"
+	   file="$(find o2as_phoxi_camera)/launch/o2as_phoxi_camera.launch">
     <arg name="camera_name"	value="$(arg camera_name)"/>
     <arg name="id"		value="2018-09-016-LC3"/>
   </include>
 
-  <include file="$(find o2as_phoxi_camera)/launch/o2as_phoxi_camera.launch"
-	   if="$(eval camera_name == 'b_phoxi_m_camera')">
+  <include if="$(eval camera_name == 'b_phoxi_m_camera')"
+	   file="$(find o2as_phoxi_camera)/launch/o2as_phoxi_camera.launch">
     <arg name="camera_name"	value="$(arg camera_name)"/>
     <arg name="id"		value='"1711015"'/>
   </include>
 
-  <include file="$(find realsense2_camera)/launch/rs_camera.launch"
-	   if="$(eval camera_name == 'a_bot_camera')">
+  <include if="$(eval camera_name == 'a_bot_camera')"
+	   file="$(find realsense2_camera)/launch/rs_camera.launch">
     <arg name="camera"		value="$(arg camera_name)"/>
     <arg name="align_depth"	value="true"/>
   </include>
 
-  <include file="$(find v4l2_camera)/launch/run.launch"
-	   if="$(eval camera_name == 'b_bot_camera')">
+  <include if="$(eval camera_name == 'b_bot_camera')"
+	   file="$(find v4l2_camera)/launch/run.launch">
     <arg name="camera_name"	value="$(arg camera_name)"/>
     <arg name="convert_to_rgb"	value="true"/>
   </include>
-
 </launch>
