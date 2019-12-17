@@ -6,6 +6,7 @@
   <arg name="robot_name"	default="b_bot"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
   <arg name="marker_id"		default="26"/>
+  <arg name="marker_size"	default="0.07"/>
 
   <arg name="eye_on_hand"
        value="$(eval arg('camera_name') == arg('robot_name') + '_camera')"/>
@@ -15,13 +16,17 @@
     <arg name="camera_name"	value="$(arg camera_name)" />
   </include>
 
-  <!-- Start ArUco -->
-  <include file="$(find o2as_easy_handeye)/launch/aruco_tracker.launch">
-    <arg name="eye_on_hand"	value="$(arg eye_on_hand)"/>
+  <!-- Start camera -->
+  <include file="$(find aist_routines)/launch/connect_camera.launch"
+	   unless="$(arg sim)">
     <arg name="camera_name"	value="$(arg camera_name)"/>
-    <arg name="camera_frame"
-	 value="$(arg camera_name)_from_$(arg robot_name)"/>
-    <arg name="reference_frame"	value="workspace_center"/>
+  </include>
+
+  <!-- Start ArUco -->
+  <include file="$(find aist_routines)/launch/aruco_tracker.launch">
+    <arg name="marker_id"	value="$(arg marker_id)"/>
+    <arg name="marker_size"	value="$(arg marker_size)"/>
+    <arg name="camera_frame"	value="$(arg camera_frame)"/>
   </include>
 
   <!-- Start robot controller -->
