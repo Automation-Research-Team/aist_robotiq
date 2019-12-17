@@ -32,6 +32,7 @@
   <include file="$(find aist_routines)/launch/aruco_tracker.launch">
     <arg name="marker_id"	value="$(arg marker_id)"/>
     <arg name="marker_size"	value="$(arg marker_size)"/>
+    <arg name="camera_name"	value="$(arg camera_name)"/>
     <arg name="camera_frame"	value="$(arg camera_frame)"/>
     <arg name="marker_frame"	value="$(arg marker_frame)"/>
   </include>
