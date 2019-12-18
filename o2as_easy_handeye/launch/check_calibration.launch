@@ -16,12 +16,6 @@
     <arg name="camera_name"	value="$(arg camera_name)" />
   </include>
 
-  <!-- Start camera -->
-  <include file="$(find aist_routines)/launch/connect_camera.launch"
-	   unless="$(arg sim)">
-    <arg name="camera_name"	value="$(arg camera_name)"/>
-  </include>
-
   <!-- Start ArUco -->
   <include file="$(find aist_routines)/launch/aruco_tracker.launch">
     <arg name="marker_id"	value="$(arg marker_id)"/>

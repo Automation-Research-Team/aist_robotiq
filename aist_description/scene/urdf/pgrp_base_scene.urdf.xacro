@@ -109,7 +109,12 @@
   <!-- Add RealSense camera -->
   <xacro:include filename="$(find aist_description)/device/urdf/_d435.urdf.xacro" />
   <xacro:sensor_d435 prefix="a_bot_" parent="a_bot_wrist_2_link">
-    <origin xyz="0.0 -0.06 0.20" rpy="${0*pi/180} 0.0 ${pi/2}" />
+    <origin xyz="0.0136772228487
+		 -0.0680299757021
+		 0.198556563348"
+	    rpy="${-1.97302363932*pi/180}
+		 ${10.5114862531*pi/180}
+		 ${94.8091668854*pi/180}"/>
   </xacro:sensor_d435>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
