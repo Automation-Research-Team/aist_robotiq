@@ -5,20 +5,6 @@
   <arg name="robot_name"	default="b_bot"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
 
-  <!-- Start PhoXi camera -->
-  <include file="$(find aist_routines)/launch/connect_camera.launch">
-    <arg name="camera_name"	value="a_phoxi_m_camera"/>
-  </include>
-
-  <!-- Start Realsense camera -->
-  <include file="$(find aist_routines)/launch/connect_camera.launch">
-    <arg name="camera_name"	value="a_bot_camera"/>
-  </include>
-
-  <!-- <include file="$(find aist_routines)/launch/connect_camera.launch"> -->
-  <!--   <arg name="camera_name"	value="b_bot_camera"/> -->
-  <!-- </include> -->
-
   <!-- Load and publish hand-eye calibration -->
   <include file="$(find o2as_easy_handeye)/launch/publish.launch">
     <arg name="robot_name"	value="$(arg robot_name)" />
@@ -38,5 +24,4 @@
   <include file="$(find aist_graspability)/launch/aist_graspability.launch">
     <arg name="server_name"	value="aist_graspability"/>
   </include>
-
 </launch>
