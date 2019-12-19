@@ -263,7 +263,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          o2as_ground:
+          ground:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -524,7 +524,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          o2as_ground:
+          ground:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -559,6 +559,14 @@ Visualization Manager:
           Value: false
         a_bot_base_link:
           Value: false
+        a_bot_camera_aligned_depth_to_color_frame:
+          Value: false
+        a_bot_camera_aligned_depth_to_infra1_frame:
+          Value: false
+        a_bot_camera_color_frame:
+          Value: false
+        a_bot_camera_color_optical_frame:
+          Value: true
         a_bot_camera_depth_frame:
           Value: false
         a_bot_camera_depth_optical_frame:
@@ -566,6 +574,10 @@ Visualization Manager:
         a_bot_camera_fisheye_frame:
           Value: false
         a_bot_camera_fisheye_optical_frame:
+          Value: false
+        a_bot_camera_infra1_frame:
+          Value: false
+        a_bot_camera_infra1_optical_frame:
           Value: false
         a_bot_camera_left_ir_frame:
           Value: false
@@ -645,8 +657,8 @@ Visualization Manager:
           Value: false
         b_bot_wrist_3_link:
           Value: false
-        o2as_ground:
-          Value: false
+        ground:
+          Value: true
         vwall1:
           Value: false
         workbox:
@@ -662,7 +674,7 @@ Visualization Manager:
       Show Names: true
       Tree:
         world:
-          o2as_ground:
+          ground:
             a_bot_base_link:
               a_bot_base:
                 a_bot_tool0_controller:
@@ -673,6 +685,14 @@ Visualization Manager:
                     a_bot_wrist_1_link:
                       a_bot_wrist_2_link:
                         a_bot_camera_link:
+                          a_bot_camera_aligned_depth_to_color_frame:
+                            a_bot_camera_color_optical_frame:
+                              {}
+                          a_bot_camera_aligned_depth_to_infra1_frame:
+                            a_bot_camera_infra1_optical_frame:
+                              {}
+                          a_bot_camera_color_frame:
+                            {}
                           a_bot_camera_depth_frame:
                             a_bot_camera_depth_optical_frame:
                               {}
@@ -685,6 +705,8 @@ Visualization Manager:
                             a_bot_camera_right_ir_frame:
                               a_bot_camera_right_ir_optical_frame:
                                 {}
+                          a_bot_camera_infra1_frame:
+                            {}
                         a_bot_wrist_3_link:
                           a_bot_ee_link:
                             a_bot_ft300_link:
@@ -741,6 +763,7 @@ Visualization Manager:
       Hide Inactive Objects: true
     - Class: rviz/MoveCamera
     - Class: rviz/Select
+    - Class: rviz/FocusCamera
   Value: true
   Views:
     Current:
@@ -760,10 +783,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.944796205
+      Pitch: 1.0547961
       Target Frame: world
       Value: XYOrbit (rviz)
-      Yaw: 0.123587921
+      Yaw: 0.368587732
     Saved: ~
 Window Geometry:
   Displays:
