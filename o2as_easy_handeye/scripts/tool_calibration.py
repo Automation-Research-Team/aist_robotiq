@@ -28,7 +28,6 @@ def is_num(s):
 ######################################################################
 class ToolCalibrationRoutines(URRoutines):
     refposes = {
-        #    'a_bot': [-0.10, 0.00, 0.20,  radians(-90), radians(-90), radians(180)],
         'a_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians( 90)],
         'b_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians(-90)],
         'c_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians( 90)],
