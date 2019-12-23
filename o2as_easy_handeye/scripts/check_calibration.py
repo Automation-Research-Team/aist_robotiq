@@ -62,13 +62,19 @@ class VisitRoutines(AISTBaseRoutines):
         self.trigger_frame(self._camera_name)
         pose = rospy.wait_for_message(self._camera_name + "/aruco_tracker/pose",
                                       gmsg.PoseStamped, 10)
-        self.go_to_pose_goal(self._robot_name,
-                             self.effector_target_pose(pose, (0, 0, 0.05)),
-                             speed, move_lin=True)
+        approach_pose = self.effector_target_pose(pose, (0, 0, 0.05))
+        print("  move to " + self.format_pose(approach_pose))
+        (success, _, current_pose) \
+            = self.go_to_pose_goal(self._robot_name, approach_pose,
+                                   speed, move_lin=True)
+        print("  reached " + self.format_pose(current_pose))
         rospy.sleep(1)
-        self.go_to_pose_goal(self._robot_name,
-                             self.effector_target_pose(pose, (0, 0, 0)),
-                             speed, move_lin=True)
+        print("  move to " + self.format_pose(pose))
+        (success, _, current_pose) \
+            = self.go_to_pose_goal(self._robot_name,
+                                   self.effector_target_pose(pose, (0, 0, 0)),
+                                   speed, move_lin=True)
+        print("  reached " + self.format_pose(current_pose))
 
     def run(self, speed):
         self.continuous_shot(self._camera_name, False)
@@ -79,7 +85,10 @@ class VisitRoutines(AISTBaseRoutines):
                 key = raw_input(">> ")
                 if key == 'q':
                     break
-                self.move(speed)
+                elif key == 'h':
+                    self.go_to_named_pose("home", self._robot_name)
+                else:
+                    self.move(speed)
             except rospy.ROSException as ex:
                 print ex.message
             except rospy.ROSInterruptException:

@@ -1,17 +1,18 @@
 <?xml version="1.0" ?>
 <launch>
-  <arg name="marker_id"		default="0"/>
-  <arg name="marker_size"	default="0.070"/>    <!-- in meters -->
-  <arg name="camera_name"	default="a_phoxi_m_camera"/>
-  <arg name="camera_frame"	default="$(arg camera_name)_from_b_bot"/>
-  <arg name="marker_frame"	default="marker_frame"/>
-  <arg name="reference_frame"	default=""/>
-  <arg name="corner_refinement"	default="LINES"/>
+  <arg name="marker_id"			default="0"/>
+  <arg name="marker_size"		default="0.070"/>    <!-- in meters -->
+  <arg name="camera_name"		default="a_phoxi_m_camera"/>
+  <arg name="camera_frame"		default="$(arg camera_name)_from_b_bot"/>
+  <arg name="marker_frame"		default="marker_frame"/>
+  <arg name="reference_frame"		default=""/>
+  <arg name="corner_refinement"		default="LINES"/>
+  <arg name="planarity_tolerance"	default="0.001"/>
 
   <include file="$(find o2as_phoxi_camera)/launch/o2as_phoxi_camera.launch">
-    <arg name="camera_name"	value="$(arg camera_name)"/>
-    <arg name="frame"		value="$(arg camera_frame)"/>
-    <arg name="trigger_mode"	value="0"/>
+    <arg name="camera_name"		value="$(arg camera_name)"/>
+    <arg name="frame"			value="$(arg camera_frame)"/>
+    <arg name="trigger_mode"		value="0"/>
   </include>
 
   <include file="$(find o2as_aruco_ros)/launch/run.launch"
