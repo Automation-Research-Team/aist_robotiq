@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+<launch>
+  <arg name="marker_id"		default="0"/>
+  <arg name="marker_size"	default="0.070"/>    <!-- in meters -->
+  <arg name="camera_name"	default="a_phoxi_m_camera"/>
+  <arg name="camera_frame"	default=""/>
+  <arg name="marker_frame"	default="marker_frame"/>
+  <arg name="reference_frame"	default=""/>
+  <arg name="corner_refinement"	default="LINES"/>
+
+  <include if="$(eval 'phoxi' in camera_name)"
+	   file="$(find o2as_aruco_ros)/launch/run.launch"
+	   ns="$(arg camera_name)">
+    <arg name="marker_id"		value="$(arg marker_id)"/>
+    <arg name="marker_size"		value="$(arg marker_size)"/>
+    <arg name="camera_name"		value="$(arg camera_name)"/>
+    <arg if="$(eval camera_frame == '')"
+	 name="camera_frame"		value="$(arg camera_name)_from_b_bot"/>
+    <arg unless="$(eval camera_frame == '')"
+	 name="camera_frame"		value="$(arg camera_frame)"/>
+    <arg name="marker_frame"		value="$(arg marker_frame)"/>
+    <arg name="reference_frame"		value="$(arg reference_frame)"/>
+    <arg name="corner_refinement"	value="$(arg corner_refinement)"/>
+
+    <arg name="camera_info_topic"	value="camera_info"/>
+    <arg name="image_topic"		value="texture"/>
+    <arg name="depth_topic"		value="depth_map"/>
+  </include>
+
+  <include if="$(eval '_bot_camera' in camera_name)"
+	   file="$(find o2as_aruco_ros)/launch/run.launch"
+	   ns="$(arg camera_name)">
+    <arg name="marker_id"		value="$(arg marker_id)"/>
+    <arg name="marker_size"		value="$(arg marker_size)"/>
+    <arg name="camera_name"		value="$(arg camera_name)"/>
+    <arg if="$(eval camera_frame == '')"
+	 name="camera_frame"		value="$(arg camera_name)_color_optical_frame"/>
+    <arg unless="$(eval camera_frame == '')"
+	 name="camera_frame"		value="$(arg camera_frame)"/>
+    <arg name="marker_frame"		value="$(arg marker_frame)"/>
+    <arg name="reference_frame"		value="$(arg reference_frame)"/>
+    <arg name="corner_refinement"	value="$(arg corner_refinement)"/>
+
+    <arg name="camera_info_topic"	value="color/camera_info"/>
+    <arg name="image_topic"		value="color/image_raw"/>
+    <arg name="depth_topic"		value="aligned_depth_to_color/image_raw"/>
+  </include>
+
+  <include if="$(eval camera_name == 'head_camera')"
+	   file="$(find o2as_aruco_ros)/launch/run.launch"
+	   ns="$(arg camera_name)">
+    <arg name="marker_id"		value="$(arg marker_id)"/>
+    <arg name="marker_size"		value="$(arg marker_size)"/>
+    <arg name="camera_name"		value="$(arg camera_name)"/>
+    <arg if="$(eval camera_frame == '')"
+	 name="camera_frame"		value="$(arg camera_name)_rgb_optical_frame"/>
+    <arg unless="$(eval camera_frame == '')"
+	 name="camera_frame"		value="$(arg camera_frame)"/>
+    <arg name="marker_frame"		value="$(arg marker_frame)"/>
+    <arg name="reference_frame"		value="$(arg reference_frame)"/>
+    <arg name="corner_refinement"	value="$(arg corner_refinement)"/>
+
+    <arg name="camera_info_topic"	value="depth/camera_info"/>
+    <arg name="image_topic"		value="rgb/image_rect_color"/>
+    <arg name="depth_topic"		value="depth/image_rect"/>
+  </include>
+</launch>
