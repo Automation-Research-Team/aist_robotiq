@@ -8,29 +8,32 @@
   <arg name="reference_frame"		default=""/>
   <arg name="corner_refinement"		default="LINES"/>
   <arg name="planarity_tolerance"	default="0.005"/>
+  <arg name="manager_name"		default="nodelet_manager"/>
 
   <include file="$(find realsense2_camera)/launch/rs_camera.launch">
     <arg name="camera"			value="$(arg camera_name)"/>
     <arg name="enable_infra1"		value="true"/>
     <arg name="enable_infra2"		value="true"/>
-    <arg name="enable_pointcloud"	value="false"/>
     <arg name="align_depth"		value="true"/>
+    <arg name="manager"			value="$(arg manager_name)"/>
   </include>
 
-  <include file="$(find o2as_aruco_ros)/launch/run.launch"
-	   ns="$(arg camera_name)">
-    <arg name="marker_id"		value="$(arg marker_id)"/>
-    <arg name="marker_size"		value="$(arg marker_size)"/>
-    <arg name="camera_name"		value="$(arg camera_name)"/>
-    <arg name="camera_frame"		value="$(arg camera_frame)"/>
-    <arg name="marker_frame"		value="$(arg marker_frame)"/>
-    <arg name="reference_frame"		value="$(arg reference_frame)"/>
-    <arg name="corner_refinement"	value="$(arg corner_refinement)"/>
-    <arg name="planarity_tolerance"	value="$(arg planarity_tolerance)"/>
-    <arg name="camera_info_topic"	value="color/camera_info"/>
-    <arg name="image_topic"		value="color/image_raw"/>
-    <arg name="depth_topic"		value="aligned_depth_to_color/image_raw"/>
-  </include>
+  <node name="aruco_detector" pkg="nodelet" type="nodelet"
+	args="load o2as_aruco_ros/aruco_detector_nodelet $(arg manager_name)">
+    <remap from="/camera_info"	to="/$(arg camera_name)/color/camera_info"/>
+    <remap from="/image"	to="/$(arg camera_name)/color/image_raw"/>
+    <remap from="/depth"	to="/$(arg camera_name)/aligned_depth_to_color/image_raw"/>
+
+    <!-- Other parameters -->
+    <param name="image_is_rectified"	value="false"/>
+    <param name="marker_id"		value="$(arg marker_id)"/>
+    <param name="marker_size"		value="$(arg marker_size)"/>
+    <param name="reference_frame"	value="$(arg reference_frame)"/>
+    <param name="camera_frame"		value="$(arg camera_frame)"/>
+    <param name="marker_frame"		value="$(arg marker_frame)"/>
+    <param name="corner_refinement"	value="$(arg corner_refinement)"/>
+    <param name="planarity_tolerance"	value="$(arg planarity_tolerance)"/>
+  </node>
 
   <arg name="command_args"
        value="-d $(find o2as_aruco_ros)/launch/realsense.rviz"/>

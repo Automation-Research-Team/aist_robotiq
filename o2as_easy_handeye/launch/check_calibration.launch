@@ -17,9 +17,10 @@
   </include>
 
   <!-- Start ArUco -->
-  <include file="$(find aist_routines)/launch/aruco_tracker.launch">
+  <include file="$(find aist_routines)/launch/aruco_detector.launch">
     <arg name="marker_id"	value="$(arg marker_id)"/>
     <arg name="marker_size"	value="$(arg marker_size)"/>
+    <arg name="camera_name"	value="$(arg camera_name)"/>
   </include>
 
   <!-- Start robot controller -->

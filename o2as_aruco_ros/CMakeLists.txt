@@ -9,11 +9,10 @@ add_compile_options(-pthread)
 
 find_package(catkin REQUIRED
   COMPONENTS
-    dynamic_reconfigure
+    ddynamic_reconfigure
     geometry_msgs
+    visualization_msgs
     image_transport
-    std_msgs
-    std_srvs
     cv_bridge
     aruco
     aruco_ros
@@ -45,24 +44,44 @@ catkin_package(
   CATKIN_DEPENDS
     roscpp
     message_runtime
-    std_msgs
     geometry_msgs
+    visualization_msgs
+    pluginlib
+    nodelet
 )
 
-add_executable(o2as_single
+add_executable(o2as_aruco_detector
   src/main.cpp
+  src/Detector.cpp
 )
 
-target_link_libraries(o2as_single
+add_dependencies(o2as_aruco_detector
+  ${${PREOJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
+
+target_link_libraries(o2as_aruco_detector
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
+  ${Boost_LIBRARIES}
   ${OpenCV_LIBRARIES}
 )
 
-add_dependencies(o2as_single
-  ${PROJECT_NAME}_gencpp
-  ${PROJECT_NAME}_gencfg
+add_library(o2as_aruco_detector_nodelet
+  src/nodelet.cpp
+  src/Detector.cpp
+)
+
+add_dependencies(o2as_aruco_detector_nodelet
+  ${${PREOJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
+)
+
+target_link_libraries(o2as_aruco_detector_nodelet
+  ${catkin_LIBRARIES}
+  ${roscpp_LIBRARIES}
+  ${Boost_LIBRARIES}
+  ${OpenCV_LIBRARIES}
 )
 
 #############
@@ -70,22 +89,11 @@ add_dependencies(o2as_single
 #############
 install(
   TARGETS
-    o2as_single
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    o2as_aruco_detector
+  ARCHIVE
+    DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY
+    DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-
-## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
-
-## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )

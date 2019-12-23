@@ -1,0 +1,8 @@
+<library path="lib/libo2as_aruco_detector_nodelet">
+  <class name="o2as_aruco_ros/o2as_aruco_detector_nodelet"
+	 type="o2as_aruco_ros::DetectorNodelet"
+	 base_class_type="nodelet::Nodelet">
+    <description>
+    </description>
+  </class>
+</library>

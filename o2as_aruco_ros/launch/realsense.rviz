@@ -10,7 +10,6 @@ Panels:
         - /TF1
         - /TF1/Frames1
         - /Image2
-        - /DepthCloud1
         - /DepthCloud1/Auto Size1
       Splitter Ratio: 0.568740964
     Tree Height: 299
@@ -58,7 +57,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /aruco_tracker/result
+      Image Topic: /a_bot_camera/aruco_detector/result
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -91,7 +90,7 @@ Visualization Manager:
           Value: false
         a_bot_camera_link:
           Value: false
-        aruco_marker_frame:
+        marker_frame_26:
           Value: true
       Marker Scale: 0.300000012
       Name: TF
@@ -102,7 +101,7 @@ Visualization Manager:
         a_bot_camera_link:
           a_bot_camera_aligned_depth_to_color_frame:
             a_bot_camera_color_optical_frame:
-              aruco_marker_frame:
+              marker_frame_26:
                 {}
           a_bot_camera_aligned_depth_to_infra1_frame:
             a_bot_camera_infra1_optical_frame:
@@ -118,7 +117,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /a_bot_camera/infra1/image_rect_raw
+      Image Topic: /a_bot_camera/color/image_raw
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -206,10 +205,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: -1.41979647
+      Pitch: -1.03479695
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.673316
+      Yaw: 4.85332012
     Saved: ~
 Window Geometry:
   Displays:

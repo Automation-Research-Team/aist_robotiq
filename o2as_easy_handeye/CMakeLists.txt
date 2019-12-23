@@ -123,7 +123,6 @@ catkin_install_python(
     scripts/handeye_calibration.py
     scripts/check_calibration.py
     scripts/tool_calibration.py
-    scripts/go_home.py
     scripts/publish.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
