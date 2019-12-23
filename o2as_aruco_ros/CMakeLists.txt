@@ -56,6 +56,8 @@ add_executable(o2as_aruco_detector
 )
 
 add_dependencies(o2as_aruco_detector
+  ${PROJECT_NAME}_gencpp
+  ${PROJECT_NAME}_gencfg
   ${${PREOJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
@@ -73,6 +75,8 @@ add_library(o2as_aruco_detector_nodelet
 )
 
 add_dependencies(o2as_aruco_detector_nodelet
+  ${PROJECT_NAME}_gencpp
+  ${PROJECT_NAME}_gencfg
   ${${PREOJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
