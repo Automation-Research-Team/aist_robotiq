@@ -39,8 +39,6 @@ class Detector
 		Detector(const std::string& name)			;
 
     void	run()							;
-    void	tick()							;
-    double	rate()						const	;
 
   private:
     void	set_refinement_method(const std::string& method)	;
@@ -77,7 +75,6 @@ class Detector
 
   private:
     ros::NodeHandle					_nh;
-    double						_rate;
 
   // transformation stuff
     const tf::TransformListener				_tfListener;

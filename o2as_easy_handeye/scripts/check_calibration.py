@@ -60,7 +60,7 @@ class VisitRoutines(AISTBaseRoutines):
 
     def move(self, speed):
         self.trigger_frame(self._camera_name)
-        pose = rospy.wait_for_message(self._camera_name + "/aruco_tracker/pose",
+        pose = rospy.wait_for_message(self._camera_name + "/aruco_detector/pose",
                                       gmsg.PoseStamped, 10)
         approach_pose = self.effector_target_pose(pose, (0, 0, 0.05))
         print("  move to " + self.format_pose(approach_pose))

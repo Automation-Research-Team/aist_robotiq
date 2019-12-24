@@ -41,7 +41,6 @@ val(const sensor_msgs::Image& image_msg, int u, int v)
 ************************************************************************/
 Detector::Detector(const std::string& name)
     :_nh(name),
-     _rate(30.0),
      _tfListener(),
      _tfBroadcaster(),
      _marker_frame(""),
@@ -68,7 +67,6 @@ Detector::Detector(const std::string& name)
      _useDepth(true),
      _planarityTolerance(0.001)
 {
-    _nh.param("rate",		    _rate,		 30.0);
     _nh.param("marker_size",	    _marker_size,	 0.05);
     _nh.param("marker_id",	    _marker_id,		 26);
     _nh.param("marker_frame",	    _marker_frame,	 std::string(""));
@@ -170,25 +168,7 @@ void
 Detector::run()
 {
     ros::spin();
-
-    // ros::Rate	looprate(_rate);
-    // while (ros::ok())
-    // {
-    // 	ros::spinOnce();
-    // 	looprate.sleep();
-    // }
 }
-
-// void
-// Detector::tick()
-// {
-// }
-
-// double
-// Detector::rate() const
-// {
-//     return _rate;
-// }
 
 void
 Detector::set_refinement_method(const std::string& method)

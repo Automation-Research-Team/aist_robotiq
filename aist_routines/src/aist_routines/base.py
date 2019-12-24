@@ -336,9 +336,10 @@ class AISTBaseRoutines(object):
     # Utility functions
     def xyz_rpy(self, target_pose):
         try:
+            target_pose.header.stamp = rospy.Time.now()
             self.listener.waitForTransform(self._reference_frame,
                                            target_pose.header.frame_id,
-                                           rospy.Time.now(),
+                                           target_pose.header.stamp,
                                            rospy.Duration(10))
             pose = self.listener.transformPose(self._reference_frame,
                                                target_pose).pose
