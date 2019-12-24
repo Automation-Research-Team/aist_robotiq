@@ -779,7 +779,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /a_phoxi_m_camera/aruco_tracker/result
+      Image Topic: /a_phoxi_m_camera/aruco_detector/result
       Max Value: 1
       Median window: 5
       Min Value: 0

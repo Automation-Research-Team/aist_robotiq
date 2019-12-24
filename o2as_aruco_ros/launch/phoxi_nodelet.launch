@@ -18,20 +18,17 @@
   </node>
 
   <node name="$(arg camera_name)" pkg="nodelet" type="nodelet"
-	args="load o2as_phoxi_camera/o2as_phoxi_camera_nodelet
-	      $(arg manager_name)">
+	args="load o2as_phoxi_camera/o2as_phoxi_camera_nodelet $(arg manager_name)">
     <param name="id"			value="$(arg camera_id)"/>
     <param name="frame"			value="$(arg camera_frame)"/>
     <param name="trigger_mode"		value="0"/>
   </node>
 
   <node name="aruco_detector" pkg="nodelet" type="nodelet"
-	args="load o2as_aruco_ros/o2as_aruco_detector_nodelet
-	      $(arg manager_name)"
-	ns="$(arg camera_name)">
-    <remap from="/camera_info"		to="camera_info"/>
-    <remap from="/image"		to="texture"/>
-    <remap from="/depth"		to="depth_map"/>
+	args="load o2as_aruco_ros/o2as_aruco_detector_nodelet $(arg manager_name)">
+    <remap from="/camera_info"		to="/$(arg camera_name)/camera_info"/>
+    <remap from="/image"		to="/$(arg camera_name)/texture"/>
+    <remap from="/depth"		to="/$(arg camera_name)/depth_map"/>
 
     <!-- Other parameters -->
     <param name="image_is_rectified"	value="false"/>

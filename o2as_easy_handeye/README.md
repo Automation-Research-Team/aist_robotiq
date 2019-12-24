@@ -11,7 +11,7 @@ $ roslaunch o2as_gazebo o2as_gazebo.launch
 ```bash
 $ roslaunch o2as_easy_handeye calibrate.launch camera_name:=$CAMERA_NAME robot_name=$ROBOT_NAME
 ```
-After robots appear in the screen, open the RViz config file `o2as_easy_handeye.rviz`. Then the marker tracker and the hand-eye calibrator start.
+After robots appear in the screen, open the RViz config file `o2as_easy_handeye.rviz`. Then the marker detector and the hand-eye calibrator start.
 
 2-2: Run calibration software in a different terminal
 ```bash
