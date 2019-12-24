@@ -11,8 +11,8 @@
 
   <!-- ========== The basic tray, without partitions -->
   <xacro:macro name="kitting_tray" params="trayname parent *origin">
-    <xacro:property name="mesh_file" value="package://aist_description/object/meshes/tray_PZ-0006-B.stl" />
-    <xacro:property name="mesh_file_col" value="package://aist_description/object/meshes/tray_PZ-0006-B.vhacd.dae" />
+    <xacro:property name="mesh_file" value="package://aist_description/wrc/meshes/tray_PZ-0006-B.stl" />
+    <xacro:property name="mesh_file_col" value="package://aist_description/wrc/meshes/tray_PZ-0006-B.vhacd.dae" />
 
     <link name="${trayname}">
       <inertial>
@@ -55,7 +55,7 @@
       <visual>
 	<xacro:insert_block name="origin"/>
 	<geometry>
-          <mesh filename="package://aist_description/object/meshes/${contents}.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="package://aist_description/wrc/meshes/${contents}.stl" scale="0.001 0.001 0.001" />
 	</geometry>
 	<material name="white">
           <color rgba="1 1 1 1"/>
@@ -64,7 +64,7 @@
       <collision>
         <xacro:insert_block name="origin"/>
         <geometry>
-          <mesh filename="package://aist_description/object/meshes/${contents}.stl" scale="0.001 0.001 0.001" />
+          <mesh filename="package://aist_description/wrc/meshes/${contents}.stl" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
     </link>

@@ -3,7 +3,6 @@
 
   <xacro:macro name="ar_marker"
 	       params="prefix parent marker_id size margin thickness *origin">
-
     <joint name="${prefix}ar_marker_joint" type="fixed">
       <parent link="${parent}" />
       <child  link="${prefix}ar_marker" />
@@ -31,7 +30,6 @@
     <gazebo reference="${prefix}ar_marker">
       <material>Aruco/marker-${marker_id}-${int(1000*size)}-${int(1000*margin)}</material>
     </gazebo>
-
   </xacro:macro>
 
   <xacro:macro name="ar_marker_70_5"
@@ -46,7 +44,6 @@
 
   <xacro:macro name="ar_marker_80_10"
 	       params="prefix parent marker_id thickness *origin">
-
     <xacro:ar_marker prefix="${prefix}" parent="${parent}"
 		     marker_id="${marker_id}" size="0.08"
 		     margin="0.01" thickness="${thickness}">
@@ -56,7 +53,6 @@
 
   <xacro:macro name="ar_marker_160_10"
 	       params="prefix parent marker_id thickness *origin">
-
     <xacro:ar_marker prefix="${prefix}" parent="${parent}"
 		     marker_id="${marker_id}" size="0.16"
 		     margin="0.01" thickness="${thickness}">
