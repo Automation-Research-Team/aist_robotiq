@@ -23,8 +23,8 @@
     <origin xyz="${plate_w/2} ${plate_l/2} ${plate_h}" rpy="0 0 0"/>
   </joint>
 
-  <xacro:include filename="$(find aist_description)/object/urdf/kitting_bins.urdf.xacro"/>
-  <xacro:include filename="$(find aist_description)/object/urdf/kitting_trays.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/wrc/urdf/kitting_bins.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/wrc/urdf/kitting_trays.urdf.xacro"/>
 
   <!-- bin_1_definition -->
   <xacro:property name="bin_1_width"		value="0.125"/>

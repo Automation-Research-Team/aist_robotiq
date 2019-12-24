@@ -5,9 +5,9 @@
   <xacro:macro name="kitting_bin_internal"
 	       params="binname parent filename z_origin_offset *origin">
     <xacro:property name="mesh_file"
-		    value="package://aist_description/object/meshes/${filename}.stl"/>
+		    value="package://aist_description/wrc/meshes/${filename}.stl"/>
     <xacro:property name="mesh_file_col"
-		    value="package://aist_description/object/meshes/${filename}.vhacd.dae"/>
+		    value="package://aist_description/wrc/meshes/${filename}.vhacd.dae"/>
 
     <link name="${binname}">
       <inertial>
