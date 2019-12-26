@@ -12,7 +12,6 @@ from tf import TransformListener, transformations as tfs
 from o2as_easy_handeye.srv import GetSampleList, ComputeCalibration
 from aist_routines.base import AISTBaseRoutines
 
-# http://wiki.ros.org/cv_bridge/Tutorials/ConvertingBetweenROSImagesAndOpenCVImagesPython
 import moveit_commander
 import sensor_msgs.msg
 import cv2
@@ -285,8 +284,7 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
         (success, _, current_pose) \
             = self.go_to_pose_goal(
                 self._robot_name, poseStamped, self._speed,
-                end_effector_link=self._robot_name + "_ee_link",
-                move_lin=True)
+                end_effector_link=self._robot_name + "_ee_link", move_lin=True)
         print("  reached " + self.format_pose(current_pose))
         return success
 
@@ -297,7 +295,7 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
 
         if self.take_sample:
             try:
-                rospy.sleep(1)  # Wait for the robot settling.
+                rospy.sleep(1)  # Wait for the robot to settle.
                 self.continuous_shot(self._camera_name, True)
                 rospy.sleep(self._sleep_time)
                 res = self.take_sample()
@@ -397,17 +395,13 @@ if __name__ == '__main__':
                         '--visit',
                         action='store_true',
                         help='only visit calibration points')
-
     args = parser.parse_args()
-
-    assert (args.camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
-    assert (args.robot_name  in {"a_bot", "b_bot", "c_bot", "d_bot"})
 
     speed = 1
     sleep_time = 2
     with HandEyeCalibrationRoutines(args.camera_name, args.robot_name,
-                                              speed, sleep_time,
-                                              not args.visit) as routines:
+                                    speed, sleep_time,
+                                    not args.visit) as routines:
 
         print("=== Calibration started for {} + {} ===".format(
             args.camera_name, args.robot_name))

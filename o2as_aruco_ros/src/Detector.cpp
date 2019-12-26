@@ -10,7 +10,6 @@
 #include <visualization_msgs/Marker.h>
 #include <cv_bridge/cv_bridge.h>
 
-#include <aruco/cvdrawingutils.h>
 #include <aruco_ros/aruco_ros_utils.h>
 
 #include <o2as_aruco_ros/Corners.h>
@@ -316,105 +315,103 @@ tf::Transform
 Detector::get_marker_transform(const aruco::Marker& marker,
 			       const image_t& depth_msg, cv::Mat& image) const
 {
-    if (!_useDepth)
-	return aruco_ros::arucoMarker2Tf(marker);
-
-    struct rgb_t	{ uint8_t r, g, b; };
-    using value_t	= float;
-    using point_t	= cv::Vec<value_t, 3>;
-    using plane_t	= o2as::Plane<value_t, 3>;
-
     if (marker.size() < 4)
 	throw std::runtime_error("Detected not all four corners!");
 
-  // Compute initial marker plane.
-    std::vector<point_t>	points;
-    for (const auto& corner : marker)
+    tf::Transform	transform;
+
+    if (_useDepth)
     {
-	const auto	point = at<value_t>(depth_msg, corner.x, corner.y);
+	struct rgb_t	{ uint8_t r, g, b; };
+	using value_t	= float;
+	using point_t	= cv::Vec<value_t, 3>;
+	using plane_t	= o2as::Plane<value_t, 3>;
 
-	if (point(2) != value_t(0))
-	    points.push_back(point);
-    }
-
-    plane_t	plane(points.cbegin(), points.cend());
-
-  // Compute 2D bounding box of marker.
-    const int	u0 = std::floor(std::min({marker[0].x, marker[1].x,
-					  marker[2].x, marker[3].x}));
-    const int	v0 = std::floor(std::min({marker[0].y, marker[1].y,
-					  marker[2].y, marker[3].y}));
-    const int	u1 = std::ceil( std::max({marker[0].x, marker[1].x,
-					  marker[2].x, marker[3].x}));
-    const int	v1 = std::ceil( std::max({marker[0].y, marker[1].y,
-					  marker[2].y, marker[3].y}));
-
-  // Select 3D points close to the initial plane within the bounding box.
-    points.clear();
-    for (auto v = v0; v <= v1; ++v)
-	for (auto u = u0; u <= u1; ++u)
+      // Compute initial marker plane.
+	std::vector<point_t>	points;
+	for (const auto& corner : marker)
 	{
-	    const auto	point = at<value_t>(depth_msg, u, v);
+	    const auto	point = at<value_t>(depth_msg, corner.x, corner.y);
 
-	    if (point(2) != value_t(0) &&
-		plane.distance(point) < _planarityTolerance)
-	    {
+	    if (point(2) != value_t(0))
 		points.push_back(point);
-		image.at<rgb_t>(v, u).b = 0;
-	    }
 	}
 
-  // Fit a plane to seleceted inliers.
-    plane.fit(points.cbegin(), points.cend());
+	plane_t	plane(points.cbegin(), points.cend());
 
-  // Compute 3D coordinates of marker corners and then publish.
-    point_t	corners[4];
-    for (int i = 0; i < 4; ++i)
-	corners[i] = plane.cross_point(view_vector(marker[i].x, marker[i].y));
+      // Compute 2D bounding box of marker.
+	const int	u0 = std::floor(std::min({marker[0].x, marker[1].x,
+						  marker[2].x, marker[3].x}));
+	const int	v0 = std::floor(std::min({marker[0].y, marker[1].y,
+						  marker[2].y, marker[3].y}));
+	const int	u1 = std::ceil( std::max({marker[0].x, marker[1].x,
+						  marker[2].x, marker[3].x}));
+	const int	v1 = std::ceil( std::max({marker[0].y, marker[1].y,
+						  marker[2].y, marker[3].y}));
 
-    Corners	corners_msg;
-    for (const auto& corner: corners)
-    {
-	geometry_msgs::PointStamped	pointStamped;
-	pointStamped.header  = depth_msg.header;
-	pointStamped.point.x = corner(0);
-	pointStamped.point.y = corner(1);
-	pointStamped.point.z = corner(2);
+      // Select 3D points close to the initial plane within the bounding box.
+	points.clear();
+	for (auto v = v0; v <= v1; ++v)
+	    for (auto u = u0; u <= u1; ++u)
+	    {
+		const auto	point = at<value_t>(depth_msg, u, v);
 
-	corners_msg.corners.push_back(pointStamped);
+		if (point(2) != value_t(0) &&
+		    plane.distance(point) < _planarityTolerance)
+		{
+		    points.push_back(point);
+		    image.at<rgb_t>(v, u).b = 0;
+		}
+	    }
+
+      // Fit a plane to seleceted inliers.
+	plane.fit(points.cbegin(), points.cend());
+
+      // Compute 3D coordinates of marker corners and then publish.
+	point_t	corners[4];
+	for (int i = 0; i < 4; ++i)
+	    corners[i] = plane.cross_point(view_vector(marker[i].x,
+						       marker[i].y));
+
+	Corners	corners_msg;
+	for (const auto& corner: corners)
+	{
+	    geometry_msgs::PointStamped	pointStamped;
+	    pointStamped.header  = depth_msg.header;
+	    pointStamped.point.x = corner(0);
+	    pointStamped.point.y = corner(1);
+	    pointStamped.point.z = corner(2);
+
+	    corners_msg.corners.push_back(pointStamped);
+	}
+	_corners_pub.publish(corners_msg);
+
+      // Compute p and q, i.e. marker's local x-axis and y-axis respectively.
+	const auto&	n = plane.normal();
+	const auto	c = (corners[2] + corners[3] - corners[0] - corners[1])
+			  + (corners[1] + corners[2] -
+			     corners[3] - corners[0]).cross(n);
+	const auto	p = c / cv::norm(c);
+	const auto	q = n.cross(p);
+
+      // Compute marker centroid.
+	const auto	centroid = 0.25*(corners[0] + corners[1] +
+					 corners[2] + corners[3]);
+
+	transform.setBasis(tf::Matrix3x3(p(0), q(0), n(0),
+					 p(1), q(1), n(1),
+					 p(2), q(2), n(2)));
+	transform.setOrigin(tf::Vector3(centroid(0), centroid(1), centroid(2)));
     }
-    _corners_pub.publish(corners_msg);
+    else
+    {
+	const tf::Transform	rot(tf::Matrix3x3(-1, 0, 0,
+						   0, 0, 1,
+						   0, 1, 0),
+				    tf::Vector3(0, 0, 0));
+	transform = aruco_ros::arucoMarker2Tf(marker) * rot;
+    }
 
-  // Compute p and q, i.e. marker's local x-axis and y-axis respectively.
-    const auto&	n = plane.normal();
-    const auto	c = (corners[2] + corners[3] - corners[0] - corners[1])
-		  + (corners[1] + corners[2] -
-		     corners[3] - corners[0]).cross(n);
-    const auto	p = c / cv::norm(c);
-    const auto	q = n.cross(p);
-
-  // Compute marker centroid.
-    const auto	centroid = 0.25*(corners[0] + corners[1] +
-				 corners[2] + corners[3]);
-
-  // Compute marker -> reference transform.
-  // Post-mulriply
-  //   -1 0 0
-  //    0 0 1
-  //    0 1 0
-  // according to ROS convensions.
-    // const tf::Transform		transform(tf::Matrix3x3(-p(0), n(0), q(0),
-    // 							-p(1), n(1), q(1),
-    // 							-p(2), n(2), q(2)),
-    // 					  tf::Vector3(centroid(0),
-    // 						      centroid(1),
-    // 						      centroid(2)));
-    const tf::Transform		transform(tf::Matrix3x3(p(0), q(0), n(0),
-    							p(1), q(1), n(1),
-    							p(2), q(2), n(2)),
-    					  tf::Vector3(centroid(0),
-    						      centroid(1),
-    						      centroid(2)));
     tf::StampedTransform	cameraToReference;
     cameraToReference.setIdentity();
     if (_reference_frame != _camera_frame)

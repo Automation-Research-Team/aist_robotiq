@@ -6,18 +6,21 @@
 	   file="$(find o2as_phoxi_camera)/launch/o2as_phoxi_camera.launch">
     <arg name="camera_name"	value="$(arg camera_name)"/>
     <arg name="id"		value="2018-09-016-LC3"/>
+    <arg name="frame"		value="$(arg camera_name)_from_b_bot"/>
   </include>
 
   <include if="$(eval camera_name == 'b_phoxi_m_camera')"
 	   file="$(find o2as_phoxi_camera)/launch/o2as_phoxi_camera.launch">
     <arg name="camera_name"	value="$(arg camera_name)"/>
     <arg name="id"		value='"1711015"'/>
+    <arg name="frame"		value="$(arg camera_name)_from_b_bot"/>
   </include>
 
   <include if="$(eval camera_name == 'a_bot_camera')"
 	   file="$(find realsense2_camera)/launch/rs_camera.launch">
     <arg name="camera"		value="$(arg camera_name)"/>
     <arg name="align_depth"	value="true"/>
+    <arg name="publish_tf"	value="false"/>
   </include>
 
   <include if="$(eval camera_name == 'b_bot_camera')"

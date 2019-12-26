@@ -20,7 +20,7 @@
   <arg name ="camera_body_frame"	value ="$(arg camera_name)_link"
        if   ="$(eval arg('camera_name') == 'a_bot_camera')"/>
   <arg name ="camera_optical_frame"
-       value="$(arg camera_name)_depth_optical_frame"
+       value="$(arg camera_name)_color_optical_frame"
        if   ="$(eval arg('camera_name') == 'a_bot_camera')"/>
 
   <!-- Publish hand-eye calibration -->
