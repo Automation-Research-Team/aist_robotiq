@@ -85,7 +85,7 @@
   <xacro:include filename="$(find aist_description)/device/urdf/single_suction_gripper.urdf.xacro"/>
   <xacro:single_suction_gripper prefix="b_bot_"
   				parent="b_bot_ft300_flange_link">
-    <origin xyz="0 0 0" rpy="0 ${0.5*pi/180} ${-0.5*pi/180}"/>
+    <origin xyz="0 0 0" rpy="0 ${0.9*pi/180} ${0.4*pi/180}"/>
     <!-- <origin xyz="0 0 0" rpy="0 0 0"/> -->
   </xacro:single_suction_gripper>
 
@@ -107,15 +107,15 @@
   </xacro:phoxi_m_camera>
 
   <!-- Add RealSense camera -->
-  <xacro:include filename="$(find aist_description)/device/urdf/_d435.urdf.xacro" />
-  <xacro:sensor_d435 prefix="a_bot_" parent="a_bot_wrist_2_link">
-    <origin xyz="0.0136772228487
-		 -0.0680299757021
-		 0.198556563348"
-	    rpy="${-1.97302363932*pi/180}
-		 ${10.5114862531*pi/180}
-		 ${94.8091668854*pi/180}"/>
-  </xacro:sensor_d435>
+  <xacro:include filename="$(find aist_description)/device/urdf/_sr305.urdf.xacro" />
+  <xacro:sensor_sr305 prefix="a_bot_" parent="a_bot_wrist_2_link">
+    <origin xyz="0.0326671856774
+		 -0.063887034743
+		 0.194855923541"
+	    rpy="${-1.9802935144*pi/180}
+		 ${10.1226491078*pi/180}
+		 ${94.4366841644*pi/180}"/>
+  </xacro:sensor_sr305>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world"/>

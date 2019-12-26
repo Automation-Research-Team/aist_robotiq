@@ -14,66 +14,39 @@ import moveit_commander
 from o2as_routines.base import O2ASBaseRoutines
 from aist_routines.base import AISTBaseRoutines
 
-orientations = {
-    'o2as': {
-        'a_bot': [radians(-90), radians( 90), radians(0)],
-        'b_bot': [radians(  0), radians( 90), radians(0)],
-        'c_bot': [radians(  0), radians( 90), radians(0)],
-    },
-
-    'aist': {
-        'a_bot': [radians(-90), radians( 90), radians(0)],
-        'b_bot': [radians(  0), radians( 90), radians(0)],
-    },
-
-    'pgrp': {
-        'a_bot': [radians(-90), radians( 90), radians(0)],
-        'b_bot': [radians(  0), radians( 90), radians(0)],
-    },
-
-    'ur5e': {
-        'c_bot': [radians(-90), radians( 90), radians(0)],
-        'd_bot': [radians(  0), radians( 90), radians(0)],
-    },
-}
-
 ######################################################################
 #  class VisitRoutines                                               #
 ######################################################################
 class VisitRoutines(AISTBaseRoutines):
     """Wrapper of MoveGroupCommander specific for this script"""
 
-    def __init__(self, robot_name, camera_name, orientations):
+    def __init__(self, robot_name, camera_name):
         super(VisitRoutines, self).__init__()
-
         self._robot_name   = robot_name
         self._camera_name  = camera_name
-        self._orientations = orientations
-
-        # Logging
-        group = moveit_commander.MoveGroupCommander(robot_name)
-        print("==== Planning frame:       %s" % group.get_planning_frame())
-        print("==== Pose reference frame: %s" %
-              group.get_pose_reference_frame())
-        print("==== End effector link:    %s" % group.get_end_effector_link())
-
 
     def move(self, speed):
         self.trigger_frame(self._camera_name)
-        pose = rospy.wait_for_message(self._camera_name + "/aruco_detector/pose",
-                                      gmsg.PoseStamped, 10)
-        approach_pose = self.effector_target_pose(pose, (0, 0, 0.05))
+        marker_pose = rospy.wait_for_message(self._camera_name
+                                             + "/aruco_detector/pose",
+                                             gmsg.PoseStamped, 10)
+        approach_pose = self.effector_target_pose(marker_pose, (0, 0, 0.05))
+
+        #  We have to transform the target pose to reference frame before moving
+        #  to the approach pose because the marker pose is given w.r.t. camera
+        #  frame which will change while moving in the case of "eye in hand".
+        target_pose = self.transform_pose_to_reference_frame(
+                          self.effector_target_pose(marker_pose, (0, 0, 0)))
         print("  move to " + self.format_pose(approach_pose))
-        (success, _, current_pose) \
-            = self.go_to_pose_goal(self._robot_name, approach_pose,
-                                   speed, move_lin=True)
+        (success, _, current_pose) = self.go_to_pose_goal(self._robot_name,
+                                                          approach_pose,
+                                                          speed, move_lin=True)
         print("  reached " + self.format_pose(current_pose))
         rospy.sleep(1)
-        print("  move to " + self.format_pose(pose))
-        (success, _, current_pose) \
-            = self.go_to_pose_goal(self._robot_name,
-                                   self.effector_target_pose(pose, (0, 0, 0)),
-                                   speed, move_lin=True)
+        print("  move to " + self.format_pose(target_pose))
+        (success, _, current_pose) = self.go_to_pose_goal(self._robot_name,
+                                                          target_pose,
+                                                          speed, move_lin=True)
         print("  reached " + self.format_pose(current_pose))
 
     def run(self, speed):
@@ -103,15 +76,6 @@ class VisitRoutines(AISTBaseRoutines):
 ######################################################################
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Check hand-eye calibration')
-    parser.add_argument('-C',
-                        '--config',
-                        action='store',
-                        nargs='?',
-                        default='aist',
-                        type=str,
-                        choices=None,
-                        help='configuration name',
-                        metavar=None)
     parser.add_argument('-c',
                         '--camera_name',
                         action='store',
@@ -130,15 +94,9 @@ if __name__ == '__main__':
                         choices=None,
                         help='robot name',
                         metavar=None)
-
     args = parser.parse_args()
-    print(args)
 
-    assert (args.camera_name in {"a_phoxi_m_camera", "a_bot_camera"})
-    assert (args.robot_name  in {"a_bot", "b_bot", "c_bot", "d_bot"})
-
-    with VisitRoutines(args.robot_name, args.camera_name,
-                       orientations[args.config][args.robot_name]) as routines:
+    with VisitRoutines(args.robot_name, args.camera_name) as routines:
 
         speed = 0.05
         routines.run(speed)

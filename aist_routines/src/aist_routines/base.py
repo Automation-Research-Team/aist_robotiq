@@ -42,7 +42,7 @@ class AISTBaseRoutines(object):
 
         rospy.init_node("aist_routines", anonymous=True)
         moveit_commander.roscpp_initialize(sys.argv)
-        self.listener = TransformListener()
+        self._listener = TransformListener()
         rospy.sleep(1.0)        # Necessary for listner spinning up
 
         # MoveIt planning parameters
@@ -83,6 +83,18 @@ class AISTBaseRoutines(object):
         self._pickOrPlaceAction.shutdown()
         rospy.signal_shutdown("AISTBaseRoutines() completed.")
         return False  # Do not forward exceptions
+
+    @property
+    def listener(self):
+        return self._listener
+
+    @property
+    def reference_frame(self):
+        return self._reference_frame
+
+    @property
+    def eef_step(self):
+        return self._eef_step
 
     # Basic motion stuffs
     def go_to_named_pose(self, named_pose, group_name):
@@ -127,11 +139,11 @@ class AISTBaseRoutines(object):
 
         if move_lin:
             try:
-                self.listener.waitForTransform(group.get_planning_frame(),
-                                               target_pose.header.frame_id,
-                                               rospy.Time.now(),
-                                               rospy.Duration(10))
-                pose_world = self.listener.transformPose(
+                self._listener.waitForTransform(group.get_planning_frame(),
+                                                target_pose.header.frame_id,
+                                                rospy.Time.now(),
+                                                rospy.Duration(10))
+                pose_world = self._listener.transformPose(
                                 group.get_planning_frame(), target_pose).pose
             except Exception as e:
                 rospy.logerr("AISTBaseRoutines.go_to_pose_goal(): {}"
@@ -334,24 +346,27 @@ class AISTBaseRoutines(object):
                           liftup_after, acc_fast, acc_slow)
 
     # Utility functions
-    def xyz_rpy(self, target_pose):
+    def transform_pose_to_reference_frame(self, pose):
         try:
-            target_pose.header.stamp = rospy.Time.now()
-            self.listener.waitForTransform(self._reference_frame,
-                                           target_pose.header.frame_id,
-                                           target_pose.header.stamp,
-                                           rospy.Duration(10))
-            pose = self.listener.transformPose(self._reference_frame,
-                                               target_pose).pose
+            pose.header.stamp = rospy.Time.now()
+            self._listener.waitForTransform(self._reference_frame,
+                                            pose.header.frame_id,
+                                            pose.header.stamp,
+                                            rospy.Duration(10))
+            return self._listener.transformPose(self._reference_frame, pose)
         except Exception as e:
-            rospy.logerr("AISTBaseRoutines.xyz_rpy(): {}".format(e))
+            rospy.logerr("AISTBaseRoutines.transform_pose_to_reference_frame(): {}".format(e))
             raise e
 
-        rpy = tfs.euler_from_quaternion([pose.orientation.x,
-                                         pose.orientation.y,
-                                         pose.orientation.z,
-                                         pose.orientation.w])
-        return [pose.position.x, pose.position.y, pose.position.z,
+    def xyz_rpy(self, pose):
+        transformed_pose = self.transform_pose_to_reference_frame(pose).pose
+        rpy = tfs.euler_from_quaternion([transformed_pose.orientation.x,
+                                         transformed_pose.orientation.y,
+                                         transformed_pose.orientation.z,
+                                         transformed_pose.orientation.w])
+        return [transformed_pose.position.x,
+                transformed_pose.position.y,
+                transformed_pose.position.z,
                 rpy[0], rpy[1], rpy[2]]
 
     def format_pose(self, target_pose):
@@ -362,7 +377,7 @@ class AISTBaseRoutines(object):
 
     def effector_target_pose(self, target_pose, offset):
         T = tfs.concatenate_matrices(
-                self.listener.fromTranslationRotation(
+                self._listener.fromTranslationRotation(
                     (target_pose.pose.position.x,
                      target_pose.pose.position.y,
                      target_pose.pose.position.z),
@@ -370,7 +385,7 @@ class AISTBaseRoutines(object):
                      target_pose.pose.orientation.y,
                      target_pose.pose.orientation.z,
                      target_pose.pose.orientation.w)),
-                self.listener.fromTranslationRotation(
+                self._listener.fromTranslationRotation(
                     offset,
                     tfs.quaternion_from_euler(0, radians(90), 0)))
         pose = gmsg.PoseStamped()
