@@ -104,16 +104,12 @@ class Transform : boost::multipliable<Transform<T> >
 
     auto		angular_difference(const Transform& trns) const
 			{
-			    const auto	rpy0 = rpy();
-			    const auto	rpy1 = trns.rpy();
-			    scalar_type	sqr  = 0;
+			    const auto	Rt0 = Rt();
+			    const auto	Rt1 = trns.Rt();
+			    scalar_type	sqr = 0;
 			    for (size_t i = 0; i < 3; ++i)
 			    {
-				auto	diff = rpy0[i] - rpy1[i];
-				while (diff >= 2*M_PI)
-				    diff -= 2*M_PI;
-				while (diff < -2*M_PI)
-				    diff += 2*M_PI;
+				const auto	diff = std::acos(Rt0[i]*Rt1[i]);
 				sqr += diff*diff;
 			    }
 
