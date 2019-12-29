@@ -33,8 +33,8 @@ class Detector
     using sync_policy_t	= message_filters::sync_policies::
 			      ApproximateTime<camera_info_t, image_t, image_t>;
     using mdetector_t	= aruco::MarkerDetector;
-    using bdetector_t	= aruco::BoardDetector;
-
+    using markermap_t	= aruco::BoardConfiguration;
+    
   public:
 		Detector(const std::string& name)			;
 
@@ -107,7 +107,8 @@ class Detector
 
     ddynamic_reconfigure::DDynamicReconfigure		_ddr;
 
-    bdetector_t						_bDetector;
+    mdetector_t						_mDetector;
+    markermap_t						_mMap;
     double						_marker_size;
     int							_marker_id;
 
