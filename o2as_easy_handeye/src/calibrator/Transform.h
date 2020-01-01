@@ -7,8 +7,9 @@
 #define TU_TRANSFORM_H
 
 #include <geometry_msgs/Transform.h>
-#include "TU/Quaternion.h"
-#include "TU/DualNumber.h"
+#include <Eigen/Geometry>
+#include "DualNumber.h"
+#include "Quaternion.h"
 
 namespace TU
 {
@@ -21,10 +22,11 @@ class Transform : boost::multipliable<Transform<T> >
   public:
     using quaternion_type	= Quaternion<T>;
     using dual_quaternion_type	= DualNumber<quaternion_type>;
-    using scalar_type		= typename quaternion_type::scalar_type;
+    using scalar_type		= T;
     using vector_type		= typename quaternion_type::vector_type;
     using translation_type	= typename quaternion_type::vector_type;
     using rotation_type		= typename quaternion_type::rotation_type;
+    using array_type		= typename quaternion_type::array_type;
 
   public:
 			Transform(const dual_quaternion_type& x)
@@ -33,15 +35,18 @@ class Transform : boost::multipliable<Transform<T> >
 			    if (primary().scalar() < 0)
 				_dq *= -1;
 #ifdef DEBUG
-			    const Vector<T, 4>	p(primary()), d(dual());
+			    const Eigen::Matrix<T, 4, 1>	p(primary()),
+								d(dual());
 			    std::cerr << "p*p-1 = " << square(p) - 1
 			    	      << std::endl;
-			    std::cerr << "p*d   = " << p*d << std::endl;
+			    std::cerr << "p*d   = " << p.dot(d) << std::endl;
 #endif
 			}
 
-			Transform(const translation_type& t={0, 0, 0},
-				  const quaternion_type&  q={1, 0, 0, 0})
+			Transform(const translation_type&
+				      t=translation_type::Zero(),
+				  const quaternion_type&
+				      q=quaternion_type(1))
 			    :Transform(dual_quaternion_type(
 					   q, 0.5*quaternion_type(0, t)*q))
 			{
@@ -62,13 +67,13 @@ class Transform : boost::multipliable<Transform<T> >
 			{
 			    geometry_msgs::Transform	ret;
 			    const auto			translation = t();
-			    ret.translation.x = translation[0];
-			    ret.translation.y = translation[1];
-			    ret.translation.z = translation[2];
+			    ret.translation.x = translation(0);
+			    ret.translation.y = translation(1);
+			    ret.translation.z = translation(2);
 			    ret.rotation.w    = primary().scalar();
-			    ret.rotation.x    = primary().vector()[0];
-			    ret.rotation.y    = primary().vector()[1];
-			    ret.rotation.z    = primary().vector()[2];
+			    ret.rotation.x    = primary().vector()(0);
+			    ret.rotation.y    = primary().vector()(1);
+			    ret.rotation.z    = primary().vector()(2);
 
 			    return ret;
 			}
@@ -81,47 +86,43 @@ class Transform : boost::multipliable<Transform<T> >
 			    return *this;
 			}
 
-    const auto&		dq()		const	{ return _dq; }
-    const auto&		primary()	const	{ return dq().primary(); }
-    const auto&		dual()		const	{ return dq().dual(); }
-    Transform		inverse()	const	{ return conj(dq()); }
-    rotation_type	R()		const	{ return primary().R(); }
-    rotation_type	Rt()		const	{ return primary().Rt(); }
-    vector_type		rpy()		const	{ return primary().rpy(); }
-    scalar_type		theta()		const	{ return primary().theta(); }
-    vector_type		n()		const	{ return primary().n(); }
-    scalar_type		d()		const	{ return n() * t(); }
+    const auto&		dq()	  const	{ return _dq; }
+    const auto&		primary() const	{ return dq().primary(); }
+    const auto&		dual()	  const	{ return dq().dual(); }
+    Transform		inverse() const	{ return conj(dq()); }
+    rotation_type	R()	  const	{ return primary().R(); }
+    rotation_type	Rt()	  const	{ return R().transpose(); }
+    array_type		rpy()	  const	{ return primary().rpy(); }
+    scalar_type		theta() const
+			{
+			    return 2 * std::acos(primary().scalar());
+			}
+    vector_type		n()	  const	{ return primary().vec().normalized();}
+    scalar_type		d()	  const	{ return n().dot(t()); }
 
     translation_type	t() const
 			{
 			    return (2 * dual() * conj(primary())).vector();
 			}
 
-    auto		translational_difference(const Transform& trns) const
+    auto		translational_distance(const Transform& trns) const
 			{
-			    return length(t() - trns.t());
+			    return (t() - trns.t()).norm();
 			}
 
-    auto		angular_difference(const Transform& trns) const
+    auto		angular_distance(const Transform& trns) const
 			{
-			    const auto	Rt0 = Rt();
-			    const auto	Rt1 = trns.Rt();
-			    scalar_type	sqr = 0;
-			    for (size_t i = 0; i < 3; ++i)
-			    {
-				const auto	diff = std::acos(Rt0[i]*Rt1[i]);
-				sqr += diff*diff;
-			    }
-
-			    return std::sqrt(sqr/3);
+			    return primary().angular_distance(trns.primary());
 			}
 
     std::ostream&	print(std::ostream& out) const
 			{
 			    constexpr scalar_type	degree = 180.0/M_PI;
 
-			    return out << "xyz(m)    = " << t()
-				       << "rot(deg.) = " << rpy()*degree;
+			    return out << "xyz(m)    = " << t()(0)
+				       << ' ' << t()(1) << ' ' << t()(2)
+				       << "\nrot(deg.) = " << rpy()*degree
+				       << std::endl;
 			}
 
   private:
@@ -133,7 +134,7 @@ operator >>(std::istream& in, Transform<T>& x)
 {
     typename Transform<T>::translation_type	t;
     char					c;
-    in >> t >> c;
+    in >> t(0) >> t(1) >> t(2) >> c;
 
     typename Transform<T>::quaternion_type	q;
     q.get(in);				// Get vector part first, then scalar.
@@ -143,10 +144,11 @@ operator >>(std::istream& in, Transform<T>& x)
     return in;
 }
 
+
 template <class T> inline std::ostream&
 operator <<(std::ostream& out, const Transform<T>& x)
 {
-    x.t().put(out) << ';';
+    out << x.t()(0) << ' ' << x.t()(1) << ' ' << x.t()(2) << "; ";
     return x.primary().put(out);	// Put vector part first, then scalar.
 }
 
