@@ -4,6 +4,11 @@ project(o2as_easy_handeye)
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++14)
 
+find_package(Boost REQUIRED COMPONENTS system)
+find_package(Eigen3 REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(YAML-CPP yaml-cpp REQUIRED)
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   image_proc
@@ -12,10 +17,9 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   sensor_msgs
   geometry_msgs
-  cv_bridge
   message_generation
-  dynamic_reconfigure
   tf
+  dynamic_reconfigure
   pcl_ros
   pcl_conversions
 )
@@ -27,16 +31,12 @@ generate_dynamic_reconfigure_options(
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
 
 add_service_files(DIRECTORY srv)
 
 generate_messages(
   DEPENDENCIES
-  std_srvs
-  std_msgs
-  sensor_msgs
-  geometry_msgs
+    geometry_msgs
 )
 
 catkin_package()
@@ -46,27 +46,18 @@ catkin_package()
 ###########
 include_directories(
   ${catkin_INCLUDE_DIRS}
-  ${OpenCV_INCLUDE_DIRS}
   src/calibrator
 )
 
 add_executable(calibrator
   src/calibrator/main.cpp
   src/calibrator/Calibrator.cpp
-  src/calibrator/Calibrator.h
-  src/calibrator/Transform.h
-  src/calibrator/HandeyeCalibration.h
 )
 
 target_link_libraries(calibrator
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
-  yaml-cpp
-)
-
-add_dependencies(calibrator
-  ${PROJECT_NAME}_gencpp
-  ${catkin_EXPORTED_TARGETS}
+  ${YAML-CPP_LIBRARIES}
 )
 
 add_executable(quat2rpy
@@ -78,15 +69,8 @@ target_link_libraries(quat2rpy
   ${roscpp_LIBRARIES}
 )
 
-add_dependencies(quat2rpy
-  ${PROJECT_NAME}_gencpp
-  ${catkin_EXPORTED_TARGETS}
-)
-
 add_executable(calibrator_test
   src/calibrator_test/main.cpp
-  src/calibrator/Transform.h
-  src/calibrator/HandeyeCalibration.h
 )
 
 target_link_libraries(calibrator_test
@@ -96,7 +80,6 @@ target_link_libraries(calibrator_test
 
 add_dependencies(calibrator_test
   ${PROJECT_NAME}_gencpp
-  ${catkin_EXPORTED_TARGETS}
 )
 
 add_executable(plane_detector
@@ -112,7 +95,6 @@ target_link_libraries(plane_detector
 add_dependencies(plane_detector
   ${PROJECT_NAME}_gencpp
   ${PROJECT_NAME}_gencfg
-  ${catkin_EXPORTED_TARGETS}
 )
 
 #############
