@@ -151,7 +151,10 @@ cameraToEffectorSingle(const std::vector<Transform<T> >& cMo,
     Eigen::SelfAdjointEigenSolver<matrix44_t>	esolver(M);
     quaternion_t	q(esolver.eigenvectors().col(0));  // computed rotation
 #ifdef DEBUG
-    std::cerr << "--- Eigenvalues ---\n" << evalues << std::endl;
+    std::cerr << "--- M ---\n" << M
+	      << "\n--- Eigenvectors ---\n" << esolver.eigenvectors()
+	      << "\n--- Eigenvalues ---\n" << esolver.eigenvalues()
+	      << std::endl;
 #endif
 
   // Compute translation.
@@ -169,6 +172,9 @@ cameraToEffectorSingle(const std::vector<Transform<T> >& cMo,
 	    N += Rt * Rt.transpose();
 	    t += Rt * (q.R()*B.t() - A.t());
 	}
+#ifdef DEBUG
+    std::cerr << "--- N ---\n" << N << std::endl;
+#endif
     t = N.colPivHouseholderQr().solve(t);
 
     return {t, q};
@@ -192,7 +198,6 @@ cameraToEffectorDual(const std::vector<Transform<T> >& cMo,
     const auto	nposes = cMo.size();
 
   // Compute rotation.
-    std::cerr << "Debug point 0" << std::endl;
     matrix88_t	M(matrix88_t::Zero());	// 4x4 matrix initialized with zeros.
     for (size_t i = 0; i < nposes; ++i)
 	for (size_t j = i + 1; j < nposes; ++j)
@@ -207,19 +212,19 @@ cameraToEffectorDual(const std::vector<Transform<T> >& cMo,
 	    M.template block<4, 4>(4, 4) += C.transpose() * C;
 	}
 
-    std::cerr << "Debug point 1" << std::endl;
     Eigen::SelfAdjointEigenSolver<matrix88_t>	esolver(M);
     const auto					U = esolver.eigenvectors();
-  //#ifdef DEBUG
-#if 1
-    std::cerr << "--- Eigenvalues ---\n" << esolver.eigenvalues() << std::endl;
+#ifdef DEBUG
+    std::cerr << "--- M ---\n" << M
+	      << "\n--- Eigenvectors ---\n" << U
+	      << "\n--- Eigenvalues ---\n" << esolver.eigenvalues()
+	      << std::endl;
 #endif
     const Transform<T>	eMc(detail::computeDualQuaternion(
 				U.template block<4, 1>(0, 1),
 				U.template block<4, 1>(4, 1),
 				U.template block<4, 1>(0, 0),
 				U.template block<4, 1>(4, 0)));
-    std::cerr << "Debug point 2" << std::endl;
 
     return eMc;
 }
@@ -231,7 +236,7 @@ objectToWorld(const std::vector<Transform<T> >& cMo,
     using vector4_type	= typename Quaternion<T>::vector4_type;
 
     const auto		nposes = cMo.size();
-    vector4_type	p, d;
+    vector4_type	p(vector4_type::Zero()), d(vector4_type::Zero());
     for (size_t i = 0; i < nposes; ++i)
     {
       // Transformation from object to world computed from estimated eMc.
