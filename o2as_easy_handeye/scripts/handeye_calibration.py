@@ -14,8 +14,6 @@ from aist_routines.base import AISTBaseRoutines
 
 import moveit_commander
 import sensor_msgs.msg
-import cv2
-from cv_bridge import CvBridge, CvBridgeError
 
 initposes = {
     'o2as': {
