@@ -7,7 +7,6 @@
 #define TU_TRANSFORM_H
 
 #include <geometry_msgs/Transform.h>
-#include <Eigen/Geometry>
 #include "DualNumber.h"
 #include "Quaternion.h"
 
@@ -148,7 +147,8 @@ operator >>(std::istream& in, Transform<T>& x)
 template <class T> inline std::ostream&
 operator <<(std::ostream& out, const Transform<T>& x)
 {
-    out << x.t()(0) << ' ' << x.t()(1) << ' ' << x.t()(2) << "; ";
+    const auto	tt = x.t();
+    out << tt(0) << ' ' << tt(1) << ' ' << tt(2) << "; ";
     return x.primary().put(out);	// Put vector part first, then scalar.
 }
 
