@@ -5,7 +5,7 @@
 #include <opencv2/core.hpp>
 #include <ros/ros.h>
 
-namespace o2as
+namespace o2as_aruco_ros
 {
 /************************************************************************
 *  struct Plane<T, N>							*
@@ -22,10 +22,10 @@ class Plane
     Plane(const vector_type& norm, value_type dist) :_n(norm), _d(dist)	{}
     template <class ITER>
     Plane(ITER begin, ITER end)				{ fit(begin, end); }
-    
+
     template <class ITER>
     void		fit(ITER begin, ITER end)	;
-    
+
     const vector_type&	normal()			const	{ return _n; }
     value_type		distance()			const	{ return _d; }
     value_type		distance(const vector_type& point) const
@@ -47,7 +47,7 @@ class Plane
     vector_type	_n;	// normal
     value_type	_d;	// distance from the origin
 };
-    
+
 template <class T, size_t N> template <class ITER> void
 Plane<T, N>::fit(ITER begin, ITER end)
 {
@@ -66,7 +66,7 @@ Plane<T, N>::fit(ITER begin, ITER end)
     const auto	npoints = std::distance(begin, end);
     if (npoints < 3)
 	throw std::runtime_error("Failed to fit a plane: three or more points required!");
-    
+
   // Compute centroid.
     auto	centroid = vector_type::zeros();
     for (auto iter = begin; iter != end; ++iter)
@@ -107,7 +107,7 @@ template <class T> cv::Matx<T, 3, 3>
 rodrigues(const cv::Matx<T, 3, 1>& r)
 {
     using matrix_t = cv::Matx<T, 3, 3>;
-    
+
     const auto	theta = r.norm();
     r /= theta;
     const auto	c = std::cos(theta), s = std::sin(theta);
@@ -115,7 +115,7 @@ rodrigues(const cv::Matx<T, 3, 1>& r)
     for (int i = 0; i < 3; ++i)
     {
 	R(i, i) += c;
-	
+
 	for (int j = 0; j < 3; ++j)
 	    R(i, j) += (1 - c)*r(i)*r(j);
     }
@@ -128,6 +128,5 @@ rodrigues(const cv::Matx<T, 3, 1>& r)
 
     return R;
 }
-    
-}	// namespace o2as
 
+}	// namespace o2as

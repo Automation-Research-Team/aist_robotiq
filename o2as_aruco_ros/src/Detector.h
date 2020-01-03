@@ -33,8 +33,10 @@ class Detector
     using sync_policy_t	= message_filters::sync_policies::
 			      ApproximateTime<camera_info_t, image_t, image_t>;
     using mdetector_t	= aruco::MarkerDetector;
+    using markerinfo_t	= aruco::MarkerInfo;
     using markermap_t	= aruco::BoardConfiguration;
-    
+    using point3_t	= cv::Vec<float, 3>;
+
   public:
 		Detector(const std::string& name)			;
 
@@ -54,24 +56,25 @@ class Detector
     void	detect_marker_cb(const camera_info_p& camera_info_msg,
 				 const image_p&	      image_msg,
 				 const image_p&	      depth_msg)	;
+    template <class ITER>
+    void	publish_transform(ITER begin, ITER end,
+				  const ros::Time& stamp,
+				  const std::string& marker_frame)	;
+    void	publish_image(const cv::Mat& image,
+			      const ros::Time& stamp)		const	;
     bool	get_transform(const std::string& refFrame,
 			      const std::string& childFrame,
 			      tf::StampedTransform& transform)	const	;
-    tf::Transform
-		get_marker_transform(const aruco::Marker& marker,
-				     const image_t& depth_msg,
-				     cv::Mat& image)		const	;
+    std::vector<point3_t>
+		get_marker_corners(const aruco::Marker& marker,
+				   const image_t& depth_msg,
+				   cv::Mat& image)		const	;
     template <class T> cv::Vec<T, 3>
 		view_vector(T u, T v)				const	;
     template <class T> cv::Vec<T, 3>
 		at(const image_t& depth_msg, int u, int v)	const	;
     template <class T> cv::Vec<T, 3>
 		at(const image_t& depth_msg, T u, T v)		const	;
-    void	publish_marker_info(const aruco::Marker& marker,
-				    const image_t& depth_msg,
-				    cv::Mat& image)			;
-    void	publish_image_info(const cv::Mat& image,
-				   const ros::Time& stamp)		;
 
   private:
     ros::NodeHandle					_nh;
@@ -94,16 +97,11 @@ class Detector
     bool						_useRectifiedImages;
     tf::StampedTransform				_rightToLeft;
 
-  // output image stuff
+  // output stuff
     image_transport::ImageTransport			_it;
     const image_transport::Publisher			_image_pub;
     const image_transport::Publisher			_debug_pub;
-
-  // output cloud, pose, marker, etc. stuff
     const ros::Publisher				_pose_pub;
-    const ros::Publisher				_visMarker_pub;
-    const ros::Publisher				_pixel_pub;
-    const ros::Publisher				_corners_pub;
 
     ddynamic_reconfigure::DDynamicReconfigure		_ddr;
 

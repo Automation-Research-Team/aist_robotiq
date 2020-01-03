@@ -15,6 +15,7 @@
 #include <o2as_aruco_ros/Corners.h>
 #include "Detector.h"
 #include "Plane.h"
+#include "Similarity.h"
 
 namespace o2as_aruco_ros
 {
@@ -56,11 +57,9 @@ Detector::Detector(const std::string& name)
      _image_pub(_it.advertise("result", 1)),
      _debug_pub(_it.advertise("debug",  1)),
      _pose_pub(     _nh.advertise<geometry_msgs::PoseStamped>("pose", 100)),
-     _visMarker_pub(_nh.advertise<visualization_msgs::Marker>("marker", 10)),
-     _pixel_pub(    _nh.advertise<geometry_msgs::PointStamped>("pixel", 10)),
-     _corners_pub(  _nh.advertise<Corners>("corners", 10)),
      _ddr(),
      _mDetector(),
+     _mMap(),
      _marker_size(0.05),
      _marker_id(0),
      _useDepth(true),
@@ -90,7 +89,18 @@ Detector::Detector(const std::string& name)
     _nh.param("marker_map", mMapFile, std::string(""));
     if (mMapFile != "")
 	_mMap.readFromFile(mMapFile);
-    
+    else if (_marker_id != 0)
+    {
+	const auto	half_size = _marker_size/2;
+	markerinfo_t	mInfo(_marker_id);
+	mInfo.push_back({-half_size, -half_size, 0});
+	mInfo.push_back({ half_size, -half_size, 0});
+	mInfo.push_back({ half_size,  half_size, 0});
+	mInfo.push_back({-half_size,  half_size, 0});
+	_mMap.push_back(mInfo);
+	_mMap.mInfoType = markermap_t::METERS;
+    }
+
   // Setup ddynamic_reconfigure service for min/max sizes.
     float	mins, maxs;
     ROS_INFO_STREAM("Marker size min: " << mins << "  max: " << maxs);
@@ -234,63 +244,165 @@ Detector::detect_marker_cb(const camera_info_p& camera_info_msg,
 	_camParam = aruco_ros::rosCameraInfo2ArucoCamParams(
 			msg_tmp, _useRectifiedImages);
 
-      // wait for one camerainfo, then shut down that subscriber
-      // handle cartesian offset between stereo pairs
-      // see the sensor_msgs/CamaraInfo documentation for details
+      // Handle cartesian offset between stereo pairs.
+      // See the sensor_msgs/CamaraInfo documentation for details.
 	_rightToLeft.setIdentity();
 	_rightToLeft.setOrigin(tf::Vector3(-camera_info_msg->P[3]/
 					    camera_info_msg->P[0],
 					   -camera_info_msg->P[7]/
 					    camera_info_msg->P[5],
 					   0.0));
-	auto	image = cv_bridge::toCvCopy(*image_msg,
+
+      // Convert sensor_msgs::ImageConstPtr to CvImagePtr.
+	auto	image = cv_bridge::toCvCopy(image_msg,
 					    sensor_msgs::image_encodings::RGB8)
 		      ->image;
 
-      // detection results will go into "markers"
+      // Detect markers. Results will go into "markers"
 	std::vector<aruco::Marker>	markers;
 	_mDetector.detect(image, markers, _camParam, _marker_size, false);
 
-	if (markers.size() == 0)
-	    throw std::runtime_error("No markers detected!");
-
-      // for each marker, draw info and its boundaries in the image
-	for (const auto& marker : markers)
+	if (_mMap.size() > 0)
 	{
-	    try
+	    std::vector<std::pair<point3_t, point3_t> >	pairs;
+
+	    for (const auto& marker : markers)
 	    {
-		if (_marker_id == 0 || marker.id == _marker_id)
-		    publish_marker_info(marker, *depth_msg, image);
-	    }
-	    catch (const std::runtime_error& e)
-	    {
-		ROS_WARN_STREAM(e.what());
+		const auto	i = _mMap.getIndexOfMarkerId(marker.id);
+		if (i == -1)
+		    continue;
+
+		const auto	corners = get_marker_corners(marker,
+							     *depth_msg, image);
+		const auto&	markerinfo = _mMap[i];
+
+		for (size_t j = 0; j < corners.size(); ++j)
+		    pairs.push_back(std::make_pair(markerinfo[j], corners[j]));
 	    }
 
-	  // but drawing all the detected markers
-	    marker.draw(image, cv::Scalar(0, 0, 255), 2);
+	    publish_transform(pairs.begin(), pairs.end(),
+			      depth_msg->header.stamp, _marker_frame);
+	}
+	else
+	{
+	  // for each marker, draw info and its boundaries in the image
+	    for (const auto& marker : markers)
+	    {
+		try
+		{
+		    const auto	corners = get_marker_corners(marker,
+							     *depth_msg, image);
+		    if (corners.size() < 4)
+			throw std::runtime_error("Not all four corners deteced!");
+
+		    std::vector<std::pair<point3_t, point3_t> >	pairs;
+		    const auto	half_size = _marker_size/2;
+		    pairs.push_back(std::make_pair(
+					corners[0],
+					point3_t(-half_size, -half_size, 0)));
+		    pairs.push_back(std::make_pair(
+					corners[1],
+					point3_t( half_size, -half_size, 0)));
+		    pairs.push_back(std::make_pair(
+					corners[2],
+					point3_t( half_size,  half_size, 0)));
+		    pairs.push_back(std::make_pair(
+					corners[3],
+					point3_t(-half_size,  half_size, 0)));
+
+		    publish_transform(pairs.begin(), pairs.end(),
+				      depth_msg->header.stamp,
+				      _marker_frame + '_'
+						    + std::to_string(marker.id));
+		}
+		catch (const std::runtime_error& e)
+		{
+		    ROS_WARN_STREAM(e.what());
+		}
+
+	      // but drawing all the detected markers
+		marker.draw(image, cv::Scalar(0, 0, 255), 2);
+	    }
 	}
 
 	if (_marker_size != -1)
 	    for (auto& marker : markers)
 		aruco::CvDrawingUtils::draw3dAxis(image, marker, _camParam);
 
-	publish_image_info(image, image_msg->header.stamp);
+	publish_image(image, image_msg->header.stamp);
     }
-    catch (const std::runtime_error& e)
+    catch (const std::exception& e)
     {
 	ROS_WARN_STREAM(e.what());
     }
-    catch (const cv_bridge::Exception& e)
+}
+
+template <class ITER> void
+Detector::publish_transform(ITER begin, ITER end, const ros::Time& stamp,
+			    const std::string& marker_frame)
+{
+    Similarity<float, 3>	similarity;
+    const auto	residual = similarity.fit(begin, end);
+
+    ROS_DEBUG_STREAM("Fitted similarity transformation: scale = "
+		     << similarity.s() << ", residual = " << residual);
+
+    const auto		R = similarity.R();
+    const auto		t = similarity.t() * (1/similarity.s());
+    tf::Transform	transform(tf::Matrix3x3(R(0, 0), R(0, 1), R(0, 2),
+						R(1, 0), R(1, 1), R(1, 2),
+						R(2, 0), R(2, 1), R(2, 2)),
+				  tf::Vector3(t(0), t(1), t(2)));
+
+    tf::StampedTransform	cameraToReference;
+    cameraToReference.setIdentity();
+    if (_reference_frame != _camera_frame)
+	get_transform(_reference_frame, _camera_frame, cameraToReference);
+
+    _tfBroadcaster.sendTransform({static_cast<tf::Transform>(cameraToReference) *
+				  static_cast<tf::Transform>(_rightToLeft) *
+				  transform,
+				  stamp, _reference_frame, marker_frame});
+
+    if (_pose_pub.getNumSubscribers() > 0)
     {
-	ROS_ERROR_STREAM("cv_bridge exception: " << e.what());
+	geometry_msgs::PoseStamped	poseMsg;
+	tf::poseTFToMsg(transform, poseMsg.pose);
+	poseMsg.header.frame_id = _reference_frame;
+	poseMsg.header.stamp    = stamp;
+	_pose_pub.publish(poseMsg);
+    }
+}
+
+void
+Detector::publish_image(const cv::Mat& image, const ros::Time& stamp) const
+{
+    if (_image_pub.getNumSubscribers() > 0)
+    {
+      //show input with augmented information
+	cv_bridge::CvImage	out_msg;
+	out_msg.header.stamp = stamp;
+	out_msg.encoding     = sensor_msgs::image_encodings::RGB8;
+	out_msg.image	     = image;
+	_image_pub.publish(out_msg.toImageMsg());
+    }
+
+    if (_debug_pub.getNumSubscribers() > 0)
+    {
+      //show also the internal image
+      //resulting from the threshold operation
+	cv_bridge::CvImage	debug_msg;
+	debug_msg.header.stamp = stamp;
+	debug_msg.encoding     = sensor_msgs::image_encodings::MONO8;
+	debug_msg.image	       = _mDetector.getThresholdedImage();
+	_debug_pub.publish(debug_msg.toImageMsg());
     }
 }
 
 bool
 Detector::get_transform(const std::string& refFrame,
-		      const std::string& childFrame,
-		      tf::StampedTransform& transform) const
+			const std::string& childFrame,
+			tf::StampedTransform& transform) const
 {
     std::string	errMsg;
     if (!_tfListener.waitForTransform(refFrame, childFrame,
@@ -317,114 +429,64 @@ Detector::get_transform(const std::string& refFrame,
     return true;
 }
 
-tf::Transform
-Detector::get_marker_transform(const aruco::Marker& marker,
-			       const image_t& depth_msg, cv::Mat& image) const
+std::vector<Detector::point3_t>
+Detector::get_marker_corners(const aruco::Marker& marker,
+			     const image_t& depth_msg, cv::Mat& image) const
 {
+    struct rgb_t	{ uint8_t r, g, b; };
+    using value_t	= float;
+    using point_t	= cv::Vec<value_t, 3>;
+    using plane_t	= Plane<value_t, 3>;
+
+    std::vector<point3_t>	corners;
+
     if (marker.size() < 4)
-	throw std::runtime_error("Detected not all four corners!");
+	return corners;
 
-    tf::Transform	transform;
-
-    if (_useDepth)
+  // Compute initial marker plane.
+    std::vector<point3_t>	points;
+    for (const auto& corner : marker)
     {
-	struct rgb_t	{ uint8_t r, g, b; };
-	using value_t	= float;
-	using point_t	= cv::Vec<value_t, 3>;
-	using plane_t	= o2as::Plane<value_t, 3>;
+	const auto	point = at<value_t>(depth_msg, corner.x, corner.y);
 
-      // Compute initial marker plane.
-	std::vector<point_t>	points;
-	for (const auto& corner : marker)
+	if (point(2) != value_t(0))
+	    points.push_back(point);
+    }
+    plane_t	plane(points.cbegin(), points.cend());
+
+  // Compute 2D bounding box of marker.
+    const int	u0 = std::floor(std::min({marker[0].x, marker[1].x,
+					  marker[2].x, marker[3].x}));
+    const int	v0 = std::floor(std::min({marker[0].y, marker[1].y,
+					  marker[2].y, marker[3].y}));
+    const int	u1 = std::ceil( std::max({marker[0].x, marker[1].x,
+					  marker[2].x, marker[3].x}));
+    const int	v1 = std::ceil( std::max({marker[0].y, marker[1].y,
+					  marker[2].y, marker[3].y}));
+
+  // Select 3D points close to the initial plane within the bounding box.
+    points.clear();
+    for (auto v = v0; v <= v1; ++v)
+	for (auto u = u0; u <= u1; ++u)
 	{
-	    const auto	point = at<value_t>(depth_msg, corner.x, corner.y);
+	    const auto	point = at<value_t>(depth_msg, u, v);
 
-	    if (point(2) != value_t(0))
-		points.push_back(point);
-	}
-
-	plane_t	plane(points.cbegin(), points.cend());
-
-      // Compute 2D bounding box of marker.
-	const int	u0 = std::floor(std::min({marker[0].x, marker[1].x,
-						  marker[2].x, marker[3].x}));
-	const int	v0 = std::floor(std::min({marker[0].y, marker[1].y,
-						  marker[2].y, marker[3].y}));
-	const int	u1 = std::ceil( std::max({marker[0].x, marker[1].x,
-						  marker[2].x, marker[3].x}));
-	const int	v1 = std::ceil( std::max({marker[0].y, marker[1].y,
-						  marker[2].y, marker[3].y}));
-
-      // Select 3D points close to the initial plane within the bounding box.
-	points.clear();
-	for (auto v = v0; v <= v1; ++v)
-	    for (auto u = u0; u <= u1; ++u)
+	    if (point(2) != value_t(0) &&
+		plane.distance(point) < _planarityTolerance)
 	    {
-		const auto	point = at<value_t>(depth_msg, u, v);
-
-		if (point(2) != value_t(0) &&
-		    plane.distance(point) < _planarityTolerance)
-		{
-		    points.push_back(point);
-		    image.at<rgb_t>(v, u).b = 0;
-		}
+		points.push_back(point);
+		image.at<rgb_t>(v, u).b = 0;
 	    }
-
-      // Fit a plane to seleceted inliers.
-	plane.fit(points.cbegin(), points.cend());
-
-      // Compute 3D coordinates of marker corners and then publish.
-	point_t	corners[4];
-	for (int i = 0; i < 4; ++i)
-	    corners[i] = plane.cross_point(view_vector(marker[i].x,
-						       marker[i].y));
-
-	Corners	corners_msg;
-	for (const auto& corner: corners)
-	{
-	    geometry_msgs::PointStamped	pointStamped;
-	    pointStamped.header  = depth_msg.header;
-	    pointStamped.point.x = corner(0);
-	    pointStamped.point.y = corner(1);
-	    pointStamped.point.z = corner(2);
-
-	    corners_msg.corners.push_back(pointStamped);
 	}
-	_corners_pub.publish(corners_msg);
 
-      // Compute p and q, i.e. marker's local x-axis and y-axis respectively.
-	const auto&	n = plane.normal();
-	const auto	c = (corners[2] + corners[3] - corners[0] - corners[1])
-			  + (corners[1] + corners[2] -
-			     corners[3] - corners[0]).cross(n);
-	const auto	p = c / cv::norm(c);
-	const auto	q = n.cross(p);
-	transform.setBasis(tf::Matrix3x3(p(0), q(0), n(0),
-					 p(1), q(1), n(1),
-					 p(2), q(2), n(2)));
+  // Fit a plane to seleceted inliers.
+    plane.fit(points.cbegin(), points.cend());
 
-      // Compute marker centroid.
-	const auto	centroid = 0.25*(corners[0] + corners[1] +
-					 corners[2] + corners[3]);
-	transform.setOrigin(tf::Vector3(centroid(0), centroid(1), centroid(2)));
-    }
-    else
-    {
-	const tf::Transform	rot(tf::Matrix3x3(-1, 0, 0,
-						   0, 0, 1,
-						   0, 1, 0),
-				    tf::Vector3(0, 0, 0));
-	transform = aruco_ros::arucoMarker2Tf(marker) * rot;
-    }
+  // Compute 3D coordinates of marker corners and then publish.
+    for (const auto& corner : marker)
+	corners.push_back(plane.cross_point(view_vector(corner.x, corner.y)));
 
-    tf::StampedTransform	cameraToReference;
-    cameraToReference.setIdentity();
-    if (_reference_frame != _camera_frame)
-	get_transform(_reference_frame, _camera_frame, cameraToReference);
-
-    return static_cast<tf::Transform>(cameraToReference)
-	 * static_cast<tf::Transform>(_rightToLeft)
-	 * transform;
+    return corners;
 }
 
 template <class T> inline cv::Vec<T, 3>
@@ -461,77 +523,6 @@ Detector::at(const image_t& depth_msg, T u, T v) const
 	}
 
     return {T(0), T(0), T(0)};
-}
-
-void
-Detector::publish_marker_info(const aruco::Marker& marker,
-			      const image_t& depth_msg, cv::Mat& image)
-{
-    const auto	stamp = depth_msg.header.stamp;
-    auto	marker_frame = _marker_frame;
-    if (_marker_id == 0)
-	(marker_frame += '_') += std::to_string(marker.id);
-    const tf::StampedTransform	stampedTransform(
-				    get_marker_transform(marker, depth_msg,
-							 image),
-				    stamp, _reference_frame, marker_frame);
-    _tfBroadcaster.sendTransform(stampedTransform);
-
-    geometry_msgs::PoseStamped	poseMsg;
-    tf::poseTFToMsg(stampedTransform, poseMsg.pose);
-    poseMsg.header.frame_id = _reference_frame;
-    poseMsg.header.stamp    = stamp;
-    _pose_pub.publish(poseMsg);
-
-    geometry_msgs::PointStamped	pixelMsg;
-    pixelMsg.header.frame_id = marker_frame;
-    pixelMsg.header.stamp    = stamp;
-    pixelMsg.point.x	     = marker.getCenter().x;
-    pixelMsg.point.y	     = marker.getCenter().y;
-    pixelMsg.point.z	     = 0;
-    _pixel_pub.publish(pixelMsg);
-
-  //Publish rviz marker representing the ArUco marker patch
-    visualization_msgs::Marker	visMarker;
-    visMarker.header   = poseMsg.header;
-    visMarker.id       = 1;
-    visMarker.type     = visualization_msgs::Marker::CUBE;
-    visMarker.action   = visualization_msgs::Marker::ADD;
-    visMarker.pose     = poseMsg.pose;
-    visMarker.scale.x  = _marker_size;
-    visMarker.scale.y  = 0.001;
-    visMarker.scale.z  = _marker_size;
-    visMarker.color.r  = 1.0;
-    visMarker.color.g  = 0;
-    visMarker.color.b  = 0;
-    visMarker.color.a  = 1.0;
-    visMarker.lifetime = ros::Duration(3.0);
-    _visMarker_pub.publish(visMarker);
-}
-
-void
-Detector::publish_image_info(const cv::Mat& image, const ros::Time& stamp)
-{
-    if (_image_pub.getNumSubscribers() > 0)
-    {
-      //show input with augmented information
-	cv_bridge::CvImage	out_msg;
-	out_msg.header.stamp = stamp;
-	out_msg.encoding     = sensor_msgs::image_encodings::RGB8;
-	out_msg.image	     = image;
-	_image_pub.publish(out_msg.toImageMsg());
-    }
-
-    if (_debug_pub.getNumSubscribers() > 0)
-    {
-      //show also the internal image
-      //resulting from the threshold operation
-	cv_bridge::CvImage	debug_msg;
-	debug_msg.header.stamp = stamp;
-	debug_msg.encoding     = sensor_msgs::image_encodings::MONO8;
-	debug_msg.image	       = _mDetector.getThresholdedImage();
-	_debug_pub.publish(debug_msg.toImageMsg());
-    }
 }
 
 }	// namespace o2as_aruco_ros
