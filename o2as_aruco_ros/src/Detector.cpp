@@ -59,8 +59,8 @@ Detector::Detector(const std::string& name)
      _debug_pub(_it.advertise("debug",  1)),
      _pose_pub(     _nh.advertise<geometry_msgs::PoseStamped>("pose", 100)),
      _ddr(),
-     _mDetector(),
-     _mMap(),
+     _marker_detector(),
+     _marker_map(),
      _marker_size(0.05),
      _marker_id(0),
      _useSimilarity(false),
@@ -89,23 +89,23 @@ Detector::Detector(const std::string& name)
     std::string	mMapFile;
     _nh.param("marker_map", mMapFile, std::string(""));
     if (mMapFile != "")
-	_mMap.readFromFile(mMapFile);
+	_marker_map.readFromFile(mMapFile);
     else if (_marker_id != 0)
     {
 	const auto	half_size = _marker_size/2;
-	markerinfo_t	mInfo(_marker_id);
+	marker_info_t	mInfo(_marker_id);
 	mInfo.push_back({-half_size, -half_size, 0});
 	mInfo.push_back({ half_size, -half_size, 0});
 	mInfo.push_back({ half_size,  half_size, 0});
 	mInfo.push_back({-half_size,  half_size, 0});
-	_mMap.push_back(mInfo);
-	_mMap.mInfoType = markermap_t::METERS;
+	_marker_map.push_back(mInfo);
+	_marker_map.mInfoType = marker_map_t::METERS;
     }
 
   // Setup ddynamic_reconfigure service for min/max sizes.
     float	mins, maxs;
     ROS_INFO_STREAM("Marker size min: " << mins << "  max: " << maxs);
-    ROS_INFO_STREAM("Desired speed: " << _mDetector.getDesiredSpeed());
+    ROS_INFO_STREAM("Desired speed: " << _marker_detector.getDesiredSpeed());
 
   // Set coner refinement method and setup ddynamic_reconfigure service for it.
     std::string refinementMethod;
@@ -124,7 +124,7 @@ Detector::Detector(const std::string& name)
     	boost::bind(&Detector::set_refinement_method, this, _1),
     	"Corner refinement method", map_refinementMethod);
     ROS_INFO_STREAM("Corner refinement method: "
-		    << _mDetector.getCornerRefinementMethod());
+		    << _marker_detector.getCornerRefinementMethod());
 
   // Set threshold method and setup ddynamic_reconfigure service for it.
     std::string thresholdMethod;
@@ -141,11 +141,12 @@ Detector::Detector(const std::string& name)
 	"threshold_method", thresholdMethod,
 	boost::bind(&Detector::set_threshold_method, this, _1),
 	"Threshold method", map_thresholdMethod);
-    ROS_INFO_STREAM("Threshold method: " << _mDetector.getThresholdMethod());
+    ROS_INFO_STREAM("Threshold method: "
+		    << _marker_detector.getThresholdMethod());
 
   // Setup ddynamic_reconfigure service for threshold values.
     double	param1, param2;
-    _mDetector.getThresholdParams(param1, param2);
+    _marker_detector.getThresholdParams(param1, param2);
     _ddr.registerVariable<double>(
 	"param1", param1,
 	boost::bind(&Detector::set_first_param<double>, this,
@@ -191,24 +192,24 @@ void
 Detector::set_refinement_method(const std::string& method)
 {
     if (method == "NONE")
-	_mDetector.setCornerRefinementMethod(mdetector_t::NONE);
+	_marker_detector.setCornerRefinementMethod(mdetector_t::NONE);
     else if (method == "HARRIS")
-	_mDetector.setCornerRefinementMethod(mdetector_t::HARRIS);
+	_marker_detector.setCornerRefinementMethod(mdetector_t::HARRIS);
     else if (method == "SUBPIX")
-	_mDetector.setCornerRefinementMethod(mdetector_t::SUBPIX);
+	_marker_detector.setCornerRefinementMethod(mdetector_t::SUBPIX);
     else
-	_mDetector.setCornerRefinementMethod(mdetector_t::LINES);
+	_marker_detector.setCornerRefinementMethod(mdetector_t::LINES);
 }
 
 void
 Detector::set_threshold_method(const std::string& method)
 {
     if (method == "FIXED_THRES")
-	_mDetector.setThresholdMethod(mdetector_t::FIXED_THRES);
+	_marker_detector.setThresholdMethod(mdetector_t::FIXED_THRES);
     else if (method == "ADPT_THRES")
-	_mDetector.setThresholdMethod(mdetector_t::ADPT_THRES);
+	_marker_detector.setThresholdMethod(mdetector_t::ADPT_THRES);
     else
-	_mDetector.setThresholdMethod(mdetector_t::CANNY);
+	_marker_detector.setThresholdMethod(mdetector_t::CANNY);
 }
 
 template <class T> inline void
@@ -217,8 +218,8 @@ Detector::set_first_param(void (mdetector_t::* get)(T&, T&) const,
 			  T param)
 {
     T	dummy, param2;
-    (_mDetector.*get)(dummy, param2);
-    (_mDetector.*set)(param, param2);
+    (_marker_detector.*get)(dummy, param2);
+    (_marker_detector.*set)(param, param2);
 }
 
 template <class T> inline void
@@ -227,8 +228,8 @@ Detector::set_second_param(void (mdetector_t::* get)(T&, T&) const,
 			   T param)
 {
     T	param1, dummy;
-    (_mDetector.*get)(param1, dummy);
-    (_mDetector.*set)(param1, param);
+    (_marker_detector.*get)(param1, dummy);
+    (_marker_detector.*set)(param1, param);
 }
 
 void
@@ -262,21 +263,21 @@ Detector::detect_marker_cb(const camera_info_p& camera_info_msg,
 
       // Detect markers. Results will go into "markers"
 	std::vector<aruco::Marker>	markers;
-	_mDetector.detect(image, markers, _camParam, _marker_size, false);
+	_marker_detector.detect(image, markers, _camParam, _marker_size, false);
 
-	if (_mMap.size() > 0)
+	if (_marker_map.size() > 0)
 	{
 	    std::vector<std::pair<point3_t, point3_t> >	pairs;
 
 	    for (const auto& marker : markers)
 	    {
-		const auto	i = _mMap.getIndexOfMarkerId(marker.id);
+		const auto	i = _marker_map.getIndexOfMarkerId(marker.id);
 		if (i == -1)
 		    continue;
 
 		const auto	corners = get_marker_corners(marker,
 							     *depth_msg, image);
-		const auto&	markerinfo = _mMap[i];
+		const auto&	markerinfo = _marker_map[i];
 
 		for (size_t j = 0; j < corners.size(); ++j)
 		    pairs.push_back(std::make_pair(markerinfo[j], corners[j]));
@@ -416,7 +417,7 @@ Detector::publish_image(const cv::Mat& image, const ros::Time& stamp) const
 	cv_bridge::CvImage	debug_msg;
 	debug_msg.header.stamp = stamp;
 	debug_msg.encoding     = sensor_msgs::image_encodings::MONO8;
-	debug_msg.image	       = _mDetector.getThresholdedImage();
+	debug_msg.image	       = _marker_detector.getThresholdedImage();
 	_debug_pub.publish(debug_msg.toImageMsg());
     }
 }
