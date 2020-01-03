@@ -110,7 +110,7 @@ class Detector
     double						_marker_size;
     int							_marker_id;
 
-    bool						_useDepth;
+    bool						_useSimilarity;
     double						_planarityTolerance;
 };
 

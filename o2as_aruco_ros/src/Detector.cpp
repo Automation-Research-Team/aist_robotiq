@@ -16,6 +16,7 @@
 #include "Detector.h"
 #include "Plane.h"
 #include "Similarity.h"
+#include "Rigidity.h"
 
 namespace o2as_aruco_ros
 {
@@ -62,7 +63,7 @@ Detector::Detector(const std::string& name)
      _mMap(),
      _marker_size(0.05),
      _marker_id(0),
-     _useDepth(true),
+     _useSimilarity(false),
      _planarityTolerance(0.001)
 {
     _nh.param("marker_size",	    _marker_size,	 0.05);
@@ -156,14 +157,15 @@ Detector::Detector(const std::string& name)
 	boost::bind(&Detector::set_second_param<double>, this,
 		    &mdetector_t::getThresholdParams,
 		    &mdetector_t::setThresholdParams, _1),
-	"The constant sbtracted from the mean or weighted mean", 1, 15);
+	"The constant subtracted from the mean or weighted mean", 1, 15);
     ROS_INFO_STREAM("Thresholding paramaeter values: "
 		    << " param1: " << param1 << " param2: " << param2);
 
-  // Set usage of depth and setup its ddynamic_recoconfigure service.
-    _nh.param("use_depth", _useDepth, true);
+  // Set usage of rigid transformation and setup its dynamic reconfigure service.
+    _nh.param("use_similarity", _useSimilarity, false);
     _ddr.registerVariable<bool>(
-    	"use_depth", &_useDepth, "Use depth for computing marker pose");
+	"use_similarity", &_useSimilarity,
+	"Use similarity transformation to determine marker poses.");
 
   // Set planarity tolerance and setup its ddynamic_recoconfigure service.
     _nh.param("planarity_tolerance", _planarityTolerance, 0.001);
@@ -341,14 +343,34 @@ template <class ITER> void
 Detector::publish_transform(ITER begin, ITER end, const ros::Time& stamp,
 			    const std::string& marker_frame)
 {
-    Similarity<float, 3>	similarity;
-    const auto	residual = similarity.fit(begin, end);
+    using element_t	= typename std::iterator_traits<ITER>::value_type
+				      ::first_type::value_type;
+    using matrix33_t	= cv::Matx<element_t, 3, 3>;
+    using vector3_t	= cv::Matx<element_t, 3, 1>;
 
-    ROS_DEBUG_STREAM("Fitted similarity transformation: scale = "
-		     << similarity.s() << ", residual = " << residual);
+    matrix33_t	R;
+    vector3_t	t;
+    if (_useSimilarity)
+    {
+	Similarity<element_t, 3>	similarity;
+	const auto	residual = similarity.fit(begin, end);
 
-    const auto		R = similarity.R();
-    const auto		t = similarity.t() * (1/similarity.s());
+	ROS_DEBUG_STREAM("Fitted similarity transformation: scale = "
+			 << similarity.s() << ", residual = " << residual);
+
+	R = similarity.R();
+	t = similarity.t() * (1/similarity.s());
+    }
+    else
+    {
+	Rigidity<element_t, 3>	rigidity;
+	const auto	residual = rigidity.fit(begin, end);
+
+	ROS_DEBUG_STREAM("Fitted rigid transformation: residual = " << residual);
+
+	R = rigidity.R();
+	t = rigidity.t();
+    }
     tf::Transform	transform(tf::Matrix3x3(R(0, 0), R(0, 1), R(0, 2),
 						R(1, 0), R(1, 1), R(1, 2),
 						R(2, 0), R(2, 1), R(2, 2)),
@@ -434,9 +456,9 @@ Detector::get_marker_corners(const aruco::Marker& marker,
 			     const image_t& depth_msg, cv::Mat& image) const
 {
     struct rgb_t	{ uint8_t r, g, b; };
-    using value_t	= float;
-    using point_t	= cv::Vec<value_t, 3>;
-    using plane_t	= Plane<value_t, 3>;
+    using element_t	= point3_t::value_type;
+    using point_t	= cv::Vec<element_t, 3>;
+    using plane_t	= Plane<element_t, 3>;
 
     std::vector<point3_t>	corners;
 
@@ -447,9 +469,9 @@ Detector::get_marker_corners(const aruco::Marker& marker,
     std::vector<point3_t>	points;
     for (const auto& corner : marker)
     {
-	const auto	point = at<value_t>(depth_msg, corner.x, corner.y);
+	const auto	point = at<element_t>(depth_msg, corner.x, corner.y);
 
-	if (point(2) != value_t(0))
+	if (point(2) != element_t(0))
 	    points.push_back(point);
     }
     plane_t	plane(points.cbegin(), points.cend());
@@ -469,9 +491,9 @@ Detector::get_marker_corners(const aruco::Marker& marker,
     for (auto v = v0; v <= v1; ++v)
 	for (auto u = u0; u <= u1; ++u)
 	{
-	    const auto	point = at<value_t>(depth_msg, u, v);
+	    const auto	point = at<element_t>(depth_msg, u, v);
 
-	    if (point(2) != value_t(0) &&
+	    if (point(2) != element_t(0) &&
 		plane.distance(point) < _planarityTolerance)
 	    {
 		points.push_back(point);
