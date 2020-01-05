@@ -209,7 +209,8 @@ DepthFilter::DepthFilter(const std::string& name)
      _top(0),
      _bottom(2048),
      _left(0),
-     _right(3072)
+     _right(3072),
+     _scale(1.0)
 {
     _nh.param("thresh_bg", _threshBG, 0.0);
     _ddr.registerVariable<double>("thresh_bg", &_threshBG,
@@ -234,6 +235,8 @@ DepthFilter::DepthFilter(const std::string& name)
     _ddr.registerVariable<int>("left",   &_left,   "Left of ROI",   0, 3072);
     _nh.param("right", _right, 3072);
     _ddr.registerVariable<int>("right",  &_right,  "Right of ROI",  0, 3072);
+    _nh.param("scale", _scale, 1.0);
+    _ddr.registerVariable<double>("scale", &_scale, "Scale depth", 0.5, 1.5);
     _ddr.publishServicesTopics();
 
     _sync.registerCallback(&DepthFilter::filter_cb, this);
@@ -358,6 +361,8 @@ DepthFilter::filter(const camera_info_t& camera_info,
 	depth_clip<T>(depth);
     if (_roi)
 	roi<T>(depth);
+    if (_scale != 1.0)
+	scale<T>(depth);
 }
 
 template <class T> void
@@ -417,4 +422,15 @@ DepthFilter::roi(image_t& depth) const
     }
 }
 
+template <class T> void
+DepthFilter::scale(image_t& depth) const
+{
+    for (int v = 0; v < depth.height; ++v)
+    {
+	auto p = ptr<T>(depth, v);
+	for (auto q = p + depth.width; p != q; ++p)
+	    *p *= _scale;
+    }
+}
+    
 }	// namespace aist_photoneo_localization
