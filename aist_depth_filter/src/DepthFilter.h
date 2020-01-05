@@ -42,7 +42,7 @@ class DepthFilter
   private:
     bool	saveBG_cb(std_srvs::Trigger::Request&  req,
 			  std_srvs::Trigger::Response& res)		;
-    bool	saveAsOply_cb(std_srvs::Trigger::Request&  req,
+    bool	saveAsOPly_cb(std_srvs::Trigger::Request&  req,
 			      std_srvs::Trigger::Response& res)		;
     void	filter_cb(const camera_info_cp& camera_info,
 			  const image_cp& image, const image_cp& depth)	;
@@ -60,16 +60,12 @@ class DepthFilter
     void	roi(image_t& depth)				  const	;
     template <class T>
     void	scale(image_t& depth)				  const	;
-    template <class T>
-    void	saveAsOply(const camera_info_t& camera_info,
-			   const image_t& image,
-			   const image_t& depth)		  const	;
 
   private:
     ros::NodeHandle					_nh;
 
     const ros::ServiceServer				_saveBG_srv;
-    const ros::ServiceServer				_saveAsOply_srv;
+    const ros::ServiceServer				_saveAsOPly_srv;
 
     message_filters::Subscriber<camera_info_t>		_camera_info_sub;
     message_filters::Subscriber<image_t>		_image_sub;
@@ -107,6 +103,9 @@ class DepthFilter
 
   // Scaling of depth values.
     double						_scale;
+
+  // Save as OrderPly file.
+    std::string						_fileOPly;
 };
 
 }	// namespace aist_photoneo_localization

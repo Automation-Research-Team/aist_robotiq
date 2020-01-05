@@ -24,7 +24,8 @@
 #ifndef ORDERED_PLY_H
 #define ORDERED_PLY_H
 #include <string>
-#include "opencv2/core/core.hpp"
+#include <vector>
+#include <array>
 
 typedef enum PhoXiControlVersion {
   PC_VER_ANY,	// Unknown version
@@ -47,18 +48,18 @@ struct OrderedPly {
   int last;			// vertexの最後の属性. 次のvertexへの目印.
 
   // element vertex
-  cv::Mat_<float> point;	// 3次元座標(x,y,z)の列
-  cv::Mat_<float> normal;	// 法線ベクトル(nx,ny,nz)の列
-  cv::Mat_<uchar> color;	// カラー(red,green,blue)の列
-  std::vector<float> texture;		// 輝度(Texture32)の列
-  std::vector<float> depth;		// 距離(Depth32)の列.
-  std::vector<float> confidence;	// 確信度(Confidence32)の列.
+  std::vector<std::array<float, 3> >  point;	   // 3次元座標(x,y,z)の列
+  std::vector<std::array<float, 3> >  normal;	   // 法線ベクトル(nx,ny,nz)の列
+  std::vector<std::array<u_char, 3> > color;	   // カラー(red,green,blue)の列
+  std::vector<float>		      texture;	   // 輝度(Texture32)の列
+  std::vector<float>		      depth;	   // 距離(Depth32)の列.
+  std::vector<float>		      confidence;  // 確信度(Confidence32)の列.
 
   // element camera
-  cv::Vec3f view;
-  cv::Vec3f x_axis;
-  cv::Vec3f y_axis;
-  cv::Vec3f z_axis;
+  std::array<float, 3> view;
+  std::array<float, 3> x_axis;
+  std::array<float, 3> y_axis;
+  std::array<float, 3> z_axis;
 
   // element phoxi_frame_params
   int   frame_width;
