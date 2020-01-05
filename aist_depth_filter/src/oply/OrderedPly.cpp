@@ -81,11 +81,11 @@ extern "C" {
     value = ply_get_argument_value(argument);	// 属性値
 
     if ((n == X) || (n == Y) || (n == Z)) {
-      data->point.at<float>(data->size, n) = value;
+      data->point[data->size][n] = value;
     } else if ((n == NX) || (n == NY) || (n == NZ)) {
-      data->normal.at<float>(data->size, n - NX) = value;
+      data->normal[data->size][n - NX] = value;
     } else if ((n == RED) || (n == GREEN) || (n == BLUE)) {
-      data->color.at<uchar>(data->size, n - RED) = value;
+      data->color[data->size][n - RED] = value;
     } else if (n == TEXTURE32) {
       data->texture[data->size] = value;
     } else if (n == DEPTH32) {
@@ -319,12 +319,12 @@ void OPlyReader::read(void)
     std::string en = element_name;
 
     if (en == "vertex") {	// 点群に頂点数(ninstances)分の容量を確保
-      data.point      = cv::Mat_<float>(ninstances, 3);
-      data.normal     = cv::Mat_<float>(ninstances, 3);
-      data.color      = cv::Mat_<uchar>(ninstances, 3);
-      data.texture    = std::vector<float>(ninstances);
-      data.depth      = std::vector<float>(ninstances);
-      data.confidence = std::vector<float>(ninstances);
+      data.point.resize(ninstances);
+      data.normal.resize(ninstances);
+      data.color.resize(ninstances);
+      data.texture.resize(ninstances);
+      data.depth.resize(ninstances);
+      data.confidence.resize(ninstances);
       data.size    = 0;		// 点の数をゼロに初期化
       data.last    = X;		// vertexの最後の要素を調べる準備
     }
@@ -555,19 +555,19 @@ void OPlyReader::read(void)
 
   // 読み込まれない属性の容量を０にする
   if (data.last < CONFIDENCE32) {
-    data.confidence.resize(0);
+    data.confidence.clear();
   }
   if (data.last < DEPTH32) {
-    data.depth.resize(0);
+    data.depth.clear();
   }
   if (data.last < TEXTURE32) {
-    data.texture.resize(0);
+    data.texture.clear();
   }
   if (data.last < RED) {
-    data.color.reshape(0, 0);
+    data.color.clear();
   }
   if (data.last < NX) {
-    data.normal.reshape(0, 0);
+    data.normal.clear();
   }
 
   data.version = guess;	// このPLYを出力したPhoXi Controlのバージョン
@@ -624,7 +624,7 @@ void OPlyWriter::write(void)
       throw std::runtime_error("error: failed to write \"z\" property.");
     }
 
-    if (data.normal.rows > 0) {
+    if (data.normal.size() > 0) {
       if (!ply_add_property(dst, "nx", PLY_FLOAT, PLY_CHAR, PLY_CHAR)) {
 	throw std::runtime_error("error: failed to write \"nx\" property.");
       }
@@ -638,7 +638,7 @@ void OPlyWriter::write(void)
       }
     }
 
-    if (data.color.rows > 0) {
+    if (data.color.size() > 0) {
       if (!ply_add_property(dst, "red", PLY_UCHAR, PLY_CHAR, PLY_CHAR)) {
 	throw std::runtime_error("error: failed to write \"red\" property.");
       }
@@ -934,26 +934,26 @@ void OPlyWriter::write(void)
 
     // vertex
     for (int i = 0; i < npoints; i++) {
-      const float x = data.point.at<float>(i, X);
-      const float y = data.point.at<float>(i, Y);
-      const float z = data.point.at<float>(i, Z);
+      const float x = data.point[i][X];
+      const float y = data.point[i][Y];
+      const float z = data.point[i][Z];
       ply_write(dst, x);
       ply_write(dst, y);
       ply_write(dst, z);
       
-      if (data.normal.rows > 0) {
-	const float nx = data.normal.at<float>(i, 0);
-	const float ny = data.normal.at<float>(i, 1);
-	const float nz = data.normal.at<float>(i, 2);
+      if (data.normal.size() > 0) {
+	const float nx = data.normal[i][0];
+	const float ny = data.normal[i][1];
+	const float nz = data.normal[i][2];
 	ply_write(dst, nx);
 	ply_write(dst, ny);
 	ply_write(dst, nz);
       }
 
-      if (data.color.rows > 0) {
-        const uchar red   = data.color.at<uchar>(i, 0);
-        const uchar green = data.color.at<uchar>(i, 1);
-        const uchar blue  = data.color.at<uchar>(i, 2);
+      if (data.color.size() > 0) {
+        const u_char red   = data.color[i][0];
+        const u_char green = data.color[i][1];
+        const u_char blue  = data.color[i][2];
 	ply_write(dst, red);
 	ply_write(dst, green);
 	ply_write(dst, blue);

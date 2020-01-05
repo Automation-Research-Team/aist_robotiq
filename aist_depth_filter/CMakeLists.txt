@@ -17,12 +17,16 @@ find_package(catkin REQUIRED
     image_transport
 )
 
+find_package(OpenCV REQUIRED)
+
 ###########
 ## Build ##
 ###########
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${LIBTIFF_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
+  src/rply
 )
 
 #add_message_files(
@@ -47,6 +51,8 @@ catkin_package(
 add_executable(depth_filter
   src/depth_filter.cpp
   src/DepthFilter.cpp
+  src/oply/OrderedPly.cpp
+  src/rply/rply.c
 )
 
 add_dependencies(depth_filter
@@ -60,6 +66,7 @@ target_link_libraries(depth_filter
   ${roscpp_LIBRARIES}
   ${Boost_LIBRARIES}
   ${LIBTIFF_LIBRARIES}
+  ${OpenCV_LIBRARIES}
 )
 
 #add_library(o2as_aruco_detector_nodelet
