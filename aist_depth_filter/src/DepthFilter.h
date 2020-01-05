@@ -59,6 +59,8 @@ class DepthFilter
     template <class T>
     void	roi(image_t& depth)				  const	;
     template <class T>
+    void	scale(image_t& depth)				  const	;
+    template <class T>
     void	saveAsOply(const camera_info_t& camera_info,
 			   const image_t& image,
 			   const image_t& depth)		  const	;
@@ -102,6 +104,9 @@ class DepthFilter
     int							_bottom;
     int							_left;
     int							_right;
+
+  // Scaling of depth values.
+    double						_scale;
 };
 
 }	// namespace aist_photoneo_localization
