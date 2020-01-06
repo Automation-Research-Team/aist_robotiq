@@ -178,16 +178,16 @@ template <class T> using array3_t =	std::array<T, 3>;
 *  global functions to save/load TIFF images				*
 ************************************************************************/
 template <class T>
-float	fval(const T p)		{ return p; }
-float	fval(const uint16_t p)	{ return 0.001f * p; }
+static float	fval(const T p)		{ return p; }
+static float	fval(const uint16_t p)	{ return 0.001f * p; }
     
-template <class T> T*
+template <class T> static T*
 ptr(sensor_msgs::Image& image, int v)
 {
     return reinterpret_cast<T*>(image.data.data() + v*image.step);
 }
 
-template <class T> const T*
+template <class T> static const T*
 ptr(const sensor_msgs::Image& image, int v)
 {
     return reinterpret_cast<const T*>(image.data.data() + v*image.step);
@@ -272,9 +272,9 @@ template <class ITER> input_iterator<ITER>
 make_input_iterator(ITER iter)	{ return input_iterator<ITER>(iter); }
     
 /************************************************************************
-*  class input_iterator<ITER>						*
+*  global functions concerning with saving PLY file			*
 ************************************************************************/
-template <class T, class ITER> ITER
+template <class T, class ITER> static ITER
 create_points(const sensor_msgs::CameraInfo& camera_info,
 	      const sensor_msgs::Image& depth, ITER out)
 {
@@ -298,7 +298,7 @@ create_points(const sensor_msgs::CameraInfo& camera_info,
     return out;
 }
 
-template <class T, class ITER> ITER
+template <class T, class ITER> static ITER
 copy_image(const sensor_msgs::Image& image, ITER out)
 {
     for (int v = 0; v < image.height; ++v)
@@ -308,16 +308,20 @@ copy_image(const sensor_msgs::Image& image, ITER out)
 }
     
 void
-saveAsOPly(const sensor_msgs::CameraInfo& camera_info,
-	   const sensor_msgs::Image& image, const sensor_msgs::Image& depth,
-	   const std::string& file)
+savePly(const sensor_msgs::CameraInfo& camera_info,
+	const sensor_msgs::Image& image, const sensor_msgs::Image& depth,
+	const sensor_msgs::Image& normal, const std::string& file)
 {
     using	namespace sensor_msgs;
     
     OrderedPly	oply;
 
+  // Set version
+    oply.version = PC_VER_1_2;
+    
   // Set number of points.
     oply.size = depth.height * depth.width;
+    oply.last = oply.size;
 	
   // Set point coordinates and depth values.
     oply.point.resize(oply.size);
@@ -334,14 +338,12 @@ saveAsOPly(const sensor_msgs::CameraInfo& camera_info,
 	copy_image<float>(depth, make_input_iterator(oply.depth.begin()));
     }
     else
-	throw std::runtime_error("saveAsOPly(): unknown depth encoding["
+	throw std::runtime_error("savePly(): unknown depth encoding["
 				 + depth.encoding + ']');
 
-  // Set normals.
+  // Set normals (REQUIRED for Photoneo Localization).
     oply.normal.resize(oply.size);
-    std::fill(make_input_iterator(oply.normal.begin()),
-	      make_input_iterator(oply.normal.end()),
-	      array3_t<float>({0.0f, 0.0f, 1.0f}));
+    copy_image<array3_t<float> >(normal, oply.normal.begin());
     
   // Set color and texture values.
     oply.color.resize(oply.size);
@@ -359,15 +361,15 @@ saveAsOPly(const sensor_msgs::CameraInfo& camera_info,
 	copy_image<RGB>(image, make_input_iterator(oply.texture.begin()));
     }
     else
-	throw std::runtime_error("saveAsOPly(): unknown image encoding["
+	throw std::runtime_error("savePly(): unknown image encoding["
 				 + image.encoding + ']');
 
-  // Set confidence values.
+  // Set confidence values (Not required for Photoneo Localization).
     oply.confidence.resize(oply.size);
-    std::fill(oply.confidence.begin(), oply.confidence.end(), 0.0f);
+    std::fill(oply.confidence.begin(), oply.confidence.end(), 0);
     
-  // Set camera orientation.
-    oply.view   = {0.0, 0.0, 1.0};
+  // Set position and orientation of the camera frame.
+    oply.view   = {0.0, 0.0, 0.0};
     oply.x_axis = {1.0, 0.0, 0.0};
     oply.y_axis = {0.0, 1.0, 0.0};
     oply.z_axis = {0.0, 0.0, 1.0};
@@ -375,16 +377,17 @@ saveAsOPly(const sensor_msgs::CameraInfo& camera_info,
   // Set frame size.
     oply.frame_width  = depth.width;
     oply.frame_height = depth.height;
-
+    oply.frame_index  = 0;
+    
   // Copy camera parameters.
-    std::copy(std::begin(camera_info.K), std::end(camera_info.K),
-	      std::begin(oply.cm));
-    std::copy(std::begin(camera_info.D), std::end(camera_info.D),
-	      std::begin(oply.dm));
+    std::copy_n(std::begin(camera_info.K), 9, std::begin(oply.cm));
+    std::copy_n(std::begin(camera_info.D), 5, std::begin(oply.dm));
 
   // Other parameters.
-    oply.width  = depth.width;
-    oply.height = depth.height;
+    oply.width	    = depth.width;
+    oply.height	    = depth.height;
+    oply.horizontal = 1;
+    oply.vertical   = 1;
 
   // Write Ordered PLY to the spceified file.
     OPlyWriter	writer(file, oply);
@@ -397,15 +400,15 @@ saveAsOPly(const sensor_msgs::CameraInfo& camera_info,
 DepthFilter::DepthFilter(const std::string& name)
     :_nh(name),
      _saveBG_srv(_nh.advertiseService("saveBG", &saveBG_cb, this)),
-     _saveAsOPly_srv(_nh.advertiseService("saveAsOPly", &saveAsOPly_cb, this)),
+     _savePly_srv(_nh.advertiseService("savePly", &savePly_cb, this)),
      _camera_info_sub(_nh, "/camera_info", 1),
-     _image_sub( _nh, "/image", 1),
-     _depth_sub( _nh, "/depth", 1),
-     _sync(sync_policy_t(10), _camera_info_sub, _image_sub, _depth_sub),
+     _image_sub( _nh, "/image",  1),
+     _depth_sub( _nh, "/depth",  1),
+     _normal_sub(_nh, "/normal", 1),
+     _sync(sync_policy_t(10),
+	   _camera_info_sub, _image_sub, _depth_sub, _normal_sub),
      _it(_nh),
-     _image_pub(_it.advertise("image", 1)),
      _depth_pub(_it.advertise("depth", 1)),
-     _camera_info_pub(_nh.advertise<camera_info_t>("camera_info", 1)),
      _ddr(),
      _camera_info(nullptr),
      _image(nullptr),
@@ -492,15 +495,15 @@ DepthFilter::saveBG_cb(std_srvs::Trigger::Request&  req,
 }
 
 bool
-DepthFilter::saveAsOPly_cb(std_srvs::Trigger::Request&  req,
-			   std_srvs::Trigger::Response& res)
+DepthFilter::savePly_cb(std_srvs::Trigger::Request&  req,
+			std_srvs::Trigger::Response& res)
 {
     try
     {
 	if (!_filtered_depth)
 	    throw std::runtime_error("no filtered depth image available!");
 
-	saveAsOPly(*_camera_info, *_image, *_filtered_depth, _fileOPly);
+	savePly(*_camera_info, *_image, *_filtered_depth, *_normal, _fileOPly);
 	_filtered_depth = nullptr;
 
 	res.success = true;
@@ -508,7 +511,7 @@ DepthFilter::saveAsOPly_cb(std_srvs::Trigger::Request&  req,
     }
     catch (const std::exception& err)
     {
-	ROS_ERROR_STREAM("DepthFilter::saveAsOPly_cb(): " << err.what());
+	ROS_ERROR_STREAM("DepthFilter::savePly_cb(): " << err.what());
 
 	res.success = false;
 	res.message = "failed.";
@@ -520,8 +523,8 @@ DepthFilter::saveAsOPly_cb(std_srvs::Trigger::Request&  req,
 }
 
 void
-DepthFilter::filter_cb(const camera_info_cp& camera_info,
-		       const image_cp& image, const image_cp& depth)
+DepthFilter::filter_cb(const camera_info_cp& camera_info, const image_cp& image,
+		       const image_cp& depth, const image_cp& normal)
 {
     _top    = std::max(0,     std::min(_top,    int(image->height)));
     _bottom = std::max(_top,  std::min(_bottom, int(image->height)));
@@ -535,6 +538,7 @@ DepthFilter::filter_cb(const camera_info_cp& camera_info,
 	_camera_info	= camera_info;
 	_image		= image;
 	_depth		= depth;
+	_normal		= normal;
 	_filtered_depth.reset(new image_t(*depth));
 
 	if (depth->encoding == image_encodings::MONO16 ||
@@ -548,8 +552,6 @@ DepthFilter::filter_cb(const camera_info_cp& camera_info,
 	ROS_ERROR_STREAM("DepthFilter::filter_cb(): " << err.what());
     }
 
-    _camera_info_pub.publish(*camera_info);
-    _image_pub.publish(*image);
     _depth_pub.publish(*_filtered_depth);
 }
 

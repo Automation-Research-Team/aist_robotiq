@@ -32,7 +32,8 @@ class DepthFilter
     using image_cp	 = sensor_msgs::ImageConstPtr;
     using image_p	 = sensor_msgs::ImagePtr;
     using sync_policy_t	 = message_filters::sync_policies::
-			       ApproximateTime<camera_info_t, image_t, image_t>;
+				ApproximateTime<camera_info_t, image_t,
+						image_t, image_t>;
 
   public:
 		DepthFilter(const std::string& name)			;
@@ -42,10 +43,11 @@ class DepthFilter
   private:
     bool	saveBG_cb(std_srvs::Trigger::Request&  req,
 			  std_srvs::Trigger::Response& res)		;
-    bool	saveAsOPly_cb(std_srvs::Trigger::Request&  req,
-			      std_srvs::Trigger::Response& res)		;
+    bool	savePly_cb(std_srvs::Trigger::Request&  req,
+			   std_srvs::Trigger::Response& res)		;
     void	filter_cb(const camera_info_cp& camera_info,
-			  const image_cp& image, const image_cp& depth)	;
+			  const image_cp& image, const image_cp& depth,
+			  const image_cp& normal)			;
 
     template <class T>
     void	filter(const camera_info_t& camera_info,
@@ -65,23 +67,23 @@ class DepthFilter
     ros::NodeHandle					_nh;
 
     const ros::ServiceServer				_saveBG_srv;
-    const ros::ServiceServer				_saveAsOPly_srv;
+    const ros::ServiceServer				_savePly_srv;
 
     message_filters::Subscriber<camera_info_t>		_camera_info_sub;
     message_filters::Subscriber<image_t>		_image_sub;
     message_filters::Subscriber<image_t>		_depth_sub;
+    message_filters::Subscriber<image_t>		_normal_sub;
     message_filters::Synchronizer<sync_policy_t>	_sync;
 
     image_transport::ImageTransport			_it;
-    const image_transport::Publisher			_image_pub;
     const image_transport::Publisher			_depth_pub;
-    const ros::Publisher				_camera_info_pub;
 
     ddynamic_reconfigure::DDynamicReconfigure		_ddr;
 
     camera_info_cp					_camera_info;
     image_cp						_image;
     image_cp						_depth;
+    image_cp						_normal;
     image_p						_filtered_depth;
     image_cp						_bg_depth;
 
