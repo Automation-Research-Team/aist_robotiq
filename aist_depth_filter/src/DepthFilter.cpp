@@ -6,36 +6,12 @@
 #include <tiffio.h>
 #include <sensor_msgs/image_encodings.h>
 #include <boost/iterator/iterator_adaptor.hpp>
+#include <opencv2/imgproc.hpp>
 #include "DepthFilter.h"
 #include "oply/OrderedPly.h"
 
 namespace aist_depth_filter
 {
-/************************************************************************
-*  struct RGB								*
-************************************************************************/
-struct RGB	{ uint8_t r, g, b; };
-
-/************************************************************************
-*  global functions to save/load TIFF images				*
-************************************************************************/
-template <class T>
-float	fval(const T* p)	{ return *p; }
-float	fval(const uint16_t* p)	{ return 0.001f * *p; }
-float	fval(const RGB* p)	{ return 0.3f*p->r + 0.59*p->g + 0.11*p->b; }
-    
-template <class T> T*
-ptr(sensor_msgs::Image& image, int v)
-{
-    return reinterpret_cast<T*>(image.data.data() + v*image.step);
-}
-
-template <class T> const T*
-ptr(const sensor_msgs::Image& image, int v)
-{
-    return reinterpret_cast<const T*>(image.data.data() + v*image.step);
-}
-
 /************************************************************************
 *  global functions to save/load TIFF images				*
 ************************************************************************/
@@ -48,7 +24,8 @@ saveTiff(const sensor_msgs::Image& image, const std::string& file)
     int			bitsPerSample;
     int			samplesPerPixel;
 
-    if (image.encoding == image_encodings::TYPE_16UC1)
+    if (image.encoding == image_encodings::MONO16 ||
+	image.encoding == image_encodings::TYPE_16UC1)
     {
 	dataType	= TIFF_SHORT;
 	bitsPerSample	= 16;
@@ -126,10 +103,10 @@ loadTiff(const std::string& file)
 	switch(bitsPerSample)
 	{
 	  case 8:
-	    image.encoding = image_encodings::TYPE_8UC1;
+	    image.encoding = image_encodings::MONO8;
 	    break;
 	  case 16:
-	    image.encoding = image_encodings::TYPE_16UC1;
+	    image.encoding = image_encodings::MONO16;
 	    break;
 	  case 32:
 	    image.encoding = image_encodings::TYPE_32FC1;
@@ -147,10 +124,10 @@ loadTiff(const std::string& file)
 	switch(bitsPerSample)
 	{
 	  case 8:
-	    image.encoding = image_encodings::TYPE_8UC3;
+	    image.encoding = image_encodings::RGB8;
 	    break;
 	  case 16:
-	    image.encoding = image_encodings::TYPE_16UC3;
+	    image.encoding = image_encodings::RGB16;
 	    break;
 	  case 32:
 	    image.encoding = image_encodings::TYPE_32FC3;
@@ -192,7 +169,32 @@ loadTiff(const std::string& file)
 }
 
 /************************************************************************
-*  global functions to save Ordered PLY point cloud			*
+*  type definitions							*
+************************************************************************/
+struct RGB				{ uint8_t r, g, b; };
+template <class T> using array3_t =	std::array<T, 3>;
+
+/************************************************************************
+*  global functions to save/load TIFF images				*
+************************************************************************/
+template <class T>
+float	fval(const T p)		{ return p; }
+float	fval(const uint16_t p)	{ return 0.001f * p; }
+    
+template <class T> T*
+ptr(sensor_msgs::Image& image, int v)
+{
+    return reinterpret_cast<T*>(image.data.data() + v*image.step);
+}
+
+template <class T> const T*
+ptr(const sensor_msgs::Image& image, int v)
+{
+    return reinterpret_cast<const T*>(image.data.data() + v*image.step);
+}
+
+/************************************************************************
+*  class input_iterator<ITER>						*
 ************************************************************************/
 namespace detail
 {
@@ -205,24 +207,38 @@ namespace detail
     public:
       input_proxy(ITER iter) :_iter(iter)	{}
 
-      const auto&	operator =(const value_type& val) const
+      template <class T_>
+      const auto&	operator =(const T_& val) const
 			{
-			    *_iter = val;
+			    assign(*_iter, val);
 			    return *this;
 			}
-      const auto&	operator =(const RGB& color) const
+
+    private:
+      template <class T_>
+      static void	assign(T_& dst, T_ val)
 			{
-			    _iter[0] = color.r;
-			    _iter[1] = color.g;
-			    _iter[2] = color.b;
-			    return *this;
+			    dst = val;
 			}
-      const auto&	operator =(uint16_t val) const
+      static void	assign(float& dst, uint16_t val)
 			{
-			    *_iter = 0.001 * val;
-			    return *this;
+			    dst = fval(val);
 			}
-	
+      static void	assign(float& dst, const RGB& rgb)
+			{
+			    dst = 0.3f * rgb.r + 0.59f * rgb.g + 0.11f * rgb.b;
+			}
+      static void	assign(array3_t<uint8_t>& a, const RGB& rgb)
+			{
+			    a[0] = rgb.r;
+			    a[1] = rgb.g;
+			    a[2] = rgb.b;
+			}
+      static void	assign(array3_t<uint8_t>& a, float val)
+			{
+			    a[2] = a[1] = a[0] = val;
+			}
+      
     private:
       ITER 	_iter;
   };
@@ -236,16 +252,14 @@ class input_iterator
 				     boost::use_default,
 				     detail::input_proxy<ITER> >
 {
-  private:
+  public:
     using super = boost::iterator_adaptor<input_iterator<ITER>,
 					  ITER,
 					  boost::use_default,
 					  boost::use_default,
 					  detail::input_proxy<ITER> >;
-    friend	class boost::iterator_core_access;
-
-  public:
     using	typename super::reference;
+    friend	class boost::iterator_core_access;
     
   public:
     input_iterator(ITER iter) :super(iter)	{}
@@ -257,23 +271,41 @@ class input_iterator
 template <class ITER> input_iterator<ITER>
 make_input_iterator(ITER iter)	{ return input_iterator<ITER>(iter); }
     
+/************************************************************************
+*  class input_iterator<ITER>						*
+************************************************************************/
 template <class T, class ITER> ITER
-copy_image(const sensor_msgs::Image& image, ITER iter)
+create_points(const sensor_msgs::CameraInfo& camera_info,
+	      const sensor_msgs::Image& depth, ITER out)
 {
-    using value_type = typename std::iterator_traits<ITER>::value_type;
+    cv::Mat_<double>	K(3, 3);
+    std::copy_n(std::begin(camera_info.K), 9, K.begin());
+    cv::Mat_<double>	distortion(4, 1);
+    std::copy_n(std::begin(camera_info.D), 4, distortion.begin());
     
-    for (int v = 0; v < image.height; ++v)
+    for (int v = 0; v < depth.height; ++v)
     {
-	auto	p = ptr<T>(image, v);
-	for (auto q = p + image.width; p != q; ++p, ++iter)
-	    *iter = *p;
+	auto	p = ptr<T>(depth, v);
+	for (int u = 0; u < depth.width; ++u)
+	{
+	    std::vector<cv::Vec<double, 2> >	uv{{u, v}}, xy;
+	    cv::undistortPoints(uv, xy, K, distortion);
+	    const auto	d = fval(*p++);
+	    *out++ = {xy[0][0] * d, xy[0][1] * d, d};
+	}
     }
-    
-    return iter;
+
+    return out;
 }
+
+template <class T, class ITER> ITER
+copy_image(const sensor_msgs::Image& image, ITER out)
+{
+    for (int v = 0; v < image.height; ++v)
+	out = std::copy_n(ptr<T>(image, v), image.width, out);
     
-template <class T>
-using array3_t = std::array<T, 3>;
+    return out;
+}
     
 void
 saveAsOPly(const sensor_msgs::CameraInfo& camera_info,
@@ -287,8 +319,23 @@ saveAsOPly(const sensor_msgs::CameraInfo& camera_info,
   // Set number of points.
     oply.size = depth.height * depth.width;
 	
-  // Set point 3D coordinates.
+  // Set point coordinates and depth values.
     oply.point.resize(oply.size);
+    oply.depth.resize(oply.size);
+    if (depth.encoding == image_encodings::MONO16 ||
+	depth.encoding == image_encodings::TYPE_16UC1)
+    {
+	create_points<uint16_t>(camera_info, depth, oply.point.begin());
+	copy_image<uint16_t>(depth, make_input_iterator(oply.depth.begin()));
+    }
+    else if (depth.encoding == image_encodings::TYPE_32FC1)
+    {
+	create_points<float>(camera_info, depth, oply.point.begin());
+	copy_image<float>(depth, make_input_iterator(oply.depth.begin()));
+    }
+    else
+	throw std::runtime_error("saveAsOPly(): unknown depth encoding["
+				 + depth.encoding + ']');
 
   // Set normals.
     oply.normal.resize(oply.size);
@@ -296,32 +343,24 @@ saveAsOPly(const sensor_msgs::CameraInfo& camera_info,
 	      make_input_iterator(oply.normal.end()),
 	      array3_t<float>({0.0f, 0.0f, 1.0f}));
     
-  // Set colpr.
+  // Set color and texture values.
     oply.color.resize(oply.size);
-    if (image.encoding == image_encodings::TYPE_32FC1)
-	copy_image<float>(image, make_input_iterator(oply.color.begin()));
-    else if (image.encoding == image_encodings::TYPE_8UC3)
-	copy_image<RGB>(image, make_input_iterator(oply.color.begin()));
-    
-  // Set texture values.
     oply.texture.resize(oply.size);
-    if (image.encoding == image_encodings::TYPE_32FC1)
-	copy_image<float>(image, oply.texture.begin());
-    else if (image.encoding == image_encodings::TYPE_8UC3)
-	copy_image<RGB>(image, oply.texture.begin());
+    if (image.encoding == image_encodings::MONO8 ||
+	image.encoding == image_encodings::TYPE_8UC1)
+    {
+	copy_image<uint8_t>(image, make_input_iterator(oply.color.begin()));
+	copy_image<uint8_t>(image, make_input_iterator(oply.texture.begin()));
+    }
+    else if (image.encoding == image_encodings::RGB8 ||
+	     image.encoding == image_encodings::TYPE_8UC3)
+    {
+	copy_image<RGB>(image, make_input_iterator(oply.color.begin()));
+	copy_image<RGB>(image, make_input_iterator(oply.texture.begin()));
+    }
     else
 	throw std::runtime_error("saveAsOPly(): unknown image encoding["
 				 + image.encoding + ']');
-
-  // Set depth values.
-    oply.depth.resize(oply.size);
-    if (depth.encoding == image_encodings::TYPE_16UC1)
-	copy_image<uint16_t>(depth, oply.depth.begin());
-    else if (depth.encoding == image_encodings::TYPE_32FC1)
-	copy_image<float>(depth, oply.depth.begin());
-    else
-	throw std::runtime_error("saveAsOPly(): unknown depth encoding["
-				 + depth.encoding + ']');
 
   // Set confidence values.
     oply.confidence.resize(oply.size);
@@ -375,10 +414,10 @@ DepthFilter::DepthFilter(const std::string& name)
      _bg_depth(),
      _threshBG(0.0),
      _fileBG("bg.tif"),
-     _depth_clip(false),
+     _z_clip(false),
      _near(0.0),
      _far(std::numeric_limits<double>::max()),
-     _roi(false),
+     _xy_clip(false),
      _top(0),
      _bottom(2048),
      _left(0),
@@ -390,8 +429,8 @@ DepthFilter::DepthFilter(const std::string& name)
     _ddr.registerVariable<double>("thresh_bg", &_threshBG,
 				  "Threshold value for background removal",
 				  0.0, 1.0);
-    _nh.param("depth_clip", _depth_clip, false);
-    _ddr.registerVariable<bool>("depth_clip", &_depth_clip,
+    _nh.param("z_clip", _z_clip, false);
+    _ddr.registerVariable<bool>("z_clip", &_z_clip,
 				"Clip outside of [near, far]");
     _nh.param("near", _near, 0.0);
     _ddr.registerVariable<double>("near", &_near,
@@ -399,8 +438,8 @@ DepthFilter::DepthFilter(const std::string& name)
     _nh.param("far", _far, 100.0);
     _ddr.registerVariable<double>("far", &_far,
 				  "Farest depth value", 0.05, 4.0);
-    _nh.param("roi", _roi, false);
-    _ddr.registerVariable<bool>("roi", &_roi, "Mask outside of ROI");
+    _nh.param("xy_clip", _xy_clip, false);
+    _ddr.registerVariable<bool>("xy_clip", &_xy_clip, "Mask outside of ROI");
     _nh.param("top", _top, 0);
     _ddr.registerVariable<int>("top",    &_top,	   "Top of ROI",    0, 2048);
     _nh.param("bottom", _bottom, 2048);
@@ -498,7 +537,8 @@ DepthFilter::filter_cb(const camera_info_cp& camera_info,
 	_depth		= depth;
 	_filtered_depth.reset(new image_t(*depth));
 
-	if (depth->encoding == image_encodings::TYPE_16UC1)
+	if (depth->encoding == image_encodings::MONO16 ||
+	    depth->encoding == image_encodings::TYPE_16UC1)
 	    filter<uint16_t>(*camera_info, *image, *_filtered_depth);
 	else if (depth->encoding == image_encodings::TYPE_32FC1)
 	    filter<float>(*camera_info, *image, *_filtered_depth);
@@ -532,10 +572,10 @@ DepthFilter::filter(const camera_info_t& camera_info,
 	    _threshBG = 0;
 	}
     }
-    if (_depth_clip)
-	depth_clip<T>(depth);
-    if (_roi)
-	roi<T>(depth);
+    if (_z_clip)
+	z_clip<T>(depth);
+    if (_xy_clip)
+	xy_clip<T>(depth);
     if (_scale != 1.0)
 	scale<T>(depth);
 }
@@ -550,51 +590,39 @@ DepthFilter::removeBG(image_t& depth, const image_t& bg_depth) const
 
     for (int v = 0; v < depth.height; ++v)
     {
-	auto p = ptr<T>(depth, v);
-	auto b = ptr<T>(bg_depth, v);
-	for (auto q = p + depth.width; p != q; ++p, ++b)
-	    if (std::abs(fval(p) - fval(b)) < _threshBG)
+	auto	p = ptr<T>(depth, v);
+	auto	b = ptr<T>(bg_depth, v);
+	for (const auto q = p + depth.width; p != q; ++p, ++b)
+	    if (std::abs(fval(*p) - fval(*b)) < _threshBG)
 		*p = 0;
     }
 }
 
 template <class T> void
-DepthFilter::depth_clip(image_t& depth) const
+DepthFilter::z_clip(image_t& depth) const
 {
     for (int v = 0; v < depth.height; ++v)
     {
-	auto p = ptr<T>(depth, v);
-	for (auto q = p + depth.width; p != q; ++p)
-	    if (fval(p) < _near || fval(p) > _far)
-		*p = 0;
+	const auto	p = ptr<T>(depth, v);
+	std::replace_if(p, p + depth.width,
+			[this](const auto& val)
+			{ return (fval(val) < _near || fval(val) > _far); },
+			0);
     }
 }
 
 template <class T> void
-DepthFilter::roi(image_t& depth) const
+DepthFilter::xy_clip(image_t& depth) const
 {
     for (int v = 0; v < _top; ++v)
-    {
-	auto p = ptr<T>(depth, v);
-	for (auto q = p + depth.width; p != q; ++p)
-	    *p = 0;
-    }
+	std::fill_n(ptr<T>(depth, v), depth.width, 0);
     for (int v = _top; v < _bottom; ++v)
     {
-	auto p = ptr<T>(depth, v);
-	for (auto q = p + _left; p != q; ++p)
-	    *p = 0;
-
-	p = ptr<T>(depth, v) + _right;
-	for (auto q = p - _right + depth.width; p != q; ++p)
-	    *p = 0;
+	std::fill_n(ptr<T>(depth, v),	       _left,		     0);
+	std::fill_n(ptr<T>(depth, v) + _right, depth.width - _right, 0);
     }
     for (int v = _bottom; v < depth.height; ++v)
-    {
-	auto p = ptr<T>(depth, v);
-	for (auto q = p + depth.width; p != q; ++p)
-	    *p = 0;
-    }
+	std::fill_n(ptr<T>(depth, v), depth.width, 0);
 }
 
 template <class T> void
@@ -602,9 +630,9 @@ DepthFilter::scale(image_t& depth) const
 {
     for (int v = 0; v < depth.height; ++v)
     {
-	auto p = ptr<T>(depth, v);
-	for (auto q = p + depth.width; p != q; ++p)
-	    *p *= _scale;
+	const auto	p = ptr<T>(depth, v);
+	std::transform(p, p + depth.width, p,
+		       [this](const auto& val){ return _scale * val; });
     }
 }
     

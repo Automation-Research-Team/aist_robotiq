@@ -26,7 +26,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${LIBTIFF_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
-  src/rply
+  src
 )
 
 #add_message_files(
