@@ -55,9 +55,9 @@ class DepthFilter
     template <class T>
     void	removeBG(image_t& depth, const image_t& bg_depth) const	;
     template <class T>
-    void	depth_clip(image_t& depth)			  const	;
+    void	z_clip(image_t& depth)				  const	;
     template <class T>
-    void	roi(image_t& depth)				  const	;
+    void	xy_clip(image_t& depth)				  const	;
     template <class T>
     void	scale(image_t& depth)				  const	;
 
@@ -90,12 +90,12 @@ class DepthFilter
     std::string						_fileBG;
 
   // Clip outside of [_near, _far].
-    bool						_depth_clip;
+    bool						_z_clip;
     double						_near;
     double						_far;
 
   // Mask outside of ROI.
-    bool						_roi;
+    bool						_xy_clip;
     int							_top;
     int							_bottom;
     int							_left;

@@ -28,7 +28,7 @@
 #include <cstdio>
 #include <cassert>
 #include "OrderedPly.h"
-#include "rply.h"
+#include "rply/rply.h"
 
 enum VertexProperty {
   X, Y, Z, NX, NY, NZ, RED, GREEN, BLUE, TEXTURE32, DEPTH32, CONFIDENCE32
