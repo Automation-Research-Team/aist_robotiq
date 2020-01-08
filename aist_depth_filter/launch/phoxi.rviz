@@ -4,6 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /DepthCloud1
         - /DepthCloud1/Auto Size1
       Splitter Ratio: 0.5
     Tree Height: 244
@@ -144,5 +145,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1138
-  X: 331
-  Y: 161
+  X: 130
+  Y: 122
