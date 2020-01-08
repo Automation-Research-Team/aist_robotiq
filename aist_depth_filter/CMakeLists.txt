@@ -48,20 +48,19 @@ catkin_package(
     nodelet
 )
 
-add_executable(depth_filter
+add_executable(aist_depth_filter
   src/depth_filter.cpp
   src/DepthFilter.cpp
   src/oply/OrderedPly.cpp
   src/rply/rply.c
 )
 
-add_dependencies(depth_filter
-#  ${PROJECT_NAME}_gencpp
+add_dependencies(aist_depth_filter
   ${${PREOJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
 
-target_link_libraries(depth_filter
+target_link_libraries(aist_depth_filter
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
   ${Boost_LIBRARIES}
@@ -69,30 +68,32 @@ target_link_libraries(depth_filter
   ${OpenCV_LIBRARIES}
 )
 
-#add_library(o2as_aruco_detector_nodelet
-#  src/nodelet.cpp
-#  src/Detector.cpp
-#)
+add_library(aist_depth_filter_nodelet
+  src/nodelet.cpp
+  src/DepthFilter.cpp
+  src/oply/OrderedPly.cpp
+  src/rply/rply.c
+)
 
-#add_dependencies(o2as_aruco_detector_nodelet
-#  ${PROJECT_NAME}_gencpp
-#  ${${PREOJECT_NAME}_EXPORTED_TARGETS}
-#  ${catkin_EXPORTED_TARGETS}
-#)
+add_dependencies(aist_depth_filter_nodelet
+  ${${PREOJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
 
-#target_link_libraries(o2as_aruco_detector_nodelet
-#  ${catkin_LIBRARIES}
-#  ${roscpp_LIBRARIES}
-#  ${Boost_LIBRARIES}
-#  ${OpenCV_LIBRARIES}
-#)
+target_link_libraries(aist_depth_filter_nodelet
+  ${catkin_LIBRARIES}
+  ${roscpp_LIBRARIES}
+  ${Boost_LIBRARIES}
+  ${LIBTIFF_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)
 
 #############
 ## Install ##
 #############
 install(
   TARGETS
-    depth_filter
+    aist_depth_filter aist_depth_filter_nodelet
   ARCHIVE
     DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY

@@ -278,20 +278,27 @@ template <class T, class ITER> static ITER
 create_points(const sensor_msgs::CameraInfo& camera_info,
 	      const sensor_msgs::Image& depth, ITER out)
 {
-    cv::Mat_<double>	K(3, 3);
+    cv::Mat_<float>	K(3, 3);
     std::copy_n(std::begin(camera_info.K), 9, K.begin());
-    cv::Mat_<double>	distortion(4, 1);
-    std::copy_n(std::begin(camera_info.D), 4, distortion.begin());
-    
+    cv::Mat_<float>	D(1, 4);
+    std::copy_n(std::begin(camera_info.D), 4, D.begin());
+
+    cv::Mat_<cv::Point2f>	uv(depth.width, 1), xy(depth.width, 1);
+    for (int u = 0; u < depth.width; ++u)
+	uv(u).x = u;
+
     for (int v = 0; v < depth.height; ++v)
     {
+	for (int u = 0; u < depth.width; ++u)
+	    uv(u).y = v;
+
+	cv::undistortPoints(uv, xy, K, D);
+	
 	auto	p = ptr<T>(depth, v);
 	for (int u = 0; u < depth.width; ++u)
 	{
-	    std::vector<cv::Vec<double, 2> >	uv{{u, v}}, xy;
-	    cv::undistortPoints(uv, xy, K, distortion);
-	    const auto	d = fval(*p++);
-	    *out++ = {xy[0][0] * d, xy[0][1] * d, d};
+	    const auto	d = 1000.0f * fval(*p++);	// unit: milimeters
+	    *out++ = {xy(u).x * d, xy(u).y * d, d};
 	}
     }
 
@@ -364,9 +371,8 @@ savePly(const sensor_msgs::CameraInfo& camera_info,
 	throw std::runtime_error("savePly(): unknown image encoding["
 				 + image.encoding + ']');
 
-  // Set confidence values (Not required for Photoneo Localization).
-    oply.confidence.resize(oply.size);
-    std::fill(oply.confidence.begin(), oply.confidence.end(), 0);
+  // Empty confidence values (Not required for Photoneo Localization).
+    oply.confidence.clear();
     
   // Set position and orientation of the camera frame.
     oply.view   = {0.0, 0.0, 0.0};
