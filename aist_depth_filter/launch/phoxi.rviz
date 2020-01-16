@@ -57,7 +57,7 @@ Visualization Manager:
       Channel Name: intensity
       Class: rviz/DepthCloud
       Color: 255; 255; 255
-      Color Image Topic: /a_phoxi_m_camera/texture
+      Color Image Topic: /a_phoxi_m_camera/depth_filter/image
       Color Transformer: RGB8
       Color Transport Hint: raw
       Decay Time: 0
@@ -107,7 +107,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.907459617
+      Distance: 0.634888649
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -122,10 +122,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: -1.51979661
+      Pitch: -1.50479639
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.72830772
+      Yaw: 4.71830273
     Saved: ~
 Window Geometry:
   Displays:

@@ -51,6 +51,8 @@ catkin_package(
 add_executable(aist_depth_filter
   src/depth_filter.cpp
   src/DepthFilter.cpp
+  src/tiff.cpp
+  src/ply.cpp
   src/oply/OrderedPly.cpp
   src/rply/rply.c
 )
@@ -71,6 +73,8 @@ target_link_libraries(aist_depth_filter
 add_library(aist_depth_filter_nodelet
   src/nodelet.cpp
   src/DepthFilter.cpp
+  src/tiff.cpp
+  src/ply.cpp
   src/oply/OrderedPly.cpp
   src/rply/rply.c
 )

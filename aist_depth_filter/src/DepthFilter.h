@@ -34,6 +34,9 @@ class DepthFilter
     using sync_policy_t	 = message_filters::sync_policies::
 				ApproximateTime<camera_info_t, image_t,
 						image_t, image_t>;
+    using sync_policy2_t = message_filters::sync_policies::
+				ApproximateTime<camera_info_t,
+						image_t, image_t>;
 
   public:
 		DepthFilter(const std::string& name)			;
@@ -48,6 +51,8 @@ class DepthFilter
     void	filter_cb(const camera_info_cp& camera_info,
 			  const image_cp& image, const image_cp& depth,
 			  const image_cp& normal)			;
+    void	filter2_cb(const camera_info_cp& camera_info,
+			   const image_cp& image, const image_cp& depth);
 
     template <class T>
     void	filter(const camera_info_t& camera_info,
@@ -59,9 +64,12 @@ class DepthFilter
     template <class T>
     void	z_clip(image_t& depth)				  const	;
     template <class T>
-    void	xy_clip(image_t& depth)				  const	;
+    image_t	computeNormal(const camera_info_t& camera_info,
+			      const image_t& depth)		  const	;
     template <class T>
     void	scale(image_t& depth)				  const	;
+    void	create_subimage(const image_t& image,
+				image_t& subimage)		  const	;
 
   private:
     ros::NodeHandle					_nh;
@@ -74,30 +82,32 @@ class DepthFilter
     message_filters::Subscriber<image_t>		_depth_sub;
     message_filters::Subscriber<image_t>		_normal_sub;
     message_filters::Synchronizer<sync_policy_t>	_sync;
+  //message_filters::Synchronizer<sync_policy2_t>	_sync2;
 
     image_transport::ImageTransport			_it;
+    const image_transport::Publisher			_image_pub;
     const image_transport::Publisher			_depth_pub;
-
+    const image_transport::Publisher			_normal_pub;
+    const ros::Publisher				_camera_info_pub;
+    
     ddynamic_reconfigure::DDynamicReconfigure		_ddr;
 
-    camera_info_cp					_camera_info;
-    image_cp						_image;
+    camera_info_t					_camera_info;
+    image_t						_image;
     image_cp						_depth;
-    image_cp						_normal;
-    image_p						_filtered_depth;
     image_cp						_bg_depth;
+    image_t						_filtered_depth;
+    image_t						_normal;
 
   // Remove background.
     double						_threshBG;
     std::string						_fileBG;
 
   // Clip outside of [_near, _far].
-    bool						_z_clip;
     double						_near;
     double						_far;
 
   // Mask outside of ROI.
-    bool						_xy_clip;
     int							_top;
     int							_bottom;
     int							_left;
@@ -108,6 +118,8 @@ class DepthFilter
 
   // Save as OrderPly file.
     std::string						_fileOPly;
+
+    constexpr static double				FarMax = 4.0;
 };
 
 }	// namespace aist_photoneo_localization
