@@ -3,403 +3,14 @@
  *  \author	Toshio UESHIBA
  *  \brief	Thin wraper of Photoneo Localization SDK
  */
-#include <tiffio.h>
 #include <sensor_msgs/image_encodings.h>
-#include <boost/iterator/iterator_adaptor.hpp>
-#include <opencv2/imgproc.hpp>
+#include "tiff.h"
+#include "ply.h"
+#include "utils.h"
 #include "DepthFilter.h"
-#include "oply/OrderedPly.h"
 
 namespace aist_depth_filter
 {
-/************************************************************************
-*  global functions to save/load TIFF images				*
-************************************************************************/
-void
-saveTiff(const sensor_msgs::Image& image, const std::string& file)
-{
-    using	namespace sensor_msgs;
-
-    TIFFDataType	dataType;
-    int			bitsPerSample;
-    int			samplesPerPixel;
-
-    if (image.encoding == image_encodings::MONO16 ||
-	image.encoding == image_encodings::TYPE_16UC1)
-    {
-	dataType	= TIFF_SHORT;
-	bitsPerSample	= 16;
-	samplesPerPixel	= 1;
-    }
-    else if (image.encoding == image_encodings::TYPE_32FC1)
-    {
-	dataType	= TIFF_FLOAT;
-	bitsPerSample	= 32;
-	samplesPerPixel = 1;
-    }
-    else
-    {
-	throw std::runtime_error("saveTiff(): unknown encoding["
-				 + image.encoding + ']');
-    }
-
-
-    TIFF* const	tiff = TIFFOpen(file.c_str(), "w");
-    if (!tiff)
-	throw std::runtime_error("saveTiff(): cannot open file["
-				 + file + ']');
-
-    TIFFSetField(tiff, TIFFTAG_IMAGEWIDTH,	image.width);
-    TIFFSetField(tiff, TIFFTAG_IMAGELENGTH,	image.height);
-    TIFFSetField(tiff, TIFFTAG_BITSPERSAMPLE,	bitsPerSample);
-    TIFFSetField(tiff, TIFFTAG_SAMPLESPERPIXEL,	samplesPerPixel);
-    TIFFSetField(tiff, TIFFTAG_ROWSPERSTRIP,	1);
-    TIFFSetField(tiff, TIFFTAG_COMPRESSION,	COMPRESSION_NONE);
-    TIFFSetField(tiff, TIFFTAG_PHOTOMETRIC,	PHOTOMETRIC_MINISBLACK);
-    TIFFSetField(tiff, TIFFTAG_FILLORDER,	FILLORDER_MSB2LSB);
-    TIFFSetField(tiff, TIFFTAG_PLANARCONFIG,	PLANARCONFIG_CONTIG);
-    TIFFSetField(tiff, TIFFTAG_ORIENTATION,	ORIENTATION_TOPLEFT);
-    TIFFSetField(tiff, TIFFTAG_XRESOLUTION,	72.0);
-    TIFFSetField(tiff, TIFFTAG_YRESOLUTION,	72.0);
-    TIFFSetField(tiff, TIFFTAG_RESOLUTIONUNIT,	RESUNIT_CENTIMETER);
-
-    for (int n = 0, offset = 0; n < image.height; ++n)
-    {
-	TIFFWriteEncodedStrip(tiff, n, image.data.data() + offset, image.step);
-	offset += image.step;
-    }
-
-    TIFFClose(tiff);
-}
-
-sensor_msgs::Image
-loadTiff(const std::string& file)
-{
-    using	namespace sensor_msgs;
-
-    TIFF* const	tiff = TIFFOpen(file.c_str(), "r");
-    if (!tiff)
-	throw std::runtime_error("loadTiff(): cannot open file[" + file + ']');
-
-    uint32	width, height;
-    uint16	bitsPerSample, samplesPerPixel, photometric;
-
-    if (!TIFFGetField(tiff, TIFFTAG_IMAGEWIDTH,	     &width)		||
-	!TIFFGetField(tiff, TIFFTAG_IMAGELENGTH,     &height)		||
-	!TIFFGetField(tiff, TIFFTAG_BITSPERSAMPLE,   &bitsPerSample)	||
-	!TIFFGetField(tiff, TIFFTAG_SAMPLESPERPIXEL, &samplesPerPixel)	||
-	!TIFFGetField(tiff, TIFFTAG_PHOTOMETRIC,     &photometric))
-    {
-	throw std::runtime_error("loadTiff(): cannot get necessary fields");
-    }
-
-    sensor_msgs::Image	image;
-    image.width  = width;
-    image.height = height;
-
-    switch (photometric)
-    {
-      case PHOTOMETRIC_MINISBLACK:
-	switch(bitsPerSample)
-	{
-	  case 8:
-	    image.encoding = image_encodings::MONO8;
-	    break;
-	  case 16:
-	    image.encoding = image_encodings::MONO16;
-	    break;
-	  case 32:
-	    image.encoding = image_encodings::TYPE_32FC1;
-	    break;
-	  case 64:
-	    image.encoding = image_encodings::TYPE_64FC1;
-	    break;
-	  default:
-	    throw std::runtime_error("loadTiff(): unsupported #bits per sample["
-				     + std::to_string(bitsPerSample) + ']');
-	}
-	break;
-
-      case PHOTOMETRIC_RGB:
-	switch(bitsPerSample)
-	{
-	  case 8:
-	    image.encoding = image_encodings::RGB8;
-	    break;
-	  case 16:
-	    image.encoding = image_encodings::RGB16;
-	    break;
-	  case 32:
-	    image.encoding = image_encodings::TYPE_32FC3;
-	    break;
-	  case 64:
-	    image.encoding = image_encodings::TYPE_64FC3;
-	    break;
-	  default:
-	    throw std::runtime_error("loadTiff(): unsupported #bits per sample["
-				     + std::to_string(bitsPerSample) + ']');
-	}
-	break;
-
-      default:
-	throw std::runtime_error("loadTiff(): unsupported photometic["
-				 + std::to_string(photometric) + ']');
-    }
-
-    image.step = image.width * bitsPerSample * samplesPerPixel / 8;
-    image.data.resize(image.height * image.step);
-
-    const auto	nBytesPerStrip = TIFFStripSize(tiff);
-    const auto	nStrips        = TIFFNumberOfStrips(tiff);
-
-    for (int n = 0, offset = 0; n < nStrips; ++n)
-    {
-	const auto nBytes = TIFFReadEncodedStrip(tiff, n,
-						 image.data.data() + offset,
-						 nBytesPerStrip);
-	if (nBytes < 0)
-	    throw std::runtime_error("loadTiff(): failed to read strip");
-
-	offset += nBytes;
-    }
-
-    TIFFClose(tiff);
-
-    return image;
-}
-
-/************************************************************************
-*  type definitions							*
-************************************************************************/
-struct RGB				{ uint8_t r, g, b; };
-template <class T> using array3_t =	std::array<T, 3>;
-
-/************************************************************************
-*  global functions to save/load TIFF images				*
-************************************************************************/
-template <class T>
-static float	fval(const T p)		{ return p; }
-static float	fval(const uint16_t p)	{ return 0.001f * p; }
-    
-template <class T> static T*
-ptr(sensor_msgs::Image& image, int v)
-{
-    return reinterpret_cast<T*>(image.data.data() + v*image.step);
-}
-
-template <class T> static const T*
-ptr(const sensor_msgs::Image& image, int v)
-{
-    return reinterpret_cast<const T*>(image.data.data() + v*image.step);
-}
-
-/************************************************************************
-*  class input_iterator<ITER>						*
-************************************************************************/
-namespace detail
-{
-  template <class ITER>
-  class input_proxy
-  {
-    public:
-      using value_type = typename std::iterator_traits<ITER>::value_type;
-      
-    public:
-      input_proxy(ITER iter) :_iter(iter)	{}
-
-      template <class T_>
-      const auto&	operator =(const T_& val) const
-			{
-			    assign(*_iter, val);
-			    return *this;
-			}
-
-    private:
-      template <class T_>
-      static void	assign(T_& dst, T_ val)
-			{
-			    dst = val;
-			}
-      static void	assign(float& dst, uint16_t val)
-			{
-			    dst = fval(val);
-			}
-      static void	assign(float& dst, const RGB& rgb)
-			{
-			    dst = 0.3f * rgb.r + 0.59f * rgb.g + 0.11f * rgb.b;
-			}
-      static void	assign(array3_t<uint8_t>& a, const RGB& rgb)
-			{
-			    a[0] = rgb.r;
-			    a[1] = rgb.g;
-			    a[2] = rgb.b;
-			}
-      static void	assign(array3_t<uint8_t>& a, float val)
-			{
-			    a[2] = a[1] = a[0] = val;
-			}
-      
-    private:
-      ITER 	_iter;
-  };
-}	// namespace detail
-    
-template <class ITER>
-class input_iterator
-    : public boost::iterator_adaptor<input_iterator<ITER>,
-				     ITER,
-				     boost::use_default,
-				     boost::use_default,
-				     detail::input_proxy<ITER> >
-{
-  public:
-    using super = boost::iterator_adaptor<input_iterator<ITER>,
-					  ITER,
-					  boost::use_default,
-					  boost::use_default,
-					  detail::input_proxy<ITER> >;
-    using	typename super::reference;
-    friend	class boost::iterator_core_access;
-    
-  public:
-    input_iterator(ITER iter) :super(iter)	{}
-
-  private:
-    reference	dereference()		const	{ return {super::base()}; }
-};
-
-template <class ITER> input_iterator<ITER>
-make_input_iterator(ITER iter)	{ return input_iterator<ITER>(iter); }
-    
-/************************************************************************
-*  global functions concerning with saving PLY file			*
-************************************************************************/
-template <class T, class ITER> static ITER
-create_points(const sensor_msgs::CameraInfo& camera_info,
-	      const sensor_msgs::Image& depth, ITER out)
-{
-    cv::Mat_<float>	K(3, 3);
-    std::copy_n(std::begin(camera_info.K), 9, K.begin());
-    cv::Mat_<float>	D(1, 4);
-    std::copy_n(std::begin(camera_info.D), 4, D.begin());
-
-    cv::Mat_<cv::Point2f>	uv(depth.width, 1), xy(depth.width, 1);
-    for (int u = 0; u < depth.width; ++u)
-	uv(u).x = u;
-
-    for (int v = 0; v < depth.height; ++v)
-    {
-	for (int u = 0; u < depth.width; ++u)
-	    uv(u).y = v;
-
-	cv::undistortPoints(uv, xy, K, D);
-	
-	auto	p = ptr<T>(depth, v);
-	for (int u = 0; u < depth.width; ++u)
-	{
-	    const auto	d = 1000.0f * fval(*p++);	// unit: milimeters
-	    *out++ = {xy(u).x * d, xy(u).y * d, d};
-	}
-    }
-
-    return out;
-}
-
-template <class T, class ITER> static ITER
-copy_image(const sensor_msgs::Image& image, ITER out)
-{
-    for (int v = 0; v < image.height; ++v)
-	out = std::copy_n(ptr<T>(image, v), image.width, out);
-    
-    return out;
-}
-    
-void
-savePly(const sensor_msgs::CameraInfo& camera_info,
-	const sensor_msgs::Image& image, const sensor_msgs::Image& depth,
-	const sensor_msgs::Image& normal, const std::string& file)
-{
-    using	namespace sensor_msgs;
-    
-    OrderedPly	oply;
-
-  // Set version
-    oply.version = PC_VER_1_2;
-    
-  // Set number of points.
-    oply.size = depth.height * depth.width;
-    oply.last = oply.size;
-	
-  // Set point coordinates and depth values.
-    oply.point.resize(oply.size);
-    oply.depth.resize(oply.size);
-    if (depth.encoding == image_encodings::MONO16 ||
-	depth.encoding == image_encodings::TYPE_16UC1)
-    {
-	create_points<uint16_t>(camera_info, depth, oply.point.begin());
-	copy_image<uint16_t>(depth, make_input_iterator(oply.depth.begin()));
-    }
-    else if (depth.encoding == image_encodings::TYPE_32FC1)
-    {
-	create_points<float>(camera_info, depth, oply.point.begin());
-	copy_image<float>(depth, make_input_iterator(oply.depth.begin()));
-    }
-    else
-	throw std::runtime_error("savePly(): unknown depth encoding["
-				 + depth.encoding + ']');
-
-  // Set normals (REQUIRED for Photoneo Localization).
-    oply.normal.resize(oply.size);
-    copy_image<array3_t<float> >(normal, oply.normal.begin());
-    
-  // Set color and texture values.
-    oply.color.resize(oply.size);
-    oply.texture.resize(oply.size);
-    if (image.encoding == image_encodings::MONO8 ||
-	image.encoding == image_encodings::TYPE_8UC1)
-    {
-	copy_image<uint8_t>(image, make_input_iterator(oply.color.begin()));
-	copy_image<uint8_t>(image, make_input_iterator(oply.texture.begin()));
-    }
-    else if (image.encoding == image_encodings::RGB8 ||
-	     image.encoding == image_encodings::TYPE_8UC3)
-    {
-	copy_image<RGB>(image, make_input_iterator(oply.color.begin()));
-	copy_image<RGB>(image, make_input_iterator(oply.texture.begin()));
-    }
-    else
-	throw std::runtime_error("savePly(): unknown image encoding["
-				 + image.encoding + ']');
-
-  // Empty confidence values (Not required for Photoneo Localization).
-    oply.confidence.clear();
-    
-  // Set position and orientation of the camera frame.
-    oply.view   = {0.0, 0.0, 0.0};
-    oply.x_axis = {1.0, 0.0, 0.0};
-    oply.y_axis = {0.0, 1.0, 0.0};
-    oply.z_axis = {0.0, 0.0, 1.0};
-
-  // Set frame size.
-    oply.frame_width  = depth.width;
-    oply.frame_height = depth.height;
-    oply.frame_index  = 0;
-    
-  // Copy camera parameters.
-    std::copy_n(std::begin(camera_info.K), 9, std::begin(oply.cm));
-    std::copy_n(std::begin(camera_info.D), 5, std::begin(oply.dm));
-
-  // Other parameters.
-    oply.width	    = depth.width;
-    oply.height	    = depth.height;
-    oply.horizontal = 1;
-    oply.vertical   = 1;
-
-  // Write Ordered PLY to the spceified file.
-    OPlyWriter	writer(file, oply);
-    writer.write();
-}
-    
 /************************************************************************
 *  class DepthFilter							*
 ************************************************************************/
@@ -413,20 +24,24 @@ DepthFilter::DepthFilter(const std::string& name)
      _normal_sub(_nh, "/normal", 1),
      _sync(sync_policy_t(10),
 	   _camera_info_sub, _image_sub, _depth_sub, _normal_sub),
+     // _sync2(sync_policy2_t(10),
+     // 	    _camera_info_sub, _image_sub, _depth_sub),
      _it(_nh),
-     _depth_pub(_it.advertise("depth", 1)),
+     _image_pub (_it.advertise("image",  1)),
+     _depth_pub( _it.advertise("depth",  1)),
+     _normal_pub(_it.advertise("normal", 1)),
+     _camera_info_pub(_nh.advertise<camera_info_t>("camera_info", 1)),
      _ddr(),
-     _camera_info(nullptr),
-     _image(nullptr),
+     _camera_info(),
+     _image(),
      _depth(nullptr),
+     _bg_depth(nullptr),
      _filtered_depth(),
-     _bg_depth(),
+     _normal(),
      _threshBG(0.0),
      _fileBG("bg.tif"),
-     _z_clip(false),
      _near(0.0),
-     _far(std::numeric_limits<double>::max()),
-     _xy_clip(false),
+     _far(FarMax),
      _top(0),
      _bottom(2048),
      _left(0),
@@ -437,18 +52,13 @@ DepthFilter::DepthFilter(const std::string& name)
     _nh.param("thresh_bg", _threshBG, 0.0);
     _ddr.registerVariable<double>("thresh_bg", &_threshBG,
 				  "Threshold value for background removal",
-				  0.0, 1.0);
-    _nh.param("z_clip", _z_clip, false);
-    _ddr.registerVariable<bool>("z_clip", &_z_clip,
-				"Clip outside of [near, far]");
+				  0.0, 0.1);
     _nh.param("near", _near, 0.0);
     _ddr.registerVariable<double>("near", &_near,
 				  "Nearest depth value", 0.0, 1.0);
     _nh.param("far", _far, 100.0);
     _ddr.registerVariable<double>("far", &_far,
-				  "Farest depth value", 0.05, 4.0);
-    _nh.param("xy_clip", _xy_clip, false);
-    _ddr.registerVariable<bool>("xy_clip", &_xy_clip, "Mask outside of ROI");
+				  "Farest depth value", 0.0, FarMax);
     _nh.param("top", _top, 0);
     _ddr.registerVariable<int>("top",    &_top,	   "Top of ROI",    0, 2048);
     _nh.param("bottom", _bottom, 2048);
@@ -506,11 +116,11 @@ DepthFilter::savePly_cb(std_srvs::Trigger::Request&  req,
 {
     try
     {
-	if (!_filtered_depth)
+	if (_filtered_depth.data.empty())
 	    throw std::runtime_error("no filtered depth image available!");
 
-	savePly(*_camera_info, *_image, *_filtered_depth, *_normal, _fileOPly);
-	_filtered_depth = nullptr;
+	savePly(_camera_info, _image, _filtered_depth, _normal, _fileOPly);
+	_filtered_depth.data.clear();
 
 	res.success = true;
 	res.message = "succeeded.";
@@ -541,24 +151,35 @@ DepthFilter::filter_cb(const camera_info_cp& camera_info, const image_cp& image,
     {
 	using	namespace sensor_msgs;
 
-	_camera_info	= camera_info;
-	_image		= image;
-	_depth		= depth;
-	_normal		= normal;
-	_filtered_depth.reset(new image_t(*depth));
-
+      // Create camera_info according to ROI.
+	_camera_info	    = *camera_info;
+	_camera_info.height = _bottom - _top;
+	_camera_info.width  = _right  - _left;
+	_camera_info.K[2]  -= _left;
+	_camera_info.K[5]  -= _top;
+	_camera_info.P[2]  -= _left;
+	_camera_info.P[6]  -= _top;
+	
+	_depth = depth;  // Keep pointer to depth for saving background.
+	create_subimage(*image,  _image);
+	create_subimage(*depth,  _filtered_depth);
+	create_subimage(*normal, _normal);
+	
 	if (depth->encoding == image_encodings::MONO16 ||
 	    depth->encoding == image_encodings::TYPE_16UC1)
-	    filter<uint16_t>(*camera_info, *image, *_filtered_depth);
+	    filter<uint16_t>(_camera_info, _image, _filtered_depth);
 	else if (depth->encoding == image_encodings::TYPE_32FC1)
-	    filter<float>(*camera_info, *image, *_filtered_depth);
+	    filter<float>(_camera_info, _image, _filtered_depth);
+
+	_camera_info_pub.publish(_camera_info);
+	_image_pub.publish(_image);
+	_depth_pub.publish(_filtered_depth);
+	_normal_pub.publish(_normal);
     }
     catch (const std::exception& err)
     {
 	ROS_ERROR_STREAM("DepthFilter::filter_cb(): " << err.what());
     }
-
-    _depth_pub.publish(*_filtered_depth);
 }
 
 template <class T> void
@@ -570,7 +191,7 @@ DepthFilter::filter(const camera_info_t& camera_info,
 	try
 	{
 	    if (!_bg_depth)
-		_bg_depth.reset(new image_t(loadTiff(_fileBG.c_str())));
+		_bg_depth = loadTiff(_fileBG.c_str());
 
 	    removeBG<T>(depth, *_bg_depth);
 	}
@@ -580,28 +201,25 @@ DepthFilter::filter(const camera_info_t& camera_info,
 	    _threshBG = 0;
 	}
     }
-    if (_z_clip)
+    if (_near > 0.0 || _far < FarMax)
+    {
 	z_clip<T>(depth);
-    if (_xy_clip)
-	xy_clip<T>(depth);
+    }
     if (_scale != 1.0)
+    {
 	scale<T>(depth);
+    }
 }
 
 template <class T> void
 DepthFilter::removeBG(image_t& depth, const image_t& bg_depth) const
 {
-    if ((depth.width	!= bg_depth.width)	 ||
-	(depth.height	!= bg_depth.height)	 ||
-	(depth.encoding != bg_depth.encoding))
-	throw std::runtime_error("DepthFilter::removeBG(): mismatched image properties!");
-
     for (int v = 0; v < depth.height; ++v)
     {
 	auto	p = ptr<T>(depth, v);
-	auto	b = ptr<T>(bg_depth, v);
+	auto	b = ptr<T>(bg_depth, v + _top) + _left;
 	for (const auto q = p + depth.width; p != q; ++p, ++b)
-	    if (std::abs(fval(*p) - fval(*b)) < _threshBG)
+	    if (*b != 0 && std::abs(fval(*p) - fval(*b)) < _threshBG)
 		*p = 0;
     }
 }
@@ -618,21 +236,41 @@ DepthFilter::z_clip(image_t& depth) const
 			0);
     }
 }
-
-template <class T> void
-DepthFilter::xy_clip(image_t& depth) const
+  /*
+template <class T> DepthFilter::image_t
+DepthFilter::computeNormal(const camera_info_t& camera_info,
+			   const image_t& depth) const
 {
-    for (int v = 0; v < _top; ++v)
-	std::fill_n(ptr<T>(depth, v), depth.width, 0);
-    for (int v = _top; v < _bottom; ++v)
-    {
-	std::fill_n(ptr<T>(depth, v),	       _left,		     0);
-	std::fill_n(ptr<T>(depth, v) + _right, depth.width - _right, 0);
-    }
-    for (int v = _bottom; v < depth.height; ++v)
-	std::fill_n(ptr<T>(depth, v), depth.width, 0);
-}
+    using		namespace sensor_msgs;
+    using vector3_t	= cv::Vec<float, 3>;
+    using matrix33_t	= cv::Matx<float, 3, 3>;
+    
+    image_t	normal;
+    normal.encoding = image_encodings::TYPE_32FC3;
+    normal.height   = depth.height;
+    normal.width    = depth.width;
+    normal.step	    = normal.width * sizeof(vector3_t);
+    normal.data.resize(normal.height * normal.step);
+    std::fill(normal.data.begin(), normal.data.end(), 0);
 
+  // Compute 3D coordinates.
+    std::vector<vector3_t>	xyz(depth.height * depth.width);
+    depth_to_points<T>(camera_info, depth, xyz.begin());
+
+  // Compute normals.
+    std::vector<vector3_t>	win;
+    for (int v = 0; v <= depth.height - _winSize; ++v)
+    {
+	auto	p = ptr<T>(depth, v);
+	auto	r = ptr<vector3_t>(normal, v + _winRadius) + _winRadius;
+
+	
+	for (; ; )
+	{
+	}
+    }
+}
+  */
 template <class T> void
 DepthFilter::scale(image_t& depth) const
 {
@@ -643,5 +281,31 @@ DepthFilter::scale(image_t& depth) const
 		       [this](const auto& val){ return _scale * val; });
     }
 }
-    
-}	// namespace aist_photoneo_localization
+
+void
+DepthFilter::create_subimage(const image_t& image, image_t& subimage) const
+{
+    using	namespace sensor_msgs;
+
+    constexpr auto	ALIGN = sizeof(float);
+    const auto	nbytesPerPixel = image_encodings::bitDepth(image.encoding)/8
+			       * image_encodings::numChannels(image.encoding);
+
+    subimage.header	  = image.header;
+    subimage.height	  = _bottom - _top;
+    subimage.width	  = _right  - _left;
+    subimage.encoding	  = image.encoding;
+    subimage.is_bigendian = image.is_bigendian;
+    subimage.step	  = subimage.width*nbytesPerPixel;
+    subimage.data.resize(subimage.height * subimage.step);
+
+    auto p = image.data.begin() + _top*image.step + _left*nbytesPerPixel;
+    for (auto q = subimage.data.begin(); q != subimage.data.end();
+	 q += subimage.step)
+    {
+	std::copy_n(p, subimage.width*nbytesPerPixel, q);
+	p += image.step;
+    }
+}
+
+}	// namespace aist_depth_filter

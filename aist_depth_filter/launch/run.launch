@@ -7,7 +7,7 @@
   <arg name="depth_topic"		default="depth_map"/>
   <arg name="normal_topic"		default="normal_map"/>
 
-  <node name="depth_filter" pkg="aist_depth_filter" type="depth_filter"
+  <node name="depth_filter" pkg="aist_depth_filter" type="aist_depth_filter"
   	output="screen">
     <remap from="/camera_info"	to="/$(arg camera_name)/$(arg camera_info_topic)"/>
     <remap from="/image"	to="/$(arg camera_name)/$(arg image_topic)"/>
