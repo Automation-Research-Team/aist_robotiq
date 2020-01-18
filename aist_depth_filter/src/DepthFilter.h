@@ -56,7 +56,8 @@ class DepthFilter
 
     template <class T>
     void	filter(const camera_info_t& camera_info,
-		       const image_t& image, image_t& depth)		;
+		       const image_t& image,
+		       image_t& depth, image_t& normal)			;
     template <class T>
     void	saveBG(image_t& depth)				  const	;
     template <class T>
@@ -64,8 +65,9 @@ class DepthFilter
     template <class T>
     void	z_clip(image_t& depth)				  const	;
     template <class T>
-    image_t	computeNormal(const camera_info_t& camera_info,
-			      const image_t& depth)		  const	;
+    void	computeNormal(const camera_info_t& camera_info,
+			      const image_t& depth,
+			      image_t& normal)			  const	;
     template <class T>
     void	scale(image_t& depth)				  const	;
     void	create_subimage(const image_t& image,
@@ -82,7 +84,7 @@ class DepthFilter
     message_filters::Subscriber<image_t>		_depth_sub;
     message_filters::Subscriber<image_t>		_normal_sub;
     message_filters::Synchronizer<sync_policy_t>	_sync;
-  //message_filters::Synchronizer<sync_policy2_t>	_sync2;
+    message_filters::Synchronizer<sync_policy2_t>	_sync2;
 
     image_transport::ImageTransport			_it;
     const image_transport::Publisher			_image_pub;
@@ -119,6 +121,10 @@ class DepthFilter
   // Save as OrderPly file.
     std::string						_fileOPly;
 
+  // Radius of window for computing normals.
+    int							_window_radius;
+    
+  private:
     constexpr static double				FarMax = 4.0;
 };
 

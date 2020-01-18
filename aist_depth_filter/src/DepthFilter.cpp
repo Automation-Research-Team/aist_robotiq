@@ -9,6 +9,8 @@
 #include "utils.h"
 #include "DepthFilter.h"
 
+#define DEBUG
+
 namespace aist_depth_filter
 {
 /************************************************************************
@@ -24,8 +26,8 @@ DepthFilter::DepthFilter(const std::string& name)
      _normal_sub(_nh, "/normal", 1),
      _sync(sync_policy_t(10),
 	   _camera_info_sub, _image_sub, _depth_sub, _normal_sub),
-     // _sync2(sync_policy2_t(10),
-     // 	    _camera_info_sub, _image_sub, _depth_sub),
+     _sync2(sync_policy2_t(10),
+     	    _camera_info_sub, _image_sub, _depth_sub),
      _it(_nh),
      _image_pub (_it.advertise("image",  1)),
      _depth_pub( _it.advertise("depth",  1)),
@@ -47,7 +49,8 @@ DepthFilter::DepthFilter(const std::string& name)
      _left(0),
      _right(3072),
      _scale(1.0),
-     _fileOPly("filtered_depth.ply")
+     _fileOPly("filtered_depth.ply"),
+     _window_radius(0)
 {
     _nh.param("thresh_bg", _threshBG, 0.0);
     _ddr.registerVariable<double>("thresh_bg", &_threshBG,
@@ -69,6 +72,9 @@ DepthFilter::DepthFilter(const std::string& name)
     _ddr.registerVariable<int>("right",  &_right,  "Right of ROI",  0, 3072);
     _nh.param("scale", _scale, 1.0);
     _ddr.registerVariable<double>("scale", &_scale, "Scale depth", 0.5, 1.5);
+    _nh.param("window_radius", _window_radius, 0);
+    _ddr.registerVariable<int>("window_radius", &_window_radius,
+			       "Window radius", 0, 5);
     _ddr.publishServicesTopics();
 
     _sync.registerCallback(&DepthFilter::filter_cb, this);
@@ -167,9 +173,9 @@ DepthFilter::filter_cb(const camera_info_cp& camera_info, const image_cp& image,
 	
 	if (depth->encoding == image_encodings::MONO16 ||
 	    depth->encoding == image_encodings::TYPE_16UC1)
-	    filter<uint16_t>(_camera_info, _image, _filtered_depth);
+	    filter<uint16_t>(_camera_info, _image, _filtered_depth, _normal);
 	else if (depth->encoding == image_encodings::TYPE_32FC1)
-	    filter<float>(_camera_info, _image, _filtered_depth);
+	    filter<float>(_camera_info, _image, _filtered_depth, _normal);
 
 	_camera_info_pub.publish(_camera_info);
 	_image_pub.publish(_image);
@@ -184,7 +190,7 @@ DepthFilter::filter_cb(const camera_info_cp& camera_info, const image_cp& image,
 
 template <class T> void
 DepthFilter::filter(const camera_info_t& camera_info,
-		    const image_t& image, image_t& depth)
+		    const image_t& image, image_t& depth, image_t& normal)
 {
     if (_threshBG > 0)
     {
@@ -204,6 +210,10 @@ DepthFilter::filter(const camera_info_t& camera_info,
     if (_near > 0.0 || _far < FarMax)
     {
 	z_clip<T>(depth);
+    }
+    if (_window_radius > 0)
+    {
+	computeNormal<T>(camera_info, depth, normal);
     }
     if (_scale != 1.0)
     {
@@ -236,41 +246,152 @@ DepthFilter::z_clip(image_t& depth) const
 			0);
     }
 }
-  /*
-template <class T> DepthFilter::image_t
+
+template <class T> void
 DepthFilter::computeNormal(const camera_info_t& camera_info,
-			   const image_t& depth) const
+			   const image_t& depth, image_t& normal) const
 {
     using		namespace sensor_msgs;
-    using vector3_t	= cv::Vec<float, 3>;
-    using matrix33_t	= cv::Matx<float, 3, 3>;
+
+    using value_t	= double;
+#ifdef DEBUG
+    using normal_t	= std::array<uint8_t, 3>;
+#else
+    using normal_t	= std::array<value_t, 3>;
+#endif
+    using vector3_t	= cv::Matx<value_t, 3, 1>;
+    using matrix33_t	= cv::Matx<value_t, 3, 3>;
     
-    image_t	normal;
-    normal.encoding = image_encodings::TYPE_32FC3;
-    normal.height   = depth.height;
-    normal.width    = depth.width;
-    normal.step	    = normal.width * sizeof(vector3_t);
+  // 0: Allocate image for output normals.
+    normal.header	= depth.header;
+#ifdef DEBUG
+    normal.encoding	= image_encodings::RGB8;
+#else
+    normal.encoding	= image_encodings::TYPE_32FC3;
+#endif
+    normal.height	= depth.height;
+    normal.width	= depth.width;
+    normal.step		= normal.width * sizeof(normal_t);
+    normal.is_bigendian = false;
     normal.data.resize(normal.height * normal.step);
     std::fill(normal.data.begin(), normal.data.end(), 0);
 
-  // Compute 3D coordinates.
-    std::vector<vector3_t>	xyz(depth.height * depth.width);
+  // 1: Compute 3D coordinates.
+    cv::Mat_<vector3_t>		xyz(depth.height, depth.width);
     depth_to_points<T>(camera_info, depth, xyz.begin());
 
-  // Compute normals.
-    std::vector<vector3_t>	win;
-    for (int v = 0; v <= depth.height - _winSize; ++v)
-    {
-	auto	p = ptr<T>(depth, v);
-	auto	r = ptr<vector3_t>(normal, v + _winRadius) + _winRadius;
+  // 2: Compute normals.
+    const auto			ws1 = 2 * _window_radius;
+    cv::Mat_<int>		n(depth.width - ws1, depth.height);
+    cv::Mat_<vector3_t>		c(depth.width - ws1, depth.height);
+    cv::Mat_<matrix33_t>	M(depth.width - ws1, depth.height);
 
-	
-	for (; ; )
+  // 2.1: Convovle with a box filter in horizontal direction.
+    for (int v = 0; v < n.cols; ++v)
+    {
+	auto	sum_n = 0;
+	auto	sum_c = vector3_t::zeros();
+	auto	sum_M = matrix33_t::zeros();
+	for (int u = 0; u < ws1; ++u)
 	{
+	    const auto&	head = xyz(v, u);
+	    
+	    if (head(2) != 0)
+	    {
+		++sum_n;
+		sum_c += head;
+		sum_M += head % head;
+	    }
+	}
+	
+	for (int u = 0; u < n.rows; ++u)
+	{
+	    const auto&	head = xyz(v, u + ws1);
+	    
+	    if (head(2) != 0)
+	    {
+		++sum_n;
+		sum_c += head;
+ 		sum_M += head % head;
+	    }
+
+	    n(u, v) = sum_n;
+	    c(u, v) = sum_c;
+	    M(u, v) = sum_M;
+
+	    const auto&	tail = xyz(v, u);
+	    
+	    if (tail(2) != 0)
+	    {
+		--sum_n;
+		sum_c -= tail;
+		sum_M -= tail % tail;
+	    }
+	}
+    }
+
+  // 2.2: Convolve with a box filter in vertical direction.
+    for (int u = 0; u < n.rows; ++u)
+    {
+	auto	sum_n = 0;
+	auto	sum_c = vector3_t::zeros();
+	auto	sum_M = matrix33_t::zeros();
+	for (int v = 0; v < ws1; ++v)
+	{
+	    sum_n += n(u, v);
+	    sum_c += c(u, v);
+	    sum_M += M(u, v);
+	}
+
+	auto	dst = ptr<normal_t>(normal, _window_radius)
+		    + _window_radius + u;
+	for (int v = ws1; v < n.cols; ++v)
+	{
+	    sum_n += n(u, v);
+	    sum_c += c(u, v);
+	    sum_M += M(u, v);
+
+	    if (sum_n > 3)
+	    {
+		const auto	A = sum_n * sum_M - sum_c % sum_c;
+		vector3_t	evalues;
+		matrix33_t	evectors;
+		cv::eigen(A, evalues, evectors);
+		auto		norm = evectors.row(2).t();
+		auto		dist = norm.dot(sum_c) / sum_n;
+		if (dist > 0)
+		{
+		    dist *= -1;
+		    norm *= -1;
+		}
+#ifdef DEBUG
+		// std::cerr << "evalues = ("
+		// 	  << evalues(0) << ", "
+		// 	  << evalues(1) << ", "
+		// 	  << evalues(2) << ")" << std::endl;
+		// std::cerr << "dist = " << dist << ", norm = ("
+		// 	  << norm(0) << ", "
+		// 	  << norm(1) << ", "
+		// 	  << norm(2) << ")" << std::endl;
+		
+		*dst = {uint8_t(128 + 127*norm(0)),
+			uint8_t(128 + 127*norm(1)),
+			uint8_t(128 + 127*norm(2))};
+#else
+		*dst = {*norm(0), norm(1), norm(2)};
+#endif
+	    }
+
+	    const auto	vh = v - ws1;
+	    sum_n -= n(u, vh);
+	    sum_c -= c(u, vh);
+	    sum_M -= M(u, vh);
+
+	    dst += normal.width;
 	}
     }
 }
-  */
+
 template <class T> void
 DepthFilter::scale(image_t& depth) const
 {
@@ -287,7 +408,6 @@ DepthFilter::create_subimage(const image_t& image, image_t& subimage) const
 {
     using	namespace sensor_msgs;
 
-    constexpr auto	ALIGN = sizeof(float);
     const auto	nbytesPerPixel = image_encodings::bitDepth(image.encoding)/8
 			       * image_encodings::numChannels(image.encoding);
 
