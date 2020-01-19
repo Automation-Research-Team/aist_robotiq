@@ -51,13 +51,12 @@ class DepthFilter
     void	filter_cb(const camera_info_cp& camera_info,
 			  const image_cp& image, const image_cp& depth,
 			  const image_cp& normal)			;
-    void	filter2_cb(const camera_info_cp& camera_info,
+    void	filter_cb2(const camera_info_cp& camera_info,
 			   const image_cp& image, const image_cp& depth);
 
     template <class T>
     void	filter(const camera_info_t& camera_info,
-		       const image_t& image,
-		       image_t& depth, image_t& normal)			;
+		       image_t& depth)					;
     template <class T>
     void	saveBG(image_t& depth)				  const	;
     template <class T>
@@ -66,12 +65,13 @@ class DepthFilter
     void	z_clip(image_t& depth)				  const	;
     template <class T>
     void	computeNormal(const camera_info_t& camera_info,
-			      const image_t& depth,
-			      image_t& normal)			  const	;
+			      const image_t& depth)			;
     template <class T>
     void	scale(image_t& depth)				  const	;
     void	create_subimage(const image_t& image,
 				image_t& subimage)		  const	;
+    void	create_colored_normal(const image_t& normal,
+				      image_t& colored_normal)	  const	;
 
   private:
     ros::NodeHandle					_nh;
@@ -90,6 +90,7 @@ class DepthFilter
     const image_transport::Publisher			_image_pub;
     const image_transport::Publisher			_depth_pub;
     const image_transport::Publisher			_normal_pub;
+    const image_transport::Publisher			_colored_normal_pub;
     const ros::Publisher				_camera_info_pub;
     
     ddynamic_reconfigure::DDynamicReconfigure		_ddr;
@@ -100,6 +101,7 @@ class DepthFilter
     image_cp						_bg_depth;
     image_t						_filtered_depth;
     image_t						_normal;
+    image_t						_colored_normal;
 
   // Remove background.
     double						_threshBG;

@@ -12,9 +12,10 @@
     <remap from="/camera_info"	to="/$(arg camera_name)/$(arg camera_info_topic)"/>
     <remap from="/image"	to="/$(arg camera_name)/$(arg image_topic)"/>
     <remap from="/depth"	to="/$(arg camera_name)/$(arg depth_topic)"/>
-    <remap from="/normal"	to="/$(arg camera_name)/$(arg normal_topic)"/>
-
-    <!-- Other parameters -->
+    <remap from="/normal"	to="/$(arg camera_name)/$(arg normal_topic)"
+	   unless="$(eval arg('normal_topic') == '')"/>
+    <param name="subscribe_normal"
+	   value="$(eval arg('normal_topic') != '')"/> -->
   </node>
 
 </launch>
