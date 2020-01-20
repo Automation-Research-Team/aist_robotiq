@@ -49,7 +49,7 @@ catkin_package(
 )
 
 add_executable(aist_depth_filter
-  src/depth_filter.cpp
+  src/main.cpp
   src/DepthFilter.cpp
   src/tiff.cpp
   src/ply.cpp

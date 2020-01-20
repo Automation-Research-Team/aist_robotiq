@@ -13,7 +13,7 @@ find_package(
 )
 
 find_package(catkin REQUIRED
-  genmsg actionlib_msgs actionlib geometry_msgs tf
+  genmsg actionlib_msgs actionlib geometry_msgs std_msgs tf
 )
 
 ###########
@@ -22,11 +22,6 @@ find_package(catkin REQUIRED
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${PHOLOCALIZATION_INCLUDE_DIRS}
-)
-
-add_service_files(
-  FILES
-    LoadScene.srv
 )
 
 add_action_files(
@@ -50,7 +45,7 @@ catkin_package(
 )
 
 add_executable(aist_localization
-  src/localization.cpp
+  src/main.cpp
   src/Localization.cpp
 )
 

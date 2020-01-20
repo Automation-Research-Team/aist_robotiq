@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<launch>
+
+  <arg name="camera_name"		default="a_phoxi_m_camera"/>
+
+  <node name="localization" pkg="aist_localization" type="aist_localization"
+  	output="screen" ns="$(arg camera_name)">
+  </node>
+
+</launch>

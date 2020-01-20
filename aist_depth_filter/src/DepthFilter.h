@@ -72,7 +72,9 @@ class DepthFilter
 				image_t& subimage)		  const	;
     void	create_colored_normal(const image_t& normal,
 				      image_t& colored_normal)	  const	;
-
+    static std::string
+		open_dir()					  	;
+    
   private:
     ros::NodeHandle					_nh;
 

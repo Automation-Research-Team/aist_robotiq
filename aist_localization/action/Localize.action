@@ -7,7 +7,6 @@ int32   number_of_poses    # number of candidate poses
 std_msgs/Header      header
 geometry_msgs/Pose[] poses
 float32[]            overlaps
-bool                 success
 ---
 # Feedback definition
 int32   number_of_poses  # number of candidate poses currently found

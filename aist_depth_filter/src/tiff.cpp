@@ -158,7 +158,8 @@ loadTiff(const std::string& file)
 				 + std::to_string(photometric) + ']');
     }
 
-    image->step = image->width * bitsPerSample * samplesPerPixel / 8;
+    image->step		= image->width * bitsPerSample * samplesPerPixel / 8;
+    image->is_bigendian = false;
     image->data.resize(image->height * image->step);
 
     const auto	nBytesPerStrip = TIFFStripSize(tiff);
