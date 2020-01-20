@@ -12,8 +12,8 @@
 
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
+#include <std_srvs/Trigger.h>
 #include <actionlib/server/simple_action_server.h>
-#include <aist_localization/LoadScene.h>
 #include <aist_localization/LocalizeAction.h>
 
 #include <PhoLocalization.h>
@@ -40,17 +40,19 @@ class Localization
     void	run()							;
 
   private:
-    bool	load_scene_cb(LoadScene::Request&  req,
-			      LoadScene::Response& res)			;
-    
+    bool	load_scene_cb(std_srvs::Trigger::Request&  req,
+			      std_srvs::Trigger::Response& res)		;
     void	localize_cb(const goal_cp& goal)			;
+    static std::string
+		scene_dir()						;
     
   private:
     ros::NodeHandle				_nh;
 
     tf::TransformBroadcaster			_tfBroadcaster;
     std::string					_camera_frame;
-
+    std::string					_config_dir;
+    
     std::unique_ptr<pho::sdk::PhoLocalization>	_localization;
     pho::sdk::SceneSource			_scene;
     bool					_scene_is_valid;
@@ -58,8 +60,6 @@ class Localization
     const ros::ServiceServer			_load_scene_srv;
     
     server_t					_localize_srv;
-    feedback_t					_feedback;
-    result_t					_result;
 };
 
 }	// namespace aist_localization
