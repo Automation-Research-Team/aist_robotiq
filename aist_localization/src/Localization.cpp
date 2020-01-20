@@ -73,14 +73,15 @@ Localization::localize_cb(const goal_cp& goal)
 {
     try
     {
-	ROS_INFO_STREAM("localize: Executing for config["
-			<< goal->config_file << "].");
+	ROS_INFO_STREAM("localize: Executing for object["
+			<< goal->object_name << "].");
 
 	if (!_scene_is_valid)
 	    throw std::runtime_error("Scene is not set.");
 
       // Load configuration.
-	const auto	config_file = _config_dir + '/' + goal->config_file;
+	const auto	config_file = _config_dir + '/'
+				    + goal->object_name + ".plcf";
 	if (!_localization->LoadLocalizationConfiguration(config_file))
 	    throw std::runtime_error("Failed to load configuration["
 				     + config_file + "].");
@@ -91,9 +92,9 @@ Localization::localize_cb(const goal_cp& goal)
 	_localization->SetStopCriterion(
 	    pho::sdk::StopCriterion::NumberOfResults(goal->number_of_poses));
 
-      //
+      // Execute localization.
 	std::vector<pho::sdk::LocalizationPose>	locPoses;
-	
+
 	for (auto queue = _localization->StartAsync();
 	     queue.Size() != goal->number_of_poses; )
 	{
@@ -117,18 +118,40 @@ Localization::localize_cb(const goal_cp& goal)
 	
 	_localization->StopAsync();
 
+      // Sort obtained poses in descending order of overlap values.
 	std::sort(locPoses.begin(), locPoses.end(),
 		  [](const auto& a, const auto& b)
 		  { return a.VisibleOverlap > b.VisibleOverlap; });
 	
-		  
+      // Broadcast and save the obtained candidate poses.
 	result_t	result;
 	result.header.stamp	= ros::Time::now();
 	result.header.frame_id	= _camera_frame;
-	for (const auto& locPose : locPoses)
+	for (size_t i = 0; i < locPoses.size(); ++i)
 	{
-	    result.poses.push_back();
-	    result.overlaps.push_back(locPose.VisibleOverlap);
+	  // Get transformation from the object to the camera.
+	    const auto&		mat = locPoses[i].Transformation;
+	    const tf::Transform	transform(tf::Matrix3x3(
+					      mat[0][0], mat[0][1], mat[0][2],
+					      mat[1][0], mat[1][1], mat[1][2],
+					      mat[2][0], mat[2][1], mat[2][2]),
+					  tf::Vector3(0.001*mat[0][3],
+						      0.001*mat[1][3],
+						      0.001*mat[2][3]));
+
+	  // Broadcast the cadidate pose as a frame.
+	    const auto	object_frame = ros::this_node::getNamespace() + '/'
+				     + goal->object_name + std::to_string(i);
+	    _tfBroadcaster.sendTransform({transform,
+					  result.header.stamp,
+					  result.header.frame_id,
+					  object_frame});
+
+	  // Save the candidate pose to the result.
+	    geometry_msgs::Pose	pose;
+	    tf::poseTFToMsg(transform, pose);
+	    result.poses.push_back(pose);
+	    result.overlaps.push_back(locPoses[i].VisibleOverlap);
 	}
 	
 	_localize_srv.setSucceeded(result);
