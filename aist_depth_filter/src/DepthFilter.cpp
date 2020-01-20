@@ -3,6 +3,8 @@
  *  \author	Toshio UESHIBA
  *  \brief	Thin wraper of Photoneo Localization SDK
  */
+#include <cstdlib>	// for getenv()
+#include <sys/stat.h>	// for mkdir()
 #include <sensor_msgs/image_encodings.h>
 #include "tiff.h"
 #include "ply.h"
@@ -40,7 +42,6 @@ DepthFilter::DepthFilter(const std::string& name)
      _filtered_depth(),
      _normal(),
      _threshBG(0.0),
-     _fileBG("bg_depth.tif"),
      _near(0.0),
      _far(FarMax),
      _top(0),
@@ -48,7 +49,6 @@ DepthFilter::DepthFilter(const std::string& name)
      _left(0),
      _right(3072),
      _scale(1.0),
-     _fileOPly("filtered_depth.ply"),
      _window_radius(0)
 {
     _nh.param("thresh_bg", _threshBG, 0.0);
@@ -105,7 +105,7 @@ DepthFilter::saveBG_cb(std_srvs::Trigger::Request&  req,
 	if (!_depth)
 	    throw std::runtime_error("no original depth image available!");
 
-	saveTiff(*_depth, _fileBG);
+	saveTiff(*_depth, open_dir() + "/bg.tif");
 	_bg_depth = _depth;
 	_depth	  = nullptr;
 
@@ -120,8 +120,7 @@ DepthFilter::saveBG_cb(std_srvs::Trigger::Request&  req,
 	res.message = "failed.";
     }
 
-    ROS_INFO_STREAM("(DepthFilter) save background image to " + _fileBG + ": "
-		    << res.message);
+    ROS_INFO_STREAM("(DepthFilter) save background image: " << res.message);
 
     return true;
 }
@@ -135,7 +134,8 @@ DepthFilter::savePly_cb(std_srvs::Trigger::Request&  req,
 	if (_filtered_depth.data.empty())
 	    throw std::runtime_error("no filtered depth image available!");
 
-	savePly(_camera_info, _image, _filtered_depth, _normal, _fileOPly);
+	savePly(_camera_info, _image, _filtered_depth, _normal,
+		open_dir() + "/scene.ply");
 	_filtered_depth.data.clear();
 
 	res.success = true;
@@ -253,7 +253,7 @@ DepthFilter::filter(const camera_info_t& camera_info, image_t& depth)
 	try
 	{
 	    if (!_bg_depth)
-		_bg_depth = loadTiff(_fileBG.c_str());
+		_bg_depth = loadTiff(open_dir() + "/bg.tif");
 
 	    removeBG<T>(depth, *_bg_depth);
 	}
@@ -523,4 +523,21 @@ DepthFilter::create_colored_normal(const image_t& normal,
     }
 }
 
+std::string
+DepthFilter::open_dir()
+{
+    const auto	home = getenv("HOME");
+    if (!home)
+	throw std::runtime_error("Environment variable[HOME] is not set.");
+
+    const auto	dir_name = home + std::string("/.ros")
+				+ ros::this_node::getNamespace();
+    struct stat	buf;
+    if (stat(dir_name.c_str(), &buf) && mkdir(dir_name.c_str(), S_IRWXU))
+	throw std::runtime_error("Cannot create " + dir_name + ": "
+						  + strerror(errno));
+
+    return dir_name;
+}
+    
 }	// namespace aist_depth_filter

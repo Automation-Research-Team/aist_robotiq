@@ -18,10 +18,6 @@ main(int argc, char* argv[])
 	aist_localization::Localization	localization("~");
 	localization.run();
     }
-    catch (const pho::sdk::AuthenticationException& err)
-    {
-	std::cerr << err.what() << std::endl;
-    }
     catch (const std::exception& err)
     {
 	std::cerr << err.what() << std::endl;
