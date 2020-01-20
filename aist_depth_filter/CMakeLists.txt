@@ -10,7 +10,8 @@ add_compile_options(-pthread)
 find_package(PkgConfig)
 pkg_check_modules(LIBTIFF REQUIRED libtiff-4)
 
-find_package(catkin REQUIRED
+find_package(
+  catkin REQUIRED
   COMPONENTS
     ddynamic_reconfigure
     sensor_msgs
@@ -29,16 +30,6 @@ include_directories(
   src
 )
 
-#add_message_files(
-#  FILES
-#    Corners.msg
-#)
-
-#generate_messages(
-#  DEPENDENCIES
-#    geometry_msgs
-#)
-
 catkin_package(
   CATKIN_DEPENDS
     roscpp
@@ -48,7 +39,8 @@ catkin_package(
     nodelet
 )
 
-add_executable(aist_depth_filter
+add_executable(
+  ${PROJECT_NAME}
   src/main.cpp
   src/DepthFilter.cpp
   src/tiff.cpp
@@ -57,12 +49,14 @@ add_executable(aist_depth_filter
   src/rply/rply.c
 )
 
-add_dependencies(aist_depth_filter
+add_dependencies(
+  ${PROJECT_NAME}
   ${${PREOJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
 
-target_link_libraries(aist_depth_filter
+target_link_libraries(
+  ${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
   ${Boost_LIBRARIES}
@@ -70,7 +64,8 @@ target_link_libraries(aist_depth_filter
   ${OpenCV_LIBRARIES}
 )
 
-add_library(aist_depth_filter_nodelet
+add_library(
+  ${PROJECT_NAME}_nodelet
   src/nodelet.cpp
   src/DepthFilter.cpp
   src/tiff.cpp
@@ -79,12 +74,14 @@ add_library(aist_depth_filter_nodelet
   src/rply/rply.c
 )
 
-add_dependencies(aist_depth_filter_nodelet
+add_dependencies(
+  ${PROJECT_NAME}_nodelet
   ${${PREOJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
 
-target_link_libraries(aist_depth_filter_nodelet
+target_link_libraries(
+  ${PROJECT_NAME}_nodelet
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
   ${Boost_LIBRARIES}
@@ -97,7 +94,7 @@ target_link_libraries(aist_depth_filter_nodelet
 #############
 install(
   TARGETS
-    aist_depth_filter aist_depth_filter_nodelet
+    ${PROJECT_NAME} ${PROJECT_NAME}_nodelet
   ARCHIVE
     DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY

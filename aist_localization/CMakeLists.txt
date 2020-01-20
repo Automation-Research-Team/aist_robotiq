@@ -12,8 +12,17 @@ find_package(
   CONFIG PATHS "$ENV{PHO_LOCALIZATION_PATH}"
 )
 
-find_package(catkin REQUIRED
-  genmsg actionlib_msgs actionlib geometry_msgs std_msgs tf
+find_package(
+  catkin REQUIRED
+  COMPONENTS
+    roscpp
+    roslib
+    genmsg
+    actionlib_msgs
+    actionlib
+    geometry_msgs
+    std_msgs
+    tf
 )
 
 ###########
@@ -44,38 +53,42 @@ catkin_package(
     nodelet
 )
 
-add_executable(aist_localization
+add_executable(
+  ${PROJECT_NAME}
   src/main.cpp
   src/Localization.cpp
 )
 
-add_dependencies(aist_localization
+add_dependencies(
+  ${PROJECT_NAME}
   ${${PREOJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
 
-target_link_libraries(aist_localization
-  ${catkin_LIBRARIES}
-  ${roscpp_LIBRARIES}
-  ${Boost_LIBRARIES}
+target_link_libraries(
+  ${PROJECT_NAME}
   ${PHOLOCALIZATION_LIBRARIES}
+  ${roscpp_LIBRARIES}
+  ${catkin_LIBRARIES}
 )
 
-add_library(aist_localization_nodelet
+add_library(
+  ${PROJECT_NAME}_nodelet
   src/nodelet.cpp
   src/Localization.cpp
 )
 
-add_dependencies(aist_localization_nodelet
+add_dependencies(
+  ${PROJECT_NAME}_nodelet
   ${${PREOJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
 
-target_link_libraries(aist_localization_nodelet
-  ${catkin_LIBRARIES}
-  ${roscpp_LIBRARIES}
-  ${Boost_LIBRARIES}
+target_link_libraries(
+  ${PROJECT_NAME}_nodelet
   ${PHOLOCALIZATION_LIBRARIES}
+  ${roscpp_LIBRARIES}
+  ${catkin_LIBRARIES}
 )
 
 #############
@@ -83,8 +96,8 @@ target_link_libraries(aist_localization_nodelet
 #############
 install(
   TARGETS
-    aist_localization aist_localization_nodelet
-  ARCHIVE
+    ${PROJECT_NAME} ${PROJECT_NAME}_nodelet
+ ARCHIVE
     DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY
     DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

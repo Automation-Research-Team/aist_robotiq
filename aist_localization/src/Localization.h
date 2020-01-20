@@ -58,7 +58,6 @@ class Localization
     bool					_scene_is_valid;
     
     const ros::ServiceServer			_load_scene_srv;
-    
     server_t					_localize_srv;
 };
 
