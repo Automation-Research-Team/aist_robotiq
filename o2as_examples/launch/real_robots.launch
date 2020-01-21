@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-
-  <include file="$(find o2as_examples)/launch/connect_real_robots.launch"/>
-</launch>
