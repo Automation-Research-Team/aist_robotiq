@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>o2as_easy_handeye</name>
+  <name>aist_handeye_calibration</name>
   <version>1.0.0</version>
-  <description>The o2as_easy_handeye package</description>
+  <description>The aist_handeye_calibration package</description>
 
   <maintainer email="t.ueshiba@aist.go.jp">Toshio UESHIBA</maintainer>
   <license>BSD</license>

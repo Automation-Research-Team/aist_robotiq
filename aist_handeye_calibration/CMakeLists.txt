@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(o2as_easy_handeye)
+project(aist_handeye_calibration)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++14)
@@ -27,7 +27,7 @@ find_package(catkin REQUIRED COMPONENTS
 #catkin_python_setup()
 
 generate_dynamic_reconfigure_options(
-  cfg/o2as_easy_handeye.cfg
+  cfg/aist_handeye_calibration.cfg
 )
 
 ## System dependencies are found with CMake's conventions

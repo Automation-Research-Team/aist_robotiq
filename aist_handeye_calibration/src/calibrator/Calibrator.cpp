@@ -14,7 +14,7 @@
 
 #define DEBUG
 
-namespace o2as_easy_handeye
+namespace aist_handeye_calibration
 {
 /************************************************************************
 *  class Calibrator							*
@@ -316,4 +316,4 @@ Calibrator::reset(std_srvs::Empty::Request&, std_srvs::Empty::Response&)
     return true;
 }
 
-}	// namespace o2as_easy_handeye
+}	// namespace aist_handeye_calibration

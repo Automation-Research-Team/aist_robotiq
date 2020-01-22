@@ -9,7 +9,7 @@
   <arg name="corner_refinement"	default="LINES"/>
 
   <include if="$(eval 'phoxi' in camera_name)"
-	   file="$(find o2as_aruco_ros)/launch/run.launch"
+	   file="$(find aist_aruco_ros)/launch/run.launch"
 	   ns="$(arg camera_name)">
     <arg name="marker_id"		value="$(arg marker_id)"/>
     <arg name="marker_size"		value="$(arg marker_size)"/>
@@ -29,7 +29,7 @@
   </include>
 
   <include if="$(eval '_bot_camera' in camera_name)"
-	   file="$(find o2as_aruco_ros)/launch/run.launch"
+	   file="$(find aist_aruco_ros)/launch/run.launch"
 	   ns="$(arg camera_name)">
     <arg name="marker_id"		value="$(arg marker_id)"/>
     <arg name="marker_size"		value="$(arg marker_size)"/>
@@ -49,7 +49,7 @@
   </include>
 
   <include if="$(eval camera_name == 'head_camera')"
-	   file="$(find o2as_aruco_ros)/launch/run.launch"
+	   file="$(find aist_aruco_ros)/launch/run.launch"
 	   ns="$(arg camera_name)">
     <arg name="marker_id"		value="$(arg marker_id)"/>
     <arg name="marker_size"		value="$(arg marker_size)"/>

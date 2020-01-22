@@ -37,7 +37,7 @@
     <arg name="scene"		value="$(arg scene)"/>
     <arg name="sim"		value="$(arg sim)"/>
     <arg name="rviz_config"
-    	 value="$(find o2as_easy_handeye)/launch/o2as_easy_handeye.rviz"/>
+    	 value="$(find aist_handeye_calibration)/launch/handeye_calibration.rviz"/>
   </include>
 
   <!-- Dummy calibration to have a fully connected TF tree and
@@ -66,6 +66,7 @@
   </group>
 
   <!-- Start easy_handeye calibrator -->
-  <node name="handeye_calibrator" pkg="o2as_easy_handeye" type="calibrator"
+  <node name="handeye_calibrator"
+	pkg="aist_handeye_calibration" type="calibrator"
   	ns="$(arg namespace)" output="screen"/>
 </launch>
