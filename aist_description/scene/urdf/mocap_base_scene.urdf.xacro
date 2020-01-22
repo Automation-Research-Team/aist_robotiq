@@ -56,7 +56,7 @@
   </xacro:robotiq_85_gripper_with_tip_link>
 
   <!-- Add PhoXi 3D scanner -->
-  <xacro:include filename="$(find o2as_phoxi_camera)/urdf/phoxi_m_camera.urdf.xacro"/>
+  <xacro:include filename="$(find aist_phoxi_camera)/urdf/phoxi_m_camera.urdf.xacro"/>
   <xacro:phoxi_m_camera prefix="b_" parent="ground">
     <origin xyz="0.547941636523
 		 -0.00827443204237
