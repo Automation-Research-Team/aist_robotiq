@@ -10,10 +10,10 @@
 #include <tf/transform_listener.h>
 #include <std_srvs/Empty.h>
 #include <std_srvs/Trigger.h>
-#include <o2as_easy_handeye/GetSampleList.h>
-#include <o2as_easy_handeye/ComputeCalibration.h>
+#include <aist_handeye_calibration/GetSampleList.h>
+#include <aist_handeye_calibration/ComputeCalibration.h>
 
-namespace o2as_easy_handeye
+namespace aist_handeye_calibration
 {
 /************************************************************************
 *  class Calibrator							*
@@ -67,5 +67,5 @@ class Calibrator
     bool			_eye_on_hand;
     double			_timeout;
 };
-}	// namespace visp_hnad2eye_calibration
+}	// namespace aist_hnadeye_calibration
 #endif	// !CALIBRATOR_H

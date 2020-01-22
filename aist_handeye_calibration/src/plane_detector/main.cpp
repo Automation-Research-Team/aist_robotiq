@@ -8,7 +8,7 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <dynamic_reconfigure/server.h>
 
-#include <o2as_easy_handeye/o2as_easy_handeyeConfig.h>
+#include <aist_handeye_calibration/aist_handeye_calibrationConfig.h>
 
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
@@ -18,7 +18,7 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/filters/extract_indices.h>
 
-namespace o2as_easy_handeye
+namespace aist_handeye_calibration
 {
 /************************************************************************
 *  static functions							*
@@ -31,7 +31,7 @@ signed_distance(const POINT& point, const PLANE& plane)
     return (plane[0]*point.x + plane[1]*point.y + plane[2]*point.z + plane[3])
 	 / norm;
 }
-    
+
 /************************************************************************
 *  class RainbowColormap						*
 ************************************************************************/
@@ -39,7 +39,7 @@ template <class T> class RainbowColormap
 {
   public:
     RainbowColormap(T min, T max)	;
-    
+
     auto	operator ()(T val) const
 		{
 		    auto idx = uint32_t((_colors.size() - 1)*(val - _min) /
@@ -50,13 +50,13 @@ template <class T> class RainbowColormap
 			idx = _colors.size() - 1;
 		    return _colors[idx];
 		}
-    
+
   private:
     static auto	color(uint32_t r, uint32_t g, uint32_t b)
 		{
 		    return (r << 16) | (g << 8) | b;
 		}
-    
+
   private:
     const T			_min, _range;
     std::array<uint32_t, 255*4>	_colors;
@@ -75,7 +75,7 @@ RainbowColormap<T>::RainbowColormap(T min, T max)
     for (size_t i = 0; i < 255; ++i)
 	_colors[765 + i] = color(255, 255-i, 0);
 }
-    
+
 /************************************************************************
 *  class PlaneDetector							*
 ************************************************************************/
@@ -84,28 +84,28 @@ class PlaneDetector
   private:
     using	cloud_t = sensor_msgs::PointCloud2;
     using	cloud_p	= sensor_msgs::PointCloud2ConstPtr;
-    
+
   public:
     PlaneDetector();
 
   private:
     void	cloud_callback(const cloud_p& cloud_msg)		;
-    void	reconf_callback(o2as_easy_handeyeConfig& config,
+    void	reconf_callback(aist_handeye_calibrationConfig& config,
 				uint32_t level)				;
-    
+
   private:
     ros::NodeHandle		_nh;
 
     const ros::Subscriber	_cloud_sub;
     const ros::Publisher	_cloud_pub;
-    const ros::Publisher	_transform_pub; 
+    const ros::Publisher	_transform_pub;
 
-    dynamic_reconfigure::Server<o2as_easy_handeyeConfig>
+    dynamic_reconfigure::Server<aist_handeye_calibrationConfig>
 				_reconf_server;
 
     float			_planarity_tolerance;
 };
-    
+
 PlaneDetector::PlaneDetector()
     :_nh("~"),
      _cloud_sub(_nh.subscribe("/pointcloud", 1,
@@ -126,7 +126,7 @@ PlaneDetector::cloud_callback(const cloud_p& cloud_msg)
 {
     using pcl_point_t	= pcl::PointXYZRGB;
     using pcl_cloud_t	= pcl::PointCloud<pcl_point_t>;
-    
+
     pcl_cloud_t::Ptr		cloud(new pcl_cloud_t);
     pcl::fromROSMsg(*cloud_msg, *cloud);
 
@@ -170,22 +170,23 @@ PlaneDetector::cloud_callback(const cloud_p& cloud_msg)
 }
 
 void
-PlaneDetector::reconf_callback(o2as_easy_handeyeConfig& config, uint32_t level)
+PlaneDetector::reconf_callback(aist_handeye_calibrationConfig& config,
+			       uint32_t level)
 {
     if (level & (1 << 0))
 	_planarity_tolerance = config.planarity_tolerance;
 }
-    
-}	// namespace o2as_easy_handeye
+
+}	// namespace aist_handeye_calibration
 
 int
 main(int argc, char** argv)
 {
-    ros::init(argc, argv, "o2as_plane_detector");
+    ros::init(argc, argv, "aist_plane_detector");
 
     try
     {
-	o2as_easy_handeye::PlaneDetector	node;
+	aist_handeye_calibration::PlaneDetector	node;
 	ros::spin();
     }
     catch (const std::exception& err)
@@ -197,6 +198,6 @@ main(int argc, char** argv)
     {
 	ROS_ERROR_STREAM("Unknown error.");
     }
-    
+
     return 0;
 }

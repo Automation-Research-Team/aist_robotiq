@@ -11,7 +11,6 @@ from tf import TransformListener, transformations as tfs
 
 import moveit_commander
 
-from o2as_routines.base import O2ASBaseRoutines
 from aist_routines.base import AISTBaseRoutines
 
 ######################################################################

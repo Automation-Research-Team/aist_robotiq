@@ -3,14 +3,14 @@
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
 
   <include if="$(eval camera_name == 'a_phoxi_m_camera')"
-	   file="$(find o2as_phoxi_camera)/launch/o2as_phoxi_camera.launch">
+	   file="$(find aist_phoxi_camera)/launch/run.launch">
     <arg name="camera_name"	value="$(arg camera_name)"/>
     <arg name="id"		value="2018-09-016-LC3"/>
     <arg name="frame"		value="$(arg camera_name)_from_b_bot"/>
   </include>
 
   <include if="$(eval camera_name == 'b_phoxi_m_camera')"
-	   file="$(find o2as_phoxi_camera)/launch/o2as_phoxi_camera.launch">
+	   file="$(find aist_phoxi_camera)/launch/run.launch">
     <arg name="camera_name"	value="$(arg camera_name)"/>
     <arg name="id"		value='"1711015"'/>
     <arg name="frame"		value="$(arg camera_name)_from_b_bot"/>

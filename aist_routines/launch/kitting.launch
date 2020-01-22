@@ -6,7 +6,7 @@
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
 
   <!-- Load and publish hand-eye calibration -->
-  <include file="$(find o2as_easy_handeye)/launch/publish.launch">
+  <include file="$(find aist_handeye_calibration)/launch/publish.launch">
     <arg name="robot_name"	value="$(arg robot_name)" />
     <arg name="camera_name"	value="$(arg camera_name)" />
   </include>

@@ -9,7 +9,7 @@ from std_srvs.srv  import Empty, Trigger
 from geometry_msgs import msg as gmsg
 from tf import TransformListener, transformations as tfs
 
-from o2as_easy_handeye.srv import GetSampleList, ComputeCalibration
+from aist_handeye_calibration.srv import GetSampleList, ComputeCalibration
 from aist_routines.base import AISTBaseRoutines
 
 import moveit_commander

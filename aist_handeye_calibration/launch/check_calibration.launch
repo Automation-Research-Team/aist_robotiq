@@ -11,7 +11,7 @@
   <arg name="eye_on_hand"
        value="$(eval arg('camera_name') == arg('robot_name') + '_camera')"/>
 
-  <include file="$(find o2as_easy_handeye)/launch/publish.launch">
+  <include file="$(find aist_handeye_calibration)/launch/publish.launch">
     <arg name="robot_name"	value="$(arg robot_name)" />
     <arg name="camera_name"	value="$(arg camera_name)" />
   </include>
@@ -29,6 +29,6 @@
     <arg name="scene"	value="$(arg scene)"/>
     <arg name="sim"	value="$(arg sim)"/>
     <arg name="rviz_config"
-    	 value="$(find o2as_easy_handeye)/launch/check_calibration.rviz"/>
+    	 value="$(find aist_handeye_calibration)/launch/check_calibration.rviz"/>
   </include>
 </launch>
