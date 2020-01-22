@@ -89,7 +89,7 @@
   </xacro:single_suction_gripper>
 
   <!-- Add PhoXi 3D scanner -->
-  <xacro:include filename="$(find o2as_phoxi_camera)/urdf/phoxi_m_camera.urdf.xacro"/>
+  <xacro:include filename="$(find aist_phoxi_camera)/urdf/phoxi_m_camera.urdf.xacro"/>
   <xacro:phoxi_m_camera prefix="a_" parent="ground">
     <origin xyz="0.480002181393
 		 -0.0102469021884
