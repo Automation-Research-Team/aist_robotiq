@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
 <launch>
-  <arg name="camera_id"		default="InstalledExamples-basic-example"/>
+  <arg name="camera_id"		default="2018-09-016-LC3"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
   <arg name="camera_frame"	default="$(arg camera_name)_from_b_bot"/>
 
-  <include file="$(find o2as_phoxi_camera)/launch/o2as_phoxi_camera.launch">
+  <include file="$(find aist_phoxi_camera)/launch/run.launch">
     <arg name="id"			value="$(arg camera_id)"/>
     <arg name="camera_name"		value="$(arg camera_name)"/>
     <arg name="frame"			value="$(arg camera_frame)"/>
