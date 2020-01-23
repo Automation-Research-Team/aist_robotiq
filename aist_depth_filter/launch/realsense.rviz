@@ -85,7 +85,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: a_bot_camera_color_optical_frame
+    Fixed Frame: a_bot_camera_aligned_depth_to_color_frame
     Frame Rate: 30
   Name: root
   Tools:
@@ -106,25 +106,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.957187295
+      Distance: 0.532420397
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.0779774636
-        Y: 0.0024034977
-        Z: 0.623081446
+        X: 0.118338391
+        Y: -0.199547768
+        Z: -0.0202186741
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: -1.50479639
+      Pitch: -0.179797441
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.71830273
+      Yaw: 3.30829334
     Saved: ~
 Window Geometry:
   Displays:
@@ -144,5 +144,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1138
-  X: 130
-  Y: 122
+  X: 1348
+  Y: 169
