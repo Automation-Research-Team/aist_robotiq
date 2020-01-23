@@ -16,8 +16,10 @@
 
   <depend>roscpp</depend>
   <depend>ddynamic_reconfigure</depend>
-  <depend>actionlib</depend>
-  <depend>actionlib_msgs</depend>
+  <build_depend>actionlib_msgs</build_depend>
+  <exec_depend>actionlib_msgs</exec_depend>
+  <build_depend>actionlib</build_depend>
+  <exec_depend>actionlib</exec_depend>
   <depend>geometry_msgs</depend>
 
   <export>

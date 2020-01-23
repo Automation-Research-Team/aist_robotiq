@@ -32,7 +32,11 @@ generate_dynamic_reconfigure_options(
 
 ## System dependencies are found with CMake's conventions
 
-add_service_files(DIRECTORY srv)
+add_service_files(
+  FILES
+    GetSampleList.srv
+    ComputeCalibration.srv
+)
 
 generate_messages(
   DEPENDENCIES
