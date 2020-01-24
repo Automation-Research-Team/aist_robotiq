@@ -35,11 +35,11 @@ catkin_package(
     geometry_msgs
 )
 
-add_executable(aist_tool_calibration
+add_executable(${PROJECT_NAME}
   src/main.cpp
 )
 
-target_link_libraries(aist_tool_calibration
+target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
   ${TUTOOLSPP_LIB}
@@ -56,7 +56,7 @@ add_dependencies(aist_tool_calibration
 #############
 install(
   TARGETS
-    aist_tool_calibration
+    ${PROJECT_NAME}
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

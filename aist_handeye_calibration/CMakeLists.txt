@@ -9,28 +9,25 @@ find_package(Eigen3 REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(YAML-CPP yaml-cpp REQUIRED)
 
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  image_proc
-  image_transport
-  std_srvs
-  std_msgs
-  sensor_msgs
-  geometry_msgs
-  message_generation
-  tf
-  dynamic_reconfigure
-  pcl_ros
-  pcl_conversions
+find_package(catkin REQUIRED
+  COMPONENTS
+    roscpp
+    image_proc
+    image_transport
+    std_srvs
+    std_msgs
+    sensor_msgs
+    geometry_msgs
+    message_generation
+    tf
+    dynamic_reconfigure
+    pcl_ros
+    pcl_conversions
 )
-
-#catkin_python_setup()
 
 generate_dynamic_reconfigure_options(
   cfg/aist_handeye_calibration.cfg
 )
-
-## System dependencies are found with CMake's conventions
 
 add_service_files(
   FILES
@@ -40,10 +37,19 @@ add_service_files(
 
 generate_messages(
   DEPENDENCIES
+    std_msgs
     geometry_msgs
 )
 
-catkin_package()
+catkin_package(
+  CATKIN_DEPENDS
+    roscpp
+    message_runtime
+    std_msgs
+    geometry_msgs
+)
+
+## System dependencies are found with CMake's conventions
 
 ###########
 ## Build ##
@@ -56,6 +62,10 @@ include_directories(
 add_executable(calibrator
   src/calibrator/main.cpp
   src/calibrator/Calibrator.cpp
+)
+
+add_dependencies(calibrator
+  ${PROJECT_NAME}_gencpp
 )
 
 target_link_libraries(calibrator
@@ -77,28 +87,28 @@ add_executable(calibrator_test
   src/calibrator_test/main.cpp
 )
 
+add_dependencies(calibrator_test
+  ${PROJECT_NAME}_gencpp
+)
+
 target_link_libraries(calibrator_test
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
-)
-
-add_dependencies(calibrator_test
-  ${PROJECT_NAME}_gencpp
 )
 
 add_executable(plane_detector
   src/plane_detector/main.cpp
 )
 
+add_dependencies(plane_detector
+  ${PROJECT_NAME}_gencpp
+  ${PROJECT_NAME}_gencfg
+)
+
 target_link_libraries(plane_detector
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
   ${pcl_LIBRARIES}
-)
-
-add_dependencies(plane_detector
-  ${PROJECT_NAME}_gencpp
-  ${PROJECT_NAME}_gencfg
 )
 
 #############
