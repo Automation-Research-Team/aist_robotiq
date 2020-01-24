@@ -120,28 +120,6 @@ inverse(const DualNumber<T>& x)
     const auto	r = inverse(x.primary());
     return {r, -r * x.dual() * r};
 }
-    
-template <class T> inline DualNumber<T>
-operator *(const DualNumber<T>& x, const T& c)
-{
-    auto	y = x;
-    y *= c;
-    return y;
-}
-    
-template <class T> inline DualNumber<T>
-operator *(const T& c, const DualNumber<T>& x)
-{
-    return x * c;
-}
-    
-template <class T> inline DualNumber<T>
-operator /(const DualNumber<T>& x, const T& c)
-{
-    auto	y = x;
-    y /= c;
-    return y;
-}
 
 template <class T> inline std::ostream&
 operator <<(std::ostream& out, const DualNumber<T>& x)

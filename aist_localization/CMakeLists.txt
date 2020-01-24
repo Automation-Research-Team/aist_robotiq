@@ -14,14 +14,15 @@ find_package(
 
 find_package(
   catkin REQUIRED
-  roscpp
-  roslib
-  genmsg
-  actionlib_msgs
-  actionlib
-  geometry_msgs
-  std_msgs
-  tf
+  COMPONENTS
+    roscpp
+    roslib
+    genmsg
+    actionlib_msgs
+    actionlib
+    geometry_msgs
+    std_msgs
+    tf
 )
 
 ###########
@@ -33,8 +34,6 @@ include_directories(
 )
 
 add_action_files(
-  DIRECTORY
-    action
   FILES
     Localize.action
 )
@@ -63,6 +62,7 @@ add_executable(
 
 add_dependencies(
   ${PROJECT_NAME}
+  ${PROJECT_NAME}_gencpp
   ${${PREOJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
@@ -82,6 +82,7 @@ add_library(
 
 add_dependencies(
   ${PROJECT_NAME}_nodelet
+  ${PROJECT_NAME}_gencpp
   ${${PREOJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )

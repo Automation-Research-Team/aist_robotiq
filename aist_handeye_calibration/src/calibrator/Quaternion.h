@@ -12,19 +12,8 @@
 namespace TU
 {
 /************************************************************************
-*  globsl functions							*
+*  global functions							*
 ************************************************************************/
-template <class T, int M, int N> Eigen::Matrix<T, M, N>
-operator %(const Eigen::Matrix<T, M, 1>& x, const Eigen::Matrix<T, N, 1>& y)
-{
-    Eigen::Matrix<T, M, N>	m;
-    for (size_t i = 0; i < m.rows(); ++i)
-	for (size_t j = 0; j < m.cols(); ++j)
-	    m(i, j) = x(i) * y(j);
-
-    return m;
-}
-
 template <class T> Eigen::Array<T, 1, 3>
 rotation_angles(const Eigen::Matrix<T, 3, 3>& R)
 {
@@ -163,7 +152,7 @@ class Quaternion : boost::field_operators<Quaternion<T> >
     rotation_type	R() const
 			{
 			    vector_type		q = 2 * _v;
-			    rotation_type	Q = q % _v;
+			    rotation_type	Q = q * _v.transpose();
 			    const auto		c = _s * _s - _v.squaredNorm();
 			    Q(0, 0) += c;
 			    Q(1, 1) += c;
