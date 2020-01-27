@@ -36,14 +36,14 @@
   <param name="robot/serial"	value="ABCDEFGHIJKLMNOPQRSTUVWX"/>
   <param name="robot/version"	value="0.0.1"/>
 
-  <!-- Load robot urdf to param "robot_description". -->
+  <!-- Load fetch urdf to param "fetch_description". -->
   <!-- Put a robot in gazebo, make it look pretty -->
-  <param name="robot_description"
+  <param name="fetch_description"
   	 command="$(find xacro)/xacro --inorder '$(find
   		  fetch_gazebo)/robots/fetch.gazebo.xacro'"/>
   <node name="robot_spawner" pkg="gazebo_ros" type="spawn_model"
   	respawn="false" output="screen"
-        args="-urdf -param robot_description -model robot -unpause
+        args="-urdf -param fetch_description -model robot -unpause
   	      -x $(arg xr) -y $(arg yr) -z $(arg z)"/>
   <node name="prepare_robot"
   	pkg="fetch_gazebo" type="prepare_simulated_robot.py"/>
@@ -57,6 +57,10 @@
   	respawn="false" output="screen"
         args="-urdf -param environment_description -model environment -unpause
   	      -x $(arg x) -y $(arg y) -z $(arg z)"/>
+
+  <param name="robot_description"
+  	 command="$(find xacro)/xacro --inorder '$(find
+  		  aist_description)/scene/urdf/$(arg scene).urdf.xacro'"/>
 
   <!-- Head Camera Pipeline -->
   <include file="$(find fetch_gazebo)/launch/include/head_camera.launch.xml"/>
