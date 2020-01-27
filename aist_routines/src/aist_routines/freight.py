@@ -20,7 +20,7 @@ class FreightRoutines(AISTBaseRoutines):
 
         self._move_base = actionlib.SimpleActionClient("move_base",
                                                        MoveBaseAction)
-        if self._move_base.wait_for_server(rospy.Duration(60)):
+        if self._move_base.wait_for_server(rospy.Duration(20)):
             rospy.loginfo("Connected to move_base.")
         else:
             rospy.logerr("FreightRoutines::__init()__: failed to connect /move_base action server")
