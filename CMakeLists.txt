@@ -69,9 +69,9 @@ add_dependencies(
 
 target_link_libraries(
   ${PROJECT_NAME}
-  ${PHOLOCALIZATION_LIBRARIES}
   ${roscpp_LIBRARIES}
   ${catkin_LIBRARIES}
+  ${PHOLOCALIZATION_LIBRARIES}
 )
 
 add_library(
@@ -89,9 +89,9 @@ add_dependencies(
 
 target_link_libraries(
   ${PROJECT_NAME}_nodelet
-  ${PHOLOCALIZATION_LIBRARIES}
   ${roscpp_LIBRARIES}
   ${catkin_LIBRARIES}
+  ${PHOLOCALIZATION_LIBRARIES}
 )
 
 #############
