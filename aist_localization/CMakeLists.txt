@@ -33,10 +33,7 @@ include_directories(
   ${PHOLOCALIZATION_INCLUDE_DIRS}
 )
 
-add_action_files(
-  FILES
-    Localize.action
-)
+add_action_files(DIRECTORY action)
 
 generate_messages(
   DEPENDENCIES

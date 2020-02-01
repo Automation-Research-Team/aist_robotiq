@@ -43,7 +43,7 @@
   		  fetch_gazebo)/robots/fetch.gazebo.xacro'"/>
   <node name="robot_spawner" pkg="gazebo_ros" type="spawn_model"
   	respawn="false" output="screen"
-        args="-urdf -param fetch_description -model robot -unpause
+        args="-urdf -param fetch_description -model fetch -unpause
   	      -x $(arg xr) -y $(arg yr) -z $(arg z)"/>
   <node name="prepare_robot"
   	pkg="fetch_gazebo" type="prepare_simulated_robot.py"/>
