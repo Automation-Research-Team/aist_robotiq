@@ -2,9 +2,10 @@
 
 import os, sys, rospy, rospkg, argparse, re
 import actionlib
-from std_srvs.srv      import Trigger
-from aist_localization import msg as lmsg
-from operator          import itemgetter
+from std_srvs.srv       import Trigger
+from aist_localization  import msg as lmsg
+from aist_model_spawner import msg as mmsg
+from operator           import itemgetter
 
 #########################################################################
 #  class ModelSpawner                                                   #
@@ -13,6 +14,16 @@ class ModelSpawner(object):
     def __init__(self):
         super(ModelSpawner, self).__init__()
 
+        self._add        = rospy.ServiceProxy("model_spawner/add", mmsg.Add)
+        self._delete     = rospy.ServiceProxy("model_spawner/add", mmsg.Delete)
+        self._delete_all = rospy.ServiceProxy("model_spawner/add",
+                                              mmsg.DeleteAll)
+
+    def add(self, name, pose):
+        msg = mmsg.AddMsg()
+        msg.name = name
+        msg.pose = pose
+        return self._add(msg).success
 
 #########################################################################
 #  class LocalizationClient                                             #
