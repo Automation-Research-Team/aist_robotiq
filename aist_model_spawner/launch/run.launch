@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<launch>
+
+  <arg name="urdf_dir"
+       default="$(find o2as_parts_description)/urdf/generated"/>
+  <arg name="param_name"	default="parts_description"/>
+
+  <node name="model_spawner" pkg="aist_model_spawner" type="model_spawner.py"
+	output="screen">
+    <param name="urdf_dir"	value="$(arg urdf_dir)"/>
+    <param name="param_name"	value="$(arg param_name)"/>
+  </node>
+
+</launch>
