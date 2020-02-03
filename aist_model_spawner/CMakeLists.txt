@@ -7,9 +7,20 @@ find_package(catkin REQUIRED
     geometry_msgs
     rospy
     tf
+    rviz
 )
 
+set(CMAKE_AUTOMOC ON)
+find_package(Qt5 ${rviz_QT_VERSION} EXACT REQUIRED
+  Core
+  Widgets
+)
+set(QT_LIBRARIES Qt5::Widgets)
+add_definitions(-DQT_NO_KEYWORDS)
+
 catkin_python_setup()
+
+include_directories(${rviz_INCLUDE_DIRS})
 
 add_service_files(DIRECTORY srv)
 
@@ -23,4 +34,13 @@ catkin_package(
     message_runtime
     geometry_msgs
     rospy
+)
+
+add_library(${PROJECT_NAME}
+  src/transient_model_display.cpp
+)
+
+target_link_libraries(${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ${QT_LIBRARIES}
 )

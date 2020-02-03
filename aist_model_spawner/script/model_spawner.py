@@ -6,17 +6,18 @@ import xacro
 import xml.dom.minidom
 from tf                 import transformations as tfs
 from aist_model_spawner import srv as msrv
+from std_msgs           import msg as smsg
 
 #########################################################################
 #  class ModelSapwnerServer                                             #
 #########################################################################
 class ModelSpawnerServer(object):
 
-    _BeginRobot = "<robot name=\"{0}\" xmlns:xacro=\"http://www.ros.org/wiki/xacro\">\n  <link name=\"world\"/>"
+    _BeginRobot = "<robot name=\"model_description\" xmlns:xacro=\"http://www.ros.org/wiki/xacro\">\n  <link name=\"world\"/>"
     _Macro      = "  <xacro:include filename=\"{1}\"/>\n  <xacro:{0} prefix=\"{2}\" parent=\"{3}\" spawn_attached=\"true\">\n    <origin xyz=\"{4} {5} {6}\" rpy=\"{7} {8} {9}\"/>\n  </xacro:{0}>\n"
     _EndRobot   = "</robot>"
 
-    def __init__(self, urdf_dir, param_name):
+    def __init__(self, urdf_dir):
         super(ModelSpawnerServer, self).__init__()
 
         self._add_srv        = rospy.Service("~add", msrv.Add, self._add_cb)
@@ -27,10 +28,11 @@ class ModelSpawnerServer(object):
         self._get_list_srv   = rospy.Service("~get_list", msrv.GetList,
                                              self._get_list_cb)
         self._urdf_dir       = urdf_dir
-        self._param_name     = param_name
         self._macros         = {}
         self._robot          = None
         self._broadcaster    = tf.TransformBroadcaster()
+        self._publisher      = rospy.Publisher("~model_description",
+                                               smsg.String, queue_size=10)
         self._update_robot()
 
     def tick(self):
@@ -103,8 +105,7 @@ class ModelSpawnerServer(object):
     def _update_robot(self):
         try:
             desc = self._create_description()
-            rospy.set_param(self._param_name, desc)
-            # print(desc)
+            self._publisher.publish(desc)
             self._robot = xml.dom.minidom.parseString(desc).childNodes[0]
             return True
         except Exception as e:
@@ -113,7 +114,7 @@ class ModelSpawnerServer(object):
 
     def _create_description(self):
         # Create Model description in Xacro format.
-        xacro_desc = ModelSpawnerServer._BeginRobot.format(self._param_name)
+        xacro_desc = ModelSpawnerServer._BeginRobot
         for macro in self._macros.values():
             xacro_desc += macro
         xacro_desc += ModelSpawnerServer._EndRobot
@@ -135,9 +136,8 @@ if __name__ == '__main__':
                      "urdf_dir",
                      os.path.join(rospack.get_path("o2as_parts_description"),
                                   "urdf/generated"))
-    param_name = rospy.get_param("param_name", "parts_description")
 
-    spawner = ModelSpawnerServer(urdf_dir, param_name)
+    spawner = ModelSpawnerServer(urdf_dir)
     rate    = rospy.Rate(1)
     while not rospy.is_shutdown():
         spawner.tick()
