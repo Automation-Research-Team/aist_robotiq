@@ -3,7 +3,6 @@
 
   <arg name="camera_frame"	default="world"/>
   <arg name="plcf_dir"		default="$(find aist_localization)/plcf"/>
-  <arg name="param_name"	default="parts_description"/>
   <arg name="urdf_dir"
        default="$(find o2as_parts_description)/urdf/generated"/>
 
@@ -12,20 +11,8 @@
     <arg name="plcf_dir"	value="$(arg plcf_dir)"/>
   </include>
 
-  <include file="$(find aist_model_spawner)/launch/run.launch">
-    <arg name="param_name"	value="$(arg param_name)"/>
+  <include file="$(find aist_model_spawner)/launch/test.launch">
     <arg name="urdf_dir"	value="$(arg urdf_dir)"/>
   </include>
-
-  <param name="robot_description"
-	 command="$(find xacro)/xacro --inorder '$(find
-		  aist_localization)/launch/empty_world.urdf'"/>
-
-  <arg name="command_args"
-       value="-d $(find aist_localization)/launch/test.rviz"/>
-  <node name="$(anon rviz)" pkg="rviz" type="rviz"
-	respawn="false" args="$(arg command_args)"
-	output="screen">
-  </node>
 
 </launch>

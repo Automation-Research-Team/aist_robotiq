@@ -39,13 +39,16 @@
 #include "rviz/properties/float_property.h"
 #include "rviz/properties/property.h"
 #include "rviz/properties/string_property.h"
+#include "rviz/properties/ros_topic_property.h"
 
 #include "transient_model_display.h"
 
 namespace rviz
 {
-
-void
+/************************************************************************
+*  static callback function						*
+************************************************************************/
+static void
 linkUpdaterStatusFunction(StatusProperty::Level level,
 			  const std::string& link_name,
 			  const std::string& text,
@@ -55,6 +58,9 @@ linkUpdaterStatusFunction(StatusProperty::Level level,
 		       QString::fromStdString(text));
 }
 
+/************************************************************************
+*  class TransientModelDisplay						*
+************************************************************************/
 TransientModelDisplay::TransientModelDisplay()
     :Display(),
      has_new_transforms_(false),
@@ -84,10 +90,13 @@ TransientModelDisplay::TransientModelDisplay()
     alpha_property_->setMin(0.0);
     alpha_property_->setMax(1.0);
 
-    robot_description_property_ = new StringProperty(
-	"Robot Description", "robot_description",
-	"Name of the parameter to search for to load the robot description.",
-	this, SLOT(updateRobotDescription()));
+    model_description_topic_property_ = new RosTopicProperty(
+	"Model Description Topic", "model_description",
+	QString::fromStdString(
+	    ros::message_traits
+	       ::datatype<aist_model_spawner::ModelDescription>()),
+	"aist_model_spawner::ModelDescription topic to subscribe to.",
+	this, SLOT(updateTopic()));
 
     tf_prefix_property_ = new StringProperty(
 	"TF Prefix", "",
@@ -100,10 +109,14 @@ TransientModelDisplay::~TransientModelDisplay()
 {
     if (initialized())
     {
+	unsubscribe();
 	delete robot_;
     }
 }
 
+/*
+ *  Overrides from Display
+ */
 void
 TransientModelDisplay::onInitialize()
 {
@@ -113,113 +126,6 @@ TransientModelDisplay::onInitialize()
     updateVisualVisible();
     updateCollisionVisible();
     updateAlpha();
-}
-
-void
-TransientModelDisplay::updateAlpha()
-{
-    robot_->setAlpha(alpha_property_->getFloat());
-    context_->queueRender();
-}
-
-void
-TransientModelDisplay::updateRobotDescription()
-{
-    if(isEnabled())
-	load();
-}
-
-void
-TransientModelDisplay::updateVisualVisible()
-{
-    robot_->setVisualVisible(visual_enabled_property_->getValue().toBool());
-    context_->queueRender();
-}
-
-void
-TransientModelDisplay::updateCollisionVisible()
-{
-    robot_->setCollisionVisible(collision_enabled_property_->getValue().toBool());
-    context_->queueRender();
-}
-
-void
-TransientModelDisplay::updateTfPrefix()
-{
-    clearStatuses();
-    context_->queueRender();
-}
-
-void
-TransientModelDisplay::load()
-{
-    clearStatuses();
-    context_->queueRender();
-
-    std::string content;
-    if(!update_nh_.getParam(robot_description_property_->getStdString(),
-			    content))
-    {
-	std::string loc;
-	if(update_nh_.searchParam(robot_description_property_->getStdString(),
-				  loc))
-	{
-	    update_nh_.getParam(loc, content);
-	}
-	else
-	{
-	    clear();
-	    setStatus(StatusProperty::Error, "URDF",
-		       "Parameter [" + robot_description_property_->getString()
-		       + "] does not exist, and was not found by searchParam()");
-	  // try again in a second
-	    QTimer::singleShot(1000, this, SLOT(updateRobotDescription()));
-	    return;
-	}
-    }
-
-    if(content.empty())
-    {
-	clear();
-	setStatus(StatusProperty::Error, "URDF", "URDF is empty");
-	return;
-    }
-
-    if(content == robot_description_)
-    {
-	return;
-    }
-
-    robot_description_ = content;
-
-    urdf::Model descr;
-    if(!descr.initString(robot_description_))
-    {
-	clear();
-	setStatus(StatusProperty::Error, "URDF", "Failed to parse URDF model");
-	return;
-    }
-
-    setStatus(StatusProperty::Ok, "URDF", "URDF parsed OK");
-    robot_->load(descr);
-    robot_->update(TFLinkUpdater(context_->getFrameManager(),
-				 boost::bind(linkUpdaterStatusFunction,
-					     _1, _2, _3, this),
-				 tf_prefix_property_->getStdString()));
-}
-
-void
-TransientModelDisplay::onEnable()
-{
-    load();
-    robot_->setVisible(true);
-}
-
-void
-TransientModelDisplay::onDisable()
-{
-    robot_->setVisible(false);
-    clear();
 }
 
 void
@@ -249,18 +155,149 @@ TransientModelDisplay::fixedFrameChanged()
 }
 
 void
-TransientModelDisplay::clear()
-{
-    robot_->clear();
-    clearStatuses();
-    robot_description_.clear();
-}
-
-void
 TransientModelDisplay::reset()
 {
     Display::reset();
     has_new_transforms_ = true;
+}
+
+void
+TransientModelDisplay::setTopic(const QString& topic,
+				const QString& /* datatype */)
+{
+    model_description_topic_property_->setString(topic);
+}
+
+void
+TransientModelDisplay::clear()
+{
+    robot_->clear();
+    clearStatuses();
+    unsubscribe();
+}
+
+/*
+ *  Qt slots
+ */
+void
+TransientModelDisplay::updateVisualVisible()
+{
+    robot_->setVisualVisible(visual_enabled_property_->getValue().toBool());
+    context_->queueRender();
+}
+
+void
+TransientModelDisplay::updateCollisionVisible()
+{
+    robot_->setCollisionVisible(collision_enabled_property_->getValue().toBool());
+    context_->queueRender();
+}
+
+void
+TransientModelDisplay::updateTfPrefix()
+{
+    clearStatuses();
+    context_->queueRender();
+}
+
+void
+TransientModelDisplay::updateAlpha()
+{
+    robot_->setAlpha(alpha_property_->getFloat());
+    context_->queueRender();
+}
+
+void
+TransientModelDisplay::updateTopic()
+{
+    onDisable();
+    onEnable();
+}
+
+/*
+ *  Overrides from Display
+ */
+void
+TransientModelDisplay::onEnable()
+{
+    subscribe();
+    robot_->setVisible(true);
+}
+
+void
+TransientModelDisplay::onDisable()
+{
+    robot_->setVisible(false);
+    clear();
+}
+
+/*
+ *  Subscribe/unsubscribe model_description topic
+ */
+void
+TransientModelDisplay::subscribe()
+{
+    if (!isEnabled())
+	return;
+
+    std::string	model_description_topic
+	= model_description_topic_property_->getTopicStd();
+    if (!model_description_topic.empty())
+    {
+	sub_.shutdown();
+
+	try
+	{
+	    sub_ = update_nh_.subscribe(
+			model_description_topic, 10,
+			&TransientModelDisplay::incomingDescription, this);
+	    setStatus(StatusProperty::Ok, "Topic", "OK");
+	}
+	catch (ros::Exception& e)
+	{
+	    setStatus(StatusProperty::Error, "Topic",
+		      QString("Error subscribing: ") + e.what());
+	}
+    }
+}
+
+void
+TransientModelDisplay::unsubscribe()
+{
+    sub_.shutdown();
+}
+
+/*
+ *  Subscription callback
+ */
+void
+TransientModelDisplay::incomingDescription(
+    const aist_model_spawner::ModelDescription::ConstPtr& desc_msg)
+{
+    clearStatuses();
+    context_->queueRender();
+
+    if(desc_msg->desc.empty())
+    {
+	clear();
+	setStatus(StatusProperty::Error, "URDF", "URDF is empty");
+	return;
+    }
+
+    urdf::Model descr;
+    if(!descr.initString(desc_msg->desc))
+    {
+	clear();
+	setStatus(StatusProperty::Error, "URDF", "Failed to parse URDF model");
+	return;
+    }
+
+    setStatus(StatusProperty::Ok, "URDF", "URDF parsed OK");
+    robot_->load(descr);
+    robot_->update(TFLinkUpdater(context_->getFrameManager(),
+				 boost::bind(linkUpdaterStatusFunction,
+					     _1, _2, _3, this),
+				 tf_prefix_property_->getStdString()));
 }
 
 } // namespace rviz

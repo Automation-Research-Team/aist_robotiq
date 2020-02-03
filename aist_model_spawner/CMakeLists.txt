@@ -24,6 +24,8 @@ include_directories(${rviz_INCLUDE_DIRS})
 
 add_service_files(DIRECTORY srv)
 
+add_message_files(DIRECTORY msg)
+
 generate_messages(
   DEPENDENCIES
     geometry_msgs

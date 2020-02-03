@@ -36,6 +36,11 @@
 
 #include <map>
 
+#ifndef Q_MOC_RUN
+#  include <ros/ros.h>
+#  include <aist_model_spawner/ModelDescription.h>
+#endif
+
 namespace Ogre
 {
 class Entity;
@@ -54,57 +59,63 @@ class FloatProperty;
 class Property;
 class Robot;
 class StringProperty;
+class RosTopicProperty;
 
 /**
  * \class TransientModelDisplay
  * \brief Uses a robot xml description to display the pieces of a robot at the transforms broadcast by rosTF
  */
-class TransientModelDisplay: public Display
+class TransientModelDisplay : public Display
 {
     Q_OBJECT
+
   public:
-    TransientModelDisplay();
-    virtual ~TransientModelDisplay();
+			TransientModelDisplay()				;
+    virtual		~TransientModelDisplay()			;
 
   // Overrides from Display
-    virtual void onInitialize();
-    virtual void update(float wall_dt, float ros_dt);
-    virtual void fixedFrameChanged();
-    virtual void reset();
+    virtual void	onInitialize();
+    virtual void	update(float wall_dt, float ros_dt)		;
+    virtual void	fixedFrameChanged()				;
+    virtual void	reset()						;
+    virtual void	setTopic(const QString& topic,
+				 const QString& datatype)		;
 
-    void clear();
+    void		clear()						;
 
   private Q_SLOTS:
-    void updateVisualVisible();
-    void updateCollisionVisible();
-    void updateTfPrefix();
-    void updateAlpha();
-    void updateRobotDescription();
+    void		updateVisualVisible()				;
+    void		updateCollisionVisible()			;
+    void		updateTfPrefix()				;
+    void		updateAlpha()					;
+    void		updateTopic()					;
 
   protected:
-  /** @brief Loads a URDF from the ros-param named by our
-   * "Robot Description" property, iterates through the links, and
-   * loads any necessary models. */
-    virtual void load();
-
   // overrides from Display
-    virtual void onEnable();
-    virtual void onDisable();
+    virtual void	onEnable()					;
+    virtual void	onDisable()					;
 
-    Robot* robot_;                 ///< Handles actually drawing the robot
+    virtual void	subscribe()					;
+    virtual void	unsubscribe()					;
 
-    bool has_new_transforms_;      ///< Callback sets this to tell our update function it needs to update the transforms
+    void		incomingDescription(
+			    const aist_model_spawner::ModelDescription
+						    ::ConstPtr& desc_msg);
 
-    float time_since_last_transform_;
+    Robot*		robot_;                 ///< Handles actually drawing the robot
 
-    std::string robot_description_;
+    bool		has_new_transforms_;      ///< Callback sets this to tell our update function it needs to update the transforms
 
-    Property* visual_enabled_property_;
-    Property* collision_enabled_property_;
-    FloatProperty* update_rate_property_;
-    StringProperty* robot_description_property_;
-    FloatProperty* alpha_property_;
-    StringProperty* tf_prefix_property_;
+    float		time_since_last_transform_;
+
+    ros::Subscriber	sub_;
+
+    Property*		visual_enabled_property_;
+    Property*		collision_enabled_property_;
+    FloatProperty*	update_rate_property_;
+    RosTopicProperty*	model_description_topic_property_;
+    FloatProperty*	alpha_property_;
+    StringProperty*	tf_prefix_property_;
 };
 
 } // namespace rviz

@@ -6,7 +6,7 @@ import xacro
 import xml.dom.minidom
 from tf                 import transformations as tfs
 from aist_model_spawner import srv as msrv
-from std_msgs           import msg as smsg
+from aist_model_spawner import msg as mmsg
 
 #########################################################################
 #  class ModelSapwnerServer                                             #
@@ -32,7 +32,8 @@ class ModelSpawnerServer(object):
         self._robot          = None
         self._broadcaster    = tf.TransformBroadcaster()
         self._publisher      = rospy.Publisher("~model_description",
-                                               smsg.String, queue_size=10)
+                                               mmsg.ModelDescription,
+                                               queue_size=10)
         self._update_robot()
 
     def tick(self):
