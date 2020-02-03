@@ -25,6 +25,8 @@ find_package(
     tf
 )
 
+catkin_python_setup()
+
 ###########
 ## Build ##
 ###########
