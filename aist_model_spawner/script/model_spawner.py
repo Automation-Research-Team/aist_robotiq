@@ -12,11 +12,11 @@ from aist_model_spawner import srv as msrv
 #########################################################################
 class ModelSpawnerServer(object):
 
-    _BeginRobot = "<robot name=\"{0}\" xmlns:xacro=\"http://www.ros.org/wiki/xacro\">"
+    _BeginRobot = "<robot name=\"{0}\" xmlns:xacro=\"http://www.ros.org/wiki/xacro\">\n  <link name=\"world\"/>"
     _Macro      = "  <xacro:include filename=\"{1}\"/>\n  <xacro:{0} prefix=\"{2}\" parent=\"{3}\" spawn_attached=\"true\">\n    <origin xyz=\"{4} {5} {6}\" rpy=\"{7} {8} {9}\"/>\n  </xacro:{0}>\n"
     _EndRobot   = "</robot>"
 
-    def __init__(self, urdf_dir, param_name="parts_description"):
+    def __init__(self, urdf_dir, param_name):
         super(ModelSpawnerServer, self).__init__()
 
         self._add_srv        = rospy.Service("~add", msrv.Add, self._add_cb)
@@ -24,6 +24,8 @@ class ModelSpawnerServer(object):
                                              self._delete_cb)
         self._delete_all_srv = rospy.Service("~delete_all", msrv.DeleteAll,
                                              self._delete_all_cb)
+        self._get_list_srv   = rospy.Service("~get_list", msrv.GetList,
+                                             self._get_list_cb)
         self._urdf_dir       = urdf_dir
         self._param_name     = param_name
         self._macros         = {}
@@ -91,6 +93,11 @@ class ModelSpawnerServer(object):
         self._macros.clear()
         res         = msrv.DeleteAllResponse()
         res.success = self._update_robot()
+        return res
+
+    def _get_list_cb(self, req):
+        res       = msrv.GetListResponse()
+        res.names = self._macros.keys()
         return res
 
     def _update_robot(self):

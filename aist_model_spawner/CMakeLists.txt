@@ -11,14 +11,7 @@ find_package(catkin REQUIRED
 
 catkin_python_setup()
 
-add_service_files(
-  DIRECTORY
-    srv
-  FILES
-    Add.srv
-    Delete.srv
-    DeleteAll.srv
-)
+add_service_files(DIRECTORY srv)
 
 generate_messages(
   DEPENDENCIES
