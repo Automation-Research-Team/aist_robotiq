@@ -19,7 +19,8 @@ Localization::Localization(const std::string& name)
      _localization(new pho::sdk::PhoLocalization()),
      _scene(),
      _scene_is_valid(false),
-     _load_scene_srv(_nh.advertiseService("load_scene", &load_scene_cb, this)),
+     _file_path_sub(_nh.subscribe<std_msgs::String>(
+			"file_path", 1, &Localization::file_path_cb, this)),
      _localize_srv(_nh, "localize",
 		   boost::bind(&Localization::localize_cb, this, _1), false)
 {
@@ -38,33 +39,27 @@ Localization::run() const
     ros::spin();
 }
 
-bool
-Localization::load_scene_cb(std_srvs::Trigger::Request&  req,
-			    std_srvs::Trigger::Response& res)
+void
+Localization::file_path_cb(const string_cp& file_path)
 {
     try
     {
-	const auto	scene_file = scene_dir() + "/scene.ply";
+	ROS_INFO_STREAM("Loading_scene[" << file_path->data << "]..,");
 
-	ROS_INFO_STREAM("Loading_scene[" << scene_file << "]..,");
-
-	_scene = pho::sdk::SceneSource::File(scene_file);
+	_scene = pho::sdk::SceneSource::File(file_path->data);
 	_localization->SetSceneSource(_scene);
 	_scene_is_valid = true;
 
 	ROS_INFO_STREAM("  succeeded.");
+	return true;
     }
     catch (const std::exception& err)
     {
 	_scene_is_valid = false;
 
 	ROS_ERROR_STREAM("  failed: " << err.what());
+	return false;
     }
-
-    res.success = _scene_is_valid;
-    res.message = (res.success ? "succeded" : "failed");
-
-    return true;
 }
 
 void
@@ -155,16 +150,6 @@ Localization::publish_feedback(const pho::sdk::LocalizationPose& locPose,
     tf::poseTFToMsg(transform, feedback.pose.pose);
     feedback.overlap = locPose.VisibleOverlap;
     _localize_srv.publishFeedback(feedback);
-}
-
-std::string
-Localization::scene_dir()
-{
-    const auto	home = getenv("HOME");
-    if (!home)
-    	throw std::runtime_error("Environment variable[HOME] is not set.");
-
-    return home + std::string("/.ros") + ros::this_node::getNamespace();
 }
 
 }	// namespace aist_localization
