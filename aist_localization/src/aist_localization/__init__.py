@@ -1,6 +1,6 @@
 import rospy
 import actionlib
-from std_srvs           import srv as ssrv
+from std_msgs           import msg as smsg
 from aist_localization  import msg as lmsg
 from operator           import itemgetter
 
@@ -11,19 +11,19 @@ class LocalizationClient(object):
     def __init__(self):
         super(LocalizationClient, self).__init__()
 
-        self._load_scene = rospy.ServiceProxy("localization/load_scene",
-                                              ssrv.Trigger)
+        self._file_path_pub = rospy.Publisher("localization/file_path",
+                                              smsg.String, queue_size=1)
         self._localize = actionlib.SimpleActionClient("localization/localize",
-                                                      lmsg.localizeAction)
+                                                      lmsg.LocalizeAction)
         self._localize.wait_for_server()
 
-    def load_scene(self):
-        return self._load_scene().success
+    def load_scene(self, file_path):
+        self._file_path_pub.publish(file_path)
 
     def send_goal(self, object_name, number_of_poses=1):
         self._poses    = []
         self._overlaps = []
-        goal = lmsg.localizeGoal()
+        goal = lmsg.LocalizeGoal()
         goal.object_name     = object_name
         goal.number_of_poses = number_of_poses
         self._localize.send_goal(goal, feedback_cb=self._feedback_cb)

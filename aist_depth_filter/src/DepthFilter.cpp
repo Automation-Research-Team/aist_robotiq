@@ -34,6 +34,7 @@ DepthFilter::DepthFilter(const std::string& name)
      _normal_pub(_it.advertise("normal", 1)),
      _colored_normal_pub(_it.advertise("colored_normal", 1)),
      _camera_info_pub(_nh.advertise<camera_info_t>("camera_info", 1)),
+     _file_path_pub(_nh.advertise<string_t>("file_path", 1)),
      _ddr(),
      _camera_info(),
      _image(),
@@ -76,16 +77,16 @@ DepthFilter::DepthFilter(const std::string& name)
     _nh.param("subscribe_normal", subscribe_normal, true);
     if (subscribe_normal)
     {
-	_sync.registerCallback(&DepthFilter::filter_cb, this);
+	_sync.registerCallback(&DepthFilter::filter_with_normal_cb, this);
     }
     else
     {
 	_nh.param("window_radius", _window_radius, 0);
 	_ddr.registerVariable<int>("window_radius", &_window_radius,
 				   "Window radius", 0, 5);
-	_sync2.registerCallback(&DepthFilter::filter_cb2, this);
+	_sync2.registerCallback(&DepthFilter::filter_without_normal_cb, this);
     }
-    
+
     _ddr.publishServicesTopics();
 
 }
@@ -134,9 +135,13 @@ DepthFilter::savePly_cb(std_srvs::Trigger::Request&  req,
 	if (_filtered_depth.data.empty())
 	    throw std::runtime_error("no filtered depth image available!");
 
-	savePly(_camera_info, _image, _filtered_depth, _normal,
-		open_dir() + "/scene.ply");
+	const auto	file_path = open_dir() + "/scene.ply";
+	savePly(_camera_info, _image, _filtered_depth, _normal, file_path);
 	_filtered_depth.data.clear();
+
+	string_t	file_path_msg;
+	file_path_msg.data = file_path;
+	_file_path_pub.publish(file_path_msg);
 
 	res.success = true;
 	res.message = "succeeded.";
@@ -155,9 +160,10 @@ DepthFilter::savePly_cb(std_srvs::Trigger::Request&  req,
 }
 
 void
-DepthFilter::filter_cb(const camera_info_cp& camera_info,
-		       const image_cp& image, const image_cp& depth,
-		       const image_cp& normal)
+DepthFilter::filter_with_normal_cb(const camera_info_cp& camera_info,
+				   const image_cp& image,
+				   const image_cp& depth,
+				   const image_cp& normal)
 {
     _top    = std::max(0,     std::min(_top,    int(image->height)));
     _bottom = std::max(_top,  std::min(_bottom, int(image->height)));
@@ -176,13 +182,13 @@ DepthFilter::filter_cb(const camera_info_cp& camera_info,
 	_camera_info.K[5]  -= _top;
 	_camera_info.P[2]  -= _left;
 	_camera_info.P[6]  -= _top;
-	
+
 	_depth = depth;  // Keep pointer to depth for saving background.
 	create_subimage(*image,  _image);
 	create_subimage(*depth,  _filtered_depth);
 	create_subimage(*normal, _normal);
 	create_colored_normal(_normal, _colored_normal);
-	
+
 	if (depth->encoding == image_encodings::MONO16 ||
 	    depth->encoding == image_encodings::TYPE_16UC1)
 	    filter<uint16_t>(_camera_info, _filtered_depth);
@@ -197,13 +203,15 @@ DepthFilter::filter_cb(const camera_info_cp& camera_info,
     }
     catch (const std::exception& err)
     {
-	ROS_ERROR_STREAM("DepthFilter::filter_cb(): " << err.what());
+	ROS_ERROR_STREAM("DepthFilter::filter_with_normal_cb(): "
+			 << err.what());
     }
 }
 
 void
-DepthFilter::filter_cb2(const camera_info_cp& camera_info,
-			const image_cp& image, const image_cp& depth)
+DepthFilter::filter_without_normal_cb(const camera_info_cp& camera_info,
+				      const image_cp& image,
+				      const image_cp& depth)
 {
     _top    = std::max(0,     std::min(_top,    int(image->height)));
     _bottom = std::max(_top,  std::min(_bottom, int(image->height)));
@@ -222,11 +230,11 @@ DepthFilter::filter_cb2(const camera_info_cp& camera_info,
 	_camera_info.K[5]  -= _top;
 	_camera_info.P[2]  -= _left;
 	_camera_info.P[6]  -= _top;
-	
+
 	_depth = depth;  // Keep pointer to depth for saving background.
 	create_subimage(*image, _image);
 	create_subimage(*depth, _filtered_depth);
-	
+
 	if (depth->encoding == image_encodings::MONO16 ||
 	    depth->encoding == image_encodings::TYPE_16UC1)
 	    filter<uint16_t>(_camera_info, _filtered_depth);
@@ -241,7 +249,7 @@ DepthFilter::filter_cb2(const camera_info_cp& camera_info,
     }
     catch (const std::exception& err)
     {
-	ROS_ERROR_STREAM("DepthFilter::filter_cb2(): " << err.what());
+	ROS_ERROR_STREAM("DepthFilter::filter_without_cb(): " << err.what());
     }
 }
 
@@ -314,7 +322,7 @@ DepthFilter::computeNormal(const camera_info_t& camera_info,
     using colored_normal_t	= std::array<uint8_t, 3>;
     using vector3_t		= cv::Matx<value_t, 3, 1>;
     using matrix33_t		= cv::Matx<value_t, 3, 3>;
-    
+
   // 0: Allocate image for output normals.
     _normal.header		= depth.header;
     _normal.encoding		= image_encodings::TYPE_32FC3;
@@ -355,7 +363,7 @@ DepthFilter::computeNormal(const camera_info_t& camera_info,
 	for (int u = 0; u < ws1; ++u)
 	{
 	    const auto&	head = xyz(v, u);
-	    
+
 	    if (head(2) != 0)
 	    {
 		++sum_n;
@@ -363,11 +371,11 @@ DepthFilter::computeNormal(const camera_info_t& camera_info,
 		sum_M += head % head;
 	    }
 	}
-	
+
 	for (int u = 0; u < n.rows; ++u)
 	{
 	    const auto&	head = xyz(v, u + ws1);
-	    
+
 	    if (head(2) != 0)
 	    {
 		++sum_n;
@@ -380,7 +388,7 @@ DepthFilter::computeNormal(const camera_info_t& camera_info,
 	    M(u, v) = sum_M;
 
 	    const auto&	tail = xyz(v, u);
-	    
+
 	    if (tail(2) != 0)
 	    {
 		--sum_n;
@@ -435,7 +443,7 @@ DepthFilter::computeNormal(const camera_info_t& camera_info,
 		// 	  << norm(0) << ", "
 		// 	  << norm(1) << ", "
 		// 	  << norm(2) << ")" << std::endl;
-		
+
 		*norm  = {normal(0), normal(1), normal(2)};
 		*cnorm = {uint8_t(128 + 127*normal(0)),
 			  uint8_t(128 + 127*normal(1)),
@@ -539,5 +547,5 @@ DepthFilter::open_dir()
 
     return dir_name;
 }
-    
+
 }	// namespace aist_depth_filter

@@ -102,9 +102,9 @@ class TransientModelDisplay : public Display
 			    const aist_model_spawner::ModelDescription
 						    ::ConstPtr& desc_msg);
 
-    Robot*		robot_;                 ///< Handles actually drawing the robot
+    Robot*		robot_;  //< Handles actually drawing the robot
 
-    bool		has_new_transforms_;      ///< Callback sets this to tell our update function it needs to update the transforms
+    bool		has_new_transforms_;  ///< Callback sets this to tell our update function it needs to update the transforms
 
     float		time_since_last_transform_;
 
