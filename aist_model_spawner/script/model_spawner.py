@@ -13,9 +13,9 @@ from aist_model_spawner import msg as mmsg
 #########################################################################
 class ModelSpawnerServer(object):
 
-    _BeginRobot = "<robot name=\"model_description\" xmlns:xacro=\"http://www.ros.org/wiki/xacro\">\n  <link name=\"world\"/>"
+    _BeginRobot = "<robot name=\"model_description\" xmlns:xacro=\"http://www.ros.org/wiki/xacro\">\n  <link name=\"{}\"/>\n"
     _Macro      = "  <xacro:include filename=\"{1}\"/>\n  <xacro:{0} prefix=\"{2}\" parent=\"{3}\" spawn_attached=\"true\">\n    <origin xyz=\"{4} {5} {6}\" rpy=\"{7} {8} {9}\"/>\n  </xacro:{0}>\n"
-    _EndRobot   = "</robot>"
+    _EndRobot   = "</robot>\n"
 
     def __init__(self, urdf_dir):
         super(ModelSpawnerServer, self).__init__()
@@ -28,6 +28,7 @@ class ModelSpawnerServer(object):
         self._get_list_srv   = rospy.Service("~get_list", msrv.GetList,
                                              self._get_list_cb)
         self._urdf_dir       = urdf_dir
+        self._parent_frame   = ""
         self._macros         = {}
         self._robot          = None
         self._broadcaster    = tf.TransformBroadcaster()
@@ -58,6 +59,16 @@ class ModelSpawnerServer(object):
                 rospy.logwarn(e)
 
     def _add_cb(self, req):
+        parent_frame = req.pose.header.frame_id
+
+        if self._parent_frame == "":
+            self._parent_frame = parent_frame
+        elif self._parent_frame != parent_frame:
+            lospy.logerr("Requested parent frame[" + parent_frame +
+                         "] is differnt from current parent frame[" +
+                         self._frame + "].")
+            return msrv.AddResponse(False)
+
         name        = req.name
         position    = req.pose.pose.position
         orientation = req.pose.pose.orientation
@@ -67,41 +78,37 @@ class ModelSpawnerServer(object):
                                 macro_name,
                                 os.path.join(self._urdf_dir,
                                              name + "_macro.urdf.xacro"),
-                                "",
-                                req.pose.header.frame_id,
+                                "", parent_frame,
                                 position.x, position.y, position.z,
                                 *tfs.euler_from_quaternion([orientation.x,
                                                             orientation.y,
                                                             orientation.z,
                                                             orientation.w]))
 
-        res         = msrv.AddResponse()
-        res.success = self._update_robot()
-
-        if not res.success:
-            del self._macros[name]
-
-        return res
+        success = self._update_robot()
+        if not success:
+            self._delete_macro(name)
+        return msrv.AddResponse(success)
 
     def _delete_cb(self, req):
-        try:
-            del self._macros[req.name]
-        except KeyErr:
-            rospy.logerr("Tried to delete unknown mopdel[" + req.name + "].")
-        res         = msrv.DeleteResponse()
-        res.success = self._update_robot()
-        return res
+        self._delete_macro(req.name)
+        return msrv.DeleteResponse(self._update_robot())
 
     def _delete_all_cb(self, req):
         self._macros.clear()
-        res         = msrv.DeleteAllResponse()
-        res.success = self._update_robot()
-        return res
+        self._parent_frame = ""
+        return msrv.DeleteAllResponse(self._update_robot())
 
     def _get_list_cb(self, req):
-        res       = msrv.GetListResponse()
-        res.names = self._macros.keys()
-        return res
+        return msrv.GetListResponse(self._macros.keys())
+
+    def _delete_macro(name):
+        try:
+            del self._macros[name]
+            if not self._macros:
+                self._parent_frame = ""
+        except KeyErr:
+            rospy.logerr("Tried to delete unknown model[" + name + "].")
 
     def _update_robot(self):
         try:
@@ -115,7 +122,7 @@ class ModelSpawnerServer(object):
 
     def _create_description(self):
         # Create Model description in Xacro format.
-        xacro_desc = ModelSpawnerServer._BeginRobot
+        xacro_desc = ModelSpawnerServer._BeginRobot.format(self._parent_frame)
         for macro in self._macros.values():
             xacro_desc += macro
         xacro_desc += ModelSpawnerServer._EndRobot
