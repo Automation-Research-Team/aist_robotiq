@@ -13,7 +13,6 @@ pkg_check_modules(LIBTIFF REQUIRED libtiff-4)
 find_package(
   catkin REQUIRED
   COMPONENTS
-    genmsg
     ddynamic_reconfigure
     sensor_msgs
     image_transport
@@ -58,6 +57,7 @@ add_executable(
 
 add_dependencies(
   ${PROJECT_NAME}
+  ${PROJECT_NAME}_gencpp
   ${${PREOJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
@@ -66,7 +66,6 @@ target_link_libraries(
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
-  ${Boost_LIBRARIES}
   ${LIBTIFF_LIBRARIES}
   ${OpenCV_LIBRARIES}
 )
@@ -83,6 +82,7 @@ add_library(
 
 add_dependencies(
   ${PROJECT_NAME}_nodelet
+  ${PROJECT_NAME}_gencpp
   ${${PREOJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
@@ -91,7 +91,6 @@ target_link_libraries(
   ${PROJECT_NAME}_nodelet
   ${catkin_LIBRARIES}
   ${roscpp_LIBRARIES}
-  ${Boost_LIBRARIES}
   ${LIBTIFF_LIBRARIES}
   ${OpenCV_LIBRARIES}
 )

@@ -42,6 +42,12 @@ add_library(${PROJECT_NAME}
   src/transient_model_display.cpp
 )
 
+add_dependencies(${PROJECT_NAME}
+  ${PROJECT_NAME}_gencpp
+  ${${PREOJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
+
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${QT_LIBRARIES}
