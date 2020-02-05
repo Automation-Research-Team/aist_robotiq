@@ -13,9 +13,11 @@ pkg_check_modules(LIBTIFF REQUIRED libtiff-4)
 find_package(
   catkin REQUIRED
   COMPONENTS
+    genmsg
     ddynamic_reconfigure
     sensor_msgs
     image_transport
+    message_generation
 )
 
 find_package(OpenCV REQUIRED)
@@ -30,9 +32,14 @@ include_directories(
   src
 )
 
+add_message_files(DIRECTORY msg)
+
+generate_messages()
+
 catkin_package(
   CATKIN_DEPENDS
     roscpp
+    rospy
     message_runtime
     sensor_msgs
     pluginlib

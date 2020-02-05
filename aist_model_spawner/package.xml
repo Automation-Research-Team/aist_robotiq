@@ -16,11 +16,10 @@
   <depend>tf</depend>
 
   <build_depend>qtbase5-dev</build_depend>
-  <build_depend>rviz</build_depend>
-  <exec_depend>rviz</exec_depend>
   <exec_depend>libqt5-core</exec_depend>
   <exec_depend>libqt5-gui</exec_depend>
   <exec_depend>libqt5-widgets</exec_depend>
+  <depend>rviz</depend>
 
   <export>
     <rviz plugin="${prefix}/plugin_description.xml"/>

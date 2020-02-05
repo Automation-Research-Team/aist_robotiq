@@ -19,8 +19,8 @@ Localization::Localization(const std::string& name)
      _localization(new pho::sdk::PhoLocalization()),
      _scene(),
      _scene_is_valid(false),
-     _file_path_sub(_nh.subscribe<std_msgs::String>(
-			"file_path", 1, &Localization::file_path_cb, this)),
+     _file_info_sub(_nh.subscribe<file_info_t>(
+			"file_info", 1, &Localization::file_info_cb, this)),
      _localize_srv(_nh, "localize",
 		   boost::bind(&Localization::localize_cb, this, _1), false)
 {
@@ -40,13 +40,14 @@ Localization::run() const
 }
 
 void
-Localization::file_path_cb(const string_cp& file_path)
+Localization::file_info_cb(const file_info_cp& file_info)
 {
     try
     {
-	ROS_INFO_STREAM("Loading_scene[" << file_path->data << "]..,");
+	ROS_INFO_STREAM("Loading_scene[" << file_info->file_path << "]..,");
 
-	_scene = pho::sdk::SceneSource::File(file_path->data);
+	_camera_frame = file_info->frame;
+	_scene = pho::sdk::SceneSource::File(file_info->file_path);
 	_localization->SetSceneSource(_scene);
 	_scene_is_valid = true;
 

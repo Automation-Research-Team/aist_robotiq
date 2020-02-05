@@ -1,8 +1,8 @@
 import rospy
 import actionlib
-from std_msgs           import msg as smsg
-from aist_localization  import msg as lmsg
-from operator           import itemgetter
+from aist_depth_filter import msg as dmsg
+from aist_localization import msg as lmsg
+from operator          import itemgetter
 
 #########################################################################
 #  class LocalizationClient                                             #
@@ -11,14 +11,14 @@ class LocalizationClient(object):
     def __init__(self):
         super(LocalizationClient, self).__init__()
 
-        self._file_path_pub = rospy.Publisher("localization/file_path",
-                                              smsg.String, queue_size=1)
+        self._file_path_pub = rospy.Publisher("localization/file_info",
+                                              dmsg.FileInfo, queue_size=1)
         self._localize = actionlib.SimpleActionClient("localization/localize",
                                                       lmsg.LocalizeAction)
         self._localize.wait_for_server()
 
-    def load_scene(self, file_path):
-        self._file_path_pub.publish(file_path)
+    def load_scene(self, file_path, frame):
+        self._file_path_pub.publish(file_path, frame)
 
     def send_goal(self, object_name, number_of_poses=1):
         self._poses    = []

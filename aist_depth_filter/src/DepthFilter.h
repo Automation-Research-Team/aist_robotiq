@@ -9,7 +9,7 @@
 #include <ros/ros.h>
 #include <std_srvs/Trigger.h>
 #include <image_transport/image_transport.h>
-#include <std_msgs/String.h>
+#include <aist_depth_filter/FileInfo.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
@@ -35,7 +35,7 @@ class DepthFilter
     using sync_policy2_t = message_filters::sync_policies::
 				ApproximateTime<camera_info_t,
 						image_t, image_t>;
-    using string_t	 = std_msgs::String;
+    using file_info_t	 = aist_depth_filter::FileInfo;
 
   public:
 		DepthFilter(const std::string& name)			;
@@ -95,7 +95,7 @@ class DepthFilter
     const image_transport::Publisher			_normal_pub;
     const image_transport::Publisher			_colored_normal_pub;
     const ros::Publisher				_camera_info_pub;
-    const ros::Publisher				_file_path_pub;
+    const ros::Publisher				_file_info_pub;
 
     ddynamic_reconfigure::DDynamicReconfigure		_ddr;
 

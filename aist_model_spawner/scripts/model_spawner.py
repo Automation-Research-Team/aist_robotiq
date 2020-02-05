@@ -64,7 +64,7 @@ class ModelSpawnerServer(object):
         if self._parent_frame == "":
             self._parent_frame = parent_frame
         elif self._parent_frame != parent_frame:
-            lospy.logerr("Requested parent frame[" + parent_frame +
+            rospy.logerr("Requested parent frame[" + parent_frame +
                          "] is differnt from current parent frame[" +
                          self._frame + "].")
             return msrv.AddResponse(False)

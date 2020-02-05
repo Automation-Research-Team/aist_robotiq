@@ -34,7 +34,7 @@ DepthFilter::DepthFilter(const std::string& name)
      _normal_pub(_it.advertise("normal", 1)),
      _colored_normal_pub(_it.advertise("colored_normal", 1)),
      _camera_info_pub(_nh.advertise<camera_info_t>("camera_info", 1)),
-     _file_path_pub(_nh.advertise<string_t>("file_path", 1)),
+     _file_info_pub(_nh.advertise<file_info_t>("file_info", 1)),
      _ddr(),
      _camera_info(),
      _image(),
@@ -139,9 +139,10 @@ DepthFilter::savePly_cb(std_srvs::Trigger::Request&  req,
 	savePly(_camera_info, _image, _filtered_depth, _normal, file_path);
 	_filtered_depth.data.clear();
 
-	string_t	file_path_msg;
-	file_path_msg.data = file_path;
-	_file_path_pub.publish(file_path_msg);
+	file_info_t	file_info;
+	file_info.file_path = file_path;
+	file_info.frame     = _camera_info.header.frame_id;
+	_file_info_pub.publish(file_info);
 
 	res.success = true;
 	res.message = "succeeded.";
