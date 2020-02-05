@@ -27,6 +27,15 @@ if __name__ == '__main__':
                         choices=None,
                         help='path to scene PLY file',
                         metavar=None)
+    parser.add_argument('-f',
+                        '--frame',
+                        action='store',
+                        nargs='?',
+                        default='world',
+                        type=str,
+                        choices=None,
+                        help='camera frame',
+                        metavar=None)
     parser.add_argument('-n',
                         '--number_of_poses',
                         action='store',
@@ -50,7 +59,7 @@ if __name__ == '__main__':
     rospy.init_node('localization_client')
 
     localize = LocalizationClient()
-    localize.load_scene(args.scene)
+    localize.load_scene(args.scene, args.frame)
     localize.send_goal(args.model, args.number_of_poses)
     (poses, overlaps, success) \
         = localize.wait_for_result(rospy.Duration(args.timeout))

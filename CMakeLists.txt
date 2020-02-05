@@ -18,11 +18,13 @@ find_package(
     roscpp
     roslib
     genmsg
+    message_generation
     actionlib_msgs
     actionlib
     geometry_msgs
     std_msgs
     tf
+    aist_depth_filter
 )
 
 catkin_python_setup()

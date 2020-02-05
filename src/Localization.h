@@ -11,9 +11,9 @@
 #include <memory>
 
 #include <ros/ros.h>
-#include <std_msgs/String.h>
 #include <actionlib/server/simple_action_server.h>
 #include <aist_localization/LocalizeAction.h>
+#include <aist_depth_filter/FileInfo.h>
 
 #include <PhoLocalization.h>
 
@@ -31,8 +31,8 @@ class Localization
     using goal_cp	= aist_localization::LocalizeGoalConstPtr;
     using server_t	= actionlib::SimpleActionServer<action_t>;
 
-    using string_t	= std_msgs::String;
-    using string_cp	= std_msgs::StringConstPtr;
+    using file_info_t	 = aist_depth_filter::FileInfo;
+    using file_info_cp	 = aist_depth_filter::FileInfoConstPtr;
 
   public:
 		Localization(const std::string& name)			;
@@ -40,8 +40,7 @@ class Localization
     void	run()						  const	;
 
   private:
-    void	file_path_cb(const string_cp& file_path)		;
-    bool	load_scene(const std::string& file_path)		;
+    void	file_info_cb(const file_info_cp& file_info)		;
     void	localize_cb(const goal_cp& goal)		  const	;
     void	preempt_cb()					  const	;
     void	publish_feedback(const pho::sdk::LocalizationPose& locPose,
@@ -58,7 +57,7 @@ class Localization
     pho::sdk::SceneSource			_scene;
     bool					_scene_is_valid;
 
-    ros::Subscriber				_file_path_sub;
+    ros::Subscriber				_file_info_sub;
     server_t					_localize_srv;
 };
 
