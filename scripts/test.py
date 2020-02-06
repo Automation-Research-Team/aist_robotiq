@@ -40,7 +40,7 @@ if __name__ == '__main__':
                         '--number_of_poses',
                         action='store',
                         nargs='?',
-                        default=1,
+                        default=2,
                         type=int,
                         choices=None,
                         help='the number of candidate poses',
@@ -49,7 +49,7 @@ if __name__ == '__main__':
                         '--timeout',
                         action='store',
                         nargs='?',
-                        default=5,
+                        default=10,
                         type=float,
                         choices=None,
                         help='timeout value',
@@ -60,14 +60,21 @@ if __name__ == '__main__':
 
     localize = LocalizationClient()
     localize.load_scene(args.scene, args.frame)
-    localize.send_goal(args.model, args.number_of_poses)
-    (poses, overlaps, success) \
-        = localize.wait_for_result(rospy.Duration(args.timeout))
-
+    models  = rospy.get_param("aist_localization", [])
     spawner = ModelSpawnerClient()
 
-    for pose, overlap in zip(poses, overlaps):
-        print("{}\noverlap: {}".format(pose, overlap))
-        spawner.add(args.model, pose)
+
+    for model in models:
+        localize.send_goal(model, args.number_of_poses)
+        (poses, overlaps, success) \
+            = localize.wait_for_result(rospy.Duration(args.timeout))
+
+        if poses:
+            print("{}\noverlap: {}".format(poses[0], overlaps[0]))
+            spawner.add(model, poses[0])
+
+        # for pose, overlap in zip(poses, overlaps):
+        #     print("{}\noverlap: {}".format(pose, overlap))
+        #     spawner.add(model, pose)
 
     print(spawner.get_list())
