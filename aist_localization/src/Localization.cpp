@@ -77,7 +77,7 @@ Localization::localize_cb(const goal_cp& goal) const
 	const auto	plcf_file = _plcf_dir + '/'
 				  + goal->object_name + ".plcf";
 	if (!_localization->LoadLocalizationConfiguration(plcf_file))
-	    throw std::runtime_error("Failed to load configuration["
+	    throw std::runtime_error("  Failed to load configuration["
 				     + plcf_file + "].");
 
       // Set stop criteria.
@@ -92,22 +92,23 @@ Localization::localize_cb(const goal_cp& goal) const
 	    if (_localize_srv.isPreemptRequested())
 	    {
 		_localization->StopAsync();
+		ROS_INFO_STREAM("  Preempted.");
 		return;
 	    }
 
 	    pho::sdk::LocalizationPose	locPose;
 	    if (queue.GetNext(locPose, 500))	// Timeout = 500ms
 	    {
-		// const auto object_frame = ros::this_node::getNamespace()
-		// 			+ '/' + goal->object_name + '_'
-		// 			+ std::to_string(queue.Size() - 1);
 		const auto object_frame = goal->object_name + '_'
 					+ std::to_string(queue.Size() - 1);
 		publish_feedback(locPose, now, object_frame);
+
+		ROS_INFO_STREAM("  Found " << queue.Size() << "-th pose.");
 	    }
 	}
 
 	_localization->StopAsync();
+	ROS_INFO_STREAM("  Completed.");
 
 	result_t	result;
 	result.success = true;
@@ -128,7 +129,6 @@ Localization::localize_cb(const goal_cp& goal) const
 void
 Localization::preempt_cb() const
 {
-    ROS_INFO_STREAM("Localization preempted.");
     _localize_srv.setPreempted();
 }
 
