@@ -1,0 +1,32 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="assy_part_19">
+  <xacro:macro name="assy_part_19" params="prefix parent spawn_attached *origin">
+    <link name="${prefix}assy_part_19">
+      <visual>
+        <origin rpy="1.5707 0 0" xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="package://o2as_parts_description/meshes/19_MSSFS3-6.dae" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="white">
+          <color rgba="1 1 1 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="1.5707 0 0" xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="package://o2as_parts_description/meshes/19_MSSFS3-6.vhacd.dae" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <xacro:if value="${spawn_attached}">
+      <joint name="${prefix}assy_part_19_joint" type="fixed">
+        <parent link="${parent}"/>
+        <child link="${prefix}assy_part_19"/>
+        <xacro:insert_block name="origin"/>
+      </joint>
+    </xacro:if>
+  
+  <!-- Extra frames for assembly and motion planning, if any -->
+<!-- #EXTRAFRAMES -->
+  </xacro:macro>
+</robot>

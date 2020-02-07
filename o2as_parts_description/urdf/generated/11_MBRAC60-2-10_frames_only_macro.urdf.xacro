@@ -1,0 +1,51 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="assy_part_frames_only_11">
+  <xacro:macro name="assy_part_frames_only_11" params="prefix parent spawn_attached *origin">
+    <link name="${prefix}assy_part_11"/>
+
+    <xacro:if value="${spawn_attached}">
+      <joint name="${prefix}assy_part_11_joint" type="fixed">
+        <parent link="${parent}"/>
+        <child link="${prefix}assy_part_11"/>
+        <xacro:insert_block name="origin"/>
+      </joint>
+    </xacro:if>
+  
+  <!-- Extra frames for assembly and motion planning, if any -->
+    <joint name="${prefix}assy_part_11_front_hole_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_11"/> 
+      <child link="${prefix}assy_part_11_front_hole"/> 
+      <origin rpy="${0} ${0} ${pi}" xyz="${0.015} ${0} ${0}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_11_front_hole"/> 
+    
+    <joint name="${prefix}assy_part_11_back_hole_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_11"/> 
+      <child link="${prefix}assy_part_11_back_hole"/> 
+      <origin rpy="${0} ${0} ${0}" xyz="${-0.005} ${0} ${0}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_11_back_hole"/> 
+    
+    <joint name="${prefix}assy_part_11_back_tip_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_11"/> 
+      <child link="${prefix}assy_part_11_back_tip"/> 
+      <origin rpy="${0} ${0} ${pi}" xyz="${-0.005} ${0} ${0}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_11_back_tip"/> 
+    
+    <joint name="${prefix}assy_part_11_screw_head_1_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_11"/> 
+      <child link="${prefix}assy_part_11_screw_head_1"/> 
+      <origin rpy="${pi/2} ${0} ${pi/2}" xyz="${0.01} ${0.00875} ${0.01}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_11_screw_head_1"/> 
+    
+    <joint name="${prefix}assy_part_11_screw_head_2_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_11"/> 
+      <child link="${prefix}assy_part_11_screw_head_2"/> 
+      <origin rpy="${pi/2} ${0} ${pi/2}" xyz="${0.01} ${-0.00875} ${0.01}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_11_screw_head_2"/> 
+    
+
+  </xacro:macro>
+</robot>

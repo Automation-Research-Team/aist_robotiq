@@ -1,0 +1,109 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="assy_part_02">
+  <xacro:macro name="assy_part_02" params="prefix parent spawn_attached *origin">
+    <link name="${prefix}assy_part_02">
+      <visual>
+        <origin rpy="1.5707 0 0" xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="package://o2as_parts_description/meshes/02_PANEL.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="white">
+          <color rgba="1 1 1 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="1.5707 0 0" xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="package://o2as_parts_description/meshes/02_PANEL.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <xacro:if value="${spawn_attached}">
+      <joint name="${prefix}assy_part_02_joint" type="fixed">
+        <parent link="${parent}"/>
+        <child link="${prefix}assy_part_02"/>
+        <xacro:insert_block name="origin"/>
+      </joint>
+    </xacro:if>
+  
+  <!-- Extra frames for assembly and motion planning, if any -->
+    <joint name="${prefix}assy_part_02_back_hole_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_02"/> 
+      <child link="${prefix}assy_part_02_back_hole"/> 
+      <origin rpy="${0} ${0} ${pi/2}" xyz="${0.033} ${-0.005} ${.04}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_02_back_hole"/> 
+    
+    <joint name="${prefix}assy_part_02_bottom_screw_hole_aligner_1_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_02"/> 
+      <child link="${prefix}assy_part_02_bottom_screw_hole_aligner_1"/> 
+      <origin rpy="${0} ${pi/2} ${0}" xyz="${0.006} ${-0.015} ${.0}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_02_bottom_screw_hole_aligner_1"/> 
+    
+    <joint name="${prefix}assy_part_02_bottom_screw_hole_aligner_2_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_02"/> 
+      <child link="${prefix}assy_part_02_bottom_screw_hole_aligner_2"/> 
+      <origin rpy="${0} ${pi/2} ${0}" xyz="${0.064} ${-0.015} ${.0}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_02_bottom_screw_hole_aligner_2"/> 
+    
+    <joint name="${prefix}assy_part_02_bottom_screw_hole_1_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_02"/> 
+      <child link="${prefix}assy_part_02_bottom_screw_hole_1"/> 
+      <origin rpy="${0} ${pi/2} ${0}" xyz="${0.006} ${-0.015} ${.005}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_02_bottom_screw_hole_1"/> 
+    
+    <joint name="${prefix}assy_part_02_bottom_screw_hole_2_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_02"/> 
+      <child link="${prefix}assy_part_02_bottom_screw_hole_2"/> 
+      <origin rpy="${0} ${pi/2} ${0}" xyz="${0.064} ${-0.015} ${.005}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_02_bottom_screw_hole_2"/> 
+    
+    <joint name="${prefix}assy_part_02_motor_screw_hole_1_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_02"/> 
+      <child link="${prefix}assy_part_02_motor_screw_hole_1"/> 
+      <origin rpy="${0} ${0} ${-pi/2}" xyz="${.035 + .0155*sin( pi/180*(30+60*0) )} ${0} ${.033 + .0155*cos( pi/180*(30+60*0) )}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_02_motor_screw_hole_1"/> 
+    
+    <joint name="${prefix}assy_part_02_motor_screw_hole_2_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_02"/> 
+      <child link="${prefix}assy_part_02_motor_screw_hole_2"/> 
+      <origin rpy="${0} ${0} ${-pi/2}" xyz="${.035 + .0155*sin( pi/180*(30+60*1) )} ${0} ${.033 + .0155*cos( pi/180*(30+60*1) )}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_02_motor_screw_hole_2"/> 
+    
+    <joint name="${prefix}assy_part_02_motor_screw_hole_3_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_02"/> 
+      <child link="${prefix}assy_part_02_motor_screw_hole_3"/> 
+      <origin rpy="${0} ${0} ${-pi/2}" xyz="${.035 + .0155*sin( pi/180*(30+60*2) )} ${0} ${.033 + .0155*cos( pi/180*(30+60*2) )}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_02_motor_screw_hole_3"/> 
+    
+    <joint name="${prefix}assy_part_02_motor_screw_hole_4_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_02"/> 
+      <child link="${prefix}assy_part_02_motor_screw_hole_4"/> 
+      <origin rpy="${0} ${0} ${-pi/2}" xyz="${.035 + .0155*sin( pi/180*(30+60*3) )} ${0} ${.033 + .0155*cos( pi/180*(30+60*3) )}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_02_motor_screw_hole_4"/> 
+    
+    <joint name="${prefix}assy_part_02_motor_screw_hole_5_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_02"/> 
+      <child link="${prefix}assy_part_02_motor_screw_hole_5"/> 
+      <origin rpy="${0} ${0} ${-pi/2}" xyz="${.035 + .0155*sin( pi/180*(30+60*4) )} ${0} ${.033 + .0155*cos( pi/180*(30+60*4) )}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_02_motor_screw_hole_5"/> 
+    
+    <joint name="${prefix}assy_part_02_motor_screw_hole_6_joint" type="fixed"> 
+      <parent link="${prefix}assy_part_02"/> 
+      <child link="${prefix}assy_part_02_motor_screw_hole_6"/> 
+      <origin rpy="${0} ${0} ${-pi/2}" xyz="${.035 + .0155*sin( pi/180*(30+60*5) )} ${0} ${.033 + .0155*cos( pi/180*(30+60*5) )}"/> 
+    </joint> 
+    <link name="${prefix}assy_part_02_motor_screw_hole_6"/> 
+    
+
+  </xacro:macro>
+</robot>
