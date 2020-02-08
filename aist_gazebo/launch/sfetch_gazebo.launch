@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="scene"	default="sfetch_base_scene"/>
+  <arg name="robot"	default="fetch"/>
+  <arg name="debug"	default="false"/>
+  <arg name="gui"	default="true"/>
+  <arg name="headless"	default="false"/>
+
+  <!-- Start Gazebo with a blank world -->
+  <include file="$(find fetch_gazebo)/launch/simulation.launch">
+    <arg name="robot"		value="$(arg robot)" />
+    <arg name="debug"		value="$(arg debug)" />
+    <arg name="gui"		value="$(arg gui)" />
+    <arg name="headless"	value="$(arg headless)"/>
+  </include>
+
+  <!-- Load environment urdf to param "environment_description". -->
+  <group unless="$(eval scene == 'sfetch_base_scene')">
+    <param name="environment_description"
+  	   command="$(find xacro)/xacro --inorder '$(find
+  		    aist_description)/scene/urdf/$(arg
+		    scene)_environment.urdf.xacro'"/>
+    <node name="environment_spawner" pkg="gazebo_ros" type="spawn_model"
+  	  respawn="false" output="screen"
+          args="-urdf -param environment_description -model environment
+		-unpause"/>
+  </group>
+
+</launch>

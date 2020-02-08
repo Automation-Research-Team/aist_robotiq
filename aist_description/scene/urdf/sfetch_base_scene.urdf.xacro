@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="sfetch_base_scene" >
+
+  <!-- Fetch robot (root = "base_link") -->
+  <xacro:include filename="$(find fetch_gazebo)/robots/fetch.gazebo.xacro"/>
+
+  <link  name="map"/>
+  <link  name="odom"/>
+  <joint name="map_odom_joint" type="planar">
+    <parent link="map"/>
+    <child  link="odom"/>
+    <axis   xyz="0 0 1"/>
+  </joint>
+
+  <joint name="odom_base_joint" type="planar">
+    <parent link="odom"/>
+    <child  link="base_link"/>
+    <axis   xyz="0 0 1"/>
+  </joint>
+
+</robot>
