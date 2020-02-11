@@ -17,9 +17,12 @@ find_package(
     sensor_msgs
     image_transport
     message_generation
+    rospy
 )
 
 find_package(OpenCV REQUIRED)
+
+catkin_python_setup()
 
 ###########
 ## Build ##
@@ -43,6 +46,7 @@ catkin_package(
     sensor_msgs
     pluginlib
     nodelet
+    rospy
 )
 
 add_executable(

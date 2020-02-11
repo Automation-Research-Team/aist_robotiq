@@ -105,11 +105,11 @@ class ModelSpawnerServer(object):
 if __name__ == '__main__':
     rospy.init_node("aist_model_spwner")
 
-    rospack    = rospkg.RosPack()
-    urdf_dir   = rospy.get_param(
-                     "urdf_dir",
-                     os.path.join(rospack.get_path("o2as_parts_description"),
-                                  "urdf/generated"))
+    rospack  = rospkg.RosPack()
+    urdf_dir = rospy.get_param("urdf_dir",
+                               os.path.join(
+                                   rospack.get_path("o2as_parts_description"),
+                                   "urdf/generated"))
 
     spawner = ModelSpawnerServer(urdf_dir)
     rate    = rospy.Rate(1)
