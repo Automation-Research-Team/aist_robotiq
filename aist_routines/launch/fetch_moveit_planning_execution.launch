@@ -1,14 +1,14 @@
 <launch>
-
   <arg name="scene"/>
   <arg name="sim"		default="false"/>
   <arg name="rviz_config"	default=""/>
   <arg name="debug"		default="false"/>
 
+  <arg name="moveit_config"	value="$(find arg('scene'))"/>
+  
   <include file="$(find aist_routines)/launch/moveit_planning_execution.launch">
     <arg name="moveit_config"	value="$(find ceatec_moveit_config)"/>
     <arg name="rviz_config"	value="$(arg rviz_config)"/>
     <arg name="debug"		value="$(arg debug)"/>
   </include>
-
 </launch>

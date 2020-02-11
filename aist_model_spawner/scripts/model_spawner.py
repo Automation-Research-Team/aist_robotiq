@@ -13,9 +13,7 @@ from aist_model_spawner import msg as mmsg
 #########################################################################
 class ModelSpawnerServer(object):
 
-    _BeginRobot = "<robot name=\"model_description\" xmlns:xacro=\"http://www.ros.org/wiki/xacro\">\n  <link name=\"{}\"/>\n"
-    _Macro      = "  <xacro:include filename=\"{1}\"/>\n  <xacro:{0} prefix=\"{2}\" parent=\"{3}\" spawn_attached=\"true\">\n    <origin xyz=\"{4} {5} {6}\" rpy=\"{7} {8} {9}\"/>\n  </xacro:{0}>\n"
-    _EndRobot   = "</robot>\n"
+    _Model = "<robot name=\"{0}\" xmlns:xacro=\"http://www.ros.org/wiki/xacro\">\n  <link name=\"{4}\"/>\n  <xacro:include filename=\"{1}\"/>\n  <xacro:{2} prefix=\"{3}\" parent=\"{4}\" spawn_attached=\"true\">\n    <origin xyz=\"{5} {6} {7}\" rpy=\"{8} {9} {10}\"/>\n  </xacro:{2}>\n</robot>\n"
 
     def __init__(self, urdf_dir):
         super(ModelSpawnerServer, self).__init__()
@@ -28,109 +26,77 @@ class ModelSpawnerServer(object):
         self._get_list_srv   = rospy.Service("~get_list", msrv.GetList,
                                              self._get_list_cb)
         self._urdf_dir       = urdf_dir
-        self._parent_frame   = ""
-        self._macros         = {}
-        self._robot          = None
+        self._models         = {}
         self._broadcaster    = tf.TransformBroadcaster()
         self._publisher      = rospy.Publisher("~model_description",
                                                mmsg.ModelDescription,
                                                queue_size=10)
-        self._update_robot()
 
     def tick(self):
         now = rospy.Time.now()
-        for childNode in self._robot.childNodes:
-            if childNode.localName != "joint" or \
-               childNode.getAttribute("type") != "fixed":
-                continue
+        for model in self._models.values():
+            for childNode in model.childNodes:
+                if childNode.localName != "joint" or \
+                   childNode.getAttribute("type") != "fixed":
+                    continue
 
-            try:
-                element = childNode.getElementsByTagName("parent")[0]
-                parent  = element.getAttribute("link")
-                element = childNode.getElementsByTagName("child")[0]
-                child   = element.getAttribute("link")
-                element = childNode.getElementsByTagName("origin")[0]
-                xyz     = map(float, element.getAttribute("xyz").split())
-                rpy     = map(float, element.getAttribute("rpy").split())
+                try:
+                    element = childNode.getElementsByTagName("parent")[0]
+                    parent  = element.getAttribute("link")
+                    element = childNode.getElementsByTagName("child")[0]
+                    child   = element.getAttribute("link")
+                    element = childNode.getElementsByTagName("origin")[0]
+                    xyz     = map(float, element.getAttribute("xyz").split())
+                    rpy     = map(float, element.getAttribute("rpy").split())
 
-                self._broadcaster.sendTransform(
-                    xyz, tfs.quaternion_from_euler(*rpy), now, child, parent)
-            except Exception as e:
-                rospy.logwarn(e)
+                    self._broadcaster.sendTransform(
+                        xyz, tfs.quaternion_from_euler(*rpy),
+                        now, child, parent)
+                except Exception as e:
+                    rospy.logwarn(e)
 
     def _add_cb(self, req):
-        parent_frame = req.pose.header.frame_id
-
-        if self._parent_frame == "":
-            self._parent_frame = parent_frame
-        elif self._parent_frame != parent_frame:
-            rospy.logerr("Requested parent frame[" + parent_frame +
-                         "] is differnt from current parent frame[" +
-                         self._frame + "].")
-            return msrv.AddResponse(False)
-
         name        = req.name
+        xacro_name  = os.path.join(self._urdf_dir, name + "_macro.urdf.xacro")
+        macro_name  = "assy_part_" + re.split("[_-]", name)[0]
         position    = req.pose.pose.position
         orientation = req.pose.pose.orientation
-        macro_name  = "assy_part_" + re.split("[_-]", name)[0]
-
-        self._macros[name] = ModelSpawnerServer._Macro.format(
-                                macro_name,
-                                os.path.join(self._urdf_dir,
-                                             name + "_macro.urdf.xacro"),
-                                "", parent_frame,
-                                position.x, position.y, position.z,
-                                *tfs.euler_from_quaternion([orientation.x,
-                                                            orientation.y,
-                                                            orientation.z,
-                                                            orientation.w]))
-
-        success = self._update_robot()
-        if not success:
-            self._delete_macro(name)
-        return msrv.AddResponse(success)
-
-    def _delete_cb(self, req):
-        self._delete_macro(req.name)
-        return msrv.DeleteResponse(self._update_robot())
-
-    def _delete_all_cb(self, req):
-        self._macros.clear()
-        self._parent_frame = ""
-        return msrv.DeleteAllResponse(self._update_robot())
-
-    def _get_list_cb(self, req):
-        return msrv.GetListResponse(self._macros.keys())
-
-    def _delete_macro(name):
+        xacro_desc  = ModelSpawnerServer._Model.format(
+                        name, xacro_name, macro_name,
+                        "", req.pose.header.frame_id,
+                        position.x, position.y, position.z,
+                        *tfs.euler_from_quaternion([orientation.x,
+                                                    orientation.y,
+                                                    orientation.z,
+                                                    orientation.w]))
         try:
-            del self._macros[name]
-            if not self._macros:
-                self._parent_frame = ""
-        except KeyErr:
-            rospy.logerr("Tried to delete unknown model[" + name + "].")
-
-    def _update_robot(self):
-        try:
-            desc = self._create_description()
-            self._publisher.publish(desc)
-            self._robot = xml.dom.minidom.parseString(desc).childNodes[0]
-            return True
+            # Expand and process Xacro into XML format.
+            doc = xacro.parse(xacro_desc)  # Create DOM tree.
+            xacro.process_doc(doc)         # Expand and process macros.
+            desc = doc.toprettyxml(indent='  ', encoding='utf8')
+            self._models[name] = xml.dom.minidom.parseString(desc).childNodes[0]
+            self._publisher.publish(mmsg.ModelDescription.ADD, name, desc)
+            return msrv.AddResponse(True)
         except Exception as e:
             rospy.logerr(e)
-            return False
+            return msrv.AddResponse(False)
 
-    def _create_description(self):
-        # Create Model description in Xacro format.
-        xacro_desc = ModelSpawnerServer._BeginRobot.format(self._parent_frame)
-        for macro in self._macros.values():
-            xacro_desc += macro
-        xacro_desc += ModelSpawnerServer._EndRobot
+    def _delete_cb(self, req):
+        try:
+            del self._models[req.name]
+            self._publisher.publish(mmsg.ModelDescription.DELETE, req.name, "")
+            return msrv.DeleteResponse(True)
+        except KeyError:
+            rospy.logerr("Tried to delete unknown model[" + req.name + "].")
+            return msrv.DeleteResponse(False)
 
-        # Expand and process Xacro into XML format.
-        doc = xacro.parse(xacro_desc)  # Create DOM tree.
-        xacro.process_doc(doc)         # Expand and process macros.
-        return doc.toprettyxml(indent='  ', encoding='utf8')
+    def _delete_all_cb(self, req):
+        self._models.clear()
+        self._publisher.publish(mmsg.ModelDescription.DELETEALL, "", "")
+        return msrv.DeleteAllResponse(True)
+
+    def _get_list_cb(self, req):
+        return msrv.GetListResponse(self._models.keys())
 
 
 ######################################################################

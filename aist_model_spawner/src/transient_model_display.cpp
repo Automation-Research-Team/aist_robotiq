@@ -110,7 +110,7 @@ TransientModelDisplay::~TransientModelDisplay()
     if (initialized())
     {
 	unsubscribe();
-	delete robot_;
+      //delete robot_;
     }
 }
 
@@ -120,8 +120,8 @@ TransientModelDisplay::~TransientModelDisplay()
 void
 TransientModelDisplay::onInitialize()
 {
-    robot_ = new Robot(scene_node_, context_,
-		       "Robot: " + getName().toStdString(), this);
+    // robot_.reset(new Robot(scene_node_, context_,
+    // 			   "Robot: " + getName().toStdString(), this));
 
     updateVisualVisible();
     updateCollisionVisible();
@@ -137,7 +137,9 @@ TransientModelDisplay::update(float wall_dt, float  /*ros_dt*/)
 
     if(has_new_transforms_ || update)
     {
-	robot_->update(TFLinkUpdater(context_->getFrameManager(),
+	for (const auto& robot : robots_)
+	    robot.second->update(TFLinkUpdater(
+				     context_->getFrameManager(),
 				     boost::bind(linkUpdaterStatusFunction,
 						 _1, _2, _3, this),
 				     tf_prefix_property_->getStdString()));
@@ -171,7 +173,9 @@ TransientModelDisplay::setTopic(const QString& topic,
 void
 TransientModelDisplay::clear()
 {
-    robot_->clear();
+    for (const auto& robot : robots_)
+	robot.second->clear();
+    robots_.clear();
     clearStatuses();
     unsubscribe();
 }
@@ -182,14 +186,18 @@ TransientModelDisplay::clear()
 void
 TransientModelDisplay::updateVisualVisible()
 {
-    robot_->setVisualVisible(visual_enabled_property_->getValue().toBool());
+    for (const auto& robot : robots_)
+	robot.second->setVisualVisible(visual_enabled_property_
+				       ->getValue().toBool());
     context_->queueRender();
 }
 
 void
 TransientModelDisplay::updateCollisionVisible()
 {
-    robot_->setCollisionVisible(collision_enabled_property_->getValue().toBool());
+    for (const auto& robot : robots_)
+	robot.second->setCollisionVisible(collision_enabled_property_
+					  ->getValue().toBool());
     context_->queueRender();
 }
 
@@ -203,7 +211,8 @@ TransientModelDisplay::updateTfPrefix()
 void
 TransientModelDisplay::updateAlpha()
 {
-    robot_->setAlpha(alpha_property_->getFloat());
+    for (const auto& robot : robots_)
+	robot.second->setAlpha(alpha_property_->getFloat());
     context_->queueRender();
 }
 
@@ -221,13 +230,15 @@ void
 TransientModelDisplay::onEnable()
 {
     subscribe();
-    robot_->setVisible(true);
+    for (const auto& robot : robots_)
+	robot.second->setVisible(true);
 }
 
 void
 TransientModelDisplay::onDisable()
 {
-    robot_->setVisible(false);
+    for (const auto& robot : robots_)
+	robot.second->setVisible(false);
     clear();
 }
 
@@ -271,30 +282,59 @@ TransientModelDisplay::unsubscribe()
  *  Subscription callback
  */
 void
-TransientModelDisplay::incomingDescription(
-    const aist_model_spawner::ModelDescription::ConstPtr& desc_msg)
+TransientModelDisplay::incomingDescription(const desc_msg_cp& desc_msg)
 {
     clearStatuses();
     context_->queueRender();
 
-    if(desc_msg->desc.empty())
+    switch (desc_msg->action)
     {
+      case desc_msg_t::ADD:
+      {
+	if(desc_msg->desc.empty())
+	{
+	    clear();
+	    setStatus(StatusProperty::Error, "URDF", "URDF is empty");
+	    return;
+	}
+
+	urdf::Model descr;
+	if(!descr.initString(desc_msg->desc))
+	{
+	    clear();
+	    setStatus(StatusProperty::Error,
+		      "URDF", "Failed to parse URDF model");
+	    return;
+	}
+
+	setStatus(StatusProperty::Ok, "URDF", "URDF parsed OK");
+	robots_[desc_msg->name].reset(new Robot(
+					  scene_node_, context_,
+					  "Robot: " + getName().toStdString(),
+					  this));
+	robots_[desc_msg->name]->load(descr);
+      }
+	break;
+
+      case desc_msg_t::DELETE:
+	robots_.erase(desc_msg->name);
+	break;
+
+      case desc_msg_t::DELETEALL:
+	for (const auto& robot : robots_)
+	    robot.second->clear();
+	robots_.clear();
+	break;
+
+      default:
 	clear();
-	setStatus(StatusProperty::Error, "URDF", "URDF is empty");
-	return;
+	setStatus(StatusProperty::Error, "URDF", "Unknown action");
+	break;
     }
 
-    urdf::Model descr;
-    if(!descr.initString(desc_msg->desc))
-    {
-	clear();
-	setStatus(StatusProperty::Error, "URDF", "Failed to parse URDF model");
-	return;
-    }
-
-    setStatus(StatusProperty::Ok, "URDF", "URDF parsed OK");
-    robot_->load(descr);
-    robot_->update(TFLinkUpdater(context_->getFrameManager(),
+    for (const auto& robot : robots_)
+	robot.second->update(TFLinkUpdater(
+				 context_->getFrameManager(),
 				 boost::bind(linkUpdaterStatusFunction,
 					     _1, _2, _3, this),
 				 tf_prefix_property_->getStdString()));
