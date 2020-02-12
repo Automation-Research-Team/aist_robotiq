@@ -29,36 +29,32 @@
   </joint>
 
   <!-- robot arms -->
-  <xacro:include filename="$(find aist_description)/device/urdf/torobo_arm.urdf.xacro"/>
-  <xacro:torobo_arm prefix="a_torobo_"/>
-  <joint name="ground_a_torobo_joint" type="fixed">
-    <parent link="ground"/>
-    <child  link="a_torobo_base"/>
-    <origin xyz="${a_torobo_x} ${a_torobo_y} ${bots_z}" rpy="0 0 ${pi/2}"/>
-  </joint>
+  <xacro:include filename="$(find torobo_resources)/urdf/arm/TRBA-R-002-7/arm.urdf.xacro"/>
+  <xacro:arm_v0 prefix="a_torobo_" parent="ground">
+    <joint_origin xyz="${a_torobo_x} ${a_torobo_y} ${bots_z}"
+		  rpy="0 0 ${pi/2}"/>
+  </xacro:arm_v0>
 
-  <xacro:torobo_arm prefix="b_torobo_"/>
-  <joint name="ground_b_torobo_joint" type="fixed">
-    <parent link="ground"/>
-    <child  link="b_torobo_base"/>
-    <origin xyz="${b_torobo_x} ${b_torobo_y} ${bots_z}" rpy="0 0 ${-pi/2}"/>
-  </joint>
+  <xacro:arm_v0 prefix="b_torobo_" parent="ground">
+    <joint_origin xyz="${b_torobo_x} ${b_torobo_y} ${bots_z}"
+		  rpy="0 0 ${-pi/2}"/>
+  </xacro:arm_v0>
 
   <!-- Attach grippers -->
-  <xacro:include filename="$(find aist_description)/device/urdf/torobo_gripper.urdf.xacro"/>
-  <xacro:torobo_gripper prefix="a_torobo_"/>
-  <joint name="a_torobo_arm_gripper_joint" type="fixed">
-    <parent link="a_torobo_arm/ee_link"/>
-    <child  link="a_torobo_gripper/base_link"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-  </joint>
+  <!-- <xacro:include filename="$(find aist_description)/device/urdf/torobo_gripper.urdf.xacro"/> -->
+  <!-- <xacro:torobo_gripper prefix="a_torobo_"/> -->
+  <!-- <joint name="a_torobo_arm_gripper_joint" type="fixed"> -->
+  <!--   <parent link="a_torobo_arm/ee_link"/> -->
+  <!--   <child  link="a_torobo_gripper/base_link"/> -->
+  <!--   <origin xyz="0 0 0" rpy="0 0 0"/> -->
+  <!-- </joint> -->
 
-  <xacro:torobo_gripper prefix="b_torobo_"/>
-  <joint name="b_torobo_arm_gripper_joint" type="fixed">
-    <parent link="b_torobo_arm/ee_link"/>
-    <child  link="b_torobo_gripper/base_link"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-  </joint>
+  <!-- <xacro:torobo_gripper prefix="b_torobo_"/> -->
+  <!-- <joint name="b_torobo_arm_gripper_joint" type="fixed"> -->
+  <!--   <parent link="b_torobo_arm/ee_link"/> -->
+  <!--   <child  link="b_torobo_gripper/base_link"/> -->
+  <!--   <origin xyz="0 0 0" rpy="0 0 0"/> -->
+  <!-- </joint> -->
 
   <!-- Add PhoXi 3D scanner -->
   <xacro:include filename="$(find aist_phoxi_camera)/urdf/phoxi_m_camera.urdf.xacro"/>
