@@ -44,7 +44,9 @@ Localization::file_info_cb(const file_info_cp& file_info)
 {
     try
     {
-	ROS_INFO_STREAM("Loading_scene[" << file_info->file_path << "]..,");
+	ROS_INFO_STREAM("Set frame to [" << file_info->frame
+			<< "] and Loading_scene["
+			<< file_info->file_path << "]..,");
 
 	_camera_frame = file_info->frame;
 	_scene = pho::sdk::SceneSource::File(file_info->file_path);
