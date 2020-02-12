@@ -35,6 +35,7 @@
 #include <OgreVector3.h>
 
 #include <map>
+#include <memory>
 
 #ifndef Q_MOC_RUN
 #  include <ros/ros.h>
@@ -69,6 +70,10 @@ class TransientModelDisplay : public Display
 {
     Q_OBJECT
 
+  private:
+    using desc_msg_t	= aist_model_spawner::ModelDescription;
+    using desc_msg_cp	= desc_msg_t::ConstPtr;
+
   public:
 			TransientModelDisplay()				;
     virtual		~TransientModelDisplay()			;
@@ -98,11 +103,10 @@ class TransientModelDisplay : public Display
     virtual void	subscribe()					;
     virtual void	unsubscribe()					;
 
-    void		incomingDescription(
-			    const aist_model_spawner::ModelDescription
-						    ::ConstPtr& desc_msg);
+    void		incomingDescription(const desc_msg_cp& desc_msg);
 
-    Robot*		robot_;  //< Handles actually drawing the robot
+    std::map<std::string, std::unique_ptr<Robot> >
+			robots_;  //< Handles actually drawing the robot
 
     bool		has_new_transforms_;  ///< Callback sets this to tell our update function it needs to update the transforms
 

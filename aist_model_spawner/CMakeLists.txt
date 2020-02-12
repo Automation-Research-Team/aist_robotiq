@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(aist_model_spawner)
 
+## Compile as C++11, supported in ROS Kinetic and newer
+add_compile_options(-w)
+add_compile_options(-std=c++14)
+add_compile_options(-fpermissive)
+add_compile_options(-pthread)
+
 find_package(catkin REQUIRED
   COMPONENTS
     message_generation

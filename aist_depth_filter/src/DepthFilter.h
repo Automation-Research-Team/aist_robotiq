@@ -6,12 +6,10 @@
 #ifndef DEPTHFILTER_H
 #define DEPTHFILTER_H
 
-#include <iostream>
-#include <cstdint>
-
 #include <ros/ros.h>
 #include <std_srvs/Trigger.h>
 #include <image_transport/image_transport.h>
+#include <aist_depth_filter/FileInfo.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
@@ -37,6 +35,7 @@ class DepthFilter
     using sync_policy2_t = message_filters::sync_policies::
 				ApproximateTime<camera_info_t,
 						image_t, image_t>;
+    using file_info_t	 = aist_depth_filter::FileInfo;
 
   public:
 		DepthFilter(const std::string& name)			;
@@ -48,11 +47,13 @@ class DepthFilter
 			  std_srvs::Trigger::Response& res)		;
     bool	savePly_cb(std_srvs::Trigger::Request&  req,
 			   std_srvs::Trigger::Response& res)		;
-    void	filter_cb(const camera_info_cp& camera_info,
-			  const image_cp& image, const image_cp& depth,
-			  const image_cp& normal)			;
-    void	filter_cb2(const camera_info_cp& camera_info,
-			   const image_cp& image, const image_cp& depth);
+    void	filter_with_normal_cb(const camera_info_cp& camera_info,
+				      const image_cp& image,
+				      const image_cp& depth,
+				      const image_cp& normal)		;
+    void	filter_without_normal_cb(const camera_info_cp& camera_info,
+					 const image_cp& image,
+					 const image_cp& depth)		;
 
     template <class T>
     void	filter(const camera_info_t& camera_info,
@@ -74,7 +75,7 @@ class DepthFilter
 				      image_t& colored_normal)	  const	;
     static std::string
 		open_dir()					  	;
-    
+
   private:
     ros::NodeHandle					_nh;
 
@@ -94,7 +95,8 @@ class DepthFilter
     const image_transport::Publisher			_normal_pub;
     const image_transport::Publisher			_colored_normal_pub;
     const ros::Publisher				_camera_info_pub;
-    
+    const ros::Publisher				_file_info_pub;
+
     ddynamic_reconfigure::DDynamicReconfigure		_ddr;
 
     camera_info_t					_camera_info;
@@ -127,7 +129,7 @@ class DepthFilter
 
   // Radius of window for computing normals.
     int							_window_radius;
-    
+
   private:
     constexpr static double				FarMax = 4.0;
 };

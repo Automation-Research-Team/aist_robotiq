@@ -1,12 +1,10 @@
 # Goal definition
-string  object_name        # [object_name].plcf gives configuration
-float32 timeout            # timeout in seconds
-int32   number_of_poses    # number of candidate poses
+string object_name        # [object_name].plcf gives configuration
+int32  number_of_poses    # number of candidate poses
 ---
 # Result definition
-std_msgs/Header      header
-geometry_msgs/Pose[] poses
-float32[]            overlaps
+bool success
 ---
 # Feedback definition
-int32   number_of_poses  # number of candidate poses currently found
+geometry_msgs/PoseStamped pose
+float32 overlap

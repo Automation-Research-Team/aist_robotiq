@@ -1,6 +1,11 @@
 <launch>
+  <arg name="load_robot_description"	default="false"/>
+  <arg name="robot_description"		default="robot_description"/>
 
-  <include file="$(find ceatec_moveit_config)/launch/planning_context.launch" />
+  <include file="$(find ceatec_moveit_config)/launch/planning_context.launch">
+    <arg name="load_robot_description"	value="$(arg load_robot_description)"/>
+    <arg name="robot_description"	value="$(arg robot_description)"/>
+  </include>
 
   <!-- GDB Debug Option -->
   <arg name="debug" default="false" />
@@ -46,13 +51,13 @@
   <!-- Trajectory Execution Functionality -->
   <include ns="move_group" file="$(find ceatec_moveit_config)/launch/trajectory_execution.launch.xml" if="$(arg allow_trajectory_execution)">
     <arg name="moveit_manage_controllers" value="true" />
-    <arg name="moveit_controller_manager" value="ceatec_base_scene" unless="$(arg fake_execution)"/>
+    <arg name="moveit_controller_manager" value="ceatec" unless="$(arg fake_execution)"/>
     <arg name="moveit_controller_manager" value="fake" if="$(arg fake_execution)"/>
   </include>
 
   <!-- Sensors Functionality -->
   <include ns="move_group" file="$(find ceatec_moveit_config)/launch/sensor_manager.launch.xml" if="$(arg allow_trajectory_execution)">
-    <arg name="moveit_sensor_manager" value="ceatec_base_scene" />
+    <arg name="moveit_sensor_manager" value="ceatec" />
   </include>
 
   <!-- Start the actual move_group node/action server -->
