@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro">
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
 
   <xacro:include filename="$(find torobo_resources
 			   )/urdf/arm/TRBA-R-002-7/arm.urdf.xacro"/>
@@ -8,7 +8,7 @@
     <xacro:arm_v0 prefix="${prefix}" parent="${parent}">
       <xacro:insert_block name="joint_origin"/>
     </xacro:arm_v0>
-    
+
     <link  name="${prefix}arm/ee_link"/>
     <joint name="${prefix}arm/ee_joint" type="fixed">
       <parent link="${prefix}arm/link_7"/>

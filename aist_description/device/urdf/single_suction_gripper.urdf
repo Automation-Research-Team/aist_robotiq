@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<robot name="aaa" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="aaa" xmlns:xacro="http://wiki.ros.org/xacro">
   <xacro:include filename="$(find aist_description)/device/urdf/single_suction_gripper.urdf.xacro" />
 
   <link name ="base_link"/>

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro">
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
 
   <xacro:include filename="$(find torobo_resources)/urdf/gripper/TRBG-L-B-001/gripper.urdf.xacro"/>
 
@@ -11,7 +11,7 @@
       <child  link="${prefix}gripper/base_link"/>
       <xacro:insert_block name="joint_origin"/>
     </joint>
-    
+
     <xacro:gripper_v0 prefix="${prefix}"
     		      parent="${prefix}gripper/base_link"
     		      use_graspfix="${use_graspfix}">
