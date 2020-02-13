@@ -1,6 +1,0 @@
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="assy_part_11">
-  <xacro:include filename="$(find o2as_parts_description)/urdf/generated/11_MBRAC60-2-10_macro.urdf.xacro"/>
-  <xacro:assy_part_11 prefix="" parent="world" spawn_attached="false">
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-  </xacro:assy_part_11>
-</robot>
