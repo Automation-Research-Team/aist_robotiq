@@ -1,4 +1,5 @@
 <launch>
+
   <!-- By default we do not overwrite the URDF. Change the following to true to change the default behavior -->
   <arg name="load_robot_description" default="false"/>
 
@@ -6,7 +7,7 @@
   <arg name="robot_description" default="robot_description"/>
 
   <!-- Load universal robot description format (URDF) -->
-  <param if="$(arg load_robot_description)" name="$(arg robot_description)" command="xacro  '$(find aist_description)/scene/urdf/ceatec.urdf.xacro'"/>
+  <param if="$(arg load_robot_description)" name="$(arg robot_description)" textfile="$(find aist_description)/scene/urdf/ceatec.urdf"/>
 
   <!-- The semantic description that corresponds to the URDF -->
   <param name="$(arg robot_description)_semantic" textfile="$(find ceatec_moveit_config)/config/ceatec.srdf" />

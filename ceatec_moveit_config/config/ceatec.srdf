@@ -127,9 +127,13 @@
     <disable_collisions link1="a_cabinet_ar_marker" link2="base_link" reason="Never" />
     <disable_collisions link1="a_cabinet_ar_marker" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_cabinet_ar_marker" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_cabinet_ar_marker" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_ar_marker" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_ar_marker" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_cabinet_ar_marker" link2="estop_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_ar_marker" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_ar_marker" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_ar_marker" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_ar_marker" link2="gripper_link" reason="Never" />
     <disable_collisions link1="a_cabinet_ar_marker" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_cabinet_ar_marker" link2="head_tilt_link" reason="Never" />
@@ -174,9 +178,13 @@
     <disable_collisions link1="a_cabinet_back" link2="base_link" reason="Never" />
     <disable_collisions link1="a_cabinet_back" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_cabinet_back" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_cabinet_back" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_back" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_back" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_cabinet_back" link2="estop_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_back" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_back" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_back" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_back" link2="gripper_link" reason="Never" />
     <disable_collisions link1="a_cabinet_back" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_cabinet_back" link2="head_tilt_link" reason="Never" />
@@ -220,9 +228,13 @@
     <disable_collisions link1="a_cabinet_base" link2="base_link" reason="Adjacent" />
     <disable_collisions link1="a_cabinet_base" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_cabinet_base" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_cabinet_base" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_base" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_base" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_cabinet_base" link2="estop_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_base" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_base" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_base" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_base" link2="gripper_link" reason="Never" />
     <disable_collisions link1="a_cabinet_base" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_cabinet_base" link2="head_tilt_link" reason="Never" />
@@ -265,9 +277,13 @@
     <disable_collisions link1="a_cabinet_shelf1" link2="base_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf1" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf1" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_cabinet_shelf1" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_shelf1" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf1" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf1" link2="estop_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_shelf1" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf1" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_shelf1" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf1" link2="gripper_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf1" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf1" link2="head_tilt_link" reason="Never" />
@@ -309,9 +325,13 @@
     <disable_collisions link1="a_cabinet_shelf2" link2="base_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf2" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf2" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_cabinet_shelf2" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_shelf2" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf2" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf2" link2="estop_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_shelf2" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf2" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_shelf2" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf2" link2="gripper_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf2" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf2" link2="head_tilt_link" reason="Never" />
@@ -352,9 +372,13 @@
     <disable_collisions link1="a_cabinet_shelf3" link2="base_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf3" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf3" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_cabinet_shelf3" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_shelf3" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf3" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf3" link2="estop_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_shelf3" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf3" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_shelf3" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf3" link2="gripper_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf3" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf3" link2="head_tilt_link" reason="Never" />
@@ -394,9 +418,13 @@
     <disable_collisions link1="a_cabinet_shelf4" link2="base_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf4" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf4" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_cabinet_shelf4" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_shelf4" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf4" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf4" link2="estop_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_shelf4" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf4" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_cabinet_shelf4" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf4" link2="gripper_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf4" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_cabinet_shelf4" link2="head_tilt_link" reason="Never" />
@@ -435,20 +463,23 @@
     <disable_collisions link1="a_table_ar_marker" link2="base_link" reason="Never" />
     <disable_collisions link1="a_table_ar_marker" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_table_ar_marker" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_table_ar_marker" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_table_ar_marker" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_table_ar_marker" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_table_ar_marker" link2="estop_link" reason="Never" />
-    <disable_collisions link1="a_table_ar_marker" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_table_ar_marker" link2="fl_caster_link" reason="Never" />
+    <disable_collisions link1="a_table_ar_marker" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_table_ar_marker" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_table_ar_marker" link2="head_tilt_link" reason="Never" />
     <disable_collisions link1="a_table_ar_marker" link2="l_wheel_link" reason="Never" />
     <disable_collisions link1="a_table_ar_marker" link2="laser_link" reason="Never" />
+    <disable_collisions link1="a_table_ar_marker" link2="r_gripper_finger_link" reason="Never" />
     <disable_collisions link1="a_table_ar_marker" link2="r_wheel_link" reason="Never" />
     <disable_collisions link1="a_table_ar_marker" link2="shoulder_lift_link" reason="Never" />
     <disable_collisions link1="a_table_ar_marker" link2="shoulder_pan_link" reason="Never" />
     <disable_collisions link1="a_table_ar_marker" link2="torso_fixed_link" reason="Never" />
     <disable_collisions link1="a_table_ar_marker" link2="torso_lift_link" reason="Never" />
     <disable_collisions link1="a_table_ar_marker" link2="upperarm_roll_link" reason="Never" />
-    <disable_collisions link1="a_table_ar_marker" link2="wrist_flex_link" reason="Never" />
     <disable_collisions link1="a_table_leg0" link2="a_table_leg1" reason="Adjacent" />
     <disable_collisions link1="a_table_leg0" link2="a_table_leg2" reason="Adjacent" />
     <disable_collisions link1="a_table_leg0" link2="a_table_leg3" reason="Adjacent" />
@@ -471,9 +502,12 @@
     <disable_collisions link1="a_table_leg0" link2="base_link" reason="Adjacent" />
     <disable_collisions link1="a_table_leg0" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_table_leg0" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_table_leg0" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_table_leg0" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_table_leg0" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_table_leg0" link2="estop_link" reason="Never" />
-    <disable_collisions link1="a_table_leg0" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_table_leg0" link2="fl_caster_link" reason="Never" />
+    <disable_collisions link1="a_table_leg0" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_table_leg0" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_table_leg0" link2="head_tilt_link" reason="Never" />
     <disable_collisions link1="a_table_leg0" link2="l_wheel_link" reason="Never" />
@@ -486,6 +520,7 @@
     <disable_collisions link1="a_table_leg0" link2="upperarm_roll_link" reason="Never" />
     <disable_collisions link1="a_table_leg1" link2="a_table_leg2" reason="Never" />
     <disable_collisions link1="a_table_leg1" link2="a_table_leg3" reason="Never" />
+    <disable_collisions link1="a_table_leg1" link2="a_table_top" reason="Always" />
     <disable_collisions link1="a_table_leg1" link2="a_tray_bottom" reason="Never" />
     <disable_collisions link1="a_table_leg1" link2="a_tray_wall0" reason="Never" />
     <disable_collisions link1="a_table_leg1" link2="a_tray_wall1" reason="Never" />
@@ -504,16 +539,17 @@
     <disable_collisions link1="a_table_leg1" link2="base_link" reason="Never" />
     <disable_collisions link1="a_table_leg1" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_table_leg1" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_table_leg1" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_table_leg1" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_table_leg1" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_table_leg1" link2="estop_link" reason="Never" />
+    <disable_collisions link1="a_table_leg1" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="a_table_leg1" link2="forearm_roll_link" reason="Never" />
-    <disable_collisions link1="a_table_leg1" link2="gripper_link" reason="Never" />
+    <disable_collisions link1="a_table_leg1" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_table_leg1" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_table_leg1" link2="head_tilt_link" reason="Never" />
-    <disable_collisions link1="a_table_leg1" link2="l_gripper_finger_link" reason="Never" />
     <disable_collisions link1="a_table_leg1" link2="l_wheel_link" reason="Never" />
     <disable_collisions link1="a_table_leg1" link2="laser_link" reason="Never" />
-    <disable_collisions link1="a_table_leg1" link2="r_gripper_finger_link" reason="Never" />
     <disable_collisions link1="a_table_leg1" link2="r_wheel_link" reason="Never" />
     <disable_collisions link1="a_table_leg1" link2="shoulder_lift_link" reason="Never" />
     <disable_collisions link1="a_table_leg1" link2="shoulder_pan_link" reason="Never" />
@@ -542,9 +578,13 @@
     <disable_collisions link1="a_table_leg2" link2="base_link" reason="Never" />
     <disable_collisions link1="a_table_leg2" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_table_leg2" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_table_leg2" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_table_leg2" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_table_leg2" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_table_leg2" link2="estop_link" reason="Never" />
+    <disable_collisions link1="a_table_leg2" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="a_table_leg2" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_table_leg2" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_table_leg2" link2="gripper_link" reason="Never" />
     <disable_collisions link1="a_table_leg2" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_table_leg2" link2="head_tilt_link" reason="Never" />
@@ -578,9 +618,13 @@
     <disable_collisions link1="a_table_leg3" link2="base_link" reason="Never" />
     <disable_collisions link1="a_table_leg3" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_table_leg3" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_table_leg3" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_table_leg3" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_table_leg3" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_table_leg3" link2="estop_link" reason="Never" />
+    <disable_collisions link1="a_table_leg3" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="a_table_leg3" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_table_leg3" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_table_leg3" link2="gripper_link" reason="Never" />
     <disable_collisions link1="a_table_leg3" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_table_leg3" link2="head_tilt_link" reason="Never" />
@@ -614,9 +658,12 @@
     <disable_collisions link1="a_table_top" link2="base_link" reason="Never" />
     <disable_collisions link1="a_table_top" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_table_top" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_table_top" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_table_top" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_table_top" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_table_top" link2="estop_link" reason="Never" />
-    <disable_collisions link1="a_table_top" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_table_top" link2="fl_caster_link" reason="Never" />
+    <disable_collisions link1="a_table_top" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_table_top" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_table_top" link2="head_tilt_link" reason="Never" />
     <disable_collisions link1="a_table_top" link2="l_wheel_link" reason="Never" />
@@ -644,9 +691,13 @@
     <disable_collisions link1="a_tray_bottom" link2="base_link" reason="Never" />
     <disable_collisions link1="a_tray_bottom" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_tray_bottom" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_tray_bottom" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_tray_bottom" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_tray_bottom" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_tray_bottom" link2="estop_link" reason="Never" />
+    <disable_collisions link1="a_tray_bottom" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="a_tray_bottom" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_tray_bottom" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_tray_bottom" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_tray_bottom" link2="head_tilt_link" reason="Never" />
     <disable_collisions link1="a_tray_bottom" link2="l_wheel_link" reason="Never" />
@@ -657,8 +708,6 @@
     <disable_collisions link1="a_tray_bottom" link2="torso_fixed_link" reason="Never" />
     <disable_collisions link1="a_tray_bottom" link2="torso_lift_link" reason="Never" />
     <disable_collisions link1="a_tray_bottom" link2="upperarm_roll_link" reason="Never" />
-    <disable_collisions link1="a_tray_bottom" link2="wrist_flex_link" reason="Never" />
-    <disable_collisions link1="a_tray_bottom" link2="wrist_roll_link" reason="Never" />
     <disable_collisions link1="a_tray_wall0" link2="a_tray_wall1" reason="Never" />
     <disable_collisions link1="a_tray_wall0" link2="a_tray_wall2" reason="Never" />
     <disable_collisions link1="a_tray_wall0" link2="a_tray_wall3" reason="Never" />
@@ -675,11 +724,16 @@
     <disable_collisions link1="a_tray_wall0" link2="base_link" reason="Never" />
     <disable_collisions link1="a_tray_wall0" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_tray_wall0" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_tray_wall0" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_tray_wall0" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_tray_wall0" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_tray_wall0" link2="estop_link" reason="Never" />
+    <disable_collisions link1="a_tray_wall0" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="a_tray_wall0" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_tray_wall0" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_tray_wall0" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_tray_wall0" link2="head_tilt_link" reason="Never" />
+    <disable_collisions link1="a_tray_wall0" link2="l_gripper_finger_link" reason="Never" />
     <disable_collisions link1="a_tray_wall0" link2="l_wheel_link" reason="Never" />
     <disable_collisions link1="a_tray_wall0" link2="laser_link" reason="Never" />
     <disable_collisions link1="a_tray_wall0" link2="r_wheel_link" reason="Never" />
@@ -703,9 +757,13 @@
     <disable_collisions link1="a_tray_wall1" link2="base_link" reason="Never" />
     <disable_collisions link1="a_tray_wall1" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_tray_wall1" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_tray_wall1" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_tray_wall1" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_tray_wall1" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_tray_wall1" link2="estop_link" reason="Never" />
+    <disable_collisions link1="a_tray_wall1" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="a_tray_wall1" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_tray_wall1" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_tray_wall1" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_tray_wall1" link2="head_tilt_link" reason="Never" />
     <disable_collisions link1="a_tray_wall1" link2="l_wheel_link" reason="Never" />
@@ -716,7 +774,7 @@
     <disable_collisions link1="a_tray_wall1" link2="torso_fixed_link" reason="Never" />
     <disable_collisions link1="a_tray_wall1" link2="torso_lift_link" reason="Never" />
     <disable_collisions link1="a_tray_wall1" link2="upperarm_roll_link" reason="Never" />
-    <disable_collisions link1="a_tray_wall1" link2="wrist_roll_link" reason="Never" />
+    <disable_collisions link1="a_tray_wall1" link2="wrist_flex_link" reason="Never" />
     <disable_collisions link1="a_tray_wall2" link2="a_tray_wall3" reason="Always" />
     <disable_collisions link1="a_tray_wall2" link2="b_table_leg0" reason="Never" />
     <disable_collisions link1="a_tray_wall2" link2="b_table_leg1" reason="Never" />
@@ -731,13 +789,16 @@
     <disable_collisions link1="a_tray_wall2" link2="base_link" reason="Never" />
     <disable_collisions link1="a_tray_wall2" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_tray_wall2" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_tray_wall2" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_tray_wall2" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_tray_wall2" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_tray_wall2" link2="estop_link" reason="Never" />
+    <disable_collisions link1="a_tray_wall2" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="a_tray_wall2" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_tray_wall2" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_tray_wall2" link2="gripper_link" reason="Never" />
     <disable_collisions link1="a_tray_wall2" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_tray_wall2" link2="head_tilt_link" reason="Never" />
-    <disable_collisions link1="a_tray_wall2" link2="l_gripper_finger_link" reason="Never" />
     <disable_collisions link1="a_tray_wall2" link2="l_wheel_link" reason="Never" />
     <disable_collisions link1="a_tray_wall2" link2="laser_link" reason="Never" />
     <disable_collisions link1="a_tray_wall2" link2="r_gripper_finger_link" reason="Never" />
@@ -762,16 +823,18 @@
     <disable_collisions link1="a_tray_wall3" link2="base_link" reason="Never" />
     <disable_collisions link1="a_tray_wall3" link2="bellows_link" reason="Never" />
     <disable_collisions link1="a_tray_wall3" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="a_tray_wall3" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="a_tray_wall3" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="a_tray_wall3" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="a_tray_wall3" link2="estop_link" reason="Never" />
+    <disable_collisions link1="a_tray_wall3" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="a_tray_wall3" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="a_tray_wall3" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="a_tray_wall3" link2="gripper_link" reason="Never" />
     <disable_collisions link1="a_tray_wall3" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="a_tray_wall3" link2="head_tilt_link" reason="Never" />
-    <disable_collisions link1="a_tray_wall3" link2="l_gripper_finger_link" reason="Never" />
     <disable_collisions link1="a_tray_wall3" link2="l_wheel_link" reason="Never" />
     <disable_collisions link1="a_tray_wall3" link2="laser_link" reason="Never" />
-    <disable_collisions link1="a_tray_wall3" link2="r_gripper_finger_link" reason="Never" />
     <disable_collisions link1="a_tray_wall3" link2="r_wheel_link" reason="Never" />
     <disable_collisions link1="a_tray_wall3" link2="shoulder_lift_link" reason="Never" />
     <disable_collisions link1="a_tray_wall3" link2="shoulder_pan_link" reason="Never" />
@@ -792,9 +855,13 @@
     <disable_collisions link1="b_table_leg0" link2="base_link" reason="Adjacent" />
     <disable_collisions link1="b_table_leg0" link2="bellows_link" reason="Never" />
     <disable_collisions link1="b_table_leg0" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="b_table_leg0" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="b_table_leg0" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="b_table_leg0" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="b_table_leg0" link2="estop_link" reason="Never" />
+    <disable_collisions link1="b_table_leg0" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="b_table_leg0" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="b_table_leg0" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="b_table_leg0" link2="gripper_link" reason="Never" />
     <disable_collisions link1="b_table_leg0" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="b_table_leg0" link2="head_tilt_link" reason="Never" />
@@ -812,7 +879,6 @@
     <disable_collisions link1="b_table_leg0" link2="wrist_roll_link" reason="Never" />
     <disable_collisions link1="b_table_leg1" link2="b_table_leg2" reason="Never" />
     <disable_collisions link1="b_table_leg1" link2="b_table_leg3" reason="Never" />
-    <disable_collisions link1="b_table_leg1" link2="b_table_top" reason="Default" />
     <disable_collisions link1="b_table_leg1" link2="b_tray_bottom" reason="Never" />
     <disable_collisions link1="b_table_leg1" link2="b_tray_wall0" reason="Never" />
     <disable_collisions link1="b_table_leg1" link2="b_tray_wall1" reason="Never" />
@@ -821,8 +887,12 @@
     <disable_collisions link1="b_table_leg1" link2="base_link" reason="Never" />
     <disable_collisions link1="b_table_leg1" link2="bellows_link" reason="Never" />
     <disable_collisions link1="b_table_leg1" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="b_table_leg1" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="b_table_leg1" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="b_table_leg1" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="b_table_leg1" link2="estop_link" reason="Never" />
+    <disable_collisions link1="b_table_leg1" link2="fl_caster_link" reason="Never" />
+    <disable_collisions link1="b_table_leg1" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="b_table_leg1" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="b_table_leg1" link2="head_tilt_link" reason="Never" />
     <disable_collisions link1="b_table_leg1" link2="l_wheel_link" reason="Never" />
@@ -843,9 +913,13 @@
     <disable_collisions link1="b_table_leg2" link2="base_link" reason="Never" />
     <disable_collisions link1="b_table_leg2" link2="bellows_link" reason="Never" />
     <disable_collisions link1="b_table_leg2" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="b_table_leg2" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="b_table_leg2" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="b_table_leg2" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="b_table_leg2" link2="estop_link" reason="Never" />
+    <disable_collisions link1="b_table_leg2" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="b_table_leg2" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="b_table_leg2" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="b_table_leg2" link2="gripper_link" reason="Never" />
     <disable_collisions link1="b_table_leg2" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="b_table_leg2" link2="head_tilt_link" reason="Never" />
@@ -869,9 +943,13 @@
     <disable_collisions link1="b_table_leg3" link2="base_link" reason="Never" />
     <disable_collisions link1="b_table_leg3" link2="bellows_link" reason="Never" />
     <disable_collisions link1="b_table_leg3" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="b_table_leg3" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="b_table_leg3" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="b_table_leg3" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="b_table_leg3" link2="estop_link" reason="Never" />
+    <disable_collisions link1="b_table_leg3" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="b_table_leg3" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="b_table_leg3" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="b_table_leg3" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="b_table_leg3" link2="head_tilt_link" reason="Never" />
     <disable_collisions link1="b_table_leg3" link2="l_wheel_link" reason="Never" />
@@ -892,8 +970,12 @@
     <disable_collisions link1="b_table_top" link2="base_link" reason="Never" />
     <disable_collisions link1="b_table_top" link2="bellows_link" reason="Never" />
     <disable_collisions link1="b_table_top" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="b_table_top" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="b_table_top" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="b_table_top" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="b_table_top" link2="estop_link" reason="Never" />
+    <disable_collisions link1="b_table_top" link2="fl_caster_link" reason="Never" />
+    <disable_collisions link1="b_table_top" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="b_table_top" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="b_table_top" link2="head_tilt_link" reason="Never" />
     <disable_collisions link1="b_table_top" link2="l_wheel_link" reason="Never" />
@@ -911,8 +993,12 @@
     <disable_collisions link1="b_tray_bottom" link2="base_link" reason="Never" />
     <disable_collisions link1="b_tray_bottom" link2="bellows_link" reason="Never" />
     <disable_collisions link1="b_tray_bottom" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="b_tray_bottom" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="b_tray_bottom" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="b_tray_bottom" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="b_tray_bottom" link2="estop_link" reason="Never" />
+    <disable_collisions link1="b_tray_bottom" link2="fl_caster_link" reason="Never" />
+    <disable_collisions link1="b_tray_bottom" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="b_tray_bottom" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="b_tray_bottom" link2="head_tilt_link" reason="Never" />
     <disable_collisions link1="b_tray_bottom" link2="l_wheel_link" reason="Never" />
@@ -929,8 +1015,12 @@
     <disable_collisions link1="b_tray_wall0" link2="base_link" reason="Never" />
     <disable_collisions link1="b_tray_wall0" link2="bellows_link" reason="Never" />
     <disable_collisions link1="b_tray_wall0" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="b_tray_wall0" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="b_tray_wall0" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="b_tray_wall0" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="b_tray_wall0" link2="estop_link" reason="Never" />
+    <disable_collisions link1="b_tray_wall0" link2="fl_caster_link" reason="Never" />
+    <disable_collisions link1="b_tray_wall0" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="b_tray_wall0" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="b_tray_wall0" link2="head_tilt_link" reason="Never" />
     <disable_collisions link1="b_tray_wall0" link2="l_wheel_link" reason="Never" />
@@ -946,8 +1036,13 @@
     <disable_collisions link1="b_tray_wall1" link2="base_link" reason="Never" />
     <disable_collisions link1="b_tray_wall1" link2="bellows_link" reason="Never" />
     <disable_collisions link1="b_tray_wall1" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="b_tray_wall1" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="b_tray_wall1" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="b_tray_wall1" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="b_tray_wall1" link2="estop_link" reason="Never" />
+    <disable_collisions link1="b_tray_wall1" link2="fl_caster_link" reason="Never" />
+    <disable_collisions link1="b_tray_wall1" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="b_tray_wall1" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="b_tray_wall1" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="b_tray_wall1" link2="head_tilt_link" reason="Never" />
     <disable_collisions link1="b_tray_wall1" link2="l_wheel_link" reason="Never" />
@@ -962,9 +1057,13 @@
     <disable_collisions link1="b_tray_wall2" link2="base_link" reason="Never" />
     <disable_collisions link1="b_tray_wall2" link2="bellows_link" reason="Never" />
     <disable_collisions link1="b_tray_wall2" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="b_tray_wall2" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="b_tray_wall2" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="b_tray_wall2" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="b_tray_wall2" link2="estop_link" reason="Never" />
+    <disable_collisions link1="b_tray_wall2" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="b_tray_wall2" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="b_tray_wall2" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="b_tray_wall2" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="b_tray_wall2" link2="head_tilt_link" reason="Never" />
     <disable_collisions link1="b_tray_wall2" link2="l_wheel_link" reason="Never" />
@@ -975,13 +1074,15 @@
     <disable_collisions link1="b_tray_wall2" link2="torso_fixed_link" reason="Never" />
     <disable_collisions link1="b_tray_wall2" link2="torso_lift_link" reason="Never" />
     <disable_collisions link1="b_tray_wall2" link2="upperarm_roll_link" reason="Never" />
-    <disable_collisions link1="b_tray_wall2" link2="wrist_flex_link" reason="Never" />
-    <disable_collisions link1="b_tray_wall2" link2="wrist_roll_link" reason="Never" />
     <disable_collisions link1="b_tray_wall3" link2="base_link" reason="Never" />
     <disable_collisions link1="b_tray_wall3" link2="bellows_link" reason="Never" />
     <disable_collisions link1="b_tray_wall3" link2="bellows_link2" reason="Never" />
+    <disable_collisions link1="b_tray_wall3" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="b_tray_wall3" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="b_tray_wall3" link2="elbow_flex_link" reason="Never" />
     <disable_collisions link1="b_tray_wall3" link2="estop_link" reason="Never" />
+    <disable_collisions link1="b_tray_wall3" link2="fl_caster_link" reason="Never" />
+    <disable_collisions link1="b_tray_wall3" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="b_tray_wall3" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="b_tray_wall3" link2="head_tilt_link" reason="Never" />
     <disable_collisions link1="b_tray_wall3" link2="l_wheel_link" reason="Never" />
@@ -994,7 +1095,11 @@
     <disable_collisions link1="b_tray_wall3" link2="upperarm_roll_link" reason="Never" />
     <disable_collisions link1="base_link" link2="bellows_link" reason="Default" />
     <disable_collisions link1="base_link" link2="bellows_link2" reason="Default" />
+    <disable_collisions link1="base_link" link2="bl_caster_link" reason="Adjacent" />
+    <disable_collisions link1="base_link" link2="br_caster_link" reason="Adjacent" />
     <disable_collisions link1="base_link" link2="estop_link" reason="Adjacent" />
+    <disable_collisions link1="base_link" link2="fl_caster_link" reason="Adjacent" />
+    <disable_collisions link1="base_link" link2="fr_caster_link" reason="Adjacent" />
     <disable_collisions link1="base_link" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="base_link" link2="head_tilt_link" reason="Never" />
     <disable_collisions link1="base_link" link2="l_wheel_link" reason="Adjacent" />
@@ -1006,7 +1111,11 @@
     <disable_collisions link1="base_link" link2="torso_lift_link" reason="Adjacent" />
     <disable_collisions link1="base_link" link2="upperarm_roll_link" reason="Never" />
     <disable_collisions link1="bellows_link" link2="bellows_link2" reason="Default" />
+    <disable_collisions link1="bellows_link" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="bellows_link" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="bellows_link" link2="estop_link" reason="Never" />
+    <disable_collisions link1="bellows_link" link2="fl_caster_link" reason="Never" />
+    <disable_collisions link1="bellows_link" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="bellows_link" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="bellows_link" link2="head_tilt_link" reason="Never" />
     <disable_collisions link1="bellows_link" link2="l_wheel_link" reason="Never" />
@@ -1017,7 +1126,11 @@
     <disable_collisions link1="bellows_link" link2="torso_fixed_link" reason="Default" />
     <disable_collisions link1="bellows_link" link2="torso_lift_link" reason="Adjacent" />
     <disable_collisions link1="bellows_link" link2="upperarm_roll_link" reason="Never" />
+    <disable_collisions link1="bellows_link2" link2="bl_caster_link" reason="Never" />
+    <disable_collisions link1="bellows_link2" link2="br_caster_link" reason="Never" />
     <disable_collisions link1="bellows_link2" link2="estop_link" reason="Never" />
+    <disable_collisions link1="bellows_link2" link2="fl_caster_link" reason="Never" />
+    <disable_collisions link1="bellows_link2" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="bellows_link2" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="bellows_link2" link2="head_tilt_link" reason="Never" />
     <disable_collisions link1="bellows_link2" link2="l_wheel_link" reason="Never" />
@@ -1028,8 +1141,45 @@
     <disable_collisions link1="bellows_link2" link2="torso_fixed_link" reason="Default" />
     <disable_collisions link1="bellows_link2" link2="torso_lift_link" reason="Adjacent" />
     <disable_collisions link1="bellows_link2" link2="upperarm_roll_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="br_caster_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="elbow_flex_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="estop_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="fl_caster_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="fr_caster_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="head_pan_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="head_tilt_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="l_wheel_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="laser_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="r_wheel_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="shoulder_lift_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="shoulder_pan_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="torso_fixed_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="torso_lift_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="upperarm_roll_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="wrist_flex_link" reason="Never" />
+    <disable_collisions link1="bl_caster_link" link2="wrist_roll_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="elbow_flex_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="estop_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="fl_caster_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="forearm_roll_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="fr_caster_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="head_pan_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="head_tilt_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="l_wheel_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="laser_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="r_wheel_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="shoulder_lift_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="shoulder_pan_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="torso_fixed_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="torso_lift_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="upperarm_roll_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="wrist_flex_link" reason="Never" />
+    <disable_collisions link1="br_caster_link" link2="wrist_roll_link" reason="Never" />
     <disable_collisions link1="elbow_flex_link" link2="estop_link" reason="Never" />
+    <disable_collisions link1="elbow_flex_link" link2="fl_caster_link" reason="Never" />
     <disable_collisions link1="elbow_flex_link" link2="forearm_roll_link" reason="Adjacent" />
+    <disable_collisions link1="elbow_flex_link" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="elbow_flex_link" link2="gripper_link" reason="Never" />
     <disable_collisions link1="elbow_flex_link" link2="l_gripper_finger_link" reason="Never" />
     <disable_collisions link1="elbow_flex_link" link2="l_wheel_link" reason="Never" />
@@ -1041,8 +1191,11 @@
     <disable_collisions link1="elbow_flex_link" link2="upperarm_roll_link" reason="Adjacent" />
     <disable_collisions link1="elbow_flex_link" link2="wrist_flex_link" reason="Never" />
     <disable_collisions link1="elbow_flex_link" link2="wrist_roll_link" reason="Never" />
+    <disable_collisions link1="estop_link" link2="fl_caster_link" reason="Never" />
+    <disable_collisions link1="estop_link" link2="fr_caster_link" reason="Never" />
     <disable_collisions link1="estop_link" link2="head_pan_link" reason="Never" />
     <disable_collisions link1="estop_link" link2="head_tilt_link" reason="Never" />
+    <disable_collisions link1="estop_link" link2="l_gripper_finger_link" reason="Never" />
     <disable_collisions link1="estop_link" link2="l_wheel_link" reason="Never" />
     <disable_collisions link1="estop_link" link2="laser_link" reason="Never" />
     <disable_collisions link1="estop_link" link2="r_wheel_link" reason="Never" />
@@ -1051,6 +1204,17 @@
     <disable_collisions link1="estop_link" link2="torso_fixed_link" reason="Never" />
     <disable_collisions link1="estop_link" link2="torso_lift_link" reason="Never" />
     <disable_collisions link1="estop_link" link2="upperarm_roll_link" reason="Never" />
+    <disable_collisions link1="fl_caster_link" link2="fr_caster_link" reason="Never" />
+    <disable_collisions link1="fl_caster_link" link2="head_pan_link" reason="Never" />
+    <disable_collisions link1="fl_caster_link" link2="head_tilt_link" reason="Never" />
+    <disable_collisions link1="fl_caster_link" link2="l_wheel_link" reason="Never" />
+    <disable_collisions link1="fl_caster_link" link2="laser_link" reason="Never" />
+    <disable_collisions link1="fl_caster_link" link2="r_wheel_link" reason="Never" />
+    <disable_collisions link1="fl_caster_link" link2="shoulder_lift_link" reason="Never" />
+    <disable_collisions link1="fl_caster_link" link2="shoulder_pan_link" reason="Never" />
+    <disable_collisions link1="fl_caster_link" link2="torso_fixed_link" reason="Never" />
+    <disable_collisions link1="fl_caster_link" link2="torso_lift_link" reason="Never" />
+    <disable_collisions link1="fl_caster_link" link2="upperarm_roll_link" reason="Never" />
     <disable_collisions link1="forearm_roll_link" link2="gripper_link" reason="Never" />
     <disable_collisions link1="forearm_roll_link" link2="l_gripper_finger_link" reason="Never" />
     <disable_collisions link1="forearm_roll_link" link2="l_wheel_link" reason="Never" />
@@ -1061,6 +1225,16 @@
     <disable_collisions link1="forearm_roll_link" link2="upperarm_roll_link" reason="Never" />
     <disable_collisions link1="forearm_roll_link" link2="wrist_flex_link" reason="Adjacent" />
     <disable_collisions link1="forearm_roll_link" link2="wrist_roll_link" reason="Never" />
+    <disable_collisions link1="fr_caster_link" link2="head_pan_link" reason="Never" />
+    <disable_collisions link1="fr_caster_link" link2="head_tilt_link" reason="Never" />
+    <disable_collisions link1="fr_caster_link" link2="l_wheel_link" reason="Never" />
+    <disable_collisions link1="fr_caster_link" link2="laser_link" reason="Never" />
+    <disable_collisions link1="fr_caster_link" link2="r_wheel_link" reason="Never" />
+    <disable_collisions link1="fr_caster_link" link2="shoulder_lift_link" reason="Never" />
+    <disable_collisions link1="fr_caster_link" link2="shoulder_pan_link" reason="Never" />
+    <disable_collisions link1="fr_caster_link" link2="torso_fixed_link" reason="Never" />
+    <disable_collisions link1="fr_caster_link" link2="torso_lift_link" reason="Never" />
+    <disable_collisions link1="fr_caster_link" link2="upperarm_roll_link" reason="Never" />
     <disable_collisions link1="gripper_link" link2="l_gripper_finger_link" reason="Adjacent" />
     <disable_collisions link1="gripper_link" link2="r_gripper_finger_link" reason="Adjacent" />
     <disable_collisions link1="gripper_link" link2="upperarm_roll_link" reason="Never" />
@@ -1092,7 +1266,6 @@
     <disable_collisions link1="l_wheel_link" link2="torso_fixed_link" reason="Never" />
     <disable_collisions link1="l_wheel_link" link2="torso_lift_link" reason="Never" />
     <disable_collisions link1="l_wheel_link" link2="upperarm_roll_link" reason="Never" />
-    <disable_collisions link1="laser_link" link2="r_gripper_finger_link" reason="Never" />
     <disable_collisions link1="laser_link" link2="r_wheel_link" reason="Never" />
     <disable_collisions link1="laser_link" link2="shoulder_lift_link" reason="Never" />
     <disable_collisions link1="laser_link" link2="shoulder_pan_link" reason="Never" />
@@ -1117,7 +1290,6 @@
     <disable_collisions link1="shoulder_pan_link" link2="torso_lift_link" reason="Adjacent" />
     <disable_collisions link1="shoulder_pan_link" link2="upperarm_roll_link" reason="Never" />
     <disable_collisions link1="shoulder_pan_link" link2="wrist_flex_link" reason="Never" />
-    <disable_collisions link1="shoulder_pan_link" link2="wrist_roll_link" reason="Never" />
     <disable_collisions link1="torso_fixed_link" link2="torso_lift_link" reason="Default" />
     <disable_collisions link1="torso_fixed_link" link2="upperarm_roll_link" reason="Never" />
     <disable_collisions link1="torso_lift_link" link2="upperarm_roll_link" reason="Never" />
