@@ -1,28 +1,28 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://wiki.ros.org/xacro">
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <xacro:property name="M_PI" value="3.1415926535897931"/>
+  <xacro:include filename="$(find torobo_resources)/urdf/gripper/TRBG-L-B-001/gripper.urdf.xacro"/>
 
-  <xacro:include filename="$(find torobo_resources
-			   )/TRBG-L-B-001/urdf/gripper.urdf.xacro"/>
-  <xacro:include filename="$(find torobo_resources
-			   )/TRBG-L-B-001/urdf/gripper.gazebo"/>
-
-  <xacro:macro name="torobo_gripper" params="prefix">
+  <xacro:macro name="torobo_gripper"
+	       params="prefix parent use_graspfix *joint_origin">
     <link  name="${prefix}gripper/base_link"/>
-
-    <xacro:gripper_macro prefix="${prefix}gripper/"
-			 attach_link="${prefix}gripper/base_link"
-			 attach_xyz="0 0 0"
-			 attach_rpy="0 ${M_PI/2} 0" />
-    <xacro:gripper_gazebo_macro prefix="${prefix}gripper/"
-				use_graspfix="false"/>
+    <joint name="${prefix}gripper_parent_base_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child  link="${prefix}gripper/base_link"/>
+      <xacro:insert_block name="joint_origin"/>
+    </joint>
+    
+    <xacro:gripper_v0 prefix="${prefix}"
+    		      parent="${prefix}gripper/base_link"
+    		      use_graspfix="${use_graspfix}">
+      <origin xyz="0 0 0" rpy="0 ${pi/2} 0"/>
+    </xacro:gripper_v0>
 
     <link  name="${prefix}gripper/tip_link"/>
     <joint name="${prefix}gripper/tip_joint" type="fixed">
-      <parent link="${prefix}gripper/grasping_frame"/>
+      <parent link="${prefix}grasping_frame"/>
       <child  link="${prefix}gripper/tip_link"/>
-      <origin xyz="0 0 0" rpy="0 ${-M_PI/2} 0"/>
+      <origin xyz="0 0 0" rpy="0 ${-pi/2} 0"/>
     </joint>
   </xacro:macro>
 
