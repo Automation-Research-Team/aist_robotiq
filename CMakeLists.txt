@@ -18,12 +18,16 @@ find_package(
     roscpp
     roslib
     genmsg
+    message_generation
     actionlib_msgs
     actionlib
     geometry_msgs
     std_msgs
     tf
+    aist_depth_filter
 )
+
+catkin_python_setup()
 
 ###########
 ## Build ##
@@ -33,10 +37,7 @@ include_directories(
   ${PHOLOCALIZATION_INCLUDE_DIRS}
 )
 
-add_action_files(
-  FILES
-    Localize.action
-)
+add_action_files(DIRECTORY action)
 
 generate_messages(
   DEPENDENCIES
@@ -69,9 +70,9 @@ add_dependencies(
 
 target_link_libraries(
   ${PROJECT_NAME}
-  ${PHOLOCALIZATION_LIBRARIES}
   ${roscpp_LIBRARIES}
   ${catkin_LIBRARIES}
+  ${PHOLOCALIZATION_LIBRARIES}
 )
 
 add_library(
@@ -89,9 +90,9 @@ add_dependencies(
 
 target_link_libraries(
   ${PROJECT_NAME}_nodelet
-  ${PHOLOCALIZATION_LIBRARIES}
   ${roscpp_LIBRARIES}
   ${catkin_LIBRARIES}
+  ${PHOLOCALIZATION_LIBRARIES}
 )
 
 #############
