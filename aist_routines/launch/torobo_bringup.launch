@@ -64,7 +64,8 @@
     </group>
 
     <!-- launch rviz gui -->
-    <group if="$(arg rviz)" ns="torobo">
+    <!-- <group if="$(arg rviz)" ns="torobo"> -->
+    <group if="$(arg rviz)">
       <include if="$(arg rviz)" file="$(find torobo_moveit_config)/launch/moveit_rviz.launch">
         <arg name="config" value="true" />
       </include>

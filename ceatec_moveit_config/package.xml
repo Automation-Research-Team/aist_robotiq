@@ -3,7 +3,9 @@
   <name>ceatec_moveit_config</name>
   <version>0.3.0</version>
   <description>
-     An automatically generated package with all the configuration and launch files for using the ceatec_base_scene with the MoveIt! Motion Planning Framework
+     An automatically generated package with all the
+     configuration and launch files for using the CEATEC scene
+     with the MoveIt! Motion Planning Framework
   </description>
   <author email="t.ueshiba@aist.go.jp">Toshio UESHIBA</author>
   <maintainer email="t.ueshiba@aist.go.jp">Toshio UESHIBA</maintainer>

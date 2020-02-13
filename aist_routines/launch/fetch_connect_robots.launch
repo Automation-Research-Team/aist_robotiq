@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Publish base_scan_raw if anything subscribes to it -->
+  <node name="publish_base_scan_raw"
+  	pkg="topic_tools" type="relay" args="base_scan base_scan_raw" >
+    <param name="lazy" type="bool" value="True"/>
+  </node>
+
+  <!-- Start a mux between application and teleop -->
+  <!-- <node name="cmd_vel_mux" pkg="topic_tools" type="mux" -->
+  <!-- 	respawn="true" args="base_controller/command /cmd_vel /teleop/cmd_vel"> -->
+  <!--   <remap from="mux" to="cmd_vel_mux" /> -->
+  <!-- </node> -->
+
+</launch>
