@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="sim" default="true" doc="If true, the robot will be simulated in Gazebo" />
+
+    <arg name="hardware_interface" default="PositionJointInterface" />
+    <arg name="model" default="iiwa14"/>
+    <arg name="end_effector" default=""/>
+    <arg name="robot_name" default="iiwa" />
+    <arg name="origin_xyz" default="'0 0 0'"/>
+
+    <group ns="$(arg robot_name)" if="$(arg sim)">
+        <include file="$(find aist_iiwa_description)/launch/$(arg model)_upload.launch">
+            <arg name="hardware_interface" value="$(arg hardware_interface)"/>
+            <arg name="end_effector" value="$(arg end_effector)" />
+            <arg name="robot_name" value="$(arg robot_name)" />
+            <arg name="origin_xyz" value="$(arg origin_xyz)" />
+        </include>
+        <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+            args="-urdf -model $(arg robot_name) -param robot_description"/>
+    </group>
+
+</launch>

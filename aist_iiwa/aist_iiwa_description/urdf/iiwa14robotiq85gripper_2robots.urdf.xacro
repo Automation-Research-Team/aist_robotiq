@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<robot name="iiwa14" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Import Rviz colors -->
+  <xacro:include filename="$(find iiwa_description)/urdf/materials.xacro" />
+  <!--Import the lbr iiwa macro -->
+  <xacro:include filename="$(find iiwa_description)/urdf/iiwa14.xacro"/>
+  <!--Import the lbr robotiq_85_gripper macro -->
+  <xacro:include filename="$(find robotiq_description)/urdf/robotiq_85_gripper.urdf.xacro"/>
+
+  <xacro:arg name="hardware_interface" default="PositionJointInterface"/>
+
+  <xacro:arg name="robot_name_1" default="a_iiwa"/>
+  <xacro:arg name="origin_xyz_1" default="0 0 0"/>
+  <xacro:arg name="origin_rpy_1" default="0 0 0"/>
+
+  <xacro:arg name="robot_name_2" default="b_iiwa"/>
+  <xacro:arg name="origin_xyz_2" default="0 1 0"/>
+  <xacro:arg name="origin_rpy_2" default="0 0 0"/>
+
+  <!-- Fix to world just for testing -->
+  <link name="world"/>
+
+  <!-- a_iiwa : iiwa -->
+  <xacro:iiwa14 hardware_interface="$(arg hardware_interface)" robot_name="$(arg robot_name_1)" parent="world">
+    <origin xyz="$(arg origin_xyz_1)" rpy="$(arg origin_rpy_1)" />
+  </xacro:iiwa14>
+
+  <!-- a_iiwa : robotiq_85_gripper -->
+  <xacro:robotiq_85_gripper prefix="$(arg robot_name_1)_r85g" parent="$(arg robot_name_1)_link_ee">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:robotiq_85_gripper>
+
+  <!-- b_iiwa : iiwa -->
+  <xacro:iiwa14 hardware_interface="$(arg hardware_interface)" robot_name="$(arg robot_name_2)" parent="world">
+    <origin xyz="$(arg origin_xyz_2)" rpy="$(arg origin_rpy_2)" />
+  </xacro:iiwa14>
+
+  <!-- b_iiwa : robotiq_85_gripper -->
+  <xacro:robotiq_85_gripper prefix="$(arg robot_name_2)_r85g" parent="$(arg robot_name_2)_link_ee">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:robotiq_85_gripper>
+
+</robot>
