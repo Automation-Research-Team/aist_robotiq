@@ -12,7 +12,7 @@
       <xacro:insert_block name="joint_origin"/>
     </joint>
 
-    <xacro:gripper_v0 prefix="${prefix}"
+    <xacro:gripper_v0 prefix="${prefix}gripper/"
     		      parent="${prefix}gripper/base_link"
     		      use_graspfix="${use_graspfix}">
       <origin xyz="0 0 0" rpy="0 ${pi/2} 0"/>
@@ -20,7 +20,7 @@
 
     <link  name="${prefix}gripper/tip_link"/>
     <joint name="${prefix}gripper/tip_joint" type="fixed">
-      <parent link="${prefix}grasping_frame"/>
+      <parent link="${prefix}gripper/grasping_frame"/>
       <child  link="${prefix}gripper/tip_link"/>
       <origin xyz="0 0 0" rpy="0 ${-pi/2} 0"/>
     </joint>
