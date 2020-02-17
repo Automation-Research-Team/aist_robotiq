@@ -1,13 +1,45 @@
 <launch>
 
-  <arg name="scene"	default="dtorobo_base_scene"/>
+  <arg name="scene"			default="dtorobo_base_scene"/>
+  <arg name="debug"			default="false"/>
+  <arg name="mock"			default="false"/>
+  <arg name="rate"			default="1000"/>
+  <arg name="allowed_start_tolerance"	default="0.01"/>
+  <arg name="dynamics"			default="true"/>
 
   <group ns="torobo">
     <!-- load robot description URDF -->
     <param name="robot_description"
   	   command="$(find xacro)/xacro --inorder
-  		    '$(find aist_description)/scene/urdf/$(arg scene
-		    ).urdf.xacro'"/>
+  		    '$(find aist_description
+		    )/scene/urdf/$(arg scene).urdf.xacro'"/>
+
+    <!-- launch nodelet manager -->
+    <node name="torobo_nodelet_manager" pkg="nodelet" type="nodelet"
+      	  args="manager" output="screen"/>
+
+    <rosparam file="$(find aist_routines
+		    )/config/dtorobo_controller_config.yaml"/>
+
+    <node name="torobo_driver_nodelet" pkg="nodelet" type="nodelet"
+          args="load torobo_driver/torobo_driver_nodelet torobo_nodelet_manager"
+          output="screen">
+      <param name="debug"			value="$(arg debug)"/>
+      <param name="mock"			value="$(arg mock)"/>
+      <param name="rate"			value="$(arg rate)"/>
+      <param name="allowed_start_tolerance"
+	     value="$(arg allowed_start_tolerance)"/>
+      <param name="robot_description_name"	value="robot_description"/>
+    </node>
+  </group>
+
+  <group if="(arg dynamics)">
+    <!-- launch torobo dynamics -->
+    <include file="$(find torobo_dynamics
+		   )/launch/torobo_dynamics_nodelet.launch">
+      <arg name="sim"		value="false"/>
+      <arg name="manager"	value="torobo_nodelet_manager"/>
+    </include>
   </group>
 
 </launch>

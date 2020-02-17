@@ -18,16 +18,16 @@
     <include file="$(find aist_gazebo)/launch/$(arg config)_gazebo.launch">
       <arg name="scene"	value="$(arg scene)"/>
     </include>
-    <remap from="/follow_joint_trajectory"
-	   to  ="/arm_controller/follow_joint_trajectory"/>
+    <!-- <remap from="/follow_joint_trajectory" -->
+    <!-- 	   to  ="/arm_controller/follow_joint_trajectory"/> -->
   </group>
 
   <!-- Load robot urdf to param "robot_description", spawn
        robot_state_publisher and launch real robots if "sim" == "false". -->
   <group unless="$(arg sim)">
     <param name="robot_description"
-	   command="$(find xacro)/xacro --inorder '$(find
-		    aist_description)/scene/urdf/$(arg scene).urdf.xacro'"/>
+	   command="$(find xacro)/xacro --inorder '$(find aist_description
+		    )/scene/urdf/$(arg scene).urdf.xacro'"/>
     <node name="robot_state_publisher"
 	  pkg="robot_state_publisher" type="robot_state_publisher"/>
     <include file="$(find aist_routines)/launch/$(arg
@@ -35,8 +35,8 @@
   </group>
 
   <!-- Launch planner -->
-  <include file="$(find aist_routines)/launch/$(arg
-		 config)_moveit_planning_execution.launch">
+  <include file="$(find aist_routines
+		 )/launch/$(arg config)_moveit_planning_execution.launch">
     <arg name="scene"		value="$(arg scene)"/>
     <arg name="sim"		value="$(arg sim)"/>
     <arg name="rviz_config"	value="$(arg rviz_config)"/>

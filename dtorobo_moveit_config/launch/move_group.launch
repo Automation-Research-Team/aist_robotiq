@@ -1,7 +1,7 @@
 <launch>
 
-  <include file="$(find
-		 dtorobo_moveit_config)/launch/planning_context.launch" />
+  <include file="$(find dtorobo_moveit_config
+		 )/launch/planning_context.launch" />
 
   <!-- GDB Debug Option -->
   <arg name="debug" default="false" />
@@ -41,27 +41,27 @@
 
   <!-- Planning Functionality -->
   <include ns="move_group"
-	   file="$(find
-		 dtorobo_moveit_config)/launch/planning_pipeline.launch.xml">
+	   file="$(find dtorobo_moveit_config
+		 )/launch/planning_pipeline.launch.xml">
     <arg name="pipeline" value="ompl" />
   </include>
 
   <!-- Trajectory Execution Functionality -->
   <include ns="move_group"
-	   file="$(find
-		 dtorobo_moveit_config)/launch/trajectory_execution.launch.xml"
+	   file="$(find dtorobo_moveit_config
+		 )/launch/trajectory_execution.launch.xml"
 	   if="$(arg allow_trajectory_execution)">
-    <arg name="moveit_manage_controllers" value="true" />
-    <arg name="moveit_controller_manager" value="dtorobo_base_scene"
+    <arg name="moveit_manage_controllers"	value="true" />
+    <arg name="moveit_controller_manager"	value="dtorobo_base_scene"
 	 unless="$(arg fake_execution)"/>
-    <arg name="moveit_controller_manager" value="fake"
+    <arg name="moveit_controller_manager"	value="fake"
 	 if="$(arg fake_execution)"/>
   </include>
 
   <!-- Sensors Functionality -->
   <include ns="move_group"
-	   file="$(find
-		 dtorobo_moveit_config)/launch/sensor_manager.launch.xml"
+	   file="$(find dtorobo_moveit_config
+		 )/launch/sensor_manager.launch.xml"
 	   if="$(arg allow_trajectory_execution)">
     <arg name="moveit_sensor_manager" value="dtorobo_base_scene" />
   </include>
@@ -71,9 +71,10 @@
 	pkg="moveit_ros_move_group" type="move_group"
 	respawn="false" output="screen" args="$(arg command_args)">
     <!-- Set the display variable, in case OpenGL code is used internally -->
-    <env name="DISPLAY" value="$(optenv DISPLAY :0)" />
+    <env name="DISPLAY"			value="$(optenv DISPLAY :0)" />
 
-    <param name="allow_trajectory_execution" value="$(arg allow_trajectory_execution)"/>
+    <param name="allow_trajectory_execution"
+	   value="$(arg allow_trajectory_execution)"/>
     <param name="max_safe_path_cost"	value="$(arg max_safe_path_cost)"/>
     <param name="jiggle_fraction"	value="$(arg jiggle_fraction)" />
     <param name="capabilities"		value="$(arg capabilities)"/>
