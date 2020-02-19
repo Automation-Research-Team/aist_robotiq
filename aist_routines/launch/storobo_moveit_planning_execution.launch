@@ -13,7 +13,7 @@
       <remap from="joint_states" to="joint_state_server/joint_states"/>
     </node>
 
-    <rosparam file="$(find dtorobo_moveit_config
+    <rosparam file="$(find storobo_moveit_config
 		    )/config/controller_config.yaml"/>
   </group>
 
@@ -25,7 +25,7 @@
 
   <!-- launch torobo collision detector -->
   <include file="$(find torobo_collision_detector
-		 )/launch/torobo_collision_detector_nodelet.launch">
+  		 )/launch/torobo_collision_detector_nodelet.launch">
     <arg name="debug"	value="falsee"/>
     <arg name="manager"	value="torobo_nodelet_manager"/>
   </include>
@@ -40,7 +40,7 @@
     <!-- load controller_config -->
     <include file="$(find aist_routines
 		   )/launch/moveit_planning_execution.launch">
-      <arg name="moveit_config"	value="$(find dtorobo_moveit_config)"/>
+      <arg name="moveit_config"	value="$(find storobo_moveit_config)"/>
       <arg name="rviz_config"	value="$(arg rviz_config)"/>
       <arg name="debug"		value="$(arg debug)"/>
     </include>
