@@ -26,7 +26,7 @@
   <!-- launch torobo collision detector -->
   <include file="$(find torobo_collision_detector
   		 )/launch/torobo_collision_detector_nodelet.launch">
-    <arg name="debug"	value="falsee"/>
+    <arg name="debug"	value="false"/>
     <arg name="manager"	value="torobo_nodelet_manager"/>
   </include>
   <!-- <include file="$(find torobo_collision_detector -->
