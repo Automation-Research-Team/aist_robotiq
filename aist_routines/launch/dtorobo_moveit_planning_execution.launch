@@ -3,45 +3,8 @@
   <arg name="sim"		default="false"/>
   <arg name="rviz_config"	default=""/>
   <arg name="debug"		default="false"/>
-  <arg name="rqt"		default="false"/>
+  <arg name="rqt"		default="true"/>
 
-  <group ns="torobo">
-    <rosparam param="robot_config"
-	      file="$(find torobo_description
-		    )/config/products/$(optenv PRODUCT default).yaml"/>
-
-    <!-- launch nodelet manager -->
-    <node name="torobo_nodelet_manager" pkg="nodelet" type="nodelet"
-      	  args="manager" output="screen"/>
-  </group>
-
-  <!-- launch torobo dynamics -->
-  <include unless="$(arg sim)"
-	   file="$(find torobo_dynamics)/launch/torobo_dynamics.launch">
-    <arg name="sim" value="$(arg sim)"/>
-  </include>
-
-  <!-- launch torobo control -->
-  <include file="$(find torobo_control)/launch/torobo_control.launch">
-    <arg name="sim" value="$(arg sim)"/>
-  </include>
-
-  <!-- launch torobo collision detector -->
-  <include file="$(find torobo_collision_detector
-		 )/launch/torobo_collision_detector.launch"/>
-  <include file="$(find torobo_collision_detector
-		 )/launch/current_state_self_collision_checker.launch">
-    <arg name="sim" value="$(arg sim)"/>
-  </include>
-
-  <!-- launch torobo operation -->
-  <!-- <include file="$(find torobo_operation)/launch/torobo_operation.launch"/> -->
-
-  <!-- launch rqt gui -->
-  <include file="$(find torobo_gui)/launch/torobo_joint_controller.launch"
-  	   if="$(arg rqt)"/>
-
-  <!-- Launch moveit -->
   <group ns="torobo">
     <!-- Given the published joint states, publish tf for the robot links -->
     <node name="robot_state_publisher"
@@ -50,12 +13,33 @@
       <remap from="joint_states" to="joint_state_server/joint_states"/>
     </node>
 
-    <!-- load controller_config -->
-    <rosparam file="$(find
-    		    dtorobo_moveit_config)/config/controller_config.yaml"/>
+    <rosparam file="$(find dtorobo_moveit_config
+		    )/config/controller_config.yaml"/>
+  </group>
 
-    <include file="$(find
-		   aist_routines)/launch/moveit_planning_execution.launch">
+  <!-- launch torobo control -->
+  <include file="$(find torobo_control)/launch/torobo_control_nodelet.launch">
+    <arg name="sim"	value="$(arg sim)"/>
+    <arg name="manager"	value="torobo_nodelet_manager"/>
+  </include>
+
+  <!-- launch torobo collision detector -->
+  <include file="$(find torobo_collision_detector
+		 )/launch/torobo_collision_detector_nodelet.launch">
+    <arg name="debug"	value="falsee"/>
+    <arg name="manager"	value="torobo_nodelet_manager"/>
+  </include>
+  <!-- <include file="$(find torobo_collision_detector -->
+  <!-- 		 )/launch/current_state_self_collision_checker_nodelet.launch"> -->
+  <!--   <arg name="sim"	value="$(arg sim)"/> -->
+  <!--   <arg name="manager"	value="torobo_nodelet_manager"/> -->
+  <!--   <arg name="rate"	value="100"/> -->
+  <!-- </include> -->
+
+  <group ns="torobo">
+    <!-- load controller_config -->
+    <include file="$(find aist_routines
+		   )/launch/moveit_planning_execution.launch">
       <arg name="moveit_config"	value="$(find dtorobo_moveit_config)"/>
       <arg name="rviz_config"	value="$(arg rviz_config)"/>
       <arg name="debug"		value="$(arg debug)"/>

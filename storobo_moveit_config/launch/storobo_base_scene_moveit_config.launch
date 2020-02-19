@@ -1,0 +1,35 @@
+<launch>
+
+  <!-- By default, run in simulation mode -->
+  <arg name="sim_in_moveit" default="true" />
+  <!-- By default, we do not start a database (it can be large) -->
+  <arg name="db" default="false" />
+  <!-- Allow user to specify database location -->
+  <arg name="db_path" default="$(find storobo_moveit_config)/default_warehouse_mongo_db" />
+
+  <!-- By default, we are not in debug mode -->
+  <arg name="debug" default="false" />
+
+  <!-- Given the published joint states, publish tf for the robot links -->
+  <node name="robot_state_publisher"
+	pkg="robot_state_publisher" type="robot_state_publisher"
+	respawn="true" output="screen">
+    <remap from="joint_states" to="joint_state_server/joint_states"/>
+  </node>
+
+  <!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
+  <include file="$(find storobo_moveit_config)/launch/move_group.launch">
+    <arg name="allow_trajectory_execution"	value="true"/>
+    <arg name="fake_execution"			value="$(arg sim_in_moveit)"/>
+    <arg name="info"				value="true"/>
+    <arg name="debug"				value="$(arg debug)"/>
+  </include>
+
+  <!-- If database loading was enabled, start mongodb as well -->
+  <include file="$(find
+		 storobo_moveit_config)/launch/default_warehouse_db.launch"
+	   if="$(arg db)">
+    <arg name="moveit_warehouse_database_path" value="$(arg db_path)"/>
+  </include>
+
+</launch>

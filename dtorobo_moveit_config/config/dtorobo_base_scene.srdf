@@ -192,6 +192,7 @@
     <disable_collisions link1="a_torobo_arm/link_0" link2="b_torobo_arm/link_5" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_0" link2="b_torobo_arm/link_6" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_0" link2="b_torobo_arm/link_7" reason="Never" />
+    <disable_collisions link1="a_torobo_arm/link_0" link2="b_torobo_gripper/finger_link" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_0" link2="b_torobo_gripper/grasping_frame" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_0" link2="b_torobo_gripper/gripper_base" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_0" link2="workbox" reason="Adjacent" />
@@ -208,7 +209,6 @@
     <disable_collisions link1="a_torobo_arm/link_1" link2="b_torobo_arm/link_5" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_1" link2="b_torobo_arm/link_6" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_1" link2="b_torobo_arm/link_7" reason="Never" />
-    <disable_collisions link1="a_torobo_arm/link_1" link2="b_torobo_gripper/grasping_frame" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_1" link2="b_torobo_gripper/gripper_base" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_1" link2="workbox" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_2" link2="a_torobo_arm/link_3" reason="Adjacent" />
@@ -223,7 +223,6 @@
     <disable_collisions link1="a_torobo_arm/link_2" link2="b_torobo_arm/link_5" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_2" link2="b_torobo_arm/link_6" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_2" link2="b_torobo_arm/link_7" reason="Never" />
-    <disable_collisions link1="a_torobo_arm/link_2" link2="b_torobo_gripper/grasping_frame" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_2" link2="workbox" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_3" link2="a_torobo_arm/link_4" reason="Adjacent" />
     <disable_collisions link1="a_torobo_arm/link_3" link2="a_torobo_arm/link_5" reason="Never" />
@@ -239,10 +238,6 @@
     <disable_collisions link1="a_torobo_arm/link_3" link2="b_torobo_arm/link_2" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_3" link2="b_torobo_arm/link_3" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_3" link2="b_torobo_arm/link_4" reason="Never" />
-    <disable_collisions link1="a_torobo_arm/link_3" link2="b_torobo_arm/link_5" reason="Never" />
-    <disable_collisions link1="a_torobo_arm/link_3" link2="b_torobo_arm/link_6" reason="Never" />
-    <disable_collisions link1="a_torobo_arm/link_3" link2="b_torobo_arm/link_7" reason="Never" />
-    <disable_collisions link1="a_torobo_arm/link_3" link2="b_torobo_gripper/grasping_frame" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_3" link2="workbox" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_4" link2="a_torobo_arm/link_5" reason="Adjacent" />
     <disable_collisions link1="a_torobo_arm/link_4" link2="a_torobo_arm/link_6" reason="Default" />
@@ -256,7 +251,6 @@
     <disable_collisions link1="a_torobo_arm/link_4" link2="b_torobo_arm/link_1" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_4" link2="b_torobo_arm/link_2" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_4" link2="b_torobo_arm/link_3" reason="Never" />
-    <disable_collisions link1="a_torobo_arm/link_4" link2="b_torobo_arm/link_4" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_5" link2="a_torobo_arm/link_6" reason="Adjacent" />
     <disable_collisions link1="a_torobo_arm/link_5" link2="a_torobo_arm/link_7" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_5" link2="a_torobo_gripper/finger_link" reason="Never" />
@@ -267,7 +261,7 @@
     <disable_collisions link1="a_torobo_arm/link_5" link2="b_torobo_arm/link_0" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_5" link2="b_torobo_arm/link_1" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_5" link2="b_torobo_arm/link_2" reason="Never" />
-    <disable_collisions link1="a_torobo_arm/link_5" link2="b_torobo_arm/link_3" reason="Never" />
+    <disable_collisions link1="a_torobo_arm/link_5" link2="b_torobo_gripper/grasping_frame" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_6" link2="a_torobo_arm/link_7" reason="Adjacent" />
     <disable_collisions link1="a_torobo_arm/link_6" link2="a_torobo_gripper/finger_link" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_6" link2="a_torobo_gripper/grasping_frame" reason="Never" />
@@ -276,8 +270,6 @@
     <disable_collisions link1="a_torobo_arm/link_6" link2="b_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_6" link2="b_torobo_arm/link_0" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_6" link2="b_torobo_arm/link_1" reason="Never" />
-    <disable_collisions link1="a_torobo_arm/link_6" link2="b_torobo_arm/link_2" reason="Never" />
-    <disable_collisions link1="a_torobo_arm/link_6" link2="b_torobo_arm/link_3" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_7" link2="a_torobo_gripper/finger_link" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_7" link2="a_torobo_gripper/grasping_frame" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_7" link2="a_torobo_gripper/gripper_base" reason="Adjacent" />
@@ -285,26 +277,18 @@
     <disable_collisions link1="a_torobo_arm/link_7" link2="b_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_7" link2="b_torobo_arm/link_0" reason="Never" />
     <disable_collisions link1="a_torobo_arm/link_7" link2="b_torobo_arm/link_1" reason="Never" />
-    <disable_collisions link1="a_torobo_arm/link_7" link2="b_torobo_arm/link_2" reason="Never" />
-    <disable_collisions link1="a_torobo_arm/link_7" link2="b_torobo_arm/link_3" reason="Never" />
     <disable_collisions link1="a_torobo_gripper/finger_link" link2="a_torobo_gripper/grasping_frame" reason="Default" />
     <disable_collisions link1="a_torobo_gripper/finger_link" link2="a_torobo_gripper/gripper_base" reason="Default" />
     <disable_collisions link1="a_torobo_gripper/finger_link" link2="a_torobo_gripper/mimic_link" reason="Adjacent" />
-    <disable_collisions link1="a_torobo_gripper/finger_link" link2="b_torobo_arm/link_0" reason="Never" />
-    <disable_collisions link1="a_torobo_gripper/finger_link" link2="b_torobo_gripper/grasping_frame" reason="Never" />
-    <disable_collisions link1="a_torobo_gripper/finger_link" link2="b_torobo_gripper/mimic_link" reason="Never" />
     <disable_collisions link1="a_torobo_gripper/grasping_frame" link2="a_torobo_gripper/gripper_base" reason="Adjacent" />
     <disable_collisions link1="a_torobo_gripper/grasping_frame" link2="a_torobo_gripper/mimic_link" reason="Default" />
     <disable_collisions link1="a_torobo_gripper/grasping_frame" link2="b_torobo_arm/link_0" reason="Never" />
     <disable_collisions link1="a_torobo_gripper/grasping_frame" link2="b_torobo_arm/link_7" reason="Never" />
+    <disable_collisions link1="a_torobo_gripper/grasping_frame" link2="b_torobo_gripper/finger_link" reason="Never" />
     <disable_collisions link1="a_torobo_gripper/grasping_frame" link2="b_torobo_gripper/grasping_frame" reason="Never" />
-    <disable_collisions link1="a_torobo_gripper/grasping_frame" link2="b_torobo_gripper/mimic_link" reason="Never" />
     <disable_collisions link1="a_torobo_gripper/gripper_base" link2="a_torobo_gripper/mimic_link" reason="Adjacent" />
-    <disable_collisions link1="a_torobo_gripper/gripper_base" link2="b_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_torobo_gripper/gripper_base" link2="b_torobo_arm/link_0" reason="Never" />
     <disable_collisions link1="a_torobo_gripper/gripper_base" link2="b_torobo_arm/link_1" reason="Never" />
-    <disable_collisions link1="a_torobo_gripper/mimic_link" link2="b_torobo_arm/link_0" reason="Never" />
-    <disable_collisions link1="a_torobo_gripper/mimic_link" link2="b_torobo_arm/link_1" reason="Never" />
     <disable_collisions link1="a_torobo_gripper/mimic_link" link2="b_torobo_gripper/grasping_frame" reason="Never" />
     <disable_collisions link1="b_phoxi_m_camera" link2="b_torobo_arm/link_0" reason="Adjacent" />
     <disable_collisions link1="b_phoxi_m_camera" link2="b_torobo_arm/link_1" reason="Never" />
@@ -314,6 +298,7 @@
     <disable_collisions link1="b_phoxi_m_camera" link2="b_torobo_arm/link_5" reason="Never" />
     <disable_collisions link1="b_phoxi_m_camera" link2="b_torobo_arm/link_6" reason="Never" />
     <disable_collisions link1="b_phoxi_m_camera" link2="b_torobo_arm/link_7" reason="Never" />
+    <disable_collisions link1="b_phoxi_m_camera" link2="b_torobo_gripper/gripper_base" reason="Never" />
     <disable_collisions link1="b_phoxi_m_camera" link2="workbox" reason="Adjacent" />
     <disable_collisions link1="b_torobo_arm/link_0" link2="b_torobo_arm/link_1" reason="Adjacent" />
     <disable_collisions link1="b_torobo_arm/link_0" link2="b_torobo_arm/link_3" reason="Never" />
@@ -322,7 +307,6 @@
     <disable_collisions link1="b_torobo_arm/link_1" link2="b_torobo_arm/link_3" reason="Never" />
     <disable_collisions link1="b_torobo_arm/link_1" link2="b_torobo_arm/link_4" reason="Never" />
     <disable_collisions link1="b_torobo_arm/link_1" link2="b_torobo_arm/link_5" reason="Never" />
-    <disable_collisions link1="b_torobo_arm/link_1" link2="b_torobo_arm/link_7" reason="Never" />
     <disable_collisions link1="b_torobo_arm/link_1" link2="workbox" reason="Never" />
     <disable_collisions link1="b_torobo_arm/link_2" link2="b_torobo_arm/link_3" reason="Adjacent" />
     <disable_collisions link1="b_torobo_arm/link_2" link2="b_torobo_arm/link_5" reason="Never" />

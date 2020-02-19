@@ -30,35 +30,25 @@
 
   <!-- robot arms -->
   <xacro:include filename="$(find aist_description)/device/urdf/torobo_arm.urdf.xacro"/>
-  <xacro:torobo_arm prefix="a_torobo_"/>
-  <joint name="ground_a_torobo_joint" type="fixed">
-    <parent link="ground"/>
-    <child  link="a_torobo_base"/>
+  <xacro:torobo_arm prefix="a_torobo_" parent="ground">
     <origin xyz="${a_torobo_x} ${a_torobo_y} ${bots_z}" rpy="0 0 ${pi/2}"/>
-  </joint>
-
-  <xacro:torobo_arm prefix="b_torobo_"/>
-  <joint name="ground_b_torobo_joint" type="fixed">
-    <parent link="ground"/>
-    <child  link="b_torobo_base"/>
+  </xacro:torobo_arm>
+  <xacro:torobo_arm prefix="b_torobo_" parent="ground">
     <origin xyz="${b_torobo_x} ${b_torobo_y} ${bots_z}" rpy="0 0 ${-pi/2}"/>
-  </joint>
+  </xacro:torobo_arm>
 
   <!-- Attach grippers -->
   <xacro:include filename="$(find aist_description)/device/urdf/torobo_gripper.urdf.xacro"/>
-  <xacro:torobo_gripper prefix="a_torobo_"/>
-  <joint name="a_torobo_arm_gripper_joint" type="fixed">
-    <parent link="a_torobo_arm/ee_link"/>
-    <child  link="a_torobo_gripper/base_link"/>
+  <xacro:torobo_gripper prefix="a_torobo_"
+  			parent="a_torobo_arm/ee_link"
+  			use_graspfix="false">
     <origin xyz="0 0 0" rpy="0 0 0"/>
-  </joint>
-
-  <xacro:torobo_gripper prefix="b_torobo_"/>
-  <joint name="b_torobo_arm_gripper_joint" type="fixed">
-    <parent link="b_torobo_arm/ee_link"/>
-    <child  link="b_torobo_gripper/base_link"/>
+  </xacro:torobo_gripper>
+  <xacro:torobo_gripper prefix="b_torobo_"
+  			parent="b_torobo_arm/ee_link"
+  			use_graspfix="false">
     <origin xyz="0 0 0" rpy="0 0 0"/>
-  </joint>
+  </xacro:torobo_gripper>
 
   <!-- Add PhoXi 3D scanner -->
   <xacro:include filename="$(find aist_phoxi_camera)/urdf/phoxi_m_camera.urdf.xacro"/>

@@ -57,6 +57,20 @@ class GripperClient(object):
         return True
 
 ######################################################################
+#  class VoidGripper                                                 #
+######################################################################
+class VoidGripper(GripperClient):
+    def __init__(self, name, base_link, timeout=10.0):
+        super(VoidGripper, self).__init__(name, "void",
+                                          base_link, base_link, timeout)
+        rospy.loginfo("{} initialized.".format(self.name))
+
+    @staticmethod
+    def base(name, base_link, timeout):
+        return VoidGripper(name, base_link, timeout)
+
+
+######################################################################
 #  class GenericGripper                                              #
 ######################################################################
 class GenericGripper(GripperClient):

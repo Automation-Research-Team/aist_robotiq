@@ -1,0 +1,13 @@
+controller_list:
+  - action_ns: follow_joint_trajectory
+    default: true
+    joints:
+      - b_torobo_arm/joint_1
+      - b_torobo_arm/joint_2
+      - b_torobo_arm/joint_3
+      - b_torobo_arm/joint_4
+      - b_torobo_arm/joint_5
+      - b_torobo_arm/joint_6
+      - b_torobo_arm/joint_7
+    name: b_torobo_arm_controller
+    type: FollowJointTrajectory

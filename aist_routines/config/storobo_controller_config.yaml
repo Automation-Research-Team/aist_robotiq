@@ -1,0 +1,20 @@
+torobo_controller_config:
+  b_torobo_arm_controller:
+    # Connection type (USB or Ethernet)
+    - connection_type: USB
+    # - connection_type: Ethernet
+
+    # Ethernet connection config
+    - ethernet: {
+        master_controller_ip: 10.66.171.62,
+        master_controller_port: 50010
+      }
+
+    # Serial Port connection config
+    - serial_port: {
+        master_controller_device_name: /dev/ttyUSB0,
+        master_controller_baudrate: 3000000
+      }
+
+    # controller definitions
+    - controller_name: b_torobo_arm_controller
