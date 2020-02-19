@@ -26,19 +26,21 @@
     <arg name="color_height"		value="$(arg camera_height)"/>
   </include>
 
-  <include file="$(find aist_depth_filter)/launch/run.launch"
-	   ns="$(arg camera_name)">
-    <arg name="camera_name"		value="$(arg camera_name)"/>
-    <arg name="camera_info_topic"	value="color/camera_info"/>
-    <arg name="image_topic"		value="color/image_raw"/>
-    <arg name="depth_topic"		value="aligned_depth_to_color/image_raw"/>
-    <arg name="normal_topic"		value=""/>
-  </include>
+  <group ns="$(arg camera_name)">
+    <include file="$(find aist_depth_filter)/launch/run.launch">
+      <arg name="camera_info_topic"	value="color/camera_info"/>
+      <arg name="image_topic"		value="color/image_raw"/>
+      <arg name="depth_topic"		value="aligned_depth_to_color/image_raw"/>
+      <arg name="normal_topic"		value=""/>
+    </include>
 
-  <include file="$(find aist_localization)/launch/run.launch">
-    <arg name="camera_frame"		value="$(arg camera_frame)"/>
-    <arg name="plcf_dir"		value="$(arg plcf_dir)"/>
-  </include>
+    <node name="localization" pkg="aist_localization" type="aist_localization"
+  	  output="screen">
+      <remap from="/file_info"		to="depth_filter/file_info"/>
+      <param name="camera_frame"	value="$(arg camera_frame)"/>
+      <param name="plcf_dir"		value="$(arg plcf_dir)"/>
+    </node>
+  </group>
 
   <include file="$(find aist_model_spawner)/launch/run.launch">
     <arg name="urdf_dir"		value="$(arg urdf_dir)"/>

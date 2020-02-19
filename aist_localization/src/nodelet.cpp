@@ -27,8 +27,7 @@ LocalizationNodelet::onInit()
 {
     NODELET_INFO("aist_localization::LocalizationNodelet::onInit()");
     _nh = getNodeHandle();
-
-    _node.reset(new Localization("aist_localization"));
+    _node.reset(new Localization(getName()));
 }
 
 }	// namespace aist_localization

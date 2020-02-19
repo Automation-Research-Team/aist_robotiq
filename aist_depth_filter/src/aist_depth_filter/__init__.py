@@ -10,7 +10,7 @@ class DepthFilterClient(object):
         super(DepthFilterClient, self).__init__()
         self._saveBG     = rospy.ServiceProxy(name + "/saveBG",  ssrv.Trigger)
         self._savePly    = rospy.ServiceProxy(name + "/savePly", ssrv.Trigger)
-        self._dyn_reconf = dynamic_reconfigure.client(name, timeout=5.0)
+        self._dyn_reconf = dynamic_reconfigure.client.Client(name, timeout=5.0)
 
     def saveBG(self):
         return self._saveBG().success
@@ -19,7 +19,7 @@ class DepthFilterClient(object):
         return self._savePly().success
 
     def set_background_threshold(self, thresh_bg):
-        self._syn_reconf.update_configuration({"thresh_bg": thresh_bg})
+        self._dyn_reconf.update_configuration({"thresh_bg": thresh_bg})
         return True
 
     def set_depth_range(self, near, far):
@@ -35,6 +35,6 @@ class DepthFilterClient(object):
         self._dyn_reconf.update_configuration({"scale": scale})
         return True
 
-    def set_window_radius(window_radius):
+    def set_window_radius(self, window_radius):
         self._dyn_reconf.update_configuration({"window_radius": window_radius})
         return True

@@ -27,8 +27,7 @@ DepthFilterNodelet::onInit()
 {
     NODELET_INFO("aist_depth_filter::DepthFilterNodelet::onInit()");
     _nh = getNodeHandle();
-  //_node.reset(new DepthFilter(getName()));
-    _node.reset(new DepthFilter("aist_depth_filter"));
+    _node.reset(new DepthFilter(getName()));
 }
 
 }	// namespace aist_depth_filter
