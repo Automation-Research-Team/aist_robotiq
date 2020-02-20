@@ -8,12 +8,12 @@ from operator          import itemgetter
 #  class LocalizationClient                                             #
 #########################################################################
 class LocalizationClient(object):
-    def __init__(self):
+    def __init__(self, name="localization"):
         super(LocalizationClient, self).__init__()
 
-        self._file_path_pub = rospy.Publisher("localization/file_info",
+        self._file_path_pub = rospy.Publisher(name + "/file_info",
                                               dmsg.FileInfo, queue_size=1)
-        self._localize = actionlib.SimpleActionClient("localization/localize",
+        self._localize = actionlib.SimpleActionClient(name + "/localize",
                                                       lmsg.LocalizeAction)
         self._localize.wait_for_server()
 
