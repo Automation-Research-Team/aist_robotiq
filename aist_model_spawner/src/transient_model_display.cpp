@@ -110,7 +110,6 @@ TransientModelDisplay::~TransientModelDisplay()
     if (initialized())
     {
 	unsubscribe();
-      //delete robot_;
     }
 }
 
@@ -120,9 +119,6 @@ TransientModelDisplay::~TransientModelDisplay()
 void
 TransientModelDisplay::onInitialize()
 {
-    // robot_.reset(new Robot(scene_node_, context_,
-    // 			   "Robot: " + getName().toStdString(), this));
-
     updateVisualVisible();
     updateCollisionVisible();
     updateAlpha();
@@ -291,7 +287,7 @@ TransientModelDisplay::incomingDescription(const desc_msg_cp& desc_msg)
     {
       case desc_msg_t::ADD:
       {
-	if(desc_msg->desc.empty())
+	if (desc_msg->desc.empty())
 	{
 	    clear();
 	    setStatus(StatusProperty::Error, "URDF", "URDF is empty");
@@ -299,7 +295,7 @@ TransientModelDisplay::incomingDescription(const desc_msg_cp& desc_msg)
 	}
 
 	urdf::Model descr;
-	if(!descr.initString(desc_msg->desc))
+	if (!descr.initString(desc_msg->desc))
 	{
 	    clear();
 	    setStatus(StatusProperty::Error,
@@ -333,11 +329,13 @@ TransientModelDisplay::incomingDescription(const desc_msg_cp& desc_msg)
     }
 
     for (const auto& robot : robots_)
+    {
 	robot.second->update(TFLinkUpdater(
 				 context_->getFrameManager(),
 				 boost::bind(linkUpdaterStatusFunction,
 					     _1, _2, _3, this),
 				 tf_prefix_property_->getStdString()));
+    }
 }
 
 } // namespace rviz

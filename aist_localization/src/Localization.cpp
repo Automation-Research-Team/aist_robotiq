@@ -20,7 +20,7 @@ Localization::Localization(const std::string& name)
      _scene(),
      _scene_is_valid(false),
      _file_info_sub(_nh.subscribe<file_info_t>(
-			"file_info", 1, &Localization::file_info_cb, this)),
+			"/file_info", 1, &Localization::file_info_cb, this)),
      _localize_srv(_nh, "localize",
 		   boost::bind(&Localization::localize_cb, this, _1), false)
 {
@@ -44,8 +44,8 @@ Localization::file_info_cb(const file_info_cp& file_info)
 {
     try
     {
-	ROS_INFO_STREAM("Set frame to [" << file_info->frame
-			<< "] and Loading_scene["
+	ROS_INFO_STREAM("(Localization) Set frame to [" << file_info->frame
+			<< "] and loading scene["
 			<< file_info->file_path << "]..,");
 
 	_camera_frame = file_info->frame;
@@ -53,14 +53,14 @@ Localization::file_info_cb(const file_info_cp& file_info)
 	_localization->SetSceneSource(_scene);
 	_scene_is_valid = true;
 
-	ROS_INFO_STREAM("  succeeded.");
+	ROS_INFO_STREAM("(Localization)  succeeded.");
 	return true;
     }
     catch (const std::exception& err)
     {
 	_scene_is_valid = false;
 
-	ROS_ERROR_STREAM("  failed: " << err.what());
+	ROS_ERROR_STREAM("(Localization)  failed: " << err.what());
 	return false;
     }
 }
@@ -70,7 +70,8 @@ Localization::localize_cb(const goal_cp& goal) const
 {
     try
     {
-	ROS_INFO_STREAM("Localizing object[" << goal->object_name << "].");
+	ROS_INFO_STREAM("(Localization) Localizing object["
+			<< goal->object_name << "].");
 
 	if (!_scene_is_valid)
 	    throw std::runtime_error("Scene is not set.");
@@ -94,7 +95,7 @@ Localization::localize_cb(const goal_cp& goal) const
 	    if (_localize_srv.isPreemptRequested())
 	    {
 		_localization->StopAsync();
-		ROS_INFO_STREAM("  Preempted.");
+		ROS_INFO_STREAM("(Localization)  Preempted.");
 		return;
 	    }
 
@@ -105,12 +106,13 @@ Localization::localize_cb(const goal_cp& goal) const
 					+ std::to_string(queue.Size() - 1);
 		publish_feedback(locPose, now, object_frame);
 
-		ROS_INFO_STREAM("  Found " << queue.Size() << "-th pose.");
+		ROS_INFO_STREAM("(Localization)  Found "
+				<< queue.Size() << "-th pose.");
 	    }
 	}
 
 	_localization->StopAsync();
-	ROS_INFO_STREAM("  Completed.");
+	ROS_INFO_STREAM("(Localization)  Completed.");
 
 	result_t	result;
 	result.success = true;
@@ -118,7 +120,7 @@ Localization::localize_cb(const goal_cp& goal) const
     }
     catch (const std::exception& err)
     {
-	ROS_ERROR_STREAM(err.what());
+	ROS_ERROR_STREAM("(Localization) " << err.what());
 
 	_localization->StopAsync();
 

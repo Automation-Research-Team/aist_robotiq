@@ -13,7 +13,6 @@
 
   <include file="$(find aist_depth_filter)/launch/run.launch"
 	   ns="$(arg camera_name)">
-    <arg name="camera_name"		value="$(arg camera_name)"/>
     <arg name="camera_info_topic"	value="camera_info"/>
     <arg name="image_topic"		value="texture"/>
     <arg name="depth_topic"		value="depth_map"/>
