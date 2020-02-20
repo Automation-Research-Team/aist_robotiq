@@ -1,0 +1,58 @@
+<launch>
+  <!-- By default we do not overwrite the URDF. Change the following to true to change the default behavior -->
+  <arg name="load_robot_description" default="false"/>
+
+  <arg name="hardware_interface" default="PositionJointInterface"/>
+  <arg name="model" default="iiwa14"/>
+  <arg name="end_effector" default=""/>
+  <arg name="robot_name_1" default="a_iiwa"/>
+  <arg name="origin_x_1" default="0"/>
+  <arg name="origin_y_1" default="0"/>
+  <arg name="origin_z_1" default="0"/>
+  <arg name="origin_roll_1"  default="0"/>
+  <arg name="origin_pitch_1" default="0"/>
+  <arg name="origin_yaw_1"   default="0"/>
+  <arg name="robot_name_2" default="b_iiwa"/>
+  <arg name="origin_x_2" default="0"/>
+  <arg name="origin_y_2" default="1.2"/>
+  <arg name="origin_z_2" default="0"/>
+  <arg name="origin_roll_2"  default="0"/>
+  <arg name="origin_pitch_2" default="0"/>
+  <arg name="origin_yaw_2"   default="${pi}"/>
+  <arg name="exist_objs" default="true" />
+
+  <!-- The name of the parameter under which the URDF is loaded -->
+  <arg name="robot_description" default="robot_description"/>
+
+  <!-- Load universal robot description format (URDF) -->
+  <group if="$(arg load_robot_description)">
+
+    <group ns="$(arg robot_name_1)">
+      <param name="/a_iiwa/robot_description" command="$(find xacro)/xacro --inorder '$(find aist_iiwa_description)/urdf/$(arg model).urdf.xacro' hardware_interface:=$(arg hardware_interface) end_effector:=$(arg end_effector) robot_name:=$(arg robot_name_1) origin_x:=$(arg origin_x_1) origin_y:=$(arg origin_y_1) origin_z:=$(arg origin_z_1) origin_roll:=$(arg origin_roll_1) origin_pitch:=$(arg origin_pitch_1) origin_yaw:=$(arg origin_yaw_1) exist_objs:=$(arg exist_objs)" />
+    </group>
+
+    <group ns="$(arg robot_name_2)">
+      <param name="/b_iiwa/robot_description" command="$(find xacro)/xacro --inorder '$(find aist_iiwa_description)/urdf/$(arg model).urdf.xacro' hardware_interface:=$(arg hardware_interface) end_effector:=$(arg end_effector) robot_name:=$(arg robot_name_2) origin_x:=$(arg origin_x_2) origin_y:=$(arg origin_y_2) origin_z:=$(arg origin_z_2) origin_roll:=$(arg origin_roll_2) origin_pitch:=$(arg origin_pitch_2) origin_yaw:=$(arg origin_yaw_2) exist_objs:=$(arg exist_objs)" />
+    </group>
+
+    <!--
+    <param name="robot_description" command="cat $(find aist_iiwa_moveit_config)/config/jikken.txt" />
+    -->
+
+
+  </group>
+
+  <!-- The semantic description that corresponds to the URDF -->
+  <param name="$(arg robot_description)_semantic" textfile="$(find aist_iiwa_moveit_config)/config/iiwa14$(arg end_effector).srdf" />
+
+  <!-- Load updated joint limits (override information from URDF) -->
+  <group ns="$(arg robot_description)_planning">
+    <rosparam command="load" file="$(find aist_iiwa_moveit_config)/config/joint_limits$(arg end_effector).yaml"/>
+  </group>
+
+  <!-- Load default settings for kinematics; these settings are overridden by settings in a node's namespace -->
+  <group ns="$(arg robot_description)_kinematics">
+    <rosparam command="load" file="$(find aist_iiwa_moveit_config)/config/kinematics.yaml"/>
+  </group>
+
+</launch>

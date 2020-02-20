@@ -14,12 +14,34 @@ https://github.com/crigroup/robotiq.git
 --------------------------------------------------------------------------------
 [ gazebo ]
 
------ 1 robot -----
-$ roslaunch aist_gazebo iiwa_gazebo.launch trajectory:=false
------ 2 robots -----
-$ roslaunch aist_gazebo iiwa_gazebo.launch trajectory:=false robot_2:=true
------ 2 robots, end_effector(bh282) -----
-$ roslaunch aist_gazebo iiwa_gazebo.launch trajectory:=false robot_2:=true end_effector:=bh282
+1 robot
+$ roslaunch aist_iiwa_gazebo iiwa_gazebo.launch trajectory:=false
+
+2 robots
+$ roslaunch aist_iiwa_gazebo iiwa_gazebo.launch trajectory:=false robot_2:=true
+
+2 robots, end_effector(bh282)
+$ roslaunch aist_iiwa_gazebo iiwa_gazebo.launch trajectory:=false robot_2:=true end_effector:=bh282
+
+--------------------------------------------------------------------------------
+[ moveit ]
+
+2 robots, end_effector(bh282)
+$ roslaunch aist_iiwa_moveit moveit_planning_execution.launch end_effector:=bh282
+
+================================================================================
+
+$ roslaunch aist_routines connect_robots.launch config:=iiwa sim:=true
+
+$ rosrun aist_routines iiwa_interactive.py -r a_iiwa
+        moveit>> reset
+        moveit>> X
+        moveit>> 0.3
+        moveit>> Y
+        moveit>> -0.2
+        moveit>> Z
+        moveit>> 2
+        moveit>> go
 
 --------------------------------------------------------------------------------
 

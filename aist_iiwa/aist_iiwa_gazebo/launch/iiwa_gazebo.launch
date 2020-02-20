@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <launch>
 
-    <arg name="scene" default="iiwa_base_scene"/>
-
     <arg name="sim" default="true" doc="If true, the robot will be simulated in Gazebo" />
 
     <arg name="hardware_interface" default="PositionJointInterface"/>
@@ -47,7 +45,7 @@
         <arg name="debug" value="$(arg debug)" />
     </include>
 
-    <include file="$(find aist_gazebo)/launch/iiwa_gazebo_sub.xml">
+    <include file="$(find aist_iiwa_gazebo)/launch/iiwa_gazebo_sub.xml">
         <arg name="sim" value="$(arg sim)" />
         <arg name="hardware_interface" value="$(arg hardware_interface)"/>
         <arg name="model" value="$(arg model)"/>
@@ -70,7 +68,7 @@
     </include>
 
     <group if="$(arg robot_2)">
-        <include file="$(find aist_gazebo)/launch/iiwa_gazebo_sub.xml">
+        <include file="$(find aist_iiwa_gazebo)/launch/iiwa_gazebo_sub.xml">
             <arg name="sim" value="$(arg sim)" />
             <arg name="hardware_interface" value="$(arg hardware_interface)"/>
             <arg name="model" value="$(arg model)"/>
@@ -92,9 +90,6 @@
             <arg name="trajectory" value="$(arg trajectory)"/>
         </include>
     </group>
-
-    <!-- for RViz & MoveIt -->
-    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find aist_description)/scene/urdf/$(arg scene).urdf.xacro' hardware_interface:=$(arg hardware_interface) end_effector:=$(arg end_effector) robot_name_1:=$(arg robot_name_1) origin_x_1:=$(arg origin_x_1) origin_y_1:=$(arg origin_y_1) origin_z_1:=$(arg origin_z_1) origin_roll_1:=$(arg origin_roll_1) origin_pitch_1:=$(arg origin_pitch_1) origin_yaw_1:=$(arg origin_yaw_1) robot_name_2:=$(arg robot_name_2) origin_x_2:=$(arg origin_x_2) origin_y_2:=$(arg origin_y_2) origin_z_2:=$(arg origin_z_2) origin_roll_2:=$(arg origin_roll_2) origin_pitch_2:=$(arg origin_pitch_2) origin_yaw_2:=$(arg origin_yaw_2) exist_objs:=$(arg exist_objs)" />
 
 </launch>
 

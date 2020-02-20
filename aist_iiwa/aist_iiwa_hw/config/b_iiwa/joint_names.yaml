@@ -1,0 +1,8 @@
+joints:
+  - b_iiwa_joint_1
+  - b_iiwa_joint_2
+  - b_iiwa_joint_3
+  - b_iiwa_joint_4
+  - b_iiwa_joint_5
+  - b_iiwa_joint_6
+  - b_iiwa_joint_7

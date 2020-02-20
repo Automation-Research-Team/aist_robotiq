@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>aist_iiwa_description</name>
+  <name>aist_iiwa_gazebo</name>
   <version>1.0.0</version>
-  <description>description</description>
+  <description>for gazebo</description>
   <author email="j.miyoshi@aist.go.jp">Jun Miyoshi</author>
   <maintainer email="j.miyoshi@aist.go.jp">Jun Miyoshi</maintainer>
 
