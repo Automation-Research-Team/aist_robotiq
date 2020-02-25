@@ -75,7 +75,7 @@ def pick_from_table(robot, robot_name, target):
   grasp.grasp_pose.pose.position.y = target.pose.position.y
   grasp.grasp_pose.pose.position.z = target.pose.position.z + 0.1
 
-  q_tf = tf.transformations.quaternion_from_euler(0, 0, 0)
+  q_tf = tf.transformations.quaternion_from_euler(0, 3.14/2, 0)
   grasp.grasp_pose.pose.orientation = Quaternion(q_tf[0], q_tf[1], q_tf[2], q_tf[3])
 
   grasp.pre_grasp_approach.direction.header.frame_id = robot_name + '_link_0'
@@ -167,7 +167,7 @@ def main():
       go_to_home(robot, 'a_iiwa')
       return
     rospy.sleep(3)
-    if place_on_table(robot, 'a_iiwa', 0.5, 0.6, 0.5+z_ext, 0.0, 0.0, 3.14/2) is False:
+    if place_on_table(robot, 'a_iiwa', 0.5, 0.6, 0.5+z_ext, 0.0, 0.0, 0) is False:
       go_to_home(robot, 'a_iiwa')
       return
     rospy.sleep(1)
@@ -189,7 +189,7 @@ def main():
     link_0 = robot.get_link('b_iiwa_link_0')
     link_0_pose = link_0.pose()
     if place_on_table(robot, 'b_iiwa',
-            0.7, link_0_pose.pose.position.y+0.4, 0.5+z_ext, 0.0, 0.0, 0.0) is False:
+            0.8, link_0_pose.pose.position.y, 0.5+z_ext, 0.0, 0.0, 0.0) is False:
       go_to_home(robot, 'b_iiwa')
       return
     rospy.sleep(1)

@@ -27,7 +27,7 @@
     <arg name="origin_pitch_1" default="0" />
     <arg name="origin_yaw_1"   default="0" />
 
-    <arg name="robot_2"      default="true"/>
+    <arg name="robot_2" default="true" doc="true is enable two robots, false is only one robot." />
     <arg name="robot_name_2" default="b_iiwa"/>
     <arg name="origin_x_2" default="0" />
     <arg name="origin_y_2" default="1.2" />

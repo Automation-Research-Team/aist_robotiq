@@ -9,7 +9,7 @@
   
   <arg name="robot_name_1" default="a_iiwa"/>
   
-  <arg name="robot_2"      default="false"/>
+  <arg name="robot_2" default="false" doc="true is enable two robots, false is only one robot." />
   <arg name="robot_name_2" default="b_iiwa"/>
   
   <include file="$(find aist_iiwa_control)/launch/iiwa_control_ext.launch">

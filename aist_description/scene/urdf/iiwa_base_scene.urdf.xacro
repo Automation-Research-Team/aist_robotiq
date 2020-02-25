@@ -132,11 +132,11 @@
   <xacro:if value="${end_effector == 'robotiq85gripper'}">
     <xacro:include filename="$(find robotiq_description)/urdf/robotiq_85_gripper.urdf.xacro"/>
     <xacro:robotiq_85_gripper prefix="$(arg robot_name_1)_r85g" parent="$(arg robot_name_1)_link_ee">
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 0" rpy="0 ${-pi/2} 0" />
     </xacro:robotiq_85_gripper>
     <xacro:include filename="$(find robotiq_description)/urdf/robotiq_85_gripper.urdf.xacro"/>
     <xacro:robotiq_85_gripper prefix="$(arg robot_name_2)_r85g" parent="$(arg robot_name_2)_link_ee">
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 0" rpy="0 ${-pi/2} 0" />
     </xacro:robotiq_85_gripper>
   </xacro:if>
 
