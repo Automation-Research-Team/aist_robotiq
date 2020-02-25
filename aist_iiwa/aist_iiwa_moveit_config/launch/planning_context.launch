@@ -20,6 +20,8 @@
   <arg name="origin_pitch_2" default="0"/>
   <arg name="origin_yaw_2"   default="${pi}"/>
 
+  <arg name="exist_objs" default="true"/>
+
   <!-- The name of the parameter under which the URDF is loaded -->
   <arg name="robot_description" default="robot_description"/>
 
@@ -42,6 +44,7 @@
       <arg name="origin_roll_2"  value="$(arg origin_roll_2)" />
       <arg name="origin_pitch_2" value="$(arg origin_pitch_2)" />
       <arg name="origin_yaw_2"   value="$(arg origin_yaw_2)" />
+      <arg name="exist_objs" value="$(arg exist_objs)" />
     </include>
   </group>
 

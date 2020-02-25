@@ -57,7 +57,7 @@
     </include>
   </group>
   
-  <group ns="$(arg robot_name_1)" unless="$(arg sim)">
+  <group unless="$(arg sim)">
     <include file="$(find aist_iiwa_control)/launch/iiwa_control_ext.launch">
       <arg name="hardware_interface" value="$(arg hardware_interface)"/>
       <arg name="model" value="$(arg model)"/>
@@ -68,10 +68,7 @@
       <arg name="hardware_interface" value="$(arg hardware_interface)" />
       <arg name="robot_name" value="$(arg robot_name_1)" />
     </include>
-  </group>
-  
-  <group if="$(arg robot_2)">
-    <group ns="$(arg robot_name_2)" unless="$(arg sim)">
+    <group if="$(arg robot_2)">
       <include file="$(find aist_iiwa_control)/launch/iiwa_control_ext.launch">
         <arg name="hardware_interface" value="$(arg hardware_interface)"/>
         <arg name="model" value="$(arg model)"/>

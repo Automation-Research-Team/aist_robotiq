@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="sim" default="true" doc="If true, the robot will be simulated in Gazebo" />
+  <arg name="sim" default="false" />
   
   <arg name="hardware_interface" default="PositionJointInterface"/>
   <arg name="model" default="iiwa14"/>
@@ -9,35 +9,31 @@
   
   <arg name="robot_name_1" default="a_iiwa"/>
   
-  <arg name="robot_2"      default="true"/>
+  <arg name="robot_2"      default="false"/>
   <arg name="robot_name_2" default="b_iiwa"/>
   
-  <group ns="$(arg robot_name_1)" unless="$(arg sim)">
+  <include file="$(find aist_iiwa_control)/launch/iiwa_control_ext.launch">
+    <arg name="hardware_interface" value="$(arg hardware_interface)"/>
+    <arg name="model" value="$(arg model)"/>
+    <arg name="trajectory" value="$(arg trajectory)" />
+    <arg name="robot_name" value="$(arg robot_name_1)" />
+  </include>
+  <include file="$(find aist_iiwa_hw)/launch/iiwa_hw_ext.launch" >
+    <arg name="hardware_interface" value="$(arg hardware_interface)" />
+    <arg name="robot_name" value="$(arg robot_name_1)" />
+  </include>
+
+  <group if="$(arg robot_2)">
     <include file="$(find aist_iiwa_control)/launch/iiwa_control_ext.launch">
       <arg name="hardware_interface" value="$(arg hardware_interface)"/>
       <arg name="model" value="$(arg model)"/>
       <arg name="trajectory" value="$(arg trajectory)" />
-      <arg name="robot_name" value="$(arg robot_name_1)" />
+      <arg name="robot_name" value="$(arg robot_name_2)" />
     </include>
     <include file="$(find aist_iiwa_hw)/launch/iiwa_hw_ext.launch" >
       <arg name="hardware_interface" value="$(arg hardware_interface)" />
-      <arg name="robot_name" value="$(arg robot_name_1)" />
+      <arg name="robot_name" value="$(arg robot_name_2)" />
     </include>
-  </group>
-  
-  <group if="$(arg robot_2)">
-    <group ns="$(arg robot_name_2)" unless="$(arg sim)">
-      <include file="$(find aist_iiwa_control)/launch/iiwa_control_ext.launch">
-        <arg name="hardware_interface" value="$(arg hardware_interface)"/>
-        <arg name="model" value="$(arg model)"/>
-        <arg name="trajectory" value="$(arg trajectory)" />
-        <arg name="robot_name" value="$(arg robot_name_2)" />
-      </include>
-      <include file="$(find aist_iiwa_hw)/launch/iiwa_hw_ext.launch" >
-        <arg name="hardware_interface" value="$(arg hardware_interface)" />
-        <arg name="robot_name" value="$(arg robot_name_2)" />
-      </include>
-    </group>
   </group>
 
 </launch>

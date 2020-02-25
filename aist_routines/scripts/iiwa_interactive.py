@@ -132,7 +132,7 @@ class InteractiveRoutines(IiwaRoutines):
                     _pose[3] = radians(float(key))
                 elif axis == 'Pitch':
                     _pose[4] = radians(float(key))
-                else:
+                elif axis == 'Yaw':
                     _pose[5] = radians(float(key))
                 print "# _pose #\n", _pose
             elif key == 'reset':
