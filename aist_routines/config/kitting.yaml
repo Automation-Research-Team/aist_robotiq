@@ -15,7 +15,7 @@ part_props:
     approach_offset: [0.0, 0.0, 0.15]
     grasp_offset: [0.0, 0.0, -0.003]
     place_offset: [0.0, 0.0, 0.06]
-    speed_slow: 0.04
+    speed_slow: 0.1
     use_normals: true
   _5:
     name: Pully for round belt
@@ -45,7 +45,7 @@ part_props:
     approach_offset: [0.0, 0.0, 0.15]
     grasp_offset: [0.0, 0.0, -0.003]
     place_offset: [0.0, 0.0, 0.05]
-    speed_slow: 0.04
+    speed_slow: 0.1
     use_normals: true
   _8:
     name: Drive shaft

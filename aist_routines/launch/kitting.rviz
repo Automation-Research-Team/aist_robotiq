@@ -4,7 +4,6 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /MotionPlanning1
         - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
         - /TF1
@@ -54,11 +53,14 @@ Visualization Manager:
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
       Value: true
-    - Class: moveit_rviz_plugin/MotionPlanning
+    - Acceleration_Scaling_Factor: 1
+      Class: moveit_rviz_plugin/MotionPlanning
       Enabled: true
       Move Group Namespace: ""
       MoveIt_Allow_Approximate_IK: false
       MoveIt_Allow_External_Program: false
+      MoveIt_Allow_Replanning: false
+      MoveIt_Allow_Sensor_Positioning: false
       MoveIt_Goal_Tolerance: 0
       MoveIt_Planning_Attempts: 10
       MoveIt_Planning_Time: 5
@@ -93,6 +95,14 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          a_bot_camera_color_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_color_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_bot_camera_depth_frame:
             Alpha: 1
             Show Axes: false
@@ -101,19 +111,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          a_bot_camera_fisheye_frame:
+          a_bot_camera_infra1_frame:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          a_bot_camera_fisheye_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_left_ir_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_left_ir_optical_frame:
+          a_bot_camera_infra1_optical_frame:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -122,11 +124,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          a_bot_camera_right_ir_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_right_ir_optical_frame:
+          a_bot_camera_projector_frame:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -783,6 +781,14 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          a_bot_camera_color_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_bot_camera_color_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_bot_camera_depth_frame:
             Alpha: 1
             Show Axes: false
@@ -791,19 +797,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          a_bot_camera_fisheye_frame:
+          a_bot_camera_infra1_frame:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          a_bot_camera_fisheye_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_left_ir_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_left_ir_optical_frame:
+          a_bot_camera_infra1_optical_frame:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -812,11 +810,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          a_bot_camera_right_ir_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_bot_camera_right_ir_optical_frame:
+          a_bot_camera_projector_frame:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -1423,6 +1417,7 @@ Visualization Manager:
         Show Robot Collision: false
         Show Robot Visual: true
       Value: true
+      Velocity_Scaling_Factor: 1
     - Class: rviz/TF
       Enabled: true
       Frame Timeout: 15
@@ -1432,10 +1427,6 @@ Visualization Manager:
           Value: false
         a_bot_base_link:
           Value: false
-        a_bot_camera_aligned_depth_to_color_frame:
-          Value: true
-        a_bot_camera_aligned_depth_to_infra1_frame:
-          Value: true
         a_bot_camera_color_frame:
           Value: true
         a_bot_camera_color_optical_frame:
@@ -1444,24 +1435,14 @@ Visualization Manager:
           Value: false
         a_bot_camera_depth_optical_frame:
           Value: true
-        a_bot_camera_fisheye_frame:
-          Value: false
-        a_bot_camera_fisheye_optical_frame:
-          Value: false
         a_bot_camera_infra1_frame:
           Value: true
         a_bot_camera_infra1_optical_frame:
           Value: true
-        a_bot_camera_left_ir_frame:
-          Value: false
-        a_bot_camera_left_ir_optical_frame:
-          Value: false
         a_bot_camera_link:
           Value: false
-        a_bot_camera_right_ir_frame:
-          Value: false
-        a_bot_camera_right_ir_optical_frame:
-          Value: false
+        a_bot_camera_projector_frame:
+          Value: true
         a_bot_ee_link:
           Value: false
         a_bot_forearm_link:
@@ -1770,28 +1751,17 @@ Visualization Manager:
                     a_bot_wrist_1_link:
                       a_bot_wrist_2_link:
                         a_bot_camera_link:
-                          a_bot_camera_aligned_depth_to_color_frame:
-                            a_bot_camera_color_optical_frame:
-                              {}
-                          a_bot_camera_aligned_depth_to_infra1_frame:
-                            a_bot_camera_infra1_optical_frame:
-                              {}
-                          a_bot_camera_color_frame:
-                            {}
                           a_bot_camera_depth_frame:
+                            a_bot_camera_color_frame:
+                              a_bot_camera_color_optical_frame:
+                                {}
                             a_bot_camera_depth_optical_frame:
                               {}
-                            a_bot_camera_fisheye_frame:
-                              a_bot_camera_fisheye_optical_frame:
+                            a_bot_camera_infra1_frame:
+                              a_bot_camera_infra1_optical_frame:
                                 {}
-                            a_bot_camera_left_ir_frame:
-                              a_bot_camera_left_ir_optical_frame:
-                                {}
-                            a_bot_camera_right_ir_frame:
-                              a_bot_camera_right_ir_optical_frame:
-                                {}
-                          a_bot_camera_infra1_frame:
-                            {}
+                            a_bot_camera_projector_frame:
+                              {}
                         a_bot_wrist_3_link:
                           a_bot_ee_link:
                             a_bot_ft300_link:
@@ -2053,7 +2023,7 @@ Visualization Manager:
       Marker Topic: /visualization_marker
       Name: MarkerArray
       Namespaces:
-        {}
+        markers: true
       Queue Size: 100
       Value: true
     - Alpha: 1
@@ -2119,7 +2089,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.464615941
+      Distance: 0.807021081
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -2134,10 +2104,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.956071019
+      Pitch: 1.2010709
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.304944903
+      Yaw: 0.559944689
     Saved: ~
 Window Geometry:
   Displays:

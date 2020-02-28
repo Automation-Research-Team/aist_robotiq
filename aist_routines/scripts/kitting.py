@@ -64,6 +64,22 @@ class KittingRoutines(URRoutines):
             self.attempt_bin(bin, 1)
         self.go_to_named_pose("home", "all_bots")
 
+    def demo(self):
+        bins = ("bin_1_part_5", "bin_2_part_4", "bin_2_part_7")
+
+        while True:
+            completed = False
+
+            for bin in bins:
+                kitting.clear_fail_poses()
+                success = kitting.attempt_bin(bin, 5, 0)
+                completed = completed and not success
+
+            if completed:
+                break
+
+        kitting.go_to_named_pose("home", kitting.former_robot_name)
+
     def attempt_bin(self, bin, max_attempts=5, marker_lifetime=0):
         item  = self._items[bin]
         props = item.part_props
@@ -158,6 +174,7 @@ if __name__ == '__main__':
             print("  s: Search graspabilities")
             print("  a: Attempt to pick and place")
             print("  A: Repeat attempts to pick and place")
+            print("  d: Perform small demo")
             print("  k: Do kitting task")
             print("  g: Grasp")
             print("  r: Release")
@@ -206,6 +223,8 @@ if __name__ == '__main__':
                     while kitting.attempt_bin(bin, 5, 0):
                         pass
                     kitting.go_to_named_pose("home", kitting.former_robot_name)
+                elif key == 'd':
+                    kitting.demo()
                 elif key == 'k':
                     kitting.run()
                 elif key == 'g':
