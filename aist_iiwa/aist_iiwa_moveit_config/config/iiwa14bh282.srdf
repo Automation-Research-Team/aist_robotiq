@@ -265,6 +265,7 @@
     <end_effector name="b_iiwa_moveit_ee" parent_link="b_iiwa_link_ee" group="b_iiwa_hand" />
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
     <virtual_joint name="a_iiwa_virtual_joint" type="fixed" parent_frame="ground" child_link="a_iiwa_link_0" />
+    <virtual_joint name="b_iiwa_virtual_joint" type="fixed" parent_frame="ground" child_link="b_iiwa_link_0" />
     <!--PASSIVE JOINT: Purpose: this element is used to mark joints that are not actuated-->
     <passive_joint name="a_iiwa_bh_j13_joint" />
     <passive_joint name="a_iiwa_bh_j23_joint" />

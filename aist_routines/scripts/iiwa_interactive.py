@@ -39,11 +39,16 @@ class InteractiveRoutines(IiwaRoutines):
         self._camera_name  = camera_name
         self._speed        = speed
 
+    def go_standing(self):
+        self.go_to_named_pose('standing', self._robot_name)
+
     def go_home(self):
         self.go_to_named_pose('home', self._robot_name)
 
+    """
     def go_back(self):
         self.go_to_named_pose('back', self._robot_name)
+    """
 
     def move(self, pose):
         target_pose = gmsg.PoseStamped()
@@ -61,7 +66,8 @@ class InteractiveRoutines(IiwaRoutines):
 
     def run(self):
         # Reset pose
-        self.go_home()
+        # self.go_home()
+        self.go_standing()
 
         axis = 'Y'
 
@@ -167,10 +173,14 @@ class InteractiveRoutines(IiwaRoutines):
                 print(str(poses))
             elif key == 'o':
                 self.move(InteractiveRoutines.refposes[self._robot_name])
+            elif key == 'standing':
+                self.go_standing()
             elif key == 'h':
                 self.go_home()
+            """
             elif key == 'b':
                 self.go_back()
+            """
 
         # Reset pose
         self.go_home()

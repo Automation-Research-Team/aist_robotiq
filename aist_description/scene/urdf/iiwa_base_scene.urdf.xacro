@@ -122,7 +122,6 @@
     <xacro:bhand_macro name="$(arg robot_name_1)_bh" parent="$(arg robot_name_1)_link_ee">
       <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:bhand_macro>
-    <xacro:include filename="$(find barrett_hand_description)/urdf/bh282.urdf.xacro"/>
     <xacro:bhand_macro name="$(arg robot_name_2)_bh" parent="$(arg robot_name_2)_link_ee">
       <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:bhand_macro>
@@ -134,7 +133,6 @@
     <xacro:robotiq_85_gripper prefix="$(arg robot_name_1)_r85g" parent="$(arg robot_name_1)_link_ee">
       <origin xyz="0 0 0" rpy="0 ${-pi/2} 0" />
     </xacro:robotiq_85_gripper>
-    <xacro:include filename="$(find robotiq_description)/urdf/robotiq_85_gripper.urdf.xacro"/>
     <xacro:robotiq_85_gripper prefix="$(arg robot_name_2)_r85g" parent="$(arg robot_name_2)_link_ee">
       <origin xyz="0 0 0" rpy="0 ${-pi/2} 0" />
     </xacro:robotiq_85_gripper>
