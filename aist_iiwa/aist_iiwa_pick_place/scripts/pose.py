@@ -47,23 +47,29 @@ def create_objects(scene, robot):
 
   print 'create objects'
 
-def go_to_home(robot, robot_name):
+def go_to_named_target(robot, robot_name, pose_name):
   if robot_name is 'a_iiwa':
-    robot.a_iiwa.set_named_target('home')
+    robot.a_iiwa.set_named_target(pose_name)
     robot.a_iiwa.go()
   elif robot_name is 'b_iiwa':
-    robot.b_iiwa.set_named_target('home')
+    robot.b_iiwa.set_named_target(pose_name)
     robot.b_iiwa.go()
   elif robot_name is 'iiwa_two_robots':
-    robot.iiwa_two_robots.set_named_target('home')
+    robot.iiwa_two_robots.set_named_target(pose_name)
     robot.iiwa_two_robots.go()
   elif robot_name is 'iiwa':
-    robot.iiwa.set_named_target('home')
+    robot.iiwa.set_named_target(pose_name)
     robot.iiwa.go()
   else:
     print robot_name, 'is unknown.'
   rospy.sleep(1)
-  print robot_name, ': go to home'
+  print robot_name, ': go to', pose_name
+
+def go_to_home(robot, robot_name):
+  go_to_named_target(robot, robot_name, 'home')
+
+def go_to_standing(robot, robot_name):
+  go_to_named_target(robot, robot_name, 'standing')
 
 def pose_targets(robot, robot_name, end_effector, poses):
   print robot_name, end_effector, ': pose_targets 1 (poses)', poses
@@ -71,29 +77,32 @@ def pose_targets(robot, robot_name, end_effector, poses):
   link_0 = robot.get_link(robot_name + '_link_0')
   link_0_pose = link_0.pose()
 
+  q_tf = tf.transformations.quaternion_from_euler(0, 3.14/2, 0)
+
   for pose in poses:
     if pose.position.x > link_0_pose.pose.position.x:
       pose.position.x -= 0.1
     else:
       pose.position.x += 0.1
     pose.position.z += 0.2
+    pose.orientation = Quaternion(q_tf[0], q_tf[1], q_tf[2], q_tf[3])
 
   result = False
 
   print robot_name, end_effector, ': pose_targets 2 (poses)', poses
   if robot_name is 'a_iiwa':
-    robot.a_iiwa.set_pose_targets(poses)
+    robot.a_iiwa.set_pose_targets(poses, 'a_iiwa_link_ee')
     result = robot.a_iiwa.go()
   elif robot_name is 'b_iiwa':
-    robot.b_iiwa.set_pose_targets(poses)
+    robot.b_iiwa.set_pose_targets(poses, 'b_iiwa_link_ee')
     result = robot.b_iiwa.go()
   elif robot_name is 'iiwa':
-    robot.iiwa.set_pose_targets(poses)
+    robot.iiwa.set_pose_targets(poses, 'iiwa_link_ee')
     result = robot.iiwa.go()
   else:
     print robot_name, 'is unknown.'
 
-  print robot_name, ': end of pick (result)', result
+  print robot_name, ': end of pose (result)', result
   return result
 
 def main(end_effector):
@@ -101,9 +110,12 @@ def main(end_effector):
   robot = RobotCommander()
   rospy.sleep(1)
 
-  go_to_home(robot, 'iiwa_two_robots')
-
   create_objects(scene, robot)
+
+  go_to_standing(robot, 'iiwa_two_robots')
+  rospy.sleep(1)
+  go_to_home(robot, 'iiwa_two_robots')
+  rospy.sleep(1)
 
   objs = scene.get_objects()
   if 'part1' in objs:
@@ -114,10 +126,12 @@ def main(end_effector):
       print 'continue'
     else:
       go_to_home(robot, 'a_iiwa')
+      rospy.sleep(3)
+      go_to_standing(robot, 'iiwa_two_robots')
       return
-    go_to_home(robot, 'a_iiwa')
 
-    rospy.sleep(1)
+    rospy.sleep(3)
+    go_to_home(robot, 'a_iiwa')
 
   objs = scene.get_objects()
   if 'part2' in objs:
@@ -128,8 +142,19 @@ def main(end_effector):
       print 'continue'
     else:
       go_to_home(robot, 'b_iiwa')
+      rospy.sleep(3)
+      go_to_standing(robot, 'iiwa_two_robots')
       return
+
+    rospy.sleep(3)
     go_to_home(robot, 'b_iiwa')
+
+  """
+  rospy.sleep(1)
+  go_to_home(robot, 'iiwa_two_robots')
+  """
+  rospy.sleep(1)
+  go_to_standing(robot, 'iiwa_two_robots')
 
   return
 

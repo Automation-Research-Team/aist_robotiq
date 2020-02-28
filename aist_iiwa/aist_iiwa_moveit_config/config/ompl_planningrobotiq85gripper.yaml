@@ -203,7 +203,7 @@ a_iiwa:
   projection_evaluator: joints(a_iiwa_joint_1,a_iiwa_joint_2)
   longest_valid_segment_fraction: 0.005
 b_iiwa_arm:
-  default_planner_config: ""
+  default_planner_config: None
   planner_configs:
     - SBL
     - EST
@@ -285,7 +285,7 @@ b_iiwa:
   projection_evaluator: joints(b_iiwa_joint_1,b_iiwa_joint_2)
   longest_valid_segment_fraction: 0.005
 iiwa_two_robots:
-  default_planner_config: None
+  default_planner_config: ""
   planner_configs:
     - SBL
     - EST

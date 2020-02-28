@@ -29,6 +29,18 @@ $ roslaunch aist_iiwa_gazebo iiwa_gazebo.launch trajectory:=false robot_2:=true 
 2 robots, end_effector(bh282)
 $ roslaunch aist_iiwa_moveit moveit_planning_execution.launch end_effector:=bh282
 
+--------------------------------------------------------------------------------
+[ pick & place, pose]
+
+pick & place, end_effector(bh282)
+$ rosrun aist_iiwa_pick_place pick.py bh282
+
+pick & place, end_effector(robotiq85gripper)
+$ rosrun aist_iiwa_pick_place pick.py r85g
+
+pose
+$ rosrun aist_iiwa_pick_place pose.py
+
 ================================================================================
 
 $ roslaunch aist_routines connect_robots.launch config:=iiwa sim:=true
