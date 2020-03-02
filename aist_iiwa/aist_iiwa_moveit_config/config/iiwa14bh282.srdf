@@ -9,6 +9,16 @@
     <!--JOINTS: When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
     <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
     <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
+    <group name="a_iiwa">
+        <chain base_link="a_iiwa_link_0" tip_link="a_iiwa_bh_tip_link" />
+    </group>
+    <group name="b_iiwa">
+        <chain base_link="b_iiwa_link_0" tip_link="b_iiwa_bh_tip_link" />
+    </group>
+    <group name="iiwa_two_robots">
+        <group name="a_iiwa" />
+        <group name="b_iiwa" />
+    </group>
     <group name="a_iiwa_arm">
         <chain base_link="a_iiwa_link_0" tip_link="a_iiwa_link_ee" />
     </group>
@@ -24,7 +34,7 @@
         <joint name="a_iiwa_bh_j32_joint" />
         <joint name="a_iiwa_bh_j33_joint" />
     </group>
-    <group name="a_iiwa">
+    <group name="a_iiwa_groups">
         <group name="a_iiwa_arm" />
         <group name="a_iiwa_hand" />
     </group>
@@ -43,43 +53,25 @@
         <joint name="b_iiwa_bh_j32_joint" />
         <joint name="b_iiwa_bh_j33_joint" />
     </group>
-    <group name="b_iiwa">
+    <group name="b_iiwa_groups">
         <group name="b_iiwa_arm" />
         <group name="b_iiwa_hand" />
     </group>
-    <group name="iiwa_two_robots">
-        <group name="a_iiwa" />
-        <group name="b_iiwa" />
+    <group name="iiwa_two_robots_groups">
+        <group name="a_iiwa_groups" />
+        <group name="b_iiwa_groups" />
     </group>
     <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
-    <group_state name="home" group="a_iiwa_arm">
+    <group_state name="standing" group="a_iiwa">
         <joint name="a_iiwa_joint_1" value="0" />
-        <joint name="a_iiwa_joint_2" value="0.4" />
+        <joint name="a_iiwa_joint_2" value="0" />
         <joint name="a_iiwa_joint_3" value="0" />
-        <joint name="a_iiwa_joint_4" value="-0.4" />
+        <joint name="a_iiwa_joint_4" value="0" />
         <joint name="a_iiwa_joint_5" value="0" />
-        <joint name="a_iiwa_joint_6" value="0.4" />
+        <joint name="a_iiwa_joint_6" value="0" />
         <joint name="a_iiwa_joint_7" value="0" />
-    </group_state>
-    <group_state name="home" group="a_iiwa_hand">
-        <joint name="a_iiwa_bh_j11_joint" value="0" />
-        <joint name="a_iiwa_bh_j12_joint" value="0" />
-        <joint name="a_iiwa_bh_j13_joint" value="0" />
-        <joint name="a_iiwa_bh_j21_joint" value="0" />
-        <joint name="a_iiwa_bh_j22_joint" value="0" />
-        <joint name="a_iiwa_bh_j23_joint" value="0" />
-        <joint name="a_iiwa_bh_j32_joint" value="0" />
-        <joint name="a_iiwa_bh_j33_joint" value="0" />
     </group_state>
     <group_state name="home" group="a_iiwa">
-        <joint name="a_iiwa_bh_j11_joint" value="0" />
-        <joint name="a_iiwa_bh_j12_joint" value="0" />
-        <joint name="a_iiwa_bh_j13_joint" value="0" />
-        <joint name="a_iiwa_bh_j21_joint" value="0" />
-        <joint name="a_iiwa_bh_j22_joint" value="0" />
-        <joint name="a_iiwa_bh_j23_joint" value="0" />
-        <joint name="a_iiwa_bh_j32_joint" value="0" />
-        <joint name="a_iiwa_bh_j33_joint" value="0" />
         <joint name="a_iiwa_joint_1" value="0" />
         <joint name="a_iiwa_joint_2" value="0.4" />
         <joint name="a_iiwa_joint_3" value="0" />
@@ -88,7 +80,16 @@
         <joint name="a_iiwa_joint_6" value="0.4" />
         <joint name="a_iiwa_joint_7" value="0" />
     </group_state>
-    <group_state name="home" group="b_iiwa_arm">
+    <group_state name="standing" group="b_iiwa">
+        <joint name="b_iiwa_joint_1" value="0" />
+        <joint name="b_iiwa_joint_2" value="0" />
+        <joint name="b_iiwa_joint_3" value="0" />
+        <joint name="b_iiwa_joint_4" value="0" />
+        <joint name="b_iiwa_joint_5" value="0" />
+        <joint name="b_iiwa_joint_6" value="0" />
+        <joint name="b_iiwa_joint_7" value="0" />
+    </group_state>
+    <group_state name="home" group="b_iiwa">
         <joint name="b_iiwa_joint_1" value="0" />
         <joint name="b_iiwa_joint_2" value="0.4" />
         <joint name="b_iiwa_joint_3" value="0" />
@@ -97,42 +98,23 @@
         <joint name="b_iiwa_joint_6" value="0.4" />
         <joint name="b_iiwa_joint_7" value="0" />
     </group_state>
-    <group_state name="home" group="b_iiwa_hand">
-        <joint name="b_iiwa_bh_j11_joint" value="0" />
-        <joint name="b_iiwa_bh_j12_joint" value="0" />
-        <joint name="b_iiwa_bh_j13_joint" value="0" />
-        <joint name="b_iiwa_bh_j21_joint" value="0" />
-        <joint name="b_iiwa_bh_j22_joint" value="0" />
-        <joint name="b_iiwa_bh_j23_joint" value="0" />
-        <joint name="b_iiwa_bh_j32_joint" value="0" />
-        <joint name="b_iiwa_bh_j33_joint" value="0" />
-    </group_state>
-    <group_state name="home" group="b_iiwa">
-        <joint name="b_iiwa_bh_j11_joint" value="0" />
-        <joint name="b_iiwa_bh_j12_joint" value="0" />
-        <joint name="b_iiwa_bh_j13_joint" value="0" />
-        <joint name="b_iiwa_bh_j21_joint" value="0" />
-        <joint name="b_iiwa_bh_j22_joint" value="0" />
-        <joint name="b_iiwa_bh_j23_joint" value="0" />
-        <joint name="b_iiwa_bh_j32_joint" value="0" />
-        <joint name="b_iiwa_bh_j33_joint" value="0" />
+    <group_state name="standing" group="iiwa_two_robots">
+        <joint name="a_iiwa_joint_1" value="0" />
+        <joint name="a_iiwa_joint_2" value="0" />
+        <joint name="a_iiwa_joint_3" value="0" />
+        <joint name="a_iiwa_joint_4" value="0" />
+        <joint name="a_iiwa_joint_5" value="0" />
+        <joint name="a_iiwa_joint_6" value="0" />
+        <joint name="a_iiwa_joint_7" value="0" />
         <joint name="b_iiwa_joint_1" value="0" />
-        <joint name="b_iiwa_joint_2" value="0.4" />
+        <joint name="b_iiwa_joint_2" value="0" />
         <joint name="b_iiwa_joint_3" value="0" />
-        <joint name="b_iiwa_joint_4" value="-0.4" />
+        <joint name="b_iiwa_joint_4" value="0" />
         <joint name="b_iiwa_joint_5" value="0" />
-        <joint name="b_iiwa_joint_6" value="0.4" />
+        <joint name="b_iiwa_joint_6" value="0" />
         <joint name="b_iiwa_joint_7" value="0" />
     </group_state>
     <group_state name="home" group="iiwa_two_robots">
-        <joint name="a_iiwa_bh_j11_joint" value="0" />
-        <joint name="a_iiwa_bh_j12_joint" value="0" />
-        <joint name="a_iiwa_bh_j13_joint" value="0" />
-        <joint name="a_iiwa_bh_j21_joint" value="0" />
-        <joint name="a_iiwa_bh_j22_joint" value="0" />
-        <joint name="a_iiwa_bh_j23_joint" value="0" />
-        <joint name="a_iiwa_bh_j32_joint" value="0" />
-        <joint name="a_iiwa_bh_j33_joint" value="0" />
         <joint name="a_iiwa_joint_1" value="0" />
         <joint name="a_iiwa_joint_2" value="0.4" />
         <joint name="a_iiwa_joint_3" value="0" />
@@ -140,14 +122,6 @@
         <joint name="a_iiwa_joint_5" value="0" />
         <joint name="a_iiwa_joint_6" value="0.4" />
         <joint name="a_iiwa_joint_7" value="0" />
-        <joint name="b_iiwa_bh_j11_joint" value="0" />
-        <joint name="b_iiwa_bh_j12_joint" value="0" />
-        <joint name="b_iiwa_bh_j13_joint" value="0" />
-        <joint name="b_iiwa_bh_j21_joint" value="0" />
-        <joint name="b_iiwa_bh_j22_joint" value="0" />
-        <joint name="b_iiwa_bh_j23_joint" value="0" />
-        <joint name="b_iiwa_bh_j32_joint" value="0" />
-        <joint name="b_iiwa_bh_j33_joint" value="0" />
         <joint name="b_iiwa_joint_1" value="0" />
         <joint name="b_iiwa_joint_2" value="0.4" />
         <joint name="b_iiwa_joint_3" value="0" />
@@ -165,6 +139,15 @@
         <joint name="a_iiwa_joint_6" value="0" />
         <joint name="a_iiwa_joint_7" value="0" />
     </group_state>
+    <group_state name="home" group="a_iiwa_arm">
+        <joint name="a_iiwa_joint_1" value="0" />
+        <joint name="a_iiwa_joint_2" value="0.4" />
+        <joint name="a_iiwa_joint_3" value="0" />
+        <joint name="a_iiwa_joint_4" value="-0.4" />
+        <joint name="a_iiwa_joint_5" value="0" />
+        <joint name="a_iiwa_joint_6" value="0.4" />
+        <joint name="a_iiwa_joint_7" value="0" />
+    </group_state>
     <group_state name="standing" group="a_iiwa_hand">
         <joint name="a_iiwa_bh_j11_joint" value="0" />
         <joint name="a_iiwa_bh_j12_joint" value="0" />
@@ -175,7 +158,17 @@
         <joint name="a_iiwa_bh_j32_joint" value="0" />
         <joint name="a_iiwa_bh_j33_joint" value="0" />
     </group_state>
-    <group_state name="standing" group="a_iiwa">
+    <group_state name="home" group="a_iiwa_hand">
+        <joint name="a_iiwa_bh_j11_joint" value="0" />
+        <joint name="a_iiwa_bh_j12_joint" value="0" />
+        <joint name="a_iiwa_bh_j13_joint" value="0" />
+        <joint name="a_iiwa_bh_j21_joint" value="0" />
+        <joint name="a_iiwa_bh_j22_joint" value="0" />
+        <joint name="a_iiwa_bh_j23_joint" value="0" />
+        <joint name="a_iiwa_bh_j32_joint" value="0" />
+        <joint name="a_iiwa_bh_j33_joint" value="0" />
+    </group_state>
+    <group_state name="standing" group="a_iiwa_groups">
         <joint name="a_iiwa_bh_j11_joint" value="0" />
         <joint name="a_iiwa_bh_j12_joint" value="0" />
         <joint name="a_iiwa_bh_j13_joint" value="0" />
@@ -192,6 +185,23 @@
         <joint name="a_iiwa_joint_6" value="0" />
         <joint name="a_iiwa_joint_7" value="0" />
     </group_state>
+    <group_state name="home" group="a_iiwa_groups">
+        <joint name="a_iiwa_bh_j11_joint" value="0" />
+        <joint name="a_iiwa_bh_j12_joint" value="0" />
+        <joint name="a_iiwa_bh_j13_joint" value="0" />
+        <joint name="a_iiwa_bh_j21_joint" value="0" />
+        <joint name="a_iiwa_bh_j22_joint" value="0" />
+        <joint name="a_iiwa_bh_j23_joint" value="0" />
+        <joint name="a_iiwa_bh_j32_joint" value="0" />
+        <joint name="a_iiwa_bh_j33_joint" value="0" />
+        <joint name="a_iiwa_joint_1" value="0" />
+        <joint name="a_iiwa_joint_2" value="0.4" />
+        <joint name="a_iiwa_joint_3" value="0" />
+        <joint name="a_iiwa_joint_4" value="-0.4" />
+        <joint name="a_iiwa_joint_5" value="0" />
+        <joint name="a_iiwa_joint_6" value="0.4" />
+        <joint name="a_iiwa_joint_7" value="0" />
+    </group_state>
     <group_state name="standing" group="b_iiwa_arm">
         <joint name="b_iiwa_joint_1" value="0" />
         <joint name="b_iiwa_joint_2" value="0" />
@@ -199,6 +209,15 @@
         <joint name="b_iiwa_joint_4" value="0" />
         <joint name="b_iiwa_joint_5" value="0" />
         <joint name="b_iiwa_joint_6" value="0" />
+        <joint name="b_iiwa_joint_7" value="0" />
+    </group_state>
+    <group_state name="home" group="b_iiwa_arm">
+        <joint name="b_iiwa_joint_1" value="0" />
+        <joint name="b_iiwa_joint_2" value="0.4" />
+        <joint name="b_iiwa_joint_3" value="0" />
+        <joint name="b_iiwa_joint_4" value="-0.4" />
+        <joint name="b_iiwa_joint_5" value="0" />
+        <joint name="b_iiwa_joint_6" value="0.4" />
         <joint name="b_iiwa_joint_7" value="0" />
     </group_state>
     <group_state name="standing" group="b_iiwa_hand">
@@ -211,7 +230,17 @@
         <joint name="b_iiwa_bh_j32_joint" value="0" />
         <joint name="b_iiwa_bh_j33_joint" value="0" />
     </group_state>
-    <group_state name="standing" group="b_iiwa">
+    <group_state name="home" group="b_iiwa_hand">
+        <joint name="b_iiwa_bh_j11_joint" value="0" />
+        <joint name="b_iiwa_bh_j12_joint" value="0" />
+        <joint name="b_iiwa_bh_j13_joint" value="0" />
+        <joint name="b_iiwa_bh_j21_joint" value="0" />
+        <joint name="b_iiwa_bh_j22_joint" value="0" />
+        <joint name="b_iiwa_bh_j23_joint" value="0" />
+        <joint name="b_iiwa_bh_j32_joint" value="0" />
+        <joint name="b_iiwa_bh_j33_joint" value="0" />
+    </group_state>
+    <group_state name="standing" group="b_iiwa_groups">
         <joint name="b_iiwa_bh_j11_joint" value="0" />
         <joint name="b_iiwa_bh_j12_joint" value="0" />
         <joint name="b_iiwa_bh_j13_joint" value="0" />
@@ -228,7 +257,24 @@
         <joint name="b_iiwa_joint_6" value="0" />
         <joint name="b_iiwa_joint_7" value="0" />
     </group_state>
-    <group_state name="standing" group="iiwa_two_robots">
+    <group_state name="home" group="b_iiwa_groups">
+        <joint name="b_iiwa_bh_j11_joint" value="0" />
+        <joint name="b_iiwa_bh_j12_joint" value="0" />
+        <joint name="b_iiwa_bh_j13_joint" value="0" />
+        <joint name="b_iiwa_bh_j21_joint" value="0" />
+        <joint name="b_iiwa_bh_j22_joint" value="0" />
+        <joint name="b_iiwa_bh_j23_joint" value="0" />
+        <joint name="b_iiwa_bh_j32_joint" value="0" />
+        <joint name="b_iiwa_bh_j33_joint" value="0" />
+        <joint name="b_iiwa_joint_1" value="0" />
+        <joint name="b_iiwa_joint_2" value="0.4" />
+        <joint name="b_iiwa_joint_3" value="0" />
+        <joint name="b_iiwa_joint_4" value="-0.4" />
+        <joint name="b_iiwa_joint_5" value="0" />
+        <joint name="b_iiwa_joint_6" value="0.4" />
+        <joint name="b_iiwa_joint_7" value="0" />
+    </group_state>
+    <group_state name="standing" group="iiwa_two_robots_groups">
         <joint name="a_iiwa_bh_j11_joint" value="0" />
         <joint name="a_iiwa_bh_j12_joint" value="0" />
         <joint name="a_iiwa_bh_j13_joint" value="0" />
@@ -258,6 +304,38 @@
         <joint name="b_iiwa_joint_4" value="0" />
         <joint name="b_iiwa_joint_5" value="0" />
         <joint name="b_iiwa_joint_6" value="0" />
+        <joint name="b_iiwa_joint_7" value="0" />
+    </group_state>
+    <group_state name="home" group="iiwa_two_robots_groups">
+        <joint name="a_iiwa_bh_j11_joint" value="0" />
+        <joint name="a_iiwa_bh_j12_joint" value="0" />
+        <joint name="a_iiwa_bh_j13_joint" value="0" />
+        <joint name="a_iiwa_bh_j21_joint" value="0" />
+        <joint name="a_iiwa_bh_j22_joint" value="0" />
+        <joint name="a_iiwa_bh_j23_joint" value="0" />
+        <joint name="a_iiwa_bh_j32_joint" value="0" />
+        <joint name="a_iiwa_bh_j33_joint" value="0" />
+        <joint name="a_iiwa_joint_1" value="0" />
+        <joint name="a_iiwa_joint_2" value="0.4" />
+        <joint name="a_iiwa_joint_3" value="0" />
+        <joint name="a_iiwa_joint_4" value="-0.4" />
+        <joint name="a_iiwa_joint_5" value="0" />
+        <joint name="a_iiwa_joint_6" value="0.4" />
+        <joint name="a_iiwa_joint_7" value="0" />
+        <joint name="b_iiwa_bh_j11_joint" value="0" />
+        <joint name="b_iiwa_bh_j12_joint" value="0" />
+        <joint name="b_iiwa_bh_j13_joint" value="0" />
+        <joint name="b_iiwa_bh_j21_joint" value="0" />
+        <joint name="b_iiwa_bh_j22_joint" value="0" />
+        <joint name="b_iiwa_bh_j23_joint" value="0" />
+        <joint name="b_iiwa_bh_j32_joint" value="0" />
+        <joint name="b_iiwa_bh_j33_joint" value="0" />
+        <joint name="b_iiwa_joint_1" value="0" />
+        <joint name="b_iiwa_joint_2" value="0.4" />
+        <joint name="b_iiwa_joint_3" value="0" />
+        <joint name="b_iiwa_joint_4" value="-0.4" />
+        <joint name="b_iiwa_joint_5" value="0" />
+        <joint name="b_iiwa_joint_6" value="0.4" />
         <joint name="b_iiwa_joint_7" value="0" />
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
@@ -292,7 +370,10 @@
     <disable_collisions link1="a_iiwa_bh_base_link" link2="a_iiwa_link_7" reason="Adjacent" />
     <disable_collisions link1="a_iiwa_bh_base_link" link2="b_iiwa_bh_finger_21_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_base_link" link2="b_iiwa_bh_finger_22_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_base_link" link2="b_iiwa_bh_finger_23_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_base_link" link2="b_iiwa_bh_finger_31_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_base_link" link2="b_iiwa_bh_finger_32_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_base_link" link2="b_iiwa_bh_finger_33_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_base_link" link2="b_iiwa_link_0" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_base_link" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_base_link" link2="b_iiwa_link_2" reason="Never" />
@@ -314,6 +395,7 @@
     <disable_collisions link1="a_iiwa_bh_finger_11_link" link2="a_iiwa_link_6" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_11_link" link2="a_iiwa_link_7" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_11_link" link2="b_iiwa_bh_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_finger_11_link" link2="b_iiwa_bh_finger_11_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_11_link" link2="b_iiwa_bh_finger_12_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_11_link" link2="b_iiwa_bh_finger_21_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_11_link" link2="b_iiwa_bh_finger_22_link" reason="Never" />
@@ -323,6 +405,7 @@
     <disable_collisions link1="a_iiwa_bh_finger_11_link" link2="b_iiwa_bh_finger_33_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_11_link" link2="b_iiwa_link_0" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_11_link" link2="b_iiwa_link_1" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_finger_11_link" link2="b_iiwa_link_2" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_11_link" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_11_link" link2="b_iiwa_table2" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="a_iiwa_bh_finger_13_link" reason="Adjacent" />
@@ -330,15 +413,16 @@
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="a_iiwa_bh_finger_22_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="a_iiwa_bh_finger_31_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="a_iiwa_bh_finger_32_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="a_iiwa_link_1" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="a_iiwa_link_2" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="a_iiwa_link_3" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="a_iiwa_link_4" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="a_iiwa_link_5" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="a_iiwa_link_6" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="a_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="b_iiwa_bh_base_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="b_iiwa_bh_finger_11_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="b_iiwa_bh_finger_12_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="b_iiwa_bh_finger_13_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="b_iiwa_bh_finger_21_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="b_iiwa_bh_finger_22_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="b_iiwa_bh_finger_23_link" reason="Never" />
@@ -350,6 +434,8 @@
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_12_link" link2="b_iiwa_table2" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="a_iiwa_bh_finger_21_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="a_iiwa_link_1" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="a_iiwa_link_2" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="a_iiwa_link_3" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="a_iiwa_link_4" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="a_iiwa_link_5" reason="Never" />
@@ -358,9 +444,11 @@
     <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="b_iiwa_bh_finger_11_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="b_iiwa_bh_finger_12_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="b_iiwa_bh_finger_13_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="b_iiwa_bh_finger_21_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="b_iiwa_bh_finger_22_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="b_iiwa_bh_finger_23_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="b_iiwa_bh_finger_31_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="b_iiwa_bh_finger_32_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="b_iiwa_bh_finger_33_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="b_iiwa_link_0" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_13_link" link2="b_iiwa_link_1" reason="Never" />
@@ -379,23 +467,18 @@
     <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="a_iiwa_link_5" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="a_iiwa_link_6" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="a_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="b_iiwa_bh_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="b_iiwa_bh_finger_11_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="b_iiwa_bh_finger_22_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="b_iiwa_bh_finger_23_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="b_iiwa_bh_finger_13_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="b_iiwa_bh_finger_31_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="b_iiwa_bh_finger_32_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="b_iiwa_bh_finger_33_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="b_iiwa_link_0" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="b_iiwa_link_2" reason="Never" />
-    <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="b_iiwa_link_7" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_21_link" link2="b_iiwa_table2" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="a_iiwa_bh_finger_23_link" reason="Adjacent" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="a_iiwa_bh_finger_31_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="a_iiwa_bh_finger_32_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="a_iiwa_bh_finger_33_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="a_iiwa_link_1" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="a_iiwa_link_2" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="a_iiwa_link_3" reason="Never" />
@@ -403,17 +486,15 @@
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="a_iiwa_link_5" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="a_iiwa_link_6" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="a_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="b_iiwa_bh_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="b_iiwa_bh_finger_11_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="b_iiwa_bh_finger_12_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="b_iiwa_bh_finger_13_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="b_iiwa_bh_finger_21_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="b_iiwa_bh_finger_22_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="b_iiwa_bh_finger_23_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="b_iiwa_bh_finger_31_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="b_iiwa_bh_finger_33_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="b_iiwa_link_0" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="b_iiwa_link_2" reason="Never" />
-    <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="b_iiwa_link_7" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_22_link" link2="b_iiwa_table2" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_23_link" link2="a_iiwa_link_2" reason="Never" />
@@ -426,13 +507,13 @@
     <disable_collisions link1="a_iiwa_bh_finger_23_link" link2="b_iiwa_bh_finger_11_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_23_link" link2="b_iiwa_bh_finger_12_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_23_link" link2="b_iiwa_bh_finger_13_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_bh_finger_23_link" link2="b_iiwa_bh_finger_21_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_bh_finger_23_link" link2="b_iiwa_bh_finger_22_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_23_link" link2="b_iiwa_bh_finger_23_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_23_link" link2="b_iiwa_bh_finger_31_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_finger_23_link" link2="b_iiwa_bh_finger_33_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_23_link" link2="b_iiwa_link_0" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_23_link" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_23_link" link2="b_iiwa_link_2" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_finger_23_link" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_23_link" link2="b_iiwa_table2" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_31_link" link2="a_iiwa_bh_finger_32_link" reason="Adjacent" />
     <disable_collisions link1="a_iiwa_bh_finger_31_link" link2="a_iiwa_bh_finger_33_link" reason="Never" />
@@ -443,7 +524,6 @@
     <disable_collisions link1="a_iiwa_bh_finger_31_link" link2="a_iiwa_link_5" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_31_link" link2="a_iiwa_link_6" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_31_link" link2="a_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_bh_finger_31_link" link2="b_iiwa_bh_base_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_31_link" link2="b_iiwa_bh_finger_11_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_31_link" link2="b_iiwa_bh_finger_12_link" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_31_link" link2="b_iiwa_bh_finger_13_link" reason="Never" />
@@ -484,7 +564,7 @@
     <disable_collisions link1="a_iiwa_bh_finger_32_link" link2="b_iiwa_link_7" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_32_link" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_32_link" link2="b_iiwa_table2" reason="Never" />
-    <disable_collisions link1="a_iiwa_bh_finger_33_link" link2="a_iiwa_link_1" reason="Never" />
+    <disable_collisions link1="a_iiwa_bh_finger_33_link" link2="a_iiwa_link_2" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_33_link" link2="a_iiwa_link_3" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_33_link" link2="a_iiwa_link_4" reason="Never" />
     <disable_collisions link1="a_iiwa_bh_finger_33_link" link2="a_iiwa_link_5" reason="Never" />
@@ -576,7 +656,6 @@
     <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_bh_finger_12_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_bh_finger_21_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_bh_finger_22_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_bh_finger_23_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_bh_finger_31_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_bh_finger_32_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_bh_finger_33_link" reason="Never" />
@@ -597,7 +676,6 @@
     <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_link_7" reason="Never" />
     <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_workbox" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_3" link2="b_iiwa_bh_finger_22_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_3" link2="b_iiwa_link_0" reason="Never" />
     <disable_collisions link1="a_iiwa_link_3" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_3" link2="b_iiwa_link_2" reason="Never" />
@@ -609,7 +687,6 @@
     <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_link_5" reason="Adjacent" />
     <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_link_6" reason="Never" />
     <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_bh_finger_22_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_link_0" reason="Never" />
     <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_link_2" reason="Never" />
@@ -623,25 +700,20 @@
     <disable_collisions link1="a_iiwa_link_5" link2="b_iiwa_link_0" reason="Never" />
     <disable_collisions link1="a_iiwa_link_5" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_5" link2="b_iiwa_link_2" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_5" link2="b_iiwa_link_3" reason="Never" />
     <disable_collisions link1="a_iiwa_link_5" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_5" link2="b_iiwa_table2" reason="Never" />
     <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_link_7" reason="Adjacent" />
-    <disable_collisions link1="a_iiwa_link_6" link2="b_iiwa_bh_finger_21_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_6" link2="b_iiwa_link_0" reason="Never" />
     <disable_collisions link1="a_iiwa_link_6" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_6" link2="b_iiwa_link_2" reason="Never" />
     <disable_collisions link1="a_iiwa_link_6" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_6" link2="b_iiwa_table2" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_bh_finger_21_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_bh_finger_22_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_bh_finger_23_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_bh_finger_31_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_bh_finger_32_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_link_0" reason="Never" />
     <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_link_2" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_link_7" reason="Never" />
     <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_table2" reason="Never" />
     <disable_collisions link1="a_iiwa_table1" link2="a_iiwa_table2" reason="Adjacent" />
@@ -704,7 +776,6 @@
     <disable_collisions link1="b_iiwa_bh_finger_11_link" link2="b_iiwa_bh_finger_31_link" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_11_link" link2="b_iiwa_bh_finger_32_link" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_11_link" link2="b_iiwa_bh_finger_33_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_bh_finger_11_link" link2="b_iiwa_link_0" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_11_link" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_11_link" link2="b_iiwa_link_2" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_11_link" link2="b_iiwa_link_3" reason="Never" />
@@ -717,7 +788,6 @@
     <disable_collisions link1="b_iiwa_bh_finger_12_link" link2="b_iiwa_bh_finger_22_link" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_12_link" link2="b_iiwa_bh_finger_31_link" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_12_link" link2="b_iiwa_bh_finger_32_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_bh_finger_12_link" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_12_link" link2="b_iiwa_link_2" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_12_link" link2="b_iiwa_link_3" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_12_link" link2="b_iiwa_link_4" reason="Never" />
@@ -746,13 +816,13 @@
     <disable_collisions link1="b_iiwa_bh_finger_22_link" link2="b_iiwa_bh_finger_23_link" reason="Adjacent" />
     <disable_collisions link1="b_iiwa_bh_finger_22_link" link2="b_iiwa_bh_finger_31_link" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_22_link" link2="b_iiwa_bh_finger_32_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_bh_finger_22_link" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_22_link" link2="b_iiwa_link_2" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_22_link" link2="b_iiwa_link_3" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_22_link" link2="b_iiwa_link_4" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_22_link" link2="b_iiwa_link_5" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_22_link" link2="b_iiwa_link_6" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_22_link" link2="b_iiwa_link_7" reason="Never" />
+    <disable_collisions link1="b_iiwa_bh_finger_23_link" link2="b_iiwa_link_2" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_23_link" link2="b_iiwa_link_3" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_23_link" link2="b_iiwa_link_4" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_23_link" link2="b_iiwa_link_5" reason="Never" />
@@ -768,7 +838,6 @@
     <disable_collisions link1="b_iiwa_bh_finger_31_link" link2="b_iiwa_link_6" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_31_link" link2="b_iiwa_link_7" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_32_link" link2="b_iiwa_bh_finger_33_link" reason="Adjacent" />
-    <disable_collisions link1="b_iiwa_bh_finger_32_link" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_32_link" link2="b_iiwa_link_2" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_32_link" link2="b_iiwa_link_3" reason="Never" />
     <disable_collisions link1="b_iiwa_bh_finger_32_link" link2="b_iiwa_link_4" reason="Never" />

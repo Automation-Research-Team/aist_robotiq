@@ -47,37 +47,38 @@ def create_objects(scene, robot):
 
   print 'create objects'
 
-def go_to_named_target(robot, robot_name, pose_name):
-  if robot_name is 'a_iiwa':
-    robot.a_iiwa.set_named_target(pose_name)
-    robot.a_iiwa.go()
-  elif robot_name is 'b_iiwa':
-    robot.b_iiwa.set_named_target(pose_name)
-    robot.b_iiwa.go()
-  elif robot_name is 'iiwa_two_robots':
-    robot.iiwa_two_robots.set_named_target(pose_name)
-    robot.iiwa_two_robots.go()
-  elif robot_name is 'iiwa':
-    robot.iiwa.set_named_target(pose_name)
-    robot.iiwa.go()
-  else:
-    print robot_name, 'is unknown.'
+def go_to_named_target(robot, name, pose_name):
+  group = robot.get_group(name)
+  group.set_named_target(pose_name)
+  group.go()
   rospy.sleep(1)
-  print robot_name, ': go to', pose_name
+  print name, ': go to', pose_name
 
-def go_to_home(robot, robot_name):
-  go_to_named_target(robot, robot_name, 'home')
+def go_to_home(robot, name):
+  go_to_named_target(robot, name, 'home')
 
-def go_to_standing(robot, robot_name):
-  go_to_named_target(robot, robot_name, 'standing')
+def go_to_standing(robot, name):
+  go_to_named_target(robot, name, 'standing')
 
-def pose_targets(robot, robot_name, end_effector, poses):
-  print robot_name, end_effector, ': pose_targets 1 (poses)', poses
+def pose_targets(robot, name, end_effector, poses):
+  print name, end_effector, ': pose_targets 1 (poses)', poses
 
-  link_0 = robot.get_link(robot_name + '_link_0')
+  group = robot.get_group(name)
+
+  link_0 = None
+  if 'a_iiwa' in name:
+    link_0 = robot.get_link('a_iiwa_link_0')
+  elif 'b_iiwa' in name:
+    link_0 = robot.get_link('b_iiwa_link_0')
   link_0_pose = link_0.pose()
 
-  q_tf = tf.transformations.quaternion_from_euler(0, 3.14/2, 0)
+  ee_link = group.get_end_effector_link()
+  print name, end_effector, ': pose_targets (ee_link)', ee_link
+
+  if 'robotiq_85_tip_link' in ee_link:
+    q_tf = tf.transformations.quaternion_from_euler(0, 0, 0)
+  else:
+    q_tf = tf.transformations.quaternion_from_euler(0, 3.14/2, 0)
 
   for pose in poses:
     if pose.position.x > link_0_pose.pose.position.x:
@@ -87,25 +88,17 @@ def pose_targets(robot, robot_name, end_effector, poses):
     pose.position.z += 0.2
     pose.orientation = Quaternion(q_tf[0], q_tf[1], q_tf[2], q_tf[3])
 
-  result = False
+  print name, end_effector, ': pose_targets 2 (poses)', poses
 
-  print robot_name, end_effector, ': pose_targets 2 (poses)', poses
-  if robot_name is 'a_iiwa':
-    robot.a_iiwa.set_pose_targets(poses, 'a_iiwa_link_ee')
-    result = robot.a_iiwa.go()
-  elif robot_name is 'b_iiwa':
-    robot.b_iiwa.set_pose_targets(poses, 'b_iiwa_link_ee')
-    result = robot.b_iiwa.go()
-  elif robot_name is 'iiwa':
-    robot.iiwa.set_pose_targets(poses, 'iiwa_link_ee')
-    result = robot.iiwa.go()
-  else:
-    print robot_name, 'is unknown.'
+  group.set_pose_targets(poses, end_effector)
+  result = group.go()
+  print name, ': end of pose (result)', result
 
-  print robot_name, ': end of pose (result)', result
   return result
 
-def main(end_effector):
+def main(params):
+  print 'main:', params
+
   scene = PlanningSceneInterface()
   robot = RobotCommander()
   rospy.sleep(1)
@@ -120,34 +113,34 @@ def main(end_effector):
   objs = scene.get_objects()
   if 'part1' in objs:
     poses = objs['part1'].primitive_poses
-    if pose_targets(robot, 'a_iiwa', end_effector, poses) in (
+    if pose_targets(robot, params[0]['name'], params[0]['end_effector'], poses) in (
             MoveItErrorCodes.SUCCESS,
             MoveItErrorCodes.MOTION_PLAN_INVALIDATED_BY_ENVIRONMENT_CHANGE ):
       print 'continue'
     else:
-      go_to_home(robot, 'a_iiwa')
+      go_to_home(robot, params[0]['name'])
       rospy.sleep(3)
       go_to_standing(robot, 'iiwa_two_robots')
       return
 
     rospy.sleep(3)
-    go_to_home(robot, 'a_iiwa')
+    go_to_home(robot, params[0]['name'])
 
   objs = scene.get_objects()
   if 'part2' in objs:
     poses = objs['part2'].primitive_poses
-    if pose_targets(robot, 'b_iiwa', end_effector, poses) in (
+    if pose_targets(robot, params[1]['name'], params[1]['end_effector'], poses) in (
             MoveItErrorCodes.SUCCESS,
             MoveItErrorCodes.MOTION_PLAN_INVALIDATED_BY_ENVIRONMENT_CHANGE ):
       print 'continue'
     else:
-      go_to_home(robot, 'b_iiwa')
+      go_to_home(robot, params[1]['name'])
       rospy.sleep(3)
       go_to_standing(robot, 'iiwa_two_robots')
       return
 
     rospy.sleep(3)
-    go_to_home(robot, 'b_iiwa')
+    go_to_home(robot, params[1]['name'])
 
   """
   rospy.sleep(1)
@@ -162,11 +155,21 @@ if __name__ == '__main__':
   roscpp_initialize(sys.argv)
   rospy.init_node('moveit_trial', anonymous=True)
 
-  end_effector = ''
-  if len(sys.argv) > 1:
-    end_effector = sys.argv[1]
+  params = [
+    { 'name': 'a_iiwa', 'end_effector' : '' },
+    { 'name': 'b_iiwa', 'end_effector' : '' },
+  ]
 
-  main(end_effector)
+  if len(sys.argv) > 1:
+    params[0]['name'] = sys.argv[1]
+  if len(sys.argv) > 2:
+    params[0]['end_effector'] = sys.argv[2]
+  if len(sys.argv) > 3:
+    params[1]['name'] = sys.argv[3]
+  if len(sys.argv) > 4:
+    params[1]['end_effector'] = sys.argv[4]
+
+  main(params)
   print '----- end of main -----'
 
   rospy.spin()

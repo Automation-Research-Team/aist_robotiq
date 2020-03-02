@@ -33,13 +33,16 @@ $ roslaunch aist_iiwa_moveit moveit_planning_execution.launch end_effector:=bh28
 [ pick & place, pose]
 
 pick & place, end_effector(bh282)
-$ rosrun aist_iiwa_pick_place pick.py bh282
+$ rosrun aist_iiwa_pick_place pick.py
 
-pick & place, end_effector(robotiq85gripper)
-$ rosrun aist_iiwa_pick_place pick.py r85g
+pick & place, end_effector(robotiq85grippe)
+$ rosrun aist_iiwa_pick_place pick.py a_iiwa r85g b_iiwa r85g iiwa_two_robots_groups r85g
 
-pose
+pose (a_iiwa, b_iiwa)
 $ rosrun aist_iiwa_pick_place pose.py
+
+pose (a_iiwa_groups, b_iiwa_groups)
+$ rosrun aist_iiwa_pick_place pose.py a_iiwa_groups a_iiwa_link_ee b_iiwa_groups b_iiwa_link_ee
 
 ================================================================================
 

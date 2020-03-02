@@ -1,7 +1,7 @@
 # Simulation settings for using moveit_sim_controllers
 moveit_sim_hw_interface:
-  joint_model_group: a_iiwa_arm
-  joint_model_group_pose: home
+  joint_model_group: a_iiwa
+  joint_model_group_pose: standing
 # Settings for ros_control_boilerplate control loop
 generic_hw_control_loop:
   loop_hz: 300
@@ -30,6 +30,49 @@ joint_state_controller:
   type: joint_state_controller/JointStateController
   publish_rate: 50
 controller_list:
+  - name: a_iiwa_controller
+    action_ns: follow_joint_trajectory
+    default: True
+    type: FollowJointTrajectory
+    joints:
+      - a_iiwa_joint_1
+      - a_iiwa_joint_2
+      - a_iiwa_joint_3
+      - a_iiwa_joint_4
+      - a_iiwa_joint_5
+      - a_iiwa_joint_6
+      - a_iiwa_joint_7
+  - name: b_iiwa_controller
+    action_ns: follow_joint_trajectory
+    default: True
+    type: FollowJointTrajectory
+    joints:
+      - b_iiwa_joint_1
+      - b_iiwa_joint_2
+      - b_iiwa_joint_3
+      - b_iiwa_joint_4
+      - b_iiwa_joint_5
+      - b_iiwa_joint_6
+      - b_iiwa_joint_7
+  - name: iiwa_two_robots_controller
+    action_ns: follow_joint_trajectory
+    default: True
+    type: FollowJointTrajectory
+    joints:
+      - a_iiwa_joint_1
+      - a_iiwa_joint_2
+      - a_iiwa_joint_3
+      - a_iiwa_joint_4
+      - a_iiwa_joint_5
+      - a_iiwa_joint_6
+      - a_iiwa_joint_7
+      - b_iiwa_joint_1
+      - b_iiwa_joint_2
+      - b_iiwa_joint_3
+      - b_iiwa_joint_4
+      - b_iiwa_joint_5
+      - b_iiwa_joint_6
+      - b_iiwa_joint_7
   - name: a_iiwa_arm_controller
     action_ns: follow_joint_trajectory
     default: True
@@ -42,7 +85,7 @@ controller_list:
       - a_iiwa_joint_5
       - a_iiwa_joint_6
       - a_iiwa_joint_7
-  - name: a_iiwa_controller
+  - name: a_iiwa_groups_controller
     action_ns: follow_joint_trajectory
     default: True
     type: FollowJointTrajectory
@@ -66,7 +109,7 @@ controller_list:
       - b_iiwa_joint_5
       - b_iiwa_joint_6
       - b_iiwa_joint_7
-  - name: b_iiwa_controller
+  - name: b_iiwa_groups_controller
     action_ns: follow_joint_trajectory
     default: True
     type: FollowJointTrajectory
@@ -78,7 +121,7 @@ controller_list:
       - b_iiwa_joint_5
       - b_iiwa_joint_6
       - b_iiwa_joint_7
-  - name: iiwa_two_robots_controller
+  - name: iiwa_two_robots_groups_controller
     action_ns: follow_joint_trajectory
     default: True
     type: FollowJointTrajectory

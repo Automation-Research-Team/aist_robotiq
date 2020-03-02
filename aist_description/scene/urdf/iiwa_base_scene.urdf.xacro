@@ -122,20 +122,48 @@
     <xacro:bhand_macro name="$(arg robot_name_1)_bh" parent="$(arg robot_name_1)_link_ee">
       <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:bhand_macro>
+    <joint name="$(arg robot_name_1)_bh_tip_joint" type="fixed">
+      <parent link="$(arg robot_name_1)_bh_base_link" />
+      <child link = "$(arg robot_name_1)_bh_tip_link" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+    <link name="$(arg robot_name_1)_bh_tip_link"/>
+
     <xacro:bhand_macro name="$(arg robot_name_2)_bh" parent="$(arg robot_name_2)_link_ee">
       <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:bhand_macro>
+    <joint name="$(arg robot_name_2)_bh_tip_joint" type="fixed">
+      <parent link="$(arg robot_name_2)_bh_base_link" />
+      <child link = "$(arg robot_name_2)_bh_tip_link" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+    <link name="$(arg robot_name_2)_bh_tip_link"/>
+
   </xacro:if>
 
   <!-- robotiq85gripper -->
   <xacro:if value="${end_effector == 'robotiq85gripper'}">
     <xacro:include filename="$(find robotiq_description)/urdf/robotiq_85_gripper.urdf.xacro"/>
-    <xacro:robotiq_85_gripper prefix="$(arg robot_name_1)_r85g" parent="$(arg robot_name_1)_link_ee">
+    <xacro:robotiq_85_gripper prefix="$(arg robot_name_1)_" parent="$(arg robot_name_1)_link_ee">
       <origin xyz="0 0 0" rpy="0 ${-pi/2} 0" />
     </xacro:robotiq_85_gripper>
-    <xacro:robotiq_85_gripper prefix="$(arg robot_name_2)_r85g" parent="$(arg robot_name_2)_link_ee">
+    <joint name="$(arg robot_name_1)_robotiq_85_tip_joint" type="fixed">
+      <parent link="$(arg robot_name_1)_robotiq_85_base_link" />
+      <child link = "$(arg robot_name_1)_robotiq_85_tip_link" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+    <link name="$(arg robot_name_1)_robotiq_85_tip_link"/>
+
+    <xacro:robotiq_85_gripper prefix="$(arg robot_name_2)_" parent="$(arg robot_name_2)_link_ee">
       <origin xyz="0 0 0" rpy="0 ${-pi/2} 0" />
     </xacro:robotiq_85_gripper>
+    <joint name="$(arg robot_name_2)_robotiq_85_tip_joint" type="fixed">
+      <parent link="$(arg robot_name_2)_robotiq_85_base_link" />
+      <child link = "$(arg robot_name_2)_robotiq_85_tip_link" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+    <link name="$(arg robot_name_2)_robotiq_85_tip_link"/>
+
   </xacro:if>
 
 </robot>

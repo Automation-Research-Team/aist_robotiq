@@ -9,21 +9,31 @@
     <!--JOINTS: When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
     <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
     <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
+    <group name="a_iiwa">
+        <chain base_link="a_iiwa_link_0" tip_link="a_iiwa_robotiq_85_tip_link" />
+    </group>
+    <group name="b_iiwa">
+        <chain base_link="b_iiwa_link_0" tip_link="b_iiwa_robotiq_85_tip_link" />
+    </group>
+    <group name="iiwa_two_robots">
+        <group name="a_iiwa" />
+        <group name="b_iiwa" />
+    </group>
     <group name="a_iiwa_arm">
         <chain base_link="a_iiwa_link_0" tip_link="a_iiwa_link_ee" />
     </group>
     <group name="a_iiwa_hand">
-        <joint name="a_iiwa_r85grobotiq_85_base_joint" />
-        <joint name="a_iiwa_r85grobotiq_85_left_inner_knuckle_joint" />
-        <joint name="a_iiwa_r85grobotiq_85_left_finger_tip_joint" />
-        <joint name="a_iiwa_r85grobotiq_85_left_knuckle_joint" />
-        <joint name="a_iiwa_r85grobotiq_85_left_finger_joint" />
-        <joint name="a_iiwa_r85grobotiq_85_right_inner_knuckle_joint" />
-        <joint name="a_iiwa_r85grobotiq_85_right_finger_tip_joint" />
-        <joint name="a_iiwa_r85grobotiq_85_right_knuckle_joint" />
-        <joint name="a_iiwa_r85grobotiq_85_right_finger_joint" />
+        <joint name="a_iiwa_robotiq_85_base_joint" />
+        <joint name="a_iiwa_robotiq_85_left_inner_knuckle_joint" />
+        <joint name="a_iiwa_robotiq_85_left_finger_tip_joint" />
+        <joint name="a_iiwa_robotiq_85_left_knuckle_joint" />
+        <joint name="a_iiwa_robotiq_85_left_finger_joint" />
+        <joint name="a_iiwa_robotiq_85_right_inner_knuckle_joint" />
+        <joint name="a_iiwa_robotiq_85_right_finger_tip_joint" />
+        <joint name="a_iiwa_robotiq_85_right_knuckle_joint" />
+        <joint name="a_iiwa_robotiq_85_right_finger_joint" />
     </group>
-    <group name="a_iiwa">
+    <group name="a_iiwa_groups">
         <group name="a_iiwa_arm" />
         <group name="a_iiwa_hand" />
     </group>
@@ -31,41 +41,33 @@
         <chain base_link="b_iiwa_link_0" tip_link="b_iiwa_link_ee" />
     </group>
     <group name="b_iiwa_hand">
-        <joint name="b_iiwa_r85grobotiq_85_base_joint" />
-        <joint name="b_iiwa_r85grobotiq_85_left_inner_knuckle_joint" />
-        <joint name="b_iiwa_r85grobotiq_85_left_finger_tip_joint" />
-        <joint name="b_iiwa_r85grobotiq_85_left_knuckle_joint" />
-        <joint name="b_iiwa_r85grobotiq_85_left_finger_joint" />
-        <joint name="b_iiwa_r85grobotiq_85_right_inner_knuckle_joint" />
-        <joint name="b_iiwa_r85grobotiq_85_right_finger_tip_joint" />
-        <joint name="b_iiwa_r85grobotiq_85_right_knuckle_joint" />
-        <joint name="b_iiwa_r85grobotiq_85_right_finger_joint" />
+        <joint name="b_iiwa_robotiq_85_base_joint" />
+        <joint name="b_iiwa_robotiq_85_left_inner_knuckle_joint" />
+        <joint name="b_iiwa_robotiq_85_left_finger_tip_joint" />
+        <joint name="b_iiwa_robotiq_85_left_knuckle_joint" />
+        <joint name="b_iiwa_robotiq_85_left_finger_joint" />
+        <joint name="b_iiwa_robotiq_85_right_inner_knuckle_joint" />
+        <joint name="b_iiwa_robotiq_85_right_finger_tip_joint" />
+        <joint name="b_iiwa_robotiq_85_right_knuckle_joint" />
+        <joint name="b_iiwa_robotiq_85_right_finger_joint" />
     </group>
-    <group name="b_iiwa">
+    <group name="b_iiwa_groups">
         <group name="b_iiwa_arm" />
         <group name="b_iiwa_hand" />
     </group>
-    <group name="iiwa_two_robots">
-        <group name="a_iiwa" />
-        <group name="b_iiwa" />
+    <group name="iiwa_two_robots_groups">
+        <group name="a_iiwa_groups" />
+        <group name="b_iiwa_groups" />
     </group>
     <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
-    <group_state name="home" group="a_iiwa_arm">
+    <group_state name="standing" group="a_iiwa">
         <joint name="a_iiwa_joint_1" value="0" />
-        <joint name="a_iiwa_joint_2" value="0.4" />
+        <joint name="a_iiwa_joint_2" value="0" />
         <joint name="a_iiwa_joint_3" value="0" />
-        <joint name="a_iiwa_joint_4" value="-0.4" />
+        <joint name="a_iiwa_joint_4" value="0" />
         <joint name="a_iiwa_joint_5" value="0" />
-        <joint name="a_iiwa_joint_6" value="0.4" />
+        <joint name="a_iiwa_joint_6" value="0" />
         <joint name="a_iiwa_joint_7" value="0" />
-    </group_state>
-    <group_state name="home" group="a_iiwa_hand">
-        <joint name="a_iiwa_r85grobotiq_85_left_finger_tip_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_left_inner_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_left_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_finger_tip_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_inner_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_knuckle_joint" value="0" />
     </group_state>
     <group_state name="home" group="a_iiwa">
         <joint name="a_iiwa_joint_1" value="0" />
@@ -75,29 +77,15 @@
         <joint name="a_iiwa_joint_5" value="0" />
         <joint name="a_iiwa_joint_6" value="0.4" />
         <joint name="a_iiwa_joint_7" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_left_finger_tip_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_left_inner_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_left_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_finger_tip_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_inner_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_knuckle_joint" value="0" />
     </group_state>
-    <group_state name="home" group="b_iiwa_arm">
+    <group_state name="standing" group="b_iiwa">
         <joint name="b_iiwa_joint_1" value="0" />
-        <joint name="b_iiwa_joint_2" value="0.4" />
+        <joint name="b_iiwa_joint_2" value="0" />
         <joint name="b_iiwa_joint_3" value="0" />
-        <joint name="b_iiwa_joint_4" value="-0.4" />
+        <joint name="b_iiwa_joint_4" value="0" />
         <joint name="b_iiwa_joint_5" value="0" />
-        <joint name="b_iiwa_joint_6" value="0.4" />
+        <joint name="b_iiwa_joint_6" value="0" />
         <joint name="b_iiwa_joint_7" value="0" />
-    </group_state>
-    <group_state name="home" group="b_iiwa_hand">
-        <joint name="b_iiwa_r85grobotiq_85_left_finger_tip_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_left_inner_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_left_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_finger_tip_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_inner_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_knuckle_joint" value="0" />
     </group_state>
     <group_state name="home" group="b_iiwa">
         <joint name="b_iiwa_joint_1" value="0" />
@@ -107,12 +95,22 @@
         <joint name="b_iiwa_joint_5" value="0" />
         <joint name="b_iiwa_joint_6" value="0.4" />
         <joint name="b_iiwa_joint_7" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_left_finger_tip_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_left_inner_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_left_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_finger_tip_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_inner_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_knuckle_joint" value="0" />
+    </group_state>
+    <group_state name="standing" group="iiwa_two_robots">
+        <joint name="a_iiwa_joint_1" value="0" />
+        <joint name="a_iiwa_joint_2" value="0" />
+        <joint name="a_iiwa_joint_3" value="0" />
+        <joint name="a_iiwa_joint_4" value="0" />
+        <joint name="a_iiwa_joint_5" value="0" />
+        <joint name="a_iiwa_joint_6" value="0" />
+        <joint name="a_iiwa_joint_7" value="0" />
+        <joint name="b_iiwa_joint_1" value="0" />
+        <joint name="b_iiwa_joint_2" value="0" />
+        <joint name="b_iiwa_joint_3" value="0" />
+        <joint name="b_iiwa_joint_4" value="0" />
+        <joint name="b_iiwa_joint_5" value="0" />
+        <joint name="b_iiwa_joint_6" value="0" />
+        <joint name="b_iiwa_joint_7" value="0" />
     </group_state>
     <group_state name="home" group="iiwa_two_robots">
         <joint name="a_iiwa_joint_1" value="0" />
@@ -122,12 +120,6 @@
         <joint name="a_iiwa_joint_5" value="0" />
         <joint name="a_iiwa_joint_6" value="0.4" />
         <joint name="a_iiwa_joint_7" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_left_finger_tip_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_left_inner_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_left_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_finger_tip_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_inner_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_knuckle_joint" value="0" />
         <joint name="b_iiwa_joint_1" value="0" />
         <joint name="b_iiwa_joint_2" value="0.4" />
         <joint name="b_iiwa_joint_3" value="0" />
@@ -135,12 +127,6 @@
         <joint name="b_iiwa_joint_5" value="0" />
         <joint name="b_iiwa_joint_6" value="0.4" />
         <joint name="b_iiwa_joint_7" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_left_finger_tip_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_left_inner_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_left_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_finger_tip_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_inner_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_knuckle_joint" value="0" />
     </group_state>
     <group_state name="standing" group="a_iiwa_arm">
         <joint name="a_iiwa_joint_1" value="0" />
@@ -151,15 +137,32 @@
         <joint name="a_iiwa_joint_6" value="0" />
         <joint name="a_iiwa_joint_7" value="0" />
     </group_state>
-    <group_state name="standing" group="a_iiwa_hand">
-        <joint name="a_iiwa_r85grobotiq_85_left_finger_tip_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_left_inner_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_left_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_finger_tip_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_inner_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_knuckle_joint" value="0" />
+    <group_state name="home" group="a_iiwa_arm">
+        <joint name="a_iiwa_joint_1" value="0" />
+        <joint name="a_iiwa_joint_2" value="0.4" />
+        <joint name="a_iiwa_joint_3" value="0" />
+        <joint name="a_iiwa_joint_4" value="-0.4" />
+        <joint name="a_iiwa_joint_5" value="0" />
+        <joint name="a_iiwa_joint_6" value="0.4" />
+        <joint name="a_iiwa_joint_7" value="0" />
     </group_state>
-    <group_state name="standing" group="a_iiwa">
+    <group_state name="standing" group="a_iiwa_hand">
+        <joint name="a_iiwa_robotiq_85_left_finger_tip_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_left_inner_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_left_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_finger_tip_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_inner_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_knuckle_joint" value="0" />
+    </group_state>
+    <group_state name="home" group="a_iiwa_hand">
+        <joint name="a_iiwa_robotiq_85_left_finger_tip_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_left_inner_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_left_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_finger_tip_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_inner_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_knuckle_joint" value="0" />
+    </group_state>
+    <group_state name="standing" group="a_iiwa_groups">
         <joint name="a_iiwa_joint_1" value="0" />
         <joint name="a_iiwa_joint_2" value="0" />
         <joint name="a_iiwa_joint_3" value="0" />
@@ -167,12 +170,27 @@
         <joint name="a_iiwa_joint_5" value="0" />
         <joint name="a_iiwa_joint_6" value="0" />
         <joint name="a_iiwa_joint_7" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_left_finger_tip_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_left_inner_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_left_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_finger_tip_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_inner_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_left_finger_tip_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_left_inner_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_left_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_finger_tip_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_inner_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_knuckle_joint" value="0" />
+    </group_state>
+    <group_state name="home" group="a_iiwa_groups">
+        <joint name="a_iiwa_joint_1" value="0" />
+        <joint name="a_iiwa_joint_2" value="0.4" />
+        <joint name="a_iiwa_joint_3" value="0" />
+        <joint name="a_iiwa_joint_4" value="-0.4" />
+        <joint name="a_iiwa_joint_5" value="0" />
+        <joint name="a_iiwa_joint_6" value="0.4" />
+        <joint name="a_iiwa_joint_7" value="0" />
+        <joint name="a_iiwa_robotiq_85_left_finger_tip_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_left_inner_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_left_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_finger_tip_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_inner_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_knuckle_joint" value="0" />
     </group_state>
     <group_state name="standing" group="b_iiwa_arm">
         <joint name="b_iiwa_joint_1" value="0" />
@@ -183,15 +201,32 @@
         <joint name="b_iiwa_joint_6" value="0" />
         <joint name="b_iiwa_joint_7" value="0" />
     </group_state>
-    <group_state name="standing" group="b_iiwa_hand">
-        <joint name="b_iiwa_r85grobotiq_85_left_finger_tip_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_left_inner_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_left_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_finger_tip_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_inner_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_knuckle_joint" value="0" />
+    <group_state name="home" group="b_iiwa_arm">
+        <joint name="b_iiwa_joint_1" value="0" />
+        <joint name="b_iiwa_joint_2" value="0.4" />
+        <joint name="b_iiwa_joint_3" value="0" />
+        <joint name="b_iiwa_joint_4" value="-0.4" />
+        <joint name="b_iiwa_joint_5" value="0" />
+        <joint name="b_iiwa_joint_6" value="0.4" />
+        <joint name="b_iiwa_joint_7" value="0" />
     </group_state>
-    <group_state name="standing" group="b_iiwa">
+    <group_state name="standing" group="b_iiwa_hand">
+        <joint name="b_iiwa_robotiq_85_left_finger_tip_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_left_inner_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_left_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_finger_tip_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_inner_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_knuckle_joint" value="0" />
+    </group_state>
+    <group_state name="home" group="b_iiwa_hand">
+        <joint name="b_iiwa_robotiq_85_left_finger_tip_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_left_inner_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_left_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_finger_tip_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_inner_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_knuckle_joint" value="0" />
+    </group_state>
+    <group_state name="standing" group="b_iiwa_groups">
         <joint name="b_iiwa_joint_1" value="0" />
         <joint name="b_iiwa_joint_2" value="0" />
         <joint name="b_iiwa_joint_3" value="0" />
@@ -199,14 +234,29 @@
         <joint name="b_iiwa_joint_5" value="0" />
         <joint name="b_iiwa_joint_6" value="0" />
         <joint name="b_iiwa_joint_7" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_left_finger_tip_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_left_inner_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_left_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_finger_tip_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_inner_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_left_finger_tip_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_left_inner_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_left_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_finger_tip_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_inner_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_knuckle_joint" value="0" />
     </group_state>
-    <group_state name="standing" group="iiwa_two_robots">
+    <group_state name="home" group="b_iiwa_groups">
+        <joint name="b_iiwa_joint_1" value="0" />
+        <joint name="b_iiwa_joint_2" value="0.4" />
+        <joint name="b_iiwa_joint_3" value="0" />
+        <joint name="b_iiwa_joint_4" value="-0.4" />
+        <joint name="b_iiwa_joint_5" value="0" />
+        <joint name="b_iiwa_joint_6" value="0.4" />
+        <joint name="b_iiwa_joint_7" value="0" />
+        <joint name="b_iiwa_robotiq_85_left_finger_tip_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_left_inner_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_left_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_finger_tip_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_inner_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_knuckle_joint" value="0" />
+    </group_state>
+    <group_state name="standing" group="iiwa_two_robots_groups">
         <joint name="a_iiwa_joint_1" value="0" />
         <joint name="a_iiwa_joint_2" value="0" />
         <joint name="a_iiwa_joint_3" value="0" />
@@ -214,12 +264,12 @@
         <joint name="a_iiwa_joint_5" value="0" />
         <joint name="a_iiwa_joint_6" value="0" />
         <joint name="a_iiwa_joint_7" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_left_finger_tip_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_left_inner_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_left_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_finger_tip_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_inner_knuckle_joint" value="0" />
-        <joint name="a_iiwa_r85grobotiq_85_right_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_left_finger_tip_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_left_inner_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_left_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_finger_tip_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_inner_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_knuckle_joint" value="0" />
         <joint name="b_iiwa_joint_1" value="0" />
         <joint name="b_iiwa_joint_2" value="0" />
         <joint name="b_iiwa_joint_3" value="0" />
@@ -227,12 +277,40 @@
         <joint name="b_iiwa_joint_5" value="0" />
         <joint name="b_iiwa_joint_6" value="0" />
         <joint name="b_iiwa_joint_7" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_left_finger_tip_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_left_inner_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_left_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_finger_tip_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_inner_knuckle_joint" value="0" />
-        <joint name="b_iiwa_r85grobotiq_85_right_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_left_finger_tip_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_left_inner_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_left_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_finger_tip_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_inner_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_knuckle_joint" value="0" />
+    </group_state>
+    <group_state name="home" group="iiwa_two_robots_groups">
+        <joint name="a_iiwa_joint_1" value="0" />
+        <joint name="a_iiwa_joint_2" value="0.4" />
+        <joint name="a_iiwa_joint_3" value="0" />
+        <joint name="a_iiwa_joint_4" value="-0.4" />
+        <joint name="a_iiwa_joint_5" value="0" />
+        <joint name="a_iiwa_joint_6" value="0.4" />
+        <joint name="a_iiwa_joint_7" value="0" />
+        <joint name="a_iiwa_robotiq_85_left_finger_tip_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_left_inner_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_left_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_finger_tip_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_inner_knuckle_joint" value="0" />
+        <joint name="a_iiwa_robotiq_85_right_knuckle_joint" value="0" />
+        <joint name="b_iiwa_joint_1" value="0" />
+        <joint name="b_iiwa_joint_2" value="0.4" />
+        <joint name="b_iiwa_joint_3" value="0" />
+        <joint name="b_iiwa_joint_4" value="-0.4" />
+        <joint name="b_iiwa_joint_5" value="0" />
+        <joint name="b_iiwa_joint_6" value="0.4" />
+        <joint name="b_iiwa_joint_7" value="0" />
+        <joint name="b_iiwa_robotiq_85_left_finger_tip_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_left_inner_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_left_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_finger_tip_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_inner_knuckle_joint" value="0" />
+        <joint name="b_iiwa_robotiq_85_right_knuckle_joint" value="0" />
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="a_iiwa_moveit_ee" parent_link="a_iiwa_link_ee" group="a_iiwa_hand" />
@@ -245,7 +323,6 @@
     <disable_collisions link1="a_iiwa_link_0" link2="a_iiwa_link_2" reason="Never" />
     <disable_collisions link1="a_iiwa_link_0" link2="a_iiwa_link_3" reason="Never" />
     <disable_collisions link1="a_iiwa_link_0" link2="a_iiwa_link_4" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_0" link2="a_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_0" link2="a_iiwa_table1" reason="Adjacent" />
     <disable_collisions link1="a_iiwa_link_0" link2="a_iiwa_table2" reason="Adjacent" />
     <disable_collisions link1="a_iiwa_link_0" link2="a_iiwa_workbox" reason="Adjacent" />
@@ -257,15 +334,15 @@
     <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_link_5" reason="Never" />
     <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_link_6" reason="Never" />
     <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_table1" reason="Adjacent" />
     <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_table2" reason="Adjacent" />
     <disable_collisions link1="a_iiwa_link_0" link2="b_iiwa_workbox" reason="Adjacent" />
@@ -275,15 +352,15 @@
     <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_link_5" reason="Never" />
     <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_link_6" reason="Never" />
     <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_table2" reason="Never" />
     <disable_collisions link1="a_iiwa_link_1" link2="a_iiwa_workbox" reason="Never" />
@@ -295,15 +372,15 @@
     <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_link_5" reason="Never" />
     <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_link_6" reason="Never" />
     <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_table2" reason="Never" />
     <disable_collisions link1="a_iiwa_link_1" link2="b_iiwa_workbox" reason="Never" />
@@ -312,15 +389,15 @@
     <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_link_5" reason="Never" />
     <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_link_6" reason="Never" />
     <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_table2" reason="Never" />
     <disable_collisions link1="a_iiwa_link_2" link2="a_iiwa_workbox" reason="Never" />
@@ -332,15 +409,14 @@
     <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_link_5" reason="Never" />
     <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_link_6" reason="Never" />
     <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_table2" reason="Never" />
     <disable_collisions link1="a_iiwa_link_2" link2="b_iiwa_workbox" reason="Never" />
@@ -348,15 +424,15 @@
     <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_link_5" reason="Never" />
     <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_link_6" reason="Never" />
     <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_3" link2="a_iiwa_workbox" reason="Never" />
     <disable_collisions link1="a_iiwa_link_3" link2="b_iiwa_link_0" reason="Never" />
@@ -364,245 +440,248 @@
     <disable_collisions link1="a_iiwa_link_3" link2="b_iiwa_link_2" reason="Never" />
     <disable_collisions link1="a_iiwa_link_3" link2="b_iiwa_link_3" reason="Never" />
     <disable_collisions link1="a_iiwa_link_3" link2="b_iiwa_link_4" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_3" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_3" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_3" link2="b_iiwa_link_5" reason="Never" />
     <disable_collisions link1="a_iiwa_link_3" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_3" link2="b_iiwa_table2" reason="Never" />
     <disable_collisions link1="a_iiwa_link_3" link2="b_iiwa_workbox" reason="Never" />
     <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_link_5" reason="Adjacent" />
     <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_link_6" reason="Never" />
     <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_4" link2="a_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_link_0" reason="Never" />
     <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_link_2" reason="Never" />
     <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_link_3" reason="Never" />
     <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_link_4" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_table2" reason="Never" />
     <disable_collisions link1="a_iiwa_link_4" link2="b_iiwa_workbox" reason="Never" />
     <disable_collisions link1="a_iiwa_link_5" link2="a_iiwa_link_6" reason="Adjacent" />
     <disable_collisions link1="a_iiwa_link_5" link2="a_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_5" link2="a_iiwa_r85grobotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_5" link2="a_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_5" link2="a_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_5" link2="a_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_5" link2="a_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_5" link2="a_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_5" link2="a_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_5" link2="a_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_5" link2="a_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_5" link2="a_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_5" link2="b_iiwa_link_0" reason="Never" />
     <disable_collisions link1="a_iiwa_link_5" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_5" link2="b_iiwa_link_2" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_5" link2="b_iiwa_link_3" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_5" link2="b_iiwa_link_4" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_5" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_5" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_5" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_5" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_5" link2="b_iiwa_table2" reason="Never" />
     <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_link_7" reason="Adjacent" />
-    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_6" link2="a_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_6" link2="b_iiwa_link_0" reason="Never" />
     <disable_collisions link1="a_iiwa_link_6" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_6" link2="b_iiwa_link_2" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_6" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_6" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_6" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_6" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_6" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_6" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_6" link2="b_iiwa_table2" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_r85grobotiq_85_base_link" reason="Adjacent" />
-    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_robotiq_85_base_link" reason="Adjacent" />
+    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_7" link2="a_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_link_0" reason="Never" />
     <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_link_1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_link_2" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="a_iiwa_link_7" link2="b_iiwa_table2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="a_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="a_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Adjacent" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="a_iiwa_r85grobotiq_85_left_knuckle_link" reason="Adjacent" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="a_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="a_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Adjacent" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="a_iiwa_r85grobotiq_85_right_knuckle_link" reason="Adjacent" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_link_0" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_link_1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_link_2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_table1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_table2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="a_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Default" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="a_iiwa_r85grobotiq_85_left_knuckle_link" reason="Adjacent" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="a_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="a_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="a_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_link_0" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_link_1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_link_2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_link_3" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_table1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_table2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Adjacent" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="a_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="a_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="a_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="a_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_link_0" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_link_1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_link_2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_table1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_table2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="a_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="a_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="a_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="a_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_link_0" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_link_1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_link_2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_link_3" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_link_4" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_link_5" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_table1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_table2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="a_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="a_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="a_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_link_0" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_link_1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_link_2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_link_3" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_table1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_table2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="a_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Default" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="a_iiwa_r85grobotiq_85_right_knuckle_link" reason="Adjacent" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_link_0" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_link_1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_link_2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_link_3" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_table1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_table2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Adjacent" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="a_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_link_0" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_link_1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_link_2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_link_6" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_table1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_table2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="a_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_link_0" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_link_1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_link_2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_link_4" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_link_6" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_table1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_table2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_knuckle_link" link2="b_iiwa_link_0" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_knuckle_link" link2="b_iiwa_link_1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_knuckle_link" link2="b_iiwa_link_2" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_knuckle_link" link2="b_iiwa_link_3" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_knuckle_link" link2="b_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_knuckle_link" link2="b_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_knuckle_link" link2="b_iiwa_table1" reason="Never" />
-    <disable_collisions link1="a_iiwa_r85grobotiq_85_right_knuckle_link" link2="b_iiwa_table2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="a_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="a_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="a_iiwa_robotiq_85_left_inner_knuckle_link" reason="Adjacent" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="a_iiwa_robotiq_85_left_knuckle_link" reason="Adjacent" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="a_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="a_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="a_iiwa_robotiq_85_right_inner_knuckle_link" reason="Adjacent" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="a_iiwa_robotiq_85_right_knuckle_link" reason="Adjacent" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="b_iiwa_link_0" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="b_iiwa_link_1" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="b_iiwa_link_2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="b_iiwa_table1" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_base_link" link2="b_iiwa_table2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="a_iiwa_robotiq_85_left_finger_tip_link" reason="Default" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="a_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="a_iiwa_robotiq_85_left_knuckle_link" reason="Adjacent" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="a_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="a_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="a_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="a_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_link_0" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_link_1" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_link_2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_link_7" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_table1" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_table2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="a_iiwa_robotiq_85_left_inner_knuckle_link" reason="Adjacent" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="a_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="a_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="a_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="a_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="a_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_link_0" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_link_2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_table2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="a_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="a_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="a_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="a_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="a_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_link_0" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_link_1" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_link_2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_link_5" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_link_7" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_table1" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_table2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="a_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="a_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="a_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="a_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_link_0" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_link_1" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_link_2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_link_7" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_table1" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_table2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="a_iiwa_robotiq_85_right_finger_tip_link" reason="Default" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="a_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="a_iiwa_robotiq_85_right_knuckle_link" reason="Adjacent" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_link_0" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_link_1" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_link_2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_link_7" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_table1" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_table2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_tip_link" link2="a_iiwa_robotiq_85_right_inner_knuckle_link" reason="Adjacent" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_tip_link" link2="a_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_tip_link" link2="b_iiwa_link_0" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_tip_link" link2="b_iiwa_link_1" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_tip_link" link2="b_iiwa_link_2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_tip_link" link2="b_iiwa_link_7" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_tip_link" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_tip_link" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_tip_link" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_tip_link" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_tip_link" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_tip_link" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_tip_link" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_tip_link" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_tip_link" link2="b_iiwa_table1" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_finger_tip_link" link2="b_iiwa_table2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_inner_knuckle_link" link2="a_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_inner_knuckle_link" link2="b_iiwa_link_0" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_inner_knuckle_link" link2="b_iiwa_link_1" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_inner_knuckle_link" link2="b_iiwa_link_2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_inner_knuckle_link" link2="b_iiwa_link_7" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_inner_knuckle_link" link2="b_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_inner_knuckle_link" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_inner_knuckle_link" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_inner_knuckle_link" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_inner_knuckle_link" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_inner_knuckle_link" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_inner_knuckle_link" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_inner_knuckle_link" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_inner_knuckle_link" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_inner_knuckle_link" link2="b_iiwa_table1" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_inner_knuckle_link" link2="b_iiwa_table2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_knuckle_link" link2="b_iiwa_link_0" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_knuckle_link" link2="b_iiwa_link_1" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_knuckle_link" link2="b_iiwa_link_2" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_knuckle_link" link2="b_iiwa_link_6" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_knuckle_link" link2="b_iiwa_link_7" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_knuckle_link" link2="b_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_knuckle_link" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_knuckle_link" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_knuckle_link" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_knuckle_link" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_knuckle_link" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_knuckle_link" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_knuckle_link" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_knuckle_link" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_knuckle_link" link2="b_iiwa_table1" reason="Never" />
+    <disable_collisions link1="a_iiwa_robotiq_85_right_knuckle_link" link2="b_iiwa_table2" reason="Never" />
     <disable_collisions link1="a_iiwa_table1" link2="a_iiwa_table2" reason="Adjacent" />
     <disable_collisions link1="a_iiwa_table1" link2="a_iiwa_workbox" reason="Adjacent" />
     <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_link_0" reason="Adjacent" />
@@ -613,15 +692,15 @@
     <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_link_5" reason="Never" />
     <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_link_6" reason="Never" />
     <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_table1" reason="Adjacent" />
     <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_table2" reason="Adjacent" />
     <disable_collisions link1="a_iiwa_table1" link2="b_iiwa_workbox" reason="Adjacent" />
@@ -637,7 +716,6 @@
     <disable_collisions link1="a_iiwa_workbox" link2="b_iiwa_link_2" reason="Never" />
     <disable_collisions link1="a_iiwa_workbox" link2="b_iiwa_link_3" reason="Never" />
     <disable_collisions link1="a_iiwa_workbox" link2="b_iiwa_link_4" reason="Never" />
-    <disable_collisions link1="a_iiwa_workbox" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
     <disable_collisions link1="a_iiwa_workbox" link2="b_iiwa_table1" reason="Adjacent" />
     <disable_collisions link1="a_iiwa_workbox" link2="b_iiwa_table2" reason="Adjacent" />
     <disable_collisions link1="a_iiwa_workbox" link2="b_iiwa_workbox" reason="Adjacent" />
@@ -654,15 +732,14 @@
     <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_link_5" reason="Never" />
     <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_link_6" reason="Never" />
     <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_table2" reason="Never" />
     <disable_collisions link1="b_iiwa_link_1" link2="b_iiwa_workbox" reason="Never" />
@@ -671,15 +748,15 @@
     <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_link_5" reason="Never" />
     <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_link_6" reason="Never" />
     <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_table2" reason="Never" />
     <disable_collisions link1="b_iiwa_link_2" link2="b_iiwa_workbox" reason="Never" />
@@ -687,88 +764,95 @@
     <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_link_5" reason="Never" />
     <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_link_6" reason="Never" />
     <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_table1" reason="Never" />
     <disable_collisions link1="b_iiwa_link_3" link2="b_iiwa_workbox" reason="Never" />
     <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_link_5" reason="Adjacent" />
     <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_link_6" reason="Never" />
     <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_4" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="b_iiwa_link_5" link2="b_iiwa_link_6" reason="Adjacent" />
     <disable_collisions link1="b_iiwa_link_5" link2="b_iiwa_link_7" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_5" link2="b_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_5" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_5" link2="b_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_5" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_5" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_5" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_5" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_5" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_5" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_5" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_5" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_link_7" reason="Adjacent" />
-    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_r85grobotiq_85_base_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_r85grobotiq_85_base_link" reason="Adjacent" />
-    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_r85grobotiq_85_left_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Adjacent" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Adjacent" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Adjacent" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_base_link" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Adjacent" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_r85grobotiq_85_left_finger_tip_link" reason="Default" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Adjacent" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_finger_link" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" reason="Adjacent" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_finger_tip_link" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_left_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_finger_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_left_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_r85grobotiq_85_right_finger_tip_link" reason="Default" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_right_finger_link" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Adjacent" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" reason="Adjacent" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_right_finger_tip_link" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
-    <disable_collisions link1="b_iiwa_r85grobotiq_85_right_inner_knuckle_link" link2="b_iiwa_r85grobotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_robotiq_85_base_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_6" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_robotiq_85_base_link" reason="Adjacent" />
+    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_link_7" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_base_link" link2="b_iiwa_robotiq_85_left_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_base_link" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_base_link" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Adjacent" />
+    <disable_collisions link1="b_iiwa_robotiq_85_base_link" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Adjacent" />
+    <disable_collisions link1="b_iiwa_robotiq_85_base_link" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_base_link" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_base_link" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Adjacent" />
+    <disable_collisions link1="b_iiwa_robotiq_85_base_link" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Adjacent" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_robotiq_85_left_finger_tip_link" reason="Default" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Adjacent" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_finger_link" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_robotiq_85_left_inner_knuckle_link" reason="Adjacent" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_finger_tip_link" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_robotiq_85_left_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_inner_knuckle_link" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_robotiq_85_right_finger_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_left_knuckle_link" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_robotiq_85_right_finger_tip_link" reason="Default" />
+    <disable_collisions link1="b_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_right_finger_link" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Adjacent" />
+    <disable_collisions link1="b_iiwa_robotiq_85_right_finger_tip_link" link2="b_iiwa_robotiq_85_right_inner_knuckle_link" reason="Adjacent" />
+    <disable_collisions link1="b_iiwa_robotiq_85_right_finger_tip_link" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
+    <disable_collisions link1="b_iiwa_robotiq_85_right_inner_knuckle_link" link2="b_iiwa_robotiq_85_right_knuckle_link" reason="Never" />
     <disable_collisions link1="b_iiwa_table1" link2="b_iiwa_table2" reason="Adjacent" />
     <disable_collisions link1="b_iiwa_table1" link2="b_iiwa_workbox" reason="Adjacent" />
     <disable_collisions link1="b_iiwa_table2" link2="b_iiwa_workbox" reason="Adjacent" />

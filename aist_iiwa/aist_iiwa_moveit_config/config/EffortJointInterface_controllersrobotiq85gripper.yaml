@@ -28,10 +28,10 @@ controller_list:
     type: FollowJointTrajectory
     default: True
     joints:
-      - a_iiwa_r85grobotiq_85_left_knuckle_joint
+      - a_iiwa_robotiq_85_left_knuckle_joint
   - name: b_iiwa/hand_controller
     action_ns: follow_joint_trajectory
     type: FollowJointTrajectory
     default: True
     joints:
-      - b_iiwa_r85grobotiq_85_left_knuckle_joint
+      - b_iiwa_robotiq_85_left_knuckle_joint

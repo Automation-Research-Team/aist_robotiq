@@ -183,7 +183,8 @@ class InteractiveRoutines(IiwaRoutines):
             """
 
         # Reset pose
-        self.go_home()
+        # self.go_home()
+        self.go_standing()
 
 
 ######################################################################

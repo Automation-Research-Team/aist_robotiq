@@ -120,6 +120,90 @@ planner_configs:
     sparse_delta_fraction: 0.25  # delta fraction for connection distance. This value represents the visibility range of sparse samples. default: 0.25
     dense_delta_fraction: 0.001  # delta fraction for interface detection. default: 0.001
     max_failures: 5000  # maximum consecutive failure limit. default: 5000
+a_iiwa:
+  default_planner_config: None
+  planner_configs:
+    - SBL
+    - EST
+    - LBKPIECE
+    - BKPIECE
+    - KPIECE
+    - RRT
+    - RRTConnect
+    - RRTstar
+    - TRRT
+    - PRM
+    - PRMstar
+    - FMT
+    - BFMT
+    - PDST
+    - STRIDE
+    - BiTRRT
+    - LBTRRT
+    - BiEST
+    - ProjEST
+    - LazyPRM
+    - LazyPRMstar
+    - SPARS
+    - SPARStwo
+  projection_evaluator: joints(a_iiwa_joint_1,a_iiwa_joint_2)
+  longest_valid_segment_fraction: 0.005
+b_iiwa:
+  default_planner_config: None
+  planner_configs:
+    - SBL
+    - EST
+    - LBKPIECE
+    - BKPIECE
+    - KPIECE
+    - RRT
+    - RRTConnect
+    - RRTstar
+    - TRRT
+    - PRM
+    - PRMstar
+    - FMT
+    - BFMT
+    - PDST
+    - STRIDE
+    - BiTRRT
+    - LBTRRT
+    - BiEST
+    - ProjEST
+    - LazyPRM
+    - LazyPRMstar
+    - SPARS
+    - SPARStwo
+  projection_evaluator: joints(b_iiwa_joint_1,b_iiwa_joint_2)
+  longest_valid_segment_fraction: 0.005
+iiwa_two_robots:
+  default_planner_config: None
+  planner_configs:
+    - SBL
+    - EST
+    - LBKPIECE
+    - BKPIECE
+    - KPIECE
+    - RRT
+    - RRTConnect
+    - RRTstar
+    - TRRT
+    - PRM
+    - PRMstar
+    - FMT
+    - BFMT
+    - PDST
+    - STRIDE
+    - BiTRRT
+    - LBTRRT
+    - BiEST
+    - ProjEST
+    - LazyPRM
+    - LazyPRMstar
+    - SPARS
+    - SPARStwo
+  projection_evaluator: joints(a_iiwa_joint_1,a_iiwa_joint_2)
+  longest_valid_segment_fraction: 0.005
 a_iiwa_arm:
   default_planner_config: None
   planner_configs:
@@ -149,7 +233,7 @@ a_iiwa_arm:
   projection_evaluator: joints(a_iiwa_joint_1,a_iiwa_joint_2)
   longest_valid_segment_fraction: 0.005
 a_iiwa_hand:
-  default_planner_config: ""
+  default_planner_config: None
   planner_configs:
     - SBL
     - EST
@@ -174,8 +258,8 @@ a_iiwa_hand:
     - LazyPRMstar
     - SPARS
     - SPARStwo
-a_iiwa:
-  default_planner_config: ""
+a_iiwa_groups:
+  default_planner_config: None
   planner_configs:
     - SBL
     - EST
@@ -231,7 +315,7 @@ b_iiwa_arm:
   projection_evaluator: joints(b_iiwa_joint_1,b_iiwa_joint_2)
   longest_valid_segment_fraction: 0.005
 b_iiwa_hand:
-  default_planner_config: ""
+  default_planner_config: None
   planner_configs:
     - SBL
     - EST
@@ -256,8 +340,8 @@ b_iiwa_hand:
     - LazyPRMstar
     - SPARS
     - SPARStwo
-b_iiwa:
-  default_planner_config: ""
+b_iiwa_groups:
+  default_planner_config: None
   planner_configs:
     - SBL
     - EST
@@ -284,8 +368,8 @@ b_iiwa:
     - SPARStwo
   projection_evaluator: joints(b_iiwa_joint_1,b_iiwa_joint_2)
   longest_valid_segment_fraction: 0.005
-iiwa_two_robots:
-  default_planner_config: ""
+iiwa_two_robots_groups:
+  default_planner_config: None
   planner_configs:
     - SBL
     - EST
