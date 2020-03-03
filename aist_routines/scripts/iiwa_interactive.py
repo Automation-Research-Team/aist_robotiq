@@ -7,6 +7,8 @@ import rospy
 import argparse
 from geometry_msgs import msg as gmsg
 
+from moveit_commander import PlanningSceneInterface
+
 from tf import transformations as tfs
 from math import radians, degrees
 from aist_routines.iiwa import IiwaRoutines
@@ -27,6 +29,10 @@ def is_num(s):
 ######################################################################
 class InteractiveRoutines(IiwaRoutines):
     refposes = {
+        'a_iiwa': [0.00,  0.00, 2.10, radians(0), radians(0), radians(0)],
+        'b_iiwa': [0.00,  1.20, 2.10, radians(0), radians(0), radians(0)],
+    }
+    refposes2 = {
         # 'a_iiwa': [0.70, -0.20, 1.50, radians(0), radians(0), radians(0)],
         'a_iiwa': [0.30,  0.00, 2.00, radians(0), radians(0), radians(0)],
         'b_iiwa': [0.70,  1.40, 1.50, radians(0), radians(0), radians(0)],
@@ -54,17 +60,75 @@ class InteractiveRoutines(IiwaRoutines):
         target_pose = gmsg.PoseStamped()
         # target_pose.header.frame_id = "workspace_center"
         target_pose.header.frame_id = "world"
-        target_pose.pose = gmsg.Pose(
-            gmsg.Point(pose[0], pose[1], pose[2]),
-            gmsg.Quaternion(
-                *tfs.quaternion_from_euler(pose[3], pose[4], pose[5])))
+
+        if type(pose) is list:
+            target_pose.pose = gmsg.Pose(
+                gmsg.Point(pose[0], pose[1], pose[2]),
+                gmsg.Quaternion(
+                    *tfs.quaternion_from_euler(pose[3], pose[4], pose[5])))
+        elif type(pose) is gmsg.Pose:
+            target_pose.pose = pose
+
         (success, _, current_pose) = self.go_to_pose_goal(
                                                 self._robot_name, target_pose,
                                                 self._speed,
                                                 move_lin=False)
         return success
 
+    def create_objects(self, scene, robot_commander, z_ext):
+        scene.remove_world_object()
+
+        p = gmsg.PoseStamped()
+        p.header.frame_id = robot_commander.get_planning_frame()
+
+        p.pose.position.x =  0.8
+        p.pose.position.y = -0.2
+        p.pose.position.z =  0.5 + z_ext
+        scene.add_box("part1", p, (0.03, 0.03, 0.3))
+
+        p.pose.position.x =  0.8
+        p.pose.position.y =  1.4
+        p.pose.position.z =  0.5 + z_ext
+        scene.add_box("part2", p, (0.03, 0.03, 0.3))
+
+    def pose_to_object(self, scene, robot_commander, robot_name):
+        obj_name = ''
+        link_0 = None
+        if robot_name == 'a_iiwa':
+            obj_name = 'part1'
+            link_0 = robot_commander.get_link('a_iiwa_link_0')
+        elif robot_name == 'b_iiwa':
+            obj_name = 'part2'
+            link_0 = robot_commander.get_link('b_iiwa_link_0')
+        if len(obj_name) <= 0:
+            print '# pose_to_object # no target'
+            return
+        if link_0 is None:
+            print '# pose_to_object # no link_0'
+            return
+        print '# pose_to_object # target object :', obj_name
+
+        link_0_pose = link_0.pose()
+        q_tf = tfs.quaternion_from_euler(0, 3.14/2, 0)
+
+        objs = scene.get_objects()
+        if obj_name in objs:
+            poses = objs[obj_name].primitive_poses
+            print '# pose_to_object #\n', poses
+            for pose in poses:
+                if pose.position.x > link_0_pose.pose.position.x:
+                    pose.position.x -= 0.1
+                else:
+                    pose.position.x += 0.1
+                pose.position.z += 0.2
+                pose.orientation = gmsg.Quaternion(q_tf[0], q_tf[1], q_tf[2], q_tf[3])
+
+                self.move(pose)
+
     def run(self):
+        scene = PlanningSceneInterface()
+        rospy.sleep(1)
+
         # Reset pose
         # self.go_home()
         self.go_standing()
@@ -173,10 +237,18 @@ class InteractiveRoutines(IiwaRoutines):
                 print(str(poses))
             elif key == 'o':
                 self.move(InteractiveRoutines.refposes[self._robot_name])
+            elif key == 'pose':
+                self.move(InteractiveRoutines.refposes2[self._robot_name])
             elif key == 'standing':
                 self.go_standing()
             elif key == 'h':
                 self.go_home()
+            elif key == 'show_objs':
+                self.create_objects(scene, self._cmd, 0.80)
+            elif key == 'remove_objs':
+                scene.remove_world_object()
+            elif key == 'pose_obj':
+                self.pose_to_object(scene, self._cmd, self._robot_name)
             """
             elif key == 'b':
                 self.go_back()

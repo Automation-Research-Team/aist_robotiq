@@ -48,13 +48,20 @@ $ rosrun aist_iiwa_pick_place pose.py a_iiwa_groups a_iiwa_link_ee b_iiwa_groups
 
 $ roslaunch aist_routines connect_robots.launch config:=iiwa sim:=true
 
+aist_gazebo/launch/iiwa_gazebo.launch
 aist_routines/launch/iiwa_connect_robots.launch
   enable two robots
     <arg name="robot_2" default="true"/>
   only one robot
     <arg name="robot_2" default="false"/>
 
-$ rosrun aist_routines iiwa_interactive.py -r a_iiwa
+(a_iiwa)
+$ rosrun aist_routines iiwa_interactive.py
+(b_iiwa)
+$ rosrun aist_routines iiwa_interactive.py -r b_iiwa
+
+    pose(x, y, z, roll, pitch, yaw) を指定して動かす
+
         moveit>> reset
         moveit>> X
         moveit>> 0.3
@@ -64,10 +71,19 @@ $ rosrun aist_routines iiwa_interactive.py -r a_iiwa
         moveit>> 2
         moveit>> go
 
-  example:
-      X,   Y,   Z, Roll, Pitch, Yaw
-    0.3, 0.0, 2.0,    0,     0,   0
-    0.0, 0.0, 2.1,    0,     0, 180
+            example:
+                X,   Y,   Z, Roll, Pitch, Yaw
+              0.3, 0.0, 2.0,    0,     0,   0
+              0.0, 0.0, 2.1,    0,     0, 180
+
+    object を削除
+        moveit>> remove_objs
+
+    object を表示
+        moveit>> show_objs
+
+    object に対して pose する
+        moveit>> pose_obj
 
 --------------------------------------------------------------------------------
 
