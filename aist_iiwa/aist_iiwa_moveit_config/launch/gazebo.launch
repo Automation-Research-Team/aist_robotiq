@@ -19,7 +19,10 @@
   <arg name="origin_z_2" default="0"/>
   <arg name="origin_roll_2"  default="0"/>
   <arg name="origin_pitch_2" default="0"/>
+  <!-- <arg name="origin_yaw_2"   default="${pi}"/> -->
   <arg name="origin_yaw_2"   default="${pi}"/>
+
+  <arg name="urdf_path" default="$(find aist_iiwa_moveit_config)/config/$(arg model)_2robots.urdf.xacro"/>
 
   <!-- startup simulated world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -46,6 +49,7 @@
     <arg name="origin_roll_2"  value="$(arg origin_roll_2)" />
     <arg name="origin_pitch_2" value="$(arg origin_pitch_2)" />
     <arg name="origin_yaw_2"   value="$(arg origin_yaw_2)" />
+    <arg name="urdf_path" value="$(arg urdf_path)" />
   </include>
 
   <!-- push robot_description to factory and spawn robot in gazebo at the origin, change x,y,z arguments to spawn in a different position -->

@@ -22,6 +22,8 @@
 
   <arg name="exist_objs" default="true"/>
 
+  <arg name="urdf_path" default="$(find aist_iiwa_moveit_config)/config/$(arg model)_2robots.urdf.xacro" />
+
   <!-- The name of the parameter under which the URDF is loaded -->
   <arg name="robot_description" default="robot_description"/>
 
@@ -45,6 +47,7 @@
       <arg name="origin_pitch_2" value="$(arg origin_pitch_2)" />
       <arg name="origin_yaw_2"   value="$(arg origin_yaw_2)" />
       <arg name="exist_objs" value="$(arg exist_objs)" />
+      <arg name="urdf_path" value="$(arg urdf_path)" />
     </include>
   </group>
 

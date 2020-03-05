@@ -47,6 +47,7 @@
     <arg name="origin_roll_2"  value="$(arg origin_roll_2)" />
     <arg name="origin_pitch_2" value="$(arg origin_pitch_2)" />
     <arg name="origin_yaw_2"   value="$(arg origin_yaw_2)" />
+    <arg name="urdf_path" value="$(find aist_description)/scene/urdf/iiwa_base_scene.urdf.xacro" />
   </include>
 
   <arg name="use_gui" default="false" />

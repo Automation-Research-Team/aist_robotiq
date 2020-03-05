@@ -3,10 +3,12 @@
   <!-- This argument must specify the list of .cfg files to process for benchmarking -->
   <arg name="cfg" />
   <arg name="end_effector" default=""/>
+  <arg name="urdf_path" default="$(find aist_iiwa_moveit_config)/config/iiwa14_2robots.urdf.xacro" />
 
   <!-- Load URDF -->
   <include file="$(find aist_iiwa_moveit_config)/launch/planning_context.launch">
     <arg name="load_robot_description" value="true"/>
+    <arg name="urdf_path" value="$(arg urdf_path)"/>
   </include>
 
   <!-- Start the database -->

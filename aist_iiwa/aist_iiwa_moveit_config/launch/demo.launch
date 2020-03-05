@@ -8,6 +8,8 @@
   <!-- By default, we are not in debug mode -->
   <arg name="debug" default="false" />
 
+  <arg name="urdf_path" default="$(find aist_iiwa_moveit_config)/config/iiwa14_2robots.urdf.xacro" />
+
   <!--
   By default, hide joint_state_publisher's GUI
 
@@ -21,6 +23,7 @@
   <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
   <include file="$(find aist_iiwa_moveit_config)/launch/planning_context.launch">
     <arg name="load_robot_description" value="true"/>
+    <arg name="urdf_path" value="$(arg urdf_path)"/>
   </include>
 
   <!-- If needed, broadcast static tf for robot root -->
