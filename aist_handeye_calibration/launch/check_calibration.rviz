@@ -58,11 +58,14 @@ Visualization Manager:
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
       Value: true
-    - Class: moveit_rviz_plugin/MotionPlanning
+    - Acceleration_Scaling_Factor: 1
+      Class: moveit_rviz_plugin/MotionPlanning
       Enabled: true
       Move Group Namespace: ""
       MoveIt_Allow_Approximate_IK: false
       MoveIt_Allow_External_Program: false
+      MoveIt_Allow_Replanning: false
+      MoveIt_Allow_Sensor_Positioning: false
       MoveIt_Goal_Tolerance: 0
       MoveIt_Planning_Attempts: 10
       MoveIt_Planning_Time: 5
@@ -561,6 +564,7 @@ Visualization Manager:
         Show Robot Collision: false
         Show Robot Visual: true
       Value: true
+      Velocity_Scaling_Factor: 1
     - Class: rviz/TF
       Enabled: true
       Frame Timeout: 15
@@ -570,10 +574,6 @@ Visualization Manager:
           Value: false
         a_bot_base_link:
           Value: false
-        a_bot_camera_aligned_depth_to_color_frame:
-          Value: true
-        a_bot_camera_aligned_depth_to_infra1_frame:
-          Value: true
         a_bot_camera_color_frame:
           Value: false
         a_bot_camera_color_optical_frame:
@@ -690,10 +690,6 @@ Visualization Manager:
                     a_bot_wrist_1_link:
                       a_bot_wrist_2_link:
                         a_bot_camera_link:
-                          a_bot_camera_aligned_depth_to_color_frame:
-                            {}
-                          a_bot_camera_aligned_depth_to_infra1_frame:
-                            {}
                           a_bot_camera_depth_frame:
                             a_bot_camera_color_frame:
                               a_bot_camera_color_optical_frame:
@@ -847,25 +843,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.322513878
+      Distance: 1.42398548
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.0331777036
-        Y: -0.188887596
-        Z: 1.51631308
+        X: 0.0781639591
+        Y: 0.0446392298
+        Z: 1.23579633
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: -0.239797577
+      Pitch: 0.970201969
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.77875721
+      Yaw: 0.0237584077
     Saved: ~
 Window Geometry:
   Displays:

@@ -1,22 +1,7 @@
 bin_props:
   _1:
-    name: bin_1_part_5
-    part_id: 5
-  _2:
-    name: bin_1_part_16
-    part_id: 16
-  _3:
-    name: bin_1_part_17
-    part_id: 17
-  _4:
-    name: bin_2_part_4
-    part_id: 4
-  _5:
-    name: bin_2_part_7
-    part_id: 7
-  _6:
-    name: bin_2_part_8
-    part_id: 8
+    name: bin_1_part_64621
+    part_id: 64621
 
 part_props:
   _4:
@@ -169,3 +154,103 @@ part_props:
     place_offset: [0.0, 0.0, 0.05]
     speed_slow: 1.0
     use_normals: false
+  _58331:
+    name: toyota1 9R
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: workspace_center
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.003]
+    place_offset: [0.0, 0.0, 0.06]
+    speed_slow: 1.0
+    use_normals: true
+  _58332:
+    name: toyota1 9L
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: workspace_center
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.003]
+    place_offset: [0.0, 0.0, 0.06]
+    speed_slow: 1.0
+    use_normals: true
+  _61653:
+    name: toyota1 5R
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: workspace_center
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.003]
+    place_offset: [0.0, 0.0, 0.06]
+    speed_slow: 1.0
+    use_normals: true
+  _61654:
+    name: toyota1 5L
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: workspace_center
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.003]
+    place_offset: [0.0, 0.0, 0.06]
+    speed_slow: 1.0
+    use_normals: true
+  _64621:
+    name: toyota1 9ZB
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: workspace_center
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.003]
+    place_offset: [0.0, 0.0, 0.06]
+    speed_slow: 1.0
+    use_normals: true
+  _68945:
+    name: toyota1 WR
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: workspace_center
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.003]
+    place_offset: [0.0, 0.0, 0.06]
+    speed_slow: 1.0
+    use_normals: true
+  _68946:
+    name: toyota1 WL
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: workspace_center
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.003]
+    place_offset: [0.0, 0.0, 0.06]
+    speed_slow: 1.0
+    use_normals: true
+  _69430:
+    name: toyota1 Lock
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: workspace_center
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.003]
+    place_offset: [0.0, 0.0, 0.06]
+    speed_slow: 1.0
+    use_normals: true
+  _89997:
+    name: toyota1 9L18
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: workspace_center
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.003]
+    place_offset: [0.0, 0.0, 0.06]
+    speed_slow: 1.0
+    use_normals: true
+  _64600:
+    name: toyota1 Trunk
+    robot_name: b_bot
+    camera_name: a_phoxi_m_camera
+    destination: workspace_center
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.003]
+    place_offset: [0.0, 0.0, 0.06]
+    speed_slow: 1.0
+    use_normals: true

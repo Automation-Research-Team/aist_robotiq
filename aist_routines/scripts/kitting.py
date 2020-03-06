@@ -1,19 +1,10 @@
 #!/usr/bin/env python
 
-import os, csv, copy, time, datetime, re, collections
+import os, copy, collections
 import rospy, rospkg, rosparam
 import aist_routines.base as base
-from aist_routines.ur   import URRoutines
-from aist_routines      import msg as amsg
-
-######################################################################
-#  global variables                                                  #
-######################################################################
-rp = rospkg.RosPack()
-
-ts = time.time()
-start_date_time = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d_%H-%M-%S')
-number_of_attempted = 1
+from aist_routines.ur import URRoutines
+from aist_routines    import msg as amsg
 
 ######################################################################
 #  class KittingRoutines                                             #
@@ -21,7 +12,7 @@ number_of_attempted = 1
 class KittingRoutines(URRoutines):
     """Implements kitting routines for aist robot system."""
 
-    BinProps = collections.namedtuple("BinProps", "bin_id part_id part_props")
+    Bin = collections.namedtuple("Bin", "name part_id part_props")
 
     def __init__(self):
         super(KittingRoutines, self).__init__()
@@ -29,16 +20,15 @@ class KittingRoutines(URRoutines):
         rospack = rospkg.RosPack()
         d = rosparam.load_file(rospack.get_path("aist_routines") +
                                "/config/kitting.yaml")[0][0]
-        self._bins = d["bins"]
+        bin_props  = base.paramtuples(d["bin_props"])
         part_props = base.paramtuples(d["part_props"])
 
         # Assign part information to each bin.
-        self._items = {}
-        for bin_id, bin in enumerate(self._bins, 1):
-            part_id = int(re.search("[0-9]+$", bin).group())
-            self._items[bin] \
-                = KittingRoutines.BinProps(bin_id, part_id,
-                                           part_props[part_id])
+        self._bins = {}
+        for bin_id, bin_prop in bin_props.items():
+            part_id = bin_prop.part_id
+            self._bins[bin_id] = KittingRoutines.Bin(bin_prop.name, part_id,
+                                                     part_props[part_id])
 
         self._former_robot_name = None
         self._fail_poses = []
@@ -52,9 +42,6 @@ class KittingRoutines(URRoutines):
     def former_robot_name(self):
         return self._former_robot_name
 
-    def item(self, bin):
-        return self._items[bin]
-
     ###----- main procedure
     def run(self):
         self.go_to_named_pose("back", "all_bots")
@@ -64,9 +51,36 @@ class KittingRoutines(URRoutines):
             self.attempt_bin(bin, 1)
         self.go_to_named_pose("home", "all_bots")
 
-    def attempt_bin(self, bin, max_attempts=5, marker_lifetime=0):
-        item  = self._items[bin]
-        props = item.part_props
+    def demo(self):
+        bin_ids = (1, 4, 5)
+
+        while True:
+            completed = False
+
+            for bin_id in bin_ids:
+                kitting.clear_fail_poses()
+                success = kitting.attempt_bin(bin_id, 5, 0)
+                completed = completed and not success
+
+            if completed:
+                break
+
+        kitting.go_to_named_pose("home", kitting.former_robot_name)
+
+    def search(self, bin_id, marker_lifetime=0):
+        bin   = self._bins[bin_id]
+        props = bin.part_props
+        self.graspability_send_goal(props.robot_name, props.camera_name,
+                                    bin.part_id, bin_id,
+                                    props.use_normals)
+        return self.graspability_wait_for_result(props.camera_name, marker_lifetime)
+        # return self.search_graspability(props.robot_name, props.camera_name,
+        #                                 bin.part_id, bin_id, props.use_normals,
+        #                                 marker_lifetime)
+
+    def attempt_bin(self, bin_id, max_attempts=5, marker_lifetime=0):
+        bin   = self._bins[bin_id]
+        props = bin.part_props
 
         # If using a different robot from the former, move it back to home.
         if self._former_robot_name is not None and \
@@ -76,20 +90,10 @@ class KittingRoutines(URRoutines):
 
         # Move to 0.15m above the bin if the camera is mounted on the robot.
         if self._is_eye_on_hand(props.robot_name, props.camera_name):
-            self.go_to_frame(props.robot_name, bin, (0, 0, 0.15))
+            self.go_to_frame(props.robot_name, bin.name, (0, 0, 0.15))
 
         # Search for graspabilities.
-        # (pick_poses, _, success) = self.search_graspability(props.robot_name,
-        #                                                     props.camera_name,
-        #                                                     item.part_id,
-        #                                                     item.bin_id,
-        #                                                     props.use_normals,
-        #                                                     marker_lifetime)
-        self.graspability_send_goal(props.robot_name, props.camera_name,
-                                    item.part_id, item.bin_id,
-                                    props.use_normals)
-        (pick_poses, _, success) = self.graspability_wait_for_result(
-                                        props.camera_name, marker_lifetime)
+        (pick_poses, _, success) = self.search(bin_id, marker_lifetime)
         if not success:
             return False
 
@@ -158,6 +162,7 @@ if __name__ == '__main__':
             print("  s: Search graspabilities")
             print("  a: Attempt to pick and place")
             print("  A: Repeat attempts to pick and place")
+            print("  d: Perform small demo")
             print("  k: Do kitting task")
             print("  g: Grasp")
             print("  r: Release")
@@ -182,30 +187,21 @@ if __name__ == '__main__':
                     kitting.create_mask_image("a_phoxi_m_camera",
                                               kitting.nbins)
                 elif key == 's':
-                    item  = kitting.item(raw_input("  bin name? "))
-                    props = item.part_props
-                    # kitting.search_graspability(props.robot_name,
-                    #                             props.camera_name,
-                    #                             item.part_id, item.bin_id,
-                    #                             props.use_normals,
-                    #                             marker_lifetime=0)
-                    kitting.graspability_send_goal(props.robot_name,
-                                                   props.camera_name,
-                                                   item.part_id, item.bin_id,
-                                                   props.use_normals)
-                    kitting.graspability_wait_for_result(props.camera_name,
-                                                         marker_lifetime=0)
+                    bin_id = int(raw_input("  bin id? "))
+                    kitting.search(bin_id)
                 elif key == 'a':
-                    bin = raw_input("  bin name? ")
+                    bin_id = int(raw_input("  bin id? "))
                     kitting.clear_fail_poses()
-                    kitting.attempt_bin(bin, 5, 0)
+                    kitting.attempt_bin(bin_id, 5, 0)
                     kitting.go_to_named_pose("home", kitting.former_robot_name)
                 elif key == 'A':
-                    bin = raw_input("  bin name? ")
+                    bin_id = int(raw_input("  bin id? "))
                     kitting.clear_fail_poses()
-                    while kitting.attempt_bin(bin, 5, 0):
+                    while kitting.attempt_bin(bin_id, 5, 0):
                         pass
                     kitting.go_to_named_pose("home", kitting.former_robot_name)
+                elif key == 'd':
+                    kitting.demo()
                 elif key == 'k':
                     kitting.run()
                 elif key == 'g':
