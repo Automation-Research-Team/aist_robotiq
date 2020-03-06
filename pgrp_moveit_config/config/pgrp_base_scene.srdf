@@ -139,9 +139,12 @@
     <disable_collisions link1="a_bot_base_link" link2="b_bot_base_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_link" link2="b_bot_ee_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="b_bot_forearm_link" reason="Never" />
+    <disable_collisions link1="a_bot_base_link" link2="b_bot_ft300_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="b_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="b_bot_upper_arm_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="b_bot_wrist_1_link" reason="Never" />
+    <disable_collisions link1="a_bot_base_link" link2="b_bot_wrist_2_link" reason="Never" />
+    <disable_collisions link1="a_bot_base_link" link2="b_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="a_bot_base_link" link2="vwall1" reason="Adjacent" />
     <disable_collisions link1="a_bot_base_link" link2="workbox" reason="Adjacent" />
     <disable_collisions link1="a_bot_camera_link" link2="a_bot_ee_link" reason="Never" />
@@ -150,7 +153,8 @@
     <disable_collisions link1="a_bot_camera_link" link2="a_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="a_bot_camera_link" link2="a_bot_wrist_2_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_camera_link" link2="a_bot_wrist_3_link" reason="Never" />
-    <disable_collisions link1="a_bot_camera_link" link2="b_bot_single_suction_gripper_base_link" reason="Never" />
+    <disable_collisions link1="a_bot_camera_link" link2="b_bot_base_link" reason="Never" />
+    <disable_collisions link1="a_bot_camera_link" link2="b_bot_ee_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="a_bot_ft300_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_ee_link" link2="a_bot_gripper_base_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="a_bot_wrist_1_link" reason="Never" />
@@ -158,11 +162,7 @@
     <disable_collisions link1="a_bot_ee_link" link2="a_bot_wrist_3_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_ee_link" link2="b_bot_base_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="b_bot_ee_link" reason="Never" />
-    <disable_collisions link1="a_bot_ee_link" link2="b_bot_forearm_link" reason="Never" />
-    <disable_collisions link1="a_bot_ee_link" link2="b_bot_ft300_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="b_bot_shoulder_link" reason="Never" />
-    <disable_collisions link1="a_bot_ee_link" link2="b_bot_single_suction_gripper_base_link" reason="Never" />
-    <disable_collisions link1="a_bot_ee_link" link2="b_bot_upper_arm_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="b_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="b_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="a_bot_ee_link" link2="b_bot_wrist_3_link" reason="Never" />
@@ -174,14 +174,12 @@
     <disable_collisions link1="a_bot_ft300_link" link2="a_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="a_bot_ft300_link" link2="a_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="a_bot_ft300_link" link2="a_bot_wrist_3_link" reason="Never" />
+    <disable_collisions link1="a_bot_ft300_link" link2="b_bot_base_link" reason="Never" />
     <disable_collisions link1="a_bot_ft300_link" link2="b_bot_ee_link" reason="Never" />
-    <disable_collisions link1="a_bot_ft300_link" link2="b_bot_ft300_link" reason="Never" />
-    <disable_collisions link1="a_bot_ft300_link" link2="b_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="a_bot_ft300_link" link2="b_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="a_bot_gripper_base_link" link2="a_bot_wrist_1_link" reason="Never" />
     <disable_collisions link1="a_bot_gripper_base_link" link2="a_bot_wrist_2_link" reason="Never" />
     <disable_collisions link1="a_bot_gripper_base_link" link2="a_bot_wrist_3_link" reason="Default" />
-    <disable_collisions link1="a_bot_gripper_base_link" link2="b_bot_ee_link" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="a_bot_upper_arm_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_shoulder_link" link2="a_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_bot_shoulder_link" link2="b_bot_base_link" reason="Never" />
@@ -199,17 +197,12 @@
     <disable_collisions link1="a_bot_wrist_1_link" link2="a_bot_wrist_2_link" reason="Adjacent" />
     <disable_collisions link1="a_bot_wrist_1_link" link2="a_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_1_link" link2="b_bot_base_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_1_link" link2="b_bot_ee_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_1_link" link2="b_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_2_link" link2="a_bot_wrist_3_link" reason="Adjacent" />
-    <disable_collisions link1="a_bot_wrist_2_link" link2="b_bot_base_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_2_link" link2="b_bot_shoulder_link" reason="Never" />
+    <disable_collisions link1="a_bot_wrist_2_link" link2="b_bot_ee_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_base_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_ee_link" reason="Never" />
     <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_shoulder_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_wrist_1_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_wrist_2_link" reason="Never" />
-    <disable_collisions link1="a_bot_wrist_3_link" link2="b_bot_wrist_3_link" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_base_link" reason="Adjacent" />
     <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_shoulder_link" reason="Never" />
     <disable_collisions link1="a_phoxi_m_camera" link2="b_bot_upper_arm_link" reason="Never" />
