@@ -28,4 +28,21 @@
     <arg name="camera_name"	value="$(arg camera_name)"/>
     <arg name="convert_to_rgb"	value="true"/>
   </include>
+
+  <include if="$(eval camera_name == 'a_bot_camera0')"
+	   file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <arg name="serial_no"	value="636203005853"/>
+    <arg name="camera"		value="$(arg camera_name)"/>
+    <arg name="align_depth"	value="true"/>
+    <arg name="publish_tf"	value="false"/>
+  </include>
+
+  <include if="$(eval camera_name == 'a_bot_camera1')"
+	   file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <arg name="serial_no"	value="636203005303"/>
+    <arg name="camera"		value="$(arg camera_name)"/>
+    <arg name="align_depth"	value="true"/>
+    <arg name="publish_tf"	value="false"/>
+  </include>
+
 </launch>
