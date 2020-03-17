@@ -129,27 +129,33 @@ class RealSenseCamera(DepthCamera):
         super(RealSenseCamera, self).__init__(name, camera_info_topic,
                                               image_topic, pointcloud_topic,
                                               depth_topic)
-        self._dyn_reconf = dynamic_reconfigure.client.Client(name, timeout=5.0)
+        self._dyn_camera = dynamic_reconfigure.client.Client(name, timeout=5.0)
+        self._dyn_sensor = dynamic_reconfigure.client.Client(
+                               name + "/coded_light_depth_sensor", timeout=5.0)
         self._recent_laser_power = 16
 
     @property
     def laser_power(self):
-        return self._dyn_reconf.get_configuration()["coded_light_depth_sensor/laseer_power"]
+        print("{}: get laser power".format(self.name))
+        ret = self._dyn_sensor.get_configuration()
+        pirnt(ret)
+        return ret["laser_power"]
 
     @laser_power.setter
     def laser_power(self, value):
-        self._dyn_reconf.update_configuration(
-            {"coded_light_depth_sensor/laser_power" : value})
+        print("{}: set laser power to {}".format(self.name, value))
+        self._dyn_sensor.update_configuration({"laser_power" : value})
 
     def continuous_shot(self, enabled):
-        if enabled:
-            self.laser_power = self._recent_laser_power
-        else:
-            current_laser_power = self.laser_power
-            if current_laser_pwoer != 0:
-                self._recent_laser_power = current_laser_power
-            self.laser_power = 0
-        self._dyn_reconf.update_configuration({"enable_streaming" : enabled})
+        # if enabled:
+        #     self.laser_power = self._recent_laser_power
+        # else:
+        #     current_laser_power = self.laser_power
+        #     if current_laser_power != 0:
+        #         self._recent_laser_power = current_laser_power
+        #     self.laser_power = 0
+        print("{}: set enable_streaming to {}".format(self.name, enabled))
+        self._dyn_camera.update_configuration({"enable_streaming" : enabled})
         return True
 
 ######################################################################
