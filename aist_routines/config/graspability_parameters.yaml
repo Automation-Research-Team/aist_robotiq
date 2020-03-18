@@ -169,6 +169,16 @@ graspability_parameters:
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 10
+  _64600:
+    name: toyota1 Trunk
+    ns: 2
+    detect_edge: true
+    object_size: 20
+    radius: 15
+    open_width: 100
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 10
   _61653:
     name: toyota1 5R
     ns: 2
@@ -235,16 +245,6 @@ graspability_parameters:
     detect_edge: true
     object_size: 15
     radius: 8
-    open_width: 100
-    finger_width: 1
-    finger_thickness: 5
-    insertion_depth: 10
-  _64600:
-    name: toyota1 Trunk
-    ns: 2
-    detect_edge: true
-    object_size: 20
-    radius: 15
     open_width: 100
     finger_width: 1
     finger_thickness: 5
