@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+  <xacro:include filename="$(find khi_rs_description
+			   )/urdf/rs007l_macro.xacro"/>
+
+  <xacro:macro name="rs007l" params="prefix parent *origin">
+    <xacro:khi_rs007l prefix="${prefix}"/>
+
+    <joint name="${prefix}parent_base_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child  link="${prefix}base_link"/>
+      <xacro:insert_block name="origin"/>
+    </joint>
+    
+    <link  name="${prefix}ee_link"/>
+    <joint name="${prefix}link6_ee_joint" type="fixed">
+      <parent link="${prefix}link6"/>
+      <child  link="${prefix}ee_link"/>
+      <origin xyz="0 0 0" rpy="${pi/2} ${-pi/2} 0"/>
+    </joint>
+  </xacro:macro>
+
+</robot>
