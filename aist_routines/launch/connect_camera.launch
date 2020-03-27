@@ -18,9 +18,13 @@
 
   <include if="$(eval camera_name == 'a_bot_camera')"
 	   file="$(find realsense2_camera)/launch/rs_camera.launch">
-    <arg name="camera"		value="$(arg camera_name)"/>
-    <arg name="align_depth"	value="true"/>
-    <arg name="publish_tf"	value="false"/>
+    <arg name="camera"			value="$(arg camera_name)"/>
+    <arg name="enable_depth"		value="true"/>
+    <arg name="enable_infra1"		value="false"/>
+    <arg name="enable_infra2"		value="false"/>
+    <arg name="enable_pointcloud"	value="false"/>
+    <arg name="align_depth"		value="true"/>
+    <arg name="publish_tf"		value="false"/>
   </include>
 
   <include if="$(eval camera_name == 'b_bot_camera')"
@@ -28,4 +32,42 @@
     <arg name="camera_name"	value="$(arg camera_name)"/>
     <arg name="convert_to_rgb"	value="true"/>
   </include>
+
+  <group if="$(eval camera_name == 'a_bot_wrist_cameras')">
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+      <arg name="serial_no"		value="636203005853"/>
+      <arg name="camera"		value="a_bot_wrist_camera0"/>
+      <arg name="enable_depth"		value="true"/>
+      <arg name="enable_color"		value="true"/>
+      <arg name="enable_infra1"		value="false"/>
+      <arg name="enable_infra2"		value="false"/>
+      <arg name="enable_pointcloud"	value="false"/>
+      <arg name="depth_fps"		value="10"/>
+      <arg name="color_fps"		value="10"/>
+      <arg name="align_depth"		value="true"/>
+      <arg name="publish_tf"		value="true"/>
+      <arg name="enable_streaming"	value="false"/>
+    </include>
+
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+      <arg name="serial_no"		value="636203005303"/>
+      <arg name="camera"		value="a_bot_wrist_camera1"/>
+      <arg name="enable_depth"		value="true"/>
+      <arg name="enable_color"		value="true"/>
+      <arg name="enable_infra1"		value="false"/>
+      <arg name="enable_infra2"		value="false"/>
+      <arg name="enable_pointcloud"	value="false"/>
+      <arg name="depth_fps"		value="10"/>
+      <arg name="color_fps"		value="10"/>
+      <arg name="align_depth"		value="true"/>
+      <arg name="publish_tf"		value="false"/>
+      <arg name="enable_streaming"	value="false"/>
+    </include>
+
+    <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false"
+	  args="-d a_bot_wrist_cameras.rviz" output="screen"/>
+
+    <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
+  </group>
+
 </launch>

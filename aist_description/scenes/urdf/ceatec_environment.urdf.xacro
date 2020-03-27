@@ -34,7 +34,7 @@
   </joint>
 
   <!-- a_table -->
-  <xacro:include filename="$(find aist_description)/object/urdf/table.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/objects/urdf/table.urdf.xacro"/>
   <xacro:table prefix="a_"
 	       width="${a_table_width}"
 	       length="${a_table_length}"
@@ -104,7 +104,7 @@
   </joint>
 
   <!-- Cabinet -->
-  <xacro:include filename="$(find aist_description)/object/urdf/cabinet.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/objects/urdf/cabinet.urdf.xacro"/>
   <xacro:cabinet prefix="a_"
 		 width="${cabinet_width}"
 		 length="${cabinet_length}"
@@ -166,7 +166,7 @@
   </joint>
 
   <!-- AR markers -->
-  <xacro:include filename="$(find aist_description)/object/urdf/ar_markers.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/objects/urdf/ar_markers.urdf.xacro"/>
 
   <xacro:ar_marker prefix="a_cabinet_" parent="a_cabinet_shelf1_origin"
 		   marker_id="17" size="0.1" margin="0.005" thickness="0.001">
@@ -179,7 +179,7 @@
   </xacro:ar_marker>
 
   <!-- Trays -->
-  <xacro:include filename="$(find aist_description)/object/urdf/tray.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/objects/urdf/tray.urdf.xacro"/>
   <xacro:tray prefix="a_"
 	      width="${tray_width}"
 	      length="${tray_length}"

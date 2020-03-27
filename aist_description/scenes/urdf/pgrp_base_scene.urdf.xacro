@@ -17,7 +17,7 @@
   <!-- The surface is 0.01 m below the robot bases and the "workspace_center" frame. -->
   <link name="ground"/>
 
-  <xacro:include filename="$(find aist_description)/object/urdf/aist_box.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/objects/urdf/aist_box.urdf.xacro"/>
   <xacro:property name="table_w" value="0.9"/>
   <xacro:property name="table_l" value="1.8"/>
   <xacro:property name="table_h" value="0.01"/>
@@ -35,7 +35,7 @@
 
   <!-- robot arms -->
   <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro"/>
-  <xacro:include filename="$(find aist_description)/device/urdf/ur5.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/devices/urdf/ur5.urdf.xacro"/>
   <xacro:ur5_robot prefix="a_bot_" joint_limited="false"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
@@ -82,7 +82,7 @@
     <!-- <origin xyz="-0.004 0 0" rpy="${-pi/2} 0 0"/> -->
   </xacro:precision_gripper>
 
-  <xacro:include filename="$(find aist_description)/device/urdf/single_suction_gripper.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/devices/urdf/single_suction_gripper.urdf.xacro"/>
   <xacro:single_suction_gripper prefix="b_bot_"
   				parent="b_bot_ft300_flange_link">
     <origin xyz="0 0 0" rpy="0 ${0.3*pi/180} ${-0.6*pi/180}"/>
@@ -106,7 +106,7 @@
   </xacro:phoxi_m_camera>
 
   <!-- Add RealSense camera -->
-  <xacro:include filename="$(find aist_description)/device/urdf/_sr305.urdf.xacro" />
+  <xacro:include filename="$(find aist_description)/devices/urdf/_sr305.urdf.xacro" />
   <xacro:sensor_sr305 prefix="a_bot_" parent="a_bot_wrist_2_link">
     <origin xyz="0.0326671856774
 		 -0.063887034743

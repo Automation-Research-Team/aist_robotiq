@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <robot name="aaa" xmlns:xacro="http://wiki.ros.org/xacro">
-  <xacro:include filename="$(find aist_description)/object/urdf/table.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/objects/urdf/table.urdf.xacro"/>
 
   <link name="base_link"/>
 

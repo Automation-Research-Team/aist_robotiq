@@ -2,10 +2,10 @@
 <robot xmlns:xacro="http://wiki.ros.org/xacro" name="ceatec" >
 
   <!-- Fetch robot in empty scene (root = "map") -->
-  <xacro:include filename="$(find aist_description)/scene/urdf/fetch_base_scene.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/scenes/urdf/fetch_base_scene.urdf.xacro"/>
 
   <!-- Environment of "ceatec" scene (root = "world") -->
-  <xacro:include filename="$(find aist_description)/scene/urdf/ceatec_environment.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/scenes/urdf/ceatec_environment.urdf.xacro"/>
 
   <!-- Make "map" frame a child of "world" frame -->
   <joint name="world_map_joint" type="fixed">

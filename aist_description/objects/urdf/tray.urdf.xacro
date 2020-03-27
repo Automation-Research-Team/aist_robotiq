@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <robot xmlns:xacro="http://wiki.ros.org/xacro" name="table">
 
-  <xacro:include filename="$(find aist_description)/object/urdf/aist_box.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/objects/urdf/aist_box.urdf.xacro"/>
 
   <xacro:macro name="tray"
 	       params="prefix width length height parent *origin">
