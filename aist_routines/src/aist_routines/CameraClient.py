@@ -52,7 +52,7 @@ class CameraClient(object):
     def normal_topic(self):
         return self._normal_topic
 
-    def continuous_shot(self, enable):
+    def continuous_shot(self, enabled):
         return True
 
     def trigger_frame(self):
@@ -78,9 +78,9 @@ class PhoXiCamera(CameraClient):
                 name + "/texture",   name + "/pointcloud",
                 name + "/depth_map", name + "/normal_map")
 
-    def continuous_shot(self, enable):
+    def continuous_shot(self, enabled):
         self._dyn_reconf.update_configuration({"trigger_mode" :
-                                               0 if enable else 1})
+                                               0 if enabled else 1})
         return True
 
     def trigger_frame(self):
@@ -98,7 +98,6 @@ class DepthCamera(CameraClient):
         super(DepthCamera, self).__init__(*DepthCamera._initargs(
             name, camera_info_topic,
             image_topic, pointcloud_topic, depth_topic))
-#        self._dyn_reconf = dynamic_reconfigure.client.Client(name, timeout=5.0)
 
     @staticmethod
     def base(name,
@@ -118,9 +117,44 @@ class DepthCamera(CameraClient):
                 name + "/" + pointcloud_topic,
                 name + "/" + depth_topic)
 
- #   def continuous_shot(self, enable):
- #       self._dyn_reconf.update_configuration({"emitter_enabled" : enable})
- #       return True
+######################################################################
+#  class RealSenseCamera                                             #
+######################################################################
+class RealSenseCamera(DepthCamera):
+    def __init__(self, name="a_bot_camera",
+                 camera_info_topic="color/camera_info",
+                 image_topic="color/image_raw",
+                 pointcloud_topic="depth/color/points",
+                 depth_topic="aligned_depth_to_color/image_raw"):
+        super(RealSenseCamera, self).__init__(name, camera_info_topic,
+                                              image_topic, pointcloud_topic,
+                                              depth_topic)
+        self._dyn_camera = dynamic_reconfigure.client.Client(
+                               name + "/realsense2_camera", timeout=5.0)
+        self._dyn_sensor = dynamic_reconfigure.client.Client(
+                               name + "/coded_light_depth_sensor", timeout=5.0)
+        self._recent_laser_power = 16
+        self.laser_power = 0
+
+    @property
+    def laser_power(self):
+        ret = self._dyn_sensor.get_configuration()
+        return ret["laser_power"]
+
+    @laser_power.setter
+    def laser_power(self, value):
+        if value != 0:
+            self._recent_laser_power = value
+        self._dyn_sensor.update_configuration({"laser_power" : value})
+
+    def continuous_shot(self, enabled):
+        if enabled:
+            self.laser_power = self._recent_laser_power
+        else:
+            self.laser_power = 0
+        self._dyn_camera.update_configuration({"enable_streaming" : enabled})
+        rospy.sleep(0.2)
+        return True
 
 ######################################################################
 #  class MonocularCamera                                             #
@@ -139,6 +173,6 @@ class MonocularCamera(CameraClient):
         return (name, "area",
                 name + "/camera0/camera_info", name + "/camera0/image")
 
-    def continuous_shot(self, enable):
-        self._dyn_reconf.update_configuration({"continuous_shot" : enable})
+    def continuous_shot(self, enabled):
+        self._dyn_reconf.update_configuration({"continuous_shot" : enabled})
         return True

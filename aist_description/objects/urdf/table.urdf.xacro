@@ -1,0 +1,73 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="table">
+
+  <xacro:include filename="$(find aist_description)/objects/urdf/aist_box.urdf.xacro"/>
+
+  <xacro:macro name="table"
+	       params="prefix width length height parent *origin">
+
+    <xacro:property name="table_thickness"	value="0.020" />
+    <xacro:property name="table_leg_thickness"	value="0.050" />
+
+    <xacro:aist_box name="${prefix}table_leg0"
+		    width="${table_leg_thickness}"
+		    length="${table_leg_thickness}"
+		    height="${height - table_thickness}"
+		    parent="${parent}">
+      <xacro:insert_block name="origin"/>
+    </xacro:aist_box>
+
+    <xacro:aist_box name="${prefix}table_leg1"
+		    width="${table_leg_thickness}"
+		    length="${table_leg_thickness}"
+		    height="${height - table_thickness}"
+		    parent="${prefix}table_leg0">
+      <origin xyz="${width - table_leg_thickness} 0 0" rpy="0 0 0"/>
+    </xacro:aist_box>
+
+    <xacro:aist_box name="${prefix}table_leg2"
+		    width="${table_leg_thickness}"
+		    length="${table_leg_thickness}"
+		    height="${height - table_thickness}"
+		    parent="${prefix}table_leg0">
+      <origin xyz="0 ${length - table_leg_thickness} 0" rpy="0 0 0"/>
+    </xacro:aist_box>
+
+    <xacro:aist_box name="${prefix}table_leg3"
+		    width="${table_leg_thickness}"
+		    length="${table_leg_thickness}"
+		    height="${height - table_thickness}"
+		    parent="${prefix}table_leg0">
+      <origin xyz="${width  - table_leg_thickness}
+		   ${length - table_leg_thickness}
+		   0"
+	      rpy="0 0 0"/>
+    </xacro:aist_box>
+
+    <xacro:aist_box name="${prefix}table_top"
+		    width="${width}"
+		    length="${length}"
+		    height="${table_thickness}"
+		    parent="${prefix}table_leg0">
+      <origin xyz="0 0 ${height - table_thickness}" rpy="0 0 0"/>
+    </xacro:aist_box>
+
+    <xacro:macro name="auxiliary_frame" params="parent framename *origin">
+      <joint name="${parent}_${framename}" type="fixed">
+	<parent link="${parent}" />
+	<child link = "${parent}_${framename}"/>
+	<xacro:insert_block name="origin"/>
+      </joint>
+      <link name="${parent}_${framename}"/>
+    </xacro:macro>
+
+    <xacro:auxiliary_frame parent="${prefix}table_top" framename="origin">
+      <origin xyz="0 0 ${table_thickness}" rpy="0 0 0"/>
+    </xacro:auxiliary_frame>
+
+    <xacro:auxiliary_frame parent="${prefix}table_top_origin" framename="center">
+      <origin xyz="${width/2} ${length/2} 0" rpy="0 0 0"/>
+    </xacro:auxiliary_frame>
+
+  </xacro:macro>
+</robot>

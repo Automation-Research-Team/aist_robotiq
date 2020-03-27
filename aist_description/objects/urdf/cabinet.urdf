@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<robot name="aaa" xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:include filename="$(find aist_description)/objects/urdf/cabinet.urdf.xacro"/>
+
+  <link name="base_link"/>
+
+  <xacro:cabinet prefix=""
+		 width="0.9" length="0.4" base_height="0.1"
+		 shelf1_height="0.443"
+		 shelf2_height="0.743"
+		 shelf3_height="1.043"
+		 shelf4_height="1.366"
+		 back_height="1.711"
+		 parent="base_link">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:cabinet>
+</robot>

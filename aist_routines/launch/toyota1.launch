@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<launch>
+  <arg name="config"		default="rq85"/>
+  <arg name="scene"		default="$(arg config)_base_scene"/>
+  <arg name="robot_name"	default="b_bot"/>
+  <arg name="camera_name"	default="a_phoxi_m_camera"/>
+
+  <!-- Load and publish hand-eye calibration -->
+  <include file="$(find aist_handeye_calibration)/launch/publish.launch">
+    <arg name="robot_name"	value="$(arg robot_name)" />
+    <arg name="camera_name"	value="$(arg camera_name)" />
+  </include>
+
+  <!-- Start robot controller -->
+  <include file="$(find aist_routines)/launch/connect_robots.launch">
+    <arg name="config"	value="$(arg config)"/>
+    <arg name="scene"	value="$(arg scene)"/>
+    <arg name="sim"	value="false"/>
+    <arg name="rviz_config"
+    	 value="$(find aist_routines)/launch/kitting.rviz"/>
+  </include>
+
+  <!-- Start graspability server -->
+  <include file="$(find aist_graspability)/launch/aist_graspability.launch">
+    <arg name="server_name"	value="aist_graspability"/>
+  </include>
+</launch>

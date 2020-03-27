@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import os, copy, collections
+import collections
+import argparse
 import rospy, rospkg, rosparam
 import aist_routines.base as base
 from aist_routines.ur import URRoutines
@@ -14,12 +15,12 @@ class KittingRoutines(URRoutines):
 
     Bin = collections.namedtuple("Bin", "name part_id part_props")
 
-    def __init__(self):
+    def __init__(self, props_name):
         super(KittingRoutines, self).__init__()
 
         rospack = rospkg.RosPack()
         d = rosparam.load_file(rospack.get_path("aist_routines") +
-                               "/config/kitting.yaml")[0][0]
+                               "/config/" + props_name + ".yaml")[0][0]
         bin_props  = base.paramtuples(d["bin_props"])
         part_props = base.paramtuples(d["part_props"])
 
@@ -154,7 +155,19 @@ class KittingRoutines(URRoutines):
 
 
 if __name__ == '__main__':
-    with KittingRoutines() as kitting:
+    parser = argparse.ArgumentParser(description='Perform kitting task')
+    parser.add_argument('-p',
+                        '--props_name',
+                        action='store',
+                        nargs='?',
+                        default='kitting',
+                        type=str,
+                        choices=None,
+                        help='YAML file for part properties',
+                        metavar=None)
+    args = parser.parse_args()
+
+    with KittingRoutines(args.props_name) as kitting:
         while not rospy.is_shutdown():
             print("============ Kitting procedures ============ ")
             print("  b: Create a backgroud image")
