@@ -10,7 +10,7 @@
   <!-- The surface is 0.01 m below the robot bases and the "workspace_center" frame. -->
   <link name="ground"/>
 
-  <xacro:include filename="$(find aist_description)/object/urdf/aist_box.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/objects/urdf/aist_box.urdf.xacro"/>
   <xacro:property name="table_w" value="0.9"/>
   <xacro:property name="table_l" value="0.75"/>
   <xacro:property name="table_h" value="0.01"/>
@@ -28,7 +28,7 @@
 
   <!-- robot arms -->
   <xacro:include filename="$(find aist_description
-			   )/device/urdf/rs007l.urdf.xacro"/>
+			   )/devices/urdf/rs007l.urdf.xacro"/>
   <xacro:rs007l prefix="a_khi_" parent="ground">
     <origin xyz="${a_khi_x} ${a_khi_y} ${bots_z}" rpy="0 0 ${pi}"/>
   </xacro:rs007l>
