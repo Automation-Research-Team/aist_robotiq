@@ -27,7 +27,7 @@
   <group unless="$(arg sim)">
     <param name="robot_description"
 	   command="$(find xacro)/xacro --inorder '$(find aist_description
-		    )/scene/urdf/$(arg scene).urdf.xacro'"/>
+		    )/scenes/urdf/$(arg scene).urdf.xacro'"/>
     <include file="$(find aist_routines)/launch/$(arg
 		   config)_connect_robots.launch"/>
     <node name="robot_state_publisher"

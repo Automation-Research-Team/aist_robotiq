@@ -19,7 +19,7 @@
   <group unless="$(eval scene == 'fetch_base_scene')">
     <param name="environment_description"
   	   command="$(find xacro)/xacro --inorder '$(find
-  		    aist_description)/scene/urdf/$(arg
+  		    aist_description)/scenes/urdf/$(arg
 		    scene)_environment.urdf.xacro'"/>
     <node name="environment_spawner" pkg="gazebo_ros" type="spawn_model"
   	  respawn="false" output="screen"
