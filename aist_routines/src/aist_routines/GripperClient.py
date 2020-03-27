@@ -109,8 +109,8 @@ class GenericGripper(GripperClient):
         return self._goal.command.max_effort
 
     @max_effort.setter
-    def max_effort(self, max_effort):
-        self._goal.command.max_effort = max_effort
+    def max_effort(self, effort):
+        self._goal.command.max_effort = effort
 
     def pregrasp(self, cmd=""):
         return self.release(cmd)

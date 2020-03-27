@@ -17,7 +17,7 @@
   <!-- Load robot urdf to param "robot_description". -->
   <param name="robot_description"
 	 command="$(find xacro)/xacro --inorder '$(find
-		  aist_description)/scene/urdf/$(arg scene).urdf.xacro'"/>
+		  aist_description)/scenes/urdf/$(arg scene).urdf.xacro'"/>
 
   <!-- push robot_description to factory and spawn robot in gazebo -->
   <!-- Initial pose modified on 9 July 2018 -->

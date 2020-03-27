@@ -153,8 +153,8 @@ graspability_parameters:
     name: toyota1 9R
     ns: 2
     detect_edge: true
-    object_size: 15
-    radius: 8
+    object_size: 20
+    radius: 15
     open_width: 100
     finger_width: 1
     finger_thickness: 5
@@ -163,8 +163,18 @@ graspability_parameters:
     name: toyota1 9L
     ns: 2
     detect_edge: true
-    object_size: 15
-    radius: 8
+    object_size: 20
+    radius: 15
+    open_width: 100
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 10
+  _64600:
+    name: toyota1 Trunk
+    ns: 2
+    detect_edge: true
+    object_size: 20
+    radius: 15
     open_width: 100
     finger_width: 1
     finger_thickness: 5
@@ -173,8 +183,8 @@ graspability_parameters:
     name: toyota1 5R
     ns: 2
     detect_edge: true
-    object_size: 15
-    radius: 8
+    object_size: 20
+    radius: 15
     open_width: 100
     finger_width: 1
     finger_thickness: 5
@@ -183,8 +193,8 @@ graspability_parameters:
     name: toyota1 5L
     ns: 2
     detect_edge: true
-    object_size: 15
-    radius: 8
+    object_size: 20
+    radius: 15
     open_width: 100
     finger_width: 1
     finger_thickness: 5
@@ -193,8 +203,8 @@ graspability_parameters:
     name: toyota1 9ZB
     ns: 2
     detect_edge: true
-    object_size: 15
-    radius: 8
+    object_size: 10
+    radius: 6
     open_width: 100
     finger_width: 1
     finger_thickness: 5
@@ -203,8 +213,8 @@ graspability_parameters:
     name: toyota1 WR
     ns: 2
     detect_edge: true
-    object_size: 15
-    radius: 8
+    object_size: 8
+    radius: 4
     open_width: 100
     finger_width: 1
     finger_thickness: 5
@@ -213,8 +223,8 @@ graspability_parameters:
     name: toyota1 WL
     ns: 0
     detect_edge: false
-    object_size: 4
-    radius: 2
+    object_size: 8
+    radius: 4
     open_width: 20
     finger_width: 1
     finger_thickness: 5
@@ -223,24 +233,14 @@ graspability_parameters:
     name: toyota1 Lock
     ns: 2
     detect_edge: true
-    object_size: 15
-    radius: 8
+    object_size: 8
+    radius: 4
     open_width: 100
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 10
   _89997:
     name: toyota1 9L18
-    ns: 2
-    detect_edge: true
-    object_size: 15
-    radius: 8
-    open_width: 100
-    finger_width: 1
-    finger_thickness: 5
-    insertion_depth: 10
-  _64600:
-    name: toyota1 Trunk
     ns: 2
     detect_edge: true
     object_size: 15
