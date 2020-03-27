@@ -30,11 +30,7 @@ if __name__ == '__main__':
 
         if n == 0:
             camera1.continuous_shot(False)
-            # camera1.laser_power = 0
-            # camera0.laser_power = 1
             camera0.continuous_shot(True)
         else:
             camera0.continuous_shot(False)
-            # camera0.laser_power = 0
-            # camera1.laser_power = 1
             camera1.continuous_shot(True)

@@ -46,7 +46,6 @@
       <arg name="color_fps"		value="10"/>
       <arg name="align_depth"		value="true"/>
       <arg name="publish_tf"		value="true"/>
-      <arg name="initial_reset"		value="false"/>
       <arg name="enable_streaming"	value="false"/>
     </include>
 
@@ -62,7 +61,6 @@
       <arg name="color_fps"		value="10"/>
       <arg name="align_depth"		value="true"/>
       <arg name="publish_tf"		value="false"/>
-      <arg name="initial_reset"		value="false"/>
       <arg name="enable_streaming"	value="false"/>
     </include>
 
