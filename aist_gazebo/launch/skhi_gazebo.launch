@@ -19,14 +19,19 @@
 	args="-urdf -param robot_description -model robot"
 	respawn="false" output="screen" />
 
-  <!-- Start fake calibration and robot_state_publisher -->
+
+  <!-- robot state publisher, fake_calibration and joint_state_controller -->
   <include file="$(find aist_gazebo)/launch/controller_utils.launch"/>
 
-  <!-- Load parameters for all controllers from YAML file -->
+  <!-- Load parameters for arm and spawn controller -->
   <rosparam file="$(find aist_gazebo)/controller/a_khi_controller.yaml"
 	    command="load"/>
   <node name="controller_spawner" pkg="controller_manager"
 	type="controller_manager" respawn="false" output="screen"
 	args="spawn a_khi_controller"/>
+
+  <!-- Load parameters for gripper -->
+  <rosparam file="$(find aist_gazebo)/controller/lehz_controller.yaml"
+	    command="load"/>
 
 </launch>

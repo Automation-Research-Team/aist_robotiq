@@ -242,11 +242,12 @@ class RobotiqGripper(GripperClient):
 #  class SuctionGripper                                              #
 ######################################################################
 class SuctionGripper(GripperClient):
-    def __init__(self, prefix="b_bot_single_", eject=False, timeout=2.0):
+    def __init__(self, name, base_link, tip_link, eject=False, timeout=2.0):
         import o2as_msgs.msg
 
         super(SuctionGripper, self) \
-            .__init__(*SuctionGripper._initargs(prefix, eject, timeout))
+            .__init__(*SuctionGripper._initargs(name, base_link, tip_link,
+                                                eject, timeout))
         self._client    = actionlib.SimpleActionClient(
                               "o2as_fastening_tools/suction_control",
                               o2as_msgs.msg.SuctionControlAction)
@@ -261,14 +262,14 @@ class SuctionGripper(GripperClient):
         self._goal.eject_screw         = False
 
     @staticmethod
-    def base(prefix, eject, timeout):
-        return GripperClient(*SuctionGripper._initargs(prefix, eject, timeout))
+    def base(name, base_link, tip_link, eject, timeout):
+        return GripperClient(*SuctionGripper._initargs(name,
+                                                       base_link, tip_link,
+                                                       eject, timeout))
 
     @staticmethod
-    def _initargs(prefix, eject, timeout):
-        return (prefix + "suction_gripper", "suction",
-                prefix + "suction_gripper_base_link",
-                prefix + "suction_gripper_pad_link", timeout)
+    def _initargs(name, base_link, tip_link, eject, timeout):
+        return (name, "suction", base_link, tip_link, timeout)
 
     @property
     def eject(self):

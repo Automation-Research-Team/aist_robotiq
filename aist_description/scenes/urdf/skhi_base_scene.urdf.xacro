@@ -34,17 +34,16 @@
   </xacro:rs007l>
 
   <!-- Attach grippers -->
+  <xacro:include filename="$(find aist_description)/devices/urdf/magripper.urdf.xacro" />
+  <xacro:magripper2 prefix="" parent="a_khi_ee_link">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:magripper2>
 
-  <!-- Add PhoXi 3D scanner -->
-  <xacro:include filename="$(find aist_phoxi_camera)/urdf/phoxi_m_camera.urdf.xacro"/>
-  <xacro:phoxi_m_camera prefix="b_" parent="ground">
-    <origin xyz="0.547941636523
-		 -0.00827443204237
-		 1.67030171767"
-	    rpy="${-151.493605482*pi/180}
-		 ${0.698490882792*pi/180}
-		 ${85.0482907121*pi/180}"/>
-  </xacro:phoxi_m_camera>
+  <!-- Required because package robot_controllers is used for
+       driving lehz40k2_30 gripper -->
+  <!-- <gazebo> -->
+  <!--   <plugin name="fetch_gazebo_plugin" filename="libfetch_gazebo_plugin.so"/> -->
+  <!-- </gazebo> -->
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world"/>

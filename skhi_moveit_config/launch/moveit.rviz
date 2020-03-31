@@ -4,7 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Image1
+        - /MotionPlanning1/Planning Request1
       Splitter Ratio: 0.742560029
     Tree Height: 156
   - Class: rviz/Help
@@ -109,16 +109,12 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          b_phoxi_m_camera:
+          gripper_base_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          b_phoxi_m_camera_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_phoxi_m_sensor:
+          gripper_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -126,6 +122,65 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          l_finger_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          magnet_base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          magnet_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          magripper_base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          magripper_base_link_flange:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          magripper_gripper_branch:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          magripper_gripper_branch_flange:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          magripper_magnet_branch:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          magripper_magnet_branch_flange:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          phoxi_m_camera:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          phoxi_m_camera_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          phoxi_m_sensor:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          r_finger_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           workbox:
             Alpha: 1
             Show Axes: false
@@ -223,16 +278,12 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          b_phoxi_m_camera:
+          gripper_base_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          b_phoxi_m_camera_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          b_phoxi_m_sensor:
+          gripper_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -240,6 +291,65 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          l_finger_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          magnet_base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          magnet_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          magripper_base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          magripper_base_link_flange:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          magripper_gripper_branch:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          magripper_gripper_branch_flange:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          magripper_magnet_branch:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          magripper_magnet_branch_flange:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          phoxi_m_camera:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          phoxi_m_camera_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          phoxi_m_sensor:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          r_finger_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           workbox:
             Alpha: 1
             Show Axes: false
@@ -260,7 +370,7 @@ Visualization Manager:
       Velocity_Scaling_Factor: 1
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /b_phoxi_m_camera/texture
+      Image Topic: /phoxi_m_camera/texture
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -286,7 +396,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 3.26012063
+      Distance: 4.580235
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -301,10 +411,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.774795771
+      Pitch: 0.299796194
       Target Frame: world
       Value: XYOrbit (rviz)
-      Yaw: 6.02494717
+      Yaw: 0.0217644125
     Saved: ~
 Window Geometry:
   Displays:

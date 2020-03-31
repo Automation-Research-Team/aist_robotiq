@@ -1,13 +1,15 @@
 grippers:
   a_khi:
-    type: VoidGripper
+    type: SuctionGripper
     args:
-      name: a_khi_gripper
-      base_link: a_khi_ee_link
-      timeout: 10.0
-      
+      name: magnet_gripper
+      base_link: magnet_base_link
+      tip_link: magnet_link
+      eject: false
+      timeout: 2.0
+
 cameras:
-  b_phoxi_m_camera:
+  phoxi_m_camera:
     type: PhoXiCamera
     args:
-      name: b_phoxi_m_camera
+      name: phoxi_m_camera
