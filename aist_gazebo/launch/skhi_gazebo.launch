@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="paused"	default="false"/>
+  <arg name="gui"	default="true"/>
+  <arg name="scene"	default="skhi_base_scene"/>
+
+  <!-- Startup simulated world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="paused"	value="$(arg paused)"/>
+    <arg name="gui"	value="$(arg gui)"/>
+  </include>
+
+  <!-- Push robot_description to factory and spawn robot in gazebo -->
+  <param name="robot_description"
+	 command="$(find xacro)/xacro --inorder '$(find
+		  aist_description)/scenes/urdf/$(arg scene).urdf.xacro'"/>
+  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model"
+	args="-urdf -param robot_description -model robot"
+	respawn="false" output="screen" />
+
+  <!-- Start fake calibration and robot_state_publisher -->
+  <include file="$(find aist_gazebo)/launch/controller_utils.launch"/>
+
+  <!-- Load parameters for all controllers from YAML file -->
+  <rosparam file="$(find aist_gazebo)/controller/a_khi_controller.yaml"
+	    command="load"/>
+  <node name="controller_spawner" pkg="controller_manager"
+	type="controller_manager" respawn="false" output="screen"
+	args="spawn a_khi_controller"/>
+
+</launch>

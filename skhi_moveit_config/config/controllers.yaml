@@ -1,0 +1,11 @@
+controller_list:
+  - name: a_khi_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    joints:
+      - a_khi_joint1
+      - a_khi_joint2
+      - a_khi_joint3
+      - a_khi_joint4
+      - a_khi_joint5
+      - a_khi_joint6

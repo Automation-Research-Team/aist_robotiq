@@ -1,0 +1,13 @@
+grippers:
+  a_khi:
+    type: VoidGripper
+    args:
+      name: a_khi_gripper
+      base_link: a_khi_ee_link
+      timeout: 10.0
+      
+cameras:
+  b_phoxi_m_camera:
+    type: PhoXiCamera
+    args:
+      name: b_phoxi_m_camera

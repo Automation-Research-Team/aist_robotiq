@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://wiki.ros.org/xacro">
 
-  <xacro:include filename="$(find khi_rs_description
-			   )/urdf/rs007l_macro.xacro"/>
-
   <xacro:macro name="rs007l" params="prefix parent *origin">
+    <xacro:include filename="$(find khi_rs_description
+			     )/urdf/rs007l_macro.xacro"/>
     <xacro:khi_rs007l prefix="${prefix}"/>
 
     <joint name="${prefix}parent_base_joint" type="fixed">

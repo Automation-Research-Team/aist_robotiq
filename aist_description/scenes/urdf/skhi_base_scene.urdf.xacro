@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="skhi_base_scene" >
+
+  <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
+  <xacro:property name="a_khi_x" value="0"/>
+  <xacro:property name="a_khi_y" value="0.4875"/>
+  <xacro:property name="bots_z"	 value="0.785"/>
+
+  <!-- Main workspace -->
+  <!-- The surface is 0.01 m below the robot bases and the "workspace_center" frame. -->
+  <link name="ground"/>
+
+  <xacro:include filename="$(find aist_description)/objects/urdf/aist_box.urdf.xacro"/>
+  <xacro:property name="table_w" value="0.9"/>
+  <xacro:property name="table_l" value="0.75"/>
+  <xacro:property name="table_h" value="0.01"/>
+  <xacro:aist_box name="workbox"
+		  width="${table_w}" length="${table_l}" height="${table_h}"
+		  parent="ground">
+    <origin xyz="${-table_w/2} ${-table_l/2} ${bots_z -table_h}" rpy="0 0 0"/>
+  </xacro:aist_box>
+  <link name="workspace_center"/>
+  <joint name="ground_to_workspace" type="fixed">
+    <parent link="ground"/>
+    <child  link="workspace_center"/>
+    <origin xyz="0 0 ${bots_z}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- robot arms -->
+  <xacro:include filename="$(find aist_description
+			   )/devices/urdf/rs007l.urdf.xacro"/>
+  <xacro:rs007l prefix="a_khi_" parent="ground">
+    <origin xyz="${a_khi_x} ${a_khi_y} ${bots_z}" rpy="0 0 ${pi}"/>
+  </xacro:rs007l>
+
+  <!-- Attach grippers -->
+
+  <!-- Add PhoXi 3D scanner -->
+  <xacro:include filename="$(find aist_phoxi_camera)/urdf/phoxi_m_camera.urdf.xacro"/>
+  <xacro:phoxi_m_camera prefix="b_" parent="ground">
+    <origin xyz="0.547941636523
+		 -0.00827443204237
+		 1.67030171767"
+	    rpy="${-151.493605482*pi/180}
+		 ${0.698490882792*pi/180}
+		 ${85.0482907121*pi/180}"/>
+  </xacro:phoxi_m_camera>
+
+  <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
+  <link name="world"/>
+  <joint name="world_ground_joint" type="fixed">
+    <parent link="world"/>
+    <child  link="ground"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+</robot>
