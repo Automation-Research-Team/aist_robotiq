@@ -3,7 +3,7 @@
 
   <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
   <xacro:property name="a_khi_x" value="0"/>
-  <xacro:property name="a_khi_y" value="0.4875"/>
+  <xacro:property name="a_khi_y" value="-0.4875"/>
   <xacro:property name="bots_z"	 value="0.785"/>
 
   <!-- Main workspace -->
@@ -30,7 +30,7 @@
   <xacro:include filename="$(find aist_description
 			   )/devices/urdf/rs007l.urdf.xacro"/>
   <xacro:rs007l prefix="a_khi_" parent="ground">
-    <origin xyz="${a_khi_x} ${a_khi_y} ${bots_z}" rpy="0 0 ${pi}"/>
+    <origin xyz="${a_khi_x} ${a_khi_y} ${bots_z}" rpy="0 0 0"/>
   </xacro:rs007l>
 
   <!-- Attach grippers -->
