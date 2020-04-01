@@ -3,10 +3,10 @@
 
   <xacro:macro name="lehz40k2_30"  params="prefix parent *origin">
 
-    <xacro:property name="length" value="0.1959"/>
-    <xacro:property name="x_offset" value="0.1084"/>
+    <xacro:property name="length"	   value="0.1959"/>
+    <xacro:property name="x_offset"	   value="0.1084"/>
     <xacro:property name="x_finger_offset" value="-0.0465"/>
-    <xacro:property name="z_offset" value="0.0238"/>
+    <xacro:property name="z_offset"	   value="0.0238"/>
 
     <!-- Body -->
     <joint name="${prefix}gripper_base_joint" type="fixed">
@@ -56,11 +56,11 @@
       <parent link="${prefix}gripper_base_link"/>
       <child  link="${prefix}l_finger_link"/>
       <axis xyz="0 -1 0"/>
-      <limit lower="0" upper="0.03125" effort="130" velocity="0.15"/>
+      <limit lower="0.015" upper="0.030" effort="130" velocity="0.15"/>
     </joint>
     <link name="${prefix}l_finger_link">
       <visual>
-        <origin xyz="${x_finger_offset} 0 ${z_offset}"
+        <origin xyz="${x_finger_offset} 0.015 ${z_offset}"
 		rpy="${pi/2} 0 ${pi/2}" />
         <geometry>
           <mesh filename="package://aist_description/devices/meshes/LEHZ40K2-30_LFINGER.stl" scale="0.001 0.001 0.001"/>
@@ -70,7 +70,7 @@
         </material>
       </visual>
       <collision>
-        <origin xyz="${x_finger_offset} 0 ${z_offset}"
+        <origin xyz="${x_finger_offset} 0.015 ${z_offset}"
 		rpy="${pi/2} 0 ${pi/2}" />
         <geometry>
           <mesh filename="package://aist_description/devices/meshes/collision/LEHZ40K2-30_LFINGER.stl" scale="0.001 0.001 0.001"/>
@@ -97,11 +97,11 @@
       <parent link="${prefix}gripper_base_link"/>
       <child  link="${prefix}r_finger_link"/>
       <axis xyz="0 1 0"/>
-      <limit lower="0" upper="0.03125" effort="130" velocity="0.15"/>
+      <limit lower="0.015" upper="0.030" effort="130" velocity="0.15"/>
     </joint>
     <link name="${prefix}r_finger_link">
       <visual>
-        <origin xyz="${x_finger_offset} 0 ${z_offset}"
+        <origin xyz="${x_finger_offset} -0.015 ${z_offset}"
 		rpy="${pi/2} 0 ${pi/2}" />
         <geometry>
           <mesh filename="package://aist_description/devices/meshes/LEHZ40K2-30_RFINGER.stl" scale="0.001 0.001 0.001"/>
@@ -111,7 +111,7 @@
         </material>
       </visual>
       <collision>
-        <origin xyz="${x_finger_offset} 0 ${z_offset}"
+        <origin xyz="${x_finger_offset} -0.015 ${z_offset}"
 		rpy="${pi/2} 0 ${pi/2}" />
         <geometry>
           <mesh filename="package://aist_description/devices/meshes/collision/LEHZ40K2-30_RFINGER.stl" scale="0.001 0.001 0.001"/>
