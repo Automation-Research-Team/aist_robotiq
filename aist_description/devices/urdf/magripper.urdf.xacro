@@ -7,7 +7,7 @@
 
   <xacro:macro name="pillar" params="name length diameter parent *origin">
 
-    <joint name="${name}" type="fixed">
+    <joint name="${name}_joint" type="fixed">
       <parent link="${parent}"/>
       <child  link="${name}"/>
       <xacro:insert_block name="origin"/>
@@ -43,7 +43,7 @@
     </joint>
 
     <link name="${name}_flange"/>
-    
+
     <gazebo reference="${name}">
       <material>Gazebo/DarkGrey</material>
     </gazebo>
@@ -86,7 +86,7 @@
 			 parent="${prefix}magripper_magnet_branch_flange">
       <origin xyz="0 0 0" rpy="0 0 0"/>
     </xacro:magswitch_e30>
-			 
+
     <!-- LEHZ40K2-30 two-finger gripper -->
     <xacro:pillar name="${prefix}magripper_gripper_branch"
 		  parent="${prefix}magripper_base_link"
@@ -131,7 +131,7 @@
 			 parent="${prefix}magripper_magnet_branch_flange">
       <origin xyz="0 0 0" rpy="0 0 0"/>
     </xacro:magswitch_e30>
-			 
+
     <!-- LEHZ40K2-30 two-finger gripper -->
     <xacro:pillar name="${prefix}magripper_gripper_branch"
 		  parent="${prefix}magripper_base_link"
