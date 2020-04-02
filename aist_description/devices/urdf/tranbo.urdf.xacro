@@ -1,40 +1,87 @@
 <?xml version="1.0"?>
 <robot name="tranbo" xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <xacro:macro name="tranbo" params="prefix">
+  <!-- Tranbo constants -->
+  <xacro:property name="tranbo_length"		value="1.050"/>
+  <xacro:property name="tranbo_width"		value="0.595"/>
+  <!-- <xacro:property name="tranbo_height"	value="0.8788"/> -->
+  <xacro:property name="tranbo_height"		value="0.882"/>
+  <xacro:property name="tranbo_offset"		value="-0.225"/>
+  <xacro:property name="tranbo_tread"		value="0.441"/>
+  <xacro:property name="tranbo_wheel_mass"	value="2.0"/>
+  <xacro:property name="tranbo_wheel_radius"	value="0.075"/>
+  <xacro:property name="tranbo_wheel_length"	value="0.05"/>
+  <xacro:property name="tranbo_caster_base"	value="0.840"/>
+  <xacro:property name="tranbo_caster_radius"	value="0.065"/>
+  <xacro:property name="tranbo_caster_length"	value="0.05"/>
+  <xacro:property name="tranbo_caster_tread"	value="0.385"/>
 
-    <!-- Tranbo constants -->
-    <xacro:property name="tranbo_length"	value="1.050"/>
-    <xacro:property name="tranbo_width"		value="0.595"/>
-    <!-- <xacro:property name="tranbo_height"	value="0.8788"/> -->
-    <xacro:property name="tranbo_height"	value="0.882"/>
-    <xacro:property name="tranbo_offset"	value="-0.225"/>
-    <xacro:property name="tranbo_tread"		value="0.441"/>
-    <xacro:property name="tranbo_wheel_mass"	value="2.0"/>
-    <xacro:property name="tranbo_wheel_radius"	value="0.075"/>
-    <xacro:property name="tranbo_wheel_length"	value="0.05"/>
+  <!-- ========= Catser ========= -->
+  <xacro:macro name="tranbo_caster" params="prefix parent front left">
+    <link name="${prefix}caster_link">
+      <inertial>
+    	<mass value="4.3542"/>
+    	<inertia ixx="0.0045" ixy="0" ixz="0"
+		 iyy="0.005" iyz="0" izz="0.0045"/>
+      </inertial>
+      <visual>
+	<geometry>
+	  <cylinder radius="${tranbo_caster_radius}"
+		    length="${tranbo_caster_length}"/>
+	</geometry>
+	<material name="">
+          <color rgba="0 0 0 1" />
+	</material>
+      </visual>
+      <collision>
+	<geometry>
+	  <cylinder radius="${tranbo_caster_radius}"
+		    length="${tranbo_caster_length}"/>
+	</geometry>
+      </collision>
+    </link>
+    <gazebo reference="${prefix}caster_link">
+      <mu1>0.0</mu1>
+      <mu2>0.0</mu2>
+      <material>Gazebo/Black</material>
+    </gazebo>
+    
+    <joint name="${prefix}caster_joint" type="fixed">
+      <origin xyz="${tranbo_caster_base/2 if front else -tranbo_caster_base/2}
+		   ${tranbo_caster_tread/2 if left else -tranbo_caster_tread/2}
+		   ${tranbo_caster_radius + 0.005}"
+	      rpy="${pi/2} 0 0" />
+      <parent link="${parent}" />
+      <child  link="${prefix}caster_link" />
+    </joint>
+  </xacro:macro>
+  
+  <!-- ========= Tranbo ========= -->
+  <xacro:macro name="tranbo" params="prefix">
 
     <!-- Body -->
     <link name="${prefix}base_link">
       <inertial>
 	<origin xyz="-0.0036 0.0 0.0014" rpy="0 0 0"/>
 	<mass value="70.1294" />
-	<inertia ixx="1.225" ixy="0.0099" ixz="0.0062" iyy="1.2853" iyz="-0.0034" izz="0.987"/>
+	<inertia ixx="1.225"  ixy="0.0099"  ixz="0.0062"
+		 iyy="1.2853" iyz="-0.0034" izz="0.987"/>
       </inertial>
       <visual>
         <origin xyz="${tranbo_offset} 0 ${tranbo_height}"
 		rpy="0 0 ${-pi/2}" />
 	<geometry>
-          <mesh filename="package://aist_description/devices/meshes/TRanbo.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://aist_description/devices/meshes/TRanbo.stl"
+		scale="0.001 0.001 0.001"/>
 	</geometry>
 	<material name="">
           <color rgba="1 1 1 1" />
 	</material>
       </visual>
       <collision>
-        <origin xyz="0 0 ${tranbo_height/2 + 0.005}" rpy="0 0 0" />
+        <origin xyz="0 0 ${tranbo_height/2 + 0.04}" rpy="0 0 0" />
 	<geometry>
-	  <box size="${tranbo_length} ${tranbo_width} ${tranbo_height}"/>
+	  <box size="${tranbo_length} ${tranbo_width} ${tranbo_height - 0.04}"/>
 	</geometry>
       </collision>
     </link>
@@ -56,15 +103,36 @@
     </joint>
     <link name="${prefix}basement_link"/>
 
+    <!-- Front-left caster -->
+    <xacro:tranbo_caster prefix="${prefix}front_left_"
+			 parent="${prefix}base_link"
+			 front="True" left="True"/>
+    
+    <!-- Front-right caster -->
+    <xacro:tranbo_caster prefix="${prefix}front_right_"
+			 parent="${prefix}base_link"
+			 front="True" left="False"/>
+    
+    <!-- Rear-left caster -->
+    <xacro:tranbo_caster prefix="${prefix}rear_left_"
+			 parent="${prefix}base_link"
+			 front="False" left="True"/>
+    
+    <!-- Front-right caster -->
+    <xacro:tranbo_caster prefix="${prefix}rear_right_"
+			 parent="${prefix}base_link"
+			 front="False" left="False"/>
+    
     <!-- Left wheel -->
     <link name="${prefix}l_wheel_link">
       <inertial>
     	<origin xyz="0 0 0" rpy="0 0 0"/>
     	<mass value="4.3542"/>
-    	<inertia ixx="0.0045" ixy="0" ixz="0" iyy="0.005" iyz="0" izz="0.0045"/>
+    	<inertia ixx="0.0045" ixy="0" ixz="0"
+		 iyy="0.005" iyz="0" izz="0.0045"/>
       </inertial>
       <visual>
-    	<origin xyz="0 0 0" rpy="${-pi/2} 0 0"/>
+    	<origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
     	<geometry>
 	  <cylinder radius="${tranbo_wheel_radius}"
 		    length="${tranbo_wheel_length}"/>
@@ -74,7 +142,7 @@
     	</material>
       </visual>
       <collision>
-    	<origin xyz="0 0 0" rpy="${-pi/2} 0 0"/>
+    	<origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
     	<geometry>
 	  <cylinder radius="${tranbo_wheel_radius}"
 		    length="${tranbo_wheel_length}"/>
@@ -108,10 +176,11 @@
       <inertial>
     	<origin xyz="0 0 0" rpy="0 0 0"/>
     	<mass value="4.3542"/>
-    	<inertia ixx="0.0045" ixy="0" ixz="0" iyy="0.005" iyz="0" izz="0.0045"/>
+    	<inertia ixx="0.0045" ixy="0" ixz="0"
+		 iyy="0.005" iyz="0" izz="0.0045"/>
       </inertial>
       <visual>
-    	<origin xyz="0 0 0" rpy="${-pi/2} 0 0"/>
+    	<origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
     	<geometry>
 	  <cylinder radius="${tranbo_wheel_radius}"
 		    length="${tranbo_wheel_length}"/>
@@ -121,7 +190,7 @@
     	</material>
       </visual>
       <collision>
-    	<origin xyz="0 0 0" rpy="${-pi/2} 0 0"/>
+    	<origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
     	<geometry>
 	  <cylinder radius="${tranbo_wheel_radius}"
 		    length="${tranbo_wheel_length}"/>
@@ -153,3 +222,19 @@
   </xacro:macro>
 
 </robot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
