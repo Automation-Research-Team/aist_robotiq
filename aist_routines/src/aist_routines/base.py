@@ -40,7 +40,6 @@ class AISTBaseRoutines(object):
     def __init__(self, ns=""):
         super(AISTBaseRoutines, self).__init__()
 
-        rospy.init_node("aist_routines", anonymous=True)
         moveit_commander.roscpp_initialize(sys.argv)
         self._listener = TransformListener()
         rospy.sleep(1.0)        # Necessary for listner spinning up

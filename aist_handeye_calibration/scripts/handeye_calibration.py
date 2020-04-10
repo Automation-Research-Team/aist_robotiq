@@ -361,6 +361,7 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
 #  global functions                                                  #
 ######################################################################
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser(description='Do hand-eye calibration')
     parser.add_argument('-C',
                         '--config',
@@ -394,6 +395,8 @@ if __name__ == '__main__':
                         action='store_true',
                         help='only visit calibration points')
     args = parser.parse_args()
+
+    rospy.init_node("handeye_calibration", anonymous=True)
 
     speed = 1
     sleep_time = 2

@@ -74,6 +74,7 @@ class VisitRoutines(AISTBaseRoutines):
 #  global functions                                                  #
 ######################################################################
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser(description='Check hand-eye calibration')
     parser.add_argument('-c',
                         '--camera_name',
@@ -94,6 +95,8 @@ if __name__ == '__main__':
                         help='robot name',
                         metavar=None)
     args = parser.parse_args()
+
+    rospy.init_node("check_calibration", anonymous=True)
 
     with VisitRoutines(args.robot_name, args.camera_name) as routines:
 

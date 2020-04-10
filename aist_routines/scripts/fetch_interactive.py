@@ -183,6 +183,7 @@ class InteractiveRoutines(FetchRoutines):
 #  global functions                                                  #
 ######################################################################
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser(description='Perform tool calibration')
     parser.add_argument('-r',
                         '--robot_name',
@@ -204,7 +205,7 @@ if __name__ == '__main__':
                         metavar=None)
     args = parser.parse_args()
 
-    #assert (args.robot_name in {'a_bot', 'b_bot', 'c_bot', 'd_bot'})
+    rospy.init_node("fetch_interactive", anonymous=True)
 
     speed = 0.1
     with InteractiveRoutines(args.robot_name,

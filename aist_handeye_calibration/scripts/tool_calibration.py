@@ -292,6 +292,7 @@ class ToolCalibrationRoutines(URRoutines):
 #  global functions                                                  #
 ######################################################################
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser(description='Perform tool calibration')
     parser.add_argument('-r',
                         '--robot_name',
@@ -314,6 +315,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     assert (args.robot_name in {'a_bot', 'b_bot', 'c_bot', 'd_bot'})
+
+    rospy.init_node("tool_calibration", anonymous=True)
 
     speed = 0.1
     with ToolCalibrationRoutines(args.robot_name,

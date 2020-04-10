@@ -191,6 +191,7 @@ class InteractiveRoutines(URRoutines):
 #  global functions                                                  #
 ######################################################################
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser(description='Perform tool calibration')
     parser.add_argument('-r',
                         '--robot_name',
@@ -220,6 +221,8 @@ if __name__ == '__main__':
                         help='namespace',
                         metavar=None)
     args = parser.parse_args()
+
+    rospy.init_node("interactive", anonymous=True)
 
     speed = 0.1
     with InteractiveRoutines(args.robot_name,

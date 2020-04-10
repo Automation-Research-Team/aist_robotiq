@@ -130,6 +130,9 @@ class BinCalibrationRoutines(AISTBaseRoutines):
         self.go_to("workspace_center", offset, False)
 
 if __name__ == "__main__":
+
+    rospy.init_node("bin_calibration", anonymous=True)
+
     with BinCalibrationRoutines() as calib:
         while not rospy.is_shutdown():
             print("============ Calibration procedures ============ ")

@@ -36,7 +36,7 @@
       <mu2>0.0</mu2>
       <material>Gazebo/Black</material>
     </gazebo>
-    
+
     <joint name="${prefix}caster_joint" type="fixed">
       <origin xyz="${tranbo_caster_base/2 if front else -tranbo_caster_base/2}
 		   ${tranbo_caster_tread/2 if left else -tranbo_caster_tread/2}
@@ -47,7 +47,7 @@
     </joint>
 
   </xacro:macro>
-  
+
   <!-- ========= Wheel ========= -->
   <xacro:macro name="tranbo_wheel" params="prefix parent left">
 
@@ -105,7 +105,7 @@
       <implicitSpringDamper>1</implicitSpringDamper>
     </gazebo>
   </xacro:macro>
-  
+
   <!-- ========= Tranbo ========= -->
   <xacro:macro name="tranbo" params="prefix">
 
@@ -166,27 +166,27 @@
     <xacro:tranbo_caster prefix="${prefix}front_left_"
 			 parent="${prefix}base_link"
 			 front="True" left="True"/>
-    
+
     <!-- Front-right caster -->
     <xacro:tranbo_caster prefix="${prefix}front_right_"
 			 parent="${prefix}base_link"
 			 front="True" left="False"/>
-    
+
     <!-- Rear-left caster -->
     <xacro:tranbo_caster prefix="${prefix}rear_left_"
 			 parent="${prefix}base_link"
 			 front="False" left="True"/>
-    
+
     <!-- Front-right caster -->
     <xacro:tranbo_caster prefix="${prefix}rear_right_"
 			 parent="${prefix}base_link"
 			 front="False" left="False"/>
-    
+
     <!-- Left wheel -->
     <xacro:tranbo_wheel prefix="${prefix}l_"
 			parent="${prefix}base_link"
 			left="True"/>
-    
+
     <!-- Right wheel -->
     <xacro:tranbo_wheel prefix="${prefix}r_"
 			parent="${prefix}base_link"
@@ -194,19 +194,3 @@
   </xacro:macro>
 
 </robot>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
