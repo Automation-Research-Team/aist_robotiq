@@ -9,12 +9,13 @@ from math                   import pi, sin
 from numpy                  import clip
 from control_msgs.msg       import PointHeadAction, PointHeadGoal
 from FollowTrajectoryClient import FollowTrajectoryClient
+from base                   import AISTBaseRoutines
 from freight                import FreightRoutines
 
 ######################################################################
 #  class FetchRoutines                                               #
 ######################################################################
-class FetchRoutines(FreightRoutines):
+class FetchRoutines(AISTBaseRoutines, FreightRoutines):
     def __init__(self, ns=""):
         super(FetchRoutines, self).__init__(ns)
 
