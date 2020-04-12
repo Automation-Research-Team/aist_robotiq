@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>aist_iiwa_gazebo</name>
+  <version>1.0.0</version>
+  <description>for gazebo</description>
+  <author email="j.miyoshi@aist.go.jp">Jun Miyoshi</author>
+  <maintainer email="j.miyoshi@aist.go.jp">Jun Miyoshi</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package format="2">
+
+  <name>aist_iiwa_pick_place</name>
+  <version>0.1.0</version>
+  <description>pick place on moveit</description>
+  <license>TODO</license>
+
+  <maintainer email="j.miyoshi@aist.go.jp">Jun Miyoshi</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>moveit_commander</exec_depend>
+  <exec_depend>moveit_msgs</exec_depend>
+  <exec_depend>moveit_ros_planning_interface</exec_depend>
+  <exec_depend>tf2_geometry_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+
+</package>
