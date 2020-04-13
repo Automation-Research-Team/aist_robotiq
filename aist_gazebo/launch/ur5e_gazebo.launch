@@ -3,10 +3,8 @@
   <arg name="paused"  default="true"/>
   <arg name="gui"     default="true"/>
   <arg name="scene"   default="ur5e_base_scene"/>
-  <!-- Gazebo needs to start up paused in order for us to be able to set the initial joint configurations.
-       This is a known bug as of July 2018. -->
 
-  <!-- startup simulated world -->
+  <!-- Startup simulated world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" default="worlds/empty.world"/>
     <arg name="paused"     value="$(arg paused)"/>
@@ -14,14 +12,10 @@
     <arg name="verbose"    value="true"/>
   </include>
 
-  <!-- Load robot urdf to param "robot_description". -->
+  <!-- Load URDF to param "robot_description" and spawn the robot in gazebo -->
   <param name="robot_description"
 	 command="$(find xacro)/xacro '$(find
 		  aist_description)/scenes/urdf/$(arg scene).urdf.xacro'"/>
-
-  <!-- push robot_description to factory and spawn robot in gazebo -->
-  <!-- Initial pose modified on 9 July 2018 -->
-  <!-- Do not change this without updating the home pose in o2as_base_scene.srdf accordingly. -->
   <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model"
         args="-urdf -param robot_description -model ur5e_bots
 	      -J c_bot_shoulder_pan_joint 1.5708
@@ -39,24 +33,18 @@
 	      -unpause"
 	respawn="false"
 	output="screen"/>
-  <include file="$(find aist_gazebo)/launch/controller_utils.launch"/>
 
-  <!-- spawn controllers -->
-  <rosparam file="$(find aist_gazebo)/controller/c_bot_controller.yaml"
-	    command="load"/>
-  <node name   ="c_bot_controller_spawner"
-	pkg    ="controller_manager"
-	type   ="controller_manager"
-	args   ="spawn c_bot_controller"
-	respawn="false"
-	output ="screen"/>
-  <rosparam file="$(find aist_gazebo)/controller/d_bot_controller.yaml"
-	    command="load"/>
-  <node name   ="d_bot_controller_spawner"
-	pkg    ="controller_manager"
-	type   ="controller_manager"
-	args   ="spawn d_bot_controller"
-	respawn="false"
-	output ="screen"/>
+  <!-- Spawn controllers -->
+  <include file="$(find aist_control)/launch/controller.launch">
+    <arg name="prefix" value="c_bot_"/>
+    <arg name="device" value="ur5"/>
+  </include>
+  <include file="$(find aist_control)/launch/controller.launch">
+    <arg name="prefix" value="d_bot_"/>
+    <arg name="device" value="ur5"/>
+  </include>
+
+  <!-- Spawn joint_state_controller and robot_state_publisher -->
+  <include file="$(find aist_control)/launch/controller_utils.launch"/>
 
 </launch>

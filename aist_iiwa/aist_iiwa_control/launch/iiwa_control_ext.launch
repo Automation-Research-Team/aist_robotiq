@@ -1,75 +1,77 @@
 <?xml version="1.0"?>
 <launch>
 
-    <arg name="hardware_interface" default="PositionJointInterface" />
-    <arg name="model" default="iiwa14"/>
-    <arg name="end_effector" default=""/>
-    <arg name="robot_name" default="iiwa" />
-    <arg name="trajectory" default="true"/>
-    <arg name="joint_state_frequency" default="100" />
-    <arg name="robot_state_frequency" default="100" />
+  <arg name="hardware_interface" default="PositionJointInterface" />
+  <arg name="model" default="iiwa14"/>
+  <arg name="end_effector" default=""/>
+  <arg name="robot_name" default="iiwa" />
+  <arg name="trajectory" default="true"/>
+  <arg name="joint_state_frequency" default="100" />
+  <arg name="robot_state_frequency" default="100" />
 
-    <!-- Spawn controllers - it uses a JointTrajectoryController -->
-    <group ns="$(arg robot_name)" if="$(arg trajectory)">
-        <include file="$(find aist_iiwa_control)/launch/iiwa_control.launch">
-            <arg name="hardware_interface" value="$(arg hardware_interface)" />
-            <arg name="controllers" value="joint_state_controller $(arg hardware_interface)_trajectory_controller" />
-            <arg name="robot_name" value="$(arg robot_name)" />
-            <arg name="model" value="$(arg model)" />
-            <arg name="joint_state_frequency" value="$(arg joint_state_frequency)" />
-            <arg name="robot_state_frequency" value="$(arg robot_state_frequency)" />
-        </include>
-    </group>
+  <!-- Spawn controllers - it uses a JointTrajectoryController -->
+  <group ns="$(arg robot_name)" if="$(arg trajectory)">
+    <include file="$(find aist_iiwa_control)/launch/iiwa_control.launch">
+      <arg name="hardware_interface" value="$(arg hardware_interface)" />
+      <arg name="controllers" value="joint_state_controller $(arg hardware_interface)_trajectory_controller" />
+      <arg name="robot_name" value="$(arg robot_name)" />
+      <arg name="model" value="$(arg model)" />
+      <arg name="joint_state_frequency" value="$(arg joint_state_frequency)" />
+      <arg name="robot_state_frequency" value="$(arg robot_state_frequency)" />
+    </include>
+  </group>
 
-    <!-- Spawn controllers - it uses an Effort Controller for each joint -->
-    <group ns="$(arg robot_name)" unless="$(arg trajectory)">
-        <include file="$(find aist_iiwa_control)/launch/iiwa_control.launch">
-            <arg name="hardware_interface" value="$(arg hardware_interface)" />
-            <arg name="controllers" value="joint_state_controller
-                 $(arg hardware_interface)_J1_controller
-                 $(arg hardware_interface)_J2_controller
-                 $(arg hardware_interface)_J3_controller
-                 $(arg hardware_interface)_J4_controller
-                 $(arg hardware_interface)_J5_controller
-                 $(arg hardware_interface)_J6_controller
-                 $(arg hardware_interface)_J7_controller"/>
-            <arg name="robot_name" value="$(arg robot_name)" />
-            <arg name="model" value="$(arg model)" />
-            <arg name="joint_state_frequency" value="$(arg joint_state_frequency)" />
-            <arg name="robot_state_frequency" value="$(arg robot_state_frequency)" />
-        </include>
-    </group>
+  <!-- Spawn controllers - it uses an Effort Controller for each joint -->
+  <group ns="$(arg robot_name)" unless="$(arg trajectory)">
+    <include file="$(find aist_iiwa_control)/launch/iiwa_control.launch">
+      <arg name="hardware_interface" value="$(arg hardware_interface)" />
+      <arg name="controllers"
+	   value="joint_state_controller
+                  $(arg hardware_interface)_J1_controller
+                  $(arg hardware_interface)_J2_controller
+                  $(arg hardware_interface)_J3_controller
+                  $(arg hardware_interface)_J4_controller
+                  $(arg hardware_interface)_J5_controller
+                  $(arg hardware_interface)_J6_controller
+                  $(arg hardware_interface)_J7_controller"/>
+      <arg name="robot_name" value="$(arg robot_name)" />
+      <arg name="model" value="$(arg model)" />
+      <arg name="joint_state_frequency" value="$(arg joint_state_frequency)" />
+      <arg name="robot_state_frequency" value="$(arg robot_state_frequency)" />
+    </include>
+  </group>
 
-    <group ns="$(arg robot_name)" if="$(eval arg('end_effector')=='bh282')" >
-        <rosparam file="$(find aist_iiwa_control)/config/$(arg robot_name)_bh282.yaml" command="load" />
-        <group if="$(arg trajectory)">
-            <node name="bh282_controller_spawner" pkg="controller_manager"
-                        type="spawner" respawn="false"
-                        output="screen" args="hand_controller" />
-        </group>
-        <group unless="$(arg trajectory)">
-            <node name="bh282_controller_spawner" pkg="controller_manager"
-                        type="spawner" respawn="false"
-                        output="screen" args="
-                            bh_j11_position_controller
-                            bh_j12_position_controller
-                            bh_j22_position_controller
-                            bh_j32_position_controller" />
-        </group>
+  <group ns="$(arg robot_name)" if="$(eval arg('end_effector')=='bh282')" >
+    <rosparam file="$(find aist_iiwa_control)/config/$(arg robot_name)_bh282.yaml" command="load" />
+    <group if="$(arg trajectory)">
+      <node name="bh282_controller_spawner" pkg="controller_manager"
+            type="spawner" respawn="false"
+            output="screen" args="hand_controller" />
     </group>
+    <group unless="$(arg trajectory)">
+      <node name="bh282_controller_spawner" pkg="controller_manager"
+            type="spawner" respawn="false"
+            output="screen"
+	    args="bh_j11_position_controller
+                  bh_j12_position_controller
+                  bh_j22_position_controller
+                  bh_j32_position_controller" />
+    </group>
+  </group>
 
-    <group ns="$(arg robot_name)" if="$(eval arg('end_effector')=='robotiq85gripper')" >
-        <rosparam file="$(find aist_iiwa_control)/config/$(arg robot_name)_robotiq85gripper.yaml" command="load" />
-        <group if="$(arg trajectory)">
-            <node name="robotiq85gripper_controller_spawner" pkg="controller_manager"
-                        type="spawner" respawn="false"
-                        output="screen" args="hand_controller" />
-        </group>
-        <group unless="$(arg trajectory)">
-            <include file="$(find robotiq_control)/launch/cmodel_simple_controller.launch">
-                <arg name="ip" value="127.0.0.1" />
-            </include>
-        </group>
+  <group ns="$(arg robot_name)"
+	 if="$(eval arg('end_effector')=='robotiq85gripper')" >
+    <rosparam file="$(find aist_iiwa_control)/config/$(arg robot_name)_robotiq85gripper.yaml" command="load" />
+    <group if="$(arg trajectory)">
+      <node name="robotiq85gripper_controller_spawner" pkg="controller_manager"
+            type="spawner" respawn="false"
+            output="screen" args="hand_controller" />
     </group>
+    <group unless="$(arg trajectory)">
+      <include file="$(find robotiq_control)/launch/cmodel_simple_controller.launch">
+        <arg name="ip" value="127.0.0.1" />
+      </include>
+    </group>
+  </group>
 
 </launch>

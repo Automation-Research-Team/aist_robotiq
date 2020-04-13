@@ -19,7 +19,7 @@
   <!--Import the lbr iiwa macro -->
   <xacro:include filename="$(find iiwa_description)/urdf/iiwa14.xacro"/>
 
-  <xacro:include filename="$(find aist_description)/object/urdf/aist_box.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/objects/urdf/aist_box.urdf.xacro"/>
 
   <xacro:property name="bots_z"  value="0.80" />
 
@@ -83,20 +83,20 @@
   </xacro:iiwa14>
 
   <!-- bh282 -->
-  <xacro:if value="${end_effector == 'bh282'}">
-    <xacro:include filename="$(find barrett_hand_description)/urdf/bh282.urdf.xacro"/>
-    <xacro:bhand_macro name="$(arg robot_name)_bh" parent="$(arg robot_name)_link_ee">
-      <origin xyz="0 0 0" rpy="0 0 0" />
-    </xacro:bhand_macro>
+  <!-- <xacro:if value="${end_effector == 'bh282'}"> -->
+  <!--   <xacro:include filename="$(find barrett_hand_description)/urdf/bh282.urdf.xacro"/> -->
+  <!--   <xacro:bhand_macro name="$(arg robot_name)_bh" parent="$(arg robot_name)_link_ee"> -->
+  <!--     <origin xyz="0 0 0" rpy="0 0 0" /> -->
+  <!--   </xacro:bhand_macro> -->
 
-    <joint name="$(arg robot_name)_bh_tip_joint" type="fixed">
-      <parent link="$(arg robot_name)_bh_base_link" />
-      <child link = "$(arg robot_name)_bh_tip_link" />
-      <origin xyz="0 0 0" rpy="0 0 0" />
-    </joint>
-    <link name="$(arg robot_name)_bh_tip_link"/>
+  <!--   <joint name="$(arg robot_name)_bh_tip_joint" type="fixed"> -->
+  <!--     <parent link="$(arg robot_name)_bh_base_link" /> -->
+  <!--     <child link = "$(arg robot_name)_bh_tip_link" /> -->
+  <!--     <origin xyz="0 0 0" rpy="0 0 0" /> -->
+  <!--   </joint> -->
+  <!--   <link name="$(arg robot_name)_bh_tip_link"/> -->
 
-  </xacro:if>
+  <!-- </xacro:if> -->
 
   <!-- robotiq85gripper -->
   <xacro:if value="${end_effector == 'robotiq85gripper'}">

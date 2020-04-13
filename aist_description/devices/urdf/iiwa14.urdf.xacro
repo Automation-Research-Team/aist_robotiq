@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+  <xacro:include filename="$(find iiwa_description)/urdf/materials.xacro" />
+  <xacro:include filename="$(find iiwa_description)/urdf/iiwa14.xacro"/>
+
+  <xacro:macro name="iiwa14_with_ee_link"
+	       params="robot_name parent hardware_interface *origin">
+    <xacro:iiwa14 robot_name="${robot_name}" parent="${parent}"
+		  hardware_interface="${hardware_interface}">
+      <xacro:insert_block name="origin"/>
+    </xacro:iiwa14>
+
+    <link  name="${robot_name}_ee_link"/>
+    <joint name="${robot_name}_ee_joint" type="fixed">
+      <parent link="${robot_name}_link_ee"/>
+      <child  link="${robot_name}_ee_link"/>
+      <origin xyz="0 0 0" rpy="0 ${-pi/2} 0"/>
+    </joint>
+  </xacro:macro>
+
+</robot>
