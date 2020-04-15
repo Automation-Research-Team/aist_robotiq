@@ -1,13 +1,10 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="paused"			default="true"/>
-  <arg name="gui"			default="true"/>
-  <arg name="scene"			default="aist_base_scene"/>
+  <arg name="paused"	default="true"/>
+  <arg name="gui"	default="true"/>
+  <arg name="scene"	default="aist_base_scene"/>
 
   <!-- Startup simulated world -->
-  <!-- Gazebo needs to start up paused in order for us to be able to
-       set the initial joint configurations.
-       This is a known bug as of July 2018. -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" default="worlds/empty.world"/>
     <arg name="paused"     value="$(arg paused)"/>
