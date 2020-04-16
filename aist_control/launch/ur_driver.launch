@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<launch>
+
+  <arg name="prefix"		default="arm_"/>
+  <arg name="device"		default="ur5"/>
+  <arg name="robot_ip_address"	default="10.66.171.51"/>
+  <arg name="reverse_port"	default="50002"/>
+
+  <group ns="$(arg prefix)controller">
+    <node name="$ur_driver" pkg="ur_modern_driver" type="ur_driver"
+	  output="screen">
+      <rosparam filename="$(find aist_control
+			  )/config/$(arg device)_driver.yaml"
+		subst_value="true"/>
+      <repmap from="joint_states" to="/joint_states"/>
+    </node>
+  </group>
+
+</launch>

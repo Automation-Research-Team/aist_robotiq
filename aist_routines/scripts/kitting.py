@@ -155,6 +155,7 @@ class KittingRoutines(URRoutines):
 
 
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser(description='Perform kitting task')
     parser.add_argument('-p',
                         '--props_name',
@@ -166,6 +167,8 @@ if __name__ == '__main__':
                         help='YAML file for part properties',
                         metavar=None)
     args = parser.parse_args()
+
+    rospy.init_node("kitting", anonymous=True)
 
     with KittingRoutines(args.props_name) as kitting:
         while not rospy.is_shutdown():

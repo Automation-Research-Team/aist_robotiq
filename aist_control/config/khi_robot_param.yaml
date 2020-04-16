@@ -1,0 +1,6 @@
+khi_robot_param:
+  robot: $(arg device)
+  arm:
+    arm1:
+      - $(arg prefix)controller
+      

@@ -40,7 +40,6 @@ class AISTBaseRoutines(object):
     def __init__(self, ns=""):
         super(AISTBaseRoutines, self).__init__()
 
-        rospy.init_node("aist_routines", anonymous=True)
         moveit_commander.roscpp_initialize(sys.argv)
         self._listener = TransformListener()
         rospy.sleep(1.0)        # Necessary for listner spinning up
@@ -124,11 +123,12 @@ class AISTBaseRoutines(object):
         # rospy.loginfo("move to " + self.format_pose(target_pose))
         self.publish_marker(target_pose, "pose")
 
-        if end_effector_link == "":
+        if end_effector_link == "" and robot_name in self._grippers:
             end_effector_link = self._grippers[robot_name].tip_link
 
         group = self._cmd.get_group(robot_name)
-        group.set_end_effector_link(end_effector_link)
+        if len(end_effector_link) > 0:
+            group.set_end_effector_link(end_effector_link)
         group.set_max_velocity_scaling_factor(clip(speed, 0.0, 1.0))
 
         if high_precision:
@@ -192,10 +192,11 @@ class AISTBaseRoutines(object):
         group.clear_pose_targets()
 
     def get_current_pose(self, robot_name, end_effector_link=""):
-        if end_effector_link == "":
+        if end_effector_link == "" and robot_name in self._grippers:
             end_effector_link = self._grippers[robot_name].tip_link
         group = self._cmd.get_group(robot_name)
-        group.set_end_effector_link(end_effector_link)
+        if len(end_effector_link) > 0:
+            group.set_end_effector_link(end_effector_link)
         return group.get_current_pose()
 
     # Gripper stuffs

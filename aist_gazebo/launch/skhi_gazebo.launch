@@ -19,19 +19,18 @@
 	args="-urdf -param robot_description -model robot"
 	respawn="false" output="screen" />
 
+  <!-- Spawn controllers -->
+  <include file="$(find aist_control)/launch/controller.launch">
+    <arg name="prefix" value="a_khi_"/>
+    <arg name="device" value="RS007L"/>
+  </include>
+  <include file="$(find aist_control)/launch/controller.launch">
+    <arg name="prefix" value=""/>
+    <arg name="device" value="gripper"/>
+    <arg name="spawn"  value="false"/>
+  </include>
 
-  <!-- robot state publisher, fake_calibration and joint_state_controller -->
-  <include file="$(find aist_gazebo)/launch/controller_utils.launch"/>
-
-  <!-- Load parameters for arm and spawn controller -->
-  <rosparam file="$(find aist_gazebo)/controller/a_khi_controller.yaml"
-	    command="load"/>
-  <node name="controller_spawner" pkg="controller_manager"
-	type="controller_manager" respawn="false" output="screen"
-	args="spawn a_khi_controller"/>
-
-  <!-- Load parameters for gripper -->
-  <rosparam file="$(find aist_gazebo)/controller/lehz_controller.yaml"
-	    command="load"/>
+  <!-- Spawn joint_state_controller and robot_state_publisher -->
+  <include file="$(find aist_control)/launch/controller_utils.launch"/>
 
 </launch>

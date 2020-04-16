@@ -9,3 +9,11 @@ controller_list:
       - a_khi_joint4
       - a_khi_joint5
       - a_khi_joint6
+  - name: lehz_controller
+    type: GripperCommand
+    action_ns: gripper_action
+    default: true
+    parallel: true
+    joint:
+      - l_gripper_finger_joint
+      - r_gripper_finger_joint

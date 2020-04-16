@@ -1,0 +1,37 @@
+$(arg prefix)base_controller:
+  type: robot_controllers/DiffDriveBaseController
+  max_velocity_x: 2.0
+  max_acceleration_x: 1.5
+  autostart: true
+  base_frame: $(arg prefix)base_link
+  odometry_frame: $(arg prefix)odom
+  l_wheel_joint: $(arg prefix)l_wheel_joint
+  r_wheel_joint: $(arg prefix)l_wheel_joint
+
+gazebo:
+  default_controllers:
+    - $(arg prefix)base_controller
+  $(arg prefix)l_wheel_joint:
+    position:
+      p: 0.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+    velocity:
+      p: 8.85
+      d: 0.0
+      i: 0.5
+      i_clamp: 6.0
+    effort_limit: 8.85
+  $(arg prefix)r_wheel_joint:
+    position:
+      p: 0.0
+      d: 0.0
+      i: 0.0
+      i_clamp: 0.0
+    velocity:
+      p: 8.85
+      d: 0.0
+      i: 0.5
+      i_clamp: 6.0
+    effort_limit: 8.85

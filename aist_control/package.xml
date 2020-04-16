@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package>
+  <name>aist_control</name>
+  <version>1.0.0</version>
+  <description>Package contains control scripts/config/tools for various robots</description>
+
+  <author email="t.ueshiba@aist.go.jp">Toshio UESHIBA</author>
+  <maintainer email="t.ueshiba@aist.go.jp">Toshio UESHIBA</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>controller_manager</run_depend>
+  <run_depend>joint_state_controller</run_depend>
+  <run_depend>joint_trajectory_controller</run_depend>
+  <run_depend>position_controllers</run_depend>
+  <run_depend>robot_state_publisher</run_depend>
+  <run_depend>tf</run_depend>
+  <run_depend>aist_description</run_depend>
+
+  <test_depend>roslaunch</test_depend>
+  <test_depend>rostest</test_depend>
+</package>

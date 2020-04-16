@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="paused" default="false"/>
+  <arg name="gazebo_gui" default="true"/>
+
+  <arg name="hardware_interface" default="PositionJointInterface"/>
+  <arg name="model" default="iiwa14"/>
+  <arg name="end_effector" default=""/>
+  <arg name="robot_name_1" default="a_iiwa"/>
+  <arg name="origin_x_1" default="0"/>
+  <arg name="origin_y_1" default="0"/>
+  <arg name="origin_z_1" default="0"/>
+  <arg name="origin_roll_1"  default="0"/>
+  <arg name="origin_pitch_1" default="0"/>
+  <arg name="origin_yaw_1"   default="0"/>
+  <arg name="robot_name_2" default="b_iiwa"/>
+  <arg name="origin_x_2" default="0"/>
+  <arg name="origin_y_2" default="1.2"/>
+  <arg name="origin_z_2" default="0"/>
+  <arg name="origin_roll_2"  default="0"/>
+  <arg name="origin_pitch_2" default="0"/>
+  <!-- <arg name="origin_yaw_2"   default="${pi}"/> -->
+  <arg name="origin_yaw_2"   default="${pi}"/>
+
+  <arg name="urdf_path" default="$(find aist_iiwa_moveit_config)/config/$(arg model)_2robots.urdf.xacro"/>
+
+  <!-- startup simulated world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" default="worlds/empty.world"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="gui" value="$(arg gazebo_gui)"/>
+  </include>
+
+  <!-- send robot urdf to param server -->
+  <include file="$(find aist_iiwa_moveit_config)/launch/$(arg model)_2robots_upload.launch">
+    <arg name="hardware_interface" value="$(arg hardware_interface)"/>
+    <arg name="end_effector" value="$(arg end_effector)" />
+    <arg name="robot_name_1" value="$(arg robot_name_1)" />
+    <arg name="origin_x_1" value="$(arg origin_x_1)" />
+    <arg name="origin_y_1" value="$(arg origin_y_1)" />
+    <arg name="origin_z_1" value="$(arg origin_z_1)" />
+    <arg name="origin_roll_1"  value="$(arg origin_roll_1)" />
+    <arg name="origin_pitch_1" value="$(arg origin_pitch_1)" />
+    <arg name="origin_yaw_1"   value="$(arg origin_yaw_1)" />
+    <arg name="robot_name_2" value="$(arg robot_name_2)" />
+    <arg name="origin_x_2" value="$(arg origin_x_2)" />
+    <arg name="origin_y_2" value="$(arg origin_y_2)" />
+    <arg name="origin_z_2" value="$(arg origin_z_2)" />
+    <arg name="origin_roll_2"  value="$(arg origin_roll_2)" />
+    <arg name="origin_pitch_2" value="$(arg origin_pitch_2)" />
+    <arg name="origin_yaw_2"   value="$(arg origin_yaw_2)" />
+    <arg name="urdf_path" value="$(arg urdf_path)" />
+  </include>
+
+  <!-- push robot_description to factory and spawn robot in gazebo at the origin, change x,y,z arguments to spawn in a different position -->
+  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot -x 0 -y 0 -z 0"
+    respawn="false" output="screen" />
+
+  <include file="$(find aist_iiwa_moveit_config)/launch/ros_controllers.launch">
+    <arg name="end_effector" value="$(arg end_effector)"/>
+  </include>
+
+</launch>
