@@ -7,7 +7,9 @@ grippers:
   b_bot:
     type: SuctionGripper
     args:
-      prefix: b_bot_single_
+      name: b_bot_single_suction_gripper
+      base_link: b_bot_single_suction_gripper_base_link
+      tip_link: b_bot_single_suction_gripper_pad_link
       eject: false
       timeout: 2.0
 

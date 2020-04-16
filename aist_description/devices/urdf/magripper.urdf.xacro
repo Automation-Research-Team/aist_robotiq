@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="magripper" >
+
+  <xacro:include filename="$(find aist_phoxi_camera)/urdf/phoxi_m_camera.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/devices/urdf/magswitch_e30.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description)/devices/urdf/lehz40k2_30.urdf.xacro" />
+
+  <xacro:macro name="pillar" params="name length diameter parent *origin">
+
+    <joint name="${name}_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child  link="${name}"/>
+      <xacro:insert_block name="origin"/>
+    </joint>
+
+    <link name="${name}">
+      <visual>
+        <origin xyz="${length/2} 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="${length} ${diameter} ${diameter}"/>
+        </geometry>
+        <material name="DarkGrey">
+          <color rgba="0.3 0.3 0.3 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="${length/2} 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="${length} ${diameter} ${diameter}"/>
+        </geometry>
+      </collision>
+
+      <inertial>
+        <mass value="0.3"/>
+        <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${name}_flange_joint" type="fixed">
+      <parent link="${name}"/>
+      <child  link="${name}_flange"/>
+      <origin xyz="${length} 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="${name}_flange"/>
+
+    <gazebo reference="${name}">
+      <material>Gazebo/DarkGrey</material>
+    </gazebo>
+
+  </xacro:macro>
+
+  <xacro:macro name="magripper" params="prefix parent *origin">
+
+    <xacro:property name="diameter"			value="0.04"/>
+    <xacro:property name="trunk_length"			value="0.23"/>
+    <xacro:property name="camera_branch_length"		value="0.09"/>
+    <xacro:property name="magnet_branch_length"		value="0.06"/>
+    <xacro:property name="gripper_branch_length"	value="0.06"/>
+
+    <xacro:pillar name="${prefix}magripper_base_link" parent="${parent}"
+		  length="${trunk_length}" diameter="${diameter}">
+      <xacro:insert_block name="origin"/>
+    </xacro:pillar>
+
+    <!-- PhoXi camera -->
+    <xacro:pillar name="${prefix}magripper_camera_branch"
+		  parent="${prefix}magripper_base_link"
+		  length="${camera_branch_length}" diameter="${diameter}">
+      <origin xyz="${trunk_length - diameter/2} 0 0"
+	      rpy="0 ${-pi/2} ${pi/2}"/>
+    </xacro:pillar>
+    <xacro:phoxi_m_camera prefix="${prefix}"
+			  parent="${prefix}magripper_camera_branch_flange">
+      <origin xyz="0 0 -0.03" rpy="${-pi/2} 0 ${-pi/2}"/>
+    </xacro:phoxi_m_camera>
+
+    <!-- Magswitch_E30 magnet hand -->
+    <xacro:pillar name="${prefix}magripper_magnet_branch"
+		  parent="${prefix}magripper_base_link"
+		  length="${magnet_branch_length}" diameter="${diameter}">
+      <origin xyz="${trunk_length - diameter/2} 0 0"
+	      rpy="0 ${-pi/4} ${pi/2}"/>
+    </xacro:pillar>
+    <xacro:magswitch_e30 prefix="${prefix}"
+			 parent="${prefix}magripper_magnet_branch_flange">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:magswitch_e30>
+
+    <!-- LEHZ40K2-30 two-finger gripper -->
+    <xacro:pillar name="${prefix}magripper_gripper_branch"
+		  parent="${prefix}magripper_base_link"
+		  length="${gripper_branch_length}" diameter="${diameter}">
+      <origin xyz="${trunk_length - diameter/2} 0 0"
+	      rpy="0 ${-pi*3/4} ${pi/2}"/>
+    </xacro:pillar>
+    <xacro:lehz40k2_30 prefix="${prefix}"
+		       parent="${prefix}magripper_gripper_branch_flange">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:lehz40k2_30>
+
+  </xacro:macro>
+
+
+  <xacro:macro name="magripper2" params="prefix parent *origin">
+
+    <xacro:property name="diameter"			value="0.04"/>
+    <xacro:property name="trunk_length"			value="0.11"/>
+    <xacro:property name="magnet_branch_length"		value="0.06"/>
+    <xacro:property name="gripper_branch_length"	value="0.06"/>
+
+    <xacro:pillar name="${prefix}magripper_base_link" parent="${parent}"
+		  length="${trunk_length}" diameter="${diameter}">
+      <xacro:insert_block name="origin"/>
+    </xacro:pillar>
+
+    <!-- PhoXi camera -->
+    <xacro:phoxi_m_camera prefix="${prefix}"
+			  parent="${prefix}magripper_base_link_flange">
+      <origin xyz="0 0 -0.03" rpy="${-pi/2} 0 ${-pi/2}"/>
+    </xacro:phoxi_m_camera>
+
+    <!-- Magswitch_E30 magnet hand -->
+    <xacro:pillar name="${prefix}magripper_magnet_branch"
+		  parent="${prefix}magripper_base_link"
+		  length="${magnet_branch_length}" diameter="${diameter}">
+      <origin xyz="${trunk_length - diameter/2 - 0.07} 0 0"
+	      rpy="0 ${pi/4} 0"/>
+    </xacro:pillar>
+    <xacro:magswitch_e30 prefix="${prefix}"
+			 parent="${prefix}magripper_magnet_branch_flange">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:magswitch_e30>
+
+    <!-- LEHZ40K2-30 two-finger gripper -->
+    <xacro:pillar name="${prefix}magripper_gripper_branch"
+		  parent="${prefix}magripper_base_link"
+		  length="${gripper_branch_length}" diameter="${diameter}">
+      <origin xyz="${trunk_length - diameter/2 - 0.07} 0 0"
+	      rpy="0 ${-pi/4} 0 "/>
+    </xacro:pillar>
+    <xacro:lehz40k2_30 prefix="${prefix}"
+		       parent="${prefix}magripper_gripper_branch_flange">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:lehz40k2_30>
+
+  </xacro:macro>
+
+</robot>

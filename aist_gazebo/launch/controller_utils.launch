@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-  <!-- Robot state publisher -->
+  <!-- robot state publisher -->
   <node name="robot_state_publisher"
 	pkg="robot_state_publisher" type="robot_state_publisher" >
     <param name="publish_frequency" type="double" value="50.0" />
@@ -13,7 +13,7 @@
         args="pub /calibrated std_msgs/Bool true" />
 
   <!-- joint_state_controller -->
-  <rosparam file="$(find ur_gazebo)/controller/joint_state_controller.yaml"
+  <rosparam file="$(find aist_gazebo)/controller/joint_state_controller.yaml"
 	    command="load"/>
   <node name="joint_state_controller_spawner"
 	pkg="controller_manager" type="controller_manager"

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="lehz40k2_30" >
+  <!-- LEHZ40K2_30_gripper -->
+  <xacro:include filename="$(find aist_description)/devices/urdf/lehz40k2_30.urdf.xacro" />
+  <xacro:lehz40k2_30 prefix="" parent="base_link">
+    <origin xyz="0 0 0" rpy="0 ${-pi/2} 0"/>
+  </xacro:lehz40k2_30>
+
+  <link name="base_link" />
+
+  <gazebo>
+    <plugin name="fetch_gazebo_plugin" filename="libfetch_gazebo_plugin.so"/>
+  </gazebo>
+
+</robot>
