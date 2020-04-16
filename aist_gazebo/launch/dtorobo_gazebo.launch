@@ -1,14 +1,17 @@
 <?xml version="1.0"?>
 <launch>
 
-  <arg name="scene"		default="dtorobo_base_scene"/>
-  <arg name="paused"		default="false"/>
-  <arg name="use_sim_time"	default="true"/>
-  <arg name="gui"		default="true"/>
-  <arg name="headless"		default="false"/>
-  <arg name="debug"		default="false"/>
+  <arg name="scene"			default="dtorobo_base_scene"/>
+  <arg name="paused"			default="false"/>
+  <arg name="use_sim_time"		default="true"/>
+  <arg name="gui"			default="true"/>
+  <arg name="headless"			default="false"/>
+  <arg name="debug"			default="false"/>
+  <arg name="manager"			default="torobo_nodelet_manager"/>
+  <arg name="joint_state_frequency"	default="500"/>
+  <arg name="robot_state_frequency"	default="500"/>
 
-  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <!-- Startup simulated world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name"	value="$(find torobo_gazebo
 				       )/worlds/ground_plane.world"/>
@@ -20,21 +23,58 @@
   </include>
 
   <group ns="torobo">
-    <!-- load robot description URDF -->
+    <!-- Load URDF to param "robot_description" and spawn the robot -->
     <param name="robot_description"
   	   command="$(find xacro)/xacro --inorder
   		    '$(find aist_description
 		    )/scenes/urdf/$(arg scene).urdf.xacro'"/>
-
-    <!-- Run a python script to the send a service call to gazebo_ros
-	 to spawn a URDF robot -->
     <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
 	  respawn="false" output="screen"
 	  args="-urdf -model dtorobo -param robot_description"/>
 
     <!-- launch nodelet manager -->
-    <node name="torobo_nodelet_manager" pkg="nodelet" type="nodelet"
+    <node name="$(arg manager)" pkg="nodelet" type="nodelet"
       	  args="manager" output="screen"/>
+
+    <!-- Setup controller parameters -->
+    <rosparam file="$(find aist_control)/config/joint_state_controller.yaml"
+	      subst_value="true"/>
+    <include file="$(find aist_control)/launch/controller.launch">
+      <arg name="prefix" value="a_torobo_"/>
+      <arg name="device" value="torobo_arm"/>
+      <arg name="spawn"  value="false"/>
+    </include>
+    <include file="$(find aist_control)/launch/controller.launch">
+      <arg name="prefix" value="a_torobo_"/>
+      <arg name="device" value="torobo_gripper"/>
+      <arg name="spawn"  value="false"/>
+    </include>
+    <include file="$(find aist_control)/launch/controller.launch">
+      <arg name="prefix" value="b_torobo_"/>
+      <arg name="device" value="torobo_arm"/>
+      <arg name="spawn"  value="false"/>
+    </include>
+    <include file="$(find aist_control)/launch/controller.launch">
+      <arg name="prefix" value="b_torobo_"/>
+      <arg name="device" value="torobo_gripper"/>
+      <arg name="spawn"  value="false"/>
+    </include>
   </group>
+
+  <!-- Spawn controllers -->
+  <rosparam file="$(find aist_control)/config/dtorobo_controller_list.yaml"
+	    ns="torobo"/>
+  <include file="$(find
+		 torobo_control)/launch/torobo_control_nodelet.launch">
+    <arg name="manager" value="$(arg manager)"/>
+    <arg name="sim"	  value="true"/>
+  </include>
+
+  <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped
+       using the parameter robot_description and publish to TF -->
+  <node name="robot_state_publisher"
+	pkg ="robot_state_publisher" type="robot_state_publisher" >
+    <param name="publish_frequency" value="$(arg robot_state_frequency)"/>
+  </node>
 
 </launch>

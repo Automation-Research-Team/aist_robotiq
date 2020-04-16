@@ -1,13 +1,12 @@
 <?xml version="1.0"?>
 <launch>
 
-  <arg name="joint_state_frequency"	default="50.0"/>
-  <arg name="robot_state_frequency"	default="50.0"/>
+  <arg name="joint_state_frequency"	default="50"/>
+  <arg name="robot_state_frequency"	default="50"/>
 
   <!-- Setup parameters for joint_state_controller -->
-  <rosparam file="$(find aist_control)/config/joint_state_controller.yaml"/>
-  <param name ="joint_state_controller/publish_rate"
-	 value="$(arg joint_state_frequency)"/>
+  <rosparam file="$(find aist_control)/config/joint_state_controller.yaml"
+	    subst_value="true"/>
 
   <!-- Spawn joint_state_controller -->
   <node name="joint_state_controller_spawner"
