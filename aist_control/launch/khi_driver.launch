@@ -3,7 +3,7 @@
 
   <arg name="prefix"		default="arm_"/>
   <arg name="device"		default="RS007L"/>
-  <arg name="robot_ip_addrfess"	default="10.66.171.51"/>
+  <arg name="robot_ip_address"	default="10.66.171.91"/>
   <arg name="period"		defualt="4"/>
   
   <node name="$(arg prefix)driver" pkg="khi_robot_control" type="main"
@@ -16,11 +16,5 @@
 
   <rosparam file="$(find aist_control)/config/$(arg device)_joint_limits.yaml"
 	    subst_value="true" ns="$(arg device)"/>
-  
-  <!-- Spawn controllers -->
-  <include file="$(find aist_control)/launch/controller.launch">
-    <arg name="prefix" value="$(arg prefix)"/>
-    <arg name="device" value="$(arg device)"/>
-  </include>
 
 </launch>

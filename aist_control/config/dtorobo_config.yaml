@@ -1,9 +1,0 @@
-device_list:
-  - name: a_torobo_arm
-    type: torobo_arm
-  - name: a_torobo_gripper
-    type: tobobo_gripper
-  - type: torobo_arm
-    name: b_torobo_arm
-  - type: tobobo_gripper
-    name: b_torobo_gripper

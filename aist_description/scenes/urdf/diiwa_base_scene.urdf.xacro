@@ -44,12 +44,12 @@
   </xacro:iiwa14_with_ee_link>
 
   <!-- Attach grippers -->
-  <xacro:include filename="$(find aist_description
-			   )/devices/urdf/robotiq_85_gripper_with_tip_link.urdf.xacro"/>
-  <xacro:robotiq_85_gripper_with_tip_link prefix="a_iiwa_"
-					  parent="a_iiwa_ee_link">
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-  </xacro:robotiq_85_gripper_with_tip_link>
+  <!-- <xacro:include filename="$(find aist_description -->
+  <!-- 			   )/devices/urdf/robotiq_85_gripper_with_tip_link.urdf.xacro"/> -->
+  <!-- <xacro:robotiq_85_gripper_with_tip_link prefix="a_iiwa_" -->
+  <!-- 					  parent="a_iiwa_ee_link"> -->
+  <!--   <origin xyz="0 0 0" rpy="0 0 0"/> -->
+  <!-- </xacro:robotiq_85_gripper_with_tip_link> -->
 
   <xacro:include filename="$(find aist_description
 			   )/devices/urdf/single_suction_gripper.urdf.xacro"/>

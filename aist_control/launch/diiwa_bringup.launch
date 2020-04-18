@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="sim"			default="false"/>
+  <arg name="scene"			default="diiwa_base_scene"/>
+  <arg name="paused"			default="false"/>
+  <arg name="gui"			default="true"/>
+  <arg name="debug"			default="false"/>
+  <arg name="joint_state_frequency"	default="100"/>
+  <arg name="robot_state_frequency"	default="100"/>
+  <arg name="rviz_config"		default=""/>
+  <arg name="robot_ip_a"		default="10.66.171.81"/>
+  <arg name="robot_ip_b"		default="10.66.171.82"/>
+  
+  <!-- Load URDF to param "robot_description" and spawn the robot -->
+  <param name="robot_description"
+  	 command="$(find xacro)/xacro --inorder
+  		  '$(find aist_description
+		  )/scenes/urdf/$(arg scene).urdf.xacro'"/>
+
+  <group if="$(arg sim)">
+    <!-- Startup simulated world -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+      <arg name="world_name" default="worlds/empty.world"/>
+      <arg name="paused"     value="$(arg paused)"/>
+      <arg name="gui"        value="$(arg gui)"/>
+      <arg name="verbose"    value="true"/>
+    </include>
+
+    <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model"
+	  args="-urdf -param robot_description -model robot"
+	  respawn="false" output="screen" />
+  </group>
+    
+  <group unless="$(arg sim)">
+    <include file="$(find aist_control)/launch/iiwa_driver.launch">
+      <arg name="prefix"		value="a_iiwa_"/>
+      <arg name="device"		value="iiwa14"/>
+      <arg name="robot_ip_address"	value="$(arg robot_ip_a)"/>
+    </include>
+    <include file="$(find aist_control)/launch/iiwa_driver.launch">
+      <arg name="prefix"		value="b_iiwa_"/>
+      <arg name="device"		value="iiwa14"/>
+      <arg name="robot_ip_address"	value="$(arg robot_ip_b)"/>
+    </include>
+  </group>
+
+  <!-- Spawn controllers -->
+  <include file="$(find aist_control)/launch/iiwa_controller.launch">
+    <arg name="robot_name" value="a_iiwa"/>
+    <arg name="device"	   value="iiwa14"/>
+  </include>
+  <include file="$(find aist_control)/launch/iiwa_controller.launch">
+    <arg name="robot_name" value="b_iiwa"/>
+    <arg name="device"	   value="iiwa14"/>
+  </include>
+
+  <!-- Setup parameters for joint_state_controller -->
+  <rosparam file="$(find aist_control)/config/joint_state_controller.yaml"
+	    subst_value="true"/>
+  <node name="joint_state_controller_spawner"
+	pkg ="controller_manager" type="controller_manager"
+	args="spawn joint_state_controller" respawn="false" output="screen"/>
+
+  <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped
+       and publish to TF according to the parameter robot_description -->
+  <node name="robot_state_publisher"
+    	pkg ="robot_state_publisher" type="robot_state_publisher">
+    <param name="publish_frequency" value="$(arg robot_state_frequency)"/>
+  </node>
+
+  <!-- Launch moveit -->
+  <include file="$(find diiwa_moveit_config)/launch/move_group.launch">
+    <arg name="debug"	value="$(arg debug)"/>
+  </include>
+
+  <!-- Launch rviz with appropriate launch-prefix and config file. -->
+  <arg if="$(eval arg('rviz_config') == '')"
+       name="command_args"
+       value="-d $(find diiwa_moveit_config)/launch/moveit.rviz"/>
+  <arg unless="$(eval arg('rviz_config') == '')"
+       name="command_args" value="-d $(arg rviz_config)"/>
+
+  <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false"
+	args="$(arg command_args)" output="screen">
+    <rosparam command="load"
+	      file="$(find diiwa_moveit_config)/config/kinematics.yaml"/>
+  </node>
+
+</launch>
