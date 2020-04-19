@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="sim" default="true" doc="If true, the robot will be simulated in Gazebo" />
+
+    <arg name="hardware_interface" default="PositionJointInterface" />
+    <arg name="model" default="iiwa14"/>
+    <arg name="end_effector" default=""/>
+    <arg name="robot_name" default="iiwa" />
+    <arg name="origin_x" default="0"/>
+    <arg name="origin_y" default="0"/>
+    <arg name="origin_z" default="0"/>
+    <arg name="origin_roll"  default="0"/>
+    <arg name="origin_pitch" default="0"/>
+    <arg name="origin_yaw"   default="0"/>
+    <arg name="exist_objs" default="true"/>
+
+    <group ns="$(arg robot_name)" if="$(arg sim)">
+
+        <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find aist_description)/scenes/urdf/$(arg model).urdf.xacro' hardware_interface:=$(arg hardware_interface) end_effector:=$(arg end_effector) robot_name:=$(arg robot_name) origin_x:=$(arg origin_x) origin_y:=$(arg origin_y) origin_z:=$(arg origin_z) origin_roll:=$(arg origin_roll) origin_pitch:=$(arg origin_pitch) origin_yaw:=$(arg origin_yaw) exist_objs:=$(arg exist_objs)" />
+
+        <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+            args="-urdf -model $(arg robot_name) -param robot_description"/>
+
+    </group>
+
+</launch>

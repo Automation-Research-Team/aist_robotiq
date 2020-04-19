@@ -2,7 +2,7 @@
 <launch>
 
   <arg name="sim"			default="false"/>
-  <arg name="scene"			default="skhi_base_scene"/>
+  <arg name="scene"			default="dkhi_base_scene"/>
   <arg name="paused"			default="false"/>
   <arg name="gui"			default="true"/>
   <arg name="debug"			default="false"/>
@@ -10,6 +10,7 @@
   <arg name="robot_state_frequency"	default="50"/>
   <arg name="rviz_config"		default=""/>
   <arg name="robot_ip_a"		default="10.66.171.91"/>
+  <arg name="robot_ip_b"		default="10.66.171.92"/>
   
   <!-- Load URDF to param "robot_description" and spawn the robot -->
   <param name="robot_description"
@@ -37,11 +38,20 @@
       <arg name="device"		value="RS007L"/>
       <arg name="robot_ip_address"	value="$(arg robot_ip_a)"/>
     </include>
+    <include file="$(find aist_control)/launch/khi_driver.launch">
+      <arg name="prefix"		value="b_khi_"/>
+      <arg name="device"		value="RS007L"/>
+      <arg name="robot_ip_address"	value="$(arg robot_ip_b)"/>
+    </include>
   </group>
 
   <!-- Spawn controllers -->
   <include file="$(find aist_control)/launch/controller.launch">
     <arg name="prefix" value="a_khi_"/>
+    <arg name="device" value="RS007L"/>
+  </include>
+  <include file="$(find aist_control)/launch/controller.launch">
+    <arg name="prefix" value="b_khi_"/>
     <arg name="device" value="RS007L"/>
   </include>
   <include file="$(find aist_control)/launch/controller.launch">
@@ -65,21 +75,21 @@
   </node>
 
   <!-- Launch moveit -->
-  <include file="$(find skhi_moveit_config)/launch/move_group.launch">
+  <include file="$(find dkhi_moveit_config)/launch/move_group.launch">
     <arg name="debug"	value="$(arg debug)"/>
   </include>
 
   <!-- Launch rviz with appropriate launch-prefix and config file. -->
   <arg if="$(eval arg('rviz_config') == '')"
        name="command_args"
-       value="-d $(find skhi_moveit_config)/launch/moveit.rviz"/>
+       value="-d $(find dkhi_moveit_config)/launch/moveit.rviz"/>
   <arg unless="$(eval arg('rviz_config') == '')"
        name="command_args" value="-d $(arg rviz_config)"/>
 
   <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false"
-	args="$(arg command_args)" output="screen">
+  	args="$(arg command_args)" output="screen">
     <rosparam command="load"
-	      file="$(find skhi_moveit_config)/config/kinematics.yaml"/>
+  	      file="$(find dkhi_moveit_config)/config/kinematics.yaml"/>
   </node>
 
 </launch>

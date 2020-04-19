@@ -55,18 +55,10 @@
     <arg name="device"	   value="iiwa14"/>
   </include>
 
-  <!-- Setup parameters for joint_state_controller -->
-  <rosparam file="$(find aist_control)/config/joint_state_controller.yaml"
-	    subst_value="true"/>
-  <node name="joint_state_controller_spawner"
-	pkg ="controller_manager" type="controller_manager"
-	args="spawn joint_state_controller" respawn="false" output="screen"/>
-
-  <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped
-       and publish to TF according to the parameter robot_description -->
-  <node name="robot_state_publisher"
-    	pkg ="robot_state_publisher" type="robot_state_publisher">
-    <param name="publish_frequency" value="$(arg robot_state_frequency)"/>
+  <!-- Launch joint_state_publisher -->
+  <node name="joint_state_publisher"
+	pkg="joint_state_publisher" type="joint_state_publisher">
+    <rosparam param="source_list">[/a_iiwa/joint_states, /b_iiwa/joint_states]</rosparam>
   </node>
 
   <!-- Launch moveit -->

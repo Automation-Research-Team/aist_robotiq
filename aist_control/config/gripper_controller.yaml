@@ -1,4 +1,4 @@
-$(arg prefix)gripper_controller:
+$(arg prefix)controller:
   gripper_action:
     type: robot_controllers/ParallelGripperController
     l_gripper_joint: $(arg prefix)l_gripper_finger_joint

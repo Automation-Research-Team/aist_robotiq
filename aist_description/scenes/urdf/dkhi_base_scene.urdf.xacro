@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://wiki.ros.org/xacro" name="skhi_base_scene" >
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="dkhi_base_scene" >
 
   <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
   <xacro:property name="a_khi_x" value="0"/>
-  <xacro:property name="a_khi_y" value="-0.4875"/>
+  <xacro:property name="a_khi_y" value="-0.6"/>
+  <xacro:property name="b_khi_x" value="0"/>
+  <xacro:property name="b_khi_y" value="0.6"/>
   <xacro:property name="bots_z"	 value="0.785"/>
 
   <!-- Main workspace -->
@@ -32,6 +34,9 @@
   <xacro:rs007l prefix="a_khi_" parent="ground">
     <origin xyz="${a_khi_x} ${a_khi_y} ${bots_z}" rpy="0 0 0"/>
   </xacro:rs007l>
+  <xacro:rs007l prefix="b_khi_" parent="ground">
+    <origin xyz="${b_khi_x} ${b_khi_y} ${bots_z}" rpy="0 0 ${pi}"/>
+  </xacro:rs007l>
 
   <!-- Attach grippers -->
   <xacro:include filename="$(find aist_description)/devices/urdf/magripper.urdf.xacro" />
@@ -42,13 +47,13 @@
   <!-- Required because package robot_controllers is used for
        driving lehz40k2_30 gripper -->
   <gazebo>
-    <!-- <plugin name="fetch_gazebo_plugin" filename="libfetch_gazebo_plugin.so"/> -->
+    <!--   <plugin name="fetch_gazebo_plugin" filename="libfetch_gazebo_plugin.so"/> -->
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/</robotNamespace>
       <legacyModeNS>true</legacyModeNS>
     </plugin>
   </gazebo>
-  
+
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world"/>
   <joint name="world_ground_joint" type="fixed">

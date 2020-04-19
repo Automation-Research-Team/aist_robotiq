@@ -1,0 +1,17 @@
+controller_list:
+  - name: fake_a_khi_controller
+    joints:
+      - a_khi_joint1
+      - a_khi_joint2
+      - a_khi_joint3
+      - a_khi_joint4
+      - a_khi_joint5
+      - a_khi_joint6
+  - name: fake_b_khi_controller
+    joints:
+      - b_khi_joint1
+      - b_khi_joint2
+      - b_khi_joint3
+      - b_khi_joint4
+      - b_khi_joint5
+      - b_khi_joint6
