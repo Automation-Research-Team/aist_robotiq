@@ -34,28 +34,36 @@
   <!-- robot arms -->
   <xacro:include filename="$(find aist_description
 			   )/devices/urdf/iiwa14.urdf.xacro"/>
-  <xacro:iiwa14_with_ee_link robot_name="a_iiwa" parent="ground"
+  <xacro:iiwa14 robot_name="a_iiwa" parent="ground"
 		hardware_interface="$(arg hardware_interface)">
     <origin xyz="${a_iiwa_x} ${a_iiwa_y} ${bots_z}" rpy="0 0 ${pi/2}"/>
-  </xacro:iiwa14_with_ee_link>
-  <xacro:iiwa14_with_ee_link robot_name="b_iiwa" parent="ground"
+  </xacro:iiwa14>
+  <xacro:iiwa14 robot_name="b_iiwa" parent="ground"
 		hardware_interface="$(arg hardware_interface)">
     <origin xyz="${b_iiwa_x} ${b_iiwa_y} ${bots_z}" rpy="0 0 ${-pi/2}"/>
-  </xacro:iiwa14_with_ee_link>
+  </xacro:iiwa14>
 
   <!-- Attach grippers -->
-  <!-- <xacro:include filename="$(find aist_description -->
-  <!-- 			   )/devices/urdf/robotiq_85_gripper_with_tip_link.urdf.xacro"/> -->
-  <!-- <xacro:robotiq_85_gripper_with_tip_link prefix="a_iiwa_" -->
-  <!-- 					  parent="a_iiwa_ee_link"> -->
-  <!--   <origin xyz="0 0 0" rpy="0 0 0"/> -->
-  <!-- </xacro:robotiq_85_gripper_with_tip_link> -->
+  <xacro:include filename="$(find aist_description
+  			   )/devices/urdf/robotiq_85_gripper_with_tip_link.urdf.xacro"/>
+  <xacro:robotiq_85_gripper_with_tip_link prefix="a_iiwa_"
+  					  parent="a_iiwa_ee_link">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:robotiq_85_gripper_with_tip_link>
 
   <xacro:include filename="$(find aist_description
 			   )/devices/urdf/single_suction_gripper.urdf.xacro"/>
   <xacro:single_suction_gripper prefix="b_iiwa_" parent="b_iiwa_ee_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:single_suction_gripper>
+
+  <!-- Gazebo plugins for IIWA arms -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/</robotNamespace>
+      <legacyModeNS>true</legacyModeNS>
+    </plugin>
+  </gazebo>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world"/>

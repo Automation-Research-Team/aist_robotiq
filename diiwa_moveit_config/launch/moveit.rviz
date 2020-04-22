@@ -122,6 +122,55 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          a_iiwa_robotiq_85_base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_left_finger_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_left_finger_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_left_inner_knuckle_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_left_knuckle_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_right_finger_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_right_finger_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_right_inner_knuckle_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_right_knuckle_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_iiwa_ee_link:
             Alpha: 1
             Show Axes: false
@@ -289,6 +338,55 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          a_iiwa_robotiq_85_base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_left_finger_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_left_finger_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_left_inner_knuckle_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_left_knuckle_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_right_finger_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_right_finger_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_right_inner_knuckle_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_right_knuckle_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_iiwa_robotiq_85_tip_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_iiwa_ee_link:
             Alpha: 1
             Show Axes: false
@@ -393,6 +491,26 @@ Visualization Manager:
           Value: false
         a_iiwa_link_ee:
           Value: false
+        a_iiwa_robotiq_85_base_link:
+          Value: false
+        a_iiwa_robotiq_85_left_finger_link:
+          Value: false
+        a_iiwa_robotiq_85_left_finger_tip_link:
+          Value: false
+        a_iiwa_robotiq_85_left_inner_knuckle_link:
+          Value: false
+        a_iiwa_robotiq_85_left_knuckle_link:
+          Value: false
+        a_iiwa_robotiq_85_right_finger_link:
+          Value: false
+        a_iiwa_robotiq_85_right_finger_tip_link:
+          Value: false
+        a_iiwa_robotiq_85_right_inner_knuckle_link:
+          Value: false
+        a_iiwa_robotiq_85_right_knuckle_link:
+          Value: false
+        a_iiwa_robotiq_85_tip_link:
+          Value: true
         b_iiwa_ee_link:
           Value: true
         b_iiwa_link_0:
@@ -443,7 +561,21 @@ Visualization Manager:
                           a_iiwa_link_7:
                             a_iiwa_link_ee:
                               a_iiwa_ee_link:
-                                {}
+                                a_iiwa_robotiq_85_base_link:
+                                  a_iiwa_robotiq_85_left_inner_knuckle_link:
+                                    a_iiwa_robotiq_85_left_finger_tip_link:
+                                      {}
+                                  a_iiwa_robotiq_85_left_knuckle_link:
+                                    a_iiwa_robotiq_85_left_finger_link:
+                                      {}
+                                  a_iiwa_robotiq_85_right_inner_knuckle_link:
+                                    a_iiwa_robotiq_85_right_finger_tip_link:
+                                      {}
+                                  a_iiwa_robotiq_85_right_knuckle_link:
+                                    a_iiwa_robotiq_85_right_finger_link:
+                                      {}
+                                  a_iiwa_robotiq_85_tip_link:
+                                    {}
             b_iiwa_link_0:
               b_iiwa_link_1:
                 b_iiwa_link_2:
@@ -494,10 +626,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6797966957092285
+      Pitch: 0.6147967576980591
       Target Frame: world
       Value: XYOrbit (rviz)
-      Yaw: 5.739961624145508
+      Yaw: 5.6699628829956055
     Saved: ~
 Window Geometry:
   Displays:
@@ -511,9 +643,9 @@ Window Geometry:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000002a200000366fc0200000007fb000000100044006900730070006c006100790073010000003d00000117000000c900fffffffb0000000800480065006c00700000000342000000bb0000006e00fffffffb0000000a0056006900650077007300000003b0000000b0000000a400fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e006701000002db0000017a0000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004100fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e0067010000015a000002490000019b00ffffff000004d80000036600000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000100000000000002a200000366fc0200000007fb000000100044006900730070006c006100790073010000003d00000117000000c900fffffffb0000000800480065006c00700000000342000000bb0000006e00fffffffb0000000a0056006900650077007300000003b0000000b0000000a400fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e006701000002db0000017a0000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004100fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e0067010000015a000002490000019b00ffffff000002d60000036600000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
-  Width: 1920
-  X: 0
-  Y: 27
+  Width: 1406
+  X: 311
+  Y: 280

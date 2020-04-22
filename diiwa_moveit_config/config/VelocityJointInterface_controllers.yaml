@@ -1,5 +1,5 @@
 controller_list:
-  - name: a_iiwa/VelocityJointInterface_trajectory_controller
+  - name: a_iiwa_VelocityJointInterface_trajectory_controller
     action_ns: follow_joint_trajectory
     type: FollowJointTrajectory
     default: true
@@ -11,7 +11,7 @@ controller_list:
       - a_iiwa_joint_5
       - a_iiwa_joint_6
       - a_iiwa_joint_7
-  - name: b_iiwa/VelocityJointInterface_trajectory_controller
+  - name: b_iiwa_VelocityJointInterface_trajectory_controller
     action_ns: follow_joint_trajectory
     type: FollowJointTrajectory
     default: true

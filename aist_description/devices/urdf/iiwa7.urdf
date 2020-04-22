@@ -7,11 +7,11 @@
   <link name="world"/>
 
   <xacro:include filename="$(find aist_description
-			   )/devices/urdf/iiwa14.urdf.xacro" />
-  <xacro:iiwa14 robot_name="$(arg robot_name)"
-		parent="world"
-		hardware_interface="$(arg hardware_interface)">
+			   )/devices/urdf/iiwa7.urdf.xacro" />
+  <xacro:iiwa7 robot_name="$(arg robot_name)"
+	       parent="world"
+	       hardware_interface="$(arg hardware_interface)">
     <origin xyz="0 0 0" rpy="0 0 0"/>
-  </xacro:iiwa14>
+  </xacro:iiwa7>
 
 </robot>

@@ -4,52 +4,30 @@
   <arg name="device"			default="iiwa14"/>
   <arg name="hardware_interface"	default="PositionJointInterface"/>
   <arg name="trajectory"		default="true"/>
-  <arg name="joint_state_frequency"	default="100"/>
-  <arg name="robot_state_frequency"	default="100"/>
 
-  <arg name="robot_description"		default="robot_description"/>
-  <arg name="scene"			default="diiwa_base_scene"/>
-  
-  <group ns="$(arg robot_name)">
-    <!-- Setup list of controllers to be spawned -->
-    <arg name ="controller_list" if="$(arg trajectory)"
-	 value="$(arg hardware_interface)_trajectory_controller"/>
-    <arg name ="controller_list" unless="$(arg trajectory)"
-	 value="$(arg hardware_interface)_J1_controller
-		$(arg hardware_interface)_J2_controller
-		$(arg hardware_interface)_J3_controller
-		$(arg hardware_interface)_J4_controller
-		$(arg hardware_interface)_J5_controller
-		$(arg hardware_interface)_J6_controller
-		$(arg hardware_interface)_J7_controller"/>
+  <arg name="controller_prefix"
+       value="$(arg robot_name)_$(arg hardware_interface)_"/>
 
-    <param name="$(arg robot_description)"
-	   command="xacro --inorder '$(find aist_description
-		    )/devices/urdf/$(arg device).urdf'
-		    robot_name:=$(arg robot_name)
-		    hardware_interface:=$(arg hardware_interface)"/>
+  <!-- Setup list of controllers to be spawned -->
+  <arg name ="controller_list" if="$(arg trajectory)"
+       value="$(arg controller_prefix)trajectory_controller"/>
+  <arg name ="controller_list" unless="$(arg trajectory)"
+       value="$(arg controller_prefix)J1_controller
+	      $(arg controller_prefix)J2_controller
+	      $(arg controller_prefix)J3_controller
+	      $(arg controller_prefix)J4_controller
+	      $(arg controller_prefix)J5_controller
+	      $(arg controller_prefix)J6_controller
+	      $(arg controller_prefix)J7_controller"/>
 
-    <!-- Setup parameters for joint_state_controller -->
-    <rosparam file="$(find aist_control)/config/joint_state_controller.yaml"
-	      subst_value="true"/>
+  <!-- Setup parameters for IIWA controllers -->
+  <rosparam file="$(find aist_control)/config/$(arg device)_controller.yaml"
+	    subst_value="true"/>
 
-    <!-- Setup parameters for IIWA controllers -->
-    <rosparam file="$(find aist_control)/config/$(arg device)_controller.yaml"
-	      subst_value="true"/>
-
-    <!-- Spawn controllers -->
-    <node name="controller_manager"
-    	  pkg ="controller_manager" type="controller_manager"
-    	  args="spawn joint_state_controller $(arg controller_list)"
-    	  respawn="false" output ="screen"/>
-
-    <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped
-	 and publish to TF based on the parameter robot_description -->
-    <node name="robot_state_publisher"
-    	  pkg ="robot_state_publisher" type="robot_state_publisher">
-      <remap from="joint_states" to="/$(arg robot_name)/joint_states"/>
-      <param name="publish_frequency" value="$(arg robot_state_frequency)"/>
-    </node>
-  </group>
+  <!-- Spawn controllers -->
+  <node name="$(arg robot_name)_controller_manager"
+    	pkg ="controller_manager" type="controller_manager"
+    	args="spawn $(arg controller_list)"
+    	respawn="false" output ="screen"/>
 
 </launch>

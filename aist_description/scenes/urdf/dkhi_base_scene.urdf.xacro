@@ -44,9 +44,9 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:magripper2>
 
-  <!-- Required because package robot_controllers is used for
-       driving lehz40k2_30 gripper -->
   <gazebo>
+    <!-- Required because package robot_controllers is used for
+	 driving lehz40k2_30 gripper -->
     <!--   <plugin name="fetch_gazebo_plugin" filename="libfetch_gazebo_plugin.so"/> -->
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/</robotNamespace>
