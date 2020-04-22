@@ -5,33 +5,37 @@
   <arg name="scene"			default="diiwa_base_scene"/>
   <arg name="paused"			default="false"/>
   <arg name="gui"			default="true"/>
+  <arg name="use_sim_time"		default="true"/>
   <arg name="debug"			default="false"/>
   <arg name="joint_state_frequency"	default="100"/>
   <arg name="robot_state_frequency"	default="100"/>
   <arg name="rviz_config"		default=""/>
   <arg name="robot_ip_a"		default="10.66.171.81"/>
   <arg name="robot_ip_b"		default="10.66.171.82"/>
-  
+  <arg name="hardware_interface"	default="PositionJointInterface"/>
+
   <!-- Load URDF to param "robot_description" and spawn the robot -->
   <param name="robot_description"
   	 command="$(find xacro)/xacro --inorder
   		  '$(find aist_description
-		  )/scenes/urdf/$(arg scene).urdf.xacro'"/>
+		  )/scenes/urdf/$(arg scene).urdf.xacro'
+		  hardware_interface:=$(arg hardware_interface)"/>
 
   <group if="$(arg sim)">
     <!-- Startup simulated world -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-      <arg name="world_name" default="worlds/empty.world"/>
-      <arg name="paused"     value="$(arg paused)"/>
-      <arg name="gui"        value="$(arg gui)"/>
-      <arg name="verbose"    value="true"/>
+      <arg name="world_name"	default="worlds/empty.world"/>
+      <arg name="paused"	value="$(arg paused)"/>
+      <arg name="gui"		value="$(arg gui)"/>
+      <arg name="use_sim_time"	value="$(arg use_sim_time)"/>
+      <arg name="verbose"	value="true"/>
     </include>
 
     <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model"
 	  args="-urdf -param robot_description -model robot"
 	  respawn="false" output="screen" />
   </group>
-    
+
   <group unless="$(arg sim)">
     <include file="$(find aist_control)/launch/iiwa_driver.launch">
       <arg name="prefix"		value="a_iiwa_"/>
@@ -57,13 +61,17 @@
 
   <!-- Launch joint_state_publisher -->
   <node name="joint_state_publisher"
-	pkg="joint_state_publisher" type="joint_state_publisher">
-    <rosparam param="source_list">[/a_iiwa/joint_states, /b_iiwa/joint_states]</rosparam>
+  	pkg="joint_state_publisher" type="joint_state_publisher">
+    <rosparam param="source_list">
+      [/a_iiwa/joint_states, /b_iiwa/joint_states]
+    </rosparam>
   </node>
 
   <!-- Launch moveit -->
   <include file="$(find diiwa_moveit_config)/launch/move_group.launch">
-    <arg name="debug"	value="$(arg debug)"/>
+    <arg name="hardware_interface"	value="$(arg hardware_interface)"/>
+    <arg name="scene"			value="$(arg scene)"/>
+    <arg name="debug"			value="$(arg debug)"/>
   </include>
 
   <!-- Launch rviz with appropriate launch-prefix and config file. -->
@@ -74,9 +82,9 @@
        name="command_args" value="-d $(arg rviz_config)"/>
 
   <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false"
-	args="$(arg command_args)" output="screen">
+  	args="$(arg command_args)" output="screen">
     <rosparam command="load"
-	      file="$(find diiwa_moveit_config)/config/kinematics.yaml"/>
+  	      file="$(find diiwa_moveit_config)/config/kinematics.yaml"/>
   </node>
 
 </launch>

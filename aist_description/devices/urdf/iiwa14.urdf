@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="iiwa14">
+
+  <xacro:arg name="robot_name"		default="iiwa"/>
+  <xacro:arg name="hardware_interface"	default="PositionJointInterface"/>
+
+  <link name="world"/>
+
+  <xacro:include filename="$(find aist_description
+			   )/devices/urdf/iiwa14.urdf.xacro" />
+  <xacro:iiwa14_with_ee_link robot_name="$(arg robot_name)"
+			     parent="world"
+			     hardware_interface="$(arg hardware_interface)">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:iiwa14_with_ee_link>
+
+</robot>

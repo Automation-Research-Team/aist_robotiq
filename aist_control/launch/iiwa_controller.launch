@@ -7,6 +7,9 @@
   <arg name="joint_state_frequency"	default="100"/>
   <arg name="robot_state_frequency"	default="100"/>
 
+  <arg name="robot_description"		default="robot_description"/>
+  <arg name="scene"			default="diiwa_base_scene"/>
+  
   <group ns="$(arg robot_name)">
     <!-- Setup list of controllers to be spawned -->
     <arg name ="controller_list" if="$(arg trajectory)"
@@ -20,6 +23,12 @@
 		$(arg hardware_interface)_J6_controller
 		$(arg hardware_interface)_J7_controller"/>
 
+    <param name="$(arg robot_description)"
+	   command="xacro --inorder '$(find aist_description
+		    )/devices/urdf/$(arg device).urdf'
+		    robot_name:=$(arg robot_name)
+		    hardware_interface:=$(arg hardware_interface)"/>
+
     <!-- Setup parameters for joint_state_controller -->
     <rosparam file="$(find aist_control)/config/joint_state_controller.yaml"
 	      subst_value="true"/>
@@ -30,9 +39,9 @@
 
     <!-- Spawn controllers -->
     <node name="controller_manager"
-	  pkg ="controller_manager" type="controller_manager"
-	  args="spawn joint_state_controller $(arg controller_list)"
-	  respawn="false" output ="screen"/>
+    	  pkg ="controller_manager" type="controller_manager"
+    	  args="spawn joint_state_controller $(arg controller_list)"
+    	  respawn="false" output ="screen"/>
 
     <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped
 	 and publish to TF based on the parameter robot_description -->
