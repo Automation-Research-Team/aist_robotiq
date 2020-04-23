@@ -81,6 +81,10 @@ class InteractiveRoutines(URRoutines):
 
             if key == 'q':
                 break
+            elif key == 'r':
+                self._robot_name = raw_input("  robot name? ")
+            elif key == 'c':
+                self._camera_name = raw_input("  camera name? ")
             elif key == 'X':
                 axis = 'X'
             elif key == 'Y':
