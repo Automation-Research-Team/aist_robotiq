@@ -10,7 +10,7 @@
     <node name="$ur_driver" pkg="ur_modern_driver" type="ur_driver"
 	  output="screen">
       <rosparam filename="$(find aist_control
-			  )/config/$(arg device)_driver.yaml"
+			  )/config/templates/$(arg device)_driver.yaml"
 		subst_value="true"/>
       <repmap from="joint_states" to="/joint_states"/>
     </node>

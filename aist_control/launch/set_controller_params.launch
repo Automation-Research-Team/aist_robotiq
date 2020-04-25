@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="controllers"		default=""/>
+  <arg name="robot_names"		default=""/>
+  <arg name="devices"			default=""/>
+  <arg name="joint_state_frequency"	default="50.0"/>
+
+  <group if="$(eval len(arg('controllers')) != 0)">
+    <arg name="controller" value="$(eval arg('controllers').split()[0])"/>
+    <arg name="robot_name" value="$(eval arg('robot_names').split()[0])"/>
+    <arg name="device"	   value="$(eval arg('devices').split()[0])"/>
+    <rosparam file="$(find aist_control
+		    )/config/templates/$(arg device)_controller.yaml"
+	      subst_value="true"/>
+
+    <arg name="remaining_controllers"
+	 value="$(eval ' '.join(arg('controllers').split()[1:]))"/>
+    <arg name="remaining_robot_names"
+	 value="$(eval ' '.join(arg('robot_names').split()[1:]))"/>
+    <arg name="remaining_devices"
+	 value="$(eval ' '.join(arg('devices').split()[1:]))"/>
+    <include file="$(find aist_control)/launch/set_controller_params.launch">
+      <arg name="controllers"		value="$(arg remaining_controllers)"/>
+      <arg name="robot_names"		value="$(arg remaining_robot_names)"/>
+      <arg name="devices"		value="$(arg remaining_devices)"/>
+      <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
+    </include>
+  </group>
+
+</launch>

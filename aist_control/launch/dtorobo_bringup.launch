@@ -10,7 +10,24 @@
   <arg name="joint_state_frequency"	default="500"/>
   <arg name="robot_state_frequency"	default="500"/>
   <arg name="rviz_config"		default=""/>
-  
+  <arg name="controllers"		value="joint_state_controller
+					       a_torobo_arm_controller
+					       a_torobo_gripper_controller
+					       b_torobo_arm_controller
+					       b_torobo_gripper_controller"/>
+  <arg name="robot_names"		value="joint_state
+					       a_torobo a_torobo
+					       b_torobo b_torobo"/>
+  <arg name="devices"			value="joint_state
+					       torobo_arm torobo_gripper
+					       torobo_arm torobo_gripper"/>
+
+  <param name="use_real_robot"	value="$(eval not arg('sim'))"/>
+  <rosparam command="delete" param="grippers"/>
+  <rosparam command="delete" param="cameras"/>
+  <rosparam command="load"
+ 	    file="$(find aist_routines)/config/dtorobo_config.yaml"/>
+
   <group ns="torobo">
     <!-- Load URDF to param "robot_description" and spawn the robot -->
     <param name="robot_description"
@@ -37,11 +54,9 @@
 	  respawn="false" output="screen" ns="torobo"
 	  args="-urdf -model robot -param robot_description"/>
   </group>
-    
-  <group unless="$(arg sim)" ns="torobo">
-    <rosparam file="$(find aist_control
-		    )/config/dtorobo_controller_config.yaml"/>
 
+  <group unless="$(arg sim)" ns="torobo">
+    <rosparam file="$(find aist_control)/config/dtorobo_drivers.yaml"/>
     <node name="torobo_driver_nodelet" pkg="nodelet" type="nodelet"
           args="load torobo_driver/torobo_driver_nodelet $(arg manager)"
           output="screen">
@@ -54,47 +69,22 @@
     </node>
   </group>
 
-  <group ns="torobo">
-    <!-- Setup controller parameters -->
-    <rosparam file="$(find aist_control)/config/joint_state_controller.yaml"
-	      subst_value="true"/>
-    <include file="$(find aist_control)/launch/controller.launch">
-      <arg name="prefix" value="a_torobo_"/>
-      <arg name="device" value="torobo_arm"/>
-      <arg name="spawn"  value="false"/>
-    </include>
-    <include file="$(find aist_control)/launch/controller.launch">
-      <arg name="prefix" value="a_torobo_"/>
-      <arg name="device" value="torobo_gripper"/>
-      <arg name="spawn"  value="false"/>
-    </include>
-    <include file="$(find aist_control)/launch/controller.launch">
-      <arg name="prefix" value="b_torobo_"/>
-      <arg name="device" value="torobo_arm"/>
-      <arg name="spawn"  value="false"/>
-    </include>
-    <include file="$(find aist_control)/launch/controller.launch">
-      <arg name="prefix" value="b_torobo_"/>
-      <arg name="device" value="torobo_gripper"/>
-      <arg name="spawn"  value="false"/>
-    </include>
-
-    <!-- Setup controller names to be spawned -->
-    <rosparam file="$(find aist_control)/config/dtorobo_controller_list.yaml"/>
-
-    <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped
-	 and publish to TF according to the parameter robot_description -->
-    <node name="robot_state_publisher"
-    	  pkg ="robot_state_publisher" type="robot_state_publisher">
-      <param name="publish_frequency" value="$(arg robot_state_frequency)"/>
-    </node>
-  </group>
-
   <!-- Spawn controllers -->
-  <include file="$(find torobo_control)/launch/torobo_control_nodelet.launch">
-    <arg name="manager" value="$(arg manager)"/>
-    <arg name="sim"	value="$(arg sim)"/>
+  <include file="$(find aist_control)/launch/torobo_spawn_controllers.launch">
+    <arg name="controllers"		value="$(arg controllers)"/>
+    <arg name="robot_names"		value="$(arg robot_names)"/>
+    <arg name="devices"			value="$(arg devices)"/>
+    <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
+    <arg name="sim"			value="$(arg sim)"/>
+    <arg name="manager"			value="$(arg manager)"/>
   </include>
+
+  <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped
+       and publish to TF according to the parameter robot_description -->
+  <node name="robot_state_publisher" ns="torobo"
+    	pkg ="robot_state_publisher" type="robot_state_publisher">
+    <param name="publish_frequency" value="$(arg robot_state_frequency)"/>
+  </node>
 
   <!-- Spawn torobo_dynamics -->
   <include file="$(find torobo_dynamics)/launch/torobo_dynamics_nodelet.launch">

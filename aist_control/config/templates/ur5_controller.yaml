@@ -1,0 +1,21 @@
+$(arg controller):
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - $(arg robot_name)_shoulder_pan_joint
+    - $(arg robot_name)_shoulder_lift_joint
+    - $(arg robot_name)_elbow_joint
+    - $(arg robot_name)_wrist_1_joint
+    - $(arg robot_name)_wrist_2_joint
+    - $(arg robot_name)_wrist_3_joint
+  constraints:
+    goal_time: 0.6
+    stopped_velocity_tolerance: 0.05
+    $(arg robot_name)_shoulder_pan_joint: {trajectory: 0.1, goal: 0.1}
+    $(arg robot_name)_shoulder_lift_joint: {trajectory: 0.1, goal: 0.1}
+    $(arg robot_name)_elbow_joint: {trajectory: 0.1, goal: 0.1}
+    $(arg robot_name)_wrist_1_joint: {trajectory: 0.1, goal: 0.1}
+    $(arg robot_name)_wrist_2_joint: {trajectory: 0.1, goal: 0.1}
+    $(arg robot_name)_wrist_3_joint: {trajectory: 0.1, goal: 0.1}
+  stop_trajectory_duration: 0.5
+  state_publish_rate:  25
+  action_monitor_rate: 10

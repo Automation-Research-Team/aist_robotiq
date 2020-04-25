@@ -1,0 +1,3 @@
+$(arg controller):
+  type: joint_state_controller/JointStateController
+  publish_rate: $(arg joint_state_frequency)

@@ -13,7 +13,12 @@
   <arg name="reverse_port_a"		default="50003"/>
   <arg name="robot_ip_b"		default="10/66/171.51"/>
   <arg name="reverse_port_b"		default="50002"/>
-  
+  <arg name="controllers"		value="joint_state_controller
+					       a_bot_controller
+					       b_bot_controller"/>
+  <arg name="robot_names"		value="joint_state a_bot b_bot"/>
+  <arg name="devices"			value="joint_state ur5 ur5"/>
+
   <!-- Load URDF to param "robot_description" and spawn the robot -->
   <param name="robot_description"
   	 command="$(find xacro)/xacro --inorder
@@ -48,23 +53,14 @@
 	  output="screen"/>
 
     <!-- Spawn controllers -->
-    <include file="$(find aist_control)/launch/controller.launch">
-      <arg name="prefix" value="a_bot_"/>
-      <arg name="device" value="ur5"/>
+    <include file="$(find aist_control)/launch/spawn_controllers.launch">
+      <arg name="controllers"		value="$(arg controllers)"/>
+      <arg name="robot_names"		value="$(arg robot_names)"/>
+      <arg name="devices"		value="$(arg devices)"/>
+      <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
     </include>
-    <include file="$(find aist_control)/launch/controller.launch">
-      <arg name="prefix" value="b_bot_"/>
-      <arg name="device" value="ur5"/>
-    </include>
-
-    <!-- Setup parameters and spawn joint_state_controller -->
-    <rosparam file="$(find aist_control)/config/joint_state_controller.yaml"
-	      subst_value="true"/>
-    <node name="joint_state_controller_spawner"
-	  pkg ="controller_manager" type="controller_manager"
-	  args="spawn joint_state_controller" respawn="false" output="screen"/>
   </group>
-    
+
   <group unless="$(arg sim)">
     <include file="$(find aist_control)/launch/ur_driver.launch">
       <arg name="prefix"		value="a_bot_"/>
@@ -86,7 +82,7 @@
 	pkg ="robot_state_publisher" type="robot_state_publisher" >
     <param name="publish_frequency" value="$(arg robot_state_frequency)"/>
   </node>
-  
+
   <!-- Launch moveit -->
   <include file="$(find aist_moveit_config)/launch/move_group.launch">
     <arg name="debug"	value="$(arg debug)"/>

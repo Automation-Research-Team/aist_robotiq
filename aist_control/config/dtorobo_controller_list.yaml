@@ -1,6 +1,0 @@
-controller_list:
-  - joint_state_controller
-  - a_torobo_arm_controller
-  - a_torobo_gripper_controller
-  - b_torobo_arm_controller
-  - b_torobo_gripper_controller

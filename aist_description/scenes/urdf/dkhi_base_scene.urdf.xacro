@@ -40,15 +40,15 @@
 
   <!-- Attach grippers -->
   <xacro:include filename="$(find aist_description)/devices/urdf/magripper.urdf.xacro" />
-  <xacro:magripper2 prefix="a_khi_gripper_" parent="a_khi_ee_link">
+  <xacro:magripper2 prefix="a_khi_" parent="a_khi_ee_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:magripper2>
 
   <gazebo>
     <!-- Required because package robot_controllers is used for
 	 driving lehz40k2_30 gripper -->
-    <!--   <plugin name="fetch_gazebo_plugin" filename="libfetch_gazebo_plugin.so"/> -->
-    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+    <!-- <plugin name="fetch_gazebo_plugin" filename="libfetch_gazebo_plugin.so"/> -->
+    <plugin name="gazebo_ros_control"  filename="libgazebo_ros_control.so">
       <robotNamespace>/</robotNamespace>
       <legacyModeNS>true</legacyModeNS>
     </plugin>

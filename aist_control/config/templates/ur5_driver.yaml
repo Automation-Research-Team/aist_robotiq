@@ -1,6 +1,6 @@
 prefix: $(arg prefix)
 robot_ip_address: $(arg robot_ip_address)
-reverse_port: $(arg reverse_poprt)
+reverse_port: $(arg reverse_port)
 min_payload: 0.0
 max_payload: 1.0
 servoj_time: 0.008

@@ -1,0 +1,27 @@
+$(arg controller):
+  type: "position_controllers/JointTrajectoryController"
+  action_ns: follow_joint_trajectory  # for moveit
+  action_type: FollowJointTrajectory  # for moveit (==>type)
+  action_default: true                # for moveit (==>default)
+  joints:
+    - $(arg robot_name)_arm/joint_1
+    - $(arg robot_name)_arm/joint_2
+    - $(arg robot_name)_arm/joint_3
+    - $(arg robot_name)_arm/joint_4
+    - $(arg robot_name)_arm/joint_5
+    - $(arg robot_name)_arm/joint_6
+    - $(arg robot_name)_arm/joint_7
+  allow_partial_joints_goal: true
+  constraints:
+    goal_time: 0.5
+    stopped_velocity_tolerance: 0.05
+    $(arg robot_name)_arm/joint_1: {trajectory: 0.01745, goal: 0.01745}
+    $(arg robot_name)_arm/joint_2: {trajectory: 0.01745, goal: 0.01745}
+    $(arg robot_name)_arm/joint_3: {trajectory: 0.01745, goal: 0.01745}
+    $(arg robot_name)_arm/joint_4: {trajectory: 0.01745, goal: 0.01745}
+    $(arg robot_name)_arm/joint_5: {trajectory: 0.01745, goal: 0.01745}
+    $(arg robot_name)_arm/joint_6: {trajectory: 0.01745, goal: 0.01745}
+    $(arg robot_name)_arm/joint_7: {trajectory: 0.01745, goal: 0.01745}
+  stop_trajectory_duration: 0.5
+  state_publish_rate: 20
+  action_monitor_rate: 20
