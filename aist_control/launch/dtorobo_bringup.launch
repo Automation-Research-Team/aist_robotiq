@@ -15,9 +15,9 @@
 					       a_torobo_gripper_controller
 					       b_torobo_arm_controller
 					       b_torobo_gripper_controller"/>
-  <arg name="robot_names"		value="joint_state
-					       a_torobo a_torobo
-					       b_torobo b_torobo"/>
+  <arg name="prefixes"			value="joint_state
+					       a_torobo_ a_torobo_
+					       b_torobo_ b_torobo_"/>
   <arg name="devices"			value="joint_state
 					       torobo_arm torobo_gripper
 					       torobo_arm torobo_gripper"/>
@@ -72,7 +72,7 @@
   <!-- Spawn controllers -->
   <include file="$(find aist_control)/launch/torobo_spawn_controllers.launch">
     <arg name="controllers"		value="$(arg controllers)"/>
-    <arg name="robot_names"		value="$(arg robot_names)"/>
+    <arg name="prefixes"		value="$(arg prefixes)"/>
     <arg name="devices"			value="$(arg devices)"/>
     <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
     <arg name="sim"			value="$(arg sim)"/>

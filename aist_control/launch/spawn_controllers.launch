@@ -2,14 +2,14 @@
 <launch>
 
   <arg name="controllers"		default=""/>
-  <arg name="robot_names"		default=""/>
+  <arg name="prefixes"			default=""/>
   <arg name="devices"			default=""/>
   <arg name="joint_state_frequency"	default="50.0"/>
 
   <!-- Setup controllers parameters -->
   <include file="$(find aist_control)/launch/set_controller_params.launch">
     <arg name="controllers"		value="$(arg controllers)"/>
-    <arg name="robot_names"		value="$(arg robot_names)"/>
+    <arg name="prefixes"		value="$(arg prefixes)"/>
     <arg name="devices"			value="$(arg devices)"/>
     <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
   </include>

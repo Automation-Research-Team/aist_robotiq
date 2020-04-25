@@ -17,7 +17,7 @@
        value="joint_state_controller
 	      a_iiwa_PositionJointInterface_trajectory_controller
 	      b_iiwa_PositionJointInterface_trajectory_controller"/>
-  <arg name="robot_names"		value="joint_state a_iiwa b_iiwa"/>
+  <arg name="prefixes"			value="joint_state a_iiwa_ b_iiwa_"/>
   <arg name="devices"			value="joint_state iiwa14 iiwa14"/>
 
   <!-- Load URDF to param "robot_description" and spawn the robot -->
@@ -58,7 +58,7 @@
   <!-- Spawn controllers -->
   <include file="$(find aist_control)/launch/spawn_controllers.launch">
     <arg name="controllers"		value="$(arg controllers)"/>
-    <arg name="robot_names"		value="$(arg robot_names)"/>
+    <arg name="prefixes"		value="$(arg prefixes)"/>
     <arg name="devices"			value="$(arg devices)"/>
     <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
   </include>

@@ -3,15 +3,15 @@ $(arg controller):
   max_velocity_x: 2.0
   max_acceleration_x: 1.5
   autostart: true
-  base_frame: $(arg robot_name)_base_link
-  odometry_frame: $(arg robot_name)_odom
-  l_wheel_joint: $(arg robot_name)_l_wheel_joint
-  r_wheel_joint: $(arg robot_name)_l_wheel_joint
+  base_frame: $(arg prefix)base_link
+  odometry_frame: $(arg prefix)odom
+  l_wheel_joint: $(arg prefix)l_wheel_joint
+  r_wheel_joint: $(arg prefix)l_wheel_joint
 
 gazebo:
   default_controllers:
     - $(arg controller)
-  $(arg robot_name)_l_wheel_joint:
+  $(arg prefix)l_wheel_joint:
     position:
       p: 0.0
       d: 0.0
@@ -23,7 +23,7 @@ gazebo:
       i: 0.5
       i_clamp: 6.0
     effort_limit: 8.85
-  $(arg robot_name)_r_wheel_joint:
+  $(arg prefix)r_wheel_joint:
     position:
       p: 0.0
       d: 0.0

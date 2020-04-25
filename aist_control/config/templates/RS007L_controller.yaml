@@ -1,19 +1,19 @@
 $(arg controller):
   type: position_controllers/JointTrajectoryController
   joints:
-    - $(arg robot_name)_joint1
-    - $(arg robot_name)_joint2
-    - $(arg robot_name)_joint3
-    - $(arg robot_name)_joint4
-    - $(arg robot_name)_joint5
-    - $(arg robot_name)_joint6
+    - $(arg prefix)joint1
+    - $(arg prefix)joint2
+    - $(arg prefix)joint3
+    - $(arg prefix)joint4
+    - $(arg prefix)joint5
+    - $(arg prefix)joint6
   constraints:
     goal_time: 2.0
     stopped_velocity_tolerance: 0.1
-    $(arg robot_name)_joint1: {trajectory: 0, goal: 0.2}
-    $(arg robot_name)_joint2: {trajectory: 0, goal: 0.2}
-    $(arg robot_name)_joint3: {trajectory: 0, goal: 0.2}
-    $(arg robot_name)_joint4: {trajectory: 0, goal: 0.2}
+    $(arg prefix)joint1: {trajectory: 0, goal: 0.2}
+    $(arg prefix)joint2: {trajectory: 0, goal: 0.2}
+    $(arg prefix)joint3: {trajectory: 0, goal: 0.2}
+    $(arg prefix)joint4: {trajectory: 0, goal: 0.2}
   state_publish_rate:  50
   action_monitor_rate: 20
   #hold_trajectory_duration: 0

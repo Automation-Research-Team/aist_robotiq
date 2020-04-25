@@ -15,8 +15,8 @@
 					       a_khi_controller
 					       b_khi_controller
 					       a_khi_gripper_controller"/>
-  <arg name="robot_names"		value="joint_state
-					       a_khi b_khi a_khi"/>
+  <arg name="prefixes"			value="joint_state
+					       a_khi_ b_khi_ a_khi_"/>
   <arg name="devices"			value="joint_state
 					       RS007L RS007L gripper"/>
 
@@ -56,7 +56,7 @@
   <!-- Spawn controllers -->
   <include file="$(find aist_control)/launch/spawn_controllers.launch">
     <arg name="controllers"		value="$(arg controllers)"/>
-    <arg name="robot_names"		value="$(arg robot_names)"/>
+    <arg name="prefixes"		value="$(arg prefixes)"/>
     <arg name="devices"			value="$(arg devices)"/>
     <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
   </include>

@@ -3,4 +3,3 @@ khi_robot_param:
   arm:
     arm1:
       - $(arg prefix)controller
-      

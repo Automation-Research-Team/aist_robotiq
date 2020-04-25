@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
 <launch>
 
-  <arg name="prefix"		default="arm_"/>
+  <arg name="robot_name"	default="khi"/>
   <arg name="device"		default="RS007L"/>
   <arg name="robot_ip_address"	default="10.66.171.91"/>
   <arg name="period"		defualt="4"/>
 
-  <node name="$(arg prefix)driver" pkg="khi_robot_control" type="main"
+  <node name="$(arg robot_name)_driver" pkg="khi_robot_control" type="main"
 	args="--interface $(arg robot_ip_address)
 	      --period $(arg period) --robot $(arg device)"
 	respawn="false" output="screen" cwd="node">
