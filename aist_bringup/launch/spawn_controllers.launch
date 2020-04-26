@@ -4,8 +4,9 @@
   <arg name="prefixes"			default=""/>
   <arg name="devices"			default=""/>
   <arg name="controllers"		default=""/>
-  <arg name="ros_controllers"		default=""/>
   <arg name="torobo_controllers"	default=""/>
+  <arg name="fetch_controllers"		default=""/>
+  <arg name="ros_controllers"		default=""/>
   <arg name="joint_state_frequency"	default="50.0"/>
   <arg name="sim"			default="false"/>
   <arg name="manager"			default="torobo_nodelet_manager"/>
@@ -14,53 +15,56 @@
     <!-- Setup parameters for the device at the head of "devices". -->
     <arg name="prefix" value="$(eval prefixes.split()[0])"/>
     <arg name="device" value="$(eval devices.split()[0])"/>
-    <rosparam file="$(find aist_bringup
-		    )/config/templates/$(arg device)_controller.yaml"
+    <rosparam file="$(find aist_bringup)/config/$(arg device)_controller.yaml"
 	      subst_value="true"/>
 
     <arg name="controller" value="$(eval controllers.split()[0])"/>
 
     <!-- If "device" is a torobo device,
-	 add its controller to the list of torobo_controllers. -->
+	 add its controller to torobo_controllers. -->
     <arg name ="updated_torobo_controllers"
 	 value="$(eval torobo_controllers + ' ' + controller
 		if device.find('torobo') != -1 else torobo_controllers)"/>
 
-    <!-- If "device" is neither a torobo nor robot_controller device,
-	 add its controller to the list of ros_controlles. -->
+    <!-- If "device" is a fetch device,
+	 add its controller to fetch_controllers. -->
+    <arg name ="updated_fetch_controllers"
+	 value="$(eval fetch_controllers + ' ' + controller
+		if device.find('fetch') != -1 else fetch_controllers)"/>
+
+    <!-- If "device" is neither a torobo nor fetch device,
+	 add its controller to ros_controlles. -->
     <arg name ="updated_ros_controllers"
 	 value="$(eval ros_controllers + ' ' + controller
-		if (device.find('torobo') == -1 and
-		    device != 'base' and device != 'gripper')
+		if (device.find('torobo') == -1 and device.find('fetch') == -1)
 		else ros_controllers)"/>
 
     <!-- Recursively setup parameters for the remaining devices. -->
-    <arg name="remaining_prefixes"
+    <arg name="remained_prefixes"
 	 value="$(eval ' '.join(prefixes.split()[1:]))"/>
-    <arg name="remaining_devices"
+    <arg name="remained_devices"
 	 value="$(eval ' '.join(devices.split()[1:]))"/>
-    <arg name="remaining_controllers"
+    <arg name="remained_controllers"
 	 value="$(eval ' '.join(controllers.split()[1:]))"/>
-    <arg name="dummy_frequency"	value="$(arg joint_state_frequency)"/>
-    <arg name="dummy_sim"	value="$(arg sim)"/>
-    <arg name="dummy_manager"	value="$(arg manager)"/>
-    
+    <arg name="kept_frequency"	value="$(arg joint_state_frequency)"/>
+    <arg name="kept_sim"	value="$(arg sim)"/>
+    <arg name="kept_manager"	value="$(arg manager)"/>
     <include file="$(find aist_bringup)/launch/spawn_controllers.launch">
-      <arg name="prefixes"	     value="$(arg remaining_prefixes)"/>
-      <arg name="devices"	     value="$(arg remaining_devices)"/>
-      <arg name="controllers"	     value="$(arg remaining_controllers)"/>
-      <arg name="ros_controllers"    value="$(arg updated_ros_controllers)"/>
+      <arg name="prefixes"	     value="$(arg remained_prefixes)"/>
+      <arg name="devices"	     value="$(arg remained_devices)"/>
+      <arg name="controllers"	     value="$(arg remained_controllers)"/>
       <arg name="torobo_controllers" value="$(arg updated_torobo_controllers)"/>
-      <arg name="joint_state_frequency"	value="$(arg dummy_frequency)"/>
-      <arg name="sim"			value="$(arg dummy_sim)"/>
-      <arg name="manager"		value="$(arg dummy_manager)"/>
+      <arg name="fetch_controllers"  value="$(arg updated_fetch_controllers)"/>
+      <arg name="ros_controllers"    value="$(arg updated_ros_controllers)"/>
+      <arg name="joint_state_frequency"	value="$(arg kept_frequency)"/>
+      <arg name="sim"			value="$(arg kept_sim)"/>
+      <arg name="manager"		value="$(arg kept_manager)"/>
     </include>
   </group>
 
   <group if="$(eval len(devices) == 0)">
     <!-- Setup joint_state_controller parameters -->
-    <rosparam file="$(find aist_bringup
-		    )/config/templates/joint_state_controller.yaml"
+    <rosparam file="$(find aist_bringup)/config/joint_state_controller.yaml"
 	      subst_value="true"/>
 
     <!-- Spawn joint_state_controller and ros_controllers -->
@@ -72,8 +76,7 @@
     <group if="$(eval len(torobo_controllers) != 0)">
       <!-- Setup joint_state_controller parameters -->
       <rosparam ns="torobo"
-		file="$(find aist_bringup
-		      )/config/templates/joint_state_controller.yaml"
+		file="$(find aist_bringup)/config/joint_state_controller.yaml"
 		subst_value="true"/>
 
       <!-- Setup controller names to be spawned -->

@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="prefixes"			default=""/>
+  <arg name="devices"			default=""/>
+  <arg name="drivers"			default=""/>
+  <arg name="ips"			default=""/>
+  <arg name="ports"			default=""/>
+  <arg name="torobo_driver"		default="False"/>
+  <arg name="manager"			default="torobo_nodelet_manager"/>
+  <arg name="robot_description_name"	default="robot_description"/>
+  <arg name="rate"			default="1000"/>
+  <arg name="allowed_start_tolerance"	default="0.01"/>
+  
+  <group if="$(eval len(drivers) != 0)">
+    <!-- Spawn the driver at the head of "drivers". -->
+    <arg name="driver" value="$(eval drivers.split()[0])"/>
+    <include file="$(find aist_bringup)/launch/$(arg driver)_driver.launch">
+      <arg name="prefix"	value="$(eval prefixes.split()[0])"/>
+      <arg name="device"	value="$(eval devices.split()[0])"/>
+      <arg name="ip"		value="$(eval ips.split()[0])"/>
+      <arg name="port"		value="$(eval ports.split()[0])"/>
+    </include>
+
+    <!-- Recursively spawn the remained drivers. -->
+    <arg name ="remained_prefixes"
+	 value="$(eval ' '.join(prefixes.split()[1:]))"/>
+    <arg name ="remained_devices"
+	 value="$(eval ' '.join(devices.split()[1:]))"/>
+    <arg name ="remained_drivers"
+	 value="$(eval ' '.join(drivers.split()[1:]))"/>
+    <arg name ="remained_ips"
+	 value="$(eval ' '.join(ips.split()[1:]))"/>
+    <arg name ="remained_ports"
+	 value="$(eval ' '.join(ports.split()[1:]))"/>
+    <arg name ="updated_torobo_driver"
+	 value="$(eval torobo_driver or driver == 'torobo')"/>
+    <arg name="kept_rate"	value="$(arg joint_state_frequency)"/>
+    <arg name="kept_tolerance"	value="$(arg allowed_start_tolerane)"/>
+    <arg name="kept_manager"	value="$(arg manager)"/>
+    <include file="$(find aist_bringup)/launch/spawn_drivers.launch">
+      <arg name="prefixes"	value="$(arg remained_prefixes)"/>
+      <arg name="devices"	value="$(arg remained_devices)"/>
+      <arg name="drivers"	value="$(arg remained_drivers)"/>
+      <arg name="ips"		value="$(arg remained_ips)"/>
+      <arg name="ports"		value="$(arg remained_ports)"/>
+      <arg name="torobo_driver"	value="$(arg updated_torobo_driver)"/>
+      <arg name="manager"	value="$(arg kept_manager)"/>
+      <arg name="robot_description_name"
+	   value="$(arg kept_robot_description_name)"/>
+      <arg name="rate"		value="$(arg kept_rate)"/>
+      <arg name="allowed_start_tolerance"
+	   value="$(arg kept_tolerance)"/>
+    </include>
+  </group>
+
+  <!-- If argument "drivers" contains "torobo", spawn torobo_driver. -->
+  <group if="$(eval len(drivers) == 0 and has_torobo)">
+    <node name="torobo_driver_nodelet" ns="torobo" pkg="nodelet" type="nodelet"
+          args="load torobo_driver/torobo_driver_nodelet $(arg manager)"
+          output="screen">
+      <param name="debug"	value="false"/>
+      <param name="mock"	value="false"/>
+      <param name="robot_description_name"
+	     value="$(arg robot_description_name)"/>
+      <param name="rate"	value="$(arg rate)"/>
+      <param name="allowed_start_tolerance"
+	     value="$(arg allowed_start_tolerance)"/>
+    </node>
+  </group>
+  
+</launch>

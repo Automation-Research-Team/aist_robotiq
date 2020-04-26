@@ -11,7 +11,7 @@
   <arg name="rviz_config"		default=""/>
 
   <arg name="prefixes"		value="a_khi_ b_khi_ a_khi_"/>
-  <arg name="devices"		value="RS007L RS007L gripper"/>
+  <arg name="devices"		value="RS007L RS007L fetch_gripper"/>
   <arg name="controllers"	value="a_khi_controller b_khi_controller
 				       a_khi_gripper_controller"/>
   <arg name="drivers"		value="khi khi"/>
