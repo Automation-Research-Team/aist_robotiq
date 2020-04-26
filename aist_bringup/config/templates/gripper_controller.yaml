@@ -1,4 +1,4 @@
-$(arg controller):
+$(arg prefix)gripper_controller:
   gripper_action:
     type: robot_controllers/ParallelGripperController
     l_gripper_joint: $(arg prefix)l_gripper_finger_joint
@@ -11,7 +11,7 @@ $(arg controller):
 
 gazebo:
   default_controllers:
-    - $(arg controller)/gripper_action
+    - $(arg prefix)gripper_controller/gripper_action
   $(arg prefix)l_gripper_finger_joint:
     position:
       p: 5000.0

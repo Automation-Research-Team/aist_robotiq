@@ -1,4 +1,4 @@
-$(arg controller):
+$(arg prefix)controller:
   type: position_controllers/JointTrajectoryController
   joints:
     - $(arg prefix)shoulder_pan_joint

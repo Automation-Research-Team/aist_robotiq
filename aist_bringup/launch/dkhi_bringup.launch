@@ -9,13 +9,14 @@
   <arg name="joint_state_frequency"	default="50"/>
   <arg name="robot_state_frequency"	default="50"/>
   <arg name="rviz_config"		default=""/>
-  <arg name="robot_ip_a"		default="10.66.171.91"/>
-  <arg name="robot_ip_b"		default="10.66.171.92"/>
-  <arg name="controllers"		value="a_khi_controller
-					       b_khi_controller
-					       a_khi_gripper_controller"/>
-  <arg name="prefixes"			value="a_khi_ b_khi_ a_khi_"/>
-  <arg name="devices"			value="RS007L RS007L gripper"/>
+
+  <arg name="prefixes"		value="a_khi_ b_khi_ a_khi_"/>
+  <arg name="devices"		value="RS007L RS007L gripper"/>
+  <arg name="controllers"	value="a_khi_controller b_khi_controller
+				       a_khi_gripper_controller"/>
+  <arg name="drivers"		value="khi khi"/>
+  <arg name="ips"		value="10.66.171.91 10.66.171.92"/>
+  <arg name="ports"		value="0 0"/>
 
   <!-- Load URDF to param "robot_description" and spawn the robot -->
   <param name="robot_description"
@@ -26,10 +27,10 @@
   <group if="$(arg sim)">
     <!-- Startup simulated world -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-      <arg name="world_name" default="worlds/empty.world"/>
-      <arg name="paused"     value="$(arg paused)"/>
-      <arg name="gui"        value="$(arg gui)"/>
-      <arg name="verbose"    value="true"/>
+      <arg name="world_name"	value="worlds/empty.world"/>
+      <arg name="paused"	value="$(arg paused)"/>
+      <arg name="gui"		value="$(arg gui)"/>
+      <arg name="verbose"	value="true"/>
     </include>
 
     <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model"
@@ -38,24 +39,23 @@
   </group>
 
   <group unless="$(arg sim)">
-    <include file="$(find aist_bringup)/launch/khi_driver.launch">
-      <arg name="prefix"		value="a_khi_"/>
-      <arg name="device"		value="RS007L"/>
-      <arg name="robot_ip_address"	value="$(arg robot_ip_a)"/>
-    </include>
-    <include file="$(find aist_bringup)/launch/khi_driver.launch">
-      <arg name="prefix"		value="b_khi_"/>
-      <arg name="device"		value="RS007L"/>
-      <arg name="robot_ip_address"	value="$(arg robot_ip_b)"/>
+    <!-- Spawn hardware drivers -->
+    <include file="$(find aist_bringup)/launch/spawn_drivers.launch">
+      <arg name="prefixes"	value="$(arg prefixes)"/>
+      <arg name="devices"	value="$(arg devices)"/>
+      <arg name="drivers"	value="$(arg drivers)"/>
+      <arg name="ips"		value="$(arg ips)"/>
+      <arg name="ports"		value="$(arg ports)"/>
     </include>
   </group>
 
   <!-- Spawn controllers -->
   <include file="$(find aist_bringup)/launch/spawn_controllers.launch">
-    <arg name="controllers"		value="$(arg controllers)"/>
     <arg name="prefixes"		value="$(arg prefixes)"/>
     <arg name="devices"			value="$(arg devices)"/>
+    <arg name="controllers"		value="$(arg controllers)"/>
     <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
+    <arg name="sim"			value="$(arg sim)"/>
   </include>
 
   <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped

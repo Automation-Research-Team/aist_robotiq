@@ -1,4 +1,4 @@
-$(arg controller):
+$(arg prefix)base_controller:
   type: robot_controllers/DiffDriveBaseController
   max_velocity_x: 2.0
   max_acceleration_x: 1.5
@@ -10,7 +10,7 @@ $(arg controller):
 
 gazebo:
   default_controllers:
-    - $(arg controller)
+    - $(arg prefix)base_controller
   $(arg prefix)l_wheel_joint:
     position:
       p: 0.0
