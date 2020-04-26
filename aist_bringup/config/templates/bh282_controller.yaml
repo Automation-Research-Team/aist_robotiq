@@ -1,0 +1,25 @@
+$(arg prefix)j11_position_controller:
+  type: position_controllers/JointPositionController
+  joint: $(arg prefix)j11_joint
+$(arg prefix)j12_position_controller:
+  type: position_controllers/JointPositionController
+  joint: $(arg prefix)j12_joint
+$(arg prefix)j22_position_controller:
+  type: position_controllers/JointPositionController
+  joint: $(arg prefix)j22_joint
+$(arg prefix)j32_position_controller:
+  type: position_controllers/JointPositionController
+  joint: $(arg prefix)j32_joint
+
+$(arg prefix)controller:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - $(arg prefix)j11_joint
+    - $(arg prefix)j12_joint
+    - $(arg prefix)j22_joint
+    - $(arg prefix)j32_joint
+  constraints:
+    goal_time: 0.5
+  state_publish_rate:  25
+  action_monitor_rate: 30
+  stop_trajectory_duration: 0.5

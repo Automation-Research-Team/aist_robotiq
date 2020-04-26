@@ -14,11 +14,10 @@
   <arg name="robot_ip_b"		default="10.66.171.82"/>
   <arg name="hardware_interface"	default="PositionJointInterface"/>
   <arg name="controllers"
-       value="joint_state_controller
-	      a_iiwa_PositionJointInterface_trajectory_controller
+       value="a_iiwa_PositionJointInterface_trajectory_controller
 	      b_iiwa_PositionJointInterface_trajectory_controller"/>
-  <arg name="prefixes"			value="joint_state a_iiwa_ b_iiwa_"/>
-  <arg name="devices"			value="joint_state iiwa14 iiwa14"/>
+  <arg name="prefixes"			value="a_iiwa_ b_iiwa_"/>
+  <arg name="devices"			value="iiwa14 iiwa14"/>
 
   <!-- Load URDF to param "robot_description" and spawn the robot -->
   <param name="robot_description"
@@ -43,12 +42,12 @@
   </group>
 
   <group unless="$(arg sim)">
-    <include file="$(find aist_control)/launch/iiwa_driver.launch">
+    <include file="$(find aist_bringup)/launch/iiwa_driver.launch">
       <arg name="prefix"		value="a_iiwa_"/>
       <arg name="device"		value="iiwa14"/>
       <arg name="robot_ip_address"	value="$(arg robot_ip_a)"/>
     </include>
-    <include file="$(find aist_control)/launch/iiwa_driver.launch">
+    <include file="$(find aist_bringup)/launch/iiwa_driver.launch">
       <arg name="prefix"		value="b_iiwa_"/>
       <arg name="device"		value="iiwa14"/>
       <arg name="robot_ip_address"	value="$(arg robot_ip_b)"/>
@@ -56,7 +55,7 @@
   </group>
 
   <!-- Spawn controllers -->
-  <include file="$(find aist_control)/launch/spawn_controllers.launch">
+  <include file="$(find aist_bringup)/launch/spawn_controllers.launch">
     <arg name="controllers"		value="$(arg controllers)"/>
     <arg name="prefixes"		value="$(arg prefixes)"/>
     <arg name="devices"			value="$(arg devices)"/>

@@ -1,20 +1,20 @@
 <?xml version="1.0" ?>
 <launch>
 
-  <arg name="robot_name"	default="khi"/>
+  <arg name="prefix"		default="khi_"/>
   <arg name="device"		default="RS007L"/>
   <arg name="robot_ip_address"	default="10.66.171.91"/>
   <arg name="period"		defualt="4"/>
 
-  <node name="$(arg robot_name)_driver" pkg="khi_robot_control" type="main"
+  <node name="$(arg prefix)driver" pkg="khi_robot_control" type="main"
 	args="--interface $(arg robot_ip_address)
 	      --period $(arg period) --robot $(arg device)"
 	respawn="false" output="screen" cwd="node">
-    <rosparam file="$(find aist_control)/config/templates/khi_robot_param.yaml"
+    <rosparam file="$(find aist_bringup)/config/templates/khi_driver.yaml"
 	      subst_value="true"/>
   </node>
 
-  <rosparam file="$(find aist_control
+  <rosparam file="$(find aist_bringup
 		  )/config/templates/$(arg device)_joint_limits.yaml"
 	    subst_value="true" ns="$(arg device)"/>
 

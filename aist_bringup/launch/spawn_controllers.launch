@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="controllers"		default=""/>
+  <arg name="prefixes"			default=""/>
+  <arg name="devices"			default=""/>
+  <arg name="joint_state_frequency"	default="50.0"/>
+
+  <!-- Setup controller parameters -->
+  <include file="$(find aist_bringup)/launch/set_controller_params.launch">
+    <arg name="controllers"	value="$(arg controllers)"/>
+    <arg name="prefixes"	value="$(arg prefixes)"/>
+    <arg name="devices"		value="$(arg devices)"/>
+  </include>
+
+  <!-- Setup joint_state_controller parameters -->
+  <rosparam file="$(find aist_bringup
+		  )/config/templates/joint_state_controller.yaml"
+	    subst_value="true"/>
+
+  <!-- Spawn controllers -->
+  <node name="controller_manager"
+	pkg ="controller_manager" type="controller_manager"
+	args="spawn joint_state_controller $(arg controllers)"
+	respawn="false" output="screen"/>
+
+</launch>

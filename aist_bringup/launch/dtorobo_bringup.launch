@@ -10,16 +10,13 @@
   <arg name="joint_state_frequency"	default="500"/>
   <arg name="robot_state_frequency"	default="500"/>
   <arg name="rviz_config"		default=""/>
-  <arg name="controllers"		value="joint_state_controller
-					       a_torobo_arm_controller
+  <arg name="controllers"		value="a_torobo_arm_controller
 					       a_torobo_gripper_controller
 					       b_torobo_arm_controller
 					       b_torobo_gripper_controller"/>
-  <arg name="prefixes"			value="joint_state
-					       a_torobo_ a_torobo_
+  <arg name="prefixes"			value="a_torobo_ a_torobo_
 					       b_torobo_ b_torobo_"/>
-  <arg name="devices"			value="joint_state
-					       torobo_arm torobo_gripper
+  <arg name="devices"			value="torobo_arm torobo_gripper
 					       torobo_arm torobo_gripper"/>
 
   <param name="use_real_robot"	value="$(eval not arg('sim'))"/>
@@ -56,7 +53,7 @@
   </group>
 
   <group unless="$(arg sim)" ns="torobo">
-    <rosparam file="$(find aist_control)/config/dtorobo_drivers.yaml"/>
+    <rosparam file="$(find aist_bringup)/config/dtorobo_drivers.yaml"/>
     <node name="torobo_driver_nodelet" pkg="nodelet" type="nodelet"
           args="load torobo_driver/torobo_driver_nodelet $(arg manager)"
           output="screen">
@@ -70,7 +67,7 @@
   </group>
 
   <!-- Spawn controllers -->
-  <include file="$(find aist_control)/launch/torobo_spawn_controllers.launch">
+  <include file="$(find aist_bringup)/launch/torobo_spawn_controllers.launch">
     <arg name="controllers"		value="$(arg controllers)"/>
     <arg name="prefixes"		value="$(arg prefixes)"/>
     <arg name="devices"			value="$(arg devices)"/>

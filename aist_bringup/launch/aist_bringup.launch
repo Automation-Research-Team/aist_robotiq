@@ -9,15 +9,14 @@
   <arg name="joint_state_frequency"	default="50"/>
   <arg name="robot_state_frequency"	default="50"/>
   <arg name="rviz_config"		default=""/>
-  <arg name="robot_ip_a"		default="10/66/171.52"/>
+  <arg name="robot_ip_a"		default="10.66.171.52"/>
   <arg name="reverse_port_a"		default="50003"/>
-  <arg name="robot_ip_b"		default="10/66/171.51"/>
+  <arg name="robot_ip_b"		default="10.66.171.51"/>
   <arg name="reverse_port_b"		default="50002"/>
-  <arg name="controllers"		value="joint_state_controller
-					       a_bot_controller
+  <arg name="controllers"		value="a_bot_controller
 					       b_bot_controller"/>
-  <arg name="prefixes"			value="joint_state a_bot_ b_bot_"/>
-  <arg name="devices"			value="joint_state ur5 ur5"/>
+  <arg name="prefixes"			value="a_bot_ b_bot_"/>
+  <arg name="devices"			value="ur5 ur5"/>
 
   <!-- Load URDF to param "robot_description" and spawn the robot -->
   <param name="robot_description"
@@ -53,7 +52,7 @@
 	  output="screen"/>
 
     <!-- Spawn controllers -->
-    <include file="$(find aist_control)/launch/spawn_controllers.launch">
+    <include file="$(find aist_bringup)/launch/spawn_controllers.launch">
       <arg name="controllers"		value="$(arg controllers)"/>
       <arg name="prefixes"		value="$(arg prefixes)"/>
       <arg name="devices"		value="$(arg devices)"/>
@@ -62,13 +61,13 @@
   </group>
 
   <group unless="$(arg sim)">
-    <include file="$(find aist_control)/launch/ur_driver.launch">
+    <include file="$(find aist_bringup)/launch/ur_driver.launch">
       <arg name="prefix"		value="a_bot_"/>
       <arg name="device"		value="ur5"/>
       <arg name="robot_ip_address"	value="robot_ip_a"/>
       <arg name="reverse_port"		value="reverse_port_a"/>
     </include>
-    <include file="$(find aist_control)/launch/ur_driver.launch">
+    <include file="$(find aist_bringup)/launch/ur_driver.launch">
       <arg name="prefix"		value="b_bot_"/>
       <arg name="device"		value="ur5"/>
       <arg name="robot_ip_address"	value="robot_ip_b"/>

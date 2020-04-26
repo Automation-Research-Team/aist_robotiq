@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>aist_control</name>
+  <name>aist_bringup</name>
   <version>1.0.0</version>
-  <description>Package contains control scripts/config/tools for various robots</description>
+  <description>Package contains bringup scripts/config/tools for various robots</description>
 
   <author email="t.ueshiba@aist.go.jp">Toshio UESHIBA</author>
   <maintainer email="t.ueshiba@aist.go.jp">Toshio UESHIBA</maintainer>
