@@ -10,8 +10,6 @@ $(arg prefix)gripper_controller:
       i_clamp: 0.0
 
 gazebo:
-  default_controllers:
-    - $(arg prefix)gripper_controller/gripper_action
   $(arg prefix)l_gripper_finger_joint:
     position:
       p: 5000.0

@@ -9,8 +9,6 @@ $(arg prefix)base_controller:
   r_wheel_joint: $(arg prefix)l_wheel_joint
 
 gazebo:
-  default_controllers:
-    - $(arg prefix)base_controller
   $(arg prefix)l_wheel_joint:
     position:
       p: 0.0

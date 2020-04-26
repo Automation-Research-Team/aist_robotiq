@@ -10,13 +10,13 @@
   <arg name="robot_state_frequency"	default="50"/>
   <arg name="rviz_config"		default=""/>
 
-  <arg name="prefixes"		value="a_khi_ b_khi_ a_khi_"/>
-  <arg name="devices"		value="RS007L RS007L fetch_gripper"/>
-  <arg name="controllers"	value="a_khi_controller b_khi_controller
-				       a_khi_gripper_controller"/>
-  <arg name="drivers"		value="khi khi"/>
-  <arg name="ips"		value="10.66.171.91 10.66.171.92"/>
-  <arg name="ports"		value="0 0"/>
+  <arg name="prefixes"	  value="a_khi_ b_khi_ a_khi_"/>
+  <arg name="devices"	  value="RS007L RS007L fetch_gripper"/>
+  <arg name="controllers" value="a_khi_controller b_khi_controller
+				 a_khi_gripper_controller/gripper_action"/>
+  <arg name="drivers"	  value="khi khi"/>
+  <arg name="ips"	  value="10.66.171.91 10.66.171.92"/>
+  <arg name="ports"	  value="0 0"/>
 
   <!-- Load URDF to param "robot_description" and spawn the robot -->
   <param name="robot_description"
