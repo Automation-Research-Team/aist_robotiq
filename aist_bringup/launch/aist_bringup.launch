@@ -14,8 +14,8 @@
   <arg name="devices"		value="ur5 ur5"/>
   <arg name="controllers"	value="a_bot_controller b_bot_controller"/>
   <arg name="drivers"		value="ur ur"/>
-  <arg name="ips"		value="10.66.171.52 10.66.171.51"/>
-  <arg name="ports"		value="50003 50002"/>
+  <arg name="driver_args"	value="10.66.171.52, 50003;
+				       10.66.171.51, 50002"/>
 
   <!-- Load URDF to param "robot_description" and spawn the robot -->
   <param name="robot_description"
@@ -66,8 +66,7 @@
       <arg name="prefixes"	value="$(arg prefixes)"/>
       <arg name="devices"	value="$(arg devices)"/>
       <arg name="drivers"	value="$(arg drivers)"/>
-      <arg name="ips"		value="$(arg ips)"/>
-      <arg name="ports"		value="$(arg ports)"/>
+      <arg name="driver_args"	value="$(arg driver_args)"/>
     </include>
   </group>
 

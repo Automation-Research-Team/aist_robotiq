@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
 <launch>
 
-  <arg name="prefix"	default="khi_"/>
-  <arg name="device"	default="RS007L"/>
-  <arg name="ip"	default="10.66.171.91"/>
-  <arg name="port"	default="0"/>
-  <arg name="period"	defualt="4"/>
+  <arg name="prefix"	 default="khi_"/>
+  <arg name="device"	 default="RS007L"/>
+  <arg name="driver_arg" default="10.66.171.91, 4"/>
 
+  <arg name="ip"	 value="$(eval driver_arg.split(',')[0])"/>
+  <arg name="period"	 value="$(eval driver_arg.split(',')[1])"/>
+    
   <node name="$(arg prefix)driver" pkg="khi_robot_control" type="main"
 	args="--interface $(arg ip)
 	      --period $(arg period) --robot $(arg device)"

@@ -25,19 +25,19 @@
 
     <!-- If "device" is a torobo device,
 	 add its controller to torobo_controllers. -->
-    <arg name ="updated_torobo_controllers"
+    <arg name ="added_torobo_controllers"
 	 value="$(eval torobo_controllers + ' ' + controller
 		if device.find('torobo') != -1 else torobo_controllers)"/>
 
     <!-- If "device" is a fetch device,
 	 add its controller to fetch_controllers. -->
-    <arg name ="updated_fetch_controllers"
+    <arg name ="added_fetch_controllers"
 	 value="$(eval fetch_controllers + ' ' + controller
 		if device.find('fetch') != -1 else fetch_controllers)"/>
 
     <!-- If "device" is neither a torobo nor fetch device,
 	 add its controller to ros_controlles. -->
-    <arg name ="updated_ros_controllers"
+    <arg name ="added_ros_controllers"
 	 value="$(eval ros_controllers + ' ' + controller
 		if (device.find('torobo') == -1 and device.find('fetch') == -1)
 		else ros_controllers)"/>
@@ -56,9 +56,9 @@
       <arg name="prefixes"	     value="$(arg remained_prefixes)"/>
       <arg name="devices"	     value="$(arg remained_devices)"/>
       <arg name="controllers"	     value="$(arg remained_controllers)"/>
-      <arg name="torobo_controllers" value="$(arg updated_torobo_controllers)"/>
-      <arg name="fetch_controllers"  value="$(arg updated_fetch_controllers)"/>
-      <arg name="ros_controllers"    value="$(arg updated_ros_controllers)"/>
+      <arg name="torobo_controllers" value="$(arg added_torobo_controllers)"/>
+      <arg name="fetch_controllers"  value="$(arg added_fetch_controllers)"/>
+      <arg name="ros_controllers"    value="$(arg added_ros_controllers)"/>
       <arg name="joint_state_frequency"	value="$(arg kept_frequency)"/>
       <arg name="sim"			value="$(arg kept_sim)"/>
       <arg name="manager"		value="$(arg kept_manager)"/>

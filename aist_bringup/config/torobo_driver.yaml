@@ -5,8 +5,8 @@ torobo_controller_config:
     - connection_type: Ethernet
 
     # Ethernet connection config
-   - ethernet: {
-        master_controller_ip: $(arg ip)
+    - ethernet: {
+        master_controller_ip: $(arg ip),
         master_controller_port: $(arg port)
       }
 
@@ -27,7 +27,7 @@ torobo_controller_config:
 
     # Ethernet connection config
     - ethernet: {
-        master_controller_ip: $(arg ip)
+        master_controller_ip: $(arg ip),
         master_controller_port: $(arg port)
       }
 

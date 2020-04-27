@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
 <launch>
 
-  <arg name="prefix"	default="torobo_"/>
-  <arg name="device"	default="torobo"/>
-  <arg name="ip"	default="10.66.171.61"/>
-  <arg name="port"	default="50000"/>
+  <arg name="prefix"	 default="torobo_"/>
+  <arg name="device"	 default="torobo"/>
+  <arg name="driver_arg" default="10.66.171.61, 50000"/>
 
+  <arg name="ip"	 value="$(eval driver_arg.split(',')[0])"/>
+  <arg name="port"	 value="$(eval driver_arg.split(',')[1])"/>
+    
   <rosparam ns="torobo"
 	    file="$(find aist_bringup)/config/torobo_driver.yaml"
 	    subst_value="true"/>

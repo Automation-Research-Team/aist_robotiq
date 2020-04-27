@@ -11,12 +11,11 @@
   <arg name="rviz_config"		default=""/>
 
   <arg name="prefixes"	  value="a_khi_ a_khi_"/>
-  <arg name="devices"	  value="RS007L gripper"/>
+  <arg name="devices"	  value="RS007L fetch_gripper"/>
   <arg name="controllers" value="a_khi_controller
 				 a_khi_gripper_controller/gripper_action"/>
   <arg name="drivers"	  value="khi"/>
-  <arg name="ips"	  value="10.66.171.91"/>
-  <arg name="ports"	  value="0"/>
+  <arg name="driver_args" value="10.66.171.91, 4"/>
 
   <!-- Load URDF to param "robot_description" and spawn the robot -->
   <param name="robot_description"
@@ -44,8 +43,7 @@
       <arg name="prefixes"	value="$(arg prefixes)"/>
       <arg name="devices"	value="$(arg devices)"/>
       <arg name="drivers"	value="$(arg drivers)"/>
-      <arg name="ips"		value="$(arg ips)"/>
-      <arg name="ports"		value="$(arg ports)"/>
+      <arg name="driver_args"	value="$(arg driver_args)"/>
     </include>
   </group>
 

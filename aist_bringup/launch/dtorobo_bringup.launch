@@ -20,8 +20,8 @@
 				       a_torobo_gripper_controller
 				       b_torobo_gripper_controller"/>
   <arg name="drivers"		value="torobo torobo"/>
-  <arg name="ips"		value="10.66.171.61 10.66.171.62"/>
-  <arg name="ports"		value="50000 50010"/>
+  <arg name="driver_args"	value="10.66.171.61, 50000;
+				       10.66.171.62, 50010"/>
 
   <param name="use_real_robot"	value="$(eval not arg('sim'))"/>
   <rosparam command="delete" param="grippers"/>
@@ -62,8 +62,7 @@
       <arg name="prefixes"	value="$(arg prefixes)"/>
       <arg name="devices"	value="$(arg devices)"/>
       <arg name="drivers"	value="$(arg drivers)"/>
-      <arg name="ips"		value="$(arg ips)"/>
-      <arg name="ports"		value="$(arg ports)"/>
+      <arg name="driver_args"	value="$(arg driver_args)"/>
       <arg name="manager"	value="$(arg manager)"/>
     </include>
   </group>
