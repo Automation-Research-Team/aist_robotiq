@@ -3,6 +3,7 @@
 
   <arg name="sim"			default="false"/>
   <arg name="scene"			default="aist_base_scene"/>
+  <arg name="manager"			default=""/>
   <arg name="gui"			default="true"/>
   <arg name="debug"			default="false"/>
   <arg name="joint_state_frequency"	default="50"/>
@@ -19,12 +20,17 @@
 
   <param name="use_real_robot"	value="$(eval not sim)"/>
 
+  <!-- Setup namespace for move_group and rviz -->
+  <arg name="ns" value="$(eval '/' if manager == '' else 'torobo')"/>
+  
   <!-- Load URDF to param "robot_description" and spawn the robot -->
-  <param name="robot_description"
-  	 command="$(find xacro)/xacro --inorder
-  		  '$(find aist_description
-		  )/scenes/urdf/$(arg scene).urdf.xacro'"/>
-
+  <group ns="$(arg ns)">
+    <param name="robot_description"
+  	   command="$(find xacro)/xacro --inorder
+  		    '$(find aist_description
+		    )/scenes/urdf/$(arg scene).urdf.xacro'"/>
+  </group>
+  
   <group if="$(arg sim)">
     <!-- Startup simulated world -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -34,25 +40,27 @@
       <arg name="verbose"	value="true"/>
     </include>
 
-    <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model"
+    <node name="spawn_gazebo_model" ns="$(arg ns)"
+	  pkg="gazebo_ros" type="spawn_model"
           args="-urdf -param robot_description -model robot -unpause
 		$(arg gazebo_init_args)"
-	  respawn="false"
 	  output="screen"/>
 
     <!-- Spawn controllers -->
-    <include file="$(find aist_bringup)/launch/spawn_controllers.launch">
+    <include file="$(find aist_bringup
+		   )/launch/include/spawn_controllers.launch">
       <arg name="prefixes"		value="$(arg prefixes)"/>
       <arg name="devices"		value="$(arg devices)"/>
       <arg name="controllers"		value="$(arg controllers)"/>
       <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
       <arg name="sim"			value="$(arg sim)"/>
+      <arg name="manager"		value="$(arg manager)"/>
     </include>
   </group>
 
   <group unless="$(arg sim)">
     <!-- Spawn hardware drivers -->
-    <include file="$(find aist_bringup)/launch/spawn_drivers.launch">
+    <include file="$(find aist_bringup)/launch/include/spawn_drivers.launch">
       <arg name="prefixes"	value="$(arg prefixes)"/>
       <arg name="devices"	value="$(arg devices)"/>
       <arg name="drivers"	value="$(arg drivers)"/>
@@ -60,29 +68,30 @@
     </include>
   </group>
 
-  <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped
-       using the parameter robot_description and publish to TF -->
-  <node name="robot_state_publisher"
-	pkg ="robot_state_publisher" type="robot_state_publisher" >
-    <param name="publish_frequency" value="$(arg robot_state_frequency)"/>
-  </node>
+  <group ns="$(arg ns)">
+    <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped
+	 using the parameter robot_description and publish to TF -->
+    <node name="robot_state_publisher"
+	  pkg ="robot_state_publisher" type="robot_state_publisher" >
+      <param name="publish_frequency" value="$(arg robot_state_frequency)"/>
+    </node>
 
-  <!-- Launch moveit -->
-  <include file="$(arg moveit_config)/launch/move_group.launch">
-    <arg name="debug"	value="$(arg debug)"/>
-  </include>
+    <!-- Launch moveit -->
+    <include file="$(arg moveit_config)/launch/move_group.launch">
+      <arg name="debug"	value="$(arg debug)"/>
+    </include>
 
-  <!-- Launch rviz with appropriate launch-prefix and config file. -->
-  <arg if="$(eval rviz_config == '')"
-       name="command_args"
-       value="-d $(arg moveit_config)/launch/moveit.rviz"/>
-  <arg unless="$(eval rviz_config == '')"
-       name="command_args" value="-d $(arg rviz_config)"/>
+    <!-- Launch rviz with appropriate launch-prefix and config file. -->
+    <arg if="$(eval rviz_config == '')"
+	 name="command_args"
+	 value="-d $(arg moveit_config)/launch/moveit.rviz"/>
+    <arg unless="$(eval rviz_config == '')"
+	 name="command_args" value="-d $(arg rviz_config)"/>
 
-  <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false"
-	args="$(arg command_args)" output="screen">
-    <rosparam command="load"
-	      file="$(arg moveit_config)/config/kinematics.yaml"/>
-  </node>
-
+    <node name="$(anon rviz)" pkg="rviz" type="rviz"
+	  args="$(arg command_args)" output="screen">
+      <rosparam file="$(arg moveit_config)/config/kinematics.yaml"/>
+    </node>
+  </group>
+  
 </launch>

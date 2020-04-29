@@ -1,0 +1,10 @@
+robot_name: $(arg robot_name)
+hardware_interface: $(arg hardware_interface)
+joints:
+  - $(arg prefix)joint_1
+  - $(arg prefix)joint_2
+  - $(arg prefix)joint_3
+  - $(arg prefix)joint_4
+  - $(arg prefix)joint_5
+  - $(arg prefix)joint_6
+  - $(arg prefix)joint_7

@@ -3,8 +3,6 @@
 
   <arg name="sim"			default="false"/>
   <arg name="scene"			default="aist_base_scene"/>
-  <arg name="gui"			default="true"/>
-  <arg name="debug"			default="false"/>
   <arg name="joint_state_frequency"	default="50"/>
   <arg name="robot_state_frequency"	default="50"/>
   <arg name="moveit_config"		default="$(find aist_moveit_config)"/>
@@ -29,11 +27,9 @@
   <arg name="driver_args"	value="10.66.171.52, 50003;
 				       10.66.171.51, 50002"/>
 
-  <include file="$(find aist_bringup)/launch/generic_bringup.launch">
+  <include file="$(find aist_bringup)/launch/include/generic_bringup.launch">
     <arg name="sim"			value="$(arg sim)"/>
     <arg name="scene"			value="$(arg scene)"/>
-    <arg name="gui"			value="$(arg gui)"/>
-    <arg name="debug"			value="$(arg debug)"/>
     <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
     <arg name="robot_state_frequency"	value="$(arg robot_state_frequency)"/>
     <arg name="moveit_config"		value="$(arg moveit_config)"/>
@@ -47,33 +43,37 @@
   </include>
 
   <rosparam file="$(find aist_routines)/config/aist_config.yaml"/>
+
+  <!-- Launch other hardware drivers -->
+  <group if="$(eval not sim)">
+
+    <!-- Drivers for the force sensors -->
+    <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch">
+      <arg name="robot_name"	value="a_bot"/>
+    </include>
+    <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch">
+      <arg name="robot_name"	value="b_bot"/>
+    </include>
+
+    <!-- Drivers for the grippers -->
+    <include file="$(find robotiq_control
+		   )/launch/ur_cmodel_action_controller.launch">
+      <arg name="namespace"	 value="a_bot_gripper" />
+      <arg name="gripper_prefix" value="a_bot_" />
+      <arg name="topic"		 value="/a_bot_controller/ur_driver/URScript"/>
+    </include>
+
+    <!-- Launch fastening tools -->
+    <arg name="config_dir"	default="$(find o2as_fastening_tools)/config"/>
+    <arg name="suction_control"	default="suction_control"/>
+    <arg name="operation_mode"	default="operation_mode"/>
+    <node name="suction_controller" pkg="o2as_fastening_tools"
+	  type="suction_controller.py" output="screen">
+      <param name="config_dir"		value="$(arg config_dir)"/>
+      <param name="suction_control"	value="$(arg suction_control)"/>
+      <param name="operation_mode"	value="$(arg operation_mode)"/>
+    </node>
+
+  </group>
   
-  <!-- Drivers for the force sensors -->
-  <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch">
-    <arg name="robot_name"	value="a_bot"/>
-  </include>
-
-  <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch">
-    <arg name="robot_name"	value="b_bot"/>
-  </include>
-
-  <!-- Drivers for the grippers -->
-  <include file="$(find robotiq_control
-		 )/launch/ur_cmodel_action_controller.launch">
-    <arg name="namespace"	value="a_bot_gripper" />
-    <arg name="gripper_prefix"	value="a_bot_" />
-    <arg name="topic"		value="/a_bot_controller/ur_driver/URScript"/>
-  </include>
-
-  <!-- Launch fastening tools -->
-  <arg name="config_dir"        default="$(find o2as_fastening_tools)/config"/>
-  <arg name="suction_control"   default="suction_control"/>
-  <arg name="operation_mode"    default="operation_mode"/>
-  <node name="suction_controller" pkg="o2as_fastening_tools"
-	type="suction_controller.py" output="screen">
-    <param name="config_dir"      type="string" value="$(arg config_dir)"/>
-    <param name="suction_control" type="string" value="$(arg suction_control)"/>
-    <param name="operation_mode"  type="string" value="$(arg operation_mode)"/>
-  </node>
-
 </launch>

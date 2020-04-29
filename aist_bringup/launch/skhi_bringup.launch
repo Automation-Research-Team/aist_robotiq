@@ -3,11 +3,9 @@
 
   <arg name="sim"			default="false"/>
   <arg name="scene"			default="skhi_base_scene"/>
-  <arg name="paused"			default="false"/>
-  <arg name="gui"			default="true"/>
-  <arg name="debug"			default="false"/>
   <arg name="joint_state_frequency"	default="50"/>
   <arg name="robot_state_frequency"	default="50"/>
+  <arg name="moveit_config"		default="$(find skhi_moveit_config)"/>
   <arg name="rviz_config"		default=""/>
 
   <arg name="prefixes"	  value="a_khi_ a_khi_"/>
@@ -17,68 +15,18 @@
   <arg name="drivers"	  value="khi"/>
   <arg name="driver_args" value="10.66.171.91, 4"/>
 
-  <!-- Load URDF to param "robot_description" and spawn the robot -->
-  <param name="robot_description"
-  	 command="$(find xacro)/xacro --inorder
-  		  '$(find aist_description
-		  )/scenes/urdf/$(arg scene).urdf.xacro'"/>
-
-  <group if="$(arg sim)">
-    <!-- Startup simulated world -->
-    <include file="$(find gazebo_ros)/launch/empty_world.launch">
-      <arg name="world_name"	value="worlds/empty.world"/>
-      <arg name="paused"	value="$(arg paused)"/>
-      <arg name="gui"		value="$(arg gui)"/>
-      <arg name="verbose"	value="true"/>
-    </include>
-
-    <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model"
-	  args="-urdf -param robot_description -model robot"
-	  respawn="false" output="screen" />
-  </group>
-
-  <group unless="$(arg sim)">
-    <!-- Spawn hardware drivers -->
-    <include file="$(find aist_bringup)/launch/spawn_drivers.launch">
-      <arg name="prefixes"	value="$(arg prefixes)"/>
-      <arg name="devices"	value="$(arg devices)"/>
-      <arg name="drivers"	value="$(arg drivers)"/>
-      <arg name="driver_args"	value="$(arg driver_args)"/>
-    </include>
-  </group>
-
-  <!-- Spawn controllers -->
-  <include file="$(find aist_bringup)/launch/spawn_controllers.launch">
+  <include file="$(find aist_bringup)/launch/include/generic_bringup.launch">
+    <arg name="sim"			value="$(arg sim)"/>
+    <arg name="scene"			value="$(arg scene)"/>
+    <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
+    <arg name="robot_state_frequency"	value="$(arg robot_state_frequency)"/>
+    <arg name="moveit_config"		value="$(arg moveit_config)"/>
+    <arg name="rviz_config"		value="$(arg rviz_config)"/>
     <arg name="prefixes"		value="$(arg prefixes)"/>
     <arg name="devices"			value="$(arg devices)"/>
     <arg name="controllers"		value="$(arg controllers)"/>
-    <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
-    <arg name="sim"			value="$(arg sim)"/>
+    <arg name="drivers"			value="$(arg drivers)"/>
+    <arg name="driver_args"		value="$(arg driver_args)"/>
   </include>
-
-  <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped
-       and publish to TF according to the parameter robot_description -->
-  <node name="robot_state_publisher"
-    	pkg ="robot_state_publisher" type="robot_state_publisher">
-    <param name="publish_frequency" value="$(arg robot_state_frequency)"/>
-  </node>
-
-  <!-- Launch moveit -->
-  <include file="$(find skhi_moveit_config)/launch/move_group.launch">
-    <arg name="debug"	value="$(arg debug)"/>
-  </include>
-
-  <!-- Launch rviz with appropriate launch-prefix and config file. -->
-  <arg if="$(eval arg('rviz_config') == '')"
-       name="command_args"
-       value="-d $(find skhi_moveit_config)/launch/moveit.rviz"/>
-  <arg unless="$(eval arg('rviz_config') == '')"
-       name="command_args" value="-d $(arg rviz_config)"/>
-
-  <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false"
-	args="$(arg command_args)" output="screen">
-    <rosparam command="load"
-	      file="$(find skhi_moveit_config)/config/kinematics.yaml"/>
-  </node>
 
 </launch>

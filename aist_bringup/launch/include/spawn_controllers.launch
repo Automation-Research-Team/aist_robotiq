@@ -52,7 +52,8 @@
     <arg name ="kept_frequency"	value="$(arg joint_state_frequency)"/>
     <arg name ="kept_sim"	value="$(arg sim)"/>
     <arg name="kept_manager"	value="$(arg manager)"/>
-    <include file="$(find aist_bringup)/launch/spawn_controllers.launch">
+    <include file="$(find aist_bringup
+		   )/launch/include/spawn_controllers.launch">
       <arg name="prefixes"	     value="$(arg remained_prefixes)"/>
       <arg name="devices"	     value="$(arg remained_devices)"/>
       <arg name="controllers"	     value="$(arg remained_controllers)"/>
@@ -74,7 +75,7 @@
     <node name="controller_manager"
 	  pkg ="controller_manager" type="controller_manager"
 	  args="spawn joint_state_controller $(arg ros_controllers)"
-	  respawn="false" output="screen"/>
+	  output="screen"/>
 
     <group if="$(eval len(torobo_controllers) != 0)">
       <!-- Setup joint_state_controller parameters -->
@@ -84,8 +85,8 @@
 
       <!-- Setup controller names to be spawned -->
       <param name="torobo/controller_list" type="yaml"
-	     value="$(eval '[joint_state_controller,'
-		    + ','.join(torobo_controllers.split()) + ']')"/>
+      	     value="$(eval '[joint_state_controller,'
+      		    + ','.join(torobo_controllers.split()) + ']')"/>
 
       <!-- Spawn joint_state_controller and torobo_controllers -->
       <include file="$(find torobo_control

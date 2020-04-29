@@ -14,7 +14,8 @@
   <group if="$(eval len(drivers) != 0)">
     <!-- Spawn the driver at the head of "drivers". -->
     <arg name="driver" value="$(eval drivers.split()[0])"/>
-    <include file="$(find aist_bringup)/launch/$(arg driver)_driver.launch">
+    <include file="$(find aist_bringup
+		   )/launch/include/$(arg driver)_driver.launch">
       <arg name="prefix"	value="$(eval prefixes.split()[0])"/>
       <arg name="device"	value="$(eval devices.split()[0])"/>
       <arg name="driver_arg"	value="$(eval driver_args.split(';')[0])"/>
@@ -36,7 +37,7 @@
 	 value="$(arg robot_description_name)"/>
     <arg name="kept_rate"	value="$(arg rate)"/>
     <arg name="kept_tolerance"	value="$(arg allowed_start_tolerance)"/>
-    <include file="$(find aist_bringup)/launch/spawn_drivers.launch">
+    <include file="$(find aist_bringup)/launch/include/spawn_drivers.launch">
       <arg name="prefixes"	value="$(arg remained_prefixes)"/>
       <arg name="devices"	value="$(arg remained_devices)"/>
       <arg name="drivers"	value="$(arg remained_drivers)"/>
@@ -51,7 +52,8 @@
     </include>
   </group>
 
-  <!-- If argument "drivers" contains "torobo", spawn torobo_driver. -->
+  <!-- If argument "drivers" has a name containing "torobo"
+       at the first call of this launch file, spawn torobo_driver. -->
   <group if="$(eval len(drivers) == 0 and torobo_driver)">
     <node name="torobo_driver_nodelet" ns="torobo" pkg="nodelet" type="nodelet"
           args="load torobo_driver/torobo_driver_nodelet $(arg manager)"

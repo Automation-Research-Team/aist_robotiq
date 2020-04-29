@@ -3,12 +3,11 @@
 
   <arg name="sim"			default="false"/>
   <arg name="scene"			default="dtorobo_base_scene"/>
-  <arg name="paused"			default="false"/>
-  <arg name="gui"			default="true"/>
-  <arg name="debug"			default="false"/>
   <arg name="manager"			default="torobo_nodelet_manager"/>
   <arg name="joint_state_frequency"	default="500"/>
   <arg name="robot_state_frequency"	default="500"/>
+  <arg name="moveit_config"		default="$(find
+						 dtorobo_moveit_config)"/>
   <arg name="rviz_config"		default=""/>
 
   <arg name="prefixes"		value="a_torobo_ b_torobo_
@@ -22,67 +21,30 @@
   <arg name="drivers"		value="torobo torobo"/>
   <arg name="driver_args"	value="10.66.171.61, 50000;
 				       10.66.171.62, 50010"/>
-
+  
   <param name="use_real_robot"	value="$(eval not arg('sim'))"/>
   <rosparam command="delete" param="grippers"/>
   <rosparam command="delete" param="cameras"/>
   <rosparam command="load"
  	    file="$(find aist_routines)/config/dtorobo_config.yaml"/>
 
-  <group ns="torobo">
-    <!-- Load URDF to param "robot_description" and spawn the robot -->
-    <param name="robot_description"
-  	   command="$(find xacro)/xacro --inorder
-  		    '$(find aist_description
-		    )/scenes/urdf/$(arg scene).urdf.xacro'"/>
-
-    <!-- launch nodelet manager -->
-    <node name="$(arg manager)" pkg="nodelet" type="nodelet"
-      	  args="manager" output="screen"/>
-  </group>
-
-  <group if="$(arg sim)">
-    <!-- Startup simulated world -->
-    <include file="$(find gazebo_ros)/launch/empty_world.launch">
-      <arg name="world_name"	value="$(find torobo_gazebo
-				       )/worlds/ground_plane.world"/>
-      <arg name="paused"	value="$(arg paused)"/>
-      <arg name="gui"		value="$(arg gui)" />
-      <arg name="debug"		value="$(arg debug)" />
-    </include>
-
-    <node name="urdf_spawner" ns="torobo" pkg="gazebo_ros" type="spawn_model"
-	  respawn="false" output="screen"
-	  args="-urdf -model robot -param robot_description"/>
-  </group>
-
-  <group unless="$(arg sim)">
-    <!-- Spawn hardware drivers -->
-    <include file="$(find aist_bringup)/launch/spawn_drivers.launch">
-      <arg name="prefixes"	value="$(arg prefixes)"/>
-      <arg name="devices"	value="$(arg devices)"/>
-      <arg name="drivers"	value="$(arg drivers)"/>
-      <arg name="driver_args"	value="$(arg driver_args)"/>
-      <arg name="manager"	value="$(arg manager)"/>
-    </include>
-  </group>
-
-  <!-- Spawn controllers -->
-  <include file="$(find aist_bringup)/launch/spawn_controllers.launch">
+  <node name="$(arg manager)" ns="torobo"
+	pkg="nodelet" type="nodelet" args="manager" output="screen"/>
+  
+  <include file="$(find aist_bringup)/launch/include/generic_bringup.launch">
+    <arg name="sim"			value="$(arg sim)"/>
+    <arg name="scene"			value="$(arg scene)"/>
+    <arg name="manager"			value="$(arg manager)"/>
+    <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
+    <arg name="robot_state_frequency"	value="$(arg robot_state_frequency)"/>
+    <arg name="moveit_config"		value="$(arg moveit_config)"/>
+    <arg name="rviz_config"		value="$(arg rviz_config)"/>
     <arg name="prefixes"		value="$(arg prefixes)"/>
     <arg name="devices"			value="$(arg devices)"/>
     <arg name="controllers"		value="$(arg controllers)"/>
-    <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
-    <arg name="sim"			value="$(arg sim)"/>
-    <arg name="manager"			value="$(arg manager)"/>
+    <arg name="drivers"			value="$(arg drivers)"/>
+    <arg name="driver_args"		value="$(arg driver_args)"/>
   </include>
-
-  <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped
-       and publish to TF according to the parameter robot_description -->
-  <node name="robot_state_publisher" ns="torobo"
-    	pkg ="robot_state_publisher" type="robot_state_publisher">
-    <param name="publish_frequency" value="$(arg robot_state_frequency)"/>
-  </node>
 
   <!-- Spawn torobo_dynamics -->
   <include file="$(find torobo_dynamics)/launch/torobo_dynamics_nodelet.launch">
@@ -95,28 +57,7 @@
   <!-- launch torobo collision detector -->
   <include file="$(find torobo_collision_detector
 		 )/launch/torobo_collision_detector_nodelet.launch">
-    <arg name="debug"	value="$(arg debug)"/>
     <arg name="manager"	value="$(arg manager)"/>
   </include>
-
-  <group ns="torobo">
-    <!-- Launch moveit -->
-    <include file="$(find dtorobo_moveit_config)/launch/move_group.launch">
-      <arg name="debug"	value="$(arg debug)"/>
-    </include>
-
-    <!-- Launch rviz with appropriate launch-prefix and config file. -->
-    <arg if="$(eval arg('rviz_config') == '')"
-	 name="command_args"
-	 value="-d $(find dtorobo_moveit_config)/launch/moveit.rviz"/>
-    <arg unless="$(eval arg('rviz_config') == '')"
-	 name="command_args" value="-d $(arg rviz_config)"/>
-
-    <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false"
-	  args="$(arg command_args)" output="screen">
-      <rosparam command="load"
-		file="$(find dtorobo_moveit_config)/config/kinematics.yaml"/>
-    </node>
-  </group>
 
 </launch>
