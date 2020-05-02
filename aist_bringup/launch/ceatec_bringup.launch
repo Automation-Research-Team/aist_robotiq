@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="scene"		default="ceatec"/>
+  <arg name="rviz_config"	default=""/>
+
+  <include file="$(find aist_bringup)/launch/include/generic_bringup.launch">
+    <arg name="sim"		value="false"/>
+    <arg name="scene"		value="$(arg scene)"/>
+    <arg name="moveit_config"	value="$(find ceatec_moveit_config)"/>
+    <arg name="rviz_config"	value="$(arg rviz_config)"/>
+  </include>
+
+  <rosparam file="$(find aist_routines)/config/ceatec_config.yaml"/>
+
+  <!-- Publish base_scan_raw if anything subscribes to it -->
+  <node name="publish_base_scan_raw"
+  	pkg="topic_tools" type="relay" args="base_scan base_scan_raw" >
+    <param name="lazy" type="bool" value="True"/>
+  </node>
+
+</launch>
