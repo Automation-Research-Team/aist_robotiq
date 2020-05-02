@@ -14,13 +14,22 @@
 				 $(arg prefix)speed_scaling_state_controller
 				 $(arg prefix)force_torque_sensor_controller"/>
   <node name="$(arg prefix)controller_spawner"
-	pkg="controller_manager" type="spawner"
-	output="screen" args="$(arg controllers)"/>
+	pkg="controller_manager" type="spawner"	output="screen"
+	args="$(arg controllers)"/>
 
   <!-- Load controllers that are not started initially. -->
   <arg name="stopped_controllers" value="$(arg prefix)pos_traj_controller"/>
   <node name="$(arg prefix)controller_stopped_spawner"
-	pkg="controller_manager" type="spawner"
-	output="screen" args="--stopped $(arg stopped_controllers)"/>
+	pkg="controller_manager" type="spawner"	output="screen"
+	args="--stopped $(arg stopped_controllers)"/>
+
+  <node name="$(arg prefix)controller_stopper"
+	pkg="controller_stopper" type="node" output="screen">
+    <remap from="robot_running"
+	   to="ur_hardware_interface/robot_program_running"/>
+    <param name="consistent_controllers" type="yaml"
+	   value="$(eval '[' + prefix + 'speed_scaling_state_controller,'
+		  + prefix + 'force_torque_sensor_controller]')"/>
+  </node>
 
 </launch>
