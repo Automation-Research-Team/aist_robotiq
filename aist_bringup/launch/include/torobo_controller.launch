@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="prefix" default="torobo_"/>
+  <arg name="device" default="arm"/>
+
+  <!-- Setup controller parameters. -->
+  <rosparam file="$(find aist_bringup)/config/torobo_controller.yaml"
+	    subst_value="true" ns="torobo"/>
+
+</launch>

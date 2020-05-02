@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="prefix" default="iiwa_"/>
+  <arg name="device" default="iiwa14"/>
+
+  <!-- Setup controller parameters. -->
+  <rosparam file="$(find aist_bringup)/config/iiwa_controller.yaml"
+	    subst_value="true"/>
+
+  <!-- Load and start controllers. -->
+  <arg name ="controllers"
+       value="$(arg prefix)EffortJointInterface_trajectory_controller
+	      $(arg prefix)PositionJointInterface_trajectory_controller
+	      $(arg prefix)VelocityJointInterface_trajectory_controller"/>
+  <node name="$(arg prefix)controller_spawner"
+	pkg="controller_manager" type="spawner"
+	output="screen" args="$(arg controllers)"/>
+
+</launch>

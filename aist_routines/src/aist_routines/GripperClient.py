@@ -172,7 +172,8 @@ class RobotiqGripper(GripperClient):
         self._open_position = self._max_gap
 
         self._client = actionlib.SimpleActionClient(
-                           str(prefix) + "gripper/gripper_action_controller",
+                           prefix
+                             + "gripper_controller/gripper_action_controller",
                            robotiq_msgs.msg.CModelCommandAction)
         self._goal          = robotiq_msgs.msg.CModelCommandGoal()
         self._goal.force    = clip(force, self._min_force, self._max_force)
@@ -181,9 +182,10 @@ class RobotiqGripper(GripperClient):
 
     @staticmethod
     def base(prefix, product, force, velocity, timeout):
-        return GripperClient(*RobotiqGripper._initargs(prefix, product,
-                                                       force, velocity,
-                                                       timeout))
+        # return GripperClient(*RobotiqGripper._initargs(prefix, product,
+        #                                                force, velocity,
+        #                                                timeout))
+        return RobotiqGripper(prefix, product, force, velocity, timeout)
 
     @staticmethod
     def _initargs(prefix, product, force, velocity, timeout):

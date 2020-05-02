@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="namespaces"	default=""/>
+  <arg name="models"		default=""/>
+  <arg name="model_args"	default=""/>
+  <arg name="environment"	default=""/>
+
+  <group if="$(eval len(models) != 0)">
+    <!-- Spawn the model at the head of "models". -->
+    <arg name="namespace"	value="$(eval namespaces.split()[0])"/>
+    <arg name="model"		value="$(eval models.split()[0])"/>
+    <arg name="model_arg"	value="$(eval model_args.split()[0])"/>
+    <include ns="$(arg namespace)"
+	     file="$(find aist_bringup
+		   )/launch/include/$(arg model)_spawn.launch">
+      <arg name="args"	 value="$(arg model_arg)"/>
+    </include>
+
+    <!-- Recursively spawn the remained models. -->
+    <arg name ="remained_namespaces"
+	 value="$(eval ' '.join(namespaces.split()[1:]))"/>
+    <arg name ="remained_models"
+	 value="$(eval ' '.join(models.split()[1:]))"/>
+    <arg name ="remained_model_args"
+	 value="$(eval ';'.join(mpdel_args.split(';')[1:]))"/>
+    <arg name="kept_environment"	value="$(arg environment)"/>
+    <include file="$(find aist_bringup)/launch/include/spawn_models.launch">
+      <arg name="namespaces"	value="$(arg remained_namespaces)"/>
+      <arg name="models"	value="$(arg remained_models)"/>
+      <arg name="model_args"	value="$(arg remained_model_args)"/>
+      <arg name="environment"	value="$(arg kept_environment)"/>
+    </include>
+  </group>
+
+  <!-- If argument "drivers" has a name containing "torobo"
+       at the first call of this launch file, spawn torobo_driver. -->
+  <group if="$(eval len(models) == 0 and len(environment) != 0)">
+    <param name="environment_description"
+  	   command="$(find xacro)/xacro --inorder
+		    '$(find aist_description
+		    )/scenes/urdf/$(arg environment).urdf.xacro'"/>
+    <node name="environment_spawner" pkg="gazebo_ros" type="spawn_model"
+  	  output="screen"
+          args="-urdf -param environment_description -model environment"/>
+  </group>
+
+</launch>

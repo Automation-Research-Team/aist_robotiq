@@ -9,9 +9,8 @@
   <arg name="rviz_config"		default=""/>
 
   <arg name="prefixes"	  value="a_khi_ a_khi_"/>
-  <arg name="devices"	  value="RS007L fetch_gripper"/>
-  <arg name="controllers" value="a_khi_controller
-				 a_khi_gripper_controller/gripper_action"/>
+  <arg name="devices"	  value="RS007L gripper"/>
+  <arg name="controllers" value="khi fetch"/>
   <arg name="drivers"	  value="khi"/>
   <arg name="driver_args" value="10.66.171.91, 4"/>
 

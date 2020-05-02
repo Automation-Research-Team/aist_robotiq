@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="prefix" default="ros_"/>
+  <arg name="device" default="gripper"/>
+
+  <!-- Setup controller parameters. -->
+  <rosparam file="$(find aist_bringup)/config/$(arg device)_controller.yaml"
+	    subst_value="true"/>
+
+  <!-- Load and start controllers. -->
+  <node name="$(arg prefix)$(arg device)_controller_spawner"
+	pkg="controller_manager" type="spawner"
+	output="screen" args="$(arg prefix)$(arg device)_controller"/>
+
+</launch>

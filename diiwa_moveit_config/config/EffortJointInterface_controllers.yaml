@@ -2,7 +2,7 @@ controller_list:
   - name: a_iiwa_EffortJointInterface_trajectory_controller
     action_ns: follow_joint_trajectory
     type: FollowJointTrajectory
-    default: true
+    default: false
     joints: 
       - a_iiwa_joint_1
       - a_iiwa_joint_2
@@ -14,7 +14,7 @@ controller_list:
   - name: b_iiwa_EffortJointInterface_trajectory_controller
     action_ns: follow_joint_trajectory
     type: FollowJointTrajectory
-    default: true
+    default: false
     joints: 
       - b_iiwa_joint_1
       - b_iiwa_joint_2

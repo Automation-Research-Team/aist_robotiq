@@ -11,9 +11,7 @@
 
   <arg name="prefixes"		value="a_iiwa_ b_iiwa_"/>
   <arg name="devices"		value="iiwa14 iiwa14"/>
-  <arg name="controllers"
-       value="a_iiwa_$(arg hardware_interface)_trajectory_controller
-	      b_iiwa_$(arg hardware_interface)_trajectory_controller"/>
+  <arg name="controllers"	value="iiwa iiwa"/>
   <arg name="drivers"		value="iiwa iiwa"/>
   <arg name="driver_args"	value="$(arg hardware_interface);
 				       $(arg hardware_interface)"/>

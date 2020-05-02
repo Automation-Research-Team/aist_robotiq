@@ -6,41 +6,33 @@
   <arg name="controllers"		default=""/>
   <arg name="torobo_controllers"	default=""/>
   <arg name="fetch_controllers"		default=""/>
-  <arg name="ros_controllers"		default=""/>
   <arg name="joint_state_frequency"	default="50.0"/>
   <arg name="sim"			default="false"/>
   <arg name="manager"			default="torobo_nodelet_manager"/>
 
   <group if="$(eval len(devices) != 0)">
     <!-- Setup parameters for the device at the head of "devices". -->
-    <arg name="prefix"  value="$(eval prefixes.split()[0])"/>
-    <arg name="device"  value="$(eval devices.split()[0])"/>
-    <arg name="ns"	value="$(eval 'torobo'
-			       if device.find('torobo') != -1 else '')"/>
-    <rosparam ns="$(arg ns)"
-	      file="$(find aist_bringup)/config/$(arg device)_controller.yaml"
-	      subst_value="true"/>
-
+    <arg name="prefix"	   value="$(eval prefixes.split()[0])"/>
+    <arg name="device"	   value="$(eval devices.split()[0])"/>
     <arg name="controller" value="$(eval controllers.split()[0])"/>
+    <include file="$(find aist_bringup
+		   )/launch/include/$(arg controller)_controller.launch">
+      <arg name="prefix" value="$(arg prefix)"/>
+      <arg name="device" value="$(arg device)"/>
+    </include>
 
-    <!-- If "device" is a torobo device,
-	 add its controller to torobo_controllers. -->
-    <arg name ="added_torobo_controllers"
-	 value="$(eval torobo_controllers + ' ' + controller
-		if device.find('torobo') != -1 else torobo_controllers)"/>
+    <!-- If "controller" is a torobo controller, add it to the list. -->
+    <arg name ="updated_torobo_controllers"
+	 value="$(eval torobo_controllers + ' ' + prefix+device+'_controller'
+		if controller == 'torobo' else torobo_controllers)"/>
 
-    <!-- If "device" is a fetch device,
-	 add its controller to fetch_controllers. -->
-    <arg name ="added_fetch_controllers"
-	 value="$(eval fetch_controllers + ' ' + controller
-		if device.find('fetch') != -1 else fetch_controllers)"/>
-
-    <!-- If "device" is neither a torobo nor fetch device,
-	 add its controller to ros_controlles. -->
-    <arg name ="added_ros_controllers"
-	 value="$(eval ros_controllers + ' ' + controller
-		if (device.find('torobo') == -1 and device.find('fetch') == -1)
-		else ros_controllers)"/>
+    <!-- If "controller" is a fetch controller, add it to the list. -->
+    <arg name ="fetch_controller"
+	 value="$(eval prefix + device + '_controller/gripper_action'
+		if device == 'gripper' else '_controller')"/>
+    <arg name ="updated_fetch_controllers"
+	 value="$(eval fetch_controllers + ' ' + fetch_controller
+		if controller == 'fetch' else fetch_controllers)"/>
 
     <!-- Recursively setup parameters for the remaining devices. -->
     <arg name ="remained_prefixes"
@@ -57,9 +49,8 @@
       <arg name="prefixes"	     value="$(arg remained_prefixes)"/>
       <arg name="devices"	     value="$(arg remained_devices)"/>
       <arg name="controllers"	     value="$(arg remained_controllers)"/>
-      <arg name="torobo_controllers" value="$(arg added_torobo_controllers)"/>
-      <arg name="fetch_controllers"  value="$(arg added_fetch_controllers)"/>
-      <arg name="ros_controllers"    value="$(arg added_ros_controllers)"/>
+      <arg name="torobo_controllers" value="$(arg updated_torobo_controllers)"/>
+      <arg name="fetch_controllers"  value="$(arg updated_fetch_controllers)"/>
       <arg name="joint_state_frequency"	value="$(arg kept_frequency)"/>
       <arg name="sim"			value="$(arg kept_sim)"/>
       <arg name="manager"		value="$(arg kept_manager)"/>
@@ -67,14 +58,12 @@
   </group>
 
   <group if="$(eval len(devices) == 0)">
-    <!-- Setup joint_state_controller parameters -->
+    <!-- Setup parameters and spawn joint_state_controller -->
     <rosparam file="$(find aist_bringup)/config/joint_state_controller.yaml"
 	      subst_value="true"/>
-
-    <!-- Spawn joint_state_controller and ros_controllers -->
-    <node name="controller_manager"
-	  pkg ="controller_manager" type="controller_manager"
-	  args="spawn joint_state_controller $(arg ros_controllers)"
+    <node name="joint_state_controller_spawner"
+	  pkg ="controller_manager" type="spawner"
+	  args="joint_state_controller"
 	  output="screen"/>
 
     <group if="$(eval len(torobo_controllers) != 0)">
@@ -102,5 +91,5 @@
 	     value="$(eval '[' + ','.join(fetch_controllers.split()) + ']')"/>
     </group>
   </group>
-  
+
 </launch>

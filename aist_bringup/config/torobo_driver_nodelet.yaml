@@ -1,0 +1,5 @@
+debug: false
+mock: false
+robot_description_name: robot_description
+rate: 1000
+allowed_start_tolerance: 0.01

@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="prefix" default="ur_"/>
+  <arg name="device" default="ur5"/>
+
+  <!-- Setup controller parameters. -->
+  <arg name="frequency" value="$(eval 500 if device[-1] == 'e' else 125)"/>
+  <rosparam file="$(find aist_bringup)/config/ur_robot_controller.yaml"
+	    subst_value="true"/>
+
+  <!-- Load and start controllers. -->
+  <arg name="controllers" value="$(arg prefix)scaled_pos_traj_controller
+				 $(arg prefix)speed_scaling_state_controller
+				 $(arg prefix)force_torque_sensor_controller"/>
+  <node name="$(arg prefix)controller_spawner"
+	pkg="controller_manager" type="spawner"
+	output="screen" args="$(arg controllers)"/>
+
+  <!-- Load controllers that are not started initially. -->
+  <arg name="stopped_controllers" value="$(arg prefix)pos_traj_controller"/>
+  <node name="$(arg prefix)controller_stopped_spawner"
+	pkg="controller_manager" type="spawner"
+	output="screen" args="--stopped $(arg stopped_controllers)"/>
+
+</launch>

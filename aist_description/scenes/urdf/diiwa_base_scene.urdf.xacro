@@ -63,6 +63,10 @@
       <robotNamespace>/</robotNamespace>
       <legacyModeNS>true</legacyModeNS>
     </plugin>
+    <plugin name="a_bot_ft_sensor" filename="libgazebo_ros_ft_sensor.so">
+      <topicName>/state/CartesianWrench</topicName>
+      <jointName>a_iiwa_joint_7</jointName>
+    </plugin>
   </gazebo>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->

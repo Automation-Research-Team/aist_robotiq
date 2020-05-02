@@ -22,7 +22,7 @@
 
   <!-- Setup namespace for move_group and rviz -->
   <arg name="ns" value="$(eval '/' if manager == '' else 'torobo')"/>
-  
+
   <!-- Load URDF to param "robot_description" and spawn the robot -->
   <group ns="$(arg ns)">
     <param name="robot_description"
@@ -30,7 +30,7 @@
   		    '$(find aist_description
 		    )/scenes/urdf/$(arg scene).urdf.xacro'"/>
   </group>
-  
+
   <group if="$(arg sim)">
     <!-- Startup simulated world -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -45,17 +45,6 @@
           args="-urdf -param robot_description -model robot -unpause
 		$(arg gazebo_init_args)"
 	  output="screen"/>
-
-    <!-- Spawn controllers -->
-    <include file="$(find aist_bringup
-		   )/launch/include/spawn_controllers.launch">
-      <arg name="prefixes"		value="$(arg prefixes)"/>
-      <arg name="devices"		value="$(arg devices)"/>
-      <arg name="controllers"		value="$(arg controllers)"/>
-      <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
-      <arg name="sim"			value="$(arg sim)"/>
-      <arg name="manager"		value="$(arg manager)"/>
-    </include>
   </group>
 
   <group unless="$(arg sim)">
@@ -67,6 +56,16 @@
       <arg name="driver_args"	value="$(arg driver_args)"/>
     </include>
   </group>
+
+  <!-- Spawn controllers -->
+  <include file="$(find aist_bringup)/launch/include/spawn_controllers.launch">
+    <arg name="prefixes"		value="$(arg prefixes)"/>
+    <arg name="devices"			value="$(arg devices)"/>
+    <arg name="controllers"		value="$(arg controllers)"/>
+    <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
+    <arg name="sim"			value="$(arg sim)"/>
+    <arg name="manager"			value="$(arg manager)"/>
+  </include>
 
   <group ns="$(arg ns)">
     <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped
@@ -93,5 +92,5 @@
       <rosparam file="$(arg moveit_config)/config/kinematics.yaml"/>
     </node>
   </group>
-  
+
 </launch>

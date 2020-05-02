@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="prefix" default="fetch_"/>
+  <arg name="device" default="base"/>
+
+  <!-- Setup controller parameters. -->
+  <rosparam file="$(find aist_bringup)/config/$(arg device)_controller.yaml"
+	    subst_value="true"/>
+
+</launch>

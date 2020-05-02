@@ -1,0 +1,62 @@
+# Settings for ros_control control loop
+hardware_control_loop:
+  loop_hz: $(arg frequency)
+
+# Settings for ros_control hardware interface
+$(arg prefix)hardware_interface:
+  joints: &robot_joints
+    - $(arg prefix)shoulder_pan_joint
+    - $(arg prefix)shoulder_lift_joint
+    - $(arg prefix)elbow_joint
+    - $(arg prefix)wrist_1_joint
+    - $(arg prefix)wrist_2_joint
+    - $(arg prefix)wrist_3_joint
+
+# Publish all joint states ----------------------------------
+$(arg prefix)joint_state_controller:
+  type:         joint_state_controller/JointStateController
+  publish_rate: $(arg frequency)
+
+# Publish wrench ----------------------------------
+$(arg prefix)force_torque_sensor_controller:
+  type:         force_torque_sensor_controller/ForceTorqueSensorController
+  publish_rate: $(arg frequency)
+
+# Publish speed_scaling factor
+$(arg prefix)speed_scaling_state_controller:
+  type:         ur_controllers/SpeedScalingStateController
+  publish_rate: $(arg frequency)
+
+# Joint Trajectory Controller - position based -------------------------------
+# For detailed explanations of parameter see http://wiki.ros.org/joint_trajectory_controller
+$(arg prefix)scaled_pos_traj_controller:
+  type: position_controllers/ScaledJointTrajectoryController
+  joints: *robot_joints
+  constraints:
+    goal_time: 0.6
+    stopped_velocity_tolerance: 0.05
+    $(arg prefix)shoulder_pan_joint: {trajectory: 0.2, goal: 0.1}
+    $(arg prefix)shoulder_lift_joint: {trajectory: 0.2, goal: 0.1}
+    $(arg prefix)elbow_joint: {trajectory: 0.2, goal: 0.1}
+    $(arg prefix)wrist_1_joint: {trajectory: 0.2, goal: 0.1}
+    $(arg prefix)wrist_2_joint: {trajectory: 0.2, goal: 0.1}
+    $(arg prefix)wrist_3_joint: {trajectory: 0.2, goal: 0.1}
+  stop_trajectory_duration: 0.5
+  state_publish_rate: $(arg frequency)
+  action_monitor_rate: 10
+
+$(arg prefix)pos_traj_controller:
+  type: position_controllers/JointTrajectoryController
+  joints: *robot_joints
+  constraints:
+    goal_time: 0.6
+    stopped_velocity_tolerance: 0.05
+    $(arg prefix)shoulder_pan_joint: {trajectory: 0.2, goal: 0.1}
+    $(arg prefix)shoulder_lift_joint: {trajectory: 0.2, goal: 0.1}
+    $(arg prefix)elbow_joint: {trajectory: 0.2, goal: 0.1}
+    $(arg prefix)wrist_1_joint: {trajectory: 0.2, goal: 0.1}
+    $(arg prefix)wrist_2_joint: {trajectory: 0.2, goal: 0.1}
+    $(arg prefix)wrist_3_joint: {trajectory: 0.2, goal: 0.1}
+  stop_trajectory_duration: 0.5
+  state_publish_rate: $(arg frequency)
+  action_monitor_rate: 10

@@ -12,25 +12,24 @@
 
   <arg name="prefixes"		value="a_torobo_ b_torobo_
 				       a_torobo_ b_torobo_"/>
-  <arg name="devices"		value="torobo_arm torobo_arm
-				       torobo_gripper torobo_gripper"/>
-  <arg name="controllers"	value="a_torobo_arm_controller
-				       b_torobo_arm_controller
-				       a_torobo_gripper_controller
-				       b_torobo_gripper_controller"/>
+  <arg name="devices"		value="arm arm gripper gripper"/>
+  <arg name="controllers"	value="torobo torobo
+				       torobo torobo"/>
   <arg name="drivers"		value="torobo torobo"/>
   <arg name="driver_args"	value="10.66.171.61, 50000;
 				       10.66.171.62, 50010"/>
-  
+
   <param name="use_real_robot"	value="$(eval not arg('sim'))"/>
   <rosparam command="delete" param="grippers"/>
   <rosparam command="delete" param="cameras"/>
   <rosparam command="load"
  	    file="$(find aist_routines)/config/dtorobo_config.yaml"/>
 
+  <!-- Spawn nodelet manager -->
   <node name="$(arg manager)" ns="torobo"
 	pkg="nodelet" type="nodelet" args="manager" output="screen"/>
-  
+
+  <!-- Bringup robots -->
   <include file="$(find aist_bringup)/launch/include/generic_bringup.launch">
     <arg name="sim"			value="$(arg sim)"/>
     <arg name="scene"			value="$(arg scene)"/>

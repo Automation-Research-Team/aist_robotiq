@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="prefix"	 default="a_bot_"/>
+  <arg name="device"	 default="robotiq_85"/>
+  <arg name="driver_arg" default=""/>
+
+  <arg name="config"	 value="$(eval 'cmodel_action_controller_hande'
+				if device == 'robotiq_hande' else
+				'cmodel_action_controller')"/>
+
+  <include file="$(find robotiq_control
+		 )/launch/ur_cmodel_action_controller.launch">
+    <arg name="topic"	value="/$(arg prefix)controller/ur_driver/URScript"/>
+    <arg name="namespace"	value="$(arg prefix)$(arg device)_controller"/>
+    <arg name="gripper_prefix"	value="$(arg prefix)"/>
+    <arg name="config"		value="$(arg config)"/>
+  </include>
+
+</launch>

@@ -1,12 +1,22 @@
 grippers:
   a_bot:
-    type: RobotiqGripper
+    type: GenericGripper
     args:
-      prefix: a_bot_
-      product: "85"
-      force: 5.0
-      velocity: 0.1
-      timeout: 6.0
+      name: a_bot_robotiq_85_gripper
+      action_ns: /a_bot_robotiq_85_controller/gripper_cmd
+      base_link: a_bot_robotiq_85_base_link
+      tip_link: a_bot_robotiq_85_tip_link
+      timeout: 10.0
+      min_gap: 0.0
+      max_gap: 1.0
+      max_effort: 5.0
+#    type: RobotiqGripper
+#    args:
+#      prefix: a_bot_
+#      product: "85"
+#      force: 5.0
+#      velocity: 0.1
+#      timeout: 6.0
   b_bot:
     type: SuctionGripper
     args:
