@@ -5,9 +5,9 @@
   <arg name="device"	 default="RS007L"/>
   <arg name="driver_arg" default="10.66.171.91, 4"/>
 
-  <arg name="ip"	 value="$(eval driver_arg.split(',')[0])"/>
-  <arg name="period"	 value="$(eval driver_arg.split(',')[1])"/>
-    
+  <arg name="ip"	 value="$(eval driver_arg.split(',')[0].strip())"/>
+  <arg name="period"	 value="$(eval driver_arg.split(',')[1].strip())"/>
+
   <node name="$(arg prefix)driver" pkg="khi_robot_control" type="main"
 	args="--interface $(arg ip)
 	      --period $(arg period) --robot $(arg device)"

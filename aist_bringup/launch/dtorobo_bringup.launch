@@ -10,12 +10,11 @@
 						 dtorobo_moveit_config)"/>
   <arg name="rviz_config"		default=""/>
 
-  <arg name="prefixes"		value="a_torobo_ b_torobo_
-				       a_torobo_ b_torobo_"/>
-  <arg name="devices"		value="arm arm gripper gripper"/>
-  <arg name="controllers"	value="torobo torobo
-				       torobo torobo"/>
-  <arg name="drivers"		value="torobo torobo"/>
+  <arg name="prefixes"		value="a_torobo_, b_torobo_,
+				       a_torobo_, b_torobo_"/>
+  <arg name="devices"		value="arm, arm, gripper, gripper"/>
+  <arg name="controllers"	value="torobo, torobo, torobo, torobo"/>
+  <arg name="drivers"		value="torobo, torobo"/>
   <arg name="driver_args"	value="10.66.171.61, 50000;
 				       10.66.171.62, 50010"/>
 

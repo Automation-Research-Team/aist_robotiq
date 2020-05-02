@@ -9,12 +9,12 @@
   <arg name="moveit_config"		default="$(find diiwa_moveit_config)"/>
   <arg name="rviz_config"		default=""/>
 
-  <arg name="prefixes"		value="a_iiwa_ b_iiwa_"/>
-  <arg name="devices"		value="iiwa14 iiwa14"/>
-  <arg name="controllers"	value="iiwa iiwa"/>
-  <arg name="drivers"		value="iiwa iiwa"/>
-  <arg name="driver_args"	value="$(arg hardware_interface);
-				       $(arg hardware_interface)"/>
+  <arg name="prefixes"			value="a_iiwa_, b_iiwa_"/>
+  <arg name="devices"			value="iiwa14, iiwa14"/>
+  <arg name="controllers"		value="iiwa, iiwa"/>
+  <arg name="drivers"			value="iiwa, iiwa"/>
+  <arg name="driver_args"		value="$(arg hardware_interface);
+					       $(arg hardware_interface)"/>
 
   <include file="$(find aist_bringup)/launch/include/generic_bringup.launch">
     <arg name="sim"			value="$(arg sim)"/>

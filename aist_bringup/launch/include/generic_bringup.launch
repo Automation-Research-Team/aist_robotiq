@@ -2,6 +2,9 @@
 <launch>
 
   <arg name="sim"			default="false"/>
+  <arg name="suppress_gazebo"		default="false"/>
+  <arg name="scene_dir"			default="$(find aist_description
+						 )/scenes/urdf"/>
   <arg name="scene"			default="aist_base_scene"/>
   <arg name="manager"			default=""/>
   <arg name="gui"			default="true"/>
@@ -27,11 +30,10 @@
   <group ns="$(arg ns)">
     <param name="robot_description"
   	   command="$(find xacro)/xacro --inorder
-  		    '$(find aist_description
-		    )/scenes/urdf/$(arg scene).urdf.xacro'"/>
+  		    '$(arg scene_dir)/$(arg scene).urdf.xacro'"/>
   </group>
 
-  <group if="$(arg sim)">
+  <group if="$(eval sim and not suppress_gazebo)">
     <!-- Startup simulated world -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
       <arg name="world_name"	value="worlds/empty.world"/>

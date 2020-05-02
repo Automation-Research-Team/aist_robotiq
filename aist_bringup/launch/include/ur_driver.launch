@@ -5,9 +5,9 @@
   <arg name="device"	 default="ur5"/>
   <arg name="driver_arg" default="10.66.171.51, 50002"/>
 
-  <arg name="ip"	 value="$(eval driver_arg.split(',')[0])"/>
-  <arg name="port"	 value="$(eval driver_arg.split(',')[1])"/>
-    
+  <arg name="ip"	 value="$(eval driver_arg.split(',')[0].strip())"/>
+  <arg name="port"	 value="$(eval driver_arg.split(',')[1].strip())"/>
+
   <group ns="$(arg prefix)controller">
     <node name="ur_driver" pkg="ur_modern_driver" type="ur_driver"
     	  output="screen">

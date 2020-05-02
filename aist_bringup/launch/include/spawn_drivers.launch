@@ -8,23 +8,23 @@
   <arg name="with_torobo"	default="False"/>
   <arg name="manager"		default="torobo_nodelet_manager"/>
 
-  <group if="$(eval len(drivers) != 0)">
+  <group if="$(eval drivers.strip() != '')">
     <!-- Spawn the driver at the head of "drivers". -->
-    <arg name="driver" value="$(eval drivers.split()[0])"/>
+    <arg name="driver" value="$(eval drivers.split(',')[0].strip())"/>
     <include file="$(find aist_bringup
 		   )/launch/include/$(arg driver)_driver.launch">
-      <arg name="prefix"	value="$(eval prefixes.split()[0])"/>
-      <arg name="device"	value="$(eval devices.split()[0])"/>
+      <arg name="prefix"	value="$(eval prefixes.split(',')[0].strip())"/>
+      <arg name="device"	value="$(eval devices.split(',')[0].strip())"/>
       <arg name="driver_arg"	value="$(eval driver_args.split(';')[0])"/>
     </include>
 
     <!-- Recursively spawn the remained drivers. -->
     <arg name ="remained_prefixes"
-	 value="$(eval ' '.join(prefixes.split()[1:]))"/>
+	 value="$(eval ','.join(prefixes.split(',')[1:]))"/>
     <arg name ="remained_devices"
-	 value="$(eval ' '.join(devices.split()[1:]))"/>
+	 value="$(eval ','.join(devices.split(',')[1:]))"/>
     <arg name ="remained_drivers"
-	 value="$(eval ' '.join(drivers.split()[1:]))"/>
+	 value="$(eval ','.join(drivers.split(',')[1:]))"/>
     <arg name ="remained_driver_args"
 	 value="$(eval ';'.join(driver_args.split(';')[1:]))"/>
     <arg name ="updated_with_torobo"
@@ -42,7 +42,7 @@
 
   <!-- If argument "drivers" has names containing "torobo"
        at the first call of this launch file, spawn torobo_drivers. -->
-  <group if="$(eval len(drivers) == 0 and with_torobo)">
+  <group if="$(eval drivers.strip() == '' and with_torobo)">
     <node name="torobo_driver_nodelet" ns="torobo" pkg="nodelet" type="nodelet"
           args="load torobo_driver/torobo_driver_nodelet $(arg manager)"
           output="screen">

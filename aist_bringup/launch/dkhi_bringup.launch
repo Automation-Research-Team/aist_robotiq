@@ -8,11 +8,12 @@
   <arg name="moveit_config"		default="$(find dkhi_moveit_config)"/>
   <arg name="rviz_config"		default=""/>
 
-  <arg name="prefixes"	  value="a_khi_ b_khi_ a_khi_"/>
-  <arg name="devices"	  value="RS007L RS007L gripper"/>
-  <arg name="controllers" value="khi khi fetch"/>
-  <arg name="drivers"	  value="khi khi"/>
-  <arg name="driver_args" value="10.66.171.91, 4; 10.66.171.92, 4"/>
+  <arg name="prefixes"			value="a_khi_, b_khi_, a_khi_"/>
+  <arg name="devices"			value="RS007L, RS007L, gripper"/>
+  <arg name="controllers"		value="khi, khi, fetch"/>
+  <arg name="drivers"			value="khi, khi"/>
+  <arg name="driver_args"		value="10.66.171.91, 4;
+					       10.66.171.92, 4"/>
 
   <include file="$(find aist_bringup)/launch/include/generic_bringup.launch">
     <arg name="sim"			value="$(arg sim)"/>
