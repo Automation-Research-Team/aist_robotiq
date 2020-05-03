@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <launch>
 
-  <arg name="sim"			default="false"/>
   <arg name="robot_description_file"
        default="$(find aist_description)/scenes/urdf/aist_base_scene.urdf"/>
+  <arg name="sim"			default="false"/>
+  <arg name="suppress_gazebo"		default="false"/>
   <arg name="manager"			default=""/>
   <arg name="gui"			default="true"/>
   <arg name="joint_state_frequency"	default="50"/>
@@ -27,7 +28,7 @@
   		    '$(arg robot_description_file)'"/>
   </group>
 
-  <group if="$(arg sim)">
+  <group if="$(eval sim and not suppress_gazebo)">
     <!-- Startup simulated world -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
       <arg name="world_name"	value="worlds/empty.world"/>
