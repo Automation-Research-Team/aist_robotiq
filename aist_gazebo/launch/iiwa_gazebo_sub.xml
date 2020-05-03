@@ -17,7 +17,7 @@
 
     <group ns="$(arg robot_name)" if="$(arg sim)">
 
-        <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find aist_description)/scenes/urdf/$(arg model).urdf.xacro' hardware_interface:=$(arg hardware_interface) end_effector:=$(arg end_effector) robot_name:=$(arg robot_name) origin_x:=$(arg origin_x) origin_y:=$(arg origin_y) origin_z:=$(arg origin_z) origin_roll:=$(arg origin_roll) origin_pitch:=$(arg origin_pitch) origin_yaw:=$(arg origin_yaw) exist_objs:=$(arg exist_objs)" />
+        <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find aist_description)/scenes/urdf/$(arg model).urdf' hardware_interface:=$(arg hardware_interface) end_effector:=$(arg end_effector) robot_name:=$(arg robot_name) origin_x:=$(arg origin_x) origin_y:=$(arg origin_y) origin_z:=$(arg origin_z) origin_roll:=$(arg origin_roll) origin_pitch:=$(arg origin_pitch) origin_yaw:=$(arg origin_yaw) exist_objs:=$(arg exist_objs)" />
 
         <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
             args="-urdf -model $(arg robot_name) -param robot_description"/>

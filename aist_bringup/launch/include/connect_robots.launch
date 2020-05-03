@@ -2,17 +2,11 @@
 <launch>
 
   <arg name="sim"			default="false"/>
-  <arg name="suppress_gazebo"		default="false"/>
-  <arg name="scene_dir"			default="$(find aist_description
-						 )/scenes/urdf"/>
-  <arg name="scene"			default="aist_base_scene"/>
+  <arg name="robot_description_file"
+       default="$(find aist_description)/scenes/urdf/aist_base_scene.urdf"/>
   <arg name="manager"			default=""/>
   <arg name="gui"			default="true"/>
-  <arg name="debug"			default="false"/>
   <arg name="joint_state_frequency"	default="50"/>
-  <arg name="robot_state_frequency"	default="50"/>
-  <arg name="moveit_config"		default=""/>
-  <arg name="rviz_config"		default=""/>
 
   <arg name="gazebo_init_args"		default=""/>
   <arg name="prefixes"			default=""/>
@@ -23,17 +17,17 @@
 
   <param name="use_real_robot"	value="$(eval not sim)"/>
 
-  <!-- Setup namespace for move_group and rviz -->
+  <!-- Setup namespace -->
   <arg name="ns" value="$(eval '/' if manager == '' else 'torobo')"/>
 
   <!-- Load URDF to param "robot_description" and spawn the robot -->
   <group ns="$(arg ns)">
     <param name="robot_description"
   	   command="$(find xacro)/xacro --inorder
-  		    '$(arg scene_dir)/$(arg scene).urdf.xacro'"/>
+  		    '$(arg robot_description_file)'"/>
   </group>
 
-  <group if="$(eval sim and not suppress_gazebo)">
+  <group if="$(arg sim)">
     <!-- Startup simulated world -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
       <arg name="world_name"	value="worlds/empty.world"/>
@@ -42,7 +36,7 @@
       <arg name="verbose"	value="true"/>
     </include>
 
-    <node name="spawn_gazebo_model" ns="$(arg ns)"
+    <node ns="$(arg ns)" name="spawn_gazebo_model"
 	  pkg="gazebo_ros" type="spawn_model"
           args="-urdf -param robot_description -model robot -unpause
 		$(arg gazebo_init_args)"
@@ -68,31 +62,5 @@
     <arg name="sim"			value="$(arg sim)"/>
     <arg name="manager"			value="$(arg manager)"/>
   </include>
-
-  <group ns="$(arg ns)">
-    <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped
-	 using the parameter robot_description and publish to TF -->
-    <node name="robot_state_publisher"
-	  pkg ="robot_state_publisher" type="robot_state_publisher" >
-      <param name="publish_frequency" value="$(arg robot_state_frequency)"/>
-    </node>
-
-    <!-- Launch moveit -->
-    <include file="$(arg moveit_config)/launch/move_group.launch">
-      <arg name="debug"	value="$(arg debug)"/>
-    </include>
-
-    <!-- Launch rviz with appropriate launch-prefix and config file. -->
-    <arg if="$(eval rviz_config == '')"
-	 name="command_args"
-	 value="-d $(arg moveit_config)/launch/moveit.rviz"/>
-    <arg unless="$(eval rviz_config == '')"
-	 name="command_args" value="-d $(arg rviz_config)"/>
-
-    <node name="$(anon rviz)" pkg="rviz" type="rviz"
-	  args="$(arg command_args)" output="screen">
-      <rosparam file="$(arg moveit_config)/config/kinematics.yaml"/>
-    </node>
-  </group>
 
 </launch>

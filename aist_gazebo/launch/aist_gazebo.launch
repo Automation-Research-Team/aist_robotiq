@@ -17,7 +17,7 @@
   <!-- Do not change this without updating the home pose in o2as_base_scene.srdf accordingly. -->
   <param name="robot_description"
 	 command="$(find xacro)/xacro --inorder '$(find
-		  aist_description)/scenes/urdf/$(arg scene).urdf.xacro'"/>
+		  aist_description)/scenes/urdf/$(arg scene).urdf'"/>
   <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model"
         args="-urdf -param robot_description -model robot
 	      -J a_bot_shoulder_pan_joint 1.5708

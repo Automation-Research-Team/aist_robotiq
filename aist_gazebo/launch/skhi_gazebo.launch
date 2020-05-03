@@ -14,7 +14,7 @@
   <!-- Push robot_description to factory and spawn robot in gazebo -->
   <param name="robot_description"
 	 command="$(find xacro)/xacro --inorder '$(find
-		  aist_description)/scenes/urdf/$(arg scene).urdf.xacro'"/>
+		  aist_description)/scenes/urdf/$(arg scene).urdf'"/>
   <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model"
 	args="-urdf -param robot_description -model robot"
 	respawn="false" output="screen" />

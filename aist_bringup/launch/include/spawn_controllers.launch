@@ -28,8 +28,8 @@
 
     <!-- If "controller" is a fetch controller, add it to the list. -->
     <arg name ="fetch_controller"
-	 value="$(eval prefix + device + '_controller/gripper_action'
-		if device == 'gripper' else '_controller')"/>
+	 value="$(eval prefix + device + '_controller'
+		+ ('/gripper_action' if device == 'gripper' else ''))"/>
     <arg name ="updated_fetch_controllers"
 	 value="$(eval fetch_controllers + ' ' + fetch_controller
 		if controller == 'fetch' else fetch_controllers)"/>

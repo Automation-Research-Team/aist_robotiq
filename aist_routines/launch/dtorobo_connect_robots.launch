@@ -11,7 +11,7 @@
     <param name="robot_description"
   	   command="$(find xacro)/xacro --inorder
   		    '$(find aist_description
-		    )/scenes/urdf/$(arg scene).urdf.xacro'"/>
+		    )/scenes/urdf/$(arg scene).urdf'"/>
 
     <!-- launch nodelet manager -->
     <node name="torobo_nodelet_manager" pkg="nodelet" type="nodelet"

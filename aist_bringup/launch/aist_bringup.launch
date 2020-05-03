@@ -8,6 +8,7 @@
   <arg name="moveit_config"		default="$(find aist_moveit_config)"/>
   <arg name="rviz_config"		default=""/>
 
+  <!-- Setup "aist" configuration -->
   <arg name="gazebo_init_args"	value="-J a_bot_shoulder_pan_joint 1.5708
 				       -J a_bot_shoulder_lift_joint -2.1
 				       -J a_bot_elbow_joint 1.4
@@ -27,19 +28,25 @@
   <arg name="driver_args"	value="10.66.171.52, 50003;
 				       10.66.171.51, 50002;"/>
 
-  <include file="$(find aist_bringup)/launch/include/generic_bringup.launch">
+  <!-- Bringup robots -->
+  <include file="$(find aist_bringup)/launch/include/connect_robots.launch">
     <arg name="sim"			value="$(arg sim)"/>
-    <arg name="scene"			value="$(arg scene)"/>
+    <arg name="robot_description_file"
+	 value="$(find aist_description)/scenes/urdf/$(arg scene).urdf"/>
     <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
-    <arg name="robot_state_frequency"	value="$(arg robot_state_frequency)"/>
-    <arg name="moveit_config"		value="$(arg moveit_config)"/>
-    <arg name="rviz_config"		value="$(arg rviz_config)"/>
     <arg name="gazebo_init_args"	value="$(arg gazebo_init_args)"/>
     <arg name="prefixes"		value="$(arg prefixes)"/>
     <arg name="devices"			value="$(arg devices)"/>
     <arg name="controllers"		value="$(arg controllers)"/>
     <arg name="drivers"			value="$(arg drivers)"/>
     <arg name="driver_args"		value="$(arg driver_args)"/>
+  </include>
+
+  <!-- Start MoveIt! -->
+  <include file="$(find aist_bringup)/launch/include/move_group.launch">
+    <arg name="robot_state_frequency"	value="$(arg robot_state_frequency)"/>
+    <arg name="moveit_config"		value="$(arg moveit_config)"/>
+    <arg name="rviz_config"		value="$(arg rviz_config)"/>
   </include>
 
   <rosparam file="$(find aist_routines)/config/aist_config.yaml"/>

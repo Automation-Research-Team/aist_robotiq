@@ -1,7 +1,7 @@
 moveit_setup_assistant_config:
   URDF:
     package: aist_description
-    relative_path: scenes/urdf/ceatec.urdf.xacro
+    relative_path: scenes/urdf/ceatec.urdf
     xacro_args: ""
   SRDF:
     relative_path: config/ceatec.srdf

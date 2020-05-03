@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="robot_state_frequency"	default="50"/>
+  <arg name="robot_description_file"    default=""/>
+  <arg name="debug"			default="false"/>
+  <arg name="moveit_config"/>
+  <arg name="rviz_config"		default=""/>
+
+  <!-- Load robot_description if the description file is specifed. -->
+  <param if="$(eval robot_description_file != '')"
+	 name="robot_description"
+  	 command="$(find xacro)/xacro --inorder
+		  '$(arg robot_description_file)'"/>
+
+  <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped
+       using the parameter robot_description and publish to TF. -->
+  <node name="robot_state_publisher"
+	pkg ="robot_state_publisher" type="robot_state_publisher" >
+    <param name="publish_frequency" value="$(arg robot_state_frequency)"/>
+  </node>
+
+  <!-- Launch moveit. -->
+  <include file="$(arg moveit_config)/launch/move_group.launch">
+    <arg name="debug" value="$(arg debug)"/>
+  </include>
+
+  <!-- Launch rviz with appropriate launch-prefix and config file. -->
+  <arg name="command_args"
+       value="$(eval '-d ' + (moveit_config + '/launch/moveit.rviz'
+			      if rviz_config == '' else rviz_config))"/>
+  <node name="$(anon rviz)" pkg="rviz" type="rviz"
+	args="$(arg command_args)" output="screen">
+    <rosparam file="$(arg moveit_config)/config/kinematics.yaml"/>
+  </node>
+
+</launch>

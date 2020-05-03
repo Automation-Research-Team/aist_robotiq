@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-  <arg name="scene"	default="fetch_base_scene"/>
+  <arg name="scene"	default=""/>
   <arg name="robot"	default="fetch"/>
   <arg name="debug"	default="false"/>
   <arg name="gui"	default="true"/>
@@ -16,11 +16,11 @@
   </include>
 
   <!-- Load environment urdf to param "environment_description". -->
-  <group unless="$(eval scene == 'fetch_base_scene')">
+  <group if="$(eval scene != '')">
     <param name="environment_description"
   	   command="$(find xacro)/xacro --inorder '$(find
   		    aist_description)/scenes/urdf/$(arg
-		    scene)_environment.urdf.xacro'"/>
+		    scene)_environment.urdf'"/>
     <node name="environment_spawner" pkg="gazebo_ros" type="spawn_model"
   	  respawn="false" output="screen"
           args="-urdf -param environment_description -model environment

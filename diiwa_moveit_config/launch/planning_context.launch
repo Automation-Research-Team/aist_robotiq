@@ -14,7 +14,7 @@
   <param if="$(arg load_robot_description)"
 	 name="$(arg robot_description)"
 	 command="xacro --inorder '$(find aist_description
-		  )/scenes/urdf/$(arg scene).urdf.xacro'
+		  )/scenes/urdf/$(arg scene).urdf'
 		  hardware_interface:=$(arg hardware_interface)"/>
 
   <!-- The semantic description that corresponds to the URDF -->

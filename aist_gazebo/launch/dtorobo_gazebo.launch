@@ -20,7 +20,7 @@
     <param name="robot_description"
   	   command="$(find xacro)/xacro --inorder
   		    '$(find aist_description
-		    )/scenes/urdf/$(arg scene).urdf.xacro'"/>
+		    )/scenes/urdf/$(arg scene).urdf'"/>
     <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
 	  respawn="false" output="screen"
 	  args="-urdf -model dtorobo -param robot_description"/>

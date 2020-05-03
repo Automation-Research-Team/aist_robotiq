@@ -8,6 +8,7 @@
   <arg name="moveit_config"		default="$(find dkhi_moveit_config)"/>
   <arg name="rviz_config"		default=""/>
 
+  <!-- Setup "dkhi" configuration -->
   <arg name="prefixes"			value="a_khi_, b_khi_, a_khi_"/>
   <arg name="devices"			value="RS007L, RS007L, gripper"/>
   <arg name="controllers"		value="khi, khi, fetch"/>
@@ -15,18 +16,24 @@
   <arg name="driver_args"		value="10.66.171.91, 4;
 					       10.66.171.92, 4"/>
 
-  <include file="$(find aist_bringup)/launch/include/generic_bringup.launch">
+  <!-- Bringup robots -->
+  <include file="$(find aist_bringup)/launch/include/connect_robots.launch">
     <arg name="sim"			value="$(arg sim)"/>
-    <arg name="scene"			value="$(arg scene)"/>
+    <arg name="robot_description_file"
+	 value="$(find aist_description)/scenes/urdf/$(arg scene).urdf"/>
     <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
-    <arg name="robot_state_frequency"	value="$(arg robot_state_frequency)"/>
-    <arg name="moveit_config"		value="$(arg moveit_config)"/>
-    <arg name="rviz_config"		value="$(arg rviz_config)"/>
     <arg name="prefixes"		value="$(arg prefixes)"/>
     <arg name="devices"			value="$(arg devices)"/>
     <arg name="controllers"		value="$(arg controllers)"/>
     <arg name="drivers"			value="$(arg drivers)"/>
     <arg name="driver_args"		value="$(arg driver_args)"/>
+  </include>
+
+  <!-- Start MoveIt! -->
+  <include file="$(find aist_bringup)/launch/include/move_group.launch">
+    <arg name="robot_state_frequency"	value="$(arg robot_state_frequency)"/>
+    <arg name="moveit_config"		value="$(arg moveit_config)"/>
+    <arg name="rviz_config"		value="$(arg rviz_config)"/>
   </include>
 
 </launch>

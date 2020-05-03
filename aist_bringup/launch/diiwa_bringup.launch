@@ -9,6 +9,7 @@
   <arg name="moveit_config"		default="$(find diiwa_moveit_config)"/>
   <arg name="rviz_config"		default=""/>
 
+  <!-- Setup "diiwa" configuration -->
   <arg name="prefixes"			value="a_iiwa_, b_iiwa_"/>
   <arg name="devices"			value="iiwa14, iiwa14"/>
   <arg name="controllers"		value="iiwa, iiwa"/>
@@ -16,18 +17,24 @@
   <arg name="driver_args"		value="$(arg hardware_interface);
 					       $(arg hardware_interface)"/>
 
-  <include file="$(find aist_bringup)/launch/include/generic_bringup.launch">
+  <!-- Bringup robots -->
+  <include file="$(find aist_bringup)/launch/include/connect_robots.launch">
     <arg name="sim"			value="$(arg sim)"/>
-    <arg name="scene"			value="$(arg scene)"/>
+    <arg name="robot_description_file"
+	 value="$(find aist_description)/scenes/urdf/$(arg scene).urdf"/>
     <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
-    <arg name="robot_state_frequency"	value="$(arg robot_state_frequency)"/>
-    <arg name="moveit_config"		value="$(arg moveit_config)"/>
-    <arg name="rviz_config"		value="$(arg rviz_config)"/>
     <arg name="prefixes"		value="$(arg prefixes)"/>
     <arg name="devices"			value="$(arg devices)"/>
     <arg name="controllers"		value="$(arg controllers)"/>
     <arg name="drivers"			value="$(arg drivers)"/>
     <arg name="driver_args"		value="$(arg driver_args)"/>
+  </include>
+
+  <!-- Start MoveIt! -->
+  <include file="$(find aist_bringup)/launch/include/move_group.launch">
+    <arg name="robot_state_frequency"	value="$(arg robot_state_frequency)"/>
+    <arg name="moveit_config"		value="$(arg moveit_config)"/>
+    <arg name="rviz_config"		value="$(arg rviz_config)"/>
   </include>
 
 </launch>
