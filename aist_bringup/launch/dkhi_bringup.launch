@@ -19,7 +19,7 @@
   <!-- Bringup robots -->
   <include file="$(find aist_bringup)/launch/include/connect_robots.launch">
     <arg name="robot_description_file"
-	 value="$(find aist_description)/scenes/urdf/$(arg scene).urdf"/>
+	 value="$(find aist_description)/scenes/urdf/$(arg scene).urdf.xacro"/>
     <arg name="sim"			value="$(arg sim)"/>
     <arg name="joint_state_frequency"	value="$(arg joint_state_frequency)"/>
     <arg name="prefixes"		value="$(arg prefixes)"/>

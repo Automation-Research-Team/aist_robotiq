@@ -20,7 +20,7 @@
     <param name="environment_description"
   	   command="$(find xacro)/xacro --inorder '$(find
   		    aist_description)/scenes/urdf/$(arg
-		    scene)_environment.urdf'"/>
+		    scene)_environment.urdf.xacro'"/>
     <node name="environment_spawner" pkg="gazebo_ros" type="spawn_model"
   	  respawn="false" output="screen"
           args="-urdf -param environment_description -model environment
