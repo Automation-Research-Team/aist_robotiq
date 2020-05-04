@@ -23,9 +23,9 @@ class MoveBaseClient(object):
         if self._move_base.wait_for_server(rospy.Duration(20)):
             rospy.loginfo("Connected to move_base.")
         else:
-            rospy.logerr("MoveBaseClient.__init()__: failed to connect /move_base action server")
+            rospy.logerr("MoveBaseClient.__init()__: failed to connect move_base action server")
 
-        self._odom_sub          = rospy.Subscriber("/odom", nmsg.Odometry,
+        self._odom_sub          = rospy.Subscriber("odom", nmsg.Odometry,
                                                    self._odom_callback)
         self._odom_recv_event   = threading.Event()
         self._current_odom      = nmsg.Odometry()
