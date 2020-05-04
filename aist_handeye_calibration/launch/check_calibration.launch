@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <launch>
   <arg name="config"		default="aist"/>
-  <arg name="scene"		default="$(arg config)_base_scene"/>
+  <arg name="scene"		default=""/>
   <arg name="sim"		default="false"/>
   <arg name="robot_name"	default="b_bot"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
@@ -24,11 +24,10 @@
   </include>
 
   <!-- Start robot controller -->
-  <include file="$(find aist_routines)/launch/connect_robots.launch">
-    <arg name="config"	value="$(arg config)"/>
-    <arg name="scene"	value="$(arg scene)"/>
-    <arg name="sim"	value="$(arg sim)"/>
-    <arg name="rviz_config"
-    	 value="$(find aist_handeye_calibration)/launch/check_calibration.rviz"/>
+  <include file="$(find aist_bringup)/launch/$(arg config)_bringup.launch">
+    <arg name="scene"		value="$(arg scene)"/>
+    <arg name="sim"		value="$(arg sim)"/>
+    <arg name="rviz_config"	value="$(find aist_handeye_calibration
+				       )/launch/check_calibration.rviz"/>
   </include>
 </launch>

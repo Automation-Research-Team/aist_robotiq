@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://wiki.ros.org/xacro" name="pgrp_kitting">
-  <xacro:include filename="$(find aist_description)/scenes/urdf/pgrp_base_scene.urdf.xacro"/>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="kitting">
 
   <xacro:property name="plate_w" value="0.68"/>
   <xacro:property name="plate_l" value="0.42"/>

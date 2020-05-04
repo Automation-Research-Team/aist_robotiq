@@ -10,8 +10,7 @@
   <!-- Load robot_description if the description file is specifed. -->
   <param if="$(eval robot_description_file != '')"
 	 name="robot_description"
-  	 command="$(find xacro)/xacro --inorder
-		  '$(arg robot_description_file)'"/>
+  	 command="$(find xacro)/xacro $(arg robot_description_file) --inorder"/>
 
   <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped
        using the parameter robot_description and publish to TF. -->

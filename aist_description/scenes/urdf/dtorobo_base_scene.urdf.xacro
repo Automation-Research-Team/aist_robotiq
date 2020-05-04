@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://wiki.ros.org/xacro" name="dtorobo_base_scene" >
 
+  <xacro:arg name="scene" default=""/>
+
   <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
   <xacro:property name="a_torobo_x" value="0"/>
   <xacro:property name="a_torobo_y" value="-0.4875"/>
@@ -68,5 +70,12 @@
     <child  link="ground"/>
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
+
+  <!-- Include indivisual scene file -->
+  <xacro:property name="scene_name" value="$(arg scene)"/>
+  <xacro:if value="${scene_name != ''}">
+    <xacro:include filename="$(find aist_description)/scenes/urdf/$(arg
+			     scene).urdf.xacro"/>
+  </xacro:if>
 
 </robot>

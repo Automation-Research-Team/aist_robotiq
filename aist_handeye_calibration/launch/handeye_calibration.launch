@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <launch>
   <arg name="config"		default="aist"/>
-  <arg name="scene"		default="$(arg config)_calibration"/>
+  <arg name="scene"		default="calibration"/>
   <arg name="sim"		default="false"/>
   <arg name="robot_name"	default="b_bot"
        unless="$(eval arg('config') == 'ur5e')"/>
@@ -32,12 +32,11 @@
   </include>
 
   <!-- Start robot controller -->
-  <include file="$(find aist_routines)/launch/connect_robots.launch">
-    <arg name="config"		value="$(arg config)"/>
+  <include file="$(find aist_bringup)/launch/$(arg config)_bringup.launch">
     <arg name="scene"		value="$(arg scene)"/>
     <arg name="sim"		value="$(arg sim)"/>
-    <arg name="rviz_config"
-    	 value="$(find aist_handeye_calibration)/launch/handeye_calibration.rviz"/>
+    <arg name="rviz_config"	value="$(find aist_handeye_calibration
+				       )/launch/handeye_calibration.rviz"/>
   </include>
 
   <!-- Dummy calibration to have a fully connected TF tree and
@@ -56,6 +55,7 @@
   <!-- Set up namespace -->
   <arg name="namespace"	value="$(arg camera_name)_from_$(arg robot_name)"/>
 
+  <!-- Start easy_handeye calibrator -->
   <group ns="$(arg namespace)">
     <param name="eye_on_hand"		value="$(arg eye_on_hand)"/>
     <param name="robot_base_frame"	value="$(arg robot_base_frame)"/>
@@ -63,10 +63,9 @@
     <param name="tracking_base_frame"	value="$(arg camera_frame)"/>
     <param name="tracking_marker_frame"	value="$(arg marker_frame)"/>
     <param name="use_dual_quaternion"	value="$(arg use_dual_quaternion)"/>
+
+    <node name="handeye_calibrator"
+	  pkg="aist_handeye_calibration" type="calibrator" output="screen"/>
   </group>
 
-  <!-- Start easy_handeye calibrator -->
-  <node name="handeye_calibrator"
-	pkg="aist_handeye_calibration" type="calibrator"
-  	ns="$(arg namespace)" output="screen"/>
 </launch>

@@ -2,7 +2,8 @@
 <launch>
 
   <arg name="robot_description_file"
-       default="$(find aist_description)/scenes/urdf/aist_base_scene.urdf"/>
+       default="$(find aist_description
+		)/scenes/urdf/aist_base_scene.urdf.xacro"/>
   <arg name="sim"			default="false"/>
   <arg name="suppress_gazebo"		default="false"/>
   <arg name="manager"			default=""/>
@@ -24,8 +25,8 @@
   <!-- Load URDF to param "robot_description" and spawn the robot -->
   <group ns="$(arg ns)">
     <param name="robot_description"
-  	   command="$(find xacro)/xacro --inorder
-  		    '$(arg robot_description_file)'"/>
+  	   command="$(find xacro)/xacro $(arg robot_description_file)
+		    --inorder"/>
   </group>
 
   <group if="$(eval sim and not suppress_gazebo)">

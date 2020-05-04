@@ -5,7 +5,8 @@
 
   <include file="$(find aist_bringup)/launch/include/move_group.launch">
     <arg name="robot_description_file"
-	 value="$(find aist_description)/scenes/urdf/ceatec.urdf.xacro"/>
+	 value="$(find aist_description
+		)/scenes/urdf/fetch_base_scene.urdf.xacro scene:=ceatec"/>
     <arg name="moveit_config"	value="$(find ceatec_moveit_config)"/>
     <arg name="rviz_config"	value="$(arg rviz_config)"/>
   </include>
