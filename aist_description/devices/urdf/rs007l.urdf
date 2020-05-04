@@ -7,4 +7,11 @@
   <xacro:rs007l prefix="a_khi_" parent="base_link">
     <origin xyz="0 0 0" rpy="0 0 0" />
   </xacro:rs007l>
+
+  <gazebo>
+    <plugin name="gazebo_ros_control"  filename="libgazebo_ros_control.so">
+      <robotNamespace>/</robotNamespace>
+      <legacyModeNS>true</legacyModeNS>
+    </plugin>
+  </gazebo>
 </robot>
