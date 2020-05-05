@@ -166,7 +166,7 @@ class InteractiveRoutines(FetchRoutines):
             elif key == 'move_base':
                 x     = float(raw_input("  x     = "))
                 y     = float(raw_input("  y     = "))
-                theta = float(raw_input("  theta = "))
+                theta = radians(float(raw_input("  theta = ")))
                 self.move_base(x, y, theta)
             elif key == 'move_base_to_frame':
                 self.move_base_to_frame(raw_input(" frame = "))
