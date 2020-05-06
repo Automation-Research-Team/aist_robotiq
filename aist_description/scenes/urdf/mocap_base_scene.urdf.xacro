@@ -34,7 +34,7 @@
 
   <!-- robot arms -->
   <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro"/>
-  <xacro:include filename="$(find aist_description)/devices/urdf/ur5e.urdf.xacro"/>
+  <xacro:include filename="$(find ur_description)/urdf/ur5e.urdf.xacro"/>
   <xacro:ur5e_robot prefix="c_bot_" joint_limited="false"
     shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
     shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
