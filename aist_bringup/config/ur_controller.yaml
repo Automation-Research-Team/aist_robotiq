@@ -1,5 +1,8 @@
 $(arg prefix)controller:
   type: position_controllers/JointTrajectoryController
+  action_ns: follow_joint_trajectory  # for moveit
+  action_type: FollowJointTrajectory  # for moveit (==>type)
+  action_default: true                # for moveit (==>default)
   joints:
     - $(arg prefix)shoulder_pan_joint
     - $(arg prefix)shoulder_lift_joint

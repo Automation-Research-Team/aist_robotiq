@@ -8,6 +8,10 @@ $(arg prefix)gripper_controller:
       d: 0.0
       i: 0.0
       i_clamp: 0.0
+  action_ns: gripper_action    # for moveit
+  action_type: GripperCommand  # for moveit (==>type)
+  action_default: true         # for moveit (==>default)
+  action_parallel: true        # for moveit (==>parallel)
 
 gazebo:
   $(arg prefix)l_gripper_finger_joint:

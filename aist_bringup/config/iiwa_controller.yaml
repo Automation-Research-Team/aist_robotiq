@@ -102,6 +102,9 @@
   # Effort Position Controllers ---------------------------------------
   $(arg prefix)EffortJointInterface_trajectory_controller:
     type: effort_controllers/JointTrajectoryController
+    action_ns: follow_joint_trajectory  # for moveit
+    action_type: FollowJointTrajectory  # for moveit (==>type)
+    action_default: false               # for moveit (==>default)
     joints:
       - $(arg prefix)joint_1
       - $(arg prefix)joint_2
@@ -131,6 +134,9 @@
   # Forward Position Controllers ---------------------------------------
   $(arg prefix)PositionJointInterface_trajectory_controller:
     type: position_controllers/JointTrajectoryController
+    action_ns: follow_joint_trajectory  # for moveit
+    action_type: FollowJointTrajectory  # for moveit (==>type)
+    action_default: true                # for moveit (==>default)
     joints:
       - $(arg prefix)joint_1
       - $(arg prefix)joint_2
@@ -151,6 +157,9 @@
   # Forward Velocity Controllers ---------------------------------------
   $(arg prefix)VelocityJointInterface_trajectory_controller:
     type: velocity_controllers/JointTrajectoryController
+    action_ns: follow_joint_trajectory  # for moveit
+    action_type: FollowJointTrajectory  # for moveit (==>type)
+    action_default: false               # for moveit (==>default)
     joints:
       - $(arg prefix)joint_1
       - $(arg prefix)joint_2

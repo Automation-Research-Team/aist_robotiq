@@ -31,6 +31,9 @@ $(arg prefix)speed_scaling_state_controller:
 # For detailed explanations of parameter see http://wiki.ros.org/joint_trajectory_controller
 $(arg prefix)scaled_pos_traj_controller:
   type: position_controllers/ScaledJointTrajectoryController
+  action_ns: follow_joint_trajectory  # for moveit
+  action_type: FollowJointTrajectory  # for moveit (==>type)
+  action_default: true                # for moveit (==>default)
   joints: *robot_joints
   constraints:
     goal_time: 0.6
@@ -47,6 +50,9 @@ $(arg prefix)scaled_pos_traj_controller:
 
 $(arg prefix)pos_traj_controller:
   type: position_controllers/JointTrajectoryController
+  action_ns: follow_joint_trajectory  # for moveit
+  action_type: FollowJointTrajectory  # for moveit (==>type)
+  action_default: false               # for moveit (==>default)
   joints: *robot_joints
   constraints:
     goal_time: 0.6
