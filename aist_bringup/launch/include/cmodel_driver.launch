@@ -12,7 +12,7 @@
   <include file="$(find robotiq_control
 		 )/launch/ur_cmodel_action_controller.launch">
     <arg name="topic"	value="/$(arg prefix)controller/ur_driver/URScript"/>
-    <arg name="namespace"	value="$(arg prefix)$(arg device)_controller"/>
+    <arg name="namespace"	value="$(arg prefix)gripper_controller"/>
     <arg name="gripper_prefix"	value="$(arg prefix)"/>
     <arg name="config"		value="$(arg config)"/>
   </include>

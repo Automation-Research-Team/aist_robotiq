@@ -67,14 +67,6 @@
       <arg name="robot_name"	value="b_bot"/>
     </include>
 
-    <!-- Drivers for the grippers -->
-    <include file="$(find robotiq_control
-		   )/launch/ur_cmodel_action_controller.launch">
-      <arg name="namespace"	 value="a_bot_gripper" />
-      <arg name="gripper_prefix" value="a_bot_" />
-      <arg name="topic"		 value="/a_bot_controller/ur_driver/URScript"/>
-    </include>
-
     <!-- Launch fastening tools -->
     <arg name="config_dir"	default="$(find o2as_fastening_tools)/config"/>
     <arg name="suction_control"	default="suction_control"/>
@@ -85,6 +77,44 @@
       <param name="suction_control"	value="$(arg suction_control)"/>
       <param name="operation_mode"	value="$(arg operation_mode)"/>
     </node>
+
+    <!-- Launch PhoXi camera -->
+    <include file="$(find aist_phoxi_camera)/launch/run.launch">
+        <arg name="camera_name"	value="a_phoxi_m_camera"/>
+	<arg name="id"		value="2018-09-016-LC3"/>
+	<arg name="frame"	value="a_phoxi_m_camera_from_b_bot"/>
+    </include>
+
+    <!-- Launch RealSense cameras -->
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+      <arg name="serial_no"		value="636203005853"/>
+      <arg name="camera"		value="a_bot_cam_inside"/>
+      <arg name="enable_depth"		value="true"/>
+      <arg name="enable_color"		value="true"/>
+      <arg name="enable_infra1"		value="false"/>
+      <arg name="enable_infra2"		value="false"/>
+      <arg name="enable_pointcloud"	value="false"/>
+      <arg name="depth_fps"		value="30"/>
+      <arg name="color_fps"		value="30"/>
+      <arg name="align_depth"		value="true"/>
+      <arg name="publish_tf"		value="true"/>
+      <arg name="enable_streaming"	value="false"/>
+    </include>
+
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+      <arg name="serial_no"		value="636203005303"/>
+      <arg name="camera"		value="a_bot_cam_outside"/>
+      <arg name="enable_depth"		value="true"/>
+      <arg name="enable_color"		value="true"/>
+      <arg name="enable_infra1"		value="false"/>
+      <arg name="enable_infra2"		value="false"/>
+      <arg name="enable_pointcloud"	value="false"/>
+      <arg name="depth_fps"		value="30"/>
+      <arg name="color_fps"		value="30"/>
+      <arg name="align_depth"		value="true"/>
+      <arg name="publish_tf"		value="false"/>
+      <arg name="enable_streaming"	value="false"/>
+    </include>
 
   </group>
 

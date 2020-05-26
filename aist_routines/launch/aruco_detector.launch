@@ -13,7 +13,6 @@
 	   ns="$(arg camera_name)">
     <arg name="marker_id"		value="$(arg marker_id)"/>
     <arg name="marker_size"		value="$(arg marker_size)"/>
-    <arg name="camera_name"		value="$(arg camera_name)"/>
     <arg if="$(eval camera_frame == '')"
 	 name="camera_frame"		value="$(arg camera_name)_from_b_bot"/>
     <arg unless="$(eval camera_frame == '')"
@@ -33,7 +32,6 @@
 	   ns="$(arg camera_name)">
     <arg name="marker_id"		value="$(arg marker_id)"/>
     <arg name="marker_size"		value="$(arg marker_size)"/>
-    <arg name="camera_name"		value="$(arg camera_name)"/>
     <arg if="$(eval camera_frame == '')"
 	 name="camera_frame"		value="$(arg camera_name)_color_optical_frame"/>
     <arg unless="$(eval camera_frame == '')"
@@ -53,7 +51,6 @@
 	   ns="$(arg camera_name)">
     <arg name="marker_id"		value="$(arg marker_id)"/>
     <arg name="marker_size"		value="$(arg marker_size)"/>
-    <arg name="camera_name"		value="$(arg camera_name)"/>
     <arg if="$(eval camera_frame == '')"
 	 name="camera_frame"		value="$(arg camera_name)_rgb_optical_frame"/>
     <arg unless="$(eval camera_frame == '')"

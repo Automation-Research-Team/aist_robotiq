@@ -24,10 +24,10 @@ class Calibrator
     using transformMsg_t	= geometry_msgs::TransformStamped;
 
   public:
-		Calibrator()						;
+		Calibrator(const ros::NodeHandle& nh)			;
 		~Calibrator()						;
 
-    void	spin();
+    void	run()							;
 
   private:
     const std::string&	camera_frame()				const	;
@@ -47,7 +47,7 @@ class Calibrator
 		      std_srvs::Empty::Response&)			;
 
   private:
-    ros::NodeHandle		_node;
+    ros::NodeHandle		_nh;
 
     const ros::ServiceServer	_get_sample_list_srv;
     const ros::ServiceServer	_take_sample_srv;

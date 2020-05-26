@@ -141,21 +141,21 @@ class GenericGripper(GripperClient):
 #  class RobotiqGripper                                              #
 ######################################################################
 class RobotiqGripper(GripperClient):
-    def __init__(self, prefix="a_bot_", product="85",
+    def __init__(self, prefix="a_bot_", product="robotiq_85",
                  force=5.0, velocity=0.1, timeout=6.0):
         import robotiq_msgs.msg
 
         super(RobotiqGripper, self) \
             .__init__(*RobotiqGripper._initargs(prefix, product,
                                                 force, velocity, timeout))
-        if product == "hande":
+        if product == "robotiq_hande":
             self._min_gap   = 0.0
             self._max_gap   = 0.026
             self._min_speed = 0.02
             self._max_speed = 0.15
             self._min_force = 20.0
             self._max_force = 130.0
-        elif product == "85":
+        elif product == "robotiq_85":
             self._min_gap   = 0.0
             self._max_gap   = 0.085
             self._min_speed = 0.013
@@ -189,9 +189,9 @@ class RobotiqGripper(GripperClient):
 
     @staticmethod
     def _initargs(prefix, product, force, velocity, timeout):
-        return (prefix + "robotiq_" + product + "_gripper", "two_finger",
-                prefix + "robotiq_" + product + "_base_link",
-                prefix + "robotiq_" + product + "_tip_link", timeout)
+        return (prefix + product + "_gripper", "two_finger",
+                prefix + product + "_base_link",
+                prefix + product + "_tip_link", timeout)
 
     @property
     def open_position(self):

@@ -3,26 +3,25 @@
   <arg name="config"		default="aist"/>
   <arg name="scene"		default="calibration"/>
   <arg name="sim"		default="false"/>
-  <arg name="robot_name"	default="b_bot"
-       unless="$(eval arg('config') == 'ur5e')"/>
-  <arg name="robot_name"	default="d_bot"
-       if="$(eval arg('config') == 'ur5e')"/>
+  <arg name="robot_name"	default="b_bot"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
   <arg name="use_dual_quaternion" default="false"/>
 
-  <arg name="robot_base_frame"	value="workspace_center"/>
-  <!-- <arg name="robot_base_frame"	value="$(arg robot_name)_base_link"/> -->
-  <arg name="camera_frame"	value="dummy_camera"/>
-  <arg name="marker_frame"	value="dummy_marker"/>
-
-  <arg name="eye_on_hand"
-       value="$(eval arg('camera_name') == arg('robot_name') + '_camera')"/>
+  <!-- Start controllers for robots, cameras and other sensors -->
+  <include file="$(find aist_bringup)/launch/$(arg config)_bringup.launch">
+    <arg name="scene"		value="$(arg scene)"/>
+    <arg name="sim"		value="$(arg sim)"/>
+    <arg name="rviz_config"	value="$(find aist_handeye_calibration
+				       )/launch/handeye_calibration.rviz"/>
+  </include>
 
   <!-- Start ArUco -->
   <arg name="marker_id"		value="26"	unless="$(arg eye_on_hand)"/>
   <arg name="marker_id"		value="32"	if    ="$(arg eye_on_hand)"/>
   <arg name="marker_size"	value="0.07"	unless="$(arg eye_on_hand)"/>
   <arg name="marker_size"	value="0.16"	if    ="$(arg eye_on_hand)"/>
+  <arg name="camera_frame"	value="dummy_camera"/>
+  <arg name="marker_frame"	value="dummy_marker"/>
   <include file="$(find aist_routines)/launch/aruco_detector.launch">
     <arg name="marker_id"	value="$(arg marker_id)"/>
     <arg name="marker_size"	value="$(arg marker_size)"/>
@@ -31,20 +30,12 @@
     <arg name="marker_frame"	value="$(arg marker_frame)"/>
   </include>
 
-  <!-- Start robot controller -->
-  <include file="$(find aist_bringup)/launch/$(arg config)_bringup.launch">
-    <arg name="scene"		value="$(arg scene)"/>
-    <arg name="sim"		value="$(arg sim)"/>
-    <arg name="rviz_config"	value="$(find aist_handeye_calibration
-				       )/launch/handeye_calibration.rviz"/>
-  </include>
-
   <!-- Dummy calibration to have a fully connected TF tree and
        see all frames -->
-  <arg name="robot_effector_frame"	value="$(arg robot_name)_wrist_2_link"
-       if="$(arg eye_on_hand)"/>
-  <arg name="robot_effector_frame"	value="$(arg robot_name)_ee_link"
-       unless="$(arg eye_on_hand)"/>
+  <arg name="eye_on_hand"
+       value="$(eval camera_name.find(robot_name) == 0)"/>
+  <arg name="robot_base_frame"		value="workspace_center"/>
+  <arg name="robot_effector_frame"	value="$(arg robot_name)_ee_link"/>
   <node name="dummy_handeye" pkg="tf" type="static_transform_publisher"
         args="0 0 0.05 0 0 0 $(arg robot_effector_frame) $(arg camera_frame) 10"
 	if="$(arg eye_on_hand)"/>
@@ -52,11 +43,8 @@
         args="-0.425 0.45 0.88 -1.5707 0 -2.8 $(arg robot_base_frame) $(arg camera_frame) 10"
 	unless="$(arg eye_on_hand)"/>
 
-  <!-- Set up namespace -->
-  <arg name="namespace"	value="$(arg camera_name)_from_$(arg robot_name)"/>
-
   <!-- Start easy_handeye calibrator -->
-  <group ns="$(arg namespace)">
+  <group ns="$(arg camera_name)_from_$(arg robot_name)">
     <param name="eye_on_hand"		value="$(arg eye_on_hand)"/>
     <param name="robot_base_frame"	value="$(arg robot_base_frame)"/>
     <param name="robot_effector_frame"	value="$(arg robot_effector_frame)"/>

@@ -19,21 +19,21 @@ namespace aist_handeye_calibration
 /************************************************************************
 *  class Calibrator							*
 ************************************************************************/
-Calibrator::Calibrator()
-    :_node(),
+Calibrator::Calibrator(const ros::NodeHandle& nh)
+    :_nh(nh),
      _get_sample_list_srv(
-      	 _node.advertiseService("get_sample_list",
-				&Calibrator::get_sample_list, this)),
+	 _nh.advertiseService("get_sample_list",
+			      &Calibrator::get_sample_list, this)),
      _take_sample_srv(
-	 _node.advertiseService("take_sample",
+	 _nh.advertiseService("take_sample",
 				&Calibrator::take_sample, this)),
      _compute_calibration_srv(
-	 _node.advertiseService("compute_calibration",
+	 _nh.advertiseService("compute_calibration",
 				&Calibrator::compute_calibration, this)),
      _save_calibration_srv(
-	 _node.advertiseService("save_calibration",
+	 _nh.advertiseService("save_calibration",
 				&Calibrator::save_calibration, this)),
-     _reset_srv(_node.advertiseService("reset", &Calibrator::reset, this)),
+     _reset_srv(_nh.advertiseService("reset", &Calibrator::reset, this)),
      _listener(),
      _use_dual_quaternion(false),
      _eye_on_hand(true),
@@ -41,28 +41,29 @@ Calibrator::Calibrator()
 {
     ROS_INFO_STREAM("initializing calibrator...");
 
-    _node.param<bool>("use_dual_quaternion", _use_dual_quaternion, false);
-    _node.param<bool>("eye_on_hand", _eye_on_hand, true);
+    _nh.param<bool>("use_dual_quaternion",
+		    _use_dual_quaternion, _use_dual_quaternion);
+    _nh.param<bool>("eye_on_hand", _eye_on_hand, _eye_on_hand);
 
     if (_eye_on_hand)
     {
-	_node.param<std::string>("robot_effector_frame", _eMc.header.frame_id,
-				 "tool0");
-	_node.param<std::string>("robot_base_frame",	 _wMo.header.frame_id,
-				 "base_link");
+	_nh.param<std::string>("robot_effector_frame",	_eMc.header.frame_id,
+			       "tool0");
+	_nh.param<std::string>("robot_base_frame",	_wMo.header.frame_id,
+			       "base_link");
     }
     else
     {
-	_node.param<std::string>("robot_effector_frame", _wMo.header.frame_id,
-				 "tool0");
-	_node.param<std::string>("robot_base_frame",	 _eMc.header.frame_id,
-				 "base_link");
+	_nh.param<std::string>("robot_effector_frame",	_wMo.header.frame_id,
+			       "tool0");
+	_nh.param<std::string>("robot_base_frame",	_eMc.header.frame_id,
+			       "base_link");
     }
 
-    _node.param<std::string>("tracking_base_frame",   _eMc.child_frame_id,
-			     "tracking_origin");
-    _node.param<std::string>("tracking_marker_frame", _wMo.child_frame_id,
-			     "tracking_target");
+    _nh.param<std::string>("tracking_base_frame",   _eMc.child_frame_id,
+			   "tracking_origin");
+    _nh.param<std::string>("tracking_marker_frame", _wMo.child_frame_id,
+			   "tracking_target");
 }
 
 Calibrator::~Calibrator()
@@ -70,7 +71,7 @@ Calibrator::~Calibrator()
 }
 
 void
-Calibrator::spin()
+Calibrator::run()
 {
     ros::spin();
 }
