@@ -106,15 +106,10 @@
   </xacro:phoxi_m_camera>
 
   <!-- Add RealSense camera -->
-  <xacro:include filename="$(find aist_description)/devices/urdf/_sr305.urdf.xacro" />
-  <xacro:sensor_sr305 prefix="a_bot_" parent="a_bot_wrist_2_link">
-    <origin xyz="0.0326671856774
-		 -0.063887034743
-		 0.194855923541"
-	    rpy="${-1.9802935144*pi/180}
-		 ${10.1226491078*pi/180}
-		 ${94.4366841644*pi/180}"/>
-  </xacro:sensor_sr305>
+  <xacro:include filename="$(find aist_description
+			   )/devices/urdf/wrist_cameras.urdf.xacro" />
+  <xacro:wrist_cameras prefix="a_bot_"
+		       parent="a_bot_robotiq_85_base_link"/>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world"/>
