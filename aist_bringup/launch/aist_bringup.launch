@@ -52,10 +52,6 @@
     <arg name="rviz_config"		value="$(arg rviz_config)"/>
   </include>
 
-  <rosparam command="delete" param="grippers"/>
-  <rosparam command="delete" param="cameras"/>
-  <rosparam file="$(find aist_routines)/config/aist_config.yaml"/>
-
   <!-- Launch other hardware drivers -->
   <group if="$(eval not sim)">
 

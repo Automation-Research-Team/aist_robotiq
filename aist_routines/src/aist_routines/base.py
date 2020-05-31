@@ -45,9 +45,9 @@ class AISTBaseRoutines(object):
         rospy.sleep(1.0)        # Necessary for listner spinning up
 
         # MoveIt planning parameters
-        self._reference_frame = rospy.get_param("moveit_pose_reference_frame",
+        self._reference_frame = rospy.get_param("~moveit_pose_reference_frame",
                                                 "workspace_center")
-        self._eef_step        = rospy.get_param("moveit_eef_step", 0.0005)
+        self._eef_step        = rospy.get_param("~moveit_eef_step", 0.0005)
         rospy.loginfo("reference_frame = {}, eef_step = {}"
                       .format(self._reference_frame, self._eef_step))
 
@@ -57,14 +57,14 @@ class AISTBaseRoutines(object):
         self._cmd = moveit_commander.RobotCommander(robot_description, ns)
 
         # Grippers
-        d = rospy.get_param("grippers", {})
+        d = rospy.get_param("~grippers", {})
         self._grippers = {}
         for robot_name, gripper in d.items():
             self._grippers[robot_name] = GripperClient.create(gripper["type"],
                                                               gripper["args"])
 
         # Cameras
-        d = rospy.get_param("cameras", {})
+        d = rospy.get_param("~cameras", {})
         self._cameras = {}
         for camera_name, camera in d.items():
             self._cameras[camera_name] = CameraClient.create(camera["type"],
@@ -398,7 +398,7 @@ class AISTBaseRoutines(object):
     # Private functions
     def _create_device(self, type_name, kwargs):
         Device = globals()[type_name]
-        if rospy.get_param("use_real_robot", False):
+        if rospy.get_param("/use_real_robot", False):
             return Device(**kwargs)
         else:
             return Device.base(**kwargs)

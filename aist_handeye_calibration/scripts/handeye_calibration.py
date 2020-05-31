@@ -249,7 +249,8 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
         self._sleep_time  = sleep_time
 
         if needs_calib:
-            ns = "/{}_from_{}/".format(camera_name, robot_name)
+            #ns = "/{}_from_{}/".format(camera_name, robot_name)
+            ns = "/handeye_calibrator/"
             self.get_sample_list = rospy.ServiceProxy(ns + "get_sample_list",
                                                       GetSampleList)
             self.take_sample = rospy.ServiceProxy(ns + "take_sample", Trigger)

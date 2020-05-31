@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<launch>
+
+  <arg name="sim"			default="false"/>
+  <arg name="camera_name"		default="a_phoxi_m_camera"/>
+
+  <include if="$(eval camera_name == 'a_phoxi_m_camera')"
+	   file="$(find aist_handeye_calibration
+		 )/launch/include/handeye_calibration.launch">
+    <arg name="config"			value="aist"/>
+    <arg name="scene"			value=""/>
+    <arg name="sim"			value="$(arg sim)"/>
+    <arg name="camera_name"		value="$(arg camera_name)"/>
+
+    <arg name="camera_info_topic"	value="camera_info"/>
+    <arg name="image_topic"		value="texture"/>
+    <arg name="depth_topic"		value="depth_map"/>
+
+    <arg name="marker_id"		value="26"/>
+    <arg name="marker_size"		value="0.07"/>
+    <arg name="planarity_tolerance"	value="0.001"/>
+
+    <arg name="check"			value="true"/>
+  </include>
+
+  <include unless="$(eval camera_name == 'a_phoxi_m_camera')"
+	   file="$(find aist_handeye_calibration
+		 )/launch/include/handeye_calibration.launch">
+    <arg name="config"			value="aist"/>
+    <arg name="scene"			value=""/>
+    <arg name="sim"			value="$(arg sim)"/>
+    <arg name="camera_name"		value="$(arg camera_name)"/>
+
+    <arg name="camera_info_topic"	value="color/camera_info"/>
+    <arg name="image_topic"		value="color/image_raw"/>
+    <arg name="depth_topic"		value="aligned_depth_to_color/image_raw"/>
+
+    <arg name="marker_id"		value="26"/>
+    <arg name="marker_size"		value="0.07"/>
+    <arg name="planarity_tolerance"	value="0.003"/>
+
+    <arg name="check"			value="true"/>
+  </include>
+
+</launch>

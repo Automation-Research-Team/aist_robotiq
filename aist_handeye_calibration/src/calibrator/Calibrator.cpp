@@ -25,14 +25,13 @@ Calibrator::Calibrator(const ros::NodeHandle& nh)
 	 _nh.advertiseService("get_sample_list",
 			      &Calibrator::get_sample_list, this)),
      _take_sample_srv(
-	 _nh.advertiseService("take_sample",
-				&Calibrator::take_sample, this)),
+	 _nh.advertiseService("take_sample", &Calibrator::take_sample, this)),
      _compute_calibration_srv(
 	 _nh.advertiseService("compute_calibration",
-				&Calibrator::compute_calibration, this)),
+			      &Calibrator::compute_calibration, this)),
      _save_calibration_srv(
 	 _nh.advertiseService("save_calibration",
-				&Calibrator::save_calibration, this)),
+			      &Calibrator::save_calibration, this)),
      _reset_srv(_nh.advertiseService("reset", &Calibrator::reset, this)),
      _listener(),
      _use_dual_quaternion(false),
@@ -60,10 +59,8 @@ Calibrator::Calibrator(const ros::NodeHandle& nh)
 			       "base_link");
     }
 
-    _nh.param<std::string>("tracking_base_frame",   _eMc.child_frame_id,
-			   "tracking_origin");
-    _nh.param<std::string>("tracking_marker_frame", _wMo.child_frame_id,
-			   "tracking_target");
+    _nh.param<std::string>("camera_frame", _eMc.child_frame_id, "camera_frame");
+    _nh.param<std::string>("marker_frame", _wMo.child_frame_id, "marker_frame");
 }
 
 Calibrator::~Calibrator()
@@ -221,69 +218,80 @@ Calibrator::save_calibration(std_srvs::Trigger::Request&,
     {
 	YAML::Emitter	emitter;
 	emitter << YAML::BeginMap;
+
 	emitter << YAML::Key   << "eye_on_hand"
 		<< YAML::Value << _eye_on_hand;
-	emitter << YAML::Key   << (_eye_on_hand ? "robot_effector_frame"
-						: "robot_base_frame")
+
+	emitter << YAML::Key   << "camera_transformation"
+		<< YAML::Value
+		<< YAML::BeginMap;
+	emitter << YAML::Key   << "parent"
 		<< YAML::Value << effector_frame();
-	emitter << YAML::Key   << "tracking_base_frame"
+	emitter << YAML::Key   << "child"
 		<< YAML::Value << camera_frame();
 	emitter << YAML::Key   << "transformation"
 		<< YAML::Value
 		<< YAML::Flow
 		<< YAML::BeginMap
-		<< YAML::Key   << "qw"
-		<< YAML::Value << _eMc.transform.rotation.w
-		<< YAML::Key   << "qx"
-		<< YAML::Value << _eMc.transform.rotation.x
-		<< YAML::Key   << "qy"
-		<< YAML::Value << _eMc.transform.rotation.y
-		<< YAML::Key   << "qz"
-		<< YAML::Value << _eMc.transform.rotation.z
 		<< YAML::Key   << "x"
 		<< YAML::Value << _eMc.transform.translation.x
 		<< YAML::Key   << "y"
 		<< YAML::Value << _eMc.transform.translation.y
 		<< YAML::Key   << "z"
 		<< YAML::Value << _eMc.transform.translation.z
+		<< YAML::Key   << "qx"
+		<< YAML::Value << _eMc.transform.rotation.x
+		<< YAML::Key   << "qy"
+		<< YAML::Value << _eMc.transform.rotation.y
+		<< YAML::Key   << "qz"
+		<< YAML::Value << _eMc.transform.rotation.z
+		<< YAML::Key   << "qw"
+		<< YAML::Value << _eMc.transform.rotation.w
 		<< YAML::EndMap;
-	emitter << YAML::Key   << (_eye_on_hand ? "robot_base_frame"
-						: "robot_effector_frame")
+	emitter << YAML::EndMap;
+	
+	emitter << YAML::Key   << "marker_transformation"
+		<< YAML::Value
+		<< YAML::BeginMap;
+	emitter << YAML::Key   << "parent"
 		<< YAML::Value << world_frame();
-	emitter << YAML::Key   << "tracking_marker_frame"
+	emitter << YAML::Key   << "child"
 		<< YAML::Value << object_frame();
-	emitter << YAML::Key   << "another_transformation"
+	emitter << YAML::Key   << "transformation"
 		<< YAML::Value
 		<< YAML::Flow
 		<< YAML::BeginMap
-		<< YAML::Key   << "qw"
-		<< YAML::Value << _wMo.transform.rotation.w
-		<< YAML::Key   << "qx"
-		<< YAML::Value << _wMo.transform.rotation.x
-		<< YAML::Key   << "qy"
-		<< YAML::Value << _wMo.transform.rotation.y
-		<< YAML::Key   << "qz"
-		<< YAML::Value << _wMo.transform.rotation.z
 		<< YAML::Key   << "x"
 		<< YAML::Value << _wMo.transform.translation.x
 		<< YAML::Key   << "y"
 		<< YAML::Value << _wMo.transform.translation.y
 		<< YAML::Key   << "z"
 		<< YAML::Value << _wMo.transform.translation.z
+		<< YAML::Key   << "qx"
+		<< YAML::Value << _wMo.transform.rotation.x
+		<< YAML::Key   << "qy"
+		<< YAML::Value << _wMo.transform.rotation.y
+		<< YAML::Key   << "qz"
+		<< YAML::Value << _wMo.transform.rotation.z
+		<< YAML::Key   << "qw"
+		<< YAML::Value << _wMo.transform.rotation.w
 		<< YAML::EndMap;
+	emitter << YAML::EndMap;
+
 	emitter << YAML::EndMap;
 
 	const auto	home = getenv("HOME");
 	if (!home)
 	    throw std::runtime_error("environment variable HOME is not set.");
 
-	std::string	name = home + std::string("/.ros/easy_handeye");
+	std::string	name = home
+			     + std::string("/.ros/aist_handeye_calibration");
 	struct stat	buf;
 	if (stat(name.c_str(), &buf) && mkdir(name.c_str(), S_IRWXU))
 	    throw std::runtime_error("cannot create " + name + ": "
 						      + strerror(errno));
 
-	name += (ros::this_node::getNamespace() + ".yaml");
+	name += ('/' + camera_frame() + ".yaml");
 	std::ofstream	out(name.c_str());
 	if (!out)
 	    throw std::runtime_error("cannot open " + name + ": "

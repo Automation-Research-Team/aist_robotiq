@@ -1,5 +1,6 @@
 <?xml version="1.0" ?>
 <launch>
+
   <arg name="config"		default="aist"/>
   <arg name="scene"		default=""/>
   <arg name="sim"		default="false"/>
@@ -7,6 +8,14 @@
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
   <arg name="marker_id"		default="26"/>
   <arg name="marker_size"	default="0.07"/>
+
+  <!-- Start controllers for robots, cameras and other sensors -->
+  <include file="$(find aist_bringup)/launch/$(arg config)_bringup.launch">
+    <arg name="scene"		value="$(arg scene)"/>
+    <arg name="sim"		value="$(arg sim)"/>
+    <arg name="rviz_config"	value="$(find aist_handeye_calibration
+				       )/launch/check_calibration.rviz"/>
+  </include>
 
   <arg name="eye_on_hand"
        value="$(eval arg('camera_name') == arg('robot_name') + '_camera')"/>
@@ -23,11 +32,4 @@
     <arg name="camera_name"	value="$(arg camera_name)"/>
   </include>
 
-  <!-- Start robot controller -->
-  <include file="$(find aist_bringup)/launch/$(arg config)_bringup.launch">
-    <arg name="scene"		value="$(arg scene)"/>
-    <arg name="sim"		value="$(arg sim)"/>
-    <arg name="rviz_config"	value="$(find aist_handeye_calibration
-				       )/launch/check_calibration.rviz"/>
-  </include>
 </launch>

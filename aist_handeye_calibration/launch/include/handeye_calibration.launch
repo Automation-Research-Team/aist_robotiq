@@ -1,0 +1,72 @@
+<?xml version="1.0" ?>
+<launch>
+
+  <arg name="config"			default="aist"/>
+  <arg name="scene"			default="calibration"/>
+  <arg name="sim"			default="false"/>
+  <arg name="camera_name"		default="a_phoxi_m_camera"/>
+
+  <arg name="camera_info_topic"		default="camera_info"/>
+  <arg name="image_topic"		default="texture"/>
+  <arg name="depth_topic"		default="depth_map"/>
+
+  <arg name="marker_id"			default="26"/>
+  <arg name="marker_size"		default="0.07"/>
+  <arg name="planarity_tolerance"	default="0.001"/>
+
+  <arg name="robot_base_frame"		default="workspace_center"/>
+  <arg name="robot_effector_frame"	default="b_bot_ee_link"/>
+
+  <arg name="eye_on_hand"		default="false"/>
+  <arg name="check"			default="false"/>
+  <arg name="use_dual_quaternion"	default="false"/>
+
+  <arg name="camera_frame"		value="$(arg camera_name)_calibrated"/>
+  <arg name="marker_frame"		value="marker_frame"/>
+
+  <!-- Start controllers for robots, cameras and other sensors -->
+  <include file="$(find aist_bringup)/launch/$(arg config)_bringup.launch">
+    <arg name="scene"		value="$(arg scene)"/>
+    <arg name="sim"		value="$(arg sim)"/>
+    <arg name="rviz_config"	value="$(find aist_handeye_calibration
+				       )/launch/handeye_calibration.rviz"/>
+  </include>
+
+  <!-- Start ArUco -->
+  <include ns="$(arg camera_name)"
+	   file="$(find aist_aruco_ros)/launch/run.launch">
+    <arg name="camera_info_topic"	value="$(arg camera_info_topic)"/>
+    <arg name="image_topic"		value="$(arg image_topic)"/>
+    <arg name="depth_topic"		value="$(arg depth_topic)"/>
+
+    <arg name="marker_id"		value="$(arg marker_id)"/>
+    <arg name="marker_size"		value="$(arg marker_size)"/>
+    <arg name="camera_frame"		value="$(arg camera_frame)"/>
+    <arg name="marker_frame"		value="$(arg marker_frame)"/>
+    <arg name="planarity_tolerance"	value="$(arg palanarity_tolerane"/>
+  </include>
+
+  <group unless="$(arg check)">
+
+    <!-- Dummy calibration to have a fully connected TF tree and
+	 see all frames -->
+    <node if="$(arg eye_on_hand)"
+	  name="dummy_handeye" pkg="tf" type="static_transform_publisher"
+          args="0 0 0.05 0 0 0
+		$(arg robot_effector_frame) $(arg camera_frame) 10"/>
+    <node unless="$(arg eye_on_hand)"
+	  name="dummy_handeye" pkg="tf" type="static_transform_publisher"
+          args="-0.425 0.45 0.88 -1.5707 0 -2.8
+		$(arg robot_base_frame) $(arg camera_frame) 10"/>
+
+    <!-- Start easy_handeye calibrator -->
+    <node name="handeye_calibrator"
+	  pkg="aist_handeye_calibration" type="calibrator" output="screen">
+      <rosparam file="$(find aist_handeye_calibration
+		      )/config/$(arg config)/$(arg camera_name).yaml"/>
+      <param name="use_dual_quaternion"	 value="$(arg use_dual_quaternion)"/>
+    </node>
+
+  </group>
+
+</launch>

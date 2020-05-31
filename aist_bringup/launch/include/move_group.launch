@@ -15,7 +15,7 @@
   <!-- Convert sensor_msgs::JointState to geometry_msgs::TransformStamped
        using the parameter robot_description and publish to TF. -->
   <node name="robot_state_publisher"
-	pkg ="robot_state_publisher" type="robot_state_publisher" >
+	pkg ="robot_state_publisher" type="robot_state_publisher">
     <param name="publish_frequency" value="$(arg robot_state_frequency)"/>
   </node>
 
