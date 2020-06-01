@@ -20,10 +20,11 @@
 				       )/launch/handeye_calibration.rviz"/>
   </include>
 
+  <!-- Set file names for configuration and calibrated parameters -->
   <arg name="config_file"
        value="$(find aist_handeye_calibration
 	      )/config/$(arg config)/$(arg camera_name).yaml"/>
-  <arg name="transform_file"
+  <arg name="calib_file"
        value="$(env HOME)/.ros/aist_handeye_calibration/$(arg camera_name
 	      )_calibrated.yaml"/>
 
@@ -41,7 +42,7 @@
 	pkg="aist_handeye_calibration" type="publish.py" output="screen">
     <param name="dummy" value="$(eval not check)"/>
     <rosparam file="$(arg config_file)"/>
-    <rosparam file="$(arg transform_file)" if="$(arg check)"/>
+    <rosparam file="$(arg calib_file)" if="$(arg check)"/>
   </node>
 
   <!-- Start easy_handeye calibrator -->
