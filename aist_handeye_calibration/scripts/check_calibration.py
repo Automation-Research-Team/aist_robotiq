@@ -1,16 +1,7 @@
 #!/usr/bin/env python
 
-import sys
-import os
 import rospy
-import argparse
-from math import radians, degrees
-from std_srvs.srv import Trigger
 from geometry_msgs import msg as gmsg
-from tf import TransformListener, transformations as tfs
-
-import moveit_commander
-
 from aist_routines.base import AISTBaseRoutines
 
 ######################################################################
@@ -19,10 +10,10 @@ from aist_routines.base import AISTBaseRoutines
 class CheckCalibrationRoutines(AISTBaseRoutines):
     """Wrapper of MoveGroupCommander specific for this script"""
 
-    def __init__(self, robot_name, camera_name):
+    def __init__(self):
         super(CheckCalibrationRoutines, self).__init__()
-        self._robot_name   = robot_name
-        self._camera_name  = camera_name
+        self._camera_name = rospy.get_param("~camera_name", "a_phoxi_m_camera")
+        self._robot_name  = rospy.get_param("~robot_name", "b_bot")
 
     def move(self, speed):
         self.trigger_frame(self._camera_name)
@@ -52,7 +43,7 @@ class CheckCalibrationRoutines(AISTBaseRoutines):
         self.continuous_shot(self._camera_name, False)
         self.go_to_named_pose("home", self._robot_name)
 
-        while True:
+        while not rospy.is_shutdown():
             try:
                 key = raw_input(">> ")
                 if key == 'q':
@@ -74,31 +65,8 @@ class CheckCalibrationRoutines(AISTBaseRoutines):
 #  global functions                                                  #
 ######################################################################
 if __name__ == '__main__':
+    rospy.init_node("check_calibration")
 
-    parser = argparse.ArgumentParser(description='Check hand-eye calibration')
-    parser.add_argument('-c',
-                        '--camera_name',
-                        action='store',
-                        nargs='?',
-                        default='a_phoxi_m_camera',
-                        type=str,
-                        choices=None,
-                        help='camera name',
-                        metavar=None)
-    parser.add_argument('-r',
-                        '--robot_name',
-                        action='store',
-                        nargs='?',
-                        default='b_bot',
-                        type=str,
-                        choices=None,
-                        help='robot name',
-                        metavar=None)
-    args = parser.parse_args()
-
-    rospy.init_node("check_calibration", anonymous=True)
-
-    with CheckCalibrationRoutines(args.robot_name, args.camera_name) as routines:
-
+    with CheckCalibrationRoutines() as routines:
         speed = 0.05
         routines.run(speed)

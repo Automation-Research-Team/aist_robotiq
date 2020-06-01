@@ -8,7 +8,7 @@
 
   <include if="$(eval camera_name == 'a_phoxi_m_camera')"
 	   file="$(find aist_handeye_calibration
-		 )/launch/include/handeye_calibration.launch">
+		 )/launch/include/handeye_calibrator.launch">
     <arg name="config"			value="aist"/>
     <arg name="scene"			value="calibration"/>
 
@@ -24,7 +24,7 @@
 
   <include unless="$(eval camera_name == 'a_phoxi_m_camera')"
 	   file="$(find aist_handeye_calibration
-		 )/launch/include/handeye_calibration.launch">
+		 )/launch/include/handeye_calibrator.launch">
     <arg name="config"			value="aist"/>
     <arg name="scene"			value="calibration"/>
 

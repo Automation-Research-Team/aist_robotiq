@@ -31,10 +31,18 @@ cameras:
     type: PhoXiCamera
     args:
       name: a_phoxi_m_camera
-  a_bot_camera:
+  a_bot_inside_camera:
     type: DepthCamera
     args:
-      name: a_bot_camera
+      name: a_bot_inside_camera
+      camera_info_topic: color/camera_info
+      image_topic: color/image_raw
+      pointcloud_topic: depth/color/point
+      depth_topic: aligned_depth_to_color/image_raw
+  a_bot_outside_camera:
+    type: DepthCamera
+    args:
+      name: a_bot_outside_camera
       camera_info_topic: color/camera_info
       image_topic: color/image_raw
       pointcloud_topic: depth/color/point

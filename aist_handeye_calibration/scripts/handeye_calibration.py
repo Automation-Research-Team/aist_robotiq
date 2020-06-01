@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-import sys, os, rospy, copy
-from math import radians, degrees
+import rospy, copy
+from math import radians
 from std_srvs.srv  import Empty, Trigger
 from geometry_msgs import msg as gmsg
-from tf import TransformListener, transformations as tfs
+from tf import transformations as tfs
 from aist_handeye_calibration.srv import GetSampleList, ComputeCalibration
 from aist_routines.base import AISTBaseRoutines
 
@@ -29,15 +29,15 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
         self._sleep_time           = rospy.get_param("~sleep_time", 2)
 
         if rospy.get_param("calibration", True):
-            ns = "/handeye_calibrator/"
-            self.get_sample_list = rospy.ServiceProxy(ns + "get_sample_list",
+            ns = "/handeye_calibrator"
+            self.get_sample_list = rospy.ServiceProxy(ns + "/get_sample_list",
                                                       GetSampleList)
-            self.take_sample = rospy.ServiceProxy(ns + "take_sample", Trigger)
+            self.take_sample = rospy.ServiceProxy(ns + "/take_sample", Trigger)
             self.compute_calibration = rospy.ServiceProxy(
-                ns + "compute_calibration", ComputeCalibration)
-            self.save_calibration = rospy.ServiceProxy(ns + "save_calibration",
+                ns + "/compute_calibration", ComputeCalibration)
+            self.save_calibration = rospy.ServiceProxy(ns + "/save_calibration",
                                                        Trigger)
-            self.reset = rospy.ServiceProxy(ns + "reset", Empty)
+            self.reset = rospy.ServiceProxy(ns + "/reset", Empty)
         else:
             self.get_sample_list     = None
             self.take_sample         = None
@@ -145,13 +145,10 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
 #  global functions                                                  #
 ######################################################################
 if __name__ == '__main__':
-    rospy.init_node("~")
+    rospy.init_node("handeye_calibration")
 
-    calibrate = HandEyeCalibrationRoutines()
-
-    while not rospy.is_shutdown():
-        if raw_input("Hit return key to start >> ") == "q":
-            break
-        calibrate.run()
-
-    sys.exit()
+    with HandEyeCalibrationRoutines() as calibrate:
+        while not rospy.is_shutdown():
+            if raw_input("Hit return key to start >> ") == "q":
+                break
+            calibrate.run()

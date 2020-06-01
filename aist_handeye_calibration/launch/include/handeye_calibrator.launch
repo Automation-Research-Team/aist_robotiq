@@ -41,16 +41,16 @@
   <node name="$(anon handeye_publisher)"
 	pkg="aist_handeye_calibration" type="publish.py" output="screen">
     <param name="dummy" value="$(eval not check)"/>
-    <rosparam file="$(arg config_file)"/>
     <rosparam file="$(arg calib_file)" if="$(arg check)"/>
+    <rosparam file="$(arg config_file)"/>
   </node>
 
-  <!-- Start easy_handeye calibrator -->
+  <!-- Start calibrator -->
   <node unless="$(arg check)"
 	name="handeye_calibrator"
 	pkg="aist_handeye_calibration" type="calibrator" output="screen">
-    <rosparam file="$(arg config_file)"/>
     <param name="use_dual_quaternion"	 value="$(arg use_dual_quaternion)"/>
+    <rosparam file="$(arg config_file)"/>
   </node>
 
 </launch>
