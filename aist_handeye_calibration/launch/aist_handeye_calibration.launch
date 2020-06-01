@@ -3,6 +3,7 @@
 
   <arg name="sim"			default="false"/>
   <arg name="camera_name"		default="a_phoxi_m_camera"/>
+  <arg name="check"			default="false"/>
   <arg name="use_dual_quaternion"	default="false"/>
 
   <include if="$(eval camera_name == 'a_phoxi_m_camera')"
@@ -10,20 +11,14 @@
 		 )/launch/include/handeye_calibration.launch">
     <arg name="config"			value="aist"/>
     <arg name="scene"			value="calibration"/>
-    <arg name="sim"			value="$(arg sim)"/>
-    <arg name="camera_name"		value="$(arg camera_name)"/>
 
     <arg name="camera_info_topic"	value="camera_info"/>
     <arg name="image_topic"		value="texture"/>
     <arg name="depth_topic"		value="depth_map"/>
 
-    <arg name="marker_id"		value="26"/>
-    <arg name="marker_size"		value="0.07"/>
-    <arg name="planarity_tolerance"	value="0.001"/>
-
-    <arg name="eye_on_hand"		value="false"/>
-    <arg name="robot_base_frame"	value="workspace_center"/>
-    <arg name="robot_effector_frame"	value="b_bot_ee_link"/>
+    <arg name="sim"			value="$(arg sim)"/>
+    <arg name="camera_name"		value="$(arg camera_name)"/>
+    <arg name="check"			value="$(arg check)"/>
     <arg name="use_dual_quaternion"	value="$(arg use_dual_quaternion)"/>
   </include>
 
@@ -32,20 +27,14 @@
 		 )/launch/include/handeye_calibration.launch">
     <arg name="config"			value="aist"/>
     <arg name="scene"			value="calibration"/>
-    <arg name="sim"			value="$(arg sim)"/>
-    <arg name="camera_name"		value="$(arg camera_name)"/>
 
     <arg name="camera_info_topic"	value="color/camera_info"/>
     <arg name="image_topic"		value="color/image_raw"/>
     <arg name="depth_topic"		value="aligned_depth_to_color/image_raw"/>
 
-    <arg name="marker_id"		value="32"/>
-    <arg name="marker_size"		value="0.16"/>
-    <arg name="planarity_tolerance"	value="0.003"/>
-
-    <arg name="eye_on_hand"		value="true"/>
-    <arg name="robot_base_frame"	value="workspace_center"/>
-    <arg name="robot_effector_frame"	value="a_bot_ee_link"/>
+    <arg name="sim"			value="$(arg sim)"/>
+    <arg name="camera_name"		value="$(arg camera_name)"/>
+    <arg name="check"			value="$(arg check)"/>
     <arg name="use_dual_quaternion"	value="$(arg use_dual_quaternion)"/>
   </include>
 

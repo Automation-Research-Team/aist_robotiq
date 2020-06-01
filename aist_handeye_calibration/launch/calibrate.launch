@@ -5,7 +5,8 @@
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
 
   <node name="calibrate"
-	pkg="aist_handeye_calibration" type="calibrate.py" output="screen">
+	pkg="aist_handeye_calibration" type="handeye_calibrate.py"
+	output="screen">
     <rosparam file="$(find aist_handeye_calibration
 		    )/config/$(arg config)/$(arg camera_name).yaml"/>
     <rosparam file="$(find aist_routines)/config/$(arg config)_config.yaml"/>

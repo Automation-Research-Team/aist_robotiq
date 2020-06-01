@@ -150,7 +150,7 @@ if __name__ == '__main__':
     calibrate = HandEyeCalibrationRoutines()
 
     while not rospy.is_shutdown():
-        if raw_input(">> ") == "q":
+        if raw_input("Hit return key to start >> ") == "q":
             break
         calibrate.run()
 

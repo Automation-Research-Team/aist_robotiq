@@ -14,13 +14,13 @@ import moveit_commander
 from aist_routines.base import AISTBaseRoutines
 
 ######################################################################
-#  class VisitRoutines                                               #
+#  class CheckCalibrationRoutines                                    #
 ######################################################################
-class VisitRoutines(AISTBaseRoutines):
+class CheckCalibrationRoutines(AISTBaseRoutines):
     """Wrapper of MoveGroupCommander specific for this script"""
 
     def __init__(self, robot_name, camera_name):
-        super(VisitRoutines, self).__init__()
+        super(CheckCalibrationRoutines, self).__init__()
         self._robot_name   = robot_name
         self._camera_name  = camera_name
 
@@ -98,7 +98,7 @@ if __name__ == '__main__':
 
     rospy.init_node("check_calibration", anonymous=True)
 
-    with VisitRoutines(args.robot_name, args.camera_name) as routines:
+    with CheckCalibrationRoutines(args.robot_name, args.camera_name) as routines:
 
         speed = 0.05
         routines.run(speed)

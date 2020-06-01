@@ -2,34 +2,14 @@
 <launch>
 
   <arg name="config"		default="aist"/>
-  <arg name="scene"		default=""/>
-  <arg name="sim"		default="false"/>
-  <arg name="robot_name"	default="b_bot"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
-  <arg name="marker_id"		default="26"/>
-  <arg name="marker_size"	default="0.07"/>
 
-  <!-- Start controllers for robots, cameras and other sensors -->
-  <include file="$(find aist_bringup)/launch/$(arg config)_bringup.launch">
-    <arg name="scene"		value="$(arg scene)"/>
-    <arg name="sim"		value="$(arg sim)"/>
-    <arg name="rviz_config"	value="$(find aist_handeye_calibration
-				       )/launch/check_calibration.rviz"/>
-  </include>
-
-  <arg name="eye_on_hand"
-       value="$(eval arg('camera_name') == arg('robot_name') + '_camera')"/>
-
-  <include file="$(find aist_handeye_calibration)/launch/publish.launch">
-    <arg name="robot_name"	value="$(arg robot_name)" />
-    <arg name="camera_name"	value="$(arg camera_name)" />
-  </include>
-
-  <!-- Start ArUco -->
-  <include file="$(find aist_routines)/launch/aruco_detector.launch">
-    <arg name="marker_id"	value="$(arg marker_id)"/>
-    <arg name="marker_size"	value="$(arg marker_size)"/>
-    <arg name="camera_name"	value="$(arg camera_name)"/>
-  </include>
+  <node name="check_calibration"
+	pkg="aist_handeye_calibration" type="check_calibration.py"
+	output="screen">
+    <rosparam file="$(find aist_handeye_calibration
+		    )/config/$(arg config)/$(arg camera_name).yaml"/>
+    <rosparam file="$(find aist_routines)/config/$(arg config)_config.yaml"/>
+  </node>
 
 </launch>

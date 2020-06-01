@@ -2,100 +2,79 @@
 
 import os
 import rospy
-import yaml
 from tf import TransformBroadcaster, TransformListener, transformations as tfs
 from geometry_msgs import msg as gmsg
-from math import radians, degrees
+from math import degrees
 
 #########################################################################
 #  local functions                                                      #
 #########################################################################
-class CalibrationPublisher:
-    def __init__(self, filename):
-        (self._X, self._Y, self._root_frame) = self._load_transforms(filename)
+class CalibrationPublisher(object):
+    # Dummy effector <-- camera transform in case of eye_on_hand
+    Tec = {"x": 0, "y": 0, "z": 0.05, "qx": 0, "qy": 0, "qz": 0, "qw": 1}
+
+    # Dummy base <-- camera transform in case of eye_on_base
+    Tbc = {"x": 0.4, "y": 0.2, "z": 0.6,
+           "qx": -0.68, "qy": -0.68, "qz": 0.22, "qw": 0.1637}
+
+    def __init__(self):
+        super(CalibrationPublisher, self).__init__()
+
         self._broadcaster = TransformBroadcaster()
         self._listener    = TransformListener()
+
+        eye_on_hand = rospy.get_param("~eye_on_hand", False)
+        parent = rospy.get_param("~robot_effector_frame" if eye_on_hand else
+                                 "~robot_base_frame")
+        child  = rospy.get_param("~camera_frame")
+
+        self._dummy = rospy.get_param("~dummy", False)
+        if not self._dummy:
+            T = rospy.get_param("~transform")
+        elif eye_on_hand:
+            T = CalibrationPublisher.Tec
+        else:
+            T = CalibrationPublisher.Tbc
+
+        self._transform = gmsg.TransformStamped()
+        self._transform.header.frame_id = parent
+        self._transform.child_frame_id  = child
+        self._transform.transform \
+            = gmsg.Transform(gmsg.Vector3(T["x"], T["y"], T["z"]),
+                             gmsg.Quaternion(
+                                 T["qx"], T["qy"], T["qz"], T["qw"]))
 
     def __enter__(self):
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
-        # Get camera(optical) <- camera(body) transformation
-        opt_body = self._get_transform(rospy.get_param('camera_optical_frame'),
-                                       rospy.get_param('camera_body_frame'))
-        bot_opt  = ((self._X.transform.translation.x,
-                     self._X.transform.translation.y,
-                     self._X.transform.translation.z),
-                    (self._X.transform.rotation.x,
-                     self._X.transform.rotation.y,
-                     self._X.transform.rotation.z,
-                     self._X.transform.rotation.w))
+        if not self._dummy:
+            # Get camera(optical) <- camera(body) transform
+            opt_body = self._get_transform(
+                        rospy.get_param("~camera_optical_frame"),
+                        rospy.get_param("~camera_body_frame"))
+            bot_opt  = ((self._transform.transform.translation.x,
+                         self._transform.transform.translation.y,
+                         self._transform.transform.translation.z),
+                        (self._transform.transform.rotation.x,
+                         self._transform.transform.rotation.y,
+                         self._transform.transform.rotation.z,
+                         self._transform.transform.rotation.w))
 
-        # Get robot(effector)/ground <- robot(effector/base) transformation
-        root_bot = self._get_transform(self._root_frame,
-                                       self._X.header.frame_id)
-
-        mat = tfs.concatenate_matrices(
-            self._listener.fromTranslationRotation(*root_bot),
-            self._listener.fromTranslationRotation(*bot_opt),
-            self._listener.fromTranslationRotation(*opt_body))
-        print '\n=== Estimated effector/world <- camera(body) transformation ==='
-        self._print_mat(mat)
-
-        print '\n=== Estimated world/effector <- marker transformation ==='
-        self._print_transform(self._Y.transform)
-
+            mat = tfs.concatenate_matrices(
+                self._listener.fromTranslationRotation(*bot_opt),
+                self._listener.fromTranslationRotation(*opt_body))
+            print("\n=== Estimated effector/base <- camera_body transform ===")
+            self._print_mat(mat)
+            print("\n")
         return True
 
-    def spin(self):
+    def run(self):
         rate = rospy.Rate(50)
         while not rospy.is_shutdown():
-            now = rospy.Time.now()
-            self._X.header.stamp = now
-            self._broadcaster.sendTransformMessage(self._X)
-            self._Y.header.stamp = now
-            self._broadcaster.sendTransformMessage(self._Y)
+            self._transform.header.stamp = rospy.Time.now()
+            self._broadcaster.sendTransformMessage(self._transform)
             rate.sleep()
-
-    def _load_transforms(self, filename):
-        with open(filename) as calib_file:
-            dict = yaml.load(calib_file.read())
-
-        eye_on_hand = dict['eye_on_hand']
-
-        X = gmsg.TransformStamped()
-        X.header.stamp    = rospy.Time.now()
-        X.header.frame_id = dict['robot_effector_frame' if eye_on_hand else
-                                 'robot_base_frame']
-        X.child_frame_id  = rospy.get_param('tracking_base_frame')
-        X.transform       = gmsg.Transform(
-                                gmsg.Vector3(
-                                    dict['transformation']['x'],
-                                    dict['transformation']['y'],
-                                    dict['transformation']['z']),
-                                gmsg.Quaternion(
-                                    dict['transformation']['qx'],
-                                    dict['transformation']['qy'],
-                                    dict['transformation']['qz'],
-                                    dict['transformation']['qw']))
-        Y = gmsg.TransformStamped()
-        Y.header.frame_id = dict['robot_base_frame' if eye_on_hand else
-                                 'robot_effector_frame']
-        Y.child_frame_id  = rospy.get_param('tracking_marker_frame')
-        Y.transform       = gmsg.Transform(
-                                gmsg.Vector3(
-                                    dict['another_transformation']['x'],
-                                    dict['another_transformation']['y'],
-                                    dict['another_transformation']['z']),
-                                gmsg.Quaternion(
-                                    dict['another_transformation']['qx'],
-                                    dict['another_transformation']['qy'],
-                                    dict['another_transformation']['qz'],
-                                    dict['another_transformation']['qw']))
-
-        root_frame = X.header.frame_id if eye_on_hand else 'ground'
-
-        return (X, Y, root_frame)
 
     def _get_transform(self, target_frame, source_frame):
         now = rospy.Time.now()
@@ -107,7 +86,6 @@ class CalibrationPublisher:
         xyz = tfs.translation_from_matrix(mat)
         rpy = map(degrees, tfs.euler_from_matrix(mat))
         print('<origin xyz="{0[0]} {0[1]} {0[2]}" rpy="${{{1[0]}*pi/180}} ${{{1[1]}*pi/180}} ${{{1[2]}*pi/180}}"/>'.format(xyz, rpy))
-
 
     def _print_transform(self, transform):
         xyz = (transform.translation.x,
@@ -122,14 +100,11 @@ class CalibrationPublisher:
 #########################################################################
 #  main part                                                            #
 #########################################################################
-if __name__ == '__main__':
-    rospy.init_node('aist_handeye_calibration_publisher')
+if __name__ == "__main__":
+    rospy.init_node("aist_handeye_calibration_publisher")
 
     while rospy.get_time() == 0.0:
         pass
 
-    filename = os.path.expanduser('~/.ros/easy_handeye/') \
-             + rospy.get_namespace().rstrip('/').split('/')[-1] + '.yaml'
-
-    with CalibrationPublisher(filename) as cp:
-        cp.spin()
+    with CalibrationPublisher() as cp:
+        cp.run()

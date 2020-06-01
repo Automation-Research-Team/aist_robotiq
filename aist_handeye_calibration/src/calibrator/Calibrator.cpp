@@ -222,14 +222,11 @@ Calibrator::save_calibration(std_srvs::Trigger::Request&,
 	emitter << YAML::Key   << "eye_on_hand"
 		<< YAML::Value << _eye_on_hand;
 
-	emitter << YAML::Key   << "camera_transformation"
-		<< YAML::Value
-		<< YAML::BeginMap;
 	emitter << YAML::Key   << "parent"
 		<< YAML::Value << effector_frame();
 	emitter << YAML::Key   << "child"
 		<< YAML::Value << camera_frame();
-	emitter << YAML::Key   << "transformation"
+	emitter << YAML::Key   << "transform"
 		<< YAML::Value
 		<< YAML::Flow
 		<< YAML::BeginMap
@@ -248,37 +245,6 @@ Calibrator::save_calibration(std_srvs::Trigger::Request&,
 		<< YAML::Key   << "qw"
 		<< YAML::Value << _eMc.transform.rotation.w
 		<< YAML::EndMap;
-	emitter << YAML::EndMap;
-	
-	emitter << YAML::Key   << "marker_transformation"
-		<< YAML::Value
-		<< YAML::BeginMap;
-	emitter << YAML::Key   << "parent"
-		<< YAML::Value << world_frame();
-	emitter << YAML::Key   << "child"
-		<< YAML::Value << object_frame();
-	emitter << YAML::Key   << "transformation"
-		<< YAML::Value
-		<< YAML::Flow
-		<< YAML::BeginMap
-		<< YAML::Key   << "x"
-		<< YAML::Value << _wMo.transform.translation.x
-		<< YAML::Key   << "y"
-		<< YAML::Value << _wMo.transform.translation.y
-		<< YAML::Key   << "z"
-		<< YAML::Value << _wMo.transform.translation.z
-		<< YAML::Key   << "qx"
-		<< YAML::Value << _wMo.transform.rotation.x
-		<< YAML::Key   << "qy"
-		<< YAML::Value << _wMo.transform.rotation.y
-		<< YAML::Key   << "qz"
-		<< YAML::Value << _wMo.transform.rotation.z
-		<< YAML::Key   << "qw"
-		<< YAML::Value << _wMo.transform.rotation.w
-		<< YAML::EndMap;
-	emitter << YAML::EndMap;
-
-	emitter << YAML::EndMap;
 
 	const auto	home = getenv("HOME");
 	if (!home)
