@@ -93,7 +93,7 @@
       <arg name="depth_fps"		value="30"/>
       <arg name="color_fps"		value="30"/>
       <arg name="align_depth"		value="true"/>
-      <arg name="publish_tf"		value="true"/>
+      <arg name="publish_tf"		value="false"/>
       <arg name="enable_streaming"	value="false"/>
     </include>
 
@@ -109,7 +109,7 @@
       <arg name="color_fps"		value="30"/>
       <arg name="align_depth"		value="true"/>
       <arg name="publish_tf"		value="false"/>
-      <arg name="enable_streaming"	value="false"/>
+      <arg name="enable_streaming"	value="true"/>
     </include>
 
   </group>
