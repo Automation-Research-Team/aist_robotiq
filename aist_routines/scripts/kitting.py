@@ -1,28 +1,23 @@
 #!/usr/bin/env python
 
-import collections
-import argparse
-import rospy, rospkg, rosparam
+import rospy, collections
 import aist_routines.base as base
-from aist_routines.ur import URRoutines
-from aist_routines    import msg as amsg
+from aist_routines.base import AISTBaseRoutines
+from aist_routines      import msg as amsg
 
 ######################################################################
 #  class KittingRoutines                                             #
 ######################################################################
-class KittingRoutines(URRoutines):
+class KittingRoutines(AISTBaseRoutines):
     """Implements kitting routines for aist robot system."""
 
     Bin = collections.namedtuple("Bin", "name part_id part_props")
 
-    def __init__(self, props_name):
+    def __init__(self):
         super(KittingRoutines, self).__init__()
 
-        rospack = rospkg.RosPack()
-        d = rosparam.load_file(rospack.get_path("aist_routines") +
-                               "/config/" + props_name + ".yaml")[0][0]
-        bin_props  = base.paramtuples(d["bin_props"])
-        part_props = base.paramtuples(d["part_props"])
+        bin_props  = base.paramtuples(rospy.get_param("~bin_props"))
+        part_props = base.paramtuples(rospy.get_param("~part_props"))
 
         # Assign part information to each bin.
         self._bins = {}
@@ -156,21 +151,9 @@ class KittingRoutines(URRoutines):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Perform kitting task')
-    parser.add_argument('-p',
-                        '--props_name',
-                        action='store',
-                        nargs='?',
-                        default='kitting',
-                        type=str,
-                        choices=None,
-                        help='YAML file for part properties',
-                        metavar=None)
-    args = parser.parse_args()
-
     rospy.init_node("kitting", anonymous=True)
 
-    with KittingRoutines(args.props_name) as kitting:
+    with KittingRoutines() as kitting:
         while not rospy.is_shutdown():
             print("============ Kitting procedures ============ ")
             print("  b: Create a backgroud image")

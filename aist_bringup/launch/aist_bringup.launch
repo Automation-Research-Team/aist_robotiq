@@ -78,7 +78,7 @@
     <include file="$(find aist_phoxi_camera)/launch/run.launch">
         <arg name="camera_name"	value="a_phoxi_m_camera"/>
 	<arg name="id"		value="2018-09-016-LC3"/>
-	<arg name="frame"	value="a_phoxi_m_camera_from_b_bot"/>
+	<arg name="frame"	value="a_phoxi_m_camera_calibrated"/>
     </include>
 
     <!-- Launch RealSense cameras -->

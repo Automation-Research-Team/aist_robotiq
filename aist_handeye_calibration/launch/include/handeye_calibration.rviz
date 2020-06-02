@@ -6,7 +6,8 @@ Panels:
       Expanded:
         - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
-      Splitter Ratio: 0.6159420013427734
+        - /TF1/Frames1/marker_frame1
+      Splitter Ratio: 0.3938506543636322
     Tree Height: 362
   - Class: rviz/Selection
     Name: Selection
@@ -26,7 +27,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: Image
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -86,11 +87,6 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
-          a_bot_ar_marker:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           a_bot_base:
             Alpha: 1
             Show Axes: false
@@ -448,11 +444,6 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
-          a_bot_ar_marker:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           a_bot_base:
             Alpha: 1
             Show Axes: false
@@ -775,8 +766,6 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        a_bot_ar_marker:
-          Value: false
         a_bot_base:
           Value: false
         a_bot_base_link:
@@ -792,67 +781,69 @@ Visualization Manager:
         a_bot_ft300_link:
           Value: false
         a_bot_ft300_wrench_link:
-          Value: true
+          Value: false
         a_bot_inside_camera_aligned_depth_to_color_frame:
-          Value: true
+          Value: false
         a_bot_inside_camera_color_frame:
-          Value: true
+          Value: false
         a_bot_inside_camera_color_optical_frame:
           Value: true
         a_bot_inside_camera_connector_link:
-          Value: true
+          Value: false
         a_bot_inside_camera_depth_frame:
-          Value: true
+          Value: false
         a_bot_inside_camera_depth_optical_frame:
-          Value: true
+          Value: false
         a_bot_inside_camera_left_ir_frame:
-          Value: true
+          Value: false
         a_bot_inside_camera_left_ir_optical_frame:
-          Value: true
+          Value: false
         a_bot_inside_camera_link:
-          Value: true
+          Value: false
         a_bot_inside_camera_right_ir_frame:
-          Value: true
+          Value: false
         a_bot_inside_camera_right_ir_optical_frame:
-          Value: true
+          Value: false
         a_bot_outside_camera_color_frame:
-          Value: true
+          Value: false
         a_bot_outside_camera_color_optical_frame:
           Value: true
+        a_bot_outside_camera_color_optical_frame_calibrated:
+          Value: false
         a_bot_outside_camera_connector_link:
-          Value: true
+          Value: false
         a_bot_outside_camera_depth_frame:
-          Value: true
+          Value: false
         a_bot_outside_camera_depth_optical_frame:
-          Value: true
+          Value: false
         a_bot_outside_camera_left_ir_frame:
-          Value: true
+          Value: false
         a_bot_outside_camera_left_ir_optical_frame:
-          Value: true
+          Value: false
         a_bot_outside_camera_link:
-          Value: true
+          Value: false
         a_bot_outside_camera_right_ir_frame:
-          Value: true
+          Value: false
         a_bot_outside_camera_right_ir_optical_frame:
-          Value: true
+          Value: false
         a_bot_robotiq_85_base_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_left_finger_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_left_finger_tip_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_left_inner_knuckle_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_left_knuckle_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_right_finger_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_right_finger_tip_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_right_inner_knuckle_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_right_knuckle_link:
-          Value: true
+          Value: false
         a_bot_robotiq_85_tip_link:
           Value: true
         a_bot_shoulder_link:
@@ -871,8 +862,6 @@ Visualization Manager:
           Value: false
         a_phoxi_m_camera:
           Value: false
-        a_phoxi_m_camera_calibrated:
-          Value: true
         a_phoxi_m_camera_link:
           Value: false
         a_phoxi_m_camera_sensor:
@@ -912,6 +901,8 @@ Visualization Manager:
         b_bot_wrist_3_link:
           Value: false
         ground:
+          Value: true
+        marker_frame:
           Value: true
         vwall1:
           Value: true
@@ -992,14 +983,12 @@ Visualization Manager:
                                     a_bot_robotiq_85_right_finger_link:
                                       {}
                                   a_bot_robotiq_85_tip_link:
-                                    a_bot_ar_marker:
-                                      {}
+                                    {}
+                            a_bot_outside_camera_color_optical_frame_calibrated:
+                              marker_frame:
+                                {}
                           a_bot_tool0:
                             {}
-            a_phoxi_m_camera:
-              a_phoxi_m_camera_sensor:
-                a_phoxi_m_camera_link:
-                  {}
             b_bot_base_link:
               b_bot_base:
                 b_bot_tool0_controller:
@@ -1027,15 +1016,17 @@ Visualization Manager:
             workbox:
               {}
             workspace_center:
-              a_phoxi_m_camera_calibrated:
-                {}
+              a_phoxi_m_camera:
+                a_phoxi_m_camera_sensor:
+                  a_phoxi_m_camera_link:
+                    {}
               workspace_ar_marker:
                 {}
       Update Interval: 0
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /a_phoxi_m_camera/aruco_detector/result
+      Image Topic: /a_bot_outside_camera/aruco_detector/result
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -1047,7 +1038,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /a_phoxi_m_camera/texture
+      Image Topic: /a_bot_outside_camera/color/image_raw
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -1085,7 +1076,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.3193180561065674
+      Distance: 2.3250892162323
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -1100,10 +1091,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.688847541809082
+      Pitch: 0.6388472318649292
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.8374126553535461
+      Yaw: 0.6174129247665405
     Saved: ~
 Window Geometry:
   Displays:

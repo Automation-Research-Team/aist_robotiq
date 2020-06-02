@@ -3,14 +3,7 @@
   <arg name="config"		default="aist"/>
   <arg name="scene"		default="kitting"/>
   <arg name="sim"		default="false"/>
-  <arg name="robot_name"	default="b_bot"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
-
-  <!-- Load and publish hand-eye calibration -->
-  <include file="$(find aist_handeye_calibration)/launch/publish.launch">
-    <arg name="robot_name"	value="$(arg robot_name)" />
-    <arg name="camera_name"	value="$(arg camera_name)" />
-  </include>
 
   <!-- Start robot controller -->
   <include file="$(find aist_bringup)/launch/$(arg config)_bringup.launch">
@@ -20,8 +13,15 @@
 				       )/launch/kitting.rviz"/>
   </include>
 
+  <!-- Load and publish hand-eye calibration -->
+  <include file="$(find aist_handeye_calibration)/launch/publish.launch">
+    <arg name="config"		value="$(arg config)" />
+    <arg name="camera_name"	value="$(arg camera_name)" />
+  </include>
+
   <!-- Start graspability server -->
   <include file="$(find aist_graspability)/launch/aist_graspability.launch">
     <arg name="server_name"	value="aist_graspability"/>
   </include>
+
 </launch>
