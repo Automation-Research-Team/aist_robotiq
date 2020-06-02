@@ -17,7 +17,7 @@
 	      else 'aligned_depth_to_color/image_raw')"/>
 
   <include file="$(find aist_handeye_calibration
-		 )/launch/include/handeye_calibrator.launch">
+		 )/launch/include/handeye_calibration.launch">
     <arg name="config"			value="aist"/>
     <arg name="scene"			value="calibration"/>
 
