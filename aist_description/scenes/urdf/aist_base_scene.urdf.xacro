@@ -97,13 +97,13 @@
   <!-- Add PhoXi 3D scanner -->
   <xacro:include filename="$(find
 			   aist_phoxi_camera)/urdf/phoxi_m_camera.urdf.xacro"/>
-  <xacro:phoxi_m_camera prefix="a_phoxi_m_" parent="ground">
-    <origin xyz="0.483473761574
-		 -0.0146268275279
-		 1.4038624572"
-	    rpy="${-152.299482977*pi/180}
-		 ${-1.97595651456*pi/180}
-		 ${86.7431680432*pi/180}"/>
+  <xacro:phoxi_m_camera prefix="a_phoxi_m_" parent="workspace_center">
+    <origin xyz="0.483543436025
+		 -0.0149511700982
+		 0.633792706454"
+	    rpy="${-152.286950706*pi/180}
+		 ${-2.00315281361*pi/180}
+		 ${86.7522427304*pi/180}"/>
   </xacro:phoxi_m_camera>
 
   <!-- Add RealSense camera -->

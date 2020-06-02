@@ -6,31 +6,24 @@
   <arg name="check"			default="false"/>
   <arg name="use_dual_quaternion"	default="false"/>
 
-  <include if="$(eval camera_name == 'a_phoxi_m_camera')"
-	   file="$(find aist_handeye_calibration
+  <arg name="camera_info_topic"
+       value="$(eval 'camera_info' if 'phoxi' in camera_name
+	      else 'color/camera_info')"/>
+  <arg name="image_topic"
+       value="$(eval 'texture' if 'phoxi' in camera_name
+	      else 'color/image_raw')"/>
+  <arg name="depth_topic"
+       value="$(eval 'depth_map' if 'phoxi' in camera_name
+	      else 'aligned_depth_to_color/image_raw')"/>
+
+  <include file="$(find aist_handeye_calibration
 		 )/launch/include/handeye_calibrator.launch">
     <arg name="config"			value="aist"/>
     <arg name="scene"			value="calibration"/>
 
-    <arg name="camera_info_topic"	value="camera_info"/>
-    <arg name="image_topic"		value="texture"/>
-    <arg name="depth_topic"		value="depth_map"/>
-
-    <arg name="sim"			value="$(arg sim)"/>
-    <arg name="camera_name"		value="$(arg camera_name)"/>
-    <arg name="check"			value="$(arg check)"/>
-    <arg name="use_dual_quaternion"	value="$(arg use_dual_quaternion)"/>
-  </include>
-
-  <include unless="$(eval camera_name == 'a_phoxi_m_camera')"
-	   file="$(find aist_handeye_calibration
-		 )/launch/include/handeye_calibrator.launch">
-    <arg name="config"			value="aist"/>
-    <arg name="scene"			value="calibration"/>
-
-    <arg name="camera_info_topic"	value="color/camera_info"/>
-    <arg name="image_topic"		value="color/image_raw"/>
-    <arg name="depth_topic"		value="aligned_depth_to_color/image_raw"/>
+    <arg name="camera_info_topic"	value="$(arg camera_info_topic)"/>
+    <arg name="image_topic"		value="$(arg image_topic)"/>
+    <arg name="depth_topic"		value="$(arg depth_topic)"/>
 
     <arg name="sim"			value="$(arg sim)"/>
     <arg name="camera_name"		value="$(arg camera_name)"/>
