@@ -90,7 +90,7 @@
 
   <!-- Add virtual wall to avoid collisions-->
   <xacro:aist_box name="vwall1" width="0.01" length="0.3" height="0.5"
-		  parent="ground">
+		  parent="ground" transparent="true">
     <origin xyz="0.45 -0.15 ${bots_z}" rpy="0 0 0"/>
   </xacro:aist_box>
 

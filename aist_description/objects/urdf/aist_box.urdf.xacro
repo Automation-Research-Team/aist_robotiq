@@ -1,8 +1,18 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://wiki.ros.org/xacro">
   <xacro:macro name="aist_box"
-	       params="name width length height parent *origin">
+	       params="name width length height parent transparent:=false
+		       *origin">
     <!-- This creates a box with the origin in the bottom corner, fixed to the world link. -->
+
+    <xacro:unless value="${transparent}">
+      <xacro:property name="rgba"	value="0.7 0.7 0.7 1"/>
+      <xacro:property name="color_name" value="Grey"/>
+    </xacro:unless>
+    <xacro:if value="${transparent}">
+      <xacro:property name="rgba"	value="0 0 0 0"/>
+      <xacro:property name="color_name"	value="Transparent"/>
+    </xacro:if>
 
     <link name="${name}">
       <!-- w is in x, l is in y, h is in z -->
@@ -11,8 +21,8 @@
         <geometry>
           <box size="${width} ${length} ${height}"/>
         </geometry>
-        <material name="Grey">
-          <color rgba="0.7 0.7 0.7 1.0"/>
+        <material name="${color_name}">
+          <color rgba="${rgba}"/>
         </material>
       </visual>
       <collision>
@@ -30,7 +40,7 @@
       </inertial>
     </link>
     <gazebo reference="${name}">
-      <material>Gazebo/Grey</material>
+      <material>Gazebo/${color_name}</material>
     </gazebo>
 
     <joint name="${name}" type="fixed">
