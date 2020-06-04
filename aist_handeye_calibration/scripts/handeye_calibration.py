@@ -118,7 +118,7 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
 
         # Reset pose
         self.go_home()
-        self.move(self._initpose)
+        #self.move(self._initpose)
 
         # Collect samples over pre-defined poses
         keyposes = self._keyposes
