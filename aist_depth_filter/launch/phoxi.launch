@@ -1,14 +1,29 @@
 <?xml version="1.0" ?>
 <launch>
-  <arg name="camera_id"		default="2018-09-016-LC3"/>
+  <arg name="id" default="InstalledExamples-basic-example"/>
+  <!-- <arg name="camera_id"		default="2018-09-016-LC3"/> -->
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
   <arg name="camera_frame"	default="$(arg camera_name)_from_b_bot"/>
+  <arg name="rate"		default="10"/>
+  <arg name="nodelet"		default="false"/>
+  <arg name="nthreads"		default="4"/>
+  
+  <arg if    ="$(arg nodelet)"	name="manager" value="nodelet_manager"/>
+  <arg unless="$(arg nodelet)"	name="manager" value=""/>
+  
+  <node if="$(arg nodelet)"
+	name="$(arg manager)" pkg ="nodelet" type="nodelet"
+	args="manager" output="screen">
+    <param name="num_worker_threads"	value="$(arg nthreads)"/>
+  </node>
 
   <include file="$(find aist_phoxi_camera)/launch/run.launch">
-    <arg name="id"			value="$(arg camera_id)"/>
-    <arg name="camera_name"		value="$(arg camera_name)"/>
-    <arg name="frame"			value="$(arg camera_frame)"/>
-    <arg name="trigger_mode"		value="0"/>
+    <arg name="id"		value="$(arg id)"/>
+    <arg name="camera_name"	value="$(arg camera_name)"/>
+    <arg name="frame"		value="$(arg camera_frame)"/>
+    <arg name="trigger_mode"	value="0"/>
+    <arg name="rate"		value="$(arg rate)"/>
+    <arg name="manager"		value="$(arg manager)"/>
   </include>
 
   <include file="$(find aist_depth_filter)/launch/run.launch"
@@ -17,6 +32,7 @@
     <arg name="image_topic"		value="texture"/>
     <arg name="depth_topic"		value="depth_map"/>
     <arg name="normal_topic"		value="normal_map"/>
+    <arg name="manager"			value="$(arg manager)"/>
   </include>
 
   <arg name="command_args"

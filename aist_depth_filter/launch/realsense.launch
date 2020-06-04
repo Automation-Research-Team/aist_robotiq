@@ -1,18 +1,17 @@
 <?xml version="1.0" ?>
 <launch>
+
   <arg name="serial_no"		default=""/>
   <arg name="camera_name"	default="a_bot_camera"/>
   <arg name="camera_width"	default="640"/>
   <arg name="camera_height"	default="480"/>
-  <arg name="camera_frame"	default="$(arg camera_name)_color_optical_frame"/>
   <arg name="enable_streaming"	default="true"/>
-  <arg name="fps"		default="30"/>
+  <arg name="manager"		default="realsense2_camera_manager"/>
 
   <include file="$(find realsense2_camera)/launch/rs_camera.launch">
-    <arg name="serial_no"		value="$(arg serial_no)"/>
+    <arg name="manager"			value="$(arg manager)"/>
     <arg name="camera"			value="$(arg camera_name)"/>
     <arg name="enable_depth"		value="true"/>
-    <arg name="enable_color"		value="true"/>
     <arg name="enable_infra1"		value="false"/>
     <arg name="enable_infra2"		value="false"/>
     <arg name="enable_pointcloud"	value="false"/>
@@ -24,22 +23,22 @@
     <arg name="color_width"		value="$(arg camera_width)"/>
     <arg name="color_height"		value="$(arg camera_height)"/>
     <arg name="enable_streaming"	value="$(arg enable_streaming)"/>
-    <arg name="depth_fps"		value="$(arg fps)"/>
-    <arg name="color_fps"		value="$(arg fps)"/>
   </include>
 
   <include file="$(find aist_depth_filter)/launch/run.launch"
 	   ns="$(arg camera_name)">
-    <arg name="camera_info_topic"	value="color/camera_info"/>
-    <arg name="image_topic"		value="color/image_raw"/>
-    <arg name="depth_topic"		value="aligned_depth_to_color/image_raw"/>
-    <arg name="normal_topic"		value=""/>
+    <arg name="camera_info_topic" value="color/camera_info"/>
+    <arg name="image_topic"	  value="color/image_raw"/>
+    <arg name="depth_topic"	  value="aligned_depth_to_color/image_raw"/>
+    <arg name="normal_topic"	  value=""/>
+    <arg name="manager"
+	 value="$(eval ''
+		if manager == 'realsense2_camera_manager' else manager)"/>
   </include>
 
-  <arg name="command_args"
-       value="-d $(find aist_depth_filter)/launch/realsense.rviz"/>
-  <node name="$(anon rviz)" pkg="rviz" type="rviz"
-	respawn="false" args="$(arg command_args)" output="screen"/>
+  <node name="$(anon rviz)" pkg="rviz" type="rviz" output="screen"
+	args="-d $(find aist_depth_filter)/launch/realsense.rviz"/>
 
   <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
+
 </launch>

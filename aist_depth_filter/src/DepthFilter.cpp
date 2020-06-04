@@ -1,7 +1,7 @@
 /*!
  *  \file	DepthFilter.cpp
  *  \author	Toshio UESHIBA
- *  \brief	Thin wraper of Photoneo Localization SDK
+ *  \brief	ROS node for applying filters to depth images
  */
 #include <cstdlib>	// for getenv()
 #include <sys/stat.h>	// for mkdir()
@@ -9,17 +9,50 @@
 #include "tiff.h"
 #include "ply.h"
 #include "utils.h"
+#include "binarize.h"
+#include "ransac.h"
 #include "DepthFilter.h"
 
 namespace aist_depth_filter
 {
 /************************************************************************
+*  static functions							*
+************************************************************************/
+template <class T, class ITER> ITER
+get_dark_pixels(const sensor_msgs::Image& image, ITER iter)
+{
+  // Create an array of intensity values.
+    std::vector<float>	intensities(image.height * image.width);
+    auto		q = intensities.begin();
+    for (size_t v = 0; v < image.height; ++v)
+    {
+	const auto	p = ptr<T>(image, v);
+	q = std::transform(p, p + image.width, q, intensity<T>);
+    }
+
+  // Binarize intensities with Otsu's method
+    const auto	thresh = *TU::binarize(intensities.begin(), intensities.end());
+
+  // Extract pixels with itensities below the threshold
+    auto	out = iter;
+    for (size_t v = 0; v < image.height; ++v)
+    {
+	auto	p = ptr<T>(image, v);
+	for (const auto pe = p + image.width; p != pe; ++p, ++iter)
+	    if (intensity(*p) < thresh && (*iter)(2) != 0.0f)
+		*out++ = *iter;
+    }
+
+    return out;		// past-the-end of the dark pixels
+}
+
+/************************************************************************
 *  class DepthFilter							*
 ************************************************************************/
-DepthFilter::DepthFilter(const std::string& name)
-    :_nh(name),
+DepthFilter::DepthFilter(const ros::NodeHandle& nh)
+    :_nh(nh),
      _saveBG_srv(_nh.advertiseService("saveBG", &saveBG_cb, this)),
-     _savePly_srv(_nh.advertiseService("savePly", &savePly_cb, this)),
+     _capture_srv(_nh.advertiseService("capture", &capture_cb, this)),
      _camera_info_sub(_nh, "/camera_info", 1),
      _image_sub( _nh, "/image",  1),
      _depth_sub( _nh, "/depth",  1),
@@ -33,14 +66,17 @@ DepthFilter::DepthFilter(const std::string& name)
      _depth_pub( _it.advertise("depth",  1)),
      _normal_pub(_it.advertise("normal", 1)),
      _colored_normal_pub(_it.advertise("colored_normal", 1)),
+     _bottom_pub(_nh.advertise<cloud_t>("bottom", 1)),
      _camera_info_pub(_nh.advertise<camera_info_t>("camera_info", 1)),
      _file_info_pub(_nh.advertise<file_info_t>("file_info", 1)),
-     _ddr(),
+     _ddr(_nh),
+     _camera_info_org(nullptr),
      _camera_info(),
+     _image_org(nullptr),
      _image(),
-     _depth(nullptr),
-     _bg_depth(nullptr),
-     _filtered_depth(),
+     _depth_org(nullptr),
+     _depth_bg(nullptr),
+     _depth(),
      _normal(),
      _threshBG(0.0),
      _near(0.0),
@@ -50,28 +86,32 @@ DepthFilter::DepthFilter(const std::string& name)
      _left(0),
      _right(3072),
      _scale(1.0),
-     _window_radius(0)
+     _window_radius(0),
+     _threshPlane(0.001)
 {
-    _nh.param("thresh_bg", _threshBG, 0.0);
+    _nh.param("thresh_bg", _threshBG, _threshBG);
     _ddr.registerVariable<double>("thresh_bg", &_threshBG,
 				  "Threshold value for background removal",
 				  0.0, 0.1);
-    _nh.param("near", _near, 0.0);
+    _nh.param("near", _near, _near);
     _ddr.registerVariable<double>("near", &_near,
 				  "Nearest depth value", 0.0, 1.0);
-    _nh.param("far", _far, 100.0);
+    _nh.param("far", _far, _far);
     _ddr.registerVariable<double>("far", &_far,
 				  "Farest depth value", 0.0, FarMax);
-    _nh.param("top", _top, 0);
+    _nh.param("top", _top, _top);
     _ddr.registerVariable<int>("top",    &_top,	   "Top of ROI",    0, 2048);
-    _nh.param("bottom", _bottom, 2048);
+    _nh.param("bottom", _bottom, _bottom);
     _ddr.registerVariable<int>("bottom", &_bottom, "Bottom of ROI", 0, 2048);
-    _nh.param("left", _left, 0);
+    _nh.param("left", _left, _left);
     _ddr.registerVariable<int>("left",   &_left,   "Left of ROI",   0, 3072);
-    _nh.param("right", _right, 3072);
+    _nh.param("right", _right, _right);
     _ddr.registerVariable<int>("right",  &_right,  "Right of ROI",  0, 3072);
-    _nh.param("scale", _scale, 1.0);
+    _nh.param("scale", _scale, _scale);
     _ddr.registerVariable<double>("scale", &_scale, "Scale depth", 0.5, 1.5);
+    _nh.param("thresh_plane", _threshPlane, _threshPlane);
+    _ddr.registerVariable<double>("thresh_plane", &_threshPlane,
+				  "Threshold of plane fitting", 0.0, 0.01);
 
     bool	subscribe_normal;
     _nh.param("subscribe_normal", subscribe_normal, true);
@@ -88,7 +128,6 @@ DepthFilter::DepthFilter(const std::string& name)
     }
 
     _ddr.publishServicesTopics();
-
 }
 
 void
@@ -103,12 +142,13 @@ DepthFilter::saveBG_cb(std_srvs::Trigger::Request&  req,
 {
     try
     {
-	if (!_depth)
+	if (!_depth_org)
 	    throw std::runtime_error("no original depth image available!");
 
-	saveTiff(*_depth, open_dir() + "/bg.tif");
-	_bg_depth = _depth;
-	_depth	  = nullptr;
+	saveTiff(*_depth_org, open_dir() + "/bg.tif");
+
+	_depth_bg  = _depth_org;
+	_depth_org = nullptr;
 
 	res.success = true;
 	res.message = "succeeded.";
@@ -127,21 +167,42 @@ DepthFilter::saveBG_cb(std_srvs::Trigger::Request&  req,
 }
 
 bool
-DepthFilter::savePly_cb(std_srvs::Trigger::Request&  req,
+DepthFilter::capture_cb(std_srvs::Trigger::Request&  req,
 			std_srvs::Trigger::Response& res)
 {
     try
     {
-	if (_filtered_depth.data.empty())
+	if (_depth.data.empty())
 	    throw std::runtime_error("no filtered depth image available!");
 
 	const auto	file_path = open_dir() + "/scene.ply";
-	savePly(_camera_info, _image, _filtered_depth, _normal, file_path);
-	_filtered_depth.data.clear();
+	savePly(_camera_info, _image, _depth, _normal, file_path);
+	_depth.data.clear();
 
 	file_info_t	file_info;
-	file_info.file_path = file_path;
-	file_info.frame     = _camera_info.header.frame_id;
+	file_info.camera_info = _camera_info;
+	file_info.file_path   = file_path;
+
+	if (_threshPlane > 0.0)
+	{
+	    const auto	plane = detect_bottom_plane(*_camera_info_org,
+						    *_image_org, *_depth_org,
+						    _threshPlane);
+	    file_info.plane_detected = true;
+	    file_info.normal.x	     = plane.normal()(0);
+	    file_info.normal.y	     = plane.normal()(1);
+	    file_info.normal.z	     = plane.normal()(2);
+	    file_info.distance	     = plane.distance();
+	}
+	else
+	{
+	    file_info.plane_detected = false;
+	    file_info.normal.x	     = 0;
+	    file_info.normal.y	     = 0;
+	    file_info.normal.z	     = -1;
+	    file_info.distance	     = 0;
+	}
+
 	_file_info_pub.publish(file_info);
 
 	res.success = true;
@@ -149,7 +210,7 @@ DepthFilter::savePly_cb(std_srvs::Trigger::Request&  req,
     }
     catch (const std::exception& err)
     {
-	ROS_ERROR_STREAM("DepthFilter::savePly_cb(): " << err.what());
+	ROS_ERROR_STREAM("DepthFilter::capture_cb(): " << err.what());
 
 	res.success = false;
 	res.message = "failed.";
@@ -171,9 +232,17 @@ DepthFilter::filter_with_normal_cb(const camera_info_cp& camera_info,
     _left   = std::max(0,     std::min(_left,   int(image->width)));
     _right  = std::max(_left, std::min(_right,  int(image->width)));
 
+    if (_top == _bottom || _left == _right)
+	return;
+
     try
     {
 	using	namespace sensor_msgs;
+
+      // Keep pointers to original data.
+	_camera_info_org = camera_info;
+	_image_org	 = image;
+	_depth_org	 = depth;
 
       // Create camera_info according to ROI.
 	_camera_info	    = *camera_info;
@@ -184,21 +253,20 @@ DepthFilter::filter_with_normal_cb(const camera_info_cp& camera_info,
 	_camera_info.P[2]  -= _left;
 	_camera_info.P[6]  -= _top;
 
-	_depth = depth;  // Keep pointer to depth for saving background.
 	create_subimage(*image,  _image);
-	create_subimage(*depth,  _filtered_depth);
+	create_subimage(*depth,  _depth);
 	create_subimage(*normal, _normal);
 	create_colored_normal(_normal, _colored_normal);
 
 	if (depth->encoding == image_encodings::MONO16 ||
 	    depth->encoding == image_encodings::TYPE_16UC1)
-	    filter<uint16_t>(_camera_info, _filtered_depth);
+	    filter<uint16_t>(_camera_info, _depth);
 	else if (depth->encoding == image_encodings::TYPE_32FC1)
-	    filter<float>(_camera_info, _filtered_depth);
+	    filter<float>(_camera_info, _depth);
 
 	_camera_info_pub.publish(_camera_info);
 	_image_pub.publish(_image);
-	_depth_pub.publish(_filtered_depth);
+	_depth_pub.publish(_depth);
 	_normal_pub.publish(_normal);
 	_colored_normal_pub.publish(_colored_normal);
     }
@@ -219,9 +287,17 @@ DepthFilter::filter_without_normal_cb(const camera_info_cp& camera_info,
     _left   = std::max(0,     std::min(_left,   int(image->width)));
     _right  = std::max(_left, std::min(_right,  int(image->width)));
 
+    if (_top == _bottom || _left == _right)
+	return;
+
     try
     {
 	using	namespace sensor_msgs;
+
+      // Keep pointers to original data.
+	_camera_info_org = camera_info;
+	_image_org	 = image;
+	_depth_org	 = depth;
 
       // Create camera_info according to ROI.
 	_camera_info	    = *camera_info;
@@ -232,19 +308,18 @@ DepthFilter::filter_without_normal_cb(const camera_info_cp& camera_info,
 	_camera_info.P[2]  -= _left;
 	_camera_info.P[6]  -= _top;
 
-	_depth = depth;  // Keep pointer to depth for saving background.
 	create_subimage(*image, _image);
-	create_subimage(*depth, _filtered_depth);
+	create_subimage(*depth, _depth);
 
 	if (depth->encoding == image_encodings::MONO16 ||
 	    depth->encoding == image_encodings::TYPE_16UC1)
-	    filter<uint16_t>(_camera_info, _filtered_depth);
+	    filter<uint16_t>(_camera_info, _depth);
 	else if (depth->encoding == image_encodings::TYPE_32FC1)
-	    filter<float>(_camera_info, _filtered_depth);
+	    filter<float>(_camera_info, _depth);
 
 	_camera_info_pub.publish(_camera_info);
 	_image_pub.publish(_image);
-	_depth_pub.publish(_filtered_depth);
+	_depth_pub.publish(_depth);
 	_normal_pub.publish(_normal);
 	_colored_normal_pub.publish(_colored_normal);
     }
@@ -261,14 +336,14 @@ DepthFilter::filter(const camera_info_t& camera_info, image_t& depth)
     {
 	try
 	{
-	    if (!_bg_depth)
-		_bg_depth = loadTiff(open_dir() + "/bg.tif");
+	    if (!_depth_bg)
+		_depth_bg = loadTiff(open_dir() + "/bg.tif");
 
-	    removeBG<T>(depth, *_bg_depth);
+	    removeBG<T>(depth, *_depth_bg);
 	}
 	catch (const std::exception& err)
 	{
-	    _bg_depth = nullptr;
+	    _depth_bg = nullptr;
 	    _threshBG = 0;
 	}
     }
@@ -287,14 +362,14 @@ DepthFilter::filter(const camera_info_t& camera_info, image_t& depth)
 }
 
 template <class T> void
-DepthFilter::removeBG(image_t& depth, const image_t& bg_depth) const
+DepthFilter::removeBG(image_t& depth, const image_t& depth_bg) const
 {
     for (int v = 0; v < depth.height; ++v)
     {
 	auto	p = ptr<T>(depth, v);
-	auto	b = ptr<T>(bg_depth, v + _top) + _left;
+	auto	b = ptr<T>(depth_bg, v + _top) + _left;
 	for (const auto q = p + depth.width; p != q; ++p, ++b)
-	    if (*b != 0 && std::abs(fval(*p) - fval(*b)) < _threshBG)
+	    if (*b != 0 && std::abs(meters(*p) - meters(*b)) < _threshBG)
 		*p = 0;
     }
 }
@@ -307,7 +382,7 @@ DepthFilter::z_clip(image_t& depth) const
 	const auto	p = ptr<T>(depth, v);
 	std::replace_if(p, p + depth.width,
 			[this](const auto& val)
-			{ return (fval(val) < _near || fval(val) > _far); },
+			{ return (meters(val) < _near || meters(val) > _far); },
 			0);
     }
 }
@@ -316,13 +391,14 @@ template <class T> void
 DepthFilter::computeNormal(const camera_info_t& camera_info,
 			   const image_t& depth)
 {
-    using		namespace sensor_msgs;
+    using	namespace sensor_msgs;
 
-    using value_t		= double;
-    using normal_t		= std::array<float, 3>;
+  // Computation of normals shoud be done in double-precision
+  // in order to avoid truncation error when sliding windows
+    using normal_t		= std::array<value_t, 3>;
     using colored_normal_t	= std::array<uint8_t, 3>;
-    using vector3_t		= cv::Matx<value_t, 3, 1>;
-    using matrix33_t		= cv::Matx<value_t, 3, 3>;
+    using vector3_t		= cv::Vec<double, 3>;	   // double-precision
+    using matrix33_t		= cv::Matx<double, 3, 3>;  // double-precision
 
   // 0: Allocate image for output normals.
     _normal.header		= depth.header;
@@ -347,7 +423,7 @@ DepthFilter::computeNormal(const camera_info_t& camera_info,
 
   // 2: Compute 3D coordinates.
     cv::Mat_<vector3_t>		xyz(depth.height, depth.width);
-    depth_to_points<T>(camera_info, depth, xyz.begin());
+    depth_to_points<T>(camera_info, depth, xyz.begin(), milimeters<T>);
 
   // 3: Compute normals.
     const auto			ws1 = 2 * _window_radius;
@@ -358,9 +434,9 @@ DepthFilter::computeNormal(const camera_info_t& camera_info,
   // 3.1: Convovle with a box filter in horizontal direction.
     for (int v = 0; v < n.cols; ++v)
     {
-	auto	sum_n = 0;
-	auto	sum_c = vector3_t::zeros();
-	auto	sum_M = matrix33_t::zeros();
+	auto		sum_n = 0;
+	vector3_t	sum_c(0, 0, 0);
+	auto		sum_M = matrix33_t::zeros();
 	for (int u = 0; u < ws1; ++u)
 	{
 	    const auto&	head = xyz(v, u);
@@ -471,6 +547,50 @@ DepthFilter::scale(image_t& depth) const
 	std::transform(p, p + depth.width, p,
 		       [this](const auto& val){ return _scale * val; });
     }
+}
+
+DepthFilter::plane_t
+DepthFilter::detect_bottom_plane(const camera_info_t& camera_info,
+				 const image_t& image,
+				 const image_t& depth, float thresh) const
+{
+    using	namespace sensor_msgs;
+
+    using grey_t	= uint8_t;
+    using rgb_t		= std::array<uint8_t, 3>;
+    using vector3_t	= cv::Vec<value_t, 3>;
+
+  // Convert depths to 3D coordinates.
+    std::vector<vector3_t>	xyz(depth.height * depth.width);
+    if (depth.encoding == image_encodings::MONO16 ||
+	depth.encoding == image_encodings::TYPE_16UC1)
+	depth_to_points<uint16_t>(camera_info, depth, xyz.begin(),
+				  meters<uint16_t>);
+    else if (depth.encoding == image_encodings::TYPE_32FC1)
+	depth_to_points<float>(camera_info, depth, xyz.begin(), meters<float>);
+    else
+	throw std::runtime_error("unknown dpeth encoding: " + depth.encoding);
+
+  // Extract pixels with intesities below the threshold.
+    const auto	end = (image.encoding == image_encodings::RGB8  ||
+		       image.encoding == image_encodings::TYPE_8UC3 ?
+    		       get_dark_pixels< rgb_t>(image, xyz.begin()) :
+    		       get_dark_pixels<grey_t>(image, xyz.begin()));
+
+  // Fit a dominant plane to the extract pixels.
+    plane_t	plane;
+    const auto	inliers = TU::ransac(xyz.begin(), end, plane,
+				     [thresh](const auto& p, const auto& plane)
+				     { return plane.distance(p) < thresh; },
+				     value_t(0.5), value_t(0.99));
+
+  // Create pointcloud and publish it.
+    const auto	cloud = create_pointcloud(inliers.begin(), inliers.end(),
+					  depth.header.stamp,
+					  depth.header.frame_id);
+    _bottom_pub.publish(cloud);
+
+    return plane;
 }
 
 void
