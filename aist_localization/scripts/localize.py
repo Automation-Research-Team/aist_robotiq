@@ -13,7 +13,7 @@ if __name__ == "__main__":
     models    = rospy.get_param("~models",  [])
 
     dfilter   = DepthFilterClient("depth_filter")
-    dfilter.set_window_radius(2)
+    dfilter.window_radius = 2
     localizer = LocalizationClient("localizer")
     spawner   = ModelSpawnerClient("/model_spawner")
 
