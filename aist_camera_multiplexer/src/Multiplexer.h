@@ -29,18 +29,19 @@ class Multiplexer
     class SyncedSubscribers
     {
       private:
-	using sync_policy_t  = message_filters::sync_policies::
+	using sync_policy_t = message_filters::sync_policies::
 				ApproximateTime<camera_info_t,
-						image_t, image_t>;
+						image_t, image_t, image_t>;
 
       public:
-	SyncedSubscribers(Multiplexer& multiplexer,
+	SyncedSubscribers(Multiplexer* multiplexer,
 			  size_t camera_number)				;
 
       private:
 	message_filters::Subscriber<camera_info_t>	_camera_info_sub;
 	message_filters::Subscriber<image_t>		_image_sub;
 	message_filters::Subscriber<image_t>		_depth_sub;
+	message_filters::Subscriber<image_t>		_normal_sub;
 	message_filters::Synchronizer<sync_policy_t>	_sync;
     };
 
@@ -57,6 +58,7 @@ class Multiplexer
     void	synced_images_cb(const camera_info_cp& camera_info,
 				 const image_cp& image,
 				 const image_cp& depth,
+				 const image_cp& normal,
 				 size_t camera_number)		const	;
 
   private:
@@ -69,6 +71,7 @@ class Multiplexer
     image_transport::ImageTransport	_it;
     const image_transport::Publisher	_image_pub;
     const image_transport::Publisher	_depth_pub;
+    const image_transport::Publisher	_normal_pub;
     const ros::Publisher		_camera_info_pub;
 };
 
