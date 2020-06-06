@@ -1,7 +1,6 @@
 import rospy
 import dynamic_reconfigure.client
 import actionlib
-from std_srvs          import srv as ssrv
 from aist_localization import msg as lmsg
 from operator          import itemgetter
 
@@ -33,7 +32,6 @@ class LocalizationClient(object):
         self._settings   = rospy.get_param("~settings",  {})
         self._z_offsets  = rospy.get_param("~z_offsets", {})
         self._dyn_reconf = dynamic_reconfigure.client.Client(name, timeout=5.0)
-        self._save_plcf  = rospy.ServiceProxy(name + "/save_plcf", ssrv.Trigger)
         self._localize   = actionlib.SimpleActionClient(name + "/localize",
                                                         lmsg.LocalizeAction)
         self._localize.wait_for_server()
@@ -53,13 +51,13 @@ class LocalizationClient(object):
 
     def send_goal(self, model, number_of_poses=1):
         if model in self._methods:
-            method = self._methods[model]
+            method = self._methods[model]      # Localization without SDK
         else:
-            method = lmsg.LocalizeGoal.FULL
+            method = lmsg.LocalizeGoal.FULL    # Full localization with SDK
         if model in self._z_offsets:
-            z_offset = self._z_offsets[model]
+            z_offset = self._z_offsets[model]  # Offset from the base plane
         else:
-            z_offset = 0
+            z_offset = 0                       # No offset
         self.set_settings(LocalizationClient._DefaultSettings)
         if model in self._settings:
             self.set_settings(self._settings[model])
@@ -75,7 +73,7 @@ class LocalizationClient(object):
 
     def wait_for_result(self, timeout=rospy.Duration()):
         if (not self._localize.wait_for_result(timeout)):
-            self._localize.cancel_goal()  # Cancel goal if timeout expired.
+            self._localize.cancel_goal()  # Cancel goal if timeout expired
 
         # Sort obtained poses in descending order of overlap values.
         pairs = sorted(zip(self._poses, self._overlaps),
