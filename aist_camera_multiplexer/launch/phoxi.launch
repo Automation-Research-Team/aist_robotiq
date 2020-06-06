@@ -1,18 +1,21 @@
 <?xml version="1.0" ?>
 <launch>
 
-  <arg name="camera_name"	default="a_bot_camera"/>
+  <arg name="id"		default="InstalledExamples-basic-example"/>
+  <arg name="camera_name"	default="a_phoxi_m_camera"/>
   <arg name="manager"		default=""/>
 
-  <include file="$(find aist_depth_filter)/launch/realsense.launch">
+  <include file="$(find aist_depth_filter)/launch/phoxi.launch">
+    <arg name="id"		value="$(arg id)"/>
     <arg name="camera_name"	value="$(arg camera_name)"/>
+    <arg name="camera_frame"	value="calibrated_a_bot_camera_color_optical_frame"/>
     <arg name="manager"		value="$(arg manager)"/>
     <arg name="vis"		value="false"/>
   </include>
 
   <node name="camera_multiplexer"
-  	pkg="aist_camera_multiplexer" type="aist_camera_multiplexer"
-  	output="screen">
+	pkg="aist_camera_multiplexer" type="aist_camera_multiplexer"
+	output="screen">
     <rosparam param="camera_names" subst_value="true">
       [$(arg camera_name)]
     </rosparam>

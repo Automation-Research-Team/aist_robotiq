@@ -9,10 +9,13 @@ add_compile_options(-pthread)
 
 find_package(catkin REQUIRED
   COMPONENTS
+    ddynamic_reconfigure
     sensor_msgs
     image_transport
-    message_generation
+    rospy
 )
+
+catkin_python_setup()
 
 ###########
 ## Build ##
@@ -21,20 +24,10 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_service_files(
-  FILES
-    SelectCamera.srv
-)
-
-generate_messages(
-#  DEPENDENCIES
-#    std_msgs
-)
-
 catkin_package(
   CATKIN_DEPENDS
     roscpp
-    message_runtime
+    rospy
     sensor_msgs
     pluginlib
     nodelet

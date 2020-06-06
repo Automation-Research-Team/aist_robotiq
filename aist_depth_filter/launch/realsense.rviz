@@ -117,7 +117,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: a_bot_camera_link
+    Fixed Frame: calibrated_a_bot_camera_link
     Frame Rate: 30
   Name: root
   Tools:
@@ -179,5 +179,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1138
-  X: 565
-  Y: 62
+  X: 347
+  Y: 53

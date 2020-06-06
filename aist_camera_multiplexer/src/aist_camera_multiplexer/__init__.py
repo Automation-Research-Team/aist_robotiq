@@ -1,7 +1,23 @@
 import rospy
 import dynamic_reconfigure.client
 from std_srvs import srv as ssrv
-from aist_depth_filter import DepthFilterClient as DepthFilter
+from aist_camera_multiplexer import srv as csrv
+
+######################################################################
+#  class CameraMultiplexerClient                                     #
+######################################################################
+class CameraMultiplexerClient(object):
+    def __init__(self, name="camera_multiplexer"):
+        self._dyn_reconf = dynamic_reconfigure.client.Client(name, timeout=5.0)
+
+    @property
+    def active_camera(self):
+        ret = self._dyn_reconf.get_configuration()
+        return ret["active_camera"]
+
+    @active_camera.setter
+    def active_camera(self, camera_name):
+        self._dyn_reconf.update_configuration({"active_camera": camera_name})
 
 ######################################################################
 #  class RealSenseCamera                                             #

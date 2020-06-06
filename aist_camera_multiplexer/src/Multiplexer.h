@@ -8,10 +8,10 @@
 
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
-#include <aist_camera_multiplexer/SelectCamera.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
+#include <ddynamic_reconfigure/ddynamic_reconfigure.h>
 
 namespace aist_camera_multiplexer
 {
@@ -34,8 +34,7 @@ class Multiplexer
 						image_t, image_t, image_t>;
 
       public:
-	SyncedSubscribers(Multiplexer* multiplexer,
-			  size_t camera_number)				;
+	SyncedSubscribers(Multiplexer* multiplexer, int camera_number)	;
 
       private:
 	message_filters::Subscriber<camera_info_t>	_camera_info_sub;
@@ -53,26 +52,26 @@ class Multiplexer
     void	run()							;
 
   private:
-    bool	select_camera_cb(SelectCamera::Request&  req,
-				 SelectCamera::Response& res)		;
+    void	activate_camera(int camera_number)			;
     void	synced_images_cb(const camera_info_cp& camera_info,
 				 const image_cp& image,
 				 const image_cp& depth,
 				 const image_cp& normal,
-				 size_t camera_number)		const	;
+				 int camera_number)		const	;
 
   private:
-    ros::NodeHandle			_nh;
+    ros::NodeHandle				_nh;
 
-    const ros::ServiceServer		_selectCamera_srv;
-    std::vector<subscribers_cp>		_subscribers;
-    size_t				_camera_number;
+    std::vector<subscribers_cp>			_subscribers;
+    int						_camera_number;
 
-    image_transport::ImageTransport	_it;
-    const image_transport::Publisher	_image_pub;
-    const image_transport::Publisher	_depth_pub;
-    const image_transport::Publisher	_normal_pub;
-    const ros::Publisher		_camera_info_pub;
+    ddynamic_reconfigure::DDynamicReconfigure	_ddr;
+
+    image_transport::ImageTransport		_it;
+    const image_transport::Publisher		_image_pub;
+    const image_transport::Publisher		_depth_pub;
+    const image_transport::Publisher		_normal_pub;
+    const ros::Publisher			_camera_info_pub;
 };
 
 }	// namespace aist_camera_multiplexer
