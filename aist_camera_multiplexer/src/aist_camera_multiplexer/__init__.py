@@ -30,7 +30,7 @@ class RealSenseMultiplexerClient(CameraMultiplexerClient):
 
     class RealSenseCamera(object):
         def __init__(self, name):
-            super(RealSenseClient, self).__init__()
+            super(RealSenseCamera, self).__init__()
             self._dyn_reconf = dynamic_reconfigure.client.Client(name,
                                                                  timeout=5.0)
             self.laser_power = 16
