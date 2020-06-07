@@ -246,27 +246,26 @@ Calibrator::save_calibration(std_srvs::Trigger::Request&,
 		<< YAML::Value << _eMc.transform.rotation.w
 		<< YAML::EndMap;
 
-	const auto	home = getenv("HOME");
-	if (!home)
-	    throw std::runtime_error("environment variable HOME is not set.");
+	std::string	calib_file;
+	_nh.param<std::string>("calib_file", calib_file,
+			       getenv("HOME") + std::string("/.ros/aist_handeye_calibration/calib.yaml"));
 
-	std::string	name = home
-			     + std::string("/.ros/aist_handeye_calibration");
+	const auto	dir = calib_file.substr(0,
+						calib_file.find_last_of('/'));
 	struct stat	buf;
-	if (stat(name.c_str(), &buf) && mkdir(name.c_str(), S_IRWXU))
-	    throw std::runtime_error("cannot create " + name + ": "
+	if (stat(dir.c_str(), &buf) && mkdir(dir.c_str(), S_IRWXU))
+	    throw std::runtime_error("cannot create " + dir + ": "
 						      + strerror(errno));
 
-	name += ('/' + camera_frame() + ".yaml");
-	std::ofstream	out(name.c_str());
+	std::ofstream	out(calib_file.c_str());
 	if (!out)
-	    throw std::runtime_error("cannot open " + name + ": "
+	    throw std::runtime_error("cannot open " + calib_file + ": "
 						    + strerror(errno));
 
 	out << emitter.c_str() << std::endl;
 
 	res.success = true;
-	res.message = "saved in " + name;
+	res.message = "saved in " + calib_file;
 	ROS_INFO_STREAM("save_calibration(): " << res.message);
     }
     catch (const std::exception& err)

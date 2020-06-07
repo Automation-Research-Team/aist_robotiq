@@ -808,7 +808,7 @@ Visualization Manager:
           Value: false
         a_bot_outside_camera_color_optical_frame:
           Value: true
-        a_bot_outside_camera_color_optical_frame_calibrated:
+        calibrated_a_bot_outside_camera_color_optical_frame:
           Value: false
         a_bot_outside_camera_connector_link:
           Value: false
@@ -984,7 +984,7 @@ Visualization Manager:
                                       {}
                                   a_bot_robotiq_85_tip_link:
                                     {}
-                            a_bot_outside_camera_color_optical_frame_calibrated:
+                            calibrated_a_bot_outside_camera_color_optical_frame:
                               marker_frame:
                                 {}
                           a_bot_tool0:

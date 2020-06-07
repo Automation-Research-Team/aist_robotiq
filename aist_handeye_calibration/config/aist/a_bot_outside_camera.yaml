@@ -3,7 +3,7 @@ robot_name: a_bot
 eye_on_hand: true
 robot_base_frame: workspace_center
 robot_effector_frame: a_bot_ee_link
-camera_frame: a_bot_outside_camera_color_optical_frame_calibrated
+camera_frame: calibrated_a_bot_outside_camera_color_optical_frame
 marker_id: 32
 marker_size: 0.16
 planarity_tolerance: 0.003

@@ -78,7 +78,7 @@
     <include file="$(find aist_phoxi_camera)/launch/run.launch">
         <arg name="camera_name"	value="a_phoxi_m_camera"/>
 	<arg name="id"		value="2018-09-016-LC3"/>
-	<arg name="frame"	value="a_phoxi_m_camera_calibrated"/>
+	<arg name="frame"	value="calibrated_a_phoxi_m_camera"/>
     </include>
 
     <!-- Launch RealSense cameras -->
@@ -94,6 +94,7 @@
       <arg name="color_fps"		value="30"/>
       <arg name="align_depth"		value="true"/>
       <arg name="publish_tf"		value="false"/>
+      <arg name="tf_prefix"		value="calibrated_a_bot_inside_camera"/>
       <arg name="enable_streaming"	value="false"/>
     </include>
 
@@ -109,6 +110,7 @@
       <arg name="color_fps"		value="30"/>
       <arg name="align_depth"		value="true"/>
       <arg name="publish_tf"		value="false"/>
+      <arg name="tf_prefix"		value="calibrated_a_bot_outside_camera"/>
       <arg name="enable_streaming"	value="true"/>
     </include>
 
