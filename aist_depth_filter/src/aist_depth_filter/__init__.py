@@ -20,8 +20,8 @@ class DepthFilterClient(object):
 
     @property
     def background_threshold(self):
-        ret = self._dyn_reconf.get_configuration()
-        return ret["thresh_bg"]
+        conf = self._dyn_reconf.get_configuration()
+        return conf["thresh_bg"]
 
     @background_threshold.setter
     def background_threshold(self, value):
@@ -29,8 +29,8 @@ class DepthFilterClient(object):
 
     @property
     def depth_range(self):
-        ret = self._dyn_reconf.get_configuration()
-        return (ret["near"], ret["far"])
+        conf = self._dyn_reconf.get_configuration()
+        return (conf["near"], conf["far"])
 
     @depth_range.setter
     def depth_range(self, range):
@@ -39,8 +39,8 @@ class DepthFilterClient(object):
 
     @property
     def roi(self):
-        ret = self._dyn_reconf.get_configuration()
-        return (ret["left"], ret["top"], ret["right"], ret["bottom"])
+        conf = self._dyn_reconf.get_configuration()
+        return (conf["left"], conf["top"], conf["right"], conf["bottom"])
 
     @roi.setter
     def roi(self, bbox):
@@ -51,8 +51,8 @@ class DepthFilterClient(object):
 
     @property
     def window_radius(self):
-        ret = self._dyn_reconf.get_configuration()
-        return ret["window_radius"]
+        conf = self._dyn_reconf.get_configuration()
+        return conf["window_radius"]
 
     @window_radius.setter
     def window_radius(self, value):
@@ -60,8 +60,8 @@ class DepthFilterClient(object):
 
     @property
     def scale(self):
-        ret = self._dyn_reconf.get_configuration()
-        return ret["scale"]
+        conf = self._dyn_reconf.get_configuration()
+        return conf["scale"]
 
     @scale.setter
     def scale(self, value):

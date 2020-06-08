@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <launch>
 
-  <arg name="camera_name"	default="a_bot_camera"/>
+  <arg name="camera_name"	default="a_bot_inside_camera"/>
   <arg name="manager"		default=""/>
 
   <include file="$(find aist_depth_filter)/launch/realsense.launch">
