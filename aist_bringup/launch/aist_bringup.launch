@@ -81,38 +81,51 @@
 	<arg name="frame"	value="calibrated_a_phoxi_m_camera"/>
     </include>
 
-    <!-- Launch RealSense cameras -->
-    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <!-- Launch RealSense cameras and associated depth filters
+    -->
+    <arg name="camera0_name"	value="a_bot_inside_camera"/>
+    <arg name="camera1_name"	value="a_bot_outside_camera"/>
+
+    <include file="$(find aist_depth_filter)/launch/realsense.launch">
       <arg name="serial_no"		value="636203005853"/>
-      <arg name="camera"		value="a_bot_inside_camera"/>
-      <arg name="enable_depth"		value="true"/>
-      <arg name="enable_color"		value="true"/>
-      <arg name="enable_infra1"		value="false"/>
-      <arg name="enable_infra2"		value="false"/>
-      <arg name="enable_pointcloud"	value="false"/>
-      <arg name="depth_fps"		value="30"/>
-      <arg name="color_fps"		value="30"/>
-      <arg name="align_depth"		value="true"/>
+      <arg name="camera_name"		value="$(arg camera0_name)"/>
+      <arg name="fps"			value="30"/>
+      <arg name="enable_streaming"	value="true"/>
+      <arg name="manager"		value="camera_manager"/>
       <arg name="publish_tf"		value="false"/>
-      <arg name="tf_prefix"		value="calibrated_a_bot_inside_camera"/>
-      <arg name="enable_streaming"	value="false"/>
+      <arg name="vis"			value="false"/>
     </include>
 
-    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <include file="$(find aist_depth_filter)/launch/realsense.launch">
       <arg name="serial_no"		value="636203005303"/>
-      <arg name="camera"		value="a_bot_outside_camera"/>
-      <arg name="enable_depth"		value="true"/>
-      <arg name="enable_color"		value="true"/>
-      <arg name="enable_infra1"		value="false"/>
-      <arg name="enable_infra2"		value="false"/>
-      <arg name="enable_pointcloud"	value="false"/>
-      <arg name="depth_fps"		value="30"/>
-      <arg name="color_fps"		value="30"/>
-      <arg name="align_depth"		value="true"/>
-      <arg name="publish_tf"		value="false"/>
-      <arg name="tf_prefix"		value="calibrated_a_bot_outside_camera"/>
+      <arg name="camera_name"		value="$(arg camera1_name)"/>
+      <arg name="fps"			value="30"/>
       <arg name="enable_streaming"	value="true"/>
+      <arg name="manager"		value="camera_manager"/>
+      <arg name="publish_tf"		value="false"/>
+      <arg name="vis"			value="false"/>
     </include>
+
+  <!-- Launch camera multiplexer -->
+  <node name="camera_multiplexer"
+  	pkg="aist_camera_multiplexer" type="aist_camera_multiplexer"
+  	output="screen">
+    <rosparam param="camera_names" subst_value="true">
+      [$(arg camera0_name), $(arg camera1_name)]
+    </rosparam>
+
+    <remap from="/camera_info0"	to="$(arg camera0_name
+  				    )/depth_filter/camera_info"/>
+    <remap from="/image0"	to="$(arg camera0_name)/depth_filter/image"/>
+    <remap from="/depth0"	to="$(arg camera0_name)/depth_filter/depth"/>
+    <remap from="/normal0"	to="$(arg camera0_name)/depth_filter/normal"/>
+
+    <remap from="/camera_info1"	to="$(arg camera1_name
+  				    )/depth_filter/camera_info"/>
+    <remap from="/image1"	to="$(arg camera1_name)/depth_filter/image"/>
+    <remap from="/depth1"	to="$(arg camera1_name)/depth_filter/depth"/>
+    <remap from="/normal1"	to="$(arg camera1_name)/depth_filter/normal"/>
+  </node>
 
   </group>
 

@@ -8,12 +8,14 @@
   <arg name="fps"		default="30"/>
   <arg name="enable_streaming"	default="true"/>
   <arg name="manager"		default=""/>
+  <arg name="publish_tf"	default="true"/>
   <arg name="vis"		default="true"/>
 
   <include file="$(find realsense2_camera)/launch/rs_camera.launch">
     <arg name="serial_no"		value="$(arg serial_no)"/>
     <arg name="camera"			value="$(arg camera_name)"/>
     <arg name="tf_prefix"		value="calibrated_$(arg camera_name)"/>
+    <arg name="publish_tf"		value="$(arg publish_tf)"/>
     <arg name="enable_depth"		value="true"/>
     <arg name="enable_infra1"		value="true"/>
     <arg name="enable_infra2"		value="false"/>
