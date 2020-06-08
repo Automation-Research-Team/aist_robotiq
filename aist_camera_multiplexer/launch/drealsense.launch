@@ -9,7 +9,6 @@
   <arg name="camera_height"	default="480"/>
   <arg name="fps"		default="30"/>
   <arg name="manager"		default=""/>
-  <arg name="vis"		default="true"/>
 
   <!-- Launch RealSense cameras -->
   <include file="$(find aist_depth_filter)/launch/realsense.launch">
@@ -65,11 +64,10 @@
   <node name="drealsense"
 	pkg="aist_camera_multiplexer" type="drealsense.py" output="screen"/>
 
-  <group if="$(arg vis)">
-    <node name="$(anon rviz)" pkg="rviz" type="rviz"
-  	  args="-d $(find aist_camera_multiplexer)/launch/test.rviz"
-  	  respawn="false" output="screen"/>
-    <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
-  </group>
+  <!-- Launch Rviz and rt_reconfigure -->
+  <node name="$(anon rviz)" pkg="rviz" type="rviz"
+  	args="-d $(find aist_camera_multiplexer)/launch/test.rviz"
+  	respawn="false" output="screen"/>
+  <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
 
 </launch>
