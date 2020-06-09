@@ -5,7 +5,6 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /Image1
         - /DepthCloud1/Auto Size1
       Splitter Ratio: 0.36058980226516724
     Tree Height: 246
@@ -89,7 +88,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: calibrated_a_bot_inside_camera_link
+    Fixed Frame: calibrated_a_bot_camera_link
     Frame Rate: 30
   Name: root
   Tools:
@@ -113,7 +112,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.6371534466743469
+      Distance: 0.7501187920570374
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -128,10 +127,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.20942305028438568
+      Pitch: 0.009423067793250084
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.102797269821167
+      Yaw: 3.072798013687134
     Saved: ~
 Window Geometry:
   Displays:
@@ -151,5 +150,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1379
-  X: 544
-  Y: 200
+  X: 396
+  Y: 126

@@ -9,30 +9,31 @@ from operator          import itemgetter
 #########################################################################
 class LocalizationClient(object):
     _DefaultSettings = {
-                           "Scene_Clustering_Level": "Normal",
-                           "Scene_Minimal_Cluster_Size": 200,
-                           "Scene_Maximal_Cluster_Size": 3500000,
-                           "Matching_Algorithm": "Surfaces",
-                           "Model_Keypoints_Sampling": "Medium",
-                           "Local_Search_Radius": "Normal",
-                           "Feature_fit_consideration_level": 15,
-                           "Global_maximal_feature_fit_overflow": 20,
-                           "Fine_Alignment_Iterations": 30,
-                           "Fine_Alignment_Point_Set": "Surface",
-                           "Fine_Alignment_Point_Set_Sampling": "Sampled",
-                           "Projection_Tolerance": 100,
-                           "Projection_Hidden_Part_Tolerance": 100,
-                           "Overlap": 15.0
+                           'Scene_Clustering_Level':              'Normal',
+                           'Scene_Minimal_Cluster_Size':          200,
+                           'Scene_Maximal_Cluster_Size':          3500000,
+                           'Matching_Algorithm':                  'Surfaces',
+                           'Model_Keypoints_Sampling':            'Medium',
+                           'Local_Search_Radius':                 'Normal',
+                           'Feature_fit_consideration_level':     15,
+                           'Global_maximal_feature_fit_overflow': 20,
+                           'Fine_Alignment_Iterations':           30,
+                           'Fine_Alignment_Point_Set':            'Surface',
+                           'Fine_Alignment_Point_Set_Sampling':   'Sampled',
+                           'Projection_Tolerance':                100,
+                           'Projection_Hidden_Part_Tolerance':    100,
+                           'Overlap':                             15.0
                        }
 
-    def __init__(self, name="localization"):
+    def __init__(self, server='localization'):
         super(LocalizationClient, self).__init__()
 
-        self._methods    = rospy.get_param("~methods",   {})
-        self._settings   = rospy.get_param("~settings",  {})
-        self._z_offsets  = rospy.get_param("~z_offsets", {})
-        self._dyn_reconf = dynamic_reconfigure.client.Client(name, timeout=5.0)
-        self._localize   = actionlib.SimpleActionClient(name + "/localize",
+        self._methods    = rospy.get_param('~methods',   {})
+        self._settings   = rospy.get_param('~settings',  {})
+        self._z_offsets  = rospy.get_param('~z_offsets', {})
+        self._dyn_reconf = dynamic_reconfigure.client.Client(server,
+                                                             timeout=5.0)
+        self._localize   = actionlib.SimpleActionClient(server + '/localize',
                                                         lmsg.LocalizeAction)
         self._localize.wait_for_server()
 
