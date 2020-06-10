@@ -11,11 +11,11 @@ from moveit_commander.conversions import pose_to_list
 
 from geometry_msgs import msg as gmsg
 
-from GripperClient      import GripperClient
-from CameraClient       import CameraClient
-from GraspabilityClient import GraspabilityClient
-from MarkerPublisher    import MarkerPublisher
-from PickOrPlaceAction  import PickOrPlaceAction
+from GripperClient     import GripperClient
+from CameraClient      import CameraClient
+from MarkerPublisher   import MarkerPublisher
+from PickOrPlaceAction import PickOrPlaceAction
+from aist_graspability import GraspabilityClient
 
 ######################################################################
 #  global functions                                                  #
@@ -70,9 +70,14 @@ class AISTBaseRoutines(object):
             self._cameras[camera_name] = CameraClient.create(camera["type"],
                                                              camera["args"])
 
-        self._markerPublisher    = MarkerPublisher()
-        self._graspabilityClient = GraspabilityClient(self._reference_frame)
-        self._pickOrPlaceAction  = PickOrPlaceAction(self)
+        # Search graspabilities
+        if rospy.has_param('~graspability_parameters'):
+            self._graspability_params \
+                = paramtuples(rospy.get_param('~graspability_parameters'))
+            self._graspabilityClient = GraspabilityClient(self._reference_frame)
+
+        self._markerPublisher    = MarkerPublisher()        # Marker publisher
+        self._pickOrPlaceAction  = PickOrPlaceAction(self)  # Other actions
         rospy.loginfo("AISTBaseRoutines initialized.")
 
     def __enter__(self):
@@ -252,48 +257,50 @@ class AISTBaseRoutines(object):
         self.delete_all_markers()
         gripper = self._grippers[robot_name]
         camera  = self._cameras[camera_name]
+        param   = self._graspability_params[part_id]
         camera.continuous_shot(True)
-        (poses, gscore, success) = \
-            self._graspabilityClient.search(camera.camera_info_topic,
-                                            camera.depth_topic,
-                                            camera.normal_topic if use_normals \
-                                            else "",
-                                            gripper.type, part_id, bin_id)
+        poses, gscores, success = \
+            self._graspabilityClient.search(
+                bin_id, gripper.type,
+                param.ns, param.detect_edge, param.object_size, param.radius,
+                param.open_width, param.finger_width, param.finger_thickness,
+                param.insertion_depth)
         camera.continuous_shot(False)
         if success:
             for i, pose in enumerate(poses):
                 self.publish_marker(pose, "graspability",
-                                    "{}[{:.3f}]".format(i, gscore[i]),
+                                    "{}[{:.3f}]".format(i, gscores[i]),
                                     lifetime=marker_lifetime)
-                rospy.loginfo("graspability: {}[{:.3f}]".format(i, gscore[i]))
+                rospy.loginfo("graspability: {}[{:.3f}]".format(i, gscores[i]))
 
-        return (poses, gscore, success)
+        return poses, gscores, success
 
     def graspability_send_goal(self, robot_name, camera_name, part_id, bin_id,
                                use_normals=True):
         self.delete_all_markers()
         gripper = self._grippers[robot_name]
         camera  = self._cameras[camera_name]
+        param   = self._graspability_params[part_id]
         camera.continuous_shot(True)
-        self._graspabilityClient.send_goal(camera.camera_info_topic,
-                                           camera.depth_topic,
-                                           camera.normal_topic if use_normals \
-                                           else "",
-                                           gripper.type, part_id, bin_id)
+        self._graspabilityClient.send_goal(
+            bin_id, gripper.type,
+            param.ns, param.detect_edge, param.object_size, param.radius,
+            param.open_width, param.finger_width, param.finger_thickness,
+            param.insertion_depth)
 
     def graspability_wait_for_result(self, camera_name, marker_lifetime=60):
-        (poses, gscore, success) = \
+        poses, gscores, success = \
             self._graspabilityClient.wait_for_result()
         camera = self._cameras[camera_name]
         camera.continuous_shot(False)
         if success:
             for i, pose in enumerate(poses):
                 self.publish_marker(pose, "graspability",
-                                    "{}[{:.3f}]".format(i, gscore[i]),
+                                    "{}[{:.3f}]".format(i, gscores[i]),
                                     lifetime=marker_lifetime)
-                rospy.loginfo("graspability: {}[{:.3f}]".format(i, gscore[i]))
+                rospy.loginfo("graspability: {}[{:.3f}]".format(i, gscores[i]))
 
-        return (poses, gscore, success)
+        return poses, gscores, success
 
     def graspability_cancel_goal(self):
         self._graspabilityClient.cancel_goal()

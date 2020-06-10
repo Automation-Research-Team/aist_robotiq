@@ -20,8 +20,12 @@
   </include>
 
   <!-- Start graspability server -->
-  <include file="$(find aist_graspability)/launch/aist_graspability.launch">
-    <arg name="server_name"	value="aist_graspability"/>
+  <include ns="$(arg camera_name)"
+	   file="$(find aist_graspability)/launch/run.launch">
+    <arg name="camera_info_topic"	value="camera_info"/>
+    <arg name="image_topic"		value="texture"/>
+    <arg name="depth_topic"		value="depth_map"/>
+    <arg name="normal_topic"		value="normal_map"/>
   </include>
 
 </launch>

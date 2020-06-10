@@ -35,8 +35,8 @@ class ImageFeeder(object):
         super(ImageFeeder, self).__init__()
 
         self._data_dir = data_dir
-        self._nposes   = rospy.get_param('~nposes',   2)
-        self._timeout  = rospy.get_param('~timeout',  10)
+        self._nposes   = rospy.get_param('~nposes',  2)
+        self._timeout  = rospy.get_param('~timeout', 10)
 
         # Load camera intrinsics
         filename = rospy.get_param('~intrinsic', 'realsense_intrinsic.json')

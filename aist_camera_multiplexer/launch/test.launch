@@ -17,7 +17,8 @@
   <include file="$(find aist_depth_filter)/launch/phoxi.launch">
     <arg name="id"		value="$(arg id)"/>
     <arg name="camera_name"	value="$(arg camera1_name)"/>
-    <arg name="camera_frame"	value="calibrated_$(arg camera0_name)_color_optical_frame"/>
+    <arg name="camera_frame"	value="calibrated_$(arg camera0_name
+				       )_color_optical_frame"/>
     <arg name="manager"		value="$(arg manager)"/>
     <arg name="vis"		value="false"/>
   </include>
