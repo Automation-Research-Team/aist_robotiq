@@ -25,7 +25,7 @@ def paramtuples(d):
     for params in d.values():
         for field in params.keys():
             fields.add(field)
-    ParamTuple = collections.namedtuple("ParamTuple", " ".join(fields))
+    ParamTuple = collections.namedtuple('ParamTuple', ' '.join(fields))
 
     params = {}
     for key, param in d.items():
@@ -37,7 +37,7 @@ def paramtuples(d):
 #  class AISTBaseRoutines                                            #
 ######################################################################
 class AISTBaseRoutines(object):
-    def __init__(self, ns=""):
+    def __init__(self, ns=''):
         super(AISTBaseRoutines, self).__init__()
 
         moveit_commander.roscpp_initialize(sys.argv)
@@ -45,49 +45,48 @@ class AISTBaseRoutines(object):
         rospy.sleep(1.0)        # Necessary for listner spinning up
 
         # MoveIt planning parameters
-        self._reference_frame = rospy.get_param("~moveit_pose_reference_frame",
-                                                "workspace_center")
-        self._eef_step        = rospy.get_param("~moveit_eef_step", 0.0005)
-        rospy.loginfo("reference_frame = {}, eef_step = {}"
+        self._reference_frame = rospy.get_param('~moveit_pose_reference_frame',
+                                                'workspace_center')
+        self._eef_step        = rospy.get_param('~moveit_eef_step', 0.0005)
+        rospy.loginfo('reference_frame = {}, eef_step = {}'
                       .format(self._reference_frame, self._eef_step))
 
         # MoveIt RobotCommander
         robot_description \
-            = "robot_description" if ns == "" else ns + "/robot_description"
+            = 'robot_description' if ns == '' else ns + '/robot_description'
         self._cmd = moveit_commander.RobotCommander(robot_description, ns)
 
         # Grippers
-        d = rospy.get_param("~grippers", {})
+        d = rospy.get_param('~grippers', {})
         self._grippers = {}
         for robot_name, gripper in d.items():
-            self._grippers[robot_name] = GripperClient.create(gripper["type"],
-                                                              gripper["args"])
+            self._grippers[robot_name] = GripperClient.create(gripper['type'],
+                                                              gripper['args'])
 
         # Cameras
-        d = rospy.get_param("~cameras", {})
+        d = rospy.get_param('~cameras', {})
         self._cameras = {}
         for camera_name, camera in d.items():
-            self._cameras[camera_name] = CameraClient.create(camera["type"],
-                                                             camera["args"])
+            self._cameras[camera_name] = CameraClient.create(camera['type'],
+                                                             camera['args'])
 
         # Search graspabilities
         if rospy.has_param('~graspability_parameters'):
             self._graspability_params \
                 = paramtuples(rospy.get_param('~graspability_parameters'))
             self._graspabilityClient \
-                = GraspabilityClient('a_phoxi_m_camera/graspability',
-                                     self._reference_frame)
+                = GraspabilityClient(reference_frame=self._reference_frame)
 
         self._markerPublisher    = MarkerPublisher()        # Marker publisher
         self._pickOrPlaceAction  = PickOrPlaceAction(self)  # Other actions
-        rospy.loginfo("AISTBaseRoutines initialized.")
+        rospy.loginfo('AISTBaseRoutines initialized.')
 
     def __enter__(self):
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
         self._pickOrPlaceAction.shutdown()
-        rospy.signal_shutdown("AISTBaseRoutines() completed.")
+        rospy.signal_shutdown('AISTBaseRoutines() completed.')
         return False  # Do not forward exceptions
 
     @property
@@ -112,7 +111,7 @@ class AISTBaseRoutines(object):
         return success
 
     def go_to_frame(self, robot_name, target_frame, offset=(0, 0, 0),
-                    speed=1.0, high_precision=False, end_effector_link="",
+                    speed=1.0, high_precision=False, end_effector_link='',
                     move_lin=True):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = target_frame
@@ -125,12 +124,12 @@ class AISTBaseRoutines(object):
                                     move_lin)
 
     def go_to_pose_goal(self, robot_name, target_pose, speed=1.0,
-                        high_precision=False, end_effector_link="",
+                        high_precision=False, end_effector_link='',
                         move_lin=True):
-        # rospy.loginfo("move to " + self.format_pose(target_pose))
-        self.publish_marker(target_pose, "pose")
+        # rospy.loginfo('move to ' + self.format_pose(target_pose))
+        self.publish_marker(target_pose, 'pose')
 
-        if end_effector_link == "" and robot_name in self._grippers:
+        if end_effector_link == '' and robot_name in self._grippers:
             end_effector_link = self._grippers[robot_name].tip_link
 
         group = self._cmd.get_group(robot_name)
@@ -153,7 +152,7 @@ class AISTBaseRoutines(object):
                 pose_world = self._listener.transformPose(
                                 group.get_planning_frame(), target_pose).pose
             except Exception as e:
-                rospy.logerr("AISTBaseRoutines.go_to_pose_goal(): {}"
+                rospy.logerr('AISTBaseRoutines.go_to_pose_goal(): {}'
                              .format(e))
                 return (False, False, group.get_current_pose())
             waypoints = []
@@ -162,12 +161,12 @@ class AISTBaseRoutines(object):
                                                             self._eef_step,
                                                             0.0) # jump_threshold
             if fraction < 0.995:
-                rospy.logwarn("Computed only {}% of the total cartesian path."
+                rospy.logwarn('Computed only {}% of the total cartesian path.'
                               .format(fraction*100))
                 group.clear_pose_targets()
                 return (False, False, group.get_current_pose())
 
-            rospy.loginfo("Execute plan with {}% computed cartesian path."
+            rospy.loginfo('Execute plan with {}% computed cartesian path.'
                           .format(fraction*100))
             plan    = group.retime_trajectory(self._cmd.get_current_state(),
                                               plan, speed)
@@ -176,8 +175,8 @@ class AISTBaseRoutines(object):
             group.set_pose_target(target_pose)
             success = group.go(wait=True)
 
-        rospy.loginfo("go_to_pose_goal() {}"
-                      .format("succeeded." if success else "failed."))
+        rospy.loginfo('go_to_pose_goal() {}'
+                      .format('succeeded.' if success else 'failed.'))
 
         if high_precision:
             group.set_goal_tolerance(goal_tolerance[1])
@@ -190,7 +189,7 @@ class AISTBaseRoutines(object):
 
         current_pose = group.get_current_pose()
         is_all_close = self._all_close(target_pose, current_pose, 0.01)
-        # rospy.loginfo("reached " + self.format_pose(current_pose))
+        # rospy.loginfo('reached ' + self.format_pose(current_pose))
         return (success, is_all_close, current_pose)
 
     def stop(self, robot_name):
@@ -198,8 +197,8 @@ class AISTBaseRoutines(object):
         group.stop()
         group.clear_pose_targets()
 
-    def get_current_pose(self, robot_name, end_effector_link=""):
-        if end_effector_link == "" and robot_name in self._grippers:
+    def get_current_pose(self, robot_name, end_effector_link=''):
+        if end_effector_link == '' and robot_name in self._grippers:
             end_effector_link = self._grippers[robot_name].tip_link
         group = self._cmd.get_group(robot_name)
         if len(end_effector_link) > 0:
@@ -210,13 +209,13 @@ class AISTBaseRoutines(object):
     def gripper(self, robot_name):
         return self._grippers[robot_name]
 
-    def pregrasp(self, robot_name, command=""):
+    def pregrasp(self, robot_name, command=''):
         return self._grippers[robot_name].pregrasp(command)
 
-    def grasp(self, robot_name, command=""):
+    def grasp(self, robot_name, command=''):
         return self._grippers[robot_name].grasp(command)
 
-    def release(self, robot_name, command=""):
+    def release(self, robot_name, command=''):
         return self._grippers[robot_name].release(command)
 
     # Camera stuffs
@@ -233,7 +232,7 @@ class AISTBaseRoutines(object):
     def delete_all_markers(self):
         self._markerPublisher.delete_all()
 
-    def publish_marker(self, pose_stamped, marker_type, text="", lifetime=15):
+    def publish_marker(self, pose_stamped, marker_type, text='', lifetime=15):
         return self._markerPublisher.add(pose_stamped, marker_type,
                                          text, lifetime)
 
@@ -265,10 +264,10 @@ class AISTBaseRoutines(object):
                 param.insertion_depth)
         if success:
             for i, pose in enumerate(poses):
-                self.publish_marker(pose, "graspability",
-                                    "{}[{:.3f}]".format(i, gscores[i]),
+                self.publish_marker(pose, 'graspability',
+                                    '{}[{:.3f}]'.format(i, gscores[i]),
                                     lifetime=marker_lifetime)
-                rospy.loginfo("graspability: {}[{:.3f}]".format(i, gscores[i]))
+                rospy.loginfo('graspability: {}[{:.3f}]'.format(i, gscores[i]))
 
         return poses, gscores, success
 
@@ -290,10 +289,10 @@ class AISTBaseRoutines(object):
             self._graspabilityClient.wait_for_result()
         if success:
             for i, pose in enumerate(poses):
-                self.publish_marker(pose, "graspability",
-                                    "{}[{:.3f}]".format(i, gscores[i]),
+                self.publish_marker(pose, 'graspability',
+                                    '{}[{:.3f}]'.format(i, gscores[i]),
                                     lifetime=marker_lifetime)
-                rospy.loginfo("graspability: {}[{:.3f}]".format(i, gscores[i]))
+                rospy.loginfo('graspability: {}[{:.3f}]'.format(i, gscores[i]))
 
         return poses, gscores, success
 
@@ -302,7 +301,7 @@ class AISTBaseRoutines(object):
 
     # Pick and place action stuffs
     def pick(self, robot_name, target_pose,
-             grasp_offset=(0.0, 0.0, 0.0), gripper_command="",
+             grasp_offset=(0.0, 0.0, 0.0), gripper_command='',
              speed_fast=1.0, speed_slow=0.04, approach_offset=(0.0, 0.0, 0.10),
              liftup_after=True, acc_fast=1.0, acc_slow=0.5):
         return self._pickOrPlaceAction.execute(
@@ -311,7 +310,7 @@ class AISTBaseRoutines(object):
             speed_fast, speed_slow, acc_fast, acc_slow)
 
     def place(self, robot_name, target_pose,
-              place_offset=(0.0, 0.0, 0.0), gripper_command="",
+              place_offset=(0.0, 0.0, 0.0), gripper_command='',
               speed_fast=1.0, speed_slow=0.04,
               approach_offset=(0.0, 0.0, 0.05),
               liftup_after=True, acc_fast=1.0, acc_slow=0.5):
@@ -321,7 +320,7 @@ class AISTBaseRoutines(object):
             speed_fast, speed_slow, acc_fast, acc_slow)
 
     def pick_at_frame(self, robot_name, target_frame, offset=(0.0, 0.0, 0.0),
-                      grasp_offset=(0.0, 0.0, 0.0), gripper_command="",
+                      grasp_offset=(0.0, 0.0, 0.0), gripper_command='',
                       speed_fast=1.0, speed_slow=0.04,
                       approach_offset=(0.0, 0.0, 0.05),
                       liftup_after=True, acc_fast=1.0, acc_slow=0.5):
@@ -335,7 +334,7 @@ class AISTBaseRoutines(object):
                          liftup_after, acc_fast, acc_slow)
 
     def place_at_frame(self, robot_name, target_frame, offset=(0.0, 0.0, 0.0),
-                       place_offset=(0.0, 0.0, 0.0), gripper_command="",
+                       place_offset=(0.0, 0.0, 0.0), gripper_command='',
                        speed_fast=1.0, speed_slow=0.04,
                        approach_offset=(0.0, 0.0, 0.05),
                        liftup_after=True, acc_fast=1.0, acc_slow=0.5):
@@ -358,7 +357,7 @@ class AISTBaseRoutines(object):
                                             rospy.Duration(10))
             return self._listener.transformPose(self._reference_frame, pose)
         except Exception as e:
-            rospy.logerr("AISTBaseRoutines.transform_pose_to_reference_frame(): {}".format(e))
+            rospy.logerr('AISTBaseRoutines.transform_pose_to_reference_frame(): {}'.format(e))
             raise e
 
     def xyz_rpy(self, pose):
@@ -374,7 +373,7 @@ class AISTBaseRoutines(object):
 
     def format_pose(self, target_pose):
         xyzrpy = self.xyz_rpy(target_pose)
-        return "[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]".format(
+        return '[{:.4f}, {:.4f}, {:.4f}; {:.2f}, {:.2f}. {:.2f}]'.format(
             xyzrpy[0], xyzrpy[1], xyzrpy[2],
             degrees(xyzrpy[3]), degrees(xyzrpy[4]), degrees(xyzrpy[5]))
 
@@ -400,7 +399,7 @@ class AISTBaseRoutines(object):
     # Private functions
     def _create_device(self, type_name, kwargs):
         Device = globals()[type_name]
-        if rospy.get_param("/use_real_robot", False):
+        if rospy.get_param('/use_real_robot', False):
             return Device(**kwargs)
         else:
             return Device.base(**kwargs)

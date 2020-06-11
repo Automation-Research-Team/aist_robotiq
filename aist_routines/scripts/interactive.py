@@ -36,8 +36,8 @@ class InteractiveRoutines(URRoutines):
     def __init__(self, robot_name, camera_name, speed, ns):
         super(InteractiveRoutines, self).__init__(ns)
 
-        self._robots  = rospy.get_param("robots", {})
-        self._cameras = rospy.get_param("cameras", {})
+        self._robots  = rospy.get_param('robots', {})
+        self._cameras = rospy.get_param('cameras', {})
         self._robot_name   = robot_name
         self._camera_name  = camera_name
         self._speed        = speed
@@ -51,7 +51,7 @@ class InteractiveRoutines(URRoutines):
 
     def move(self, pose):
         target_pose = gmsg.PoseStamped()
-        target_pose.header.frame_id = "workspace_center"
+        target_pose.header.frame_id = 'workspace_center'
         target_pose.pose = gmsg.Pose(
             gmsg.Point(pose[0], pose[1], pose[2]),
             gmsg.Quaternion(
@@ -75,18 +75,18 @@ class InteractiveRoutines(URRoutines):
 
         while not rospy.is_shutdown():
             current_pose = self.get_current_pose(self._robot_name)
-            prompt = "{:>5}:{}{:>9}>> " \
+            prompt = '{:>5}:{}{:>9}>> ' \
                    .format(axis, self.format_pose(current_pose),
-                           "urscript" if self._ur_movel else "moveit")
+                           'urscript' if self._ur_movel else 'moveit')
 
             key = raw_input(prompt)
 
             if key == 'q':
                 break
             elif key == 'r':
-                self._robot_name = raw_input("  robot name? ")
+                self._robot_name = raw_input('  robot name? ')
             elif key == 'c':
-                self._camera_name = raw_input("  camera name? ")
+                self._camera_name = raw_input('  camera name? ')
             elif key == 'X':
                 axis = 'X'
             elif key == 'Y':
@@ -160,7 +160,7 @@ class InteractiveRoutines(URRoutines):
                 self.trigger_frame(self._camera_name)
             elif key == 'mask':
                 self.create_mask_image(self._camera_name,
-                                       int(raw_input("  #bins? ")))
+                                       int(raw_input('  #bins? ')))
             elif key == 'search':
                 self.delete_all_markers()
                 self.graspability_send_goal(self._robot_name,
@@ -228,7 +228,7 @@ if __name__ == '__main__':
                         metavar=None)
     args = parser.parse_args()
 
-    rospy.init_node("interactive", anonymous=True)
+    rospy.init_node('interactive', anonymous=True)
 
     speed = 0.1
     with InteractiveRoutines(args.robot_name,
