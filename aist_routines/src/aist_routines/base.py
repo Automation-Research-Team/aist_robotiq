@@ -74,7 +74,9 @@ class AISTBaseRoutines(object):
         if rospy.has_param('~graspability_parameters'):
             self._graspability_params \
                 = paramtuples(rospy.get_param('~graspability_parameters'))
-            self._graspabilityClient = GraspabilityClient(self._reference_frame)
+            self._graspabilityClient \
+                = GraspabilityClient('a_phoxi_m_camera/graspability',
+                                     self._reference_frame)
 
         self._markerPublisher    = MarkerPublisher()        # Marker publisher
         self._pickOrPlaceAction  = PickOrPlaceAction(self)  # Other actions
@@ -238,18 +240,14 @@ class AISTBaseRoutines(object):
     # Graspability stuffs
     def create_background_image(self, camera_name):
         camera = self._cameras[camera_name]
-        camera.continuous_shot(True)
-        success = self._graspabilityClient.create_background_image(
-                        camera.depth_topic)
-        camera.continuous_shot(False)
+        camera.trigger_frame()
+        success = self._graspabilityClient.create_background_image()
         return success
 
     def create_mask_image(self, camera_name, nbins):
         camera = self._cameras[camera_name]
-        camera.continuous_shot(True)
-        success = self._graspabilityClient.create_mask_image(
-                        camera.image_topic, nbins)
-        camera.continuous_shot(False)
+        camera.trigger_frame()
+        success = self._graspabilityClient.create_mask_image(nbins)
         return success
 
     def search_graspability(self, robot_name, camera_name, part_id, bin_id,
@@ -258,14 +256,13 @@ class AISTBaseRoutines(object):
         gripper = self._grippers[robot_name]
         camera  = self._cameras[camera_name]
         param   = self._graspability_params[part_id]
-        camera.continuous_shot(True)
+        camera.trigger_frame()
         poses, gscores, success = \
             self._graspabilityClient.search(
                 bin_id, gripper.type,
                 param.ns, param.detect_edge, param.object_size, param.radius,
                 param.open_width, param.finger_width, param.finger_thickness,
                 param.insertion_depth)
-        camera.continuous_shot(False)
         if success:
             for i, pose in enumerate(poses):
                 self.publish_marker(pose, "graspability",
@@ -281,7 +278,7 @@ class AISTBaseRoutines(object):
         gripper = self._grippers[robot_name]
         camera  = self._cameras[camera_name]
         param   = self._graspability_params[part_id]
-        camera.continuous_shot(True)
+        camera.trigger_frame()
         self._graspabilityClient.send_goal(
             bin_id, gripper.type,
             param.ns, param.detect_edge, param.object_size, param.radius,
@@ -291,8 +288,6 @@ class AISTBaseRoutines(object):
     def graspability_wait_for_result(self, camera_name, marker_lifetime=60):
         poses, gscores, success = \
             self._graspabilityClient.wait_for_result()
-        camera = self._cameras[camera_name]
-        camera.continuous_shot(False)
         if success:
             for i, pose in enumerate(poses):
                 self.publish_marker(pose, "graspability",
