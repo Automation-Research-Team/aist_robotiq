@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<launch>
+
+  <arg name="config" default="aist"/>
+
+  <!-- Start kitting client -->
+  <node name="interactive"
+	pkg="aist_routines" type="interactive.py" output="screen">
+    <rosparam file="$(find aist_routines)/config/$(arg config)_config.yaml"/>
+  </node>
+
+</launch>

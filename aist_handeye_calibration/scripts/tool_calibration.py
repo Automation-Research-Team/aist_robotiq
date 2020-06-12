@@ -34,38 +34,41 @@ class ToolCalibrationRoutines(URRoutines):
         'd_bot': [0.00, 0.00, 0.15, radians(  0), radians( 90), radians(  0)],
     }
 
-    def __init__(self, robot_name, camera_name, speed):
+    def __init__(self, speed):
         super(ToolCalibrationRoutines, self).__init__()
 
-        self._robot_name  = robot_name
-        self._camera_name = camera_name
+        self._robots  = rospy.get_param('robots', {})
+        self._cameras = rospy.get_param('cameras', {})
+        self._robot_name  = 'b_bot'
+        self._camera_name = 'a_phoxi_m_camera'
         self._speed       = speed
-        self._refpose     = ToolCalibrationRoutines.refposes[robot_name]
+        self._refpose     = ToolCalibrationRoutines.refposes[self._robot_name]
         self._goalpose    = copy.deepcopy(self._refpose)
         self._ur_movel    = False
 
+        gripper = self.gripper(self._robot_name)
+
         self._R0          = self.listener.fromTranslationRotation(
                                 *self.listener.lookupTransform(
-                                    self.parent_frame(
-                                        self.gripper(robot_name).base_link),
-                                    self.gripper(robot_name).base_link,
+                                    self.parent_frame(gripper.base_link),
+                                    gripper.base_link,
                                     rospy.Time(0)))
         self._D0          = self.listener.fromTranslationRotation(
                                 *self.listener.lookupTransform(
-                                    self.gripper(robot_name).base_link,
-                                    self.gripper(robot_name).tip_link,
+                                    gripper.base_link,
+                                    gripper.tip_link,
                                     rospy.Time(0)))
         self._rpy         = list(tfs.euler_from_matrix(self._R0))
 
         self._pick_pose = gmsg.PoseStamped()
-        self._pick_pose.header.frame_id = "workspace_center"
+        self._pick_pose.header.frame_id = 'workspace_center'
         self._pick_pose.pose = gmsg.Pose(gmsg.Point(-0.1, 0.1, 0.01),
                                          gmsg.Quaternion(
                                              *tfs.quaternion_from_euler(
                                                  radians(15), 0, 0)))
 
         self._place_pose = gmsg.PoseStamped()
-        self._place_pose.header.frame_id = "workspace_center"
+        self._place_pose.header.frame_id = 'workspace_center'
         self._place_pose.pose = gmsg.Pose(gmsg.Point(0.1, 0, 0.01),
                                           gmsg.Quaternion(
                                               *tfs.quaternion_from_euler(
@@ -90,11 +93,11 @@ class ToolCalibrationRoutines(URRoutines):
                 self._R0,
                 self._D0)
         target_pose = gmsg.PoseStamped()
-        target_pose.header.frame_id = "workspace_center"
+        target_pose.header.frame_id = 'workspace_center'
         target_pose.pose \
             = gmsg.Pose(gmsg.Point(*tfs.translation_from_matrix(T)),
                         gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
-        print("move to " + self.format_pose(target_pose))
+        print('move to ' + self.format_pose(target_pose))
         if self._ur_movel:
             (success, _, current_pose) = self.ur_movel(self._robot_name,
                                                        target_pose,
@@ -105,7 +108,7 @@ class ToolCalibrationRoutines(URRoutines):
                                                 self._speed,
                                                 move_lin=True,
                                                 high_precision=True)
-        print("reached " + self.format_pose(current_pose))
+        print('reached ' + self.format_pose(current_pose))
         return success
 
     def rolling_motion(self):
@@ -164,13 +167,17 @@ class ToolCalibrationRoutines(URRoutines):
         axis = 'Pitch'
 
         while not rospy.is_shutdown():
-            prompt = "{:>5}:[p={:.3f},y={:.3f}]{:>9}>> " \
+            prompt = '{:>5}:[p={:.3f},y={:.3f}]{:>9}>> ' \
                    .format(axis, degrees(self._rpy[1]), degrees(self._rpy[2]),
-                           "urscript" if self._ur_movel else "moveit")
+                           'urscript' if self._ur_movel else 'moveit')
             key = raw_input(prompt)
 
             if key == 'q':
                 break
+            elif key == 'R':
+                self._robot_name = raw_input('  robot name? ')
+            elif key == 'C':
+                self._camera_name = raw_input('  camera name? ')
             elif key == 'o':
                 self.move(self._refpose)
             elif key == 'r':
@@ -240,10 +247,10 @@ class ToolCalibrationRoutines(URRoutines):
             elif key == 'release':
                 self.release(self._robot_name)
             elif key == 'pick':
-                print("   pick at " + self.format_pose(self._pick_pose))
+                print('   pick at ' + self.format_pose(self._pick_pose))
                 self.pick(self._robot_name, self._pick_pose)
             elif key == 'place':
-                print("  place at " + self.format_pose(self._pick_pose))
+                print('  place at ' + self.format_pose(self._pick_pose))
                 self.place(self._robot_name, self._place_pose)
             elif key == 'cont':
                 self.continuous_shot(self._camera_name, True)
@@ -253,7 +260,7 @@ class ToolCalibrationRoutines(URRoutines):
                 self.trigger_frame(self._camera_name)
             elif key == 'create':
                 self.create_mask_image(self._camera_name,
-                                       int(raw_input("  #bins? ")))
+                                       int(raw_input('  #bins? ')))
             elif key == 'search':
                 self.delete_all_markers()
                 (poses, rotipz, gscore, success) = \
@@ -283,8 +290,8 @@ class ToolCalibrationRoutines(URRoutines):
 
     def parent_frame(self, frame):
         tm    = rospy.Time(0)
-        chain = self.listener.chain("workspace_center", tm, frame, tm,
-                                    "workspace_center")
+        chain = self.listener.chain('workspace_center', tm, frame, tm,
+                                    'workspace_center')
         return chain[chain.index(frame) + 1]
 
 
@@ -293,32 +300,8 @@ class ToolCalibrationRoutines(URRoutines):
 ######################################################################
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Perform tool calibration')
-    parser.add_argument('-r',
-                        '--robot_name',
-                        action='store',
-                        nargs='?',
-                        default='b_bot',
-                        type=str,
-                        choices=None,
-                        help='robot name',
-                        metavar=None)
-    parser.add_argument('-c',
-                        '--camera_name',
-                        action='store',
-                        nargs='?',
-                        default='a_phoxi_m_camera',
-                        type=str,
-                        choices=None,
-                        help='camera name',
-                        metavar=None)
-    args = parser.parse_args()
-
-    assert (args.robot_name in {'a_bot', 'b_bot', 'c_bot', 'd_bot'})
-
-    rospy.init_node("tool_calibration", anonymous=True)
+    rospy.init_node('tool_calibration', anonymous=True)
 
     speed = 0.1
-    with ToolCalibrationRoutines(args.robot_name,
-                                 args.camera_name, speed) as routines:
+    with ToolCalibrationRoutines(speed) as routines:
         routines.run()

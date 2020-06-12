@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<launch>
+
+  <arg name="config" default="aist"/>
+
+  <node name="tool_calibration"
+	pkg="aist_handeye_calibration" type="tool_calibration.py"
+	output="screen">
+    <rosparam file="$(find aist_routines)/config/$(arg config)_config.yaml"/>
+  </node>
+
+</launch>
