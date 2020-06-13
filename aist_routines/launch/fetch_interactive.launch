@@ -3,7 +3,7 @@
 
   <arg name="speed"	default="0.1"/>
 
-  <!-- Start kitting client -->
+  <!-- Start client -->
   <node name="fetch_interactive"
 	pkg="aist_routines" type="fetch_interactive.py" output="screen">
     <rosparam file="$(find aist_routines)/config/fetch_config.yaml"/>

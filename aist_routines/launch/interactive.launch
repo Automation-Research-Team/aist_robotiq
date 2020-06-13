@@ -5,10 +5,10 @@
   <arg name="robot_name"	default="b_bot"/>
   <arg name="camera_name"	default="a_phoxi_m_camera"/>
   <arg name="speed"		default="0.1"/>
-  <arg name="namespace"		default="/"/>
+  <arg name="ns"		default="/"/>
 
   <!-- Start client -->
-  <node ns="$(arg namespace)" name="interactive"
+  <node ns="$(arg ns)" name="interactive"
 	pkg="aist_routines" type="interactive.py" output="screen">
     <rosparam file="$(find aist_routines)/config/$(arg config)_config.yaml"/>
     <param name="robot_name"	value="$(arg robot_name)"/>

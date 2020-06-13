@@ -45,11 +45,6 @@
     <arg name="rviz_config"		value="$(arg rviz_config)"/>
   </include>
 
-  <rosparam command="delete" param="grippers"/>
-  <rosparam command="delete" param="cameras"/>
-  <rosparam command="load"
- 	    file="$(find aist_routines)/config/dtorobo_config.yaml"/>
-
   <!-- Spawn torobo_dynamics -->
   <include file="$(find torobo_dynamics)/launch/torobo_dynamics_nodelet.launch">
     <arg name="sim" value="$(arg sim)"/>

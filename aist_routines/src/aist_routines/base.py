@@ -37,7 +37,7 @@ def paramtuples(d):
 #  class AISTBaseRoutines                                            #
 ######################################################################
 class AISTBaseRoutines(object):
-    def __init__(self, ns=''):
+    def __init__(self):
         super(AISTBaseRoutines, self).__init__()
 
         moveit_commander.roscpp_initialize(sys.argv)
@@ -52,9 +52,7 @@ class AISTBaseRoutines(object):
                       .format(self._reference_frame, self._eef_step))
 
         # MoveIt RobotCommander
-        robot_description \
-            = 'robot_description' if ns == '' else ns + '/robot_description'
-        self._cmd = moveit_commander.RobotCommander(robot_description, ns)
+        self._cmd = moveit_commander.RobotCommander('robot_description')
 
         # Grippers
         d = rospy.get_param('~grippers', {})
