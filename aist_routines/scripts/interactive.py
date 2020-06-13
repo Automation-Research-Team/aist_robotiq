@@ -44,7 +44,7 @@ class InteractiveRoutines(URRoutines):
 
     def move(self, pose):
         target_pose = gmsg.PoseStamped()
-        target_pose.header.frame_id = 'workspace_center'
+        target_pose.header.frame_id = self.reference_frame
         target_pose.pose = gmsg.Pose(
             gmsg.Point(pose[0], pose[1], pose[2]),
             gmsg.Quaternion(

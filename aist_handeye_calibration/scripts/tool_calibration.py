@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 
-import sys
-import os
-import copy
-import rospy
-import argparse
+import rospy, copy
 import moveit_msgs.msg
 from geometry_msgs      import msg as gmsg
 from tf                 import transformations as tfs
@@ -75,7 +71,7 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
                 self._R0,
                 self._D0)
         target_pose = gmsg.PoseStamped()
-        target_pose.header.frame_id = 'workspace_center'
+        target_pose.header.frame_id = self.reference_frame
         target_pose.pose \
             = gmsg.Pose(gmsg.Point(*tfs.translation_from_matrix(T)),
                         gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))

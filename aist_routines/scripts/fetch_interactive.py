@@ -31,7 +31,7 @@ class InteractiveRoutines(FetchRoutines):
 
     def move(self, pose):
         target_pose = gmsg.PoseStamped()
-        target_pose.header.frame_id = 'base_link'
+        target_pose.header.frame_id = self.reference_frame
         target_pose.pose = gmsg.Pose(
             gmsg.Point(pose[0], pose[1], pose[2]),
             gmsg.Quaternion(
