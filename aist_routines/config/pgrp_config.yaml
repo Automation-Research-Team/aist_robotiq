@@ -14,18 +14,8 @@ grippers:
       timeout: 2.0
 
 cameras:
-  a_phoxi_m_camera:
-    type: PhoXiCamera
-    args:
-      name: a_phoxi_m_camera
-  a_bot_camera:
-    type: DepthCamera
-    args:
-      name: a_bot_camera
-      camera_info_topic: color/camera_info
-      image_topic: color/image_raw
-      pointcloud_topic: depth/color/point
-      depth_topic: aligned_depth_to_color/image_raw
+  a_phoxi_m_camera: PhoXiCamera
+  a_bot_camera: DepthCamera
 
 ftsensor:
   a_bot:

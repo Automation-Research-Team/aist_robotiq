@@ -9,7 +9,4 @@ grippers:
       timeout: 2.0
 
 cameras:
-  phoxi_m_camera:
-    type: PhoXiCamera
-    args:
-      name: phoxi_m_camera
+  phoxi_m_camera: PhoXiCamera

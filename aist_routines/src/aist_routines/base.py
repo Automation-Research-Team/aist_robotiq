@@ -66,9 +66,9 @@ class AISTBaseRoutines(object):
         # Cameras
         d = rospy.get_param('~cameras', {})
         self._cameras = {}
-        for camera_name, camera in d.items():
-            self._cameras[camera_name] = CameraClient.create(camera['type'],
-                                                             camera['args'])
+        for camera_name, type_name in d.items():
+            self._cameras[camera_name] = CameraClient.create(camera_name,
+                                                             type_name)
 
         # Search graspabilities
         if rospy.has_param('~graspability_parameters'):

@@ -23,7 +23,4 @@ grippers:
       max_effort: 5.0
 
 cameras:
-  b_phoxi_m_camera:
-    type: PhoXiCamera
-    args:
-      name: b_phoxi_m_camera
+  b_phoxi_m_camera: PhoXiCamera
