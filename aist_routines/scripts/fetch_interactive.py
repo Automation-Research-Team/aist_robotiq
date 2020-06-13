@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 
-import sys
-import os
-import copy
 import rospy
-import argparse
 
-from math                import radians, degrees
+from math                import radians
 from geometry_msgs       import msg as gmsg
 from tf                  import transformations as tfs
 from aist_routines.fetch import FetchRoutines
@@ -26,12 +22,12 @@ def is_num(s):
 #  class InteractiveRoutines                                         #
 ######################################################################
 class InteractiveRoutines(FetchRoutines):
-    def __init__(self, robot_name, camera_name, speed):
+    def __init__(self):
         super(InteractiveRoutines, self).__init__()
 
-        self._robot_name   = robot_name
-        self._camera_name  = camera_name
-        self._speed        = speed
+        self._robot_name  = 'arm'
+        self._camera_name = 'head_camera'
+        self._speed       = rospy.get_param('~speed', 0.1)
 
     def move(self, pose):
         target_pose = gmsg.PoseStamped()
@@ -184,30 +180,7 @@ class InteractiveRoutines(FetchRoutines):
 ######################################################################
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Perform tool calibration')
-    parser.add_argument('-r',
-                        '--robot_name',
-                        action='store',
-                        nargs='?',
-                        default='arm',
-                        type=str,
-                        choices=None,
-                        help='robot name',
-                        metavar=None)
-    parser.add_argument('-c',
-                        '--camera_name',
-                        action='store',
-                        nargs='?',
-                        default='head_camera',
-                        type=str,
-                        choices=None,
-                        help='camera name',
-                        metavar=None)
-    args = parser.parse_args()
-
     rospy.init_node('fetch_interactive', anonymous=True)
 
-    speed = 0.1
-    with InteractiveRoutines(args.robot_name,
-                             args.camera_name, speed) as routines:
+    with InteractiveRoutines() as routines:
         routines.run()

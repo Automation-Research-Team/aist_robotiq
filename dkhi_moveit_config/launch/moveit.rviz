@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /MotionPlanning1/Planned Path1
+        - /Image1
         - /TF1/Frames1
       Splitter Ratio: 0.6383928656578064
     Tree Height: 155
@@ -79,6 +80,15 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          a_khi_camera:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_khi_camera_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_khi_ee_link:
             Alpha: 1
             Show Axes: false
@@ -163,24 +173,15 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          a_khi_phoxi_m_camera:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_khi_phoxi_m_camera_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_khi_phoxi_m_sensor:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           a_khi_r_finger_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          a_khi_sensor:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_khi_base_link:
             Alpha: 1
             Show Axes: false
@@ -287,6 +288,15 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          a_khi_camera:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_khi_camera_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_khi_ee_link:
             Alpha: 1
             Show Axes: false
@@ -371,24 +381,15 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          a_khi_phoxi_m_camera:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_khi_phoxi_m_camera_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_khi_phoxi_m_sensor:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           a_khi_r_finger_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
+          a_khi_sensor:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           b_khi_base_link:
             Alpha: 1
             Show Axes: false
@@ -452,7 +453,7 @@ Visualization Manager:
       Velocity_Scaling_Factor: 1
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /a_khi_phoxi_m_camera/texture
+      Image Topic: /a_khi_camera/texture
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -469,6 +470,10 @@ Visualization Manager:
         All Enabled: false
         a_khi_base_link:
           Value: false
+        a_khi_camera:
+          Value: true
+        a_khi_camera_link:
+          Value: true
         a_khi_ee_link:
           Value: false
         a_khi_gripper_base_link:
@@ -503,11 +508,7 @@ Visualization Manager:
           Value: false
         a_khi_magripper_magnet_branch_flange:
           Value: false
-        a_khi_phoxi_m_camera:
-          Value: false
-        a_khi_phoxi_m_camera_link:
-          Value: false
-        a_khi_phoxi_m_sensor:
+        a_khi_sensor:
           Value: true
         b_khi_base_link:
           Value: false
@@ -551,9 +552,9 @@ Visualization Manager:
                           a_khi_ee_link:
                             a_khi_magripper_base_link:
                               a_khi_magripper_base_link_flange:
-                                a_khi_phoxi_m_camera:
-                                  a_khi_phoxi_m_sensor:
-                                    a_khi_phoxi_m_camera_link:
+                                a_khi_camera:
+                                  a_khi_sensor:
+                                    a_khi_camera_link:
                                       {}
                               a_khi_magripper_gripper_branch:
                                 a_khi_magripper_gripper_branch_flange:

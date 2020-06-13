@@ -1,14 +1,9 @@
 #!/usr/bin/env python
 
-import sys
-import os
-import copy
 import rospy
-import argparse
-from geometry_msgs import msg as gmsg
-
-from tf import transformations as tfs
-from math import radians, degrees
+from geometry_msgs    import msg as gmsg
+from tf               import transformations as tfs
+from math             import radians
 from aist_routines.ur import URRoutines
 
 ######################################################################
@@ -33,15 +28,13 @@ class InteractiveRoutines(URRoutines):
         'd_bot': [0.00, 0.00, 0.3, radians(  0), radians( 90), radians(  0)],
     }
 
-    def __init__(self, speed):
+    def __init__(self):
         super(InteractiveRoutines, self).__init__()
 
-        self._robots  = rospy.get_param('robots', {})
-        self._cameras = rospy.get_param('cameras', {})
-        self._robot_name   = 'b_bot'
-        self._camera_name  = 'a_phoxi_m_camera'
-        self._speed        = speed
-        self._ur_movel     = False
+        self._robot_name  = rospy.get_param('~robot_name', 'b_bot')
+        self._camera_name = rospy.get_param('~camer_name', 'a_phoxi_m_camera')
+        self._speed       = rospy.get_param('~speed',       0.1)
+        self._ur_movel    = False
 
     def go_home(self):
         self.go_to_named_pose('home', self._robot_name)
@@ -200,6 +193,5 @@ if __name__ == '__main__':
 
     rospy.init_node('interactive', anonymous=True)
 
-    speed = 0.1
-    with InteractiveRoutines(speed) as routines:
+    with InteractiveRoutines() as routines:
         routines.run()

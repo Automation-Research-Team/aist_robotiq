@@ -15,3 +15,8 @@ controller_list:
       - b_khi_joint4
       - b_khi_joint5
       - b_khi_joint6
+initial:  # Define initial robot poses.
+  - group: a_khi
+    pose: standing
+  - group: b_khi
+    pose: standing
