@@ -65,8 +65,7 @@ class DepthCamera(CameraClient):
 class RealSenseCamera(DepthCamera):
     def __init__(self, name="a_bot_camera"):
         super(RealSenseCamera, self).__init__(name)
-        self._dyn_camera = dynamic_reconfigure.client.Client(
-                               name + "/realsense2_camera", timeout=5.0)
+        self._dyn_camera = dynamic_reconfigure.client.Client(name, timeout=5.0)
         self._dyn_sensor = dynamic_reconfigure.client.Client(
                                name + "/coded_light_depth_sensor", timeout=5.0)
         self._recent_laser_power = 16
@@ -97,7 +96,7 @@ class RealSenseCamera(DepthCamera):
 ######################################################################
 class PhoXiCamera(DepthCamera):
     def __init__(self, name="a_phoxi_m_camera"):
-        super(PhoXiCamera, self).__init__(name, "depth")
+        super(PhoXiCamera, self).__init__(name)
         self._dyn_reconf = dynamic_reconfigure.client.Client(name, timeout=5.0)
         self._trigger_frame = rospy.ServiceProxy(name + "/trigger_frame",
                                                  std_srvs.srv.Trigger)
