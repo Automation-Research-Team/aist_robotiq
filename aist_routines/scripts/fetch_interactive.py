@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 
-import sys
-import os
-import copy
 import rospy
-import argparse
 
-from math                import radians, degrees
+from math                import radians
 from geometry_msgs       import msg as gmsg
 from tf                  import transformations as tfs
 from aist_routines.fetch import FetchRoutines
@@ -26,16 +22,16 @@ def is_num(s):
 #  class InteractiveRoutines                                         #
 ######################################################################
 class InteractiveRoutines(FetchRoutines):
-    def __init__(self, robot_name, camera_name, speed):
+    def __init__(self):
         super(InteractiveRoutines, self).__init__()
 
-        self._robot_name   = robot_name
-        self._camera_name  = camera_name
-        self._speed        = speed
+        self._robot_name  = 'arm'
+        self._camera_name = 'head_camera'
+        self._speed       = rospy.get_param('~speed', 0.1)
 
     def move(self, pose):
         target_pose = gmsg.PoseStamped()
-        target_pose.header.frame_id = "base_link"
+        target_pose.header.frame_id = self.reference_frame
         target_pose.pose = gmsg.Pose(
             gmsg.Point(pose[0], pose[1], pose[2]),
             gmsg.Quaternion(
@@ -57,7 +53,7 @@ class InteractiveRoutines(FetchRoutines):
 
         while not rospy.is_shutdown():
             current_pose = self.get_current_pose(self._robot_name)
-            prompt = "{:>5}:{}>> ".format(axis, self.format_pose(current_pose))
+            prompt = '{:>5}:{}>> '.format(axis, self.format_pose(current_pose))
 
             key = raw_input(prompt)
 
@@ -138,7 +134,7 @@ class InteractiveRoutines(FetchRoutines):
                 self.create_background_image(self._camera_name)
             elif key == 'mask':
                 self.create_mask_image(self._camera_name,
-                                       int(raw_input("  #bins? ")))
+                                       int(raw_input('  #bins? ')))
             elif key == 'search':
                 self.delete_all_markers()
                 self.graspability_send_goal(self._robot_name,
@@ -157,23 +153,23 @@ class InteractiveRoutines(FetchRoutines):
             elif key == 'pick_ready':
                 self.go_to_named_pose('pick_ready', self._robot_name)
             elif key == 'torso':
-                position = float(raw_input("  position = "))
+                position = float(raw_input('  position = '))
                 self.move_torso(position)
             elif key == 'head':
-                pan  = radians(float(raw_input("  head pan  = ")))
-                tilt = radians(float(raw_input("  head tilt = ")))
+                pan  = radians(float(raw_input('  head pan  = ')))
+                tilt = radians(float(raw_input('  head tilt = ')))
                 self.move_head(pan, tilt)
             elif key == 'move_base':
-                x     = float(raw_input("  x     = "))
-                y     = float(raw_input("  y     = "))
-                theta = radians(float(raw_input("  theta = ")))
+                x     = float(raw_input('  x     = '))
+                y     = float(raw_input('  y     = '))
+                theta = radians(float(raw_input('  theta = ')))
                 self.move_base(x, y, theta)
             elif key == 'move_base_to_frame':
-                self.move_base_to_frame(raw_input(" frame = "))
+                self.move_base_to_frame(raw_input(' frame = '))
             elif key == 'shake_head':
                 self.shake_head(radians(30), radians(30))
             elif key == 'gaze':
-                self.gaze_frame(raw_input("  frame = "))
+                self.gaze_frame(raw_input('  frame = '))
 
         # Reset pose
         self.go_home()
@@ -184,30 +180,7 @@ class InteractiveRoutines(FetchRoutines):
 ######################################################################
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Perform tool calibration')
-    parser.add_argument('-r',
-                        '--robot_name',
-                        action='store',
-                        nargs='?',
-                        default='arm',
-                        type=str,
-                        choices=None,
-                        help='robot name',
-                        metavar=None)
-    parser.add_argument('-c',
-                        '--camera_name',
-                        action='store',
-                        nargs='?',
-                        default='head_camera',
-                        type=str,
-                        choices=None,
-                        help='camera name',
-                        metavar=None)
-    args = parser.parse_args()
+    rospy.init_node('fetch_interactive', anonymous=True)
 
-    rospy.init_node("fetch_interactive", anonymous=True)
-
-    speed = 0.1
-    with InteractiveRoutines(args.robot_name,
-                             args.camera_name, speed) as routines:
+    with InteractiveRoutines() as routines:
         routines.run()

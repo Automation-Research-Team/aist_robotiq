@@ -12,14 +12,7 @@ grippers:
       max_effort: 0.0
 
 cameras:
-  head_camera:
-    type: DepthCamera
-    args:
-      name: head_camera
-      camera_info_topic: depth/camera_info
-      image_topic: rgb/image_rect_color
-      pointcloud_topic: depth/point
-      depth_topic: depth/image_rect
+  head_camera: DepthCamera
 
-moveit_pose_reference_frame: "base_link"
+moveit_pose_reference_frame: base_link
 moveit_eef_step: 0.05

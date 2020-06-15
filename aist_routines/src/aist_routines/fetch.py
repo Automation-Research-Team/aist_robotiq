@@ -16,8 +16,8 @@ from freight                import FreightRoutines
 #  class FetchRoutines                                               #
 ######################################################################
 class FetchRoutines(AISTBaseRoutines, FreightRoutines):
-    def __init__(self, ns=""):
-        super(FetchRoutines, self).__init__(ns)
+    def __init__(self):
+        super(FetchRoutines, self).__init__()
 
         self._lock = threading.Lock()
         self._joint_names     = None

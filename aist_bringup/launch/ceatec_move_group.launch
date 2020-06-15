@@ -11,6 +11,4 @@
     <arg name="rviz_config"	value="$(arg rviz_config)"/>
   </include>
 
-  <rosparam file="$(find aist_routines)/config/ceatec_config.yaml"/>
-
 </launch>

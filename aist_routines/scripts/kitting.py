@@ -11,13 +11,13 @@ from aist_routines      import msg as amsg
 class KittingRoutines(AISTBaseRoutines):
     """Implements kitting routines for aist robot system."""
 
-    Bin = collections.namedtuple("Bin", "name part_id part_props")
+    Bin = collections.namedtuple('Bin', 'name part_id part_props')
 
     def __init__(self):
         super(KittingRoutines, self).__init__()
 
-        bin_props  = base.paramtuples(rospy.get_param("~bin_props"))
-        part_props = base.paramtuples(rospy.get_param("~part_props"))
+        bin_props  = base.paramtuples(rospy.get_param('~bin_props'))
+        part_props = base.paramtuples(rospy.get_param('~part_props'))
 
         # Assign part information to each bin.
         self._bins = {}
@@ -28,7 +28,7 @@ class KittingRoutines(AISTBaseRoutines):
 
         self._former_robot_name = None
         self._fail_poses = []
-        #self.go_to_named_pose("home", "all_bots")
+        #self.go_to_named_pose('home', 'all_bots')
 
     @property
     def nbins(self):
@@ -40,12 +40,12 @@ class KittingRoutines(AISTBaseRoutines):
 
     ###----- main procedure
     def run(self):
-        self.go_to_named_pose("back", "all_bots")
+        self.go_to_named_pose('back', 'all_bots')
         for bin in self._bins:
             if rospy.is_shutdown():
                 break
             self.attempt_bin(bin, 1)
-        self.go_to_named_pose("home", "all_bots")
+        self.go_to_named_pose('home', 'all_bots')
 
     def demo(self):
         bin_ids = (1, 4, 5)
@@ -61,7 +61,7 @@ class KittingRoutines(AISTBaseRoutines):
             if completed:
                 break
 
-        kitting.go_to_named_pose("home", kitting.former_robot_name)
+        kitting.go_to_named_pose('home', kitting.former_robot_name)
 
     def search(self, bin_id, marker_lifetime=0):
         bin   = self._bins[bin_id]
@@ -81,7 +81,7 @@ class KittingRoutines(AISTBaseRoutines):
         # If using a different robot from the former, move it back to home.
         if self._former_robot_name is not None and \
            self._former_robot_name != props.robot_name:
-            self.go_to_named_pose("back", self._former_robot_name)
+            self.go_to_named_pose('back', self._former_robot_name)
         self._former_robot_name = props.robot_name
 
         # Move to 0.15m above the bin if the camera is mounted on the robot.
@@ -118,7 +118,7 @@ class KittingRoutines(AISTBaseRoutines):
                 self._fail_poses.append(pose)
             elif result == amsg.pickOrPlaceResult.DEPARTURE_FAILURE:
                 self.release(props.robot_name)
-                raise RuntimeError("Failed to depart from pick/place pose")
+                raise RuntimeError('Failed to depart from pick/place pose')
             elif result == amsg.pickOrPlaceResult.PICK_FAILURE:
                 self._fail_poses.append(pose)
                 nattempts += 1
@@ -131,7 +131,7 @@ class KittingRoutines(AISTBaseRoutines):
         self._fail_poses = []
 
     def _is_eye_on_hand(self, robot_name, camera_name):
-        return camera_name == robot_name + "_camera"
+        return camera_name == robot_name + '_camera'
 
     def _is_close_to_fail_poses(self, pose):
         for fail_pose in self._fail_poses:
@@ -151,54 +151,54 @@ class KittingRoutines(AISTBaseRoutines):
 
 if __name__ == '__main__':
 
-    rospy.init_node("kitting", anonymous=True)
+    rospy.init_node('kitting', anonymous=True)
 
     with KittingRoutines() as kitting:
         while not rospy.is_shutdown():
-            print("============ Kitting procedures ============ ")
-            print("  b: Create a backgroud image")
-            print("  m: Create a mask image")
-            print("  s: Search graspabilities")
-            print("  a: Attempt to pick and place")
-            print("  A: Repeat attempts to pick and place")
-            print("  d: Perform small demo")
-            print("  k: Do kitting task")
-            print("  g: Grasp")
-            print("  r: Release")
-            print("  H: Move all robots to home")
-            print("  B: Move all robots to back")
-            print("  q: Quit")
+            print('============ Kitting procedures ============ ')
+            print('  b: Create a backgroud image')
+            print('  m: Create a mask image')
+            print('  s: Search graspabilities')
+            print('  a: Attempt to pick and place')
+            print('  A: Repeat attempts to pick and place')
+            print('  d: Perform small demo')
+            print('  k: Do kitting task')
+            print('  g: Grasp')
+            print('  r: Release')
+            print('  H: Move all robots to home')
+            print('  B: Move all robots to back')
+            print('  q: Quit')
 
             try:
-                key = raw_input(">> ")
+                key = raw_input('>> ')
                 if key == 'q':
                     if kitting.former_robot_name is not None:
-                        kitting.go_to_named_pose("home",
+                        kitting.go_to_named_pose('home',
                                                  kitting.former_robot_name)
                     break
                 elif key == 'H':
-                    kitting.go_to_named_pose("home", "all_bots")
+                    kitting.go_to_named_pose('home', 'all_bots')
                 elif key == 'B':
-                    kitting.go_to_named_pose("back", "all_bots")
+                    kitting.go_to_named_pose('back', 'all_bots')
                 elif key == 'b':
-                    kitting.create_background_image("a_phoxi_m_camera")
+                    kitting.create_background_image('a_phoxi_m_camera')
                 elif key == 'm':
-                    kitting.create_mask_image("a_phoxi_m_camera",
+                    kitting.create_mask_image('a_phoxi_m_camera',
                                               kitting.nbins)
                 elif key == 's':
-                    bin_id = int(raw_input("  bin id? "))
+                    bin_id = int(raw_input('  bin id? '))
                     kitting.search(bin_id)
                 elif key == 'a':
-                    bin_id = int(raw_input("  bin id? "))
+                    bin_id = int(raw_input('  bin id? '))
                     kitting.clear_fail_poses()
                     kitting.attempt_bin(bin_id, 5, 0)
-                    kitting.go_to_named_pose("home", kitting.former_robot_name)
+                    kitting.go_to_named_pose('home', kitting.former_robot_name)
                 elif key == 'A':
-                    bin_id = int(raw_input("  bin id? "))
+                    bin_id = int(raw_input('  bin id? '))
                     kitting.clear_fail_poses()
                     while kitting.attempt_bin(bin_id, 5, 0):
                         pass
-                    kitting.go_to_named_pose("home", kitting.former_robot_name)
+                    kitting.go_to_named_pose('home', kitting.former_robot_name)
                 elif key == 'd':
                     kitting.demo()
                 elif key == 'k':
