@@ -146,4 +146,110 @@
 
   </xacro:macro>
 
+  <xacro:macro name="magripper3" params="prefix parent *origin">
+
+    <xacro:property name="gripper_x_offset" value="0.075"/>
+    <xacro:property name="gripper_y_offset" value="-0.050"/>
+    <xacro:property name="gripper_z_offset" value="0.050"/>
+    <xacro:property name="magnet_y_offset" value="-0.174"/>
+    <!-- <xacro:property name="camera_x_offset" value="0.298"/> -->
+    <xacro:property name="camera_x_offset" value="0.180"/>
+    <xacro:property name="camera_y_offset" value="-0.1145"/>
+    <xacro:property name="camera_z_offset" value="-0.0355"/>
+
+    <joint name="${prefix}magripper_base_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${prefix}magripper_base_link"/>
+      <xacro:insert_block name="origin"/>
+    </joint>
+
+    <link name="${prefix}magripper_base_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://aist_description/devices/meshes/magripper_base.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="Gazebo/Grey">
+          <color rgba="0.7 0.7 0.7 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="$0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://aist_description/devices/meshes/collision/magripper_base.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </collision>
+
+      <!-- Required for Gazebo -->
+      <inertial>
+	<mass value="1.5"/>
+	<inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+      </inertial>
+    </link>
+
+    <!-- <gazebo reference="${prefix}magripper_base_link"> -->
+    <!--   <material>Gazebo/Grey</material> -->
+    <!--   <selfCollide>True</selfCollide> -->
+    <!-- </gazebo> -->
+
+    <!-- Magswitch_E30 magnet hand -->
+    <joint name="${prefix}magripper_magnet_axis_joint" type="fixed">
+      <parent link="${prefix}magripper_base_link"/>
+      <child  link="${prefix}magripper_magnet_axis_link"/>
+      <origin xyz="${gripper_x_offset} 0 0"
+	      rpy="${-pi/4} 0 0"/>
+    </joint>
+    <link name="${prefix}magripper_magnet_axis_link"/>
+    
+    <joint name="${prefix}magripper_magnet_flange_joint" type="fixed">
+      <parent link="${prefix}magripper_magnet_axis_link"/>
+      <child  link="${prefix}magripper_magnet_flange"/>
+      <origin xyz="0 ${magnet_y_offset} ${gripper_z_offset}"
+	      rpy="0 0 ${-pi/2}"/>
+    </joint>
+    <link name="${prefix}magripper_magnet_flange"/>
+    
+    <xacro:magswitch_e30 prefix="${prefix}"
+    			 parent="${prefix}magripper_magnet_flange">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:magswitch_e30>
+
+    <!-- LEHZ40K2-30 two-finger gripper -->
+    <joint name="${prefix}magripper_gripper_axis_joint" type="fixed">
+      <parent link="${prefix}magripper_base_link"/>
+      <child  link="${prefix}magripper_gripper_axis_link"/>
+      <origin xyz="${gripper_x_offset} 0 0"
+	      rpy="${pi/4} 0 0"/>
+    </joint>
+    <link name="${prefix}magripper_gripper_axis_link"/>
+    
+    <joint name="${prefix}magripper_gripper_flange_joint" type="fixed">
+      <parent link="${prefix}magripper_gripper_axis_link"/>
+      <child  link="${prefix}magripper_gripper_flange"/>
+      <origin xyz="0 ${gripper_y_offset} ${-gripper_z_offset}"
+	      rpy="0 0 ${-pi/2}"/>
+    </joint>
+    <link name="${prefix}magripper_gripper_flange"/>
+
+    <xacro:lehz40k2_30 prefix="${prefix}"
+    		       parent="${prefix}magripper_gripper_flange">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:lehz40k2_30>
+    
+    <!-- PhoXi camera -->
+    <joint name="${prefix}magripper_camera_flange_joint" type="fixed">
+      <parent link="${prefix}magripper_base_link"/>
+      <child  link="${prefix}magripper_camera_flange"/>
+      <origin xyz="${camera_x_offset} ${camera_y_offset} ${camera_z_offset}"
+	      rpy="${-pi/2} 0 ${pi}"/>
+    </joint>
+    <link name="${prefix}magripper_camera_flange"/>
+    
+    <xacro:phoxi_m_camera prefix="${prefix}"
+    			  parent="${prefix}magripper_camera_flange">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:phoxi_m_camera>
+
+  </xacro:macro>
+
 </robot>
