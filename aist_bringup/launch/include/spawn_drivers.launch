@@ -46,7 +46,7 @@
     <node name="torobo_driver_nodelet" ns="torobo" pkg="nodelet" type="nodelet"
           args="load torobo_driver/torobo_driver_nodelet $(arg manager)"
           output="screen">
-      <rosparam file="$(find aist_bringup)/config/torobo_driver_nodelet.yaml)"/>
+      <rosparam file="$(find aist_bringup)/config/torobo_driver_nodelet.yaml"/>
     </node>
   </group>
 

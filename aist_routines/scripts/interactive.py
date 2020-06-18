@@ -1,14 +1,9 @@
 #!/usr/bin/env python
 
-import sys
-import os
-import copy
 import rospy
-import argparse
-from geometry_msgs import msg as gmsg
-
-from tf import transformations as tfs
-from math import radians, degrees
+from geometry_msgs    import msg as gmsg
+from tf               import transformations as tfs
+from math             import radians
 from aist_routines.ur import URRoutines
 
 ######################################################################
@@ -33,15 +28,13 @@ class InteractiveRoutines(URRoutines):
         'd_bot': [0.00, 0.00, 0.3, radians(  0), radians( 90), radians(  0)],
     }
 
-    def __init__(self, robot_name, camera_name, speed, ns):
-        super(InteractiveRoutines, self).__init__(ns)
+    def __init__(self):
+        super(InteractiveRoutines, self).__init__()
 
-        self._robots  = rospy.get_param("robots", {})
-        self._cameras = rospy.get_param("cameras", {})
-        self._robot_name   = robot_name
-        self._camera_name  = camera_name
-        self._speed        = speed
-        self._ur_movel     = False
+        self._robot_name  = rospy.get_param('~robot_name', 'b_bot')
+        self._camera_name = rospy.get_param('~camer_name', 'a_phoxi_m_camera')
+        self._speed       = rospy.get_param('~speed',       0.1)
+        self._ur_movel    = False
 
     def go_home(self):
         self.go_to_named_pose('home', self._robot_name)
@@ -51,7 +44,7 @@ class InteractiveRoutines(URRoutines):
 
     def move(self, pose):
         target_pose = gmsg.PoseStamped()
-        target_pose.header.frame_id = "workspace_center"
+        target_pose.header.frame_id = self.reference_frame
         target_pose.pose = gmsg.Pose(
             gmsg.Point(pose[0], pose[1], pose[2]),
             gmsg.Quaternion(
@@ -75,18 +68,18 @@ class InteractiveRoutines(URRoutines):
 
         while not rospy.is_shutdown():
             current_pose = self.get_current_pose(self._robot_name)
-            prompt = "{:>5}:{}{:>9}>> " \
+            prompt = '{:>5}:{}{:>9}>> ' \
                    .format(axis, self.format_pose(current_pose),
-                           "urscript" if self._ur_movel else "moveit")
+                           'urscript' if self._ur_movel else 'moveit')
 
             key = raw_input(prompt)
 
             if key == 'q':
                 break
             elif key == 'r':
-                self._robot_name = raw_input("  robot name? ")
+                self._robot_name = raw_input('  robot name? ')
             elif key == 'c':
-                self._camera_name = raw_input("  camera name? ")
+                self._camera_name = raw_input('  camera name? ')
             elif key == 'X':
                 axis = 'X'
             elif key == 'Y':
@@ -160,7 +153,7 @@ class InteractiveRoutines(URRoutines):
                 self.trigger_frame(self._camera_name)
             elif key == 'mask':
                 self.create_mask_image(self._camera_name,
-                                       int(raw_input("  #bins? ")))
+                                       int(raw_input('  #bins? ')))
             elif key == 'search':
                 self.delete_all_markers()
                 self.graspability_send_goal(self._robot_name,
@@ -198,39 +191,7 @@ class InteractiveRoutines(URRoutines):
 ######################################################################
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Perform tool calibration')
-    parser.add_argument('-r',
-                        '--robot_name',
-                        action='store',
-                        nargs='?',
-                        default='b_bot',
-                        type=str,
-                        choices=None,
-                        help='robot name',
-                        metavar=None)
-    parser.add_argument('-c',
-                        '--camera_name',
-                        action='store',
-                        nargs='?',
-                        default='a_phoxi_m_camera',
-                        type=str,
-                        choices=None,
-                        help='camera name',
-                        metavar=None)
-    parser.add_argument('-n',
-                        '--ns',
-                        action='store',
-                        nargs='?',
-                        default='',
-                        type=str,
-                        choices=None,
-                        help='namespace',
-                        metavar=None)
-    args = parser.parse_args()
+    rospy.init_node('interactive', anonymous=True)
 
-    rospy.init_node("interactive", anonymous=True)
-
-    speed = 0.1
-    with InteractiveRoutines(args.robot_name,
-                             args.camera_name, speed, args.ns) as routines:
+    with InteractiveRoutines() as routines:
         routines.run()

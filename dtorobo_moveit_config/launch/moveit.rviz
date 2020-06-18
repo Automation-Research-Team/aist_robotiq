@@ -5,8 +5,9 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /MotionPlanning1/Planning Request1
+        - /Image1
       Splitter Ratio: 0.6251830458641052
-    Tree Height: 225
+    Tree Height: 140
   - Class: rviz/Help
     Name: Help
   - Class: rviz/Views
@@ -149,16 +150,16 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          b_phoxi_m_camera:
+          b_camera:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          b_phoxi_m_camera_link:
+          b_camera_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          b_phoxi_m_sensor:
+          b_sensor:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -376,16 +377,16 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          b_phoxi_m_camera:
+          b_camera:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          b_phoxi_m_camera_link:
+          b_camera_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          b_phoxi_m_sensor:
+          b_sensor:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -524,12 +525,12 @@ Visualization Manager:
           Value: false
         a_torobo_gripper/tip_link:
           Value: true
-        b_phoxi_m_camera:
-          Value: false
-        b_phoxi_m_camera_link:
-          Value: false
-        b_phoxi_m_sensor:
-          Value: false
+        b_camera:
+          Value: true
+        b_camera_link:
+          Value: true
+        b_sensor:
+          Value: true
         b_torobo_arm/ee_link:
           Value: false
         b_torobo_arm/link_0:
@@ -597,9 +598,9 @@ Visualization Manager:
                                       {}
                             a_torobo_arm/link_tip:
                               {}
-            b_phoxi_m_camera:
-              b_phoxi_m_sensor:
-                b_phoxi_m_camera_link:
+            b_camera:
+              b_sensor:
+                b_camera_link:
                   {}
             b_torobo_arm/link_0:
               b_torobo_arm/link_1:
@@ -628,7 +629,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /torobo/b_phoxi_m_camera/texture
+      Image Topic: /torobo/b_camera/texture
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -677,7 +678,7 @@ Visualization Manager:
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1172
+  Height: 959
   Help:
     collapsed: false
   Hide Left Dock: false
@@ -688,9 +689,9 @@ Window Geometry:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000002ad0000043afc0200000008fb000000100044006900730070006c006100790073010000003d0000011e000000c900fffffffb0000000800480065006c00700000000342000000bb0000006e00fffffffb0000000a0056006900650077007300000003b0000000b0000000a400fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004100fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e00670100000161000001c20000019b00fffffffb0000000a0049006d00610067006501000003290000014e0000001600ffffff000004cd0000043a00000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000100000000000002ad00000365fc0200000008fb000000100044006900730070006c006100790073010000003d000000c9000000c900fffffffb0000000800480065006c00700000000342000000bb0000006e00fffffffb0000000a0056006900650077007300000003b0000000b0000000a400fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004100fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e0067010000010c000001a60000019b00fffffffb0000000a0049006d00610067006501000002b8000000ea0000001600ffffff000002cb0000036500000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
-  Width: 1920
-  X: 2560
-  Y: 0
+  Width: 1406
+  X: 199
+  Y: 53

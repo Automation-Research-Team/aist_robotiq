@@ -21,21 +21,21 @@ def is_num(s):
 ######################################################################
 if __name__ == '__main__':
 
-    rospy.init_node("base_interactive", anonymous=True)
+    rospy.init_node('base_interactive', anonymous=True)
 
     routines = MoveBaseRoutines()
 
     while not rospy.is_shutdown():
-        prompt = "{}>> ".format(
+        prompt = '{}>> '.format(
             routines.format_odom(routines.current_odom))
         key = raw_input(prompt)
 
         if key == 'q':
             break
         elif key == 'move_base':
-            x     = float(raw_input("  x     = "))
-            y     = float(raw_input("  y     = "))
-            theta = float(raw_input("  theta = "))
+            x     = float(raw_input('  x     = '))
+            y     = float(raw_input('  y     = '))
+            theta = float(raw_input('  theta = '))
             routines.move_base(x, y, theta)
         elif key == 'move_base_to_frame':
-            routines.move_base_to_frame(raw_input(" frame = "))
+            routines.move_base_to_frame(raw_input(' frame = '))

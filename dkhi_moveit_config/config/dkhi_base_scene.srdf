@@ -86,6 +86,16 @@
     <disable_collisions link1="a_khi_base_link" link2="b_khi_link5" reason="Never" />
     <disable_collisions link1="a_khi_base_link" link2="b_khi_link6" reason="Never" />
     <disable_collisions link1="a_khi_base_link" link2="workbox" reason="Adjacent" />
+    <disable_collisions link1="a_khi_camera" link2="a_khi_gripper_base_link" reason="Never" />
+    <disable_collisions link1="a_khi_camera" link2="a_khi_l_finger_link" reason="Never" />
+    <disable_collisions link1="a_khi_camera" link2="a_khi_link3" reason="Never" />
+    <disable_collisions link1="a_khi_camera" link2="a_khi_link5" reason="Never" />
+    <disable_collisions link1="a_khi_camera" link2="a_khi_link6" reason="Never" />
+    <disable_collisions link1="a_khi_camera" link2="a_khi_magnet_base_link" reason="Never" />
+    <disable_collisions link1="a_khi_camera" link2="a_khi_magripper_base_link" reason="Adjacent" />
+    <disable_collisions link1="a_khi_camera" link2="a_khi_magripper_gripper_branch" reason="Never" />
+    <disable_collisions link1="a_khi_camera" link2="a_khi_magripper_magnet_branch" reason="Never" />
+    <disable_collisions link1="a_khi_camera" link2="a_khi_r_finger_link" reason="Never" />
     <disable_collisions link1="a_khi_gripper_base_link" link2="a_khi_l_finger_link" reason="Adjacent" />
     <disable_collisions link1="a_khi_gripper_base_link" link2="a_khi_link3" reason="Never" />
     <disable_collisions link1="a_khi_gripper_base_link" link2="a_khi_link4" reason="Never" />
@@ -95,7 +105,6 @@
     <disable_collisions link1="a_khi_gripper_base_link" link2="a_khi_magripper_base_link" reason="Never" />
     <disable_collisions link1="a_khi_gripper_base_link" link2="a_khi_magripper_gripper_branch" reason="Adjacent" />
     <disable_collisions link1="a_khi_gripper_base_link" link2="a_khi_magripper_magnet_branch" reason="Never" />
-    <disable_collisions link1="a_khi_gripper_base_link" link2="a_khi_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_khi_gripper_base_link" link2="a_khi_r_finger_link" reason="Adjacent" />
     <disable_collisions link1="a_khi_l_finger_link" link2="a_khi_link3" reason="Never" />
     <disable_collisions link1="a_khi_l_finger_link" link2="a_khi_link4" reason="Never" />
@@ -105,9 +114,7 @@
     <disable_collisions link1="a_khi_l_finger_link" link2="a_khi_magripper_base_link" reason="Never" />
     <disable_collisions link1="a_khi_l_finger_link" link2="a_khi_magripper_gripper_branch" reason="Never" />
     <disable_collisions link1="a_khi_l_finger_link" link2="a_khi_magripper_magnet_branch" reason="Never" />
-    <disable_collisions link1="a_khi_l_finger_link" link2="a_khi_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_khi_l_finger_link" link2="a_khi_r_finger_link" reason="Never" />
-    <disable_collisions link1="a_khi_l_finger_link" link2="b_khi_link1" reason="Never" />
     <disable_collisions link1="a_khi_l_finger_link" link2="b_khi_link5" reason="Never" />
     <disable_collisions link1="a_khi_l_finger_link" link2="b_khi_link6" reason="Never" />
     <disable_collisions link1="a_khi_link1" link2="a_khi_link2" reason="Adjacent" />
@@ -124,12 +131,10 @@
     <disable_collisions link1="a_khi_link2" link2="a_khi_link4" reason="Never" />
     <disable_collisions link1="a_khi_link2" link2="a_khi_link5" reason="Never" />
     <disable_collisions link1="a_khi_link2" link2="a_khi_link6" reason="Never" />
-    <disable_collisions link1="a_khi_link2" link2="a_khi_magripper_gripper_branch" reason="Never" />
     <disable_collisions link1="a_khi_link2" link2="b_khi_base_link" reason="Never" />
     <disable_collisions link1="a_khi_link2" link2="b_khi_link1" reason="Never" />
     <disable_collisions link1="a_khi_link2" link2="b_khi_link2" reason="Never" />
     <disable_collisions link1="a_khi_link2" link2="b_khi_link3" reason="Never" />
-    <disable_collisions link1="a_khi_link2" link2="b_khi_link6" reason="Never" />
     <disable_collisions link1="a_khi_link3" link2="a_khi_link4" reason="Adjacent" />
     <disable_collisions link1="a_khi_link3" link2="a_khi_link5" reason="Never" />
     <disable_collisions link1="a_khi_link3" link2="a_khi_link6" reason="Never" />
@@ -137,13 +142,11 @@
     <disable_collisions link1="a_khi_link3" link2="a_khi_magripper_base_link" reason="Never" />
     <disable_collisions link1="a_khi_link3" link2="a_khi_magripper_gripper_branch" reason="Never" />
     <disable_collisions link1="a_khi_link3" link2="a_khi_magripper_magnet_branch" reason="Never" />
-    <disable_collisions link1="a_khi_link3" link2="a_khi_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_khi_link3" link2="a_khi_r_finger_link" reason="Never" />
     <disable_collisions link1="a_khi_link3" link2="b_khi_base_link" reason="Never" />
     <disable_collisions link1="a_khi_link3" link2="b_khi_link1" reason="Never" />
     <disable_collisions link1="a_khi_link3" link2="b_khi_link2" reason="Never" />
     <disable_collisions link1="a_khi_link3" link2="b_khi_link3" reason="Never" />
-    <disable_collisions link1="a_khi_link3" link2="b_khi_link6" reason="Never" />
     <disable_collisions link1="a_khi_link4" link2="a_khi_link5" reason="Adjacent" />
     <disable_collisions link1="a_khi_link4" link2="a_khi_link6" reason="Never" />
     <disable_collisions link1="a_khi_link4" link2="a_khi_magripper_base_link" reason="Never" />
@@ -157,44 +160,38 @@
     <disable_collisions link1="a_khi_link5" link2="a_khi_magripper_base_link" reason="Never" />
     <disable_collisions link1="a_khi_link5" link2="a_khi_magripper_gripper_branch" reason="Never" />
     <disable_collisions link1="a_khi_link5" link2="a_khi_magripper_magnet_branch" reason="Never" />
-    <disable_collisions link1="a_khi_link5" link2="a_khi_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_khi_link5" link2="a_khi_r_finger_link" reason="Never" />
     <disable_collisions link1="a_khi_link5" link2="b_khi_base_link" reason="Never" />
     <disable_collisions link1="a_khi_link5" link2="b_khi_link1" reason="Never" />
+    <disable_collisions link1="a_khi_link5" link2="b_khi_link6" reason="Never" />
     <disable_collisions link1="a_khi_link6" link2="a_khi_magnet_base_link" reason="Never" />
     <disable_collisions link1="a_khi_link6" link2="a_khi_magripper_base_link" reason="Adjacent" />
     <disable_collisions link1="a_khi_link6" link2="a_khi_magripper_gripper_branch" reason="Never" />
     <disable_collisions link1="a_khi_link6" link2="a_khi_magripper_magnet_branch" reason="Never" />
-    <disable_collisions link1="a_khi_link6" link2="a_khi_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_khi_link6" link2="a_khi_r_finger_link" reason="Never" />
     <disable_collisions link1="a_khi_link6" link2="b_khi_base_link" reason="Never" />
     <disable_collisions link1="a_khi_link6" link2="b_khi_link1" reason="Never" />
+    <disable_collisions link1="a_khi_link6" link2="b_khi_link5" reason="Never" />
     <disable_collisions link1="a_khi_link6" link2="b_khi_link6" reason="Never" />
     <disable_collisions link1="a_khi_magnet_base_link" link2="a_khi_magripper_base_link" reason="Never" />
     <disable_collisions link1="a_khi_magnet_base_link" link2="a_khi_magripper_gripper_branch" reason="Never" />
     <disable_collisions link1="a_khi_magnet_base_link" link2="a_khi_magripper_magnet_branch" reason="Adjacent" />
-    <disable_collisions link1="a_khi_magnet_base_link" link2="a_khi_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_khi_magnet_base_link" link2="a_khi_r_finger_link" reason="Never" />
-    <disable_collisions link1="a_khi_magnet_base_link" link2="b_khi_link5" reason="Never" />
-    <disable_collisions link1="a_khi_magnet_base_link" link2="b_khi_link6" reason="Never" />
     <disable_collisions link1="a_khi_magripper_base_link" link2="a_khi_magripper_gripper_branch" reason="Adjacent" />
     <disable_collisions link1="a_khi_magripper_base_link" link2="a_khi_magripper_magnet_branch" reason="Adjacent" />
-    <disable_collisions link1="a_khi_magripper_base_link" link2="a_khi_phoxi_m_camera" reason="Adjacent" />
     <disable_collisions link1="a_khi_magripper_base_link" link2="a_khi_r_finger_link" reason="Never" />
     <disable_collisions link1="a_khi_magripper_base_link" link2="b_khi_base_link" reason="Never" />
+    <disable_collisions link1="a_khi_magripper_base_link" link2="b_khi_link1" reason="Never" />
     <disable_collisions link1="a_khi_magripper_base_link" link2="b_khi_link6" reason="Never" />
     <disable_collisions link1="a_khi_magripper_gripper_branch" link2="a_khi_magripper_magnet_branch" reason="Default" />
-    <disable_collisions link1="a_khi_magripper_gripper_branch" link2="a_khi_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_khi_magripper_gripper_branch" link2="a_khi_r_finger_link" reason="Never" />
     <disable_collisions link1="a_khi_magripper_gripper_branch" link2="b_khi_base_link" reason="Never" />
+    <disable_collisions link1="a_khi_magripper_gripper_branch" link2="b_khi_link1" reason="Never" />
     <disable_collisions link1="a_khi_magripper_gripper_branch" link2="b_khi_link6" reason="Never" />
-    <disable_collisions link1="a_khi_magripper_magnet_branch" link2="a_khi_phoxi_m_camera" reason="Never" />
     <disable_collisions link1="a_khi_magripper_magnet_branch" link2="a_khi_r_finger_link" reason="Never" />
     <disable_collisions link1="a_khi_magripper_magnet_branch" link2="b_khi_base_link" reason="Never" />
+    <disable_collisions link1="a_khi_magripper_magnet_branch" link2="b_khi_link1" reason="Never" />
     <disable_collisions link1="a_khi_magripper_magnet_branch" link2="b_khi_link6" reason="Never" />
-    <disable_collisions link1="a_khi_phoxi_m_camera" link2="a_khi_r_finger_link" reason="Never" />
-    <disable_collisions link1="a_khi_r_finger_link" link2="b_khi_link5" reason="Never" />
-    <disable_collisions link1="a_khi_r_finger_link" link2="b_khi_link6" reason="Never" />
     <disable_collisions link1="b_khi_base_link" link2="b_khi_link1" reason="Adjacent" />
     <disable_collisions link1="b_khi_base_link" link2="workbox" reason="Adjacent" />
     <disable_collisions link1="b_khi_link1" link2="b_khi_link2" reason="Adjacent" />
