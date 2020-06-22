@@ -117,16 +117,16 @@ Calibrator::take_sample(std_srvs::Trigger::Request&,
 {
     try
     {
-	const auto	now = ros::Time::now();
-
-	_listener.waitForTransform(camera_frame(), object_frame(),
-				   now, ros::Duration(_timeout));
+	ros::Time	time;
+	std::string	error_string;
+	_listener.getLatestCommonTime(camera_frame(), object_frame(), time,
+				      &error_string);
 	_listener.waitForTransform(world_frame(), effector_frame(),
-				   now, ros::Duration(_timeout));
+				   time, ros::Duration(_timeout));
 
 	tf::StampedTransform	cMo, wMe;
-	_listener.lookupTransform(camera_frame(), object_frame(),   now, cMo);
-	_listener.lookupTransform(world_frame(),  effector_frame(), now, wMe);
+	_listener.lookupTransform(camera_frame(), object_frame(),   time, cMo);
+	_listener.lookupTransform(world_frame(),  effector_frame(), time, wMe);
 
 	transformMsg_t	msg;
 	tf::transformStampedTFToMsg(cMo, msg);
