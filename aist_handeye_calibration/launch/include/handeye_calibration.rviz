@@ -6,9 +6,8 @@ Panels:
       Expanded:
         - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
-        - /TF1/Frames1/marker_frame1
       Splitter Ratio: 0.3938506543636322
-    Tree Height: 362
+    Tree Height: 361
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -293,7 +292,7 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          a_phoxi_m_camera_sensor:
+          a_phoxi_m_sensor:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -650,7 +649,7 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          a_phoxi_m_camera_sensor:
+          a_phoxi_m_sensor:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -782,8 +781,6 @@ Visualization Manager:
           Value: false
         a_bot_ft300_wrench_link:
           Value: false
-        a_bot_inside_camera_aligned_depth_to_color_frame:
-          Value: false
         a_bot_inside_camera_color_frame:
           Value: false
         a_bot_inside_camera_color_optical_frame:
@@ -808,8 +805,6 @@ Visualization Manager:
           Value: false
         a_bot_outside_camera_color_optical_frame:
           Value: true
-        calibrated_a_bot_outside_camera_color_optical_frame:
-          Value: false
         a_bot_outside_camera_connector_link:
           Value: false
         a_bot_outside_camera_depth_frame:
@@ -850,8 +845,6 @@ Visualization Manager:
           Value: false
         a_bot_tool0:
           Value: false
-        a_bot_tool0_controller:
-          Value: true
         a_bot_upper_arm_link:
           Value: false
         a_bot_wrist_1_link:
@@ -864,7 +857,7 @@ Visualization Manager:
           Value: false
         a_phoxi_m_camera_link:
           Value: false
-        a_phoxi_m_camera_sensor:
+        a_phoxi_m_sensor:
           Value: true
         b_bot_ar_marker:
           Value: false
@@ -890,8 +883,6 @@ Visualization Manager:
           Value: true
         b_bot_tool0:
           Value: false
-        b_bot_tool0_controller:
-          Value: true
         b_bot_upper_arm_link:
           Value: false
         b_bot_wrist_1_link:
@@ -900,6 +891,8 @@ Visualization Manager:
           Value: false
         b_bot_wrist_3_link:
           Value: false
+        calibrated_a_phoxi_m_camera:
+          Value: true
         ground:
           Value: true
         marker_frame:
@@ -924,8 +917,7 @@ Visualization Manager:
           ground:
             a_bot_base_link:
               a_bot_base:
-                a_bot_tool0_controller:
-                  {}
+                {}
               a_bot_shoulder_link:
                 a_bot_upper_arm_link:
                   a_bot_forearm_link:
@@ -942,8 +934,6 @@ Visualization Manager:
                                     {}
                                   a_bot_inside_camera_connector_link:
                                     a_bot_inside_camera_link:
-                                      a_bot_inside_camera_aligned_depth_to_color_frame:
-                                        {}
                                       a_bot_inside_camera_depth_frame:
                                         a_bot_inside_camera_color_frame:
                                           a_bot_inside_camera_color_optical_frame:
@@ -984,15 +974,11 @@ Visualization Manager:
                                       {}
                                   a_bot_robotiq_85_tip_link:
                                     {}
-                            calibrated_a_bot_outside_camera_color_optical_frame:
-                              marker_frame:
-                                {}
                           a_bot_tool0:
                             {}
             b_bot_base_link:
               b_bot_base:
-                b_bot_tool0_controller:
-                  {}
+                {}
               b_bot_shoulder_link:
                 b_bot_upper_arm_link:
                   b_bot_forearm_link:
@@ -1017,16 +1003,19 @@ Visualization Manager:
               {}
             workspace_center:
               a_phoxi_m_camera:
-                a_phoxi_m_camera_sensor:
+                a_phoxi_m_sensor:
                   a_phoxi_m_camera_link:
                     {}
+              calibrated_a_phoxi_m_camera:
+                marker_frame:
+                  {}
               workspace_ar_marker:
                 {}
       Update Interval: 0
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /a_bot_outside_camera/aruco_detector/result
+      Image Topic: /a_phoxi_m_camera/aruco_detector/result
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -1099,7 +1088,7 @@ Visualization Manager:
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1052
+  Height: 759
   Hide Left Dock: false
   Hide Right Dock: true
   Image:
@@ -1108,7 +1097,7 @@ Window Geometry:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000002ad000003c2fc020000000dfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afc0000003d000001c4000001b80100001cfa000000010100000002fb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e00670100000000ffffffff0000029500fffffffb000000100044006900730070006c0061007900730100000000000002ad0000015600fffffffb0000000a0049006d0061006700650100000207000000f90000001600fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000120020002d00200053006c00690064006500720000000000ffffffff0000000000000000fb0000002e004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d00200053006c00690064006500720000000000ffffffff0000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004100fffffffb0000000a0049006d0061006700650100000306000000f90000001600ffffff000000010000010f000003ccfc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003a000003cc000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000074f0000003efc0100000002fb0000000800540069006d006500000000000000074f000002eb00fffffffb0000000800540069006d00650100000000000004500000000000000000000004cd000003c200000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000002ad0000029dfc020000000dfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afc0000003d000001c3000001b80100001cfa000000010100000002fb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e00670100000000ffffffff0000029500fffffffb000000100044006900730070006c0061007900730100000000000002ad0000015600fffffffb0000000a0049006d0061006700650100000206000000670000001600fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000120020002d00200053006c00690064006500720000000000ffffffff0000000000000000fb0000002e004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d00200053006c00690064006500720000000000ffffffff0000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004100fffffffb0000000a0049006d0061006700650100000273000000670000001600ffffff000000010000010f000003ccfc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003a000003cc000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000074f0000003efc0100000002fb0000000800540069006d006500000000000000074f000002eb00fffffffb0000000800540069006d00650100000000000004500000000000000000000002cb0000029d00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -1117,6 +1106,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: true
-  Width: 1920
-  X: 2560
-  Y: 0
+  Width: 1406
+  X: 404
+  Y: 219

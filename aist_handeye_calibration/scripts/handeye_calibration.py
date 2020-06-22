@@ -45,9 +45,6 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
             self.save_calibration    = None
             self.reset               = None
 
-    def is_eye_on_hand(self):
-        return self._camera_name.find(self._robot_name) == 0
-
     def go_home(self):
         self.go_to_named_pose('home', self._robot_name)
 
@@ -125,7 +122,7 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
         for i, keypose in enumerate(keyposes, 1):
             print('\n*** Keypose [{}/{}]: Try! ***'
                   .format(i, len(keyposes)))
-            if self.is_eye_on_hand():
+            if self._eye_on_hand:
                 self.move_to(keypose, i, 1)
             else:
                 self.move_to_subposes(keypose, i)
