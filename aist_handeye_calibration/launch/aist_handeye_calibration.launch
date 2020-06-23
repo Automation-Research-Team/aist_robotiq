@@ -4,7 +4,7 @@
   <arg name="sim"			default="false"/>
   <arg name="camera_name"		default="a_phoxi_m_camera"/>
   <arg name="check"			default="false"/>
-  <arg name="use_dual_quaternion"	default="false"/>
+  <arg name="use_dual_quaternion"	default="true"/>
 
   <arg name="camera_info_topic"
        value="$(eval 'camera_info' if 'phoxi' in camera_name
