@@ -81,8 +81,7 @@
 	<arg name="frame"	value="calibrated_a_phoxi_m_camera"/>
     </include>
 
-    <!-- Launch RealSense cameras and associated depth filters
-    -->
+    <!-- Launch RealSense cameras and associated depth filters -->
     <arg name="camera0_name"	value="a_bot_inside_camera"/>
     <arg name="camera1_name"	value="a_bot_outside_camera"/>
 
@@ -106,26 +105,26 @@
       <arg name="vis"			value="false"/>
     </include>
 
-  <!-- Launch camera multiplexer -->
-  <node name="camera_multiplexer"
-  	pkg="aist_camera_multiplexer" type="aist_camera_multiplexer"
-  	output="screen">
-    <rosparam param="camera_names" subst_value="true">
-      [$(arg camera0_name), $(arg camera1_name)]
-    </rosparam>
+    <!-- Launch camera multiplexer -->
+    <node name="camera_multiplexer"
+  	  pkg="aist_camera_multiplexer" type="aist_camera_multiplexer"
+  	  output="screen">
+      <rosparam param="camera_names" subst_value="true">
+	[$(arg camera0_name), $(arg camera1_name)]
+      </rosparam>
 
-    <remap from="/camera_info0"	to="$(arg camera0_name
-  				    )/depth_filter/camera_info"/>
-    <remap from="/image0"	to="$(arg camera0_name)/depth_filter/image"/>
-    <remap from="/depth0"	to="$(arg camera0_name)/depth_filter/depth"/>
-    <remap from="/normal0"	to="$(arg camera0_name)/depth_filter/normal"/>
-
-    <remap from="/camera_info1"	to="$(arg camera1_name
-  				    )/depth_filter/camera_info"/>
-    <remap from="/image1"	to="$(arg camera1_name)/depth_filter/image"/>
-    <remap from="/depth1"	to="$(arg camera1_name)/depth_filter/depth"/>
-    <remap from="/normal1"	to="$(arg camera1_name)/depth_filter/normal"/>
-  </node>
+      <remap from="/camera_info0"
+	     to="$(arg camera0_name)/depth_filter/camera_info"/>
+      <remap from="/image0"	to="$(arg camera0_name)/depth_filter/image"/>
+      <remap from="/depth0"	to="$(arg camera0_name)/depth_filter/depth"/>
+      <remap from="/normal0"	to="$(arg camera0_name)/depth_filter/normal"/>
+      
+      <remap from="/camera_info1"
+	     to="$(arg camera1_name)/depth_filter/camera_info"/>
+      <remap from="/image1"	to="$(arg camera1_name)/depth_filter/image"/>
+      <remap from="/depth1"	to="$(arg camera1_name)/depth_filter/depth"/>
+      <remap from="/normal1"	to="$(arg camera1_name)/depth_filter/normal"/>
+    </node>
 
   </group>
 
