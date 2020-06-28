@@ -37,9 +37,9 @@
 
   <!-- Attach grippers -->
   <xacro:include filename="$(find aist_description)/devices/urdf/magripper.urdf.xacro" />
-  <xacro:magripper2 prefix="a_khi_gripper_" parent="a_khi_ee_link">
+  <xacro:magripper3 prefix="a_khi_gripper_" parent="a_khi_ee_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
-  </xacro:magripper2>
+  </xacro:magripper3>
 
   <gazebo>
     <!-- Required because package robot_controllers is used for
