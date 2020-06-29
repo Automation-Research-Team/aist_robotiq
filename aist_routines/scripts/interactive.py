@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 import rospy
-from geometry_msgs    import msg as gmsg
-from tf               import transformations as tfs
-from math             import radians
-from aist_routines.ur import URRoutines
+from geometry_msgs      import msg as gmsg
+from tf                 import transformations as tfs
+from math               import radians
+from aist_routines.ur   import URRoutines
+from aist_routines.base import AISTBaseRoutines
 
 ######################################################################
 #  global functions                                                  #
@@ -20,7 +21,7 @@ def is_num(s):
 ######################################################################
 #  class InteractiveRoutines                                         #
 ######################################################################
-class InteractiveRoutines(URRoutines):
+class InteractiveRoutines(AISTBaseRoutines):
     refposes = {
         'a_bot': [0.00, 0.00, 0.3, radians(  0), radians( 90), radians( 90)],
         'b_bot': [0.00, 0.00, 0.3, radians(  0), radians( 90), radians(-90)],

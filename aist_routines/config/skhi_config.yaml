@@ -3,10 +3,10 @@ grippers:
     type: SuctionGripper
     args:
       name: magnet_gripper
-      base_link: magnet_base_link
-      tip_link: magnet_link
+      base_link: a_khi_gripper_magnet_base_link
+      tip_link: a_khi_gripper_magnet_link
       eject: false
       timeout: 2.0
 
-cameras:
-  phoxi_m_camera: PhoXiCamera
+#cameras:
+#  phoxi_m_camera: PhoXiCamera
