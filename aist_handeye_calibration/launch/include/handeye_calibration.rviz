@@ -28,7 +28,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: Image
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -847,8 +847,6 @@ Visualization Manager:
           Value: false
         a_bot_tool0:
           Value: false
-        a_bot_tool0_controller:
-          Value: true
         a_bot_upper_arm_link:
           Value: false
         a_bot_wrist_1_link:
@@ -887,8 +885,6 @@ Visualization Manager:
           Value: true
         b_bot_tool0:
           Value: false
-        b_bot_tool0_controller:
-          Value: true
         b_bot_upper_arm_link:
           Value: false
         b_bot_wrist_1_link:
@@ -897,9 +893,11 @@ Visualization Manager:
           Value: false
         b_bot_wrist_3_link:
           Value: false
-        calibrated_a_phoxi_m_camera:
+        calibrated_a_bot_inside_camera_color_optical_frame:
           Value: true
         ground:
+          Value: true
+        marker_frame:
           Value: true
         vwall1:
           Value: false
@@ -921,8 +919,7 @@ Visualization Manager:
           ground:
             a_bot_base_link:
               a_bot_base:
-                a_bot_tool0_controller:
-                  {}
+                {}
               a_bot_shoulder_link:
                 a_bot_upper_arm_link:
                   a_bot_forearm_link:
@@ -979,12 +976,14 @@ Visualization Manager:
                                       {}
                                   a_bot_robotiq_85_tip_link:
                                     {}
+                            calibrated_a_bot_inside_camera_color_optical_frame:
+                              marker_frame:
+                                {}
                           a_bot_tool0:
                             {}
             b_bot_base_link:
               b_bot_base:
-                b_bot_tool0_controller:
-                  {}
+                {}
               b_bot_shoulder_link:
                 b_bot_upper_arm_link:
                   b_bot_forearm_link:
@@ -1012,8 +1011,6 @@ Visualization Manager:
                 a_phoxi_m_sensor:
                   a_phoxi_m_camera_link:
                     {}
-              calibrated_a_phoxi_m_camera:
-                {}
               workspace_ar_marker:
                 {}
       Update Interval: 0
@@ -1032,7 +1029,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /a_phoxi_m_camera/aruco_detector/result
+      Image Topic: /aruco_detector/result
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -1112,5 +1109,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1875
-  X: 67
-  Y: 27
+  X: 2759
+  Y: 14
