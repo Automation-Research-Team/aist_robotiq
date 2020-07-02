@@ -8,12 +8,12 @@
   <arg name="ip"	 value="$(eval driver_arg.split(',')[0].strip())"/>
   <arg name="period"	 value="$(eval driver_arg.split(',')[1].strip())"/>
 
-  <node name="$(arg prefix)driver" pkg="khi_robot_control" type="main"
+  <rosparam file="$(find aist_bringup)/config/khi_driver.yaml"
+	    subst_value="true"/>
+  <node name="$(arg prefix)controller" pkg="khi_robot_control" type="main"
 	args="--interface $(arg ip)
 	      --period $(arg period) --robot $(arg device)"
 	output="screen" cwd="node">
-    <rosparam file="$(find aist_bringup)/config/khi_driver.yaml"
-	      subst_value="true"/>
   </node>
 
   <rosparam ns="$(arg device)"

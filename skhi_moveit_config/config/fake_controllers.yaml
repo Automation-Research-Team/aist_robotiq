@@ -7,3 +7,10 @@ controller_list:
       - a_khi_joint4
       - a_khi_joint5
       - a_khi_joint6
+  - name: fake_a_khi_gripper_controller
+    joints:
+      - a_khi_gripper_l_gripper_finger_joint
+      - a_khi_gripper_r_gripper_finger_joint
+initial:  # Define initial robot poses.
+  - group: a_khi
+    pose: standing
