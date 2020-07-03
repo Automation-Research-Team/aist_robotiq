@@ -7,13 +7,16 @@
 
   <arg name="ip"	 value="$(eval driver_arg.split(',')[0].strip())"/>
   <arg name="period"	 value="$(eval driver_arg.split(',')[1].strip())"/>
+  <arg name="plugins"	 value="$(eval
+				','.join(driver_arg.split(',')[2].split()))"/>
 
   <rosparam file="$(find aist_bringup)/config/khi_driver.yaml"
 	    subst_value="true"/>
-  <node name="$(arg prefix)controller" pkg="khi_robot_control" type="main"
+  <node name="$(arg prefix)driver" pkg="khi_robot_control" type="main"
 	args="--interface $(arg ip)
 	      --period $(arg period) --robot $(arg device)"
 	output="screen" cwd="node">
+    <rosparam param="plugins" subst_value="true">[$(arg plugins)]</rosparam>
   </node>
 
   <rosparam ns="$(arg device)"

@@ -13,8 +13,8 @@
   <arg name="devices"			value="RS007L, RS007L, gripper"/>
   <arg name="controllers"		value="khi, khi, fetch"/>
   <arg name="drivers"			value="khi, khi"/>
-  <arg name="driver_args"		value="10.66.171.91, 4;
-					       10.66.171.92, 4"/>
+  <arg name="driver_args"		value="10.66.171.91, 4, ;
+					       10.66.171.92, 4, "/>
 
   <!-- Bringup robots -->
   <include file="$(find aist_bringup)/launch/include/connect_robots.launch">
