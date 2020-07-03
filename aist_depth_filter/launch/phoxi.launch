@@ -19,12 +19,11 @@
     <arg name="manager"		value="$(arg manager)"/>
   </include>
 
-  <include ns="$(arg camera_name)"
-	   file="$(find aist_depth_filter)/launch/run.launch">
-    <arg name="camera_info_topic"	value="camera_info"/>
-    <arg name="image_topic"		value="texture"/>
-    <arg name="depth_topic"		value="depth_map"/>
-    <arg name="normal_topic"		value="normal_map"/>
+  <include file="$(find aist_depth_filter)/launch/run.launch">
+    <arg name="camera_info_topic"	value="$(arg camera_name)/camera_info"/>
+    <arg name="image_topic"		value="$(arg camera_name)/texture"/>
+    <arg name="depth_topic"		value="$(arg camera_name)/depth_map"/>
+    <arg name="normal_topic"		value="$(arg camera_name)/normal_map"/>
     <arg name="manager"			value="$(arg manager)"/>
   </include>
 

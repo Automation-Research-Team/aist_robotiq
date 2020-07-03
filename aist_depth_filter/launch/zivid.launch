@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<launch>
+
+  <arg name="vis"		default="true"/>
+  <arg name="camera_name"	value="zivid_camera"/>
+
+  <group ns="$(arg camera_name)">
+    <node name="camera_node"
+	  pkg="zivid_camera" type="zivid_camera_node" output="screen"/>
+    <node name="capture"
+	  pkg="zivid_samples" type="sample_capture.py" output="screen"/>
+  </group>
+
+  <include file="$(find aist_depth_filter)/launch/run.launch">
+    <arg name="camera_info_topic" value="$(arg camera_name)/color/camera_info"/>
+    <arg name="image_topic"	  value="$(arg camera_name)/color/image_color"/>
+    <arg name="depth_topic"	  value="$(arg camera_name)/depth/image_raw"/>
+    <arg name="normal_topic"	  value=""/>
+  </include>
+
+  <node name="set_window_radius" pkg="dynamic_reconfigure" type="dynparam"
+	args="set depth_filter window_radius 2"/>
+
+  <group if="$(arg vis)">
+    <node name="$(anon rviz)" pkg="rviz" type="rviz" output="screen"
+	  args="-d $(find aist_depth_filter)/launch/zivid.rviz"/>
+
+    <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
+  </group>
+
+</launch>
