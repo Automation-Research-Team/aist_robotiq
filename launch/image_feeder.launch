@@ -24,10 +24,10 @@
   </node>
 
   <!-- Spawn depth_filter and localizer -->
-  <include file="$(find aist_localization)/launch/run.launch" ns="feeder">
-    <arg name="camera_info_topic" value="camera_info"/>
-    <arg name="image_topic"	  value="image"/>
-    <arg name="depth_topic"	  value="depth"/>
+  <include file="$(find aist_localization)/launch/run.launch">
+    <arg name="camera_info_topic" value="feeder/camera_info"/>
+    <arg name="image_topic"	  value="feeder/image"/>
+    <arg name="depth_topic"	  value="feeder/depth"/>
     <arg name="normal_topic"	  value=""/>
   </include>
 
