@@ -5,6 +5,7 @@
   <arg name="image_topic"	default="texture"/>
   <arg name="depth_topic"	default="depth_map"/>
   <arg name="normal_topic"	default="normal_map"/>
+  <arg name="window_radius"	default="0"/>
   <arg name="manager"		default=""/>
 
   <node if="$(eval manager == '')"
@@ -16,6 +17,7 @@
     <remap from="/normal"	to="$(arg normal_topic)"
 	   unless="$(eval normal_topic == '')"/>
     <param name="subscribe_normal" value="$(eval normal_topic != '')"/>
+    <param name="window_radius"	   value="$(arg window_radius)"/>
   </node>
 
   <node unless="$(eval manager == '')"
@@ -27,6 +29,7 @@
     <remap from="/normal"	to="$(arg normal_topic)"
     	   unless="$(eval normal_topic == '')"/>
     <param name="subscribe_normal" value="$(eval normal_topic != '')"/>
+    <param name="window_radius"	   value="$(arg window_radius)"/>
   </node>
 
 </launch>

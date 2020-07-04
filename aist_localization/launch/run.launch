@@ -5,6 +5,7 @@
   <arg name="image_topic"	default="texture"/>
   <arg name="depth_topic"	default="depth_map"/>
   <arg name="normal_topic"	default="normal_map"/>
+  <arg name="window_radius"	default="2"/>
   <arg name="manager"		default=""/>
   <arg name="ply_dir"		default="$(find o2ac_parts_description
 					 )/meshes"/>
@@ -15,6 +16,7 @@
     <arg name="image_topic"		value="$(arg image_topic)"/>
     <arg name="depth_topic"		value="$(arg depth_topic)"/>
     <arg name="normal_topic"		value="$(arg normal_topic)"/>
+    <arg name="window_radius"		value="$(arg window_radius)"/>
     <arg name="manager"			value="$(arg manager)"/>
   </include>
 
