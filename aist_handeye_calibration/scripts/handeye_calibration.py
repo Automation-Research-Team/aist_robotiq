@@ -45,9 +45,6 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
             self.save_calibration    = None
             self.reset               = None
 
-    def go_home(self):
-        self.go_to_named_pose('home', self._robot_name)
-
     def move(self, pose):
         poseStamped = gmsg.PoseStamped()
         poseStamped.header.frame_id = self._robot_base_frame
@@ -105,14 +102,14 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
                 print('--- Subpose [{}/5]: Failed. ---'.format(i + 4))
             subpose[4] -= 30
 
-    def run(self):
+    def calibrate(self):
         self.continuous_shot(self._camera_name, False)
 
         if self.reset:
             self.reset()
 
         # Reset pose
-        self.go_home()
+        self.go_to_named_pose('home', self._robot_name)
         self.move(self._initpose)
 
         # Collect samples over pre-defined poses
@@ -133,7 +130,15 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
             res = self.save_calibration()
             print(res.message)
 
-        self.go_home()
+        self.go_to_named_pose('home', self._robot_name)
+
+    def run(self):
+        while not rospy.is_shutdown():
+            print('\n  RET: do calibration')
+            print('  q  : go to home position and quit')
+            if raw_input('>> ') == 'q':
+                break
+            self.calibrate()
 
 
 ######################################################################
@@ -143,7 +148,4 @@ if __name__ == '__main__':
     rospy.init_node('handeye_calibration')
 
     with HandEyeCalibrationRoutines() as calibrate:
-        while not rospy.is_shutdown():
-            if raw_input('Hit return key to start >> ') == 'q':
-                break
-            calibrate.run()
+        calibrate.run()
