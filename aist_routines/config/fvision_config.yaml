@@ -1,0 +1,9 @@
+grippers:
+  d_bot:
+    type: RobotiqGripper
+    args:
+      prefix: d_bot_
+      product: robotiq_hande
+      force: 5.0
+      velocity: 0.1
+      timeout: 6.0
