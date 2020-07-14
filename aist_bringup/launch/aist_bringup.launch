@@ -27,7 +27,7 @@
   <arg name="controllers"	value="ur, ur, ros"/>
   <arg name="drivers"		value="ur, ur, cmodel"/>
   <arg name="driver_args"	value="10.66.171.52, 50003;
-				       10.66.171.51, 50002;"/>
+  				       10.66.171.51, 50002;"/>
 
   <!-- Bringup robots -->
   <include file="$(find aist_bringup)/launch/include/connect_robots.launch">
@@ -60,12 +60,12 @@
   <group if="$(eval not sim)">
 
     <!-- Drivers for the force sensors -->
-    <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch">
-      <arg name="robot_name"	value="a_bot"/>
-    </include>
-    <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch">
-      <arg name="robot_name"	value="b_bot"/>
-    </include>
+    <!-- <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch"> -->
+    <!--   <arg name="robot_name"	value="a_bot"/> -->
+    <!-- </include> -->
+    <!-- <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch"> -->
+    <!--   <arg name="robot_name"	value="b_bot"/> -->
+    <!-- </include> -->
 
     <!-- Launch fastening tools -->
     <node name="suction_controller" pkg="o2as_fastening_tools"

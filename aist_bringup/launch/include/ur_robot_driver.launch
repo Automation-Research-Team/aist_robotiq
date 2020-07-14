@@ -16,8 +16,8 @@
     <node name="ur_hardware_interface"
 	  pkg="ur_robot_driver" type="ur_robot_driver_node"
 	  output="screen" required="true">
-      <rosparam file="$(find ur_description
-		      )/config/$(arg device)_default.yaml"/>
+      <rosparam file="$(find aist_bringup
+		      )/config/$(arg prefix)calibration.yaml"/>
       <rosparam file="$(find aist_bringup)/config/ur_robot_driver.yaml"
 		subst_value="true"/>
       <remap from="joint_states" to="/joint_states"/>
