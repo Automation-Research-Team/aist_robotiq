@@ -11,7 +11,7 @@
   <group ns="$(arg prefix)controller">
     <node name="ur_driver" pkg="ur_modern_driver" type="ur_driver"
     	  output="screen">
-      <rosparam file="$(find aist_bringup)/config/$(arg device)_driver.yaml"
+      <rosparam file="$(find aist_bringup)/config/ur_driver.yaml"
 		subst_value="true"/>
       <remap from="joint_states" to="/joint_states"/>
     </node>
