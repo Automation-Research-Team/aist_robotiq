@@ -1,0 +1,9 @@
+<launch>
+
+  <arg name="prefix" default="a_bot_"/>
+
+  <rosparam command="load"
+    file="$(find aist_robotiq2f85_controller)/config/default_controllers.yaml" />
+  <node name="$(arg prefix)gripper_controller2" pkg="aist_robotiq2f85_controller" type="aist_robotiq2f85_controller_node" output="screen" />
+
+</launch>
