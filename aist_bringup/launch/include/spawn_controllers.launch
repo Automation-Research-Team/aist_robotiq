@@ -19,6 +19,7 @@
 		   )/launch/include/$(arg controller)_controller.launch">
       <arg name="prefix" value="$(arg prefix)"/>
       <arg name="device" value="$(arg device)"/>
+      <arg name="sim"    value="$(arg sim)"/>
     </include>
 
     <!-- If "controller" is a torobo controller, add it to the list. -->

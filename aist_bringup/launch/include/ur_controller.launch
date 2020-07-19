@@ -3,7 +3,8 @@
 
   <arg name="prefix" default="ur_"/>
   <arg name="device" default="ur5"/>
-
+  <arg name="sim"/>
+  
   <!-- Setup controller parameters. -->
   <arg name="frequency" value="$(eval 500 if device[-1] == 'e' else 125)"/>
   <rosparam file="$(find aist_bringup)/config/ur_controller.yaml"

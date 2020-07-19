@@ -6,7 +6,7 @@
   <arg name="ns"		default="/"/>
 
   <node ns="$(arg ns)" name="handeye_calibration"
-	pkg="aist_handeye_calibration" type="handeye_calibration.py"
+	pkg="aist_handeye_calibration" type="run_calibration.py"
 	output="screen">
     <rosparam file="$(find aist_handeye_calibration
 		    )/config/$(arg config)/$(arg camera_name).yaml"/>

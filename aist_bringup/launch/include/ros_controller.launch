@@ -3,6 +3,7 @@
 
   <arg name="prefix" default="ros_"/>
   <arg name="device" default="gripper"/>
+  <arg name="sim"/>
 
   <!-- Setup controller parameters. -->
   <rosparam file="$(find aist_bringup)/config/$(arg device)_controller.yaml"

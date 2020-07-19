@@ -10,17 +10,17 @@
 
   <!-- Setup "ur5e" configuration -->
   <arg name="config"		value="fvision"/>
-  <arg name="gazebo_init_args"	value="-J c_bot_shoulder_pan_joint 1.5708
-				       -J c_bot_shoulder_lift_joint -2.1
-				       -J c_bot_elbow_joint 1.4
-				       -J c_bot_wrist_1_joint -0.85
-				       -J c_bot_wrist_2_joint -1.5708
-				       -J c_bot_wrist_3_joint 0.0"/>
+  <arg name="gazebo_init_args"	value="-J d_bot_shoulder_pan_joint 1.5708
+				       -J d_bot_shoulder_lift_joint -2.1
+				       -J d_bot_elbow_joint 1.4
+				       -J d_bot_wrist_1_joint -0.85
+				       -J d_bot_wrist_2_joint -1.5708
+				       -J d_bot_wrist_3_joint 0.0"/>
   <arg name="prefixes"		value="d_bot_, d_bot_"/>
   <arg name="devices"		value="ur5e, robotiq_hande"/>
-  <arg name="controllers"	value="ur, ros"/>
-  <arg name="drivers"		value="ur, cmodel"/>
-  <arg name="driver_args"	value="10.66.171.54, 50004;"/>
+  <arg name="controllers"	value="ur_robot, ros"/>
+  <arg name="drivers"		value="ur_robot, cmodel"/>
+  <arg name="driver_args"	value="10.66.171.54, 50003, 50004, False;"/>
 
   <!-- Bringup robots -->
   <include file="$(find aist_bringup)/launch/include/connect_robots.launch">
@@ -54,11 +54,11 @@
     <!-- </include> -->
 
     <!-- Launch PhoXi camera -->
-    <include file="$(find aist_phoxi_camera)/launch/run.launch">
-        <arg name="camera_name"	value="b_phoxi_m_camera"/>
-    	<arg name="id"		value='"1711015"'/>
-    	<arg name="frame"	value="calibrated_b_phoxi_m_camera"/>
-    </include>
+    <!-- <include file="$(find aist_phoxi_camera)/launch/run.launch"> -->
+    <!--     <arg name="camera_name"	value="b_phoxi_m_camera"/> -->
+    <!-- 	<arg name="id"		value='"1711015"'/> -->
+    <!-- 	<arg name="frame"	value="calibrated_b_phoxi_m_camera"/> -->
+    <!-- </include> -->
     
   </group>
 

@@ -3,6 +3,7 @@
 
   <arg name="prefix" default="fetch_"/>
   <arg name="device" default="base"/>
+  <arg name="sim"/>
 
   <!-- Setup controller parameters. -->
   <rosparam file="$(find aist_bringup)/config/$(arg device)_controller.yaml"

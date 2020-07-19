@@ -3,6 +3,7 @@
 
   <arg name="prefix" default="torobo_"/>
   <arg name="device" default="arm"/>
+  <arg name="sim"/>
 
   <!-- Setup controller parameters. -->
   <rosparam file="$(find aist_bringup)/config/torobo_controller.yaml"

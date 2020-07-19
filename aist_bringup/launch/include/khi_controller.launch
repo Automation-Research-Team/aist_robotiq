@@ -3,6 +3,7 @@
 
   <arg name="prefix" default="khi_"/>
   <arg name="device" default="RS007L"/>
+  <arg name="sim"/>
 
   <!-- Setup controller parameters. -->
   <rosparam file="$(find aist_bringup)/config/khi_controller.yaml"

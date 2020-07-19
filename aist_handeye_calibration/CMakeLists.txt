@@ -116,10 +116,10 @@ target_link_libraries(plane_detector
 #############
 catkin_install_python(
   PROGRAMS
-    scripts/handeye_calibration.py
+    scripts/run_calibration.py
     scripts/check_calibration.py
     scripts/tool_calibration.py
-    scripts/publish.py
+    scripts/publish_calibration.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
