@@ -98,10 +98,11 @@ int Robotiq85GripperController::init(ros::NodeHandle& nh, ControllerManager* man
   effort_ = effort_limit_[1];
   velocity_ = velocity_limit_[1];
 
-  ur_script_ = "";
-  is_moving_ = false;
+  is_moving_  = false;
   is_closing_ = false;
-  last_ur_state_ = false;
+  long_move_  = false;
+
+  ur_script_ = "";
 
   initialized_ = true;
 
@@ -180,7 +181,12 @@ bool Robotiq85GripperController::reset()
 
 bool Robotiq85GripperController::ready()
 {
-  return ( status_.gSTA && status_.gACT == 1 );
+  return ( status_.gSTA == 3 && status_.gACT == 1 );
+}
+
+bool Robotiq85GripperController::stalled()
+{
+  return ( status_.gOBJ == 1 || status_.gOBJ == 2 );
 }
 
 bool Robotiq85GripperController::activate()
@@ -264,7 +270,7 @@ bool Robotiq85GripperController::sendCommand(
   if (command.rPR  == last_command_.rPR && command.rACT == last_command_.rACT &&
       command.rFR  == last_command_.rFR && command.rSP  == last_command_.rSP)
   {
-    ROS_DEBUG_STREAM_NAMED(log_named, log_named
+    ROS_INFO_STREAM_NAMED(log_named, log_named
         << "::sendCommand It is same command, so it does not send.");
     return true;
   }
@@ -275,7 +281,7 @@ bool Robotiq85GripperController::sendCommand(
   status_.gACT = command.rACT;
   status_.gGTO = command.rGTO;
   status_.gSTA = 3;
-  if (command.rGTO == 1 && command.rPR < 10)    // Gripper opens
+  if (command.rGTO == 1 && command.rPR < 15)    // Gripper opens
   {
     status_.gOBJ = 0;   // Pretend that no object was grasped
     is_moving_  = true;
@@ -374,7 +380,7 @@ void Robotiq85GripperController::executeCb(const control_msgs::GripperCommandGoa
     return;
   }
 
-  ROS_DEBUG_STREAM_NAMED(log_named, log_named
+  ROS_INFO_STREAM_NAMED(log_named, log_named
                 << "::executeCb goal position=" << goal->command.position
                 << " effort=" << goal->command.max_effort);
 
@@ -411,8 +417,13 @@ void Robotiq85GripperController::executeCb(const control_msgs::GripperCommandGoa
     feedback.position = left_->getPosition() + right_->getPosition();
     feedback.effort = left_->getEffort() + right_->getEffort();
     feedback.reached_goal = false;
-    feedback.stalled = false;
+    feedback.stalled = stalled();
     server_->publishFeedback(feedback);
+
+    ROS_DEBUG_STREAM_NAMED(log_named, log_named
+                << "::executeCb position feedback=" << feedback.position
+                << ", goal=" <<  goal->command.position
+                << ", last=" << last_position << ")");
 
     // Goal detection
     if (fabs(feedback.position - goal->command.position) < 0.002)
@@ -420,7 +431,7 @@ void Robotiq85GripperController::executeCb(const control_msgs::GripperCommandGoa
       result.position = feedback.position;
       result.effort = feedback.effort;
       result.reached_goal = true;
-      result.stalled = false;
+      result.stalled = stalled();
       ROS_INFO_STREAM_NAMED(log_named, log_named << " Command Succeeded.");
       server_->setSucceeded(result);
       return;
@@ -439,7 +450,7 @@ void Robotiq85GripperController::executeCb(const control_msgs::GripperCommandGoa
         result.position = feedback.position;
         result.effort = feedback.effort;
         result.reached_goal = false;
-        result.stalled = true;
+        result.stalled = stalled();
         ROS_INFO_STREAM_NAMED(log_named, log_named
                                 << " Gripper stalled, but succeeding.");
         server_->setSucceeded(result);
@@ -469,15 +480,28 @@ void Robotiq85GripperController::statusCb(
                 const ur_msgs::RobotModeDataMsg::ConstPtr& msg)
 {
   ROS_DEBUG_STREAM_NAMED(log_named, log_named << "::statusCb msg=" << (*msg));
-  ROS_DEBUG_NAMED(log_named, "%s::statusCb is_program_running=(%d, %d)",
-                log_named.c_str(), last_ur_state_, msg->is_program_running);
-  if (last_ur_state_ == 1 && msg->is_program_running == 0)
+
+  if (is_moving_)
   {
-    ros::Time update_time = ros::Time::now();
-    left_->update(update_time, ros::Duration(0.2));
-    right_->update(update_time, ros::Duration(0.2));
+    ros::Duration st = ros::Time::now() - command_received_time_;
+    ROS_DEBUG_STREAM_NAMED(log_named, log_named << "::statusCb moving " << st);
+    if (st > ros::Duration((long_move_ ? 4.0: 1.0)))
+    {
+      if (is_closing_)
+        status_.gOBJ = 1;
+
+      is_moving_  = false;
+      is_closing_ = false;
+      long_move_  = false;
+      status_.gPO = status_.gPR;
+      ROS_INFO_NAMED(log_named, "%s::statusCb update status gPO=%d",
+                log_named.c_str(), status_.gPO);
+
+      ros::Time update_time = ros::Time::now();
+      left_->update(update_time, ros::Duration(0.1));
+      right_->update(update_time, ros::Duration(0.1));
+    }
   }
-  last_ur_state_ = msg->is_program_running;
 }
 
 }  // namespace aist_robotiq2f85_controller

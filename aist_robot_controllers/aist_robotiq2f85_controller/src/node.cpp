@@ -75,6 +75,7 @@ void Robotiq85GripperControllerNode::OnUpdate(const ros::TimerEvent& event)
 
   ros::Time now = ros::Time::now();
   double dt = now.toSec() - prevUpdateTime_.toSec();
+  ROS_DEBUG_STREAM_NAMED(log_named, log_named << "::OnUpdate dt=" << dt);
 
   controller_manager_.update(now, ros::Duration(dt));
 

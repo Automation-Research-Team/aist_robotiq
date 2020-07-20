@@ -119,12 +119,12 @@ private:
   bool long_move_;
 
   std::string ur_script_;
-  uint8_t last_ur_state_;
 
   const std::string log_named = "Robotiq85GripperController";
 
   void statusCb(const ur_msgs::RobotModeDataMsg::ConstPtr& msg);
   bool ready();
+  bool stalled();
   bool activate();
   std_msgs::String buildCommand(robotiq_msgs::CModelCommand command);
   bool sendCommand(robotiq_msgs::CModelCommand command);
