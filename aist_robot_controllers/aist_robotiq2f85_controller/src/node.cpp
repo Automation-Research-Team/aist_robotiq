@@ -61,7 +61,7 @@ void Robotiq85GripperControllerNode::Init()
   // Publish joint states only after controllers are fully ready
   joint_state_pub_ = nh_.advertise<sensor_msgs::JointState>("joint_states", 10);
 
-  timer_ = nh_.createTimer(ros::Duration(1.0),
+  timer_ = nh_.createTimer(ros::Duration(0.5),
               boost::bind(&Robotiq85GripperControllerNode::OnUpdate, this, _1));
 
   ROS_INFO_STREAM_NAMED(log_named, log_named

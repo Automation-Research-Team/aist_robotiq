@@ -10,6 +10,7 @@ find_package(catkin
     robot_controllers
     robot_controllers_interface
     robotiq_msgs
+    ur_modern_driver
 )
 
 include_directories(

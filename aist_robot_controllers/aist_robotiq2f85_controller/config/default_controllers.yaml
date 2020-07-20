@@ -8,8 +8,8 @@ a_bot_gripper_controller2:
     l_gripper_joint: "robotiq_85_left_knuckle_joint"
     r_gripper_joint: "robotiq_85_right_knuckle_joint"
 
-    command_topic: "/a_bot_gripper_controller/command"
-    status_topic: "/a_bot_gripper_controller/status"
+    ur_script_topic: "/a_bot_controller/ur_driver/URScript"
+    ur_state_topic: "/a_bot_controller/ur_driver/robot_mode_state"
 
     # Feedback rate in Hz
     publish_rate: 100

@@ -8,10 +8,12 @@
 #include <robot_controllers_interface/controller.h>
 #include <robot_controllers_interface/controller_manager.h>
 #include <control_msgs/GripperCommandAction.h>
+#include <std_msgs/String.h>
 #include <actionlib/server/simple_action_server.h>
 
 #include <robotiq_msgs/CModelCommand.h>
 #include <robotiq_msgs/CModelStatus.h>
+#include <ur_msgs/RobotModeDataMsg.h>
 
 #include <aist_robotiq2f85_controller/joint_handle.h>
 
@@ -106,15 +108,27 @@ private:
   boost::shared_ptr<server_t> server_;
 
   /* for cmodel_urscript_driver */
-  ros::Publisher command_pub_;
-  ros::Subscriber status_sub_;
-  ros::Time last_command_;
-  robotiq_msgs::CModelCommand command_;
+  ros::Publisher ur_script_pub_;
+  ros::Subscriber ur_state_sub_;
+  robotiq_msgs::CModelStatus  status_;
+  robotiq_msgs::CModelCommand last_command_;
+  ros::Time command_received_time_;
+
+  bool is_moving_;
+  bool is_closing_;
+  bool long_move_;
+
+  std::string ur_script_;
+  uint8_t last_ur_state_;
 
   const std::string log_named = "Robotiq85GripperController";
 
-  void statusCb(const robotiq_msgs::CModelStatus::ConstPtr& msg);
-  void sendCommand(double position, double velocity, double effort);
+  void statusCb(const ur_msgs::RobotModeDataMsg::ConstPtr& msg);
+  bool ready();
+  bool activate();
+  std_msgs::String buildCommand(robotiq_msgs::CModelCommand command);
+  bool sendCommand(robotiq_msgs::CModelCommand command);
+  bool sendCommand(double position, double velocity, double effort);
 
 };
 

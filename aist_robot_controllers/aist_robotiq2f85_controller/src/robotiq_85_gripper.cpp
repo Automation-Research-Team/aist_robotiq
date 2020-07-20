@@ -1,6 +1,8 @@
 #include <pluginlib/class_list_macros.h>
 #include <aist_robotiq2f85_controller/robotiq_85_gripper.h>
 
+#include <fstream>
+
 PLUGINLIB_EXPORT_CLASS(aist_robotiq2f85_controller::Robotiq85GripperController, robot_controllers::Controller)
 
 namespace aist_robotiq2f85_controller
@@ -75,31 +77,34 @@ int Robotiq85GripperController::init(ros::NodeHandle& nh, ControllerManager* man
         << publish_rate);
 
   // Subscribe status from cmodel_urscript_driver
-  std::string status_topic;
-  nh.param<std::string>("status_topic", status_topic, "status");
-  status_sub_ = nh.subscribe<robotiq_msgs::CModelStatus>(status_topic, 1,
+  std::string ur_state_topic;
+  nh.param<std::string>("ur_state_topic", ur_state_topic,
+                "/ur_driver/robot_mode_state");
+  ur_state_sub_ = nh.subscribe<ur_msgs::RobotModeDataMsg>(ur_state_topic, 1,
                 boost::bind(&Robotiq85GripperController::statusCb, this, _1));
-  last_command_ = ros::Time(0);
+  command_received_time_ = ros::Time(0);
 
   // Publish command to cmodel_urscript_driver
-  std::string command_topic;
-  nh.param<std::string>("command_topic", command_topic, "command");
-  command_pub_ = nh.advertise<robotiq_msgs::CModelCommand>(command_topic, 10);
+  std::string ur_script_topic;
+  nh.param<std::string>("ur_script_topic", ur_script_topic,
+                "/ur_driver/URScript");
+  ur_script_pub_ = nh.advertise<std_msgs::String>(ur_script_topic, 1);
+
+  ros::Duration(2.0).sleep();
+  activate();
 
   // Set default to max
   goal_ = position_limit_[1];
   effort_ = effort_limit_[1];
   velocity_ = velocity_limit_[1];
 
-  command_.rACT = 1;
-  command_.rGTO = 1;
-  command_.rATR = 0;
-  command_.rPR  = 0;
-  command_.rSP  = 255;
-  command_.rFR  = 0;
-  command_pub_.publish(command_);
+  ur_script_ = "";
+  is_moving_ = false;
+  is_closing_ = false;
+  last_ur_state_ = false;
 
   initialized_ = true;
+
   return 0;
 }
 
@@ -122,7 +127,7 @@ bool Robotiq85GripperController::start()
   }
 
 #if 0
-  if (ros::Time::now() - last_command_ > ros::Duration(3.0))
+  if (ros::Time::now() - command_received_time_ > ros::Duration(3.0))
   {
     ROS_ERROR_STREAM_NAMED(log_named, log_named << "Unable to start, no goal.");
     return false;
@@ -158,18 +163,145 @@ bool Robotiq85GripperController::stop(bool force)
 
 bool Robotiq85GripperController::reset()
 {
-  command_.rACT = 0;
-  command_.rGTO = 0;
-  command_.rATR = 0;
-  command_.rPR  = 0;
-  command_.rSP  = 0;
-  command_.rFR  = 0;
-  command_pub_.publish(command_);
+  ROS_INFO_STREAM_NAMED(log_named, log_named << "::reset");
+#if 0
+  robotiq_msgs::CModelCommand command;
+  command.rACT = 0;
+  command.rGTO = 0;
+  command.rATR = 0;
+  command.rPR  = 0;
+  command.rSP  = 0;
+  command.rFR  = 0;
+  return sendCommand(command);
+#else
+  return true;
+#endif
+}
+
+bool Robotiq85GripperController::ready()
+{
+  return ( status_.gSTA && status_.gACT == 1 );
+}
+
+bool Robotiq85GripperController::activate()
+{
+  ROS_INFO_STREAM_NAMED(log_named, log_named << "::activate");
+
+  robotiq_msgs::CModelCommand command;
+  command.rACT = 1;
+  command.rGTO = 1;
+  command.rATR = 0;
+  command.rPR  = 0;
+  command.rSP  = 255;
+  command.rFR  = 150;
+
+  while (! ready())
+  {
+    if (! ros::ok())
+    {
+        server_->setPreempted();
+        ROS_INFO_STREAM_NAMED(log_named, log_named
+                << "::activate setPreempted");
+        return false;
+    }
+    sendCommand(command);
+  }
+  return true;
+}
+
+std_msgs::String Robotiq85GripperController::buildCommand(
+                robotiq_msgs::CModelCommand command)
+{
+  ROS_DEBUG_STREAM_NAMED(log_named, log_named << "::buildCommand");
+
+  if (ur_script_.size() <= 0)
+  {
+    std::string fpath;
+    try
+    {
+      fpath = ros::package::getPath("robotiq_control");
+      fpath += "/src/robotiq_urscript.script";
+      ROS_INFO_STREAM_NAMED(log_named, log_named
+                << "::buildCommand filePath=" << fpath);
+      std::ifstream fs(fpath, std::ios::binary);
+      char buf[1024+1];
+      while (! fs.eof())
+      {
+        fs.read(buf, 1024);
+        buf[fs.gcount()] = '\0';
+        std::string str(buf);
+        ur_script_ += str;
+      }
+      fs.close();
+      ROS_DEBUG_STREAM_NAMED(log_named, log_named
+                << "::buildCommand script=" << ur_script_);
+    }
+    catch (const std::exception& e)
+    {
+        ROS_ERROR_STREAM_NAMED(log_named, log_named
+                << " can not open file(" << fpath << ")");
+    }
+  }
+
+  std_msgs::String msg;
+  msg.data  = ur_script_;
+  msg.data += ("rq_set_force(" + std::to_string(command.rFR) + ")\n");
+  msg.data += ("rq_set_speed(" + std::to_string(command.rSP) + ")\n");
+  msg.data += ("rq_move("      + std::to_string(command.rPR) + ")\n");
+  msg.data += "end";
+  ROS_DEBUG_STREAM_NAMED(log_named, log_named
+                << "::buildCommand msg.data=" << msg.data);
+
+  return msg;
+}
+
+bool Robotiq85GripperController::sendCommand(
+                robotiq_msgs::CModelCommand command)
+{
+  ROS_DEBUG_STREAM_NAMED(log_named, log_named << "::sendCommand");
+
+
+  if (command.rPR  == last_command_.rPR && command.rACT == last_command_.rACT &&
+      command.rFR  == last_command_.rFR && command.rSP  == last_command_.rSP)
+  {
+    ROS_DEBUG_STREAM_NAMED(log_named, log_named
+        << "::sendCommand It is same command, so it does not send.");
+    return true;
+  }
+
+  ur_script_pub_.publish(buildCommand(command));
+  last_command_ = command;
+
+  status_.gACT = command.rACT;
+  status_.gGTO = command.rGTO;
+  status_.gSTA = 3;
+  if (command.rGTO == 1 && command.rPR < 10)    // Gripper opens
+  {
+    status_.gOBJ = 0;   // Pretend that no object was grasped
+    is_moving_  = true;
+    is_closing_ = false;
+  }
+  if (command.rGTO == 1 && command.rPR > 200)
+  {
+    is_moving_  = true;
+    is_closing_ = true;
+  }
+  command_received_time_ = ros::Time::now();
+
+  status_.gFLT = 0;  // Fault
+  status_.gPR  = command.rPR;
+  status_.gCU  = 10; // Current
+
+  if (command.rGTO == 1 && command.rSP < 50)    // Gripper opens
+    long_move_ = true;
+
+  ROS_INFO_NAMED(log_named, "%s::sendCommand finished rFR=%d rSP=%d rPR=%d",
+                log_named.c_str(), command.rFR, command.rSP, command.rPR);
 
   return true;
 }
 
-void Robotiq85GripperController::sendCommand(
+bool Robotiq85GripperController::sendCommand(
                 double position, double velocity, double effort)
 {
   ROS_DEBUG_STREAM_NAMED(log_named, log_named << "::sendCommand"
@@ -179,26 +311,30 @@ void Robotiq85GripperController::sendCommand(
         << velocity_limit_[0] << ", " << velocity_limit_[1]
         << ") effort=(" << effort << ", "
         << effort_limit_[0] << "," << effort_limit_[1] << ")");
+
+  robotiq_msgs::CModelCommand command;
+  command.rACT = 1;
+  command.rGTO = 1;
+  command.rATR = 0;
   
   // position (0-255)
   double val = 0.0;
   val = (-min_gap_counts)/(position_limit_[1]-position_limit_[0])*(position-position_limit_[0])+min_gap_counts;
-  command_.rPR = (val < 0.0 ? 0: (val > min_gap_counts ? min_gap_counts: val));
+  command.rPR = (val < 0.0 ? 0: (val > min_gap_counts ? min_gap_counts: val));
   ROS_DEBUG_STREAM_NAMED(log_named, log_named << "::sendCommand pos=" << val);
 
   // speed (0-255)
   val = 255.0/(velocity_limit_[1]-velocity_limit_[0])*(velocity-velocity_limit_[0]);
   ROS_DEBUG_STREAM_NAMED(log_named, log_named << "::sendCommand vel=" << val);
-  command_.rSP = (val < 0.0 ? 0: (val > 255.0 ? 255: val));
+  command.rSP = (val < 0.0 ? 0: (val > 255.0 ? 255: val));
 
   // force (0-255)
   val = 255.0/(effort_limit_[1]-effort_limit_[0])*(effort-effort_limit_[0]);
   ROS_DEBUG_STREAM_NAMED(log_named, log_named << "::sendCommand ef=" << val);
-  command_.rFR = (val < 0.0 ? 0: (val > 255.0 ? 255: val));
+  command.rFR = (val < 0.0 ? 0: (val > 255.0 ? 255: val));
 
-  command_pub_.publish(command_);
+  return sendCommand(command);
 }
-
 
 void Robotiq85GripperController::update(const ros::Time& now, const ros::Duration& dt)
 {
@@ -209,6 +345,9 @@ void Robotiq85GripperController::update(const ros::Time& now, const ros::Duratio
 
   left_->setPosition(goal_, velocity_, effort_);
   right_->setPosition(0, 0, 0);
+
+  if (! ready())
+    activate();
 
   sendCommand(goal_, velocity_, effort_);
 }
@@ -327,12 +466,18 @@ std::vector<std::string> Robotiq85GripperController::getClaimedNames()
 }
 
 void Robotiq85GripperController::statusCb(
-                const robotiq_msgs::CModelStatus::ConstPtr& msg)
+                const ur_msgs::RobotModeDataMsg::ConstPtr& msg)
 {
-  ROS_DEBUG_STREAM_NAMED(log_named, log_named << "::statusCb");
-  last_command_ = ros::Time::now();
-  left_->update(last_command_, ros::Duration(2.0));
-  right_->update(last_command_, ros::Duration(2.0));
+  ROS_DEBUG_STREAM_NAMED(log_named, log_named << "::statusCb msg=" << (*msg));
+  ROS_DEBUG_NAMED(log_named, "%s::statusCb is_program_running=(%d, %d)",
+                log_named.c_str(), last_ur_state_, msg->is_program_running);
+  if (last_ur_state_ == 1 && msg->is_program_running == 0)
+  {
+    ros::Time update_time = ros::Time::now();
+    left_->update(update_time, ros::Duration(0.2));
+    right_->update(update_time, ros::Duration(0.2));
+  }
+  last_ur_state_ = msg->is_program_running;
 }
 
 }  // namespace aist_robotiq2f85_controller

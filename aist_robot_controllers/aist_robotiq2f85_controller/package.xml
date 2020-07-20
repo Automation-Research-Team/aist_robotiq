@@ -16,6 +16,7 @@
   <depend>robot_controllers</depend>
   <depend>robot_controllers_interface</depend>
   <depend>robotiq_msgs</depend>
+  <depend>ur_modern_driver</depend>
 
   <exec_depend>actionlib</exec_depend>
   <exec_depend>control_msgs</exec_depend>
