@@ -5,7 +5,6 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /MotionPlanning1/Planning Request1
-        - /TF1
         - /TF1/Frames1
       Splitter Ratio: 0.4658018946647644
     Tree Height: 361
@@ -80,76 +79,33 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          a_khi_camera:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_khi_camera_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_khi_ee_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          a_khi_gripper_camera:
+          a_khi_gripper_base_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          a_khi_gripper_camera_link:
+          a_khi_gripper_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          a_khi_gripper_gripper_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_khi_gripper_gripper_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_khi_gripper_l_finger_link:
+          a_khi_l_finger_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          a_khi_gripper_magnet_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_khi_gripper_magnet_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_khi_gripper_magripper_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_khi_gripper_magripper_camera_flange:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_khi_gripper_magripper_gripper_axis_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_khi_gripper_magripper_gripper_flange:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_khi_gripper_magripper_magnet_axis_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_khi_gripper_magripper_magnet_flange:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_khi_gripper_r_finger_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_khi_gripper_sensor:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           a_khi_link1:
             Alpha: 1
             Show Axes: false
@@ -180,6 +136,49 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          a_khi_magnet_base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_khi_magnet_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_khi_magripper_base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_khi_magripper_camera_flange:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_khi_magripper_gripper_axis_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_khi_magripper_gripper_flange:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_khi_magripper_magnet_axis_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_khi_magripper_magnet_flange:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_khi_r_finger_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_khi_sensor:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           ground:
             Alpha: 1
             Show Axes: false
@@ -247,76 +246,33 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          a_khi_camera:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_khi_camera_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           a_khi_ee_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          a_khi_gripper_camera:
+          a_khi_gripper_base_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          a_khi_gripper_camera_link:
+          a_khi_gripper_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          a_khi_gripper_gripper_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_khi_gripper_gripper_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_khi_gripper_l_finger_link:
+          a_khi_l_finger_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          a_khi_gripper_magnet_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_khi_gripper_magnet_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_khi_gripper_magripper_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_khi_gripper_magripper_camera_flange:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_khi_gripper_magripper_gripper_axis_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_khi_gripper_magripper_gripper_flange:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_khi_gripper_magripper_magnet_axis_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_khi_gripper_magripper_magnet_flange:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          a_khi_gripper_r_finger_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          a_khi_gripper_sensor:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           a_khi_link1:
             Alpha: 1
             Show Axes: false
@@ -347,6 +303,49 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          a_khi_magnet_base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_khi_magnet_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_khi_magripper_base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_khi_magripper_camera_flange:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_khi_magripper_gripper_axis_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_khi_magripper_gripper_flange:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_khi_magripper_magnet_axis_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_khi_magripper_magnet_flange:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          a_khi_r_finger_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          a_khi_sensor:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           ground:
             Alpha: 1
             Show Axes: false
@@ -371,7 +370,7 @@ Visualization Manager:
       Velocity_Scaling_Factor: 1
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /a_khi_gripper_camera/texture
+      Image Topic: /a_khi_camera/texture
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -388,33 +387,15 @@ Visualization Manager:
         All Enabled: false
         a_khi_base_link:
           Value: false
+        a_khi_camera:
+          Value: true
+        a_khi_camera_link:
+          Value: true
         a_khi_ee_link:
           Value: true
-        a_khi_gripper_camera:
-          Value: false
-        a_khi_gripper_camera_link:
-          Value: false
-        a_khi_gripper_gripper_base_link:
-          Value: false
-        a_khi_gripper_gripper_link:
+        a_khi_gripper_base_link:
           Value: true
-        a_khi_gripper_magnet_base_link:
-          Value: false
-        a_khi_gripper_magnet_link:
-          Value: true
-        a_khi_gripper_magripper_base_link:
-          Value: false
-        a_khi_gripper_magripper_camera_flange:
-          Value: false
-        a_khi_gripper_magripper_gripper_axis_link:
-          Value: false
-        a_khi_gripper_magripper_gripper_flange:
-          Value: false
-        a_khi_gripper_magripper_magnet_axis_link:
-          Value: false
-        a_khi_gripper_magripper_magnet_flange:
-          Value: false
-        a_khi_gripper_sensor:
+        a_khi_gripper_link:
           Value: true
         a_khi_link1:
           Value: false
@@ -428,6 +409,24 @@ Visualization Manager:
           Value: false
         a_khi_link6:
           Value: false
+        a_khi_magnet_base_link:
+          Value: true
+        a_khi_magnet_link:
+          Value: true
+        a_khi_magripper_base_link:
+          Value: true
+        a_khi_magripper_camera_flange:
+          Value: true
+        a_khi_magripper_gripper_axis_link:
+          Value: true
+        a_khi_magripper_gripper_flange:
+          Value: true
+        a_khi_magripper_magnet_axis_link:
+          Value: true
+        a_khi_magripper_magnet_flange:
+          Value: true
+        a_khi_sensor:
+          Value: true
         ground:
           Value: false
         workbox:
@@ -452,21 +451,21 @@ Visualization Manager:
                       a_khi_link5:
                         a_khi_link6:
                           a_khi_ee_link:
-                            a_khi_gripper_magripper_base_link:
-                              a_khi_gripper_magripper_camera_flange:
-                                a_khi_gripper_camera:
-                                  a_khi_gripper_sensor:
-                                    a_khi_gripper_camera_link:
+                            a_khi_magripper_base_link:
+                              a_khi_magripper_camera_flange:
+                                a_khi_camera:
+                                  a_khi_sensor:
+                                    a_khi_camera_link:
                                       {}
-                              a_khi_gripper_magripper_gripper_axis_link:
-                                a_khi_gripper_magripper_gripper_flange:
-                                  a_khi_gripper_gripper_base_link:
-                                    a_khi_gripper_gripper_link:
+                              a_khi_magripper_gripper_axis_link:
+                                a_khi_magripper_gripper_flange:
+                                  a_khi_gripper_base_link:
+                                    a_khi_gripper_link:
                                       {}
-                              a_khi_gripper_magripper_magnet_axis_link:
-                                a_khi_gripper_magripper_magnet_flange:
-                                  a_khi_gripper_magnet_base_link:
-                                    a_khi_gripper_magnet_link:
+                              a_khi_magripper_magnet_axis_link:
+                                a_khi_magripper_magnet_flange:
+                                  a_khi_magnet_base_link:
+                                    a_khi_magnet_link:
                                       {}
             workbox:
               {}
@@ -530,4 +529,4 @@ Window Geometry:
     collapsed: false
   Width: 1406
   X: 333
-  Y: 129
+  Y: 99
