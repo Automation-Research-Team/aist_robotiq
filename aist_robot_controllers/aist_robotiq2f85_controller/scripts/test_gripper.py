@@ -16,7 +16,7 @@ class GripperActionClient(object):
     def __init__(self):
         rospy.loginfo("Waiting for gripper_controller...")
         self.gripper_client = actionlib.SimpleActionClient(
-            "a_bot_gripper_controller2/gripper_action", GripperCommandAction)
+            "a_bot_gripper_controller/gripper_action", GripperCommandAction)
         self.gripper_client.wait_for_server()
         rospy.loginfo("...connected.")
 

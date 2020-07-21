@@ -1,6 +1,6 @@
-a_bot_gripper_controller2:
+a_bot_gripper_controller:
   default_controllers:
-    - "a_bot_gripper_controller2/gripper_action"
+    - "a_bot_gripper_controller/gripper_action"
 
   gripper_action:
     type: "aist_robotiq2f85_controller/Robotiq85GripperController"
