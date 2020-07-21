@@ -11,6 +11,11 @@ a_bot_gripper_controller2:
     ur_script_topic: "/a_bot_controller/ur_driver/URScript"
     ur_state_topic: "/a_bot_controller/ur_driver/robot_mode_state"
 
+    # ur_script_filepath: ros::package::getPath("robotiq_control")+"/src/robotiq_urscript.script")
+    # moving_duration:
+    #   short: 1.0
+    #   long:  4.0
+
     # Feedback rate in Hz
     publish_rate: 100
     min_gap_counts: 224

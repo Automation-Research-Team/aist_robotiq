@@ -76,6 +76,15 @@ int Robotiq85GripperController::init(ros::NodeHandle& nh, ControllerManager* man
         << effort_limit_[0] << ", " << effort_limit_[1] << ") rate="
         << publish_rate);
 
+  nh.param<std::string>("ur_script_filepath", ur_script_filepath_,
+      ros::package::getPath("robotiq_control")+"/src/robotiq_urscript.script");
+  nh.param<double>("moving_duration/short", moving_duration_[0], 1.0);
+  nh.param<double>("moving_duration/long",  moving_duration_[1], 4.0);
+  ROS_INFO_STREAM_NAMED(log_named, log_named
+        << "::init ur_script_filepath=" << ur_script_filepath_
+        << "moving_duration=(" << moving_duration_[0]
+        << ", " << moving_duration_[1] << ")");
+
   // Subscribe status from cmodel_urscript_driver
   std::string ur_state_topic;
   nh.param<std::string>("ur_state_topic", ur_state_topic,
@@ -126,14 +135,6 @@ bool Robotiq85GripperController::start()
                 << " Unable to start, action server is not active.");
     return false;
   }
-
-#if 0
-  if (ros::Time::now() - command_received_time_ > ros::Duration(3.0))
-  {
-    ROS_ERROR_STREAM_NAMED(log_named, log_named << "Unable to start, no goal.");
-    return false;
-  }
-#endif
 
   return true;
 }
@@ -222,14 +223,11 @@ std_msgs::String Robotiq85GripperController::buildCommand(
 
   if (ur_script_.size() <= 0)
   {
-    std::string fpath;
     try
     {
-      fpath = ros::package::getPath("robotiq_control");
-      fpath += "/src/robotiq_urscript.script";
       ROS_INFO_STREAM_NAMED(log_named, log_named
-                << "::buildCommand filePath=" << fpath);
-      std::ifstream fs(fpath, std::ios::binary);
+                << "::buildCommand filePath=" << ur_script_filepath_);
+      std::ifstream fs(ur_script_filepath_, std::ios::binary);
       char buf[1024+1];
       while (! fs.eof())
       {
@@ -245,7 +243,7 @@ std_msgs::String Robotiq85GripperController::buildCommand(
     catch (const std::exception& e)
     {
         ROS_ERROR_STREAM_NAMED(log_named, log_named
-                << " can not open file(" << fpath << ")");
+                << " can not open file(" << ur_script_filepath_ << ")");
     }
   }
 
@@ -270,7 +268,7 @@ bool Robotiq85GripperController::sendCommand(
   if (command.rPR  == last_command_.rPR && command.rACT == last_command_.rACT &&
       command.rFR  == last_command_.rFR && command.rSP  == last_command_.rSP)
   {
-    ROS_INFO_STREAM_NAMED(log_named, log_named
+    ROS_DEBUG_STREAM_NAMED(log_named, log_named
         << "::sendCommand It is same command, so it does not send.");
     return true;
   }
@@ -366,6 +364,8 @@ void Robotiq85GripperController::executeCb(const control_msgs::GripperCommandGoa
   control_msgs::GripperCommandFeedback feedback;
   control_msgs::GripperCommandResult result;
 
+  status_.gOBJ = 0;
+
   if (!initialized_)
   {
     server_->setAborted(result, "Controller is not initialized.");
@@ -426,7 +426,8 @@ void Robotiq85GripperController::executeCb(const control_msgs::GripperCommandGoa
                 << ", last=" << last_position << ")");
 
     // Goal detection
-    if (fabs(feedback.position - goal->command.position) < 0.002)
+    if (status_.gPO == status_.gPR &&
+        fabs(feedback.position - goal->command.position) < 0.002)
     {
       result.position = feedback.position;
       result.effort = feedback.effort;
@@ -445,7 +446,8 @@ void Robotiq85GripperController::executeCb(const control_msgs::GripperCommandGoa
     }
     else
     {
-      if (ros::Time::now() - last_position_time > ros::Duration(2.0))
+      if (ros::Time::now() - last_position_time > ros::Duration(
+                                moving_duration_[(long_move_ ? 1: 0)]))
       {
         result.position = feedback.position;
         result.effort = feedback.effort;
@@ -481,27 +483,27 @@ void Robotiq85GripperController::statusCb(
 {
   ROS_DEBUG_STREAM_NAMED(log_named, log_named << "::statusCb msg=" << (*msg));
 
-  if (is_moving_)
-  {
-    ros::Duration st = ros::Time::now() - command_received_time_;
-    ROS_DEBUG_STREAM_NAMED(log_named, log_named << "::statusCb moving " << st);
-    if (st > ros::Duration((long_move_ ? 4.0: 1.0)))
-    {
-      if (is_closing_)
-        status_.gOBJ = 1;
+  if (! is_moving_)
+    return;
 
-      is_moving_  = false;
-      is_closing_ = false;
-      long_move_  = false;
-      status_.gPO = status_.gPR;
-      ROS_INFO_NAMED(log_named, "%s::statusCb update status gPO=%d",
-                log_named.c_str(), status_.gPO);
+  ros::Duration st = ros::Time::now() - command_received_time_;
+  ROS_DEBUG_STREAM_NAMED(log_named, log_named << "::statusCb moving " << st);
+  if (st <= ros::Duration(moving_duration_[(long_move_ ? 1: 0)]))
+    return;
 
-      ros::Time update_time = ros::Time::now();
-      left_->update(update_time, ros::Duration(0.1));
-      right_->update(update_time, ros::Duration(0.1));
-    }
-  }
+  if (is_closing_)
+    status_.gOBJ = 1;
+
+  is_moving_  = false;
+  is_closing_ = false;
+  long_move_  = false;
+  status_.gPO = status_.gPR;
+  ROS_INFO_NAMED(log_named, "%s::statusCb update status gPO=%d",
+            log_named.c_str(), status_.gPO);
+
+  ros::Time update_time = ros::Time::now();
+  left_->update(update_time, ros::Duration(0.1));
+  right_->update(update_time, ros::Duration(0.1));
 }
 
 }  // namespace aist_robotiq2f85_controller

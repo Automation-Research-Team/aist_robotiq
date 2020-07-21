@@ -118,6 +118,9 @@ private:
   bool is_closing_;
   bool long_move_;
 
+  double moving_duration_[2];
+
+  std::string ur_script_filepath_;
   std::string ur_script_;
 
   const std::string log_named = "Robotiq85GripperController";

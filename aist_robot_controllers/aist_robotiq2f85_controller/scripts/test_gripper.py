@@ -27,6 +27,7 @@ class GripperActionClient(object):
         self.gripper_client.send_goal(gripper_goal)
         result = self.gripper_client.wait_for_result(rospy.Duration(timeout))
         rospy.loginfo("result %d", result)
+        # rospy.sleep(1.5)
         return result
 
 class MoveFetch(object):
