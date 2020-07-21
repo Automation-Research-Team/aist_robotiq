@@ -190,6 +190,12 @@ bool Robotiq85GripperController::stalled()
   return ( status_.gOBJ == 1 || status_.gOBJ == 2 );
 }
 
+bool Robotiq85GripperController::reached_goal(
+                double cur_pos, double goal_pos, double tolerance)
+{
+  return ( status_.gPO == status_.gPR && fabs(cur_pos-goal_pos) < tolerance );
+}
+
 bool Robotiq85GripperController::activate()
 {
   ROS_INFO_STREAM_NAMED(log_named, log_named << "::activate");
@@ -416,7 +422,8 @@ void Robotiq85GripperController::executeCb(const control_msgs::GripperCommandGoa
     // Publish feedback before possibly completing
     feedback.position = left_->getPosition() + right_->getPosition();
     feedback.effort = left_->getEffort() + right_->getEffort();
-    feedback.reached_goal = false;
+    feedback.reached_goal = reached_goal(
+                feedback.position, goal->command.position);
     feedback.stalled = stalled();
     server_->publishFeedback(feedback);
 
@@ -426,13 +433,12 @@ void Robotiq85GripperController::executeCb(const control_msgs::GripperCommandGoa
                 << ", last=" << last_position << ")");
 
     // Goal detection
-    if (status_.gPO == status_.gPR &&
-        fabs(feedback.position - goal->command.position) < 0.002)
+    if (feedback.reached_goal)
     {
       result.position = feedback.position;
       result.effort = feedback.effort;
       result.reached_goal = true;
-      result.stalled = stalled();
+      result.stalled = feedback.stalled;
       ROS_INFO_STREAM_NAMED(log_named, log_named << " Command Succeeded.");
       server_->setSucceeded(result);
       return;
@@ -447,12 +453,12 @@ void Robotiq85GripperController::executeCb(const control_msgs::GripperCommandGoa
     else
     {
       if (ros::Time::now() - last_position_time > ros::Duration(
-                                moving_duration_[(long_move_ ? 1: 0)]))
+                                moving_duration_[(long_move_ ? 1: 0)]+1.0))
       {
         result.position = feedback.position;
         result.effort = feedback.effort;
-        result.reached_goal = false;
-        result.stalled = stalled();
+        result.reached_goal = feedback.reached_goal;
+        result.stalled = feedback.stalled;
         ROS_INFO_STREAM_NAMED(log_named, log_named
                                 << " Gripper stalled, but succeeding.");
         server_->setSucceeded(result);

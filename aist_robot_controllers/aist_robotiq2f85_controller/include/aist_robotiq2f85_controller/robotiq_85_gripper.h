@@ -128,6 +128,7 @@ private:
   void statusCb(const ur_msgs::RobotModeDataMsg::ConstPtr& msg);
   bool ready();
   bool stalled();
+  bool reached_goal(double cur_pos, double goal_pos, double tolerance = 0.002);
   bool activate();
   std_msgs::String buildCommand(robotiq_msgs::CModelCommand command);
   bool sendCommand(robotiq_msgs::CModelCommand command);

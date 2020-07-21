@@ -1,4 +1,4 @@
-$ roslaunch aist_robotiq2f85_controller node.launch 
+$ roslaunch aist_bringup aist_bringup.launch
 
 [TEST]
 $ python test_gripper.py

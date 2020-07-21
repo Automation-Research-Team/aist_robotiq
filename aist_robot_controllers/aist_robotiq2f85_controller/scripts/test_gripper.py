@@ -88,6 +88,7 @@ def move_tests():
         seq_num += 1
         if seq_num > 10:
             break
+        rospy.sleep(2)
 
 if __name__ == '__main__':
     rospy.init_node('aist_robotiq2f85_controller_node', anonymous=True, log_level=rospy.DEBUG)
