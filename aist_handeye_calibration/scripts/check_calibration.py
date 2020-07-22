@@ -19,6 +19,12 @@ class CheckCalibrationRoutines(AISTBaseRoutines):
         self._robot_name       = rospy.get_param('~robot_name', 'b_bot')
         self._robot_base_frame = rospy.get_param('~robot_base_frame',
                                                  'workspace_center')
+        self._robot_effector_frame \
+                               = rospy.get_param('~robot_effector_frame',
+                                                 'b_bot_ee_link')
+        self._robot_effector_tip_frame \
+                               = rospy.get_param('~robot_effector_tip_frame',
+                                                 '')
         self._initpose         = rospy.get_param('~initpose', [])
         self._speed            = rospy.get_param('~speed', 1)
 
@@ -33,6 +39,7 @@ class CheckCalibrationRoutines(AISTBaseRoutines):
         (success, _, current_pose) \
             = self.go_to_pose_goal(
                 self._robot_name, poseStamped, self._speed,
+                end_effector_link=self._robot_effector_frame,
                 move_lin=True)
         print('  reached ' + self.format_pose(current_pose))
         return success
@@ -49,16 +56,19 @@ class CheckCalibrationRoutines(AISTBaseRoutines):
         target_pose = self.transform_pose_to_reference_frame(
                           self.effector_target_pose(marker_pose, (0, 0, 0)))
         print('  move to ' + self.format_pose(approach_pose))
-        (success, _, current_pose) = self.go_to_pose_goal(self._robot_name,
-                                                          approach_pose,
-                                                          self._speed,
-                                                          move_lin=True)
+        (success, _, current_pose) \
+            = self.go_to_pose_goal(
+                self._robot_name, approach_pose, self._speed,
+                end_effector_link=self._robot_effector_tip_frame,
+                move_lin=True)
         print('  reached ' + self.format_pose(current_pose))
         rospy.sleep(1)
         print('  move to ' + self.format_pose(target_pose))
-        (success, _, current_pose) = self.go_to_pose_goal(self._robot_name,
-                                                          target_pose,
-                                                          0.05, move_lin=True)
+        (success, _, current_pose) \
+            = self.go_to_pose_goal(
+                self._robot_name, target_pose, 0.05,
+                end_effector_link=self._robot_effector_tip_frame,
+                move_lin=True)
         print('  reached ' + self.format_pose(current_pose))
 
     def run(self):

@@ -1,0 +1,18 @@
+#grippers:
+#  arm:
+#    type: GenericGripper
+#    args:
+#      name: two_finger_gripper
+#      action_ns: gripper_controller/gripper_action
+#      base_link: gripper_base_link
+#      tip_link: gripper_link
+#      timeout: 10.0
+#      min_gap: 0.03
+#      max_gap: 0.06
+#      max_effort: 210.0
+
+cameras:
+  camera: PhoXiCamera
+
+moveit_pose_reference_frame: basement_link
+moveit_eef_step: 0.05

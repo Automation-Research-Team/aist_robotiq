@@ -111,6 +111,7 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
         # Reset pose
         self.go_to_named_pose('home', self._robot_name)
         self.move(self._initpose)
+        self.trigger_frame(self._camera_name)
 
         # Collect samples over pre-defined poses
         keyposes = self._keyposes
@@ -149,7 +150,7 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
 #  global functions                                                  #
 ######################################################################
 if __name__ == '__main__':
-    rospy.init_node('handeye_calibration')
+    rospy.init_node('run_calibration')
 
     with HandEyeCalibrationRoutines() as calibrate:
         calibrate.run()

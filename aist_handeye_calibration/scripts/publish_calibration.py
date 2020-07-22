@@ -101,7 +101,7 @@ class CalibrationPublisher(object):
 #  main part                                                            #
 #########################################################################
 if __name__ == "__main__":
-    rospy.init_node("aist_handeye_calibration_publisher")
+    rospy.init_node("publish_calibration")
 
     while rospy.get_time() == 0.0:
         pass
