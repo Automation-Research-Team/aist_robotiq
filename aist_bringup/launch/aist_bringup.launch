@@ -25,7 +25,7 @@
   <arg name="prefixes"		value="a_bot_, b_bot_, a_bot_"/>
   <arg name="devices"		value="ur5, ur5, robotiq_85"/>
   <arg name="controllers"	value="ur, ur, ros"/>
-  <arg name="drivers"		value="ur, ur, cmodel"/>
+  <arg name="drivers"		value="ur, ur, robotiq2f85"/>
   <arg name="driver_args"	value="10.66.171.52, 50003;
   				       10.66.171.51, 50002;"/>
 
