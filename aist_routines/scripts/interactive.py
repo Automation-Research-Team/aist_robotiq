@@ -37,12 +37,6 @@ class InteractiveRoutines(AISTBaseRoutines):
         self._speed       = rospy.get_param('~speed',       0.1)
         self._ur_movel    = False
 
-    def go_home(self):
-        self.go_to_named_pose('home', self._robot_name)
-
-    def go_back(self):
-        self.go_to_named_pose('back', self._robot_name)
-
     def move(self, pose):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = self.reference_frame
@@ -179,9 +173,18 @@ class InteractiveRoutines(AISTBaseRoutines):
             elif key == 'o':
                 self.move(InteractiveRoutines.refposes[self._robot_name])
             elif key == 'h':
-                self.go_home()
+                self.go_to_named_pose("home", self._robot_name)
             elif key == 'b':
-                self.go_back()
+                self.go_to_named_pose("back", self._robot_name)
+            elif key == 'n':
+                pose_name = raw_input("  pose name? ")
+                try:
+                    self.go_to_named_pose(pose_name, self._robot_name)
+                except rospy.ROSException as e:
+                    rospy.logerr('Unknown pose: %s' % e)
+            elif key == 'f':
+                frame = raw_input("  frame? ")
+                self.go_to_frame(self._robot_name, frame)
 
         # Reset pose
         self.go_home()

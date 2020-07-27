@@ -15,7 +15,6 @@ from GripperClient     import GripperClient
 from CameraClient      import CameraClient
 from MarkerPublisher   import MarkerPublisher
 from PickOrPlaceAction import PickOrPlaceAction
-from aist_graspability import GraspabilityClient
 
 ######################################################################
 #  global functions                                                  #
@@ -70,6 +69,7 @@ class AISTBaseRoutines(object):
 
         # Search graspabilities
         if rospy.has_param('~graspability_parameters'):
+            from aist_graspability import GraspabilityClient
             self._graspability_params \
                 = paramtuples(rospy.get_param('~graspability_parameters'))
             self._graspabilityClient \
@@ -102,7 +102,12 @@ class AISTBaseRoutines(object):
     # Basic motion stuffs
     def go_to_named_pose(self, named_pose, group_name):
         group = self._cmd.get_group(group_name)
-        group.set_named_target(named_pose)
+        try:
+            group.set_named_target(named_pose)
+        except moveit_commander.exception.MoveItCommanderException as e:
+            rospy.logerr('AISTBaseRoutines.go_to_named_pose(): {}'
+                         .format(e))
+            return False
         group.set_max_velocity_scaling_factor(1.0)
         success = group.go(wait=True)
         group.clear_pose_targets()
