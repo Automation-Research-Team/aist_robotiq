@@ -4,6 +4,7 @@
   <xacro:macro name="lehz40k2_30"  params="prefix parent *origin">
 
     <xacro:property name="length"	   value="0.1959"/>
+    <xacro:property name="nail_length"	   value="0.1200"/>
     <xacro:property name="x_offset"	   value="0.1084"/>
     <xacro:property name="x_finger_offset" value="-0.0465"/>
     <xacro:property name="z_offset"	   value="0.0238"/>
@@ -46,7 +47,7 @@
     <joint name="${prefix}gripper_joint" type="fixed">
       <parent link="${prefix}gripper_base_link"/>
       <child  link="${prefix}gripper_link"/>
-      <origin xyz="${length} 0 0" rpy="0 0 0"/>
+      <origin xyz="${length + nail_length} 0 0" rpy="0 0 0"/>
     </joint>
     <link name="${prefix}gripper_link"/>
 
