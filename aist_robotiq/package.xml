@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>aist_robotiq</name>
+  <version>0.1.0</version>
+  <description>The aist_robotiq package</description>
+
+  <maintainer email="t.ueshiba@aist.go.jp">Toshio UESHIBA</maintainer>
+  <license>BSD</license>
+  <author email="t.ueshiba@aist.go.jp">Toshio UESHIBA</author>
+  <url type="website">https://gitlab.com/art-aist/artros/aist_robotiq</url>
+  <url type="bugtracker">https://gitlab.com/art-aist/artros/aist_robotiq/issues</url>
+  <url type="repository">https://gitlab.com/art-aist/artros/aist_robotiq</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>rospy</depend>
+
+  <build_depend>gazebo_ros</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>control_toolbox</build_depend>
+  <build_depend>xmlrpcpp</build_depend>
+  
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>control_toolbox</exec_depend>
+  <exec_depend>xmlrpcpp</exec_depend>
+  
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>urdf</exec_depend>
+  <exec_depend>xacro</exec_depend>
+
+  <export>
+    <gazebo_ros plugin_path="${prefix}/lib" gazebo_media_path="${prefix}" />
+  </export>
+
+</package>
