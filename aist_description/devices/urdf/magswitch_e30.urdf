@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="magswitch_e30" >
-  <xacro:include filename="$(find aist_description)/devices/urdf/magswitch_e30.urdf.xacro" />
-  <xacro:magswitch_e30 prefix="" parent="base_link">
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-  </xacro:magswitch_e30>
-
-  <link name="base_link" />
-</robot>

@@ -41,7 +41,7 @@
   </xacro:rs007l>
 
   <!-- Attach grippers -->
-  <xacro:include filename="$(find aist_description)/devices/urdf/magripper.urdf.xacro" />
+  <xacro:include filename="$(find toyota1_description)/devices/urdf/magripper.urdf.xacro" />
   <xacro:magripper2 prefix="a_khi_" parent="a_khi_ee_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:magripper2>
