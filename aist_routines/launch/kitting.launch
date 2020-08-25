@@ -14,7 +14,8 @@
   </include>
 
   <!-- Load and publish hand-eye calibration -->
-  <include file="$(find aist_handeye_calibration)/launch/publish.launch">
+  <include file="$(find aist_handeye_calibration
+		 )/launch/publish_calibration.launch">
     <arg name="config"		value="$(arg config)" />
     <arg name="camera_name"	value="$(arg camera_name)" />
   </include>
