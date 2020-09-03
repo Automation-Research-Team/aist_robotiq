@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="ur10e_base_scene" >
+
+  <xacro:arg name="scene" default=""/>
+
+  <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
+  <xacro:property name="a_bot_x" value="0"/>
+  <xacro:property name="a_bot_y" value="-0.4875"/>
+  <xacro:property name="bots_z" value="0.77"/>
+
+  <!-- This is the main file defining our robot arrangement and physical environment. -->
+
+  <!-- Main workspace -->
+  <!-- The surface is 0.01 m below the robot bases and the "workspace_center" frame. -->
+  <link name="ground"/>
+
+  <xacro:include filename="$(find aist_description)/objects/urdf/aist_box.urdf.xacro"/>
+  <xacro:property name="table_w" value="0.9"/>
+  <xacro:property name="table_l" value="0.75"/>
+  <xacro:property name="table_h" value="0.01"/>
+  <xacro:aist_box name="workbox"
+		  width="${table_w}" length="${table_l}" height="${table_h}"
+		  parent="ground">
+    <origin xyz="${-table_w/2} ${-table_l/2} ${bots_z - table_h}" rpy="0 0 0"/>
+  </xacro:aist_box>
+  <link name="workspace_center"/>
+  <joint name="ground_to_workspace" type="fixed">
+    <parent link="ground"/>
+    <child link="workspace_center"/>
+    <origin xyz="0 0 ${bots_z}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- robot arms -->
+  <xacro:include filename="$(find ur_e_description)/urdf/common.gazebo.xacro"/>
+  <xacro:include filename="$(find ur_e_description)/urdf/ur10e.urdf.xacro"/>
+  <xacro:ur10e_robot prefix="a_bot_" joint_limited="false"
+    shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
+    shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
+    elbow_joint_lower_limit="0.0" elbow_joint_upper_limit="${pi}"
+    wrist_1_lower_limit="${-pi}" wrist_1_upper_limit="${pi}"
+    wrist_2_lower_limit="${-pi}" wrist_2_upper_limit="${pi}"
+    wrist_3_lower_limit="${-pi}" wrist_3_upper_limit="${pi}"
+    kinematics_file="${load_yaml(
+		     '$(find ur_e_description)/config/ur10e_default.yaml')}"/>
+
+  <joint name="ground_a_bot_joint" type="fixed">
+    <parent link="ground"/>
+    <child  link= "a_bot_base_link"/>
+    <origin xyz="${a_bot_x} ${a_bot_y} ${bots_z}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Spawn and attach gripper -->
+  <xacro:include filename="$(find aist_description)/devices/urdf/robotiq_85_gripper_with_tip_link.urdf.xacro"/>
+  <xacro:robotiq_85_gripper_with_tip_link prefix="a_bot_"
+					  parent="a_bot_ee_link">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:robotiq_85_gripper_with_tip_link>
+
+  <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
+  <link name="world"/>
+  <joint name="world_ground_joint" type="fixed">
+    <parent link="world"/>
+    <child  link="ground"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Include indivisual scene file -->
+  <xacro:property name="scene_name" value="$(arg scene)"/>
+  <xacro:if value="${scene_name != ''}">
+    <xacro:include filename="$(find aist_description)/scenes/urdf/$(arg
+			     scene).urdf.xacro"/>
+  </xacro:if>
+
+</robot>
