@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="robotiq_85_gripper" >
+  <!-- robotiq_hande_gripper -->
+  <xacro:include filename="$(find aist_robotiq)/urdf/robotiq_85_gripper.urdf.xacro" />
+  <xacro:robotiq_85_gripper prefix="robotiq_85_" parent="base_link">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </xacro:robotiq_85_gripper>
+
+  <link name="base_link" />
+</robot>

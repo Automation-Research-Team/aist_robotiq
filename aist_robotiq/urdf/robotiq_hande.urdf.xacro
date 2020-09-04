@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="robotiq_hande"  params="prefix parent *origin">
+    <joint name="${prefix}base_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${prefix}base_link"/>
+      <xacro:insert_block name="origin"/>
+    </joint>
+
+    <link name="${prefix}base_link">
+      <inertial>
+        <origin xyz="0 0 0.04607" rpy="${pi/2} 0 ${pi/2}" />
+        <mass value="0.86387" />
+        <inertia ixx="1017560E-9" ixy="0" ixz="2235E-9" iyy="1028041E-9" iyz="0" izz="489810E-9" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 ${pi/2}" />
+        <geometry>
+          <mesh filename="package://aist_robotiq/meshes/visual/hand-e.dae" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="Gazebo/Black">
+          <color rgba="0.1 0.1 0.1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 ${pi/2}" />
+        <geometry>
+          <mesh filename="package://aist_robotiq/meshes/visual/hand-e.dae" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </collision>
+    </link>
+    <gazebo reference="${prefix}base_link">
+      <material>Gazebo/Black</material>
+      <selfCollide>True</selfCollide>
+    </gazebo>
+
+    <link name="${prefix}left_finger">
+      <inertial>
+        <origin xyz="0.02262 -0.00759 0.00738" rpy="${pi/2} 0 ${pi/2}"/>
+        <mass value="0.03804"/>
+        <inertia ixx="13567E-9" ixy="1849E-9" ixz="3622E-9" iyy="15784E-9" iyz="3616E-9" izz="7478E-9"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 ${pi/2}"/>
+        <geometry>
+          <mesh filename="package://aist_robotiq/meshes/visual/hand-e_finger_1.dae" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="Gazebo/Grey">
+          <color rgba="0.1 0.1 0.1 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 ${pi/2}"/>
+        <geometry>
+          <mesh filename="package://aist_robotiq/meshes/visual/hand-e_finger_1.dae" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </collision>
+    </link>
+    <gazebo reference="${prefix}left_finger">
+      <material>Gazebo/Grey</material>
+      <selfCollide>True</selfCollide>
+    </gazebo>
+
+    <link name="${prefix}right_finger">
+      <inertial>
+        <origin xyz="-0.02262 0.00759 0.00738" rpy="${pi/2} 0 ${pi/2}"/>
+        <mass value="0.03804"/>
+        <inertia ixx="13567E-9" ixy="1849E-9" ixz="-3622E-9" iyy="15784E-9" iyz="-3616E-9" izz="7478E-9"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 ${pi/2}"/>
+        <geometry>
+          <mesh filename="package://aist_robotiq/meshes/visual/hand-e_finger_2.dae" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="Gazebo/Grey">
+          <color rgba="0.1 0.1 0.1 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 ${pi/2}"/>
+        <geometry>
+          <mesh filename="package://aist_robotiq/meshes/visual/hand-e_finger_2.dae" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </collision>
+    </link>
+    <gazebo reference="${prefix}right_finger">
+      <material>Gazebo/Grey</material>
+      <selfCollide>True</selfCollide>
+    </gazebo>
+
+    <joint name="${prefix}joint_finger" type="prismatic">
+      <origin xyz="0.099 0 0" rpy="0 0 0"/>
+      <parent link="${prefix}base_link"/>
+      <child link="${prefix}left_finger"/>
+      <axis xyz="0 -1 0"/>
+      <limit effort="130" lower="0" upper="0.025" velocity="0.15"/>
+    </joint>
+
+    <joint name="${prefix}base_to_right_finger" type="prismatic">
+      <origin xyz="0.099 0 0" rpy="0 0 0"/>
+      <parent link="${prefix}base_link"/>
+      <child link="${prefix}right_finger"/>
+      <axis xyz="0 1 0"/>
+      <limit effort="130" lower="0" upper="0.025" velocity="0.15"/>
+      <mimic joint="${prefix}joint_finger" multiplier="1" offset="0"/>
+    </joint>
+
+    <!-- Add additional links for us to plan with. Oriented like the UR frame. -->
+    <link name="${prefix}tip_link"/>
+    <joint name="${prefix}tip_link_joint" type="fixed">
+      <parent link="${prefix}base_link"/>
+      <child link="${prefix}tip_link"/>
+      <origin rpy="0.0 0.0 0.0" xyz=".146 0.0 0.0"/>
+    </joint>
+
+    <transmission name="${prefix}joint_finger_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}joint_finger">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="${prefix}joint_finger_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <gazebo>
+      <plugin filename="libgazebo_mimic_joint_plugin.so"
+	      name="${prefix}mimic_robotiq_hande">
+        <joint>${prefix}joint_finger</joint>
+        <mimicJoint>${prefix}base_to_right_finger</mimicJoint>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+</robot>

@@ -1,0 +1,9 @@
+grippers:
+  a_bot:
+    type: RobotiqGripper
+    args:
+      prefix: a_bot_
+      product: robotiq_140
+      force: 5.0
+      velocity: 0.1
+      timeout: 6.0
