@@ -50,11 +50,11 @@
   </joint>
 
   <!-- Spawn and attach gripper -->
-  <xacro:include filename="$(find aist_description)/devices/urdf/robotiq_85_gripper_with_tip_link.urdf.xacro"/>
-  <xacro:robotiq_85_gripper_with_tip_link prefix="a_bot_"
-					  parent="a_bot_ee_link">
+  <xacro:include filename="$(find aist_description)/devices/urdf/robotiq_140_gripper_with_tip_link.urdf.xacro"/>
+  <xacro:robotiq_140_gripper_with_tip_link prefix="a_bot_"
+					   parent="a_bot_ee_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
-  </xacro:robotiq_85_gripper_with_tip_link>
+  </xacro:robotiq_140_gripper_with_tip_link>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world"/>

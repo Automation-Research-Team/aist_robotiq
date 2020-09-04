@@ -7,6 +7,8 @@
 
   <arg name="config"	 value="$(eval 'cmodel_action_controller_hande'
 				if device == 'robotiq_hande' else
+				'cmodel_action_controller_140'
+				if device == 'robotiq_140' else
 				'cmodel_action_controller')"/>
 
   <include file="$(find robotiq_control

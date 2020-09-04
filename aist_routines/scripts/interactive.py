@@ -57,7 +57,7 @@ class InteractiveRoutines(AISTBaseRoutines):
 
     def run(self):
         # Reset pose
-        self.go_home()
+        self.go_to_named_pose("home", self._robot_name)
 
         axis = 'Y'
 
@@ -187,7 +187,7 @@ class InteractiveRoutines(AISTBaseRoutines):
                 self.go_to_frame(self._robot_name, frame)
 
         # Reset pose
-        self.go_home()
+        self.go_to_named_pose("home", self._robot_name)
 
 
 ######################################################################
