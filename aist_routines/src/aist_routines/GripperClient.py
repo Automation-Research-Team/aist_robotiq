@@ -436,3 +436,51 @@ class PrecisionGripper(GripperClient):
             rospy.loginfo(
                 "PrecisionGripper: program interrupted before completion.",
                 file=sys.stderr)
+
+######################################################################
+#  class Lecp6Gripper                                                #
+######################################################################
+class Lecp6Gripper(GripperClient):
+    def __init__(self, prefix="a_bot_", timeout=3.0):
+        import tranbo_control.msg
+
+        super(Lecp6Gripper, self) \
+            .__init__(*Lecp6Gripper._initargs(prefix, timeout))
+        self._client = actionlib.SimpleActionClient(
+                           "/arm_driver/lecp6_driver/lecp6",
+                           tranbo_control.msg.Lecp6CommandAction)
+
+    @staticmethod
+    def base(prefix, timeout):
+        return GripperClient(*Lecp6Gripper._initargs(prefix, timeout))
+
+    @staticmethod
+    def _initargs(prefix, timeout):
+        return (prefix + "gripper", "two_finger",
+                prefix + "gripper_base_link",
+                prefix + "gripper_link", timeout)
+
+    def pregrasp(self, cmd=""):
+        return self._send_command(True)
+
+    def grasp(self, cmd=""):
+        if not self._send_command(True):
+            return False
+        rospy.sleep(0.5)
+        return self._picked
+
+    def release(self, cmd=""):
+        return self._send_command(False)
+
+    def _send_command(self, close):
+        try:
+            goal = tranbo_control.msg.Lecp6CommandGoal()
+            goal.stepdata_no = 1 if close else 2
+            self._client.send_goal(goal)
+            self._client.wait_for_result(rospy.Duration(self.timeout))
+            result = self._client.get_result()
+            rospy.loginfo(result)
+        except rospy.ROSInterruptException:
+            rospy.loginfo(
+                "Lecp6Gripper: program interrupted before completion.",
+                file=sys.stderr)
