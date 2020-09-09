@@ -2,13 +2,13 @@
 <launch>
 
   <arg name="sim"			default="false"/>
-  <arg name="scene"			default="ur10e_calibration"/>
+  <arg name="scene"			default=""/>
   <arg name="joint_state_frequency"	default="50"/>
   <arg name="robot_state_frequency"	default="50"/>
   <arg name="moveit_config"		default="$(find ur10e_moveit_config)"/>
   <arg name="rviz_config"		default=""/>
 
-  <!-- Setup "ur5e" configuration -->
+  <!-- Setup "ur10e" configuration -->
   <arg name="config"		value="ur10e"/>
   <arg name="gazebo_init_args"	value="-J a_bot_shoulder_pan_joint 1.5708
 				       -J a_bot_shoulder_lift_joint -2.1
