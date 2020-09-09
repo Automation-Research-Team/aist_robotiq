@@ -2,7 +2,7 @@
 <launch>
 
   <arg name="sim"			default="false"/>
-  <arg name="scene"			default=""/>
+  <arg name="scene"			default="ur10e_calibration"/>
   <arg name="joint_state_frequency"	default="50"/>
   <arg name="robot_state_frequency"	default="50"/>
   <arg name="moveit_config"		default="$(find ur10e_moveit_config)"/>
@@ -48,21 +48,36 @@
   <!-- Launch other hardware drivers -->
   <group if="$(eval not sim)">
 
-    <!-- Drivers for the force sensors -->
-    <!-- <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch"> -->
-    <!--   <arg name="robot_name"	value="a_bot"/> -->
-    <!-- </include> -->
-    <!-- <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch"> -->
-    <!--   <arg name="robot_name"	value="d_bot"/> -->
-    <!-- </include> -->
+    <!-- Launch RealSense cameras and associated depth filters -->
+    <arg name="camera_name"		value="a_bot_camera"/>
+    <arg name="camera_width"		default="640"/>
+    <arg name="camera_height"		default="480"/>
+    <arg name="fps"			default="30"/>
+    <arg name="manager"			default=""/>
 
-    <!-- Launch PhoXi camera -->
-    <!-- <include file="$(find aist_phoxi_camera)/launch/run.launch"> -->
-    <!--   <arg name="camera_name"	value="b_phoxi_m_camera"/> -->
-    <!-- 	<arg name="id"		value='"1711015"'/> -->
-    <!-- 	<arg name="frame"	value="calibrated_b_phoxi_m_camera"/> -->
-    <!-- </include> -->
-    
+    <!-- Launch RealSense cameras -->
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+      <arg name="camera"		value="$(arg camera_name)"/>
+      <arg name="tf_prefix"		value="calibrated_$(arg camera_name)"/>
+      <arg name="enable_depth"		value="true"/>
+      <arg name="enable_infra1"		value="true"/>
+      <arg name="enable_infra2"		value="false"/>
+      <arg name="enable_pointcloud"	value="false"/>
+      <arg name="align_depth"		value="true"/>
+      <arg name="depth_width"		value="$(arg camera_width)"/>
+      <arg name="depth_height"		value="$(arg camera_height)"/>
+      <arg name="depth_fps"		value="$(arg fps)"/>
+      <arg name="infra_width"		value="$(arg camera_width)"/>
+      <arg name="infra_height"		value="$(arg camera_height)"/>
+      <arg name="infra_fps"		value="$(arg fps)"/>
+      <arg name="color_width"		value="$(arg camera_width)"/>
+      <arg name="color_height"		value="$(arg camera_height)"/>
+      <arg name="color_fps"		value="$(arg fps)"/>
+      <arg name="enable_streaming"	value="true"/>
+      <arg name="manager"		value="$(arg manager)"
+	   unless="$(eval manager == '')"/>
+    </include>
+
   </group>
 
 </launch>

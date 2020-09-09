@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://wiki.ros.org/xacro" name="ur10e_base_scene" >
 
-  <xacro:arg name="scene" default=""/>
+  <xacro:arg name="scene" default="ur10e_calibration"/>
 
   <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
   <xacro:property name="a_bot_x" value="0"/>
@@ -55,6 +55,11 @@
 					   parent="a_bot_ee_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:robotiq_140_gripper_with_tip_link>
+
+  <!-- Add RealSense camera -->
+  <xacro:include filename="$(find aist_description
+			   )/devices/urdf/wrist_d435.urdf.xacro" />
+  <xacro:wrist_d435 prefix="a_bot_" parent="a_bot_robotiq_140_base_link"/>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world"/>
