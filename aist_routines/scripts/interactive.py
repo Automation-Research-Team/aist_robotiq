@@ -134,6 +134,16 @@ class InteractiveRoutines(AISTBaseRoutines):
                 self.move(goal_pose)
             elif key == 's':
                 self.stop(self._robot_name)
+            elif key == 'gripper':
+                gripper_name = raw_input("  gripper name? ")
+                try:
+                    self.set_gripper_to_robot(gripper_name, self._robot_name)
+                except KeyError as e:
+                    rospy.logerr('Unknown gripper: %s' % e)
+            elif key == 'f':
+                frame = raw_input("  frame? ")
+                self.go_to_frame(self._robot_name, frame)
+
             elif key == 'pregrasp':
                 self.pregrasp(self._robot_name)
             elif key == 'grasp':

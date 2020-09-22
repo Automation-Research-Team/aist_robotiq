@@ -1,5 +1,11 @@
-grippers:
+robots:
   a_torobo:
+    default_gripper: a_torobo_gripper
+  b_torobo:
+    default_gripper: b_torobo_gripper
+
+grippers:
+  a_torobo_gripper:
     type: GenericGripper
     args:
       name: a_torobo_gripper
@@ -10,7 +16,7 @@ grippers:
       min_gap: 0.0
       max_gap: 0.1
       max_effort: 5.0
-  b_torobo:
+  b_torobo_gripper:
     type: GenericGripper
     args:
       name: b_torobo_gripper

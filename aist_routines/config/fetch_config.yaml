@@ -1,5 +1,9 @@
-grippers:
+robots:
   arm:
+    default_gripper: gripper
+
+grippers:
+  gripper:
     type: GenericGripper
     args:
       name: gripper

@@ -11,7 +11,7 @@ from moveit_commander.conversions import pose_to_list
 
 from geometry_msgs import msg as gmsg
 
-from GripperClient     import GripperClient
+from GripperClient     import GripperClient, VoidGripper
 from CameraClient      import CameraClient
 from MarkerPublisher   import MarkerPublisher
 from PickOrPlaceAction import PickOrPlaceAction
@@ -55,15 +55,22 @@ class AISTBaseRoutines(object):
 
         # Grippers
         d = rospy.get_param('~grippers', {})
-        self._grippers = {}
+        # self._grippers = {'void_gripper': GripperClient.create('VoidGripper', {'name': 'void_gripper', 'base_link': 'void_gripper_base_link', 'timeout': 10.0})}
+        self._grippers = {'void_gripper':
+                          VoidGripper('void_gripper',
+                                      'void_gripper_base_link')}
         for gripper_name, props in d.items():
             self._grippers[gripper_name] = GripperClient.create(props['type'],
                                                                 props['args'])
 
         # Robots
         d = rospy.get_param('~robots', {})
+        self._active_grippers = {}
         for robot_name, props in d.items():
-            self.set_gripper_to_robot(props['default_gripper'], robot_name)
+            if 'default_gripper' in props:
+                self.set_gripper_to_robot(props['default_gripper'], robot_name)
+            else:
+                self.set_gripper_to_robot('void_gripper', robot_name)
 
         # Cameras
         d = rospy.get_param('~cameras', {})
@@ -137,7 +144,7 @@ class AISTBaseRoutines(object):
         # rospy.loginfo('move to ' + self.format_pose(target_pose))
         self.publish_marker(target_pose, 'pose')
 
-        if end_effector_link == '' and robot_name in self._grippers:
+        if end_effector_link == '':
             end_effector_link = self.gripper(robot_name).tip_link
 
         group = self._cmd.get_group(robot_name)
@@ -215,10 +222,10 @@ class AISTBaseRoutines(object):
 
     # Gripper stuffs
     def set_gripper_to_robot(self, gripper_name, robot_name):
-        self._current_grippers[robot_name] = self._grippers[gripper_name]
-        
+        self._active_grippers[robot_name] = self._grippers[gripper_name]
+
     def gripper(self, robot_name):
-        return self._current_grippers[robot_name]
+        return self._active_grippers[robot_name]
 
     def pregrasp(self, robot_name, command=''):
         return self.gripper(robot_name).pregrasp(command)

@@ -1,10 +1,16 @@
-grippers:
+robots:
   a_bot:
+    default_gripper: a_bot_gripper
+  a_bot:
+    default_gripper: b_bot_single_suction_gripper
+
+grippers:
+  a_bot_gripper:
     type: PrecisionGripper
     args:
       prefix: a_bot_
       timeout: 3.0
-  b_bot:
+  b_bot_single_suction_gripper:
     type: SuctionGripper
     args:
       name: b_bot_single_suction_gripper

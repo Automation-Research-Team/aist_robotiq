@@ -1,5 +1,9 @@
-grippers:
+robots:
   c_bot:
+    default_gripper: c_bot_robotiq_85_gripper
+
+grippers:
+  c_bot_robotiq_85_gripper:
     type: RobotiqGripper
     args:
       prefix: c_bot_

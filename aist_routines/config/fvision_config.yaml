@@ -1,5 +1,9 @@
-grippers:
+robots:
   d_bot:
+    default_gripper: d_bot_robotiq_hande_gripper
+
+grippers:
+  d_bot_robotiq_hande_gripper:
     type: RobotiqGripper
     args:
       prefix: d_bot_

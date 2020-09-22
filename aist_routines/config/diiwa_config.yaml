@@ -1,0 +1,23 @@
+robots:
+  a_iiwa:
+    default_gripper: a_iiwa_robotiq_85_gripper
+  b_iiwa:
+    default_gripper: b_iiwa_single_suction_gripper
+    
+grippers:
+  a_iiwa_robotiq_85_gripper:
+    type: RobotiqGripper
+    args:
+      prefix: a_iiwa_
+      product: robotiq_85
+      force: 5.0
+      velocity: 0.1
+      timeout: 6.0
+  b_iiwa_single_suction_gripper:
+    type: SuctionGripper
+    args:
+      name: b_iiwa_single_suction_gripper
+      base_link: b_iiwa_single_suction_gripper_base_link
+      tip_link: b_iiwa_single_suction_gripper_pad_link
+      eject: false
+      timeout: 2.0

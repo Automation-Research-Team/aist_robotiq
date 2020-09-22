@@ -1,8 +1,11 @@
-grippers:
+robots:
   arm:
+    default_gripper: gripper
+
+grippers:
+  gripper:
     type: GenericGripper
     args:
-      name: gripper
       action_ns: gripper_controller/gripper_action
       base_link: wrist_roll_link
       tip_link: gripper_link

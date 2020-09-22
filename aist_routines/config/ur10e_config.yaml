@@ -1,5 +1,9 @@
-grippers:
+robots:
   a_bot:
+    default_gripper: a_bot_robotiq_140_gripper
+
+grippers:
+  a_bot_robotiq_140_gripper:
     type: RobotiqGripper
     args:
       prefix: a_bot_
@@ -9,4 +13,4 @@ grippers:
       timeout: 6.0
 
 cameras:
-  a_bot_camera: RealSenseCamera
+  a_bot_camera: DepthCamera
