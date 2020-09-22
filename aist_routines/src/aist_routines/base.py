@@ -56,9 +56,14 @@ class AISTBaseRoutines(object):
         # Grippers
         d = rospy.get_param('~grippers', {})
         self._grippers = {}
-        for robot_name, gripper in d.items():
-            self._grippers[robot_name] = GripperClient.create(gripper['type'],
-                                                              gripper['args'])
+        for gripper_name, props in d.items():
+            self._grippers[gripper_name] = GripperClient.create(props['type'],
+                                                                props['args'])
+
+        # Robots
+        d = rospy.get_param('~robots', {})
+        for robot_name, props in d.items():
+            self.set_gripper_to_robot(props['default_gripper'], robot_name)
 
         # Cameras
         d = rospy.get_param('~cameras', {})
@@ -133,7 +138,7 @@ class AISTBaseRoutines(object):
         self.publish_marker(target_pose, 'pose')
 
         if end_effector_link == '' and robot_name in self._grippers:
-            end_effector_link = self._grippers[robot_name].tip_link
+            end_effector_link = self.gripper(robot_name).tip_link
 
         group = self._cmd.get_group(robot_name)
         if len(end_effector_link) > 0:
@@ -202,34 +207,37 @@ class AISTBaseRoutines(object):
 
     def get_current_pose(self, robot_name, end_effector_link=''):
         if end_effector_link == '' and robot_name in self._grippers:
-            end_effector_link = self._grippers[robot_name].tip_link
+            end_effector_link = self.gripper(robot_name).tip_link
         group = self._cmd.get_group(robot_name)
         if len(end_effector_link) > 0:
             group.set_end_effector_link(end_effector_link)
         return group.get_current_pose()
 
     # Gripper stuffs
+    def set_gripper_to_robot(self, gripper_name, robot_name):
+        self._current_grippers[robot_name] = self._grippers[gripper_name]
+        
     def gripper(self, robot_name):
-        return self._grippers[robot_name]
+        return self._current_grippers[robot_name]
 
     def pregrasp(self, robot_name, command=''):
-        return self._grippers[robot_name].pregrasp(command)
+        return self.gripper(robot_name).pregrasp(command)
 
     def grasp(self, robot_name, command=''):
-        return self._grippers[robot_name].grasp(command)
+        return self.gripper(robot_name).grasp(command)
 
     def release(self, robot_name, command=''):
-        return self._grippers[robot_name].release(command)
+        return self.gripper(robot_name).release(command)
 
     # Camera stuffs
     def camera(self, camera_name):
         return self._cameras[camera_name]
 
     def continuous_shot(self, camera_name, enable):
-        return self._cameras[camera_name].continuous_shot(enable)
+        return self.camera(camera_name).continuous_shot(enable)
 
     def trigger_frame(self, camera_name):
-        return self._cameras[camera_name].trigger_frame()
+        return self.camera(camera_name).trigger_frame()
 
     # Marker stuffs
     def delete_all_markers(self):
@@ -241,13 +249,13 @@ class AISTBaseRoutines(object):
 
     # Graspability stuffs
     def create_background_image(self, camera_name):
-        camera = self._cameras[camera_name]
+        camera = self.camera(camera_name)
         camera.trigger_frame()
         success = self._graspabilityClient.create_background_image()
         return success
 
     def create_mask_image(self, camera_name, nbins):
-        camera = self._cameras[camera_name]
+        camera = self.camera(camera_name)
         camera.trigger_frame()
         success = self._graspabilityClient.create_mask_image(nbins)
         return success
@@ -255,8 +263,8 @@ class AISTBaseRoutines(object):
     def search_graspability(self, robot_name, camera_name, part_id, bin_id,
                             use_normals=True, marker_lifetime=60):
         self.delete_all_markers()
-        gripper = self._grippers[robot_name]
-        camera  = self._cameras[camera_name]
+        gripper = self.gripper(robot_name)
+        camera  = self.camera(camera_name)
         param   = self._graspability_params[part_id]
         camera.trigger_frame()
         poses, gscores, success = \
@@ -277,8 +285,8 @@ class AISTBaseRoutines(object):
     def graspability_send_goal(self, robot_name, camera_name, part_id, bin_id,
                                use_normals=True):
         self.delete_all_markers()
-        gripper = self._grippers[robot_name]
-        camera  = self._cameras[camera_name]
+        gripper = self.gripper(robot_name)
+        camera  = self.camera(camera_name)
         param   = self._graspability_params[part_id]
         camera.trigger_frame()
         self._graspabilityClient.send_goal(
