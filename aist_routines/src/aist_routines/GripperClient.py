@@ -509,7 +509,6 @@ class MagswitchGripper(GripperClient):
         self._suctioned        = False
         self._calibration_step = 0
         self._goal = tranbo_control.msg.MagswitchCommandGoal()
-        print("MagswitchGripper 1", self._goal)
 
     @staticmethod
     def base(prefix, timeout):
@@ -569,7 +568,6 @@ class MagswitchGripper(GripperClient):
         try:
             self._calibration_step = 0
             self._suctioned = False
-            print("MagswitchGripper 2", self._goal)
             self._goal.used_sdo = False
             self._goal.command.home_magnet         = home_magnet
             self._goal.command.calibration_trigger = calibration_trigger
