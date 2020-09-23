@@ -449,6 +449,8 @@ class Lecp6Gripper(GripperClient):
         self._client = actionlib.SimpleActionClient(
                            "/arm_driver/lecp6_driver/lecp6",
                            tranbo_control.msg.Lecp6CommandAction)
+        self._goal = tranbo_control.msg.Lecp6CommandGoal()
+        self._picked = False
 
     @staticmethod
     def base(prefix, timeout):
@@ -460,27 +462,130 @@ class Lecp6Gripper(GripperClient):
                 prefix + "gripper_base_link",
                 prefix + "gripper_link", timeout)
 
+    @property
+    def picked(self):
+        return self._picked
+
     def pregrasp(self, cmd=""):
-        return self._send_command(True)
+        return self.release()
 
     def grasp(self, cmd=""):
-        if not self._send_command(True):
-            return False
-        rospy.sleep(0.5)
-        return self._picked
+        return self._send_command(True)
 
     def release(self, cmd=""):
         return self._send_command(False)
 
     def _send_command(self, close):
         try:
-            goal = tranbo_control.msg.Lecp6CommandGoal()
-            goal.stepdata_no = 1 if close else 2
-            self._client.send_goal(goal)
+            self._picked = False
+            self._goal.command.stepdata_no = 2 if close else 1
+            self._client.send_goal(self._goal)
             self._client.wait_for_result(rospy.Duration(self.timeout))
             result = self._client.get_result()
+            if close:
+                self._picked = result.reached_goal
             rospy.loginfo(result)
+            return result.reached_goal
         except rospy.ROSInterruptException:
             rospy.loginfo(
                 "Lecp6Gripper: program interrupted before completion.",
                 file=sys.stderr)
+            return False
+
+######################################################################
+#  class MagswitchGripper                                            #
+######################################################################
+class MagswitchGripper(GripperClient):
+    def __init__(self, prefix="a_bot_", sensitivity=0, position=100, timeout=3.0):
+        import tranbo_control.msg
+
+        super(MagswitchGripper, self) \
+            .__init__(*MagswitchGripper._initargs(prefix, timeout))
+        self._client = actionlib.SimpleActionClient(
+                              "/arm_driver/magswitch_driver/magswitch",
+                              tranbo_control.msg.MagswitchCommandAction)
+        self._sensitivity      = sensitivity
+        self._position         = position
+        self._suctioned        = False
+        self._calibration_step = 0
+        self._goal = tranbo_control.msg.MagswitchCommandGoal()
+        print("MagswitchGripper 1", self._goal)
+
+    @staticmethod
+    def base(prefix, timeout):
+        return GripperClient(*MagswitchGripper._initargs(prefix, timeout))
+
+    @staticmethod
+    def _initargs(prefix, timeout):
+        return (prefix + "gripper", "suction",
+                prefix + "gripper_base_link",
+                prefix + "gripper_link", timeout)
+
+    @property
+    def suctioned(self):
+        return self._suctioned
+
+    def home_magnet(self):
+        return self._send_command(home_magnet=True)
+
+    @property
+    def calibration_step(self):
+        return self._calibration_step
+
+    def calibration(self, calibration_select):
+        return self._send_command(
+                calibration_trigger=1, calibration_select=calibration_select)
+
+    @property
+    def sensitivity(self):
+        return self._sensitivity
+
+    @property
+    def sensitivity(self, value):
+        self._sensitivity = value
+        return self._sensitivity
+
+    @property
+    def position(self):
+        return self._position
+
+    @property
+    def position(self, value):
+        self._position = value
+        return self._position
+
+    def pregrasp(self, cmd=""):
+        pos = self._position if self._position > 0 else 100
+        return self._send_command(sensitivity=self._sensitivity, position=pos)
+
+    def grasp(self, cmd=""):
+        pos = self._position if self._position > 0 else 100
+        return self._send_command(sensitivity=self._sensitivity, position=pos)
+
+    def release(self, cmd=""):
+        return self._send_command(sensitivity=self._sensitivity, position=0)
+
+    def _send_command(self, home_magnet=False, calibration_trigger=0, calibration_select=0, sensitivity=0, position=0):
+        try:
+            self._calibration_step = 0
+            self._suctioned = False
+            print("MagswitchGripper 2", self._goal)
+            self._goal.used_sdo = False
+            self._goal.command.home_magnet         = home_magnet
+            self._goal.command.calibration_trigger = calibration_trigger
+            self._goal.command.calibration_select  = calibration_select
+            self._goal.command.sensitivity         = sensitivity
+            self._goal.command.position            = position
+            self._client.send_goal(self._goal)
+            self._client.wait_for_result(rospy.Duration(self.timeout))
+            result = self._client.get_result()
+            if calibration_trigger == 1:
+                self._calibration_step = result.magswitch_out.calibration_step
+            if position > 0:
+                self._suctioned = result.reached_goal
+            return result.reached_goal
+        except rospy.ROSInterruptException:
+            rospy.loginfo(
+                "MagswitchGripper: program interrupted before completion.",
+                file=sys.stderr)
+            return False
