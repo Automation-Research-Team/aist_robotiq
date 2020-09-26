@@ -516,9 +516,9 @@ class MagswitchGripper(GripperClient):
 
     @staticmethod
     def _initargs(prefix, timeout):
-        return (prefix + "gripper", "suction",
-                prefix + "gripper_base_link",
-                prefix + "gripper_link", timeout)
+        return (prefix + "magnet", "suction",
+                prefix + "magnet_base_link",
+                prefix + "magnet_link", timeout)
 
     @property
     def suctioned(self):
@@ -577,6 +577,8 @@ class MagswitchGripper(GripperClient):
             self._client.send_goal(self._goal)
             self._client.wait_for_result(rospy.Duration(self.timeout))
             result = self._client.get_result()
+            if result is None:
+                return False
             if calibration_trigger == 1:
                 self._calibration_step = result.magswitch_out.calibration_step
             if position > 0:
