@@ -441,7 +441,7 @@ class PrecisionGripper(GripperClient):
 #  class Lecp6Gripper                                                #
 ######################################################################
 class Lecp6Gripper(GripperClient):
-    def __init__(self, prefix="a_bot_", timeout=3.0):
+    def __init__(self, prefix="a_bot_", timeout=3.0, open_no=1, close_no=2):
         import tranbo_control.msg
 
         super(Lecp6Gripper, self) \
@@ -451,6 +451,7 @@ class Lecp6Gripper(GripperClient):
                            tranbo_control.msg.Lecp6CommandAction)
         self._goal = tranbo_control.msg.Lecp6CommandGoal()
         self._picked = False
+        self._stepdata_no = (open_no, close_no)
 
     @staticmethod
     def base(prefix, timeout):
@@ -466,6 +467,18 @@ class Lecp6Gripper(GripperClient):
     def picked(self):
         return self._picked
 
+    @property
+    def stepdata_no(self):
+        return self._stepdata_no
+
+    @stepdata_no.setter
+    def stepdata_no(self, value):
+        print('stepdata_no', value)
+        if len(value) == 2:
+            self._stepdata_no = value
+        else:
+            print('invalid args')
+
     def pregrasp(self, cmd=""):
         return self.release()
 
@@ -478,7 +491,8 @@ class Lecp6Gripper(GripperClient):
     def _send_command(self, close):
         try:
             self._picked = False
-            self._goal.command.stepdata_no = 2 if close else 1
+            self._goal.command.stepdata_no = \
+                self._stepdata_no[1] if close else self._stepdata_no[0]
             self._client.send_goal(self._goal)
             self._client.wait_for_result(rospy.Duration(self.timeout))
             result = self._client.get_result()
@@ -539,7 +553,7 @@ class MagswitchGripper(GripperClient):
     def sensitivity(self):
         return self._sensitivity
 
-    @property
+    @sensitivity.setter
     def sensitivity(self, value):
         self._sensitivity = value
         return self._sensitivity
@@ -548,7 +562,7 @@ class MagswitchGripper(GripperClient):
     def position(self):
         return self._position
 
-    @property
+    @position.setter
     def position(self, value):
         self._position = value
         return self._position
