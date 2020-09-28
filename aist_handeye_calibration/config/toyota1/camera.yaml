@@ -4,7 +4,7 @@ robot_name: arm
 eye_on_hand: true
 robot_base_frame: basement_link
 robot_effector_frame: arm_ee_link
-robot_effector_tip_frame: magnet_link
+robot_effector_tip_frame: gripper_link
 camera_frame: calibrated_camera
 marker_id: 26
 marker_size: 0.07
