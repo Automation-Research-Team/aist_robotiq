@@ -67,9 +67,8 @@ class KittingRoutines(AISTBaseRoutines):
         bin   = self._bins[bin_id]
         props = bin.part_props
         self.graspability_send_goal(props.robot_name, props.camera_name,
-                                    bin.part_id, bin_id,
-                                    props.use_normals)
-        return self.graspability_wait_for_result(props.camera_name, marker_lifetime)
+                                    bin.part_id, bin_id)
+        return self.graspability_wait_for_result(marker_lifetime)
         # return self.search_graspability(props.robot_name, props.camera_name,
         #                                 bin.part_id, bin_id, props.use_normals,
         #                                 marker_lifetime)
