@@ -89,6 +89,8 @@ class MarkerPublisher(object):
         markers.markers.append(copy.deepcopy(marker))
 
         if text != "":
+            marker.scale.x = 0
+            marker.scale.y = 0
             marker.pose.position.z -= (marker.scale.z + 0.001)
             marker.type  = vmsg.Marker.TEXT_VIEW_FACING
             marker.color = smsg.ColorRGBA(1.0, 1.0, 1.0, 0.8)  # white

@@ -55,7 +55,6 @@ class AISTBaseRoutines(object):
 
         # Grippers
         d = rospy.get_param('~grippers', {})
-        # self._grippers = {'void_gripper': GripperClient.create('VoidGripper', {'name': 'void_gripper', 'base_link': 'void_gripper_base_link', 'timeout': 10.0})}
         self._grippers = {'void_gripper':
                           VoidGripper('void_gripper',
                                       'void_gripper_base_link')}
@@ -81,8 +80,8 @@ class AISTBaseRoutines(object):
 
         # Search graspabilities
         if rospy.has_param('~graspability_parameters'):
-            # from aist_graspability import GraspabilityClient
-            from aist_graspability_py2cpp import GraspabilityClient
+            from aist_graspability import GraspabilityClient
+            #from aist_graspability_py2cpp import GraspabilityClient
             self._graspability_params \
                 = paramtuples(rospy.get_param('~graspability_parameters'))
             self._graspabilityClient \
