@@ -55,7 +55,6 @@ class AISTBaseRoutines(object):
 
         # Grippers
         d = rospy.get_param('~grippers', {})
-        # self._grippers = {'void_gripper': GripperClient.create('VoidGripper', {'name': 'void_gripper', 'base_link': 'void_gripper_base_link', 'timeout': 10.0})}
         self._grippers = {'void_gripper':
                           VoidGripper('void_gripper',
                                       'void_gripper_base_link')}
@@ -82,6 +81,7 @@ class AISTBaseRoutines(object):
         # Search graspabilities
         if rospy.has_param('~graspability_parameters'):
             from aist_graspability import GraspabilityClient
+            #from aist_graspability_py2cpp import GraspabilityClient
             self._graspability_params \
                 = paramtuples(rospy.get_param('~graspability_parameters'))
             self._graspabilityClient \
@@ -289,8 +289,7 @@ class AISTBaseRoutines(object):
 
         return poses, gscores, success
 
-    def graspability_send_goal(self, robot_name, camera_name, part_id, bin_id,
-                               use_normals=True):
+    def graspability_send_goal(self, robot_name, camera_name, part_id, bin_id):
         self.delete_all_markers()
         gripper = self.gripper(robot_name)
         camera  = self.camera(camera_name)
@@ -302,7 +301,7 @@ class AISTBaseRoutines(object):
             param.open_width, param.finger_width, param.finger_thickness,
             param.insertion_depth)
 
-    def graspability_wait_for_result(self, camera_name, marker_lifetime=60):
+    def graspability_wait_for_result(self, marker_lifetime=60):
         poses, gscores, success = \
             self._graspabilityClient.wait_for_result()
         if success:
