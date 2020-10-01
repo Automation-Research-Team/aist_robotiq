@@ -57,7 +57,7 @@ class InteractiveRoutines(AISTBaseRoutines):
 
     def run(self):
         # Reset pose
-        self.go_to_named_pose("home", self._robot_name)
+        self.go_to_named_pose(self._robot_name, "home")
 
         axis = 'Y'
 
@@ -141,7 +141,7 @@ class InteractiveRoutines(AISTBaseRoutines):
             elif key == 'gripper':
                 gripper_name = raw_input("  gripper name? ")
                 try:
-                    self.set_gripper_to_robot(gripper_name, self._robot_name)
+                    self.set_gripper(self._robot_name, gripper_name)
                 except KeyError as e:
                     rospy.logerr('Unknown gripper: %s' % e)
             elif key == 'pregrasp':
@@ -183,9 +183,9 @@ class InteractiveRoutines(AISTBaseRoutines):
             elif key == 'o':
                 self.move(InteractiveRoutines.refposes[self._robot_name])
             elif key == 'h':
-                self.go_to_named_pose("home", self._robot_name)
+                self.go_to_named_pose(self._robot_name, "home")
             elif key == 'b':
-                self.go_to_named_pose("back", self._robot_name)
+                self.go_to_named_pose(self._robot_name, "back")
             elif key == 'n':
                 pose_name = raw_input("  pose name? ")
                 try:
@@ -194,7 +194,7 @@ class InteractiveRoutines(AISTBaseRoutines):
                     rospy.logerr('Unknown pose: %s' % e)
 
         # Reset pose
-        self.go_to_named_pose("home", self._robot_name)
+        self.go_to_named_pose(self._robot_name, "home")
 
 
 ######################################################################

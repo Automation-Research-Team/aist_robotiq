@@ -59,7 +59,7 @@ class BinCalibrationRoutines(AISTBaseRoutines):
             self._offset[0], self._offset[1], self._offset[2], self._axis)
 
     def go_home(self):
-        self.go_to_named_pose('home', self._robot_name)
+        self.go_to_named_pose(self._robot_name, 'home')
 
     def go_to(self, target_frame, offset, interactive=True):
         if interactive:
@@ -77,7 +77,7 @@ class BinCalibrationRoutines(AISTBaseRoutines):
 
     def touch_the_table(self):
         print('**** Calibrating between robot and table. ****')
-        self.go_to_named_pose('home', self._robot_name)
+        self.go_to_named_pose(self._robot_name, 'home')
         print('==== Going to 3 cm above the table. ====')
         self.go_to('workspace_center', (0, 0, 0.03))
         print('==== Going to 1 cm above the table. ====')
@@ -86,7 +86,7 @@ class BinCalibrationRoutines(AISTBaseRoutines):
 
     def bin_calibration(self):
         print('**** Calibrating bins. ****')
-        self.go_to_named_pose('home', self._robot_name)
+        self.go_to_named_pose(self._robot_name, 'home')
         for bin in self._bins:
             print('==== Going to 3 cm above center of bin. ====')
             self.go_to(bin, (0, 0, 0.03))
@@ -94,7 +94,7 @@ class BinCalibrationRoutines(AISTBaseRoutines):
 
     def bin_corner_calibration(self):
         print('**** Calibrating bin corners. ****')
-        self.go_to_named_pose('home', self._robot_name)
+        self.go_to_named_pose(self._robot_name, 'home')
         for bin in self._bins:
             print('---- ' + bin + ' ----')
             target_frame = bin + '_top_back_left_corner'
@@ -109,7 +109,7 @@ class BinCalibrationRoutines(AISTBaseRoutines):
 
     def workspace_calibration(self):
         print('**** Calibrating workspace. ****')
-        self.go_to_named_pose('home', self._robot_name)
+        self.go_to_named_pose(self._robot_name, 'home')
         self.go_to('workspace_center', ( 0,    0, 0.03))
         self.go_to('workspace_center', (-0.10, 0, 0.03))
         self.go_to('workspace_center', (-0.20, 0, 0.03))
@@ -161,7 +161,7 @@ if __name__ == '__main__':
             elif key == 'Z':
                 calib.axis = 'Z'
             elif key == 'h':
-                calib.go_to_named_pose('home', calib.robot_name)
+                calib.go_to_named_pose(calib.robot_name, 'home')
             elif key == 't':
                 calib.touch_the_table()
             # elif key == 'b':

@@ -67,9 +67,9 @@ class AISTBaseRoutines(object):
         self._active_grippers = {}
         for robot_name, props in d.items():
             if 'default_gripper' in props:
-                self.set_gripper_to_robot(props['default_gripper'], robot_name)
+                self.set_gripper(robot_name, props['default_gripper'])
             else:
-                self.set_gripper_to_robot('void_gripper', robot_name)
+                self.set_gripper(robot_name, 'void_gripper')
 
         # Cameras
         d = rospy.get_param('~cameras', {})
@@ -112,8 +112,8 @@ class AISTBaseRoutines(object):
         return self._eef_step
 
     # Basic motion stuffs
-    def go_to_named_pose(self, named_pose, group_name):
-        group = self._cmd.get_group(group_name)
+    def go_to_named_pose(self, robot_name, named_pose):
+        group = self._cmd.get_group(robot_name)
         try:
             group.set_named_target(named_pose)
         except moveit_commander.exception.MoveItCommanderException as e:
@@ -144,12 +144,12 @@ class AISTBaseRoutines(object):
         # rospy.loginfo('move to ' + self.format_pose(target_pose))
         self.publish_marker(target_pose, 'pose')
 
+        group = self._cmd.get_group(robot_name)
+
         if end_effector_link == '':
             end_effector_link = self.gripper(robot_name).tip_link
 
-        group = self._cmd.get_group(robot_name)
-        if len(end_effector_link) > 0:
-            group.set_end_effector_link(end_effector_link)
+        group.set_end_effector_link(end_effector_link)
         group.set_max_velocity_scaling_factor(clip(speed, 0.0, 1.0))
 
         if high_precision:
@@ -170,9 +170,7 @@ class AISTBaseRoutines(object):
                 rospy.logerr('AISTBaseRoutines.go_to_pose_goal(): {}'
                              .format(e))
                 return (False, False, group.get_current_pose())
-            waypoints = []
-            waypoints.append(pose_world)
-            (plan, fraction) = group.compute_cartesian_path(waypoints,
+            (plan, fraction) = group.compute_cartesian_path([pose_world],
                                                             self._eef_step,
                                                             0.0) # jump_threshold
             if fraction < 0.995:
@@ -221,7 +219,7 @@ class AISTBaseRoutines(object):
         return group.get_current_pose()
 
     # Gripper stuffs
-    def set_gripper_to_robot(self, gripper_name, robot_name):
+    def set_gripper(self, robot_name, gripper_name):
         self._active_grippers[robot_name] = self._grippers[gripper_name]
 
     def gripper(self, robot_name):
