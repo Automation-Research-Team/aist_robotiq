@@ -28,7 +28,7 @@ class KittingRoutines(AISTBaseRoutines):
 
         self._former_robot_name = None
         self._fail_poses = []
-        #self.go_to_named_pose('home', 'all_bots')
+        #self.go_to_named_pose('all_bots', 'home')
 
     @property
     def nbins(self):
@@ -40,12 +40,12 @@ class KittingRoutines(AISTBaseRoutines):
 
     ###----- main procedure
     def run(self):
-        self.go_to_named_pose('back', 'all_bots')
+        self.go_to_named_pose('all_bots', 'back')
         for bin in self._bins:
             if rospy.is_shutdown():
                 break
             self.attempt_bin(bin, 1)
-        self.go_to_named_pose('home', 'all_bots')
+        self.go_to_named_pose('all_bots', 'home')
 
     def demo(self):
         bin_ids = (1, 4, 5)
@@ -61,7 +61,7 @@ class KittingRoutines(AISTBaseRoutines):
             if completed:
                 break
 
-        kitting.go_to_named_pose('home', kitting.former_robot_name)
+        kitting.go_to_named_pose(kitting.former_robot_name, 'home')
 
     def search(self, bin_id, marker_lifetime=0):
         bin   = self._bins[bin_id]
@@ -81,7 +81,7 @@ class KittingRoutines(AISTBaseRoutines):
         # If using a different robot from the former, move it back to home.
         if self._former_robot_name is not None and \
            self._former_robot_name != props.robot_name:
-            self.go_to_named_pose('back', self._former_robot_name)
+            self.go_to_named_pose(self._former_robot_name, 'back')
         self._former_robot_name = props.robot_name
 
         # Move to 0.15m above the bin if the camera is mounted on the robot.
@@ -173,13 +173,13 @@ if __name__ == '__main__':
                 key = raw_input('>> ')
                 if key == 'q':
                     if kitting.former_robot_name is not None:
-                        kitting.go_to_named_pose('home',
-                                                 kitting.former_robot_name)
+                        kitting.go_to_named_pose(kitting.former_robot_name,
+                                                 'home')
                     break
                 elif key == 'H':
-                    kitting.go_to_named_pose('home', 'all_bots')
+                    kitting.go_to_named_pose('all_bots', 'home')
                 elif key == 'B':
-                    kitting.go_to_named_pose('back', 'all_bots')
+                    kitting.go_to_named_pose('all_bots', 'back')
                 elif key == 'b':
                     kitting.create_background_image('a_phoxi_m_camera')
                 elif key == 'm':
@@ -192,13 +192,13 @@ if __name__ == '__main__':
                     bin_id = int(raw_input('  bin id? '))
                     kitting.clear_fail_poses()
                     kitting.attempt_bin(bin_id, 5, 0)
-                    kitting.go_to_named_pose('home', kitting.former_robot_name)
+                    kitting.go_to_named_pose(kitting.former_robot_name, 'home')
                 elif key == 'A':
                     bin_id = int(raw_input('  bin id? '))
                     kitting.clear_fail_poses()
                     while kitting.attempt_bin(bin_id, 5, 0):
                         pass
-                    kitting.go_to_named_pose('home', kitting.former_robot_name)
+                    kitting.go_to_named_pose(kitting.former_robot_name, 'home')
                 elif key == 'd':
                     kitting.demo()
                 elif key == 'k':

@@ -43,7 +43,7 @@ class InteractiveRoutines(FetchRoutines):
 
     def go_home(self):
         self.move_head(0, 0)
-        self.go_to_named_pose('ready', self._robot_name)
+        self.go_to_named_pose(self._robot_name, 'ready')
 
     def run(self):
         # Reset pose
@@ -145,13 +145,13 @@ class InteractiveRoutines(FetchRoutines):
                     print(str(gs))
                 print(str(poses))
             elif key == 'tucking':
-                self.go_to_named_pose('tucking', self._robot_name)
+                self.go_to_named_pose(self._robot_name, 'tucking')
             elif key == 'home':
-                self.go_to_named_pose('ready', self._robot_name)
+                self.go_to_named_pose(self._robot_name, 'ready')
             elif key == 'ready':
-                self.go_to_named_pose('ready', self._robot_name)
+                self.go_to_named_pose(self._robot_name, 'ready')
             elif key == 'pick_ready':
-                self.go_to_named_pose('pick_ready', self._robot_name)
+                self.go_to_named_pose(self._robot_name, 'pick_ready')
             elif key == 'torso':
                 position = float(raw_input('  position = '))
                 self.move_torso(position)

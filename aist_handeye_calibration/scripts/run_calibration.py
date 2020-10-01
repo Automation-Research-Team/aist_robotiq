@@ -109,7 +109,7 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
             self.reset()
 
         # Reset pose
-        self.go_to_named_pose('home', self._robot_name)
+        self.go_to_named_pose(self._robot_name, 'home')
         self.move(self._initpose)
         self.trigger_frame(self._camera_name)
 
@@ -135,7 +135,7 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
             except rospy.ServiceException as e:
                 rospy.logerr('Service call failed: %s' % e)
 
-        self.go_to_named_pose('home', self._robot_name)
+        self.go_to_named_pose(self._robot_name, 'home')
 
     def run(self):
         while not rospy.is_shutdown():

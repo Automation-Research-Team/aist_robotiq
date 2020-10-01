@@ -72,7 +72,7 @@ class CheckCalibrationRoutines(AISTBaseRoutines):
         print('  reached ' + self.format_pose(current_pose))
 
     def run(self):
-        self.go_to_named_pose('home', self._robot_name)
+        self.go_to_named_pose(self._robot_name, 'home')
 
         while not rospy.is_shutdown():
             try:
@@ -84,7 +84,7 @@ class CheckCalibrationRoutines(AISTBaseRoutines):
                 if key == 'i':
                     self.move(self._initpose)
                 elif key == 'h':
-                    self.go_to_named_pose('home', self._robot_name)
+                    self.go_to_named_pose(self._robot_name, 'home')
                 elif key == 'q':
                     break
                 else:
@@ -95,7 +95,7 @@ class CheckCalibrationRoutines(AISTBaseRoutines):
                 rospy.logerr(ex)
                 break
 
-        self.go_to_named_pose('home', self._robot_name)
+        self.go_to_named_pose(self._robot_name, 'home')
 
 
 ######################################################################

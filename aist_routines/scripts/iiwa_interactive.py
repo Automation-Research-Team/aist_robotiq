@@ -46,14 +46,14 @@ class InteractiveRoutines(IiwaRoutines):
         self._speed        = speed
 
     def go_standing(self):
-        self.go_to_named_pose('standing', self._robot_name)
+        self.go_to_named_pose(self._robot_name, 'standing')
 
     def go_home(self):
-        self.go_to_named_pose('home', self._robot_name)
+        self.go_to_named_pose(self._robot_name, 'home')
 
     """
     def go_back(self):
-        self.go_to_named_pose('back', self._robot_name)
+        self.go_to_named_pose(self._robot_name, 'back')
     """
 
     def move(self, pose):

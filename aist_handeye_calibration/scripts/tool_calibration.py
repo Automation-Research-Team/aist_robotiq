@@ -53,10 +53,10 @@ class ToolCalibrationRoutines(AISTBaseRoutines):
         self._rpy = list(tfs.euler_from_matrix(self._R0))
 
     def go_home(self):
-        self.go_to_named_pose('home', self._robot_name)
+        self.go_to_named_pose(self._robot_name, 'home')
 
     def go_back(self):
-        self.go_to_named_pose('back', self._robot_name)
+        self.go_to_named_pose(self._robot_name, 'back')
 
     def move(self, pose):
         R = self.listener.fromTranslationRotation(

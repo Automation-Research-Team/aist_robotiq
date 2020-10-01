@@ -86,7 +86,7 @@ class FTCalibrationRoutines(AISTBaseRoutines):
             self.save_calibration    = None
 
     def go_home(self):
-        self.go_to_named_pose("home", self._robot_name)
+        self.go_to_named_pose(self._robot_name, "home")
 
     def move(self, pose):
         poseStamped = gmsg.PoseStamped()
