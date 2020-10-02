@@ -1,4 +1,4 @@
-arms:
+robots:
   arm:
     default_gripper: gripper
 

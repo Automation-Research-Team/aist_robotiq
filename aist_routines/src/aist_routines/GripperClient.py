@@ -496,6 +496,8 @@ class Lecp6Gripper(GripperClient):
             self._client.send_goal(self._goal)
             self._client.wait_for_result(rospy.Duration(self.timeout))
             result = self._client.get_result()
+            if result is None:
+                return False
             if close:
                 self._picked = result.reached_goal
             rospy.loginfo(result)
