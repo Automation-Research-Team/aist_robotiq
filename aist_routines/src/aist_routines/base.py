@@ -84,8 +84,7 @@ class AISTBaseRoutines(object):
             #from aist_graspability_py2cpp import GraspabilityClient
             self._graspability_params \
                 = paramtuples(rospy.get_param('~graspability_parameters'))
-            self._graspabilityClient \
-                = GraspabilityClient(reference_frame=self._reference_frame)
+            self._graspabilityClient = GraspabilityClient()
 
         self._markerPublisher    = MarkerPublisher()        # Marker publisher
         self._pickOrPlaceAction  = PickOrPlaceAction(self)  # Other actions
@@ -170,9 +169,8 @@ class AISTBaseRoutines(object):
                 rospy.logerr('AISTBaseRoutines.go_to_pose_goal(): {}'
                              .format(e))
                 return (False, False, group.get_current_pose())
-            (plan, fraction) = group.compute_cartesian_path([pose_world],
-                                                            self._eef_step,
-                                                            0.0) # jump_threshold
+            plan, fraction = group.compute_cartesian_path([pose_world],
+                                                          self._eef_step, 0.0)
             if fraction < 0.995:
                 rospy.logwarn('Computed only {}% of the total cartesian path.'
                               .format(fraction*100))
@@ -265,28 +263,6 @@ class AISTBaseRoutines(object):
         success = self._graspabilityClient.create_mask_image(nbins)
         return success
 
-    def search_graspability(self, robot_name, camera_name, part_id, bin_id,
-                            use_normals=True, marker_lifetime=60):
-        self.delete_all_markers()
-        gripper = self.gripper(robot_name)
-        camera  = self.camera(camera_name)
-        param   = self._graspability_params[part_id]
-        camera.trigger_frame()
-        poses, gscores, success = \
-            self._graspabilityClient.search(
-                bin_id, gripper.type,
-                param.ns, param.detect_edge, param.object_size, param.radius,
-                param.open_width, param.finger_width, param.finger_thickness,
-                param.insertion_depth)
-        if success:
-            for i, pose in enumerate(poses):
-                self.publish_marker(pose, 'graspability',
-                                    '{}[{:.3f}]'.format(i, gscores[i]),
-                                    lifetime=marker_lifetime)
-                rospy.loginfo('graspability: {}[{:.3f}]'.format(i, gscores[i]))
-
-        return poses, gscores, success
-
     def graspability_send_goal(self, robot_name, camera_name, part_id, bin_id):
         self.delete_all_markers()
         gripper = self.gripper(robot_name)
@@ -299,9 +275,10 @@ class AISTBaseRoutines(object):
             param.open_width, param.finger_width, param.finger_thickness,
             param.insertion_depth)
 
-    def graspability_wait_for_result(self, marker_lifetime=60):
-        poses, gscores, success = \
-            self._graspabilityClient.wait_for_result()
+    def graspability_wait_for_result(self, orientation=None, max_slant=pi/4,
+                                     marker_lifetime=60):
+        poses, gscores, success \
+            = self._graspabilityClient.wait_for_result(orientation, max_slant)
         if success:
             for i, pose in enumerate(poses):
                 self.publish_marker(pose, 'graspability',
