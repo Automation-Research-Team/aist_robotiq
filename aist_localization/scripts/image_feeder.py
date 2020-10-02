@@ -65,9 +65,9 @@ class ImageFeeder(object):
         self._image_pub = rospy.Publisher('~image', smsg.Image, queue_size=1)
         self._depth_pub = rospy.Publisher('~depth', smsg.Image, queue_size=1)
 
-        self._dfilter   = DepthFilterClient('depth_filter')
+        self._dfilter   = DepthFilterClient('~depth_filter')
         self._dfilter.window_radius = 2
-        self._localizer = LocalizationClient('localization')
+        self._localizer = LocalizationClient('~localization')
         self._spawner   = ModelSpawnerClient()
 
     def load_and_localize(self, annotation_filename):

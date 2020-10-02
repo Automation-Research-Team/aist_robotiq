@@ -40,9 +40,11 @@
     <arg name="image_topic"	  value="$(arg camera_name)/color/image_raw"/>
     <arg name="depth_topic"	  value="$(arg camera_name)/aligned_depth_to_color/image_raw"/>
     <arg name="normal_topic"	  value=""/>
-    <arg name="window_radius"	  value="2"/>
     <arg name="manager"		  value="$(arg manager)"/>
   </include>
+
+  <node name="set_window_radius" pkg="dynamic_reconfigure" type="dynparam"
+	args="set depth_filter window_radius 2"/>
 
   <group if="$(arg vis)">
     <node name="$(anon rviz)" pkg="rviz" type="rviz" output="screen"
