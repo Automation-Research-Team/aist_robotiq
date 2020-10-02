@@ -276,7 +276,15 @@ class AISTBaseRoutines(object):
             param.insertion_depth)
 
     def graspability_wait_for_result(self, orientation=None, max_slant=pi/4,
-                                     marker_lifetime=60):
+                                     marker_lifetime=0):
+        if orientation is None:
+            orientation = gmsg.QuaternionStamped()
+            orientation.header.frame_id = self._reference_frame
+            orientation.quaternion.x = 0
+            orientation.quaternion.y = 0
+            orientation.quaternion.z = 0
+            orientation.quaternion.w = 1
+
         poses, gscores, success \
             = self._graspabilityClient.wait_for_result(orientation, max_slant)
         if success:

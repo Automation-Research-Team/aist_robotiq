@@ -55,7 +55,7 @@ class KittingRoutines(AISTBaseRoutines):
 
             for bin_id in bin_ids:
                 kitting.clear_fail_poses()
-                success = kitting.attempt_bin(bin_id, 5, 0)
+                success = kitting.attempt_bin(bin_id, 5)
                 completed = completed and not success
 
             if completed:
@@ -63,17 +63,14 @@ class KittingRoutines(AISTBaseRoutines):
 
         kitting.go_to_named_pose(kitting.former_robot_name, 'home')
 
-    def search(self, bin_id, marker_lifetime=0):
+    def search(self, bin_id):
         bin   = self._bins[bin_id]
         props = bin.part_props
         self.graspability_send_goal(props.robot_name, props.camera_name,
                                     bin.part_id, bin_id)
-        return self.graspability_wait_for_result(marker_lifetime)
-        # return self.search_graspability(props.robot_name, props.camera_name,
-        #                                 bin.part_id, bin_id, props.use_normals,
-        #                                 marker_lifetime)
+        return self.graspability_wait_for_result()
 
-    def attempt_bin(self, bin_id, max_attempts=5, marker_lifetime=0):
+    def attempt_bin(self, bin_id, max_attempts=5):
         bin   = self._bins[bin_id]
         props = bin.part_props
 
@@ -88,7 +85,7 @@ class KittingRoutines(AISTBaseRoutines):
             self.go_to_frame(props.robot_name, bin.name, (0, 0, 0.15))
 
         # Search for graspabilities.
-        (pick_poses, _, success) = self.search(bin_id, marker_lifetime)
+        (pick_poses, _, success) = self.search(bin_id)
         if not success:
             return False
 
@@ -190,12 +187,12 @@ if __name__ == '__main__':
                 elif key == 'a':
                     bin_id = int(raw_input('  bin id? '))
                     kitting.clear_fail_poses()
-                    kitting.attempt_bin(bin_id, 5, 0)
+                    kitting.attempt_bin(bin_id, 5)
                     kitting.go_to_named_pose(kitting.former_robot_name, 'home')
                 elif key == 'A':
                     bin_id = int(raw_input('  bin id? '))
                     kitting.clear_fail_poses()
-                    while kitting.attempt_bin(bin_id, 5, 0):
+                    while kitting.attempt_bin(bin_id, 5):
                         pass
                     kitting.go_to_named_pose(kitting.former_robot_name, 'home')
                 elif key == 'd':
