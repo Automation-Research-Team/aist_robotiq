@@ -288,6 +288,8 @@ class AISTBaseRoutines(object):
         poses, gscores, success \
             = self._graspabilityClient.wait_for_result(orientation, max_slant)
         if success:
+            poses = [ self.transform_pose_to_reference_frame(pose)
+                      for pose in poses ]
             for i, pose in enumerate(poses):
                 self.publish_marker(pose, 'graspability',
                                     '{}[{:.3f}]'.format(i, gscores[i]),
