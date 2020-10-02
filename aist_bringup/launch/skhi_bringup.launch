@@ -13,8 +13,7 @@
   <arg name="devices"			value="RS007L, gripper"/>
   <arg name="controllers"		value="khi, fetch"/>
   <arg name="drivers"			value="khi"/>
-  <arg name="driver_args"		value="192.168.0.2, 4,
-  					       tranbo_control/tranbo_monitor"/>
+  <arg name="driver_args"		value="192.168.0.2, 4,"/>
 
   <!-- Bringup robots -->
   <include file="$(find aist_bringup)/launch/include/connect_robots.launch">

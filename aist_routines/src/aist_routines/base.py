@@ -169,9 +169,8 @@ class AISTBaseRoutines(object):
                 rospy.logerr('AISTBaseRoutines.go_to_pose_goal(): {}'
                              .format(e))
                 return (False, False, group.get_current_pose())
-            (plan, fraction) \
-                = group.compute_cartesian_path([pose_world], self._eef_step,
-                                               0.0) # jump_threshold
+            plan, fraction = group.compute_cartesian_path([pose_world],
+                                                          self._eef_step, 0.0)
             if fraction < 0.995:
                 rospy.logwarn('Computed only {}% of the total cartesian path.'
                               .format(fraction*100))
@@ -276,11 +275,10 @@ class AISTBaseRoutines(object):
             param.open_width, param.finger_width, param.finger_thickness,
             param.insertion_depth)
 
-    def graspability_wait_for_result(self,
-                                     orientation=None, marker_lifetime=60):
-        poses, gscores, success = \
-            self._graspabilityClient.wait_for_result(self._reference_frame,
-                                                     orientation)
+    def graspability_wait_for_result(self, orientation=None, max_slant=pi/4,
+                                     marker_lifetime=60):
+        poses, gscores, success \
+            = self._graspabilityClient.wait_for_result(orientation, max_slant)
         if success:
             for i, pose in enumerate(poses):
                 self.publish_marker(pose, 'graspability',
