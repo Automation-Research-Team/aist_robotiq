@@ -25,7 +25,7 @@ part_props:
     camera_name: a_phoxi_m_camera
     destination: tray_1_partition_4
     approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, -0.003]
+    grasp_offset: [0.0, 0.0, 0.005]
     place_offset: [0.0, 0.0, 0.06]
     speed_slow: 0.1
     use_normals: true
@@ -35,7 +35,7 @@ part_props:
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_6
     approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, -0.003]
+    grasp_offset: [0.0, 0.0, 0.004]
     place_offset: [0.0, 0.0, 0.03]
     speed_slow: 1.0
     use_normals: true
@@ -55,7 +55,7 @@ part_props:
     camera_name: a_phoxi_m_camera
     destination: tray_1_partition_2
     approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, -0.003]
+    grasp_offset: [0.0, 0.0, 0.004]
     place_offset: [0.0, 0.0, 0.05]
     speed_slow: 0.1
     use_normals: true
@@ -65,7 +65,7 @@ part_props:
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_1
     approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, -0.003]
+    grasp_offset: [0.0, 0.0, 0.00]
     place_offset: [0.0, 0.0, 0.03]
     speed_slow: 0.1
     use_normals: true
@@ -95,7 +95,7 @@ part_props:
     camera_name: a_phoxi_m_camera
     destination: tray_1_partition_1
     approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, 0,0]
+    grasp_offset: [0.0, 0.0, -0.001]
     place_offset: [0.0, 0.0, 0.05]
     speed_slow: 0.04
     use_normals: true
@@ -115,7 +115,7 @@ part_props:
     camera_name: a_phoxi_m_camera
     destination: tray_1_partition_5
     approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, 0.0]
+    grasp_offset: [0.0, 0.0, -0.001]
     place_offset: [0.0, 0.0, 0.05]
     speed_slow: 0.04
     use_normals: true
