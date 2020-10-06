@@ -1,6 +1,5 @@
 graspability_parameters:
-  _4:
-    name: Geared motor
+  04_37D-GEARMOTOR-50-70:
     ns: 2
     detect_edge: true
     object_size: 15
@@ -9,8 +8,7 @@ graspability_parameters:
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 10
-  _5:
-    name: Pully for round belt
+  05_MBRFA30-2-P6:
     ns: 2
     detect_edge: true
     object_size: 8
@@ -19,8 +17,7 @@ graspability_parameters:
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 3
-  _6:
-    name: Polyurethane round belt
+  06_MBT4-400:
     ns: 2
     detect_edge: true
     object_size: 2
@@ -29,8 +26,7 @@ graspability_parameters:
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 5
-  _7:
-    name: Bearing with housing
+  07_SBARB6200ZZ_30:
     ns: 2
     detect_edge: true
     object_size: 12
@@ -39,8 +35,7 @@ graspability_parameters:
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 5
-  _8:
-    name: Drive shaft
+  08_KZAF1075NA4WA55GA20AA0:
     ns: 0
     detect_edge: false
     object_size: 4
@@ -49,8 +44,7 @@ graspability_parameters:
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 4
-  _9:
-    name: End cap for shaft
+  09_EDCS10:
     ns: 2
     detect_edge: true
     object_size: 3
@@ -59,8 +53,7 @@ graspability_parameters:
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 1
-  _10:
-    name: Bearing spacers for inner ring
+  10_CLBPS10_17_4:
     ns: 2
     detect_edge: true
     object_size: 3
@@ -69,8 +62,7 @@ graspability_parameters:
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 1
-  _11:
-    name: Pully for round belts clamping
+  11_MBRAC60-2-10:
     ns: 2
     detect_edge: true
     object_size: 12
@@ -79,8 +71,7 @@ graspability_parameters:
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 1
-  _12:
-    name: Bearing spacer for inner ring
+  12_CLBUS6-9-9.5:
     ns: 2
     detect_edge: true
     object_size: 4
@@ -89,8 +80,7 @@ graspability_parameters:
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 1
-  _13:
-    name: Idler for round belt
+  13_MBGA30-2:
     ns: 2
     detect_edge: true
     object_size: 7
@@ -99,8 +89,7 @@ graspability_parameters:
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 1
-  _14:
-    name: Bearing shaft screw
+  14_BGPSL6-9-L30-F8:
     ns: 0
     detect_edge: true
     object_size: 4
@@ -109,8 +98,7 @@ graspability_parameters:
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 5
-  _15:
-    name: M6 hex nut
+  15_SLBNR6:
     ns: 2
     detect_edge: true
     object_size: 3
@@ -119,8 +107,7 @@ graspability_parameters:
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 1
-  _16:
-    name: M6 flat washer
+  16_SPWF6:
     ns: 0
     detect_edge: true
     object_size: 3
@@ -129,8 +116,7 @@ graspability_parameters:
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 1
-  _17:
-    name: M4 head cap screw
+  17_SCB4-10:
     ns: 0
     detect_edge: true
     object_size: 1
@@ -139,8 +125,7 @@ graspability_parameters:
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 1
-  _18:
-    name: M3 head cap screw
+  18_SCB3-10:
     ns: 0
     detect_edge: true
     object_size: 1
@@ -149,103 +134,3 @@ graspability_parameters:
     finger_width: 1
     finger_thickness: 5
     insertion_depth: 1
-  _58331:
-    name: toyota1 9R
-    ns: 2
-    detect_edge: true
-    object_size: 20
-    radius: 15
-    open_width: 100
-    finger_width: 1
-    finger_thickness: 5
-    insertion_depth: 10
-  _58332:
-    name: toyota1 9L
-    ns: 2
-    detect_edge: true
-    object_size: 20
-    radius: 15
-    open_width: 100
-    finger_width: 1
-    finger_thickness: 5
-    insertion_depth: 10
-  _64600:
-    name: toyota1 Trunk
-    ns: 2
-    detect_edge: true
-    object_size: 20
-    radius: 15
-    open_width: 100
-    finger_width: 1
-    finger_thickness: 5
-    insertion_depth: 10
-  _61653:
-    name: toyota1 5R
-    ns: 2
-    detect_edge: true
-    object_size: 20
-    radius: 15
-    open_width: 100
-    finger_width: 1
-    finger_thickness: 5
-    insertion_depth: 10
-  _61654:
-    name: toyota1 5L
-    ns: 2
-    detect_edge: true
-    object_size: 20
-    radius: 15
-    open_width: 100
-    finger_width: 1
-    finger_thickness: 5
-    insertion_depth: 10
-  _64621:
-    name: toyota1 9ZB
-    ns: 2
-    detect_edge: true
-    object_size: 10
-    radius: 6
-    open_width: 100
-    finger_width: 1
-    finger_thickness: 5
-    insertion_depth: 10
-  _68945:
-    name: toyota1 WR
-    ns: 2
-    detect_edge: true
-    object_size: 8
-    radius: 4
-    open_width: 100
-    finger_width: 1
-    finger_thickness: 5
-    insertion_depth: 10
-  _68946:
-    name: toyota1 WL
-    ns: 0
-    detect_edge: false
-    object_size: 8
-    radius: 4
-    open_width: 20
-    finger_width: 1
-    finger_thickness: 5
-    insertion_depth: 4
-  _69430:
-    name: toyota1 Lock
-    ns: 2
-    detect_edge: true
-    object_size: 8
-    radius: 4
-    open_width: 100
-    finger_width: 1
-    finger_thickness: 5
-    insertion_depth: 10
-  _89997:
-    name: toyota1 9L18
-    ns: 2
-    detect_edge: true
-    object_size: 15
-    radius: 8
-    open_width: 100
-    finger_width: 1
-    finger_thickness: 5
-    insertion_depth: 10

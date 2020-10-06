@@ -83,7 +83,7 @@ class AISTBaseRoutines(object):
             from aist_graspability import GraspabilityClient
             #from aist_graspability_py2cpp import GraspabilityClient
             self._graspability_params \
-                = paramtuples(rospy.get_param('~graspability_parameters'))
+                = rospy.get_param('~graspability_parameters'))
             self._graspabilityClient = GraspabilityClient()
 
         self._markerPublisher    = MarkerPublisher()        # Marker publisher
@@ -263,28 +263,18 @@ class AISTBaseRoutines(object):
         success = self._graspabilityClient.create_mask_image(nbins)
         return success
 
-    def graspability_send_goal(self, robot_name, camera_name, part_id, bin_id):
+    def graspability_send_goal(self,
+                               robot_name, camera_name, part_id, mask_id):
         self.delete_all_markers()
         gripper = self.gripper(robot_name)
         camera  = self.camera(camera_name)
-        param   = self._graspability_params[part_id]
+        params  = self._graspability_params[part_id]
         camera.trigger_frame()
-        self._graspabilityClient.send_goal(
-            bin_id, gripper.type,
-            param.ns, param.detect_edge, param.object_size, param.radius,
-            param.open_width, param.finger_width, param.finger_thickness,
-            param.insertion_depth)
+        self._graspabilityClient.set_parameters(params)
+        self._graspabilityClient.send_goal(mask_id, gripper.type, **params)
 
     def graspability_wait_for_result(self, orientation=None, max_slant=pi/4,
                                      marker_lifetime=0):
-        if orientation is None:
-            orientation = gmsg.QuaternionStamped()
-            orientation.header.frame_id = self._reference_frame
-            orientation.quaternion.x = 0
-            orientation.quaternion.y = 0
-            orientation.quaternion.z = 0
-            orientation.quaternion.w = 1
-
         poses, gscores, success \
             = self._graspabilityClient.wait_for_result(orientation, max_slant)
         if success:
