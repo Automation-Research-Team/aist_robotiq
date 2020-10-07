@@ -28,8 +28,7 @@ def paramtuples(d):
 
     params = {}
     for key, param in d.items():
-        id = int(key.split('_')[1])
-        params[id] = ParamTuple(**param)
+        params[key] = ParamTuple(**param)
     return params
 
 ######################################################################
@@ -83,11 +82,11 @@ class AISTBaseRoutines(object):
             from aist_graspability import GraspabilityClient
             #from aist_graspability_py2cpp import GraspabilityClient
             self._graspability_params \
-                = rospy.get_param('~graspability_parameters'))
+                = rospy.get_param('~graspability_parameters')
             self._graspabilityClient = GraspabilityClient()
 
-        self._markerPublisher    = MarkerPublisher()        # Marker publisher
-        self._pickOrPlaceAction  = PickOrPlaceAction(self)  # Other actions
+        self._markerPublisher   = MarkerPublisher()        # Marker publisher
+        self._pickOrPlaceAction = PickOrPlaceAction(self)  # Other actions
         rospy.loginfo('AISTBaseRoutines initialized.')
 
     def __enter__(self):
@@ -252,41 +251,38 @@ class AISTBaseRoutines(object):
 
     # Graspability stuffs
     def create_background_image(self, camera_name):
-        camera = self.camera(camera_name)
-        camera.trigger_frame()
-        success = self._graspabilityClient.create_background_image()
-        return success
+        self.camera(camera_name).trigger_frame()
+        return self._graspabilityClient.create_background_image()
 
     def create_mask_image(self, camera_name, nbins):
-        camera = self.camera(camera_name)
-        camera.trigger_frame()
-        success = self._graspabilityClient.create_mask_image(nbins)
-        return success
+        self.camera(camera_name).trigger_frame()
+        return self._graspabilityClient.create_mask_image(nbins)
 
     def graspability_send_goal(self,
                                robot_name, camera_name, part_id, mask_id):
         self.delete_all_markers()
-        gripper = self.gripper(robot_name)
-        camera  = self.camera(camera_name)
         params  = self._graspability_params[part_id]
-        camera.trigger_frame()
         self._graspabilityClient.set_parameters(params)
-        self._graspabilityClient.send_goal(mask_id, gripper.type, **params)
+
+        # Send goal first to be ready for subscribing image, then trigger frame.
+        self._graspabilityClient.send_goal(mask_id,
+                                           self.gripper(robot_name).type)
+        self.camera(camera_name).trigger_frame()
 
     def graspability_wait_for_result(self, orientation=None, max_slant=pi/4,
                                      marker_lifetime=0):
-        poses, gscores, success \
-            = self._graspabilityClient.wait_for_result(orientation, max_slant)
-        if success:
-            poses = [ self.transform_pose_to_reference_frame(pose)
-                      for pose in poses ]
-            for i, pose in enumerate(poses):
-                self.publish_marker(pose, 'graspability',
-                                    '{}[{:.3f}]'.format(i, gscores[i]),
-                                    lifetime=marker_lifetime)
-                rospy.loginfo('graspability: {}[{:.3f}]'.format(i, gscores[i]))
+        poses, gscores = self._graspabilityClient.wait_for_result(orientation,
+                                                                  max_slant)
 
-        return poses, gscores, success
+        poses = [ self.transform_pose_to_reference_frame(pose)
+                  for pose in poses ]
+        for i, pose in enumerate(poses):
+            self.publish_marker(pose, 'graspability',
+                                '{}[{:.3f}]'.format(i, gscores[i]),
+                                lifetime=marker_lifetime)
+            rospy.loginfo('graspability: {}[{:.3f}]'.format(i, gscores[i]))
+
+        return poses, gscores
 
     def graspability_cancel_goal(self):
         self._graspabilityClient.cancel_goal()

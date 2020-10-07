@@ -11,21 +11,11 @@ from aist_routines      import msg as amsg
 class KittingRoutines(AISTBaseRoutines):
     """Implements kitting routines for aist robot system."""
 
-    Bin = collections.namedtuple('Bin', 'name part_id part_props')
-
     def __init__(self):
         super(KittingRoutines, self).__init__()
 
-        bin_props  = base.paramtuples(rospy.get_param('~bin_props'))
-        part_props = base.paramtuples(rospy.get_param('~part_props'))
-
-        # Assign part information to each bin.
-        self._bins = {}
-        for bin_id, bin_prop in bin_props.items():
-            part_id = bin_prop.part_id
-            self._bins[bin_id] = KittingRoutines.Bin(bin_prop.name, part_id,
-                                                     part_props[part_id])
-
+        self._bin_props  = base.paramtuples(rospy.get_param('~bin_props'))
+        self._part_props = base.paramtuples(rospy.get_param('~part_props'))
         self._former_robot_name = None
         self._fail_poses = []
         #self.go_to_named_pose('all_bots', 'home')
@@ -48,7 +38,7 @@ class KittingRoutines(AISTBaseRoutines):
         self.go_to_named_pose('all_bots', 'home')
 
     def demo(self):
-        bin_ids = (1, 4, 5)
+        bin_ids = ('bin_1', 'bin_4', 'bin_5')
 
         while True:
             completed = False
@@ -64,30 +54,30 @@ class KittingRoutines(AISTBaseRoutines):
         kitting.go_to_named_pose(kitting.former_robot_name, 'home')
 
     def search(self, bin_id):
-        bin   = self._bins[bin_id]
-        props = bin.part_props
-        self.graspability_send_goal(props.robot_name, props.camera_name,
-                                    bin.part_id, bin_id)
+        bin_props  = self._bin_props[bin_id]
+        part_props = self._part_props[bin_props.part_id]
+        self.graspability_send_goal(part_props.robot_name,
+                                    part_props.camera_name,
+                                    bin_props.part_id, bin_props.mask_id)
         return self.graspability_wait_for_result()
 
     def attempt_bin(self, bin_id, max_attempts=5):
-        bin   = self._bins[bin_id]
-        props = bin.part_props
+        bin_props  = self._bin_props[bin_id]
+        part_props = self._part_props[bin_props.part_id]
 
         # If using a different robot from the former, move it back to home.
         if self._former_robot_name is not None and \
-           self._former_robot_name != props.robot_name:
+           self._former_robot_name != part_props.robot_name:
             self.go_to_named_pose(self._former_robot_name, 'back')
-        self._former_robot_name = props.robot_name
+        self._former_robot_name = part_props.robot_name
 
         # Move to 0.15m above the bin if the camera is mounted on the robot.
-        if self._is_eye_on_hand(props.robot_name, props.camera_name):
-            self.go_to_frame(props.robot_name, bin.name, (0, 0, 0.15))
+        if self._is_eye_on_hand(part_props.robot_name, part_props.camera_name):
+            self.go_to_frame(part_props.robot_name, bin_props.name,
+                             (0, 0, 0.15))
 
         # Search for graspabilities.
-        (pick_poses, _, success) = self.search(bin_id)
-        if not success:
-            return False
+        pick_poses, _ = self.search(bin_id)
 
         # Attempt to pick the item.
         nattempts = 0
@@ -98,28 +88,28 @@ class KittingRoutines(AISTBaseRoutines):
             if self._is_close_to_fail_poses(pose):
                 continue
 
-            result = self.pick(props.robot_name, pose,
-                               speed_slow=props.speed_slow,
-                               grasp_offset=props.grasp_offset,
-                               approach_offset=props.approach_offset)
+            result = self.pick(part_props.robot_name, pose,
+                               speed_slow=part_props.speed_slow,
+                               grasp_offset=part_props.grasp_offset,
+                               approach_offset=part_props.approach_offset)
             if result == amsg.pickOrPlaceResult.SUCCESS:
                 result = self.place_at_frame(
-                                props.robot_name, props.destination,
-                                speed_slow=props.speed_slow,
-                                place_offset=props.place_offset,
-                                approach_offset=props.approach_offset)
+                                part_props.robot_name, part_props.destination,
+                                speed_slow=part_props.speed_slow,
+                                place_offset=part_props.place_offset,
+                                approach_offset=part_props.approach_offset)
                 return result == amsg.pickOrPlaceResult.SUCCESS
             elif result == amsg.pickOrPlaceResult.MOVE_FAILURE or \
                  result == amsg.pickOrPlaceResult.APPROACH_FAILURE:
                 self._fail_poses.append(pose)
             elif result == amsg.pickOrPlaceResult.DEPARTURE_FAILURE:
-                self.release(props.robot_name)
+                self.release(part_props.robot_name)
                 raise RuntimeError('Failed to depart from pick/place pose')
             elif result == amsg.pickOrPlaceResult.PICK_FAILURE:
                 self._fail_poses.append(pose)
                 nattempts += 1
 
-            self.release(props.robot_name)
+            self.release(part_props.robot_name)
 
         return False
 
@@ -182,15 +172,15 @@ if __name__ == '__main__':
                     kitting.create_mask_image('a_phoxi_m_camera',
                                               kitting.nbins)
                 elif key == 's':
-                    bin_id = int(raw_input('  bin id? '))
+                    bin_id = 'bin_' + raw_input('  bin id? ')
                     kitting.search(bin_id)
                 elif key == 'a':
-                    bin_id = int(raw_input('  bin id? '))
+                    bin_id = 'bin_' + raw_input('  bin id? ')
                     kitting.clear_fail_poses()
                     kitting.attempt_bin(bin_id, 5)
                     kitting.go_to_named_pose(kitting.former_robot_name, 'home')
                 elif key == 'A':
-                    bin_id = int(raw_input('  bin id? '))
+                    bin_id = 'bin_' + raw_input('  bin id? ')
                     kitting.clear_fail_poses()
                     while kitting.attempt_bin(bin_id, 5):
                         pass

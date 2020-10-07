@@ -2,21 +2,27 @@ bin_props:
   bin_1:
     name: bin_1_part_5
     part_id: 05_MBRFA30-2-P6
+    mask_id: 1
   bin_2:
     name: bin_1_part_16
     part_id: 16_SPWF6
+    mask_id: 2
   bin_3:
     name: bin_1_part_17
     part_id: 17_SCB4-10
+    mask_id: 3
   bin_4:
     name: bin_2_part_4
     part_id: 04_37D-GEARMOTOR-50-70
+    mask_id: 4
   bin_5:
     name: bin_2_part_7
     part_id: 07_SBARB6200ZZ_30
+    mask_id: 5
   bin_6:
     name: bin_2_part_8
     part_id: 08_KZAF1075NA4WA55GA20AA0
+    mask_id: 6
 
 part_props:
   04_37D-GEARMOTOR-50-70:
@@ -169,3 +175,140 @@ part_props:
     place_offset: [0.0, 0.0, 0.05]
     speed_slow: 1.0
     use_normals: false
+
+graspability_parameters:
+  04_37D-GEARMOTOR-50-70:
+    ns: 2
+    detect_edge: true
+    object_size: 15
+    radius: 8
+    open_width: 100
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 10
+  05_MBRFA30-2-P6:
+    ns: 2
+    detect_edge: true
+    object_size: 8
+    radius: 6
+    open_width: 45
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 3
+  06_MBT4-400:
+    ns: 2
+    detect_edge: true
+    object_size: 2
+    radius: 2
+    open_width: 20
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 5
+  07_SBARB6200ZZ_30:
+    ns: 2
+    detect_edge: true
+    object_size: 12
+    radius: 12
+    open_width: 20
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 5
+  08_KZAF1075NA4WA55GA20AA0:
+    ns: 0
+    detect_edge: false
+    object_size: 4
+    radius: 2
+    open_width: 20
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 4
+  09_EDCS10:
+    ns: 2
+    detect_edge: true
+    object_size: 3
+    radius: 3
+    open_width: 20
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
+  10_CLBPS10_17_4:
+    ns: 2
+    detect_edge: true
+    object_size: 3
+    radius: 3
+    open_width: 20
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
+  11_MBRAC60-2-10:
+    ns: 2
+    detect_edge: true
+    object_size: 12
+    radius: 12
+    open_width: 20
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
+  12_CLBUS6-9-9.5:
+    ns: 2
+    detect_edge: true
+    object_size: 4
+    radius: 2
+    open_width: 20
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
+  13_MBGA30-2:
+    ns: 2
+    detect_edge: true
+    object_size: 7
+    radius: 2
+    open_width: 30
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
+  14_BGPSL6-9-L30-F8:
+    ns: 0
+    detect_edge: true
+    object_size: 4
+    radius: 2
+    open_width: 14
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 5
+  15_SLBNR6:
+    ns: 2
+    detect_edge: true
+    object_size: 3
+    radius: 3
+    open_width: 20
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
+  16_SPWF6:
+    ns: 0
+    detect_edge: true
+    object_size: 3
+    radius: 3
+    open_width: 15
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
+  17_SCB4-10:
+    ns: 0
+    detect_edge: true
+    object_size: 1
+    radius: 1
+    open_width: 10
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
+  18_SCB3-10:
+    ns: 0
+    detect_edge: true
+    object_size: 1
+    radius: 1
+    open_width: 10
+    finger_width: 1
+    finger_thickness: 5
+    insertion_depth: 1
