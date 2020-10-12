@@ -1,8 +1,10 @@
 import rospy
 import actionlib
 import std_msgs.msg
+import std_srvs
 
 from numpy import clip
+from tranbo_control   import srv as tsrv
 
 ######################################################################
 #  class GripperClient                                               #
@@ -512,7 +514,7 @@ class Lecp6Gripper(GripperClient):
 #  class MagswitchGripper                                            #
 ######################################################################
 class MagswitchGripper(GripperClient):
-    def __init__(self, prefix="a_bot_", sensitivity=0, position=100, timeout=3.0):
+    def __init__(self, prefix="a_bot_", sensitivity=0, position=100, timeout=30.0):
         import tranbo_control.msg
 
         super(MagswitchGripper, self) \
@@ -525,6 +527,13 @@ class MagswitchGripper(GripperClient):
         self._suctioned        = False
         self._calibration_step = 0
         self._goal = tranbo_control.msg.MagswitchCommandGoal()
+
+        self._enable_arm = rospy.ServiceProxy(
+            '/arm_driver/tranbo_base_driver/enable_arm',
+            std_srvs.srv.SetBool)
+        self._set_state_trigger = rospy.ServiceProxy(
+            '/arm_driver/tranbo_base_driver/set_state_trigger',
+            tsrv.SetStateTrigger)
 
     @staticmethod
     def base(prefix, timeout):
@@ -582,6 +591,8 @@ class MagswitchGripper(GripperClient):
 
     def _send_command(self, home_magnet=False, calibration_trigger=0, calibration_select=0, sensitivity=0, position=0):
         try:
+            self._enable_arm(False)
+
             self._calibration_step = 0
             self._suctioned = False
             self._goal.used_sdo = False
@@ -593,6 +604,11 @@ class MagswitchGripper(GripperClient):
             self._client.send_goal(self._goal)
             self._client.wait_for_result(rospy.Duration(self.timeout))
             result = self._client.get_result()
+
+            self._enable_arm(True)
+            self._set_state_trigger(2)
+            rospy.sleep(5)
+
             if result is None:
                 return False
             if calibration_trigger == 1:
