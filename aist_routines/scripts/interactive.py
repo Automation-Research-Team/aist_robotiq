@@ -162,7 +162,8 @@ class InteractiveRoutines(AISTBaseRoutines):
             elif key == 'search':
                 self.delete_all_markers()
                 self.graspability_send_goal(self._robot_name,
-                                            self._camera_name, 4, 0, True)
+                                            self._camera_name,
+                                            '04_37D-GEARMOTOR-50-70', 0)
                 (poses, gscore, success) = \
                     self.graspability_wait_for_result(self._camera_name, 0)
                 for gs in gscore:

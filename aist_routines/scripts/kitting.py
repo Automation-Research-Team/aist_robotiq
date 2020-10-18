@@ -14,10 +14,11 @@ class KittingRoutines(AISTBaseRoutines):
     def __init__(self):
         super(KittingRoutines, self).__init__()
 
-        self._bin_props  = base.paramtuples(rospy.get_param('~bin_props'))
-        self._part_props = base.paramtuples(rospy.get_param('~part_props'))
+        self._bin_props         = rospy.get_param('~bin_props')
+        self._part_props        = rospy.get_param('~part_props')
+        self._grasp_params      = rospy.get_param('~graspability_parameters')
         self._former_robot_name = None
-        self._fail_poses = []
+        self._fail_poses        = []
         #self.go_to_named_pose('all_bots', 'home')
 
     @property
@@ -55,26 +56,27 @@ class KittingRoutines(AISTBaseRoutines):
 
     def search(self, bin_id):
         bin_props  = self._bin_props[bin_id]
-        part_props = self._part_props[bin_props.part_id]
-        self.graspability_send_goal(part_props.robot_name,
-                                    part_props.camera_name,
-                                    bin_props.part_id, bin_props.mask_id)
+        part_props = self._part_props[bin_props['part_id']]
+        self.graspability_send_goal(part_props['robot_name'],
+                                    part_props['camera_name'],
+                                    bin_props['part_id'], bin_props['mask_id'])
         return self.graspability_wait_for_result()
 
     def attempt_bin(self, bin_id, max_attempts=5):
         bin_props  = self._bin_props[bin_id]
-        part_props = self._part_props[bin_props.part_id]
+        part_id    = bin_props['part_id']
+        part_props = self._part_props[part_id]
+        robot_name = part_props['robot_name']
 
         # If using a different robot from the former, move it back to home.
         if self._former_robot_name is not None and \
-           self._former_robot_name != part_props.robot_name:
+           self._former_robot_name != robot_name:
             self.go_to_named_pose(self._former_robot_name, 'back')
-        self._former_robot_name = part_props.robot_name
+        self._former_robot_name = robot_name
 
         # Move to 0.15m above the bin if the camera is mounted on the robot.
-        if self._is_eye_on_hand(part_props.robot_name, part_props.camera_name):
-            self.go_to_frame(part_props.robot_name, bin_props.name,
-                             (0, 0, 0.15))
+        if self._is_eye_on_hand(robot_name, part_props['camera_name']):
+            self.go_to_frame(robot_name, bin_props['name'], (0, 0, 0.15))
 
         # Search for graspabilities.
         pick_poses, _ = self.search(bin_id)
@@ -88,16 +90,11 @@ class KittingRoutines(AISTBaseRoutines):
             if self._is_close_to_fail_poses(pose):
                 continue
 
-            result = self.pick(part_props.robot_name, pose,
-                               speed_slow=part_props.speed_slow,
-                               grasp_offset=part_props.grasp_offset,
-                               approach_offset=part_props.approach_offset)
+            result = self.pick(robot_name, pose, part_id)
             if result == amsg.pickOrPlaceResult.SUCCESS:
-                result = self.place_at_frame(
-                                part_props.robot_name, part_props.destination,
-                                speed_slow=part_props.speed_slow,
-                                place_offset=part_props.place_offset,
-                                approach_offset=part_props.approach_offset)
+                result = self.place_at_frame(robot_name,
+                                             part_props['destination'],
+                                             part_id)
                 return result == amsg.pickOrPlaceResult.SUCCESS
             elif result == amsg.pickOrPlaceResult.MOVE_FAILURE or \
                  result == amsg.pickOrPlaceResult.APPROACH_FAILURE:

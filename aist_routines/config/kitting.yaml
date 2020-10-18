@@ -30,151 +30,182 @@ part_props:
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
     destination: tray_1_partition_4
-    approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, 0.005]
-    place_offset: [0.0, 0.0, 0.06]
-    speed_slow: 0.1
-    use_normals: true
   05_MBRFA30-2-P6:
     name: Pully for round belt
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_6
-    approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, 0.004]
-    place_offset: [0.0, 0.0, 0.03]
-    speed_slow: 1.0
-    use_normals: true
   06_MBT4-400:
     name: Polyurethane round belt
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
     destination: tray_1_partition_3
-    approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, 0.0]
-    place_offset: [0.0, 0.0, 0.05]
-    speed_slow: 1.0
-    use_normals: false
   07_SBARB6200ZZ_30:
     name: Bearing with housing
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
     destination: tray_1_partition_2
-    approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, 0.004]
-    place_offset: [0.0, 0.0, 0.05]
-    speed_slow: 0.1
-    use_normals: true
   08_KZAF1075NA4WA55GA20AA0:
     name: Drive shaft
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_1
-    approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, 0.00]
-    place_offset: [0.0, 0.0, 0.03]
-    speed_slow: 0.1
-    use_normals: true
   09_EDCS10:
     name: End cap for shaft
     robot_name: a_bot
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_4
-    approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, -0.002]
-    place_offset: [0.0, 0.0, 0.05]
-    speed_slow: 1.0
-    use_normals: false
   10_CLBPS10_17_4:
     name: Bearing spacers for inner ring
     robot_name: a_bot
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_7
-    approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, -0.002]
-    place_offset: [0.0, 0.0, 0.05]
-    speed_slow: 1.0
-    use_normals: false
   11_MBRAC60-2-10:
     name: Pully for round belts clamping
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
     destination: tray_1_partition_1
-    approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, -0.001]
-    place_offset: [0.0, 0.0, 0.05]
-    speed_slow: 0.04
-    use_normals: true
   12_CLBUS6-9-9.5:
     name: Bearing spacer for inner ring
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_3
-    approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, 0.0]
-    place_offset: [0.0, 0.0, 0.05]
-    speed_slow: 0.04
-    use_normals: false
   13_MBGA30-2:
     name: Idler for round belt
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
     destination: tray_1_partition_5
-    approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, -0.001]
-    place_offset: [0.0, 0.0, 0.05]
-    speed_slow: 0.04
-    use_normals: true
   14_BGPSL6-9-L30-F8:
     name: Bearing shaft screw
     robot_name: a_bot
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_2
-    approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, -0.002]
-    place_offset: [0.0, 0.0, 0.05]
-    speed_slow: 1.0
-    use_normals: false
   15_SLBNR6:
     name: M6 hex nut
     robot_name: a_bot
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_5
-    approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, -0.002]
-    place_offset: [0.0, 0.0, 0.05]
-    speed_slow: 1.0
-    use_normals: false
   16_SPWF6:
     name: M6 flat washer
     robot_name: a_bot
     camera_name: a_phoxi_m_camera
     destination: tray_2_partition_8
-    approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, -0.002]
-    place_offset: [0.0, 0.0, 0.05]
-    speed_slow: 1.0
-    use_normals: false
   17_SCB4-10:
     name: M4 head cap screw
     robot_name: a_bot
     camera_name: a_phoxi_m_camera
     destination: skrewholder_1
-    approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, -0.002]
-    place_offset: [0.0, 0.0, 0.05]
-    speed_slow: 1.0
-    use_normals: false
   18_SCB3-10:
     name: M3 head cap screw
     robot_name: a_bot
     camera_name: a_phoxi_m_camera
     destination: skrewholder_2
+
+picking_parameters:
+  04_37D-GEARMOTOR-50-70:
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, 0.005]
+    place_offset: [0.0, 0.0, 0.06]
+    liftup_after: true
+    speed_fast: 1.0
+    speed_slow: 0.1
+  05_MBRFA30-2-P6:
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, 0.004]
+    place_offset: [0.0, 0.0, 0.03]
+    liftup_after: true
+    speed_fast: 1.0
+    speed_slow: 1.0
+  06_MBT4-400:
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, 0.0]
+    place_offset: [0.0, 0.0, 0.05]
+    liftup_after: true
+    speed_fast: 1.0
+    speed_slow: 1.0
+  07_SBARB6200ZZ_30:
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, 0.004]
+    place_offset: [0.0, 0.0, 0.05]
+    liftup_after: true
+    speed_fast: 1.0
+    speed_slow: 0.1
+  08_KZAF1075NA4WA55GA20AA0:
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, 0.00]
+    place_offset: [0.0, 0.0, 0.03]
+    liftup_after: true
+    speed_fast: 1.0
+    speed_slow: 0.1
+  09_EDCS10:
     approach_offset: [0.0, 0.0, 0.15]
     grasp_offset: [0.0, 0.0, -0.002]
     place_offset: [0.0, 0.0, 0.05]
+    liftup_after: true
+    speed_fast: 1.0
     speed_slow: 1.0
-    use_normals: false
+  10_CLBPS10_17_4:
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.002]
+    place_offset: [0.0, 0.0, 0.05]
+    liftup_after: true
+    speed_fast: 1.0
+    speed_slow: 1.0
+  11_MBRAC60-2-10:
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.001]
+    place_offset: [0.0, 0.0, 0.05]
+    liftup_after: true
+    speed_fast: 1.0
+    speed_slow: 0.04
+  12_CLBUS6-9-9.5:
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, 0.0]
+    place_offset: [0.0, 0.0, 0.05]
+    liftup_after: true
+    speed_fast: 1.0
+    speed_slow: 0.04
+  13_MBGA30-2:
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.001]
+    place_offset: [0.0, 0.0, 0.05]
+    speed_fast: 1.0
+    speed_slow: 0.04
+  14_BGPSL6-9-L30-F8:
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.002]
+    place_offset: [0.0, 0.0, 0.05]
+    liftup_after: true
+    speed_fast: 1.0
+    speed_slow: 1.0
+  15_SLBNR6:
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.002]
+    place_offset: [0.0, 0.0, 0.05]
+    liftup_after: true
+    speed_fast: 1.0
+    speed_slow: 1.0
+  16_SPWF6:
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.002]
+    place_offset: [0.0, 0.0, 0.05]
+    liftup_after: true
+    speed_fast: 1.0
+    speed_slow: 1.0
+  17_SCB4-10:
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.002]
+    place_offset: [0.0, 0.0, 0.05]
+    liftup_after: true
+    speed_fast: 1.0
+    speed_slow: 1.0
+  18_SCB3-10:
+    approach_offset: [0.0, 0.0, 0.15]
+    grasp_offset: [0.0, 0.0, -0.002]
+    place_offset: [0.0, 0.0, 0.05]
+    liftup_after: true
+    speed_fast: 1.0
+    speed_slow: 1.0
 
 graspability_parameters:
   04_37D-GEARMOTOR-50-70:

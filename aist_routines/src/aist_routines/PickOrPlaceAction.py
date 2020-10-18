@@ -23,21 +23,17 @@ class PickOrPlaceAction(object):
     def shutdown(self):
         self._server.__del__()
 
-    def execute(self, robot_name, pose_stamped, pick, gripper_command,
-                grasp_offset, approach_offset, liftup_after,
-                speed_fast, speed_slow, acc_fast, acc_slow):
+    def execute(self, robot_name, pose_stamped, pick, grasp_offset,
+                approach_offset, liftup_after, speed_fast, speed_slow):
         goal = amsg.pickOrPlaceGoal()
         goal.robot_name      = robot_name
         goal.pose            = pose_stamped
         goal.pick            = pick
-        goal.gripper_command = gripper_command
         goal.grasp_offset    = gmsg.Vector3(*grasp_offset)
         goal.approach_offset = gmsg.Vector3(*approach_offset)
         goal.liftup_after    = liftup_after
         goal.speed_fast      = speed_fast
         goal.speed_slow      = speed_slow
-        goal.acc_fast        = acc_fast
-        goal.acc_slow        = acc_slow
         self._client.send_goal(goal, feedback_cb=self._feedback_cb)
         self._client.wait_for_result()
         return self._client.get_result().result
@@ -74,7 +70,7 @@ class PickOrPlaceAction(object):
         # Pregrasp
         if goal.pick:
             rospy.loginfo("--- Pregrasp. ---")
-            gripper.pregrasp(goal.gripper_command)
+            gripper.pregrasp()
 
         # Approach pick/place pose.
         rospy.loginfo("--- Go to {} pose. ---"
@@ -96,13 +92,13 @@ class PickOrPlaceAction(object):
 
         # Grasp or release
         if goal.pick:
-            success = gripper.grasp(goal.gripper_command)
+            success = gripper.grasp()
             if success:
                 rospy.loginfo("--- Pick succeeded. ---")
             else:
                 rospy.logwarn("--- Pick failed. ---")
         else:
-            success = gripper.release(goal.gripper_command)
+            success = gripper.release()
             if success:
                 rospy.loginfo("--- Place succeeded. ---")
             else:

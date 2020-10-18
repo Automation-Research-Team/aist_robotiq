@@ -85,15 +85,24 @@ class AISTBaseRoutines(object):
                 = rospy.get_param('~graspability_parameters')
             self._graspabilityClient = GraspabilityClient()
 
-        self._markerPublisher   = MarkerPublisher()        # Marker publisher
-        self._pickOrPlaceAction = PickOrPlaceAction(self)  # Other actions
+        # Pick and place action
+        if rospy.has_param('~picking_parameters'):
+            self._picking_params    = rospy.get_param('~picking_parameters')
+            self._pickOrPlaceAction = PickOrPlaceAction(self)
+        else:
+            self._pickOrPlaceAction = None
+
+        # Marker publisher
+        self._markerPublisher = MarkerPublisher()
+
         rospy.loginfo('AISTBaseRoutines initialized.')
 
     def __enter__(self):
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
-        self._pickOrPlaceAction.shutdown()
+        if self._pickOrPlaceAction:
+            self._pickOrPlaceAction.shutdown()
         rospy.signal_shutdown('AISTBaseRoutines() completed.')
         return False  # Do not forward exceptions
 
@@ -267,10 +276,11 @@ class AISTBaseRoutines(object):
     def graspability_send_goal(self,
                                robot_name, camera_name, part_id, mask_id):
         self.delete_all_markers()
-        params  = self._graspability_params[part_id]
+        params = self._graspability_params[part_id]
         self._graspabilityClient.set_parameters(params)
 
-        # Send goal first to be ready for subscribing image, then trigger frame.
+        # Send goal first to be ready for subscribing image,
+        # and then trigger frame.
         self._graspabilityClient.send_goal(mask_id,
                                            self.gripper(robot_name).type)
         self.camera(camera_name).trigger_frame()
@@ -294,52 +304,49 @@ class AISTBaseRoutines(object):
         self._graspabilityClient.cancel_goal()
 
     # Pick and place action stuffs
-    def pick(self, robot_name, target_pose,
-             grasp_offset=(0.0, 0.0, 0.0), gripper_command='',
-             speed_fast=1.0, speed_slow=0.04, approach_offset=(0.0, 0.0, 0.10),
-             liftup_after=True, acc_fast=1.0, acc_slow=0.5):
-        return self._pickOrPlaceAction.execute(
-            robot_name, target_pose, True, gripper_command,
-            grasp_offset, approach_offset, liftup_after,
-            speed_fast, speed_slow, acc_fast, acc_slow)
+    def pick(self, robot_name, target_pose, part_id):
+        params = self._picking_params[part_id]
+        if 'gripper_name' in params:
+            self.set_gripper(params['gripper_name'])
+        if 'gripper_parameters' in params:
+            self.gripper(robot_name) \
+                .set_parameters(params['gripper_parameters'])
+        return self._pickOrPlaceAction.execute(robot_name, target_pose, True,
+                                               params['grasp_offset'],
+                                               params['approach_offset'],
+                                               params['liftup_after'],
+                                               params['speed_fast'],
+                                               params['speed_slow'])
 
-    def place(self, robot_name, target_pose,
-              place_offset=(0.0, 0.0, 0.0), gripper_command='',
-              speed_fast=1.0, speed_slow=0.04,
-              approach_offset=(0.0, 0.0, 0.05),
-              liftup_after=True, acc_fast=1.0, acc_slow=0.5):
-        return self._pickOrPlaceAction.execute(
-            robot_name, target_pose, False, gripper_command,
-            place_offset, approach_offset, liftup_after,
-            speed_fast, speed_slow, acc_fast, acc_slow)
+    def place(self, robot_name, target_pose, part_id):
+        params = self._picking_params[part_id]
+        if 'gripper_name' in params:
+            self.set_gripper(params['gripper_name'])
+        if 'gripper_parameters' in params:
+            self.gripper(robot_name) \
+                .set_parameters(params['gripper_parameters'])
+        return self._pickOrPlaceAction.execute(robot_name, target_pose, False,
+                                               params['place_offset'],
+                                               params['approach_offset'],
+                                               params['liftup_after'],
+                                               params['speed_fast'],
+                                               params['speed_slow'])
 
-    def pick_at_frame(self, robot_name, target_frame, offset=(0.0, 0.0, 0.0),
-                      grasp_offset=(0.0, 0.0, 0.0), gripper_command='',
-                      speed_fast=1.0, speed_slow=0.04,
-                      approach_offset=(0.0, 0.0, 0.05),
-                      liftup_after=True, acc_fast=1.0, acc_slow=0.5):
+    def pick_at_frame(self, robot_name, target_frame, part_id,
+                      offset=(0.0, 0.0, 0.0)):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = target_frame
         target_pose.pose            = gmsg.Pose(gmsg.Point(*offset),
                                                 gmsg.Quaternion(0, 0, 0, 1))
-        return self.pick(robot_name, target_pose,
-                         grasp_offset, gripper_command,
-                         speed_fast, speed_slow, approach_offset,
-                         liftup_after, acc_fast, acc_slow)
+        return self.pick(robot_name, target_pose, part_id)
 
-    def place_at_frame(self, robot_name, target_frame, offset=(0.0, 0.0, 0.0),
-                       place_offset=(0.0, 0.0, 0.0), gripper_command='',
-                       speed_fast=1.0, speed_slow=0.04,
-                       approach_offset=(0.0, 0.0, 0.05),
-                       liftup_after=True, acc_fast=1.0, acc_slow=0.5):
+    def place_at_frame(self, robot_name, target_frame, part_id,
+                       offset=(0.0, 0.0, 0,0)):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = target_frame
         target_pose.pose            = gmsg.Pose(gmsg.Point(*offset),
                                                 gmsg.Quaternion(0, 0, 0, 1))
-        return self.place(robot_name, target_pose,
-                          place_offset, gripper_command,
-                          speed_fast, speed_slow, approach_offset,
-                          liftup_after, acc_fast, acc_slow)
+        return self.place(robot_name, target_pose, part_id)
 
     # Utility functions
     def transform_pose_to_reference_frame(self, pose):
