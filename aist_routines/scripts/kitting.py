@@ -16,7 +16,6 @@ class KittingRoutines(AISTBaseRoutines):
 
         self._bin_props         = rospy.get_param('~bin_props')
         self._part_props        = rospy.get_param('~part_props')
-        self._grasp_params      = rospy.get_param('~graspability_parameters')
         self._former_robot_name = None
         self._fail_poses        = []
         #self.go_to_named_pose('all_bots', 'home')
