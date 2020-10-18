@@ -80,7 +80,6 @@ class AISTBaseRoutines(object):
         # Search graspabilities
         if rospy.has_param('~graspability_parameters'):
             from aist_graspability import GraspabilityClient
-            #from aist_graspability_py2cpp import GraspabilityClient
             self._graspability_params \
                 = rospy.get_param('~graspability_parameters')
             self._graspabilityClient = GraspabilityClient()
