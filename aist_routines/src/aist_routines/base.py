@@ -221,14 +221,20 @@ class AISTBaseRoutines(object):
     def gripper(self, robot_name):
         return self._active_grippers[robot_name]
 
-    def pregrasp(self, robot_name, command=''):
-        return self.gripper(robot_name).pregrasp(command)
+    def set_gripper_parameters(self, robot_name, parameters):
+        self.gripper(robot_name).parameters = parameters
 
-    def grasp(self, robot_name, command=''):
-        return self.gripper(robot_name).grasp(command)
+    def gripper_parameters(self, robot_name):
+        return self.gripper(robot_name).parameters
 
-    def release(self, robot_name, command=''):
-        return self.gripper(robot_name).release(command)
+    def pregrasp(self, robot_name):
+        return self.gripper(robot_name).pregrasp()
+
+    def grasp(self, robot_name):
+        return self.gripper(robot_name).grasp()
+
+    def release(self, robot_name):
+        return self.gripper(robot_name).release()
 
     # Camera stuffs
     def camera(self, camera_name):
