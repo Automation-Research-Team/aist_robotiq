@@ -341,7 +341,7 @@ class AISTBaseRoutines(object):
         return self.pick(robot_name, target_pose, part_id)
 
     def place_at_frame(self, robot_name, target_frame, part_id,
-                       offset=(0.0, 0.0, 0,0)):
+                       offset=(0.0, 0.0, 0.0)):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = target_frame
         target_pose.pose            = gmsg.Pose(gmsg.Point(*offset),

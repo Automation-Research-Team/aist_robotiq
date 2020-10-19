@@ -22,7 +22,7 @@ class KittingRoutines(AISTBaseRoutines):
 
     @property
     def nbins(self):
-        return len(self._bins)
+        return len(self._bin_props)
 
     @property
     def former_robot_name(self):
@@ -31,10 +31,10 @@ class KittingRoutines(AISTBaseRoutines):
     ###----- main procedure
     def run(self):
         self.go_to_named_pose('all_bots', 'back')
-        for bin in self._bins:
+        for bin_id in self._binprops.keys():
             if rospy.is_shutdown():
                 break
-            self.attempt_bin(bin, 1)
+            self.attempt_bin(bin_id, 1)
         self.go_to_named_pose('all_bots', 'home')
 
     def demo(self):
@@ -99,13 +99,13 @@ class KittingRoutines(AISTBaseRoutines):
                  result == amsg.pickOrPlaceResult.APPROACH_FAILURE:
                 self._fail_poses.append(pose)
             elif result == amsg.pickOrPlaceResult.DEPARTURE_FAILURE:
-                self.release(part_props.robot_name)
+                self.release(robot_name)
                 raise RuntimeError('Failed to depart from pick/place pose')
             elif result == amsg.pickOrPlaceResult.PICK_FAILURE:
                 self._fail_poses.append(pose)
                 nattempts += 1
 
-            self.release(part_props.robot_name)
+            self.release(robot_name)
 
         return False
 
