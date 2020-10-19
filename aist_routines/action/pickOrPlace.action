@@ -2,14 +2,11 @@
 string robot_name
 geometry_msgs/PoseStamped pose
 bool pick
-string gripper_command
 geometry_msgs/Vector3 grasp_offset
 geometry_msgs/Vector3 approach_offset
 bool liftup_after
 float32 speed_fast
 float32 speed_slow
-float32 acc_fast
-float32 acc_slow
 ---
 # Result
 uint8 SUCCESS=0

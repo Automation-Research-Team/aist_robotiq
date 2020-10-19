@@ -179,10 +179,10 @@ class RobotiqGripper(GripperClient):
 
     @staticmethod
     def base(prefix, product, force, velocity, timeout):
-        # return GripperClient(*RobotiqGripper._initargs(prefix, product,
-        #                                                force, velocity,
-        #                                                timeout))
-        return RobotiqGripper(prefix, product, force, velocity, timeout)
+        return GripperClient(*RobotiqGripper._initargs(prefix, product,
+                                                       force, velocity,
+                                                       timeout))
+        # return RobotiqGripper(prefix, product, force, velocity, timeout)
 
     @staticmethod
     def _initargs(prefix, product, force, velocity, timeout):
