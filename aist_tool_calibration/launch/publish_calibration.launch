@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="tool_name"	default="gripper"/>
+
+  <!-- Publish hand-eye calibration -->
+  <node  name="$(anon tool_calibration_publisher)"
+	 pkg="aist_tool_calibration" type="publish_calibration.py"
+	 output="screen">
+    <rosparam file="$(env HOME
+		    )/.ros/aist_tool_calibration/$(arg tool_name).yaml"/>
+  </node>
+
+</launch>
