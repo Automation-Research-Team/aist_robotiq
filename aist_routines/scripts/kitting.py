@@ -2,6 +2,7 @@
 
 import rospy, collections
 import aist_routines.base as base
+from geometry_msgs      import msg as gmsg
 from aist_routines.base import AISTBaseRoutines
 from aist_routines      import msg as amsg
 
@@ -59,7 +60,14 @@ class KittingRoutines(AISTBaseRoutines):
         self.graspability_send_goal(part_props['robot_name'],
                                     part_props['camera_name'],
                                     bin_props['part_id'], bin_props['mask_id'])
-        return self.graspability_wait_for_result()
+
+        orientation = gmsg.QuaternionStamped()
+        orientation.header.frame_id = self.reference_frame
+        orientation.quaternion.x = 0
+        orientation.quaternion.y = 0
+        orientation.quaternion.z = 0
+        orientation.quaternion.w = 1
+        return self.graspability_wait_for_result(orientation)
 
     def attempt_bin(self, bin_id, max_attempts=5):
         bin_props  = self._bin_props[bin_id]
