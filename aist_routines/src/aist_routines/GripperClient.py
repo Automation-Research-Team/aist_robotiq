@@ -449,7 +449,7 @@ class Lecp6Gripper(GripperClient):
     def grasp(self):
         return self._send_command(True)
 
-    def release(self, cmd=''):
+    def release(self):
         return self._send_command(False)
 
     def _send_command(self, close):
@@ -516,7 +516,7 @@ class MagswitchGripper(GripperClient):
         return self._send_command(calibration_trigger=1,
                                   calibration_select=calibration_select)
 
-    def pregrasp(self, cmd=''):
+    def pregrasp(self):
         return self.grasp()
 
     def grasp(self):
