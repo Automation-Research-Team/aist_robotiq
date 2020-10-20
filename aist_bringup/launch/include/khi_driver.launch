@@ -11,11 +11,13 @@
   <arg name="plugins"	 value="$(eval
 				','.join(driver_arg.split(',')[3].split()))"/>
 
+  <arg name="opt_rtcprog"
+       value="$(eval '' if rtcprog == '' else '--rtcprog ' + rtcprog)"/>
   <rosparam file="$(find aist_bringup)/config/khi_driver.yaml"
 	    subst_value="true"/>
   <node name="$(arg prefix)driver" pkg="khi_robot_control" type="main"
 	args="--interface $(arg ip) --period $(arg period)
-	      --rtcprog $(arg rtcprog) --robot $(arg device)"
+	      $(arg opt_rtcprog) --robot $(arg device)"
 	output="screen" cwd="node">
     <rosparam param="plugins" subst_value="true">[$(arg plugins)]</rosparam>
   </node>

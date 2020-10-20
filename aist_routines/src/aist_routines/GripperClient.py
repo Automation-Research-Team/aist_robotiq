@@ -536,14 +536,19 @@ class MagswitchGripper(GripperClient):
             self._goal.command.sensitivity         = self.parameters['sensitivity']
             self._goal.command.position            = position
             self._client.send_goal(self._goal)
-            result = self._client.get_result()
-            if result is None:
+            if self._client.wait_for_result(rospy.Duration(self.timeout)):
+                result = self._client.get_result()
+                if result is None:
+                    return False
+                if calibration_trigger == 1:
+                    self._calibration_step = result.magswitch_out.calibration_step
+                if position > 0:
+                    self._suctioned = result.reached_goal
+                return result.reached_goal
+            else:
+                rospy.logerr('No goal exists.')
                 return False
-            if calibration_trigger == 1:
-                self._calibration_step = result.magswitch_out.calibration_step
-            if position > 0:
-                self._suctioned = result.reached_goal
-            return result.reached_goal
+
         except rospy.ROSInterruptException:
             rospy.loginfo(
                 'MagswitchGripper: program interrupted before completion.',
