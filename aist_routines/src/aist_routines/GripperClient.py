@@ -512,9 +512,6 @@ class MagswitchGripper(GripperClient):
     def calibration_step(self):
         return self._calibration_step
 
-    def home_magnet(self):
-        return self._send_command(home_magnet=True)
-
     def calibration(self, calibration_select):
         return self._send_command(calibration_trigger=1,
                                   calibration_select=calibration_select)
@@ -528,13 +525,12 @@ class MagswitchGripper(GripperClient):
     def release(self):
         return self._send_command(position=0)
 
-    def _send_command(self, home_magnet=False,
+    def _send_command(self,
                       calibration_trigger=0, calibration_select=0, position=0):
         try:
             self._calibration_step = 0
             self._suctioned = False
             self._goal.used_sdo = False
-            self._goal.command.home_magnet         = home_magnet
             self._goal.command.calibration_trigger = calibration_trigger
             self._goal.command.calibration_select  = calibration_select
             self._goal.command.sensitivity         = self.parameters['sensitivity']
