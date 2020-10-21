@@ -122,6 +122,8 @@ class PickOrPlaceAction(object):
                 result.result = amsg.pickOrPlaceResult.DEPARTURE_FAILURE
                 self._server.set_succeeded(result)
                 return
+
+            gripper.postgrasp()
             if goal.pick and hasattr(gripper, "suctioned"):
                 success = gripper.suctioned
 
