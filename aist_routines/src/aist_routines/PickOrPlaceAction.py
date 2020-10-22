@@ -126,6 +126,11 @@ class PickOrPlaceAction(object):
             gripper.postgrasp()
             if goal.pick and hasattr(gripper, "suctioned"):
                 success = gripper.suctioned
+                if success:
+                    rospy.loginfo("--- Suction succeeded. ---")
+                else:
+                    rospy.logwarn("--- Suction failed. ---")
+                    gripper.release()
 
         result.result = amsg.pickOrPlaceResult.SUCCESS if success else \
                         amsg.pickOrPlaceResult.PICK_FAILURE
