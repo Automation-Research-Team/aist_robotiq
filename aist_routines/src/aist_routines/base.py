@@ -308,8 +308,7 @@ class AISTBaseRoutines(object):
         if 'gripper_name' in params:
             self.set_gripper(robot_name, params['gripper_name'])
         if 'gripper_parameters' in params:
-            self.gripper(robot_name) \
-                .set_parameters(params['gripper_parameters'])
+            self.gripper(robot_name).parameters = params['gripper_parameters']
         return self._pickOrPlaceAction.execute(robot_name, target_pose, True,
                                                params['grasp_offset'],
                                                params['approach_offset'],
@@ -322,8 +321,7 @@ class AISTBaseRoutines(object):
         if 'gripper_name' in params:
             self.set_gripper(robot_name, params['gripper_name'])
         if 'gripper_parameters' in params:
-            self.gripper(robot_name) \
-                .set_parameters(params['gripper_parameters'])
+            self.gripper(robot_name).parameters = params['gripper_parameters']
         return self._pickOrPlaceAction.execute(robot_name, target_pose, False,
                                                params['place_offset'],
                                                params['approach_offset'],

@@ -551,7 +551,7 @@ class MagswitchGripper(GripperClient):
                 = clip(self.parameters['sensitivity'], -30, 30)
             self._goal.command.position            = clip(position, 0, 100)
             self._client.send_goal(self._goal)
-            if self._client.wait_for_result(rospy.Duration(self.timeout)):
+            if not self._client.wait_for_result(rospy.Duration(self.timeout)):
                 rospy.logerr('Timeout[%f] has expired before goal finished',
                              self.timeout)
                 return False
