@@ -1,0 +1,21 @@
+robots:
+  arm:
+    default_gripper: gripper
+
+grippers:
+  magnet:
+    type: MagswitchGripper
+    args:
+      prefix: ''
+      timeout: 10.0
+  gripper:
+    type: Lecp6Gripper
+    args:
+      prefix: ''
+      timeout: 10.0
+
+cameras:
+  camera: PhoXiCamera
+
+moveit_pose_reference_frame: base_link
+moveit_eef_step: 0.05
