@@ -4,7 +4,6 @@ import std_msgs.msg
 import std_srvs
 
 from numpy import clip
-from tranbo_control   import srv as tsrv
 
 ######################################################################
 #  class GripperClient                                               #
