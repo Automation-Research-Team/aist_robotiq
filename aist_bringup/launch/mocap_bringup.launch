@@ -8,7 +8,7 @@
   <arg name="moveit_config"		default="$(find mocap_moveit_config)"/>
   <arg name="rviz_config"		default=""/>
 
-  <!-- Setup "ur5e" configuration -->
+  <!-- Setup "mocap" configuration -->
   <arg name="config"		value="mocap"/>
   <arg name="gazebo_init_args"	value="-J c_bot_shoulder_pan_joint 1.5708
 				       -J c_bot_shoulder_lift_joint -2.1
@@ -54,13 +54,6 @@
     <!-- </include> -->
     <!-- <include file="$(find aist_ftsensor)/launch/aist_ftsensor.launch"> -->
     <!--   <arg name="robot_name"	value="d_bot"/> -->
-    <!-- </include> -->
-
-    <!-- Launch PhoXi camera -->
-    <!-- <include file="$(find aist_phoxi_camera)/launch/run.launch"> -->
-    <!--     <arg name="camera_name"	value="b_phoxi_m_camera"/> -->
-    <!-- 	<arg name="id"		value='"1711015"'/> -->
-    <!-- 	<arg name="frame"	value="calibrated_b_phoxi_m_camera"/> -->
     <!-- </include> -->
 
   </group>

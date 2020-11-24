@@ -6,14 +6,10 @@
   <!-- Calibration help: If the robot is not moving far enough to the calibration point, increase these distances -->
   <xacro:property name="c_bot_x" value="0"/>
   <xacro:property name="c_bot_y" value="-0.4875"/>
-  <!-- <xacro:property name="c_bot_theta" value="${pi}"/> -->
 
   <xacro:property name="bots_z" value="0.77"/>
 
-  <!-- This is the main file defining our robot arrangement and physical environment. -->
-
   <!-- Main workspace -->
-  <!-- The surface is 0.01 m below the robot bases and the "workspace_center" frame. -->
   <link name="ground"/>
 
   <xacro:include filename="$(find aist_description)/objects/urdf/aist_box.urdf.xacro"/>
@@ -57,17 +53,6 @@
 					  parent="c_bot_ee_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:robotiq_85_gripper_with_tip_link>
-
-  <!-- Add PhoXi 3D scanner -->
-  <xacro:include filename="$(find aist_phoxi_camera)/urdf/phoxi_m_camera.urdf.xacro"/>
-  <xacro:phoxi_m_camera prefix="b_" parent="ground">
-    <origin xyz="0.547941636523
-		 -0.00827443204237
-		 1.67030171767"
-	    rpy="${-151.493605482*pi/180}
-		 ${0.698490882792*pi/180}
-		 ${85.0482907121*pi/180}"/>
-  </xacro:phoxi_m_camera>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world"/>
