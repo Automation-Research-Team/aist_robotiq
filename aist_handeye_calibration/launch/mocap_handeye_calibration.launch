@@ -15,7 +15,6 @@
   <include file="$(find aist_handeye_calibration
 		 )/launch/include/handeye_calibration.launch">
     <arg name="config"			value="mocap"/>
-    <arg name="scene"			value=""/>
 
     <arg name="camera_info_topic"	value="$(arg camera_info_topic)"/>
     <arg name="image_topic"		value="$(arg image_topic)"/>
