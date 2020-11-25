@@ -2,32 +2,20 @@
 <launch>
 
   <arg name="sim"			default="false"/>
-  <arg name="camera_name"		default="a_phoxi_m_camera"/>
+  <arg name="camera_name"		default="realsenseD435"/>
   <arg name="check"			default="false"/>
   <arg name="use_dual_quaternion"	default="true"/>
 
   <!-- Set camera topic names -->
-  <arg name="camera_info_topic"
-       value="$(eval 'camera_info' if 'phoxi' in camera_name
-	      else 'color/camera_info')"/>
-  <arg name="image_topic"
-       value="$(eval 'texture' if 'phoxi' in camera_name
-	      else 'color/image_raw')"/>
-  <arg name="depth_topic"
-       value="$(eval 'depth_map' if 'phoxi' in camera_name
-	      else 'aligned_depth_to_color/image_raw')"/>
-
-  <!-- Turn on laser only for a camera to be calibrated -->
-  <node unless="$(eval 'phoxi' in camera_name)"
-	name="select_realsense_camera"
-	pkg="aist_camera_multiplexer" type="select_realsense_camera.py"
-	args="$(arg camera_name)"/>
+  <arg name="camera_info_topic"	value="color/camera_info"/>
+  <arg name="image_topic"	value="color/image_raw"/>
+  <arg name="depth_topic"	value="aligned_depth_to_color/image_raw"/>
 
   <!-- Launch devices and calibrator -->
   <include file="$(find aist_handeye_calibration
 		 )/launch/include/handeye_calibration.launch">
-    <arg name="config"			value="aist"/>
-    <arg name="scene"			value="aist_calibration"/>
+    <arg name="config"			value="mocap"/>
+    <arg name="scene"			value=""/>
 
     <arg name="camera_info_topic"	value="$(arg camera_info_topic)"/>
     <arg name="image_topic"		value="$(arg image_topic)"/>

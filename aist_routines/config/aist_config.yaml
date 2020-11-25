@@ -3,7 +3,7 @@ robots:
     default_gripper: a_bot_robotiq_85_gripper
   b_bot:
     default_gripper: b_bot_single_suction_gripper
-    
+
 grippers:
   a_bot_robotiq_85_gripper:
     type: RobotiqGripper

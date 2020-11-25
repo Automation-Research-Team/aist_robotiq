@@ -48,11 +48,21 @@
   </joint>
 
   <!-- Spawn and attach gripper -->
-  <xacro:include filename="$(find aist_description)/devices/urdf/robotiq_85_gripper_with_tip_link.urdf.xacro"/>
+  <xacro:include filename="$(find aist_description
+			   )/devices/urdf/robotiq_85_gripper_with_tip_link.urdf.xacro"/>
   <xacro:robotiq_85_gripper_with_tip_link prefix="c_bot_"
 					  parent="c_bot_ee_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:robotiq_85_gripper_with_tip_link>
+
+  <!-- Add RealSense camera -->
+  <xacro:include filename="$(find aist_description
+			   )/devices/urdf/_d435.urdf.xacro"/>
+  <xacro:sensor_d435 name="realsenseD435" parent="workspace_center"
+		     use_nominal_extrinsics="true">
+    <origin xyz="0.0 0.7 0.6"
+	    rpy="${0*pi/180} ${30*pi/180} ${-90*pi/180}"/>
+  </xacro:sensor_d435>
 
   <!-- I would like to remove the "world" link definition, but apparently it is necessary for Gazebo -->
   <link name="world"/>

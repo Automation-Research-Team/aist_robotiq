@@ -11,3 +11,6 @@ grippers:
       force: 5.0
       velocity: 0.1
       timeout: 6.0
+
+cameras:
+  realsenseD435: DepthCamera
