@@ -123,8 +123,8 @@ class PickOrPlaceAction(object):
                 self._server.set_succeeded(result)
                 return
 
-            gripper.postgrasp()
             if goal.pick and hasattr(gripper, "suctioned"):
+                gripper.postgrasp()
                 success = gripper.suctioned
                 if success:
                     rospy.loginfo("--- Suction succeeded. ---")
