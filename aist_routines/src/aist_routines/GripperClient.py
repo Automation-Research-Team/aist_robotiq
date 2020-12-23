@@ -488,7 +488,7 @@ class Lecp6Gripper(GripperClient):
 #  class MagswitchGripper                                            #
 ######################################################################
 class MagswitchGripper(GripperClient):
-    def __init__(self, prefix='a_bot_', timeout=5.0,
+    def __init__(self, prefix='a_bot_', timeout=10.0,
                  sensitivity=0, position=100):
         import tranbo_control.msg
 

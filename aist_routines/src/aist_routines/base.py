@@ -359,11 +359,11 @@ class AISTBaseRoutines(object):
     # Utility functions
     def transform_pose_to_reference_frame(self, pose):
         try:
-            # pose.header.stamp = rospy.Time.now()
-            # self._listener.waitForTransform(self._reference_frame,
-            #                                 pose.header.frame_id,
-            #                                 pose.header.stamp,
-            #                                 rospy.Duration(10))
+            pose.header.stamp = rospy.Time.now()
+            self._listener.waitForTransform(self._reference_frame,
+                                            pose.header.frame_id,
+                                            pose.header.stamp,
+                                            rospy.Duration(10))
             return self._listener.transformPose(self._reference_frame, pose)
         except Exception as e:
             rospy.logerr('AISTBaseRoutines.transform_pose_to_reference_frame(): {}'.format(e))

@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
-<robot name="aaa" xmlns:xacro="http://wiki.ros.org/xacro">
+<robot name="arm" xmlns:xacro="http://wiki.ros.org/xacro">
   <xacro:include filename="$(find aist_description
 			   )/devices/urdf/rs007l.urdf.xacro"/>
 
-  <link name ="base_link"/>
-  <xacro:rs007l prefix="a_khi_" parent="base_link">
+  <link name ="world"/>
+  <xacro:rs007l prefix="arm_" parent="world">
     <origin xyz="0 0 0" rpy="0 0 0" />
   </xacro:rs007l>
 
