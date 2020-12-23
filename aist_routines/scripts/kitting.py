@@ -39,7 +39,8 @@ class KittingRoutines(AISTBaseRoutines):
         self.go_to_named_pose('all_bots', 'home')
 
     def demo(self):
-        bin_ids = ('bin_1', 'bin_4', 'bin_5')
+#        bin_ids = ('bin_1', 'bin_4', 'bin_5')
+        bin_ids = ('bin_1', 'bin_4')
 
         while True:
             completed = False

@@ -272,8 +272,8 @@ class AISTBaseRoutines(object):
         self.camera(camera_name).trigger_frame()
         return self._graspabilityClient.create_mask_image(nbins)
 
-    def graspability_send_goal(self,
-                               robot_name, camera_name, part_id, mask_id):
+    def graspability_send_goal(self, robot_name, camera_name, part_id, mask_id,
+                               feedback_cb=None):
         self.delete_all_markers()
         params = self._graspability_params[part_id]
         self._graspabilityClient.set_parameters(params)
@@ -281,7 +281,8 @@ class AISTBaseRoutines(object):
         # Send goal first to be ready for subscribing image,
         # and then trigger frame.
         self._graspabilityClient.send_goal(mask_id,
-                                           self.gripper(robot_name).type)
+                                           self.gripper(robot_name).type,
+                                           feedback_cb)
         self.camera(camera_name).trigger_frame()
 
     def graspability_wait_for_result(self, orientation=None, max_slant=pi/4,
@@ -303,7 +304,8 @@ class AISTBaseRoutines(object):
         self._graspabilityClient.cancel_goal()
 
     # Pick and place action stuffs
-    def pick(self, robot_name, target_pose, part_id):
+    def pick(self, robot_name, target_pose, part_id,
+             wait=True, feedback_cb=None):
         params = self._picking_params[part_id]
         if 'gripper_name' in params:
             self.set_gripper(robot_name, params['gripper_name'])
@@ -314,9 +316,11 @@ class AISTBaseRoutines(object):
                                                params['approach_offset'],
                                                params['liftup_after'],
                                                params['speed_fast'],
-                                               params['speed_slow'])
+                                               params['speed_slow'],
+                                               wait, feedback_cb)
 
-    def place(self, robot_name, target_pose, part_id):
+    def place(self, robot_name, target_pose, part_id,
+              wait=True, feedback_cb=None):
         params = self._picking_params[part_id]
         if 'gripper_name' in params:
             self.set_gripper(robot_name, params['gripper_name'])
@@ -327,32 +331,39 @@ class AISTBaseRoutines(object):
                                                params['approach_offset'],
                                                params['liftup_after'],
                                                params['speed_fast'],
-                                               params['speed_slow'])
+                                               params['speed_slow'],
+                                               wait, feedback_cb)
 
     def pick_at_frame(self, robot_name, target_frame, part_id,
-                      offset=(0.0, 0.0, 0.0)):
+                      offset=(0.0, 0.0, 0.0), wait=True, feedback_cb=None):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = target_frame
         target_pose.pose            = gmsg.Pose(gmsg.Point(*offset),
                                                 gmsg.Quaternion(0, 0, 0, 1))
-        return self.pick(robot_name, target_pose, part_id)
+        return self.pick(robot_name, target_pose, part_id, wait, feedback_cb)
 
     def place_at_frame(self, robot_name, target_frame, part_id,
-                       offset=(0.0, 0.0, 0.0)):
+                       offset=(0.0, 0.0, 0.0), wait=True, feedback_cb=None):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = target_frame
         target_pose.pose            = gmsg.Pose(gmsg.Point(*offset),
                                                 gmsg.Quaternion(0, 0, 0, 1))
-        return self.place(robot_name, target_pose, part_id)
+        return self.place(robot_name, target_pose, part_id, wait, feedback_cb)
+
+    def pick_or_place_wait_for_result(self):
+        return self._pickOrPlaceAction.wait_for_result()
+
+    def pick_or_place_cancel(self):
+        return self._pickOrPlaceAction.cancel()
 
     # Utility functions
     def transform_pose_to_reference_frame(self, pose):
         try:
-            pose.header.stamp = rospy.Time.now()
-            self._listener.waitForTransform(self._reference_frame,
-                                            pose.header.frame_id,
-                                            pose.header.stamp,
-                                            rospy.Duration(10))
+            # pose.header.stamp = rospy.Time.now()
+            # self._listener.waitForTransform(self._reference_frame,
+            #                                 pose.header.frame_id,
+            #                                 pose.header.stamp,
+            #                                 rospy.Duration(10))
             return self._listener.transformPose(self._reference_frame, pose)
         except Exception as e:
             rospy.logerr('AISTBaseRoutines.transform_pose_to_reference_frame(): {}'.format(e))
