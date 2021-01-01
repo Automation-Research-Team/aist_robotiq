@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 
 import rospy, copy
 from math                         import radians
@@ -16,13 +16,13 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
         super(HandEyeCalibrationRoutines, self).__init__()
 
         self._camera_name          = rospy.get_param('~camera_name',
-                                                     'a_phoxi_m_camera')
+                                                    'realsenseD435')
         self._robot_name           = rospy.get_param('~robot_name', 'b_bot')
         self._eye_on_hand          = rospy.get_param('~eye_on_hand', False)
         self._robot_base_frame     = rospy.get_param('~robot_base_frame',
-                                                     'workspace_center')
+                                                    'workspace_center')
         self._robot_effector_frame = rospy.get_param('~robot_effector_frame',
-                                                     'b_bot_ee_link')
+                                                    'b_bot_ee_link')
         self._initpose             = rospy.get_param('~initpose', [])
         self._keyposes             = rospy.get_param('~keyposes', [])
         self._speed                = rospy.get_param('~speed', 1)
@@ -31,12 +31,12 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
         if rospy.get_param('calibration', True):
             ns = '/handeye_calibrator'
             self.get_sample_list = rospy.ServiceProxy(ns + '/get_sample_list',
-                                                      GetSampleList)
+                                                    GetSampleList)
             self.take_sample = rospy.ServiceProxy(ns + '/take_sample', Trigger)
             self.compute_calibration = rospy.ServiceProxy(
                 ns + '/compute_calibration', ComputeCalibration)
             self.save_calibration = rospy.ServiceProxy(ns + '/save_calibration',
-                                                       Trigger)
+                                                    Trigger)
             self.reset = rospy.ServiceProxy(ns + '/reset', Empty)
         else:
             self.get_sample_list     = None
@@ -49,7 +49,7 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
         poseStamped = gmsg.PoseStamped()
         poseStamped.header.frame_id = self._robot_base_frame
         poseStamped.pose = gmsg.Pose(gmsg.Point(*pose[0:3]),
-                                     gmsg.Quaternion(
+                                    gmsg.Quaternion(
                                          *tfs.quaternion_from_euler(
                                              *map(radians, pose[3:6]))))
         print('  move to ' + self.format_pose(poseStamped))
@@ -117,13 +117,13 @@ class HandEyeCalibrationRoutines(AISTBaseRoutines):
         keyposes = self._keyposes
         for i, keypose in enumerate(keyposes, 1):
             print('\n*** Keypose [{}/{}]: Try! ***'
-                  .format(i, len(keyposes)))
+                .format(i, len(keyposes)))
             if self._eye_on_hand:
                 self.move_to(keypose, i, 1)
             else:
                 self.move_to_subposes(keypose, i)
             print('*** Keypose [{}/{}]: Completed. ***'
-                  .format(i, len(keyposes)))
+                .format(i, len(keyposes)))
 
         if self.compute_calibration:
             try:

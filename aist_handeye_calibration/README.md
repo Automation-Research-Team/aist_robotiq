@@ -34,7 +34,7 @@ $ roslaunch aist_handeye_calibration run_calibration.launch config:=<config> cam
 ```
 Here, `<config>` and `<camera name>` must be same as the ones specified for the server.
 
-After the comes up, please simply hit **return** key to start the calibration process. The robot moves to several key poses at each of which the client takes an image of the marker and estimates its pose. After visiting allHere, `<config>` and `<camera name>` must be same as the ones specified for the server. the key poses, a 3D transformation from the camera to the robot is computed and saved in `${HOME}/.ros/aist_handeye_calibration/<camera_name>.yaml`. The estimated transformation is also displayed in the terminal which has launched the client together with the residual errors.
+After the client comes up, please simply hit **return** key to start the calibration process. The robot moves to several key poses at each of which the client takes an image of the marker and estimates its pose. After visiting allHere, `<config>` and `<camera name>` must be same as the ones specified for the server. the key poses, a 3D transformation from the camera to the robot is computed and saved in `${HOME}/.ros/aist_handeye_calibration/<camera_name>.yaml`. The estimated transformation is also displayed in the terminal which has launched the client together with the residual errors.
 
 You can terminate the client by hitting **q** and **return**.
 
