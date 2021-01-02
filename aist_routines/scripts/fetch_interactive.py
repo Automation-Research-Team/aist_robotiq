@@ -136,9 +136,9 @@ class InteractiveRoutines(FetchRoutines):
                 self.create_mask_image(self._camera_name,
                                        int(raw_input('  #bins? ')))
             elif key == 'search':
-                self.delete_all_markers()
                 self.graspability_send_goal(self._robot_name,
-                                            self._camera_name, 4, 0, True)
+                                            '04_37D-GEARMOTOR-50-70', 0)
+                self.trigger_frame(self._camera_name)
                 (poses, gscore, success) = \
                     self.graspability_wait_for_result(self._camera_name, 0)
                 for gs in gscore:

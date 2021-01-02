@@ -272,18 +272,16 @@ class AISTBaseRoutines(object):
         self.camera(camera_name).trigger_frame()
         return self._graspabilityClient.create_mask_image(nbins)
 
-    def graspability_send_goal(self, robot_name, camera_name, part_id, mask_id,
+    def graspability_send_goal(self, robot_name, part_id, mask_id,
                                feedback_cb=None):
         self.delete_all_markers()
         params = self._graspability_params[part_id]
         self._graspabilityClient.set_parameters(params)
 
         # Send goal first to be ready for subscribing image,
-        # and then trigger frame.
         self._graspabilityClient.send_goal(mask_id,
                                            self.gripper(robot_name).type,
                                            feedback_cb)
-        self.camera(camera_name).trigger_frame()
 
     def graspability_wait_for_result(self, orientation=None, max_slant=pi/4,
                                      marker_lifetime=0):

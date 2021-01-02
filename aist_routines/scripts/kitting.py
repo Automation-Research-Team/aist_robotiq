@@ -59,8 +59,8 @@ class KittingRoutines(AISTBaseRoutines):
         bin_props  = self._bin_props[bin_id]
         part_props = self._part_props[bin_props['part_id']]
         self.graspability_send_goal(part_props['robot_name'],
-                                    part_props['camera_name'],
                                     bin_props['part_id'], bin_props['mask_id'])
+        self.camera(part_props['camera_name']).trigger_frame()
 
         orientation = gmsg.QuaternionStamped()
         orientation.header.frame_id = self.reference_frame
