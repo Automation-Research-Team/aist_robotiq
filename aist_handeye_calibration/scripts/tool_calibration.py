@@ -2,10 +2,10 @@
 
 import rospy, copy
 import moveit_msgs.msg
-from geometry_msgs      import msg as gmsg
-from tf                 import transformations as tfs
-from math               import radians, degrees
-from aist_routines.base import AISTBaseRoutines
+from geometry_msgs import msg as gmsg
+from tf            import transformations as tfs
+from math          import radians, degrees
+from aist_routines import AISTBaseRoutines
 
 ######################################################################
 #  global functions                                                  #

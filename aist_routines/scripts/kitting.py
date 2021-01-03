@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
 import rospy, collections
-import aist_routines.base as base
-from geometry_msgs      import msg as gmsg
-from aist_routines.base import AISTBaseRoutines
-from aist_routines      import msg as amsg
+from geometry_msgs import msg as gmsg
+from aist_routines import AISTBaseRoutines
+from aist_routines import msg as amsg
 
 ######################################################################
 #  class KittingRoutines                                             #

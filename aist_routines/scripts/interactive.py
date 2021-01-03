@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 import rospy
-from geometry_msgs      import msg as gmsg
-from tf                 import transformations as tfs
-from math               import radians
-from aist_routines.ur   import URRoutines
-from aist_routines.base import AISTBaseRoutines
+from geometry_msgs    import msg as gmsg
+from tf               import transformations as tfs
+from math             import radians
+from aist_routines.ur import URRoutines
+from aist_routines    import AISTBaseRoutines
 
 ######################################################################
 #  global functions                                                  #

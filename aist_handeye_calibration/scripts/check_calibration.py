@@ -1,10 +1,10 @@
 #!/usr/bin/env python2.7
 
 import rospy
-from math               import radians
-from tf                 import transformations as tfs
-from geometry_msgs      import msg as gmsg
-from aist_routines.base import AISTBaseRoutines
+from math          import radians
+from tf            import transformations as tfs
+from geometry_msgs import msg as gmsg
+from aist_routines import AISTBaseRoutines
 
 ######################################################################
 #  class CheckCalibrationRoutines                                    #

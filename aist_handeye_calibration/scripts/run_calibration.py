@@ -6,7 +6,7 @@ from std_srvs.srv                 import Empty, Trigger
 from geometry_msgs                import msg as gmsg
 from tf                           import transformations as tfs
 from aist_handeye_calibration.srv import GetSampleList, ComputeCalibration
-from aist_routines.base           import AISTBaseRoutines
+from aist_routines                import AISTBaseRoutines
 
 ######################################################################
 #  class HandEyeCalibrationRoutines                                  #

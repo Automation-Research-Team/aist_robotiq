@@ -1,5 +1,5 @@
 import rospy
-from base              import AISTBaseRoutines
+from aist_routines import AISTBaseRoutines
 
 ######################################################################
 #  class IiwaRoutines                                                #

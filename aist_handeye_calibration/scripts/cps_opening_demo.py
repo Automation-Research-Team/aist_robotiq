@@ -15,7 +15,7 @@ from std_msgs.msg import String
 from std_srvs.srv import Empty
 from std_srvs.srv import Trigger
 
-from aist_routines.base import AISTBaseRoutines
+from aist_routines import AISTBaseRoutines
 
 
 initposes = {

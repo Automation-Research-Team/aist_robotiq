@@ -9,7 +9,7 @@ from std_srvs.srv  import Empty, Trigger
 from geometry_msgs import msg as gmsg
 from tf import TransformListener, transformations as tfs
 
-from aist_routines.base import AISTBaseRoutines
+from aist_routines import AISTBaseRoutines
 
 import moveit_commander
 import sensor_msgs.msg

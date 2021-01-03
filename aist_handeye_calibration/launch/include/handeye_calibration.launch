@@ -14,9 +14,9 @@
 
   <!-- Start controllers for robots, cameras and other sensors -->
   <include file="$(find aist_bringup)/launch/$(arg config)_bringup.launch">
-    <arg name="scene"	value="$(arg config)_calibration" if="$(arg check)"/>
-    <arg name="scene"	value="" unless="$(arg check)"/>
-    <arg name="sim"	value="$(arg sim)"/>
+    <arg name="scene" value="$(arg config)_calibration" unless="$(arg check)"/>
+    <arg name="scene" value="" if="$(arg check)"/>
+    <arg name="sim"   value="$(arg sim)"/>
     <arg name="rviz_config"
 	 value="$(find aist_handeye_calibration
 		)/launch/include/handeye_calibration.rviz"/>

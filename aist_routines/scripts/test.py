@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
 import rospy, collections
-import aist_routines.base as base
-from aist_routines.base import AISTBaseRoutines
-from aist_routines      import msg as amsg
+from aist_routines import AISTBaseRoutines
+from aist_routines import msg as amsg
 
 if __name__ == '__main__':
 

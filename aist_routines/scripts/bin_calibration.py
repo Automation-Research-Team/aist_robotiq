@@ -6,7 +6,7 @@ import tf
 import tf_conversions
 import geometry_msgs.msg
 
-from aist_routines.base import AISTBaseRoutines
+from aist_routines import AISTBaseRoutines
 
 def is_num(s):
     try:
