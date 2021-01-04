@@ -385,8 +385,8 @@ class AISTBaseRoutines(object):
             degrees(xyzrpy[3]), degrees(xyzrpy[4]), degrees(xyzrpy[5]))
 
     def effector_target_pose(self, target_pose, offset):
-        est_pose = target_pose.poses[0] #poseArray
-        # est_pose = target_pose.pose #poseStamped
+        est_pose = target_pose.pose      #poseStamped
+        #est_pose = target_pose.poses[0] #poseArray
         T = tfs.concatenate_matrices(
                 self._listener.fromTranslationRotation(
                     (est_pose.position.x,
