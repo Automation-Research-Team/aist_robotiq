@@ -22,9 +22,9 @@ class PickOrPlaceAction(object):
         self._client.wait_for_server()
 
     # Client stuffs
-    def exectute(self, robot_name, pose_stamped, pick, grasp_offset,
-                 approach_offset, liftup_after, speed_fast, speed_slow,
-                 wait=True, feedback_cb=None):
+    def execute(self, robot_name, pose_stamped, pick, grasp_offset,
+                approach_offset, liftup_after, speed_fast, speed_slow,
+                wait=True, feedback_cb=None):
         goal = amsg.pickOrPlaceGoal()
         goal.robot_name      = robot_name
         goal.pose            = pose_stamped
