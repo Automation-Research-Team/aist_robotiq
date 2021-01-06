@@ -12,21 +12,19 @@ class PickOrPlaceAction(object):
         super(PickOrPlaceAction, self).__init__()
 
         self._routines = routines
-        self._server   = actionlib.SimpleActionServer(
-                                "pickOrPlace", amsg.pickOrPlaceAction,
-                                execute_cb=self._execute_cb, auto_start=False)
+        self._server   = actionlib.SimpleActionServer("pickOrPlace",
+                                                      amsg.pickOrPlaceAction,
+                                                      self._execute_cb, False)
         self._server.register_preempt_callback(self._preempt_callback)
         self._server.start()
         self._client = actionlib.SimpleActionClient("pickOrPlace",
                                                     amsg.pickOrPlaceAction)
         self._client.wait_for_server()
 
-    def shutdown(self):
-        self._server.__del__()
-
-    def execute(self, robot_name, pose_stamped, pick, grasp_offset,
-                approach_offset, liftup_after, speed_fast, speed_slow,
-                wait=True, feedback_cb=None):
+    # Client stuffs
+    def exectute(self, robot_name, pose_stamped, pick, grasp_offset,
+                 approach_offset, liftup_after, speed_fast, speed_slow,
+                 wait=True, feedback_cb=None):
         goal = amsg.pickOrPlaceGoal()
         goal.robot_name      = robot_name
         goal.pose            = pose_stamped
@@ -48,6 +46,10 @@ class PickOrPlaceAction(object):
 
     def cancel(self):
         self._client.cancel_goal()
+
+    # Server stuffs
+    def shutdown(self):
+        self._server.__del__()
 
     def _execute_cb(self, goal):
         rospy.loginfo("*** Do {} ***".format("picking" if goal.pick else
