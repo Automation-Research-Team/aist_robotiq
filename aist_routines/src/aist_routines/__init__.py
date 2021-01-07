@@ -294,7 +294,7 @@ class AISTBaseRoutines(object):
             self.publish_marker(pose, 'graspability',
                                 '{}[{:.3f}]'.format(i, gscores[i]),
                                 lifetime=marker_lifetime)
-            rospy.loginfo('graspability: {}[{:.3f}]'.format(i, gscores[i]))
+            # rospy.loginfo('graspability: {}[{:.3f}]'.format(i, gscores[i]))
 
         return poses, gscores
 
