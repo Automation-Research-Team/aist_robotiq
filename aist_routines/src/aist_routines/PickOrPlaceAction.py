@@ -38,11 +38,13 @@ class PickOrPlaceAction(object):
         if wait:
             return self.wait_for_result()
         else:
-            return amsg.pickOrPlaceResult.EXECUTING
+            return None
 
-    def wait_for_result(self):
-        self._client.wait_for_result()
-        return self._client.get_result().result
+    def wait_for_result(self, timeout=rospy.Duration(0)):
+        if self._client.wait_for_result(timeout):
+            return self._client.get_result().result
+        else:
+            return None
 
     def cancel(self):
         self._client.cancel_goal()
@@ -74,7 +76,7 @@ class PickOrPlaceAction(object):
                                        goal.speed_slow)
         if not success:
             result.result = amsg.pickOrPlaceResult.MOVE_FAILURE
-            self._server.set_succeeded(result)
+            self._server.set_aborted(result, "Failed to go to approach pose")
             return
 
         # Pregrasp
@@ -97,7 +99,7 @@ class PickOrPlaceAction(object):
                                                    goal.speed_slow)
         if not success:
             result.result = amsg.pickOrPlaceResult.APPROACH_FAILURE
-            self._server.set_succeeded(result)
+            self._server.set_aborted(result, "Failed to approach target")
             return
 
         # Grasp or release
@@ -133,7 +135,7 @@ class PickOrPlaceAction(object):
                                            move_lin=True)
             if not success:
                 result.result = amsg.pickOrPlaceResult.DEPARTURE_FAILURE
-                self._server.set_succeeded(result)
+                self._server.set_aborted(result, "Failed to depart from target")
                 return
 
             if goal.pick and hasattr(gripper, "suctioned"):
@@ -145,9 +147,12 @@ class PickOrPlaceAction(object):
                     rospy.logwarn("--- Suction failed. ---")
                     gripper.release()
 
-        result.result = amsg.pickOrPlaceResult.SUCCESS if success else \
-                        amsg.pickOrPlaceResult.PICK_FAILURE
-        self._server.set_succeeded(result)
+        if success:
+            result.result = amsg.pickOrPlaceResult.SUCCESS
+            self._server.set_succeeded(result, "Succeeded")
+        else:
+            result.result = amsg.pickOrPlaceResult.GRASP_FAILURE
+            self._server.set_aborted(result, "Failed to grasp")
 
     def _preempt_callback(self):
         routines.stop(self._server.current_goal.get_goal().robot_name)
