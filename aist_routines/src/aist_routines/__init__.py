@@ -288,10 +288,14 @@ class AISTBaseRoutines(object):
         poses, gscores = self._graspabilityClient.wait_for_result(orientation,
                                                                   max_slant)
 
-        poses = [ self.transform_pose_to_reference_frame(pose)
-                  for pose in poses ]
-        for i, pose in enumerate(poses):
-            self.publish_marker(pose, 'graspability',
+        #  We have to transform the poses to reference frame before moving
+        #  because graspability poses are represented w.r.t. camera frame
+        #  which will change while moving in the case of "eye on hand".
+        poses = self.transform_poses_to_reference_frame(poses)
+        for i, pose in enumerate(poses.poses):
+            self.publish_marker(gmsg.PoseStamped(graspabilities.poses.header,
+                                                 pose),
+                                'graspability',
                                 '{}[{:.3f}]'.format(i, gscores[i]),
                                 lifetime=marker_lifetime)
             # rospy.loginfo('graspability: {}[{:.3f}]'.format(i, gscores[i]))
@@ -367,16 +371,47 @@ class AISTBaseRoutines(object):
             rospy.logerr('AISTBaseRoutines.transform_pose_to_reference_frame(): {}'.format(e))
             raise e
 
+    def transform_poses_to_reference_frame(self, poses):
+        try:
+            # poses.header.stamp = rospy.Time.now()
+            self._listener.waitForTransform(self._reference_frame,
+                                            poses.header.frame_id,
+                                            poses.header.stamp,
+                                            rospy.Duration(10))
+            mat44 = self._listener.asMatrix(self._reference_frame,
+                                            poses.header)
+            for i, pose in enumerate(poses.poses):
+                m44 = tfs.concatenate_matrices(
+                          mat44,
+                          self._listener.fromTranslationRotation(
+                              (pose.position.x,
+                               pose.position.y,
+                               pose.position.z),
+                              (pose.orientation.x,
+                               pose.orientation.y,
+                               pose.orientation.z,
+                               pose.orientation.w)))
+                poses.poses[i] \
+                    = gmsg.Pose(gmsg.Point(
+                                    *tuple(tfs.translation_from_matrix(m44))),
+                                gmsg.Quaternion(
+                                    *tuple(tfs.quaternion_from_matrix(m44))))
+            poses.header.frame_id = self._reference_frame
+            return poses
+        except Exception as e:
+            rospy.logerr('AISTBaseRoutines.transform_poses_to_reference_frame(): {}'.format(e))
+            raise e
+
     def xyz_rpy(self, pose):
         transformed_pose = self.transform_pose_to_reference_frame(pose).pose
-        rpy = tfs.euler_from_quaternion([transformed_pose.orientation.x,
+        rpy = tfs.euler_from_quaternion((transformed_pose.orientation.x,
                                          transformed_pose.orientation.y,
                                          transformed_pose.orientation.z,
-                                         transformed_pose.orientation.w])
-        return [transformed_pose.position.x,
+                                         transformed_pose.orientation.w))
+        return (transformed_pose.position.x,
                 transformed_pose.position.y,
                 transformed_pose.position.z,
-                rpy[0], rpy[1], rpy[2]]
+                rpy[0], rpy[1], rpy[2])
 
     def format_pose(self, target_pose):
         xyzrpy = self.xyz_rpy(target_pose)

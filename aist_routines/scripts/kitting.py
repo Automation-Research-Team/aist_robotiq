@@ -86,14 +86,15 @@ class KittingRoutines(AISTBaseRoutines):
             self.go_to_frame(robot_name, bin_props['name'], (0, 0, 0.15))
 
         # Search for graspabilities.
-        pick_poses, _ = self.search(bin_id)
+        poses, _ = self.search(bin_id)
 
         # Attempt to pick the item.
         nattempts = 0
-        for pose in pick_poses:
+        for i, p in enumerate(poses.poses):
             if nattempts == max_attempts:
                 break
 
+            pose = gmsg.PoseStamped(poses.header, p)
             if self._is_close_to_fail_poses(pose):
                 continue
 
