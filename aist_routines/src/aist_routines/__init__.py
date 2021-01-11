@@ -293,8 +293,7 @@ class AISTBaseRoutines(object):
         #  which will change while moving in the case of "eye on hand".
         poses = self.transform_poses_to_reference_frame(poses)
         for i, pose in enumerate(poses.poses):
-            self.publish_marker(gmsg.PoseStamped(graspabilities.poses.header,
-                                                 pose),
+            self.publish_marker(gmsg.PoseStamped(poses.header, pose),
                                 'graspability',
                                 '{}[{:.3f}]'.format(i, gscores[i]),
                                 lifetime=marker_lifetime)
