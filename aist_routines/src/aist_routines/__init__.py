@@ -373,10 +373,10 @@ class AISTBaseRoutines(object):
     def transform_poses_to_reference_frame(self, poses):
         try:
             # poses.header.stamp = rospy.Time.now()
-            self._listener.waitForTransform(self._reference_frame,
-                                            poses.header.frame_id,
-                                            poses.header.stamp,
-                                            rospy.Duration(10))
+            # self._listener.waitForTransform(self._reference_frame,
+            #                                 poses.header.frame_id,
+            #                                 poses.header.stamp,
+            #                                 rospy.Duration(10))
             mat44 = self._listener.asMatrix(self._reference_frame,
                                             poses.header)
             for i, pose in enumerate(poses.poses):

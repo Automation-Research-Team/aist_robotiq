@@ -1,8 +1,9 @@
 import rospy
 import actionlib
-from geometry_msgs import msg as gmsg
-from aist_routines import msg as amsg
-from tf            import transformations as tfs
+from actionlib_msgs.msg import GoalStatus
+from geometry_msgs      import msg as gmsg
+from aist_routines      import msg as amsg
+from tf                 import transformations as tfs
 
 ######################################################################
 #  class PickOrPlaceAction                                           #
@@ -47,7 +48,9 @@ class PickOrPlaceAction(object):
             return None
 
     def cancel(self):
-        self._client.cancel_goal()
+        if self._client.get_state() in ( GoalStatus.PENDING,
+                                         GoalStatus.ACTIVE ):
+            self._client.cancel_goal()
 
     # Server stuffs
     def shutdown(self):
@@ -155,5 +158,5 @@ class PickOrPlaceAction(object):
             self._server.set_aborted(result, "Failed to grasp")
 
     def _preempt_callback(self):
-        routines.stop(self._server.current_goal.get_goal().robot_name)
+        self._routines.stop(self._server.current_goal.get_goal().robot_name)
         self._server.set_preempted()
