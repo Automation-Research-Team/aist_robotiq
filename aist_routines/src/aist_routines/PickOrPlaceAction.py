@@ -61,13 +61,12 @@ class PickOrPlaceAction(object):
                                              "placing"))
         routines = self._routines
         gripper  = routines.gripper(goal.robot_name)
-        feedback = amsg.pickOrPlaceFeedback()
         result   = amsg.pickOrPlaceResult()
 
         # Move to preparation pose.
         rospy.loginfo("--- Go to approach pose. ---")
-        feedback.state = amsg.pickOrPlaceFeedback.MOVING
-        self._server.publish_feedback(feedback)
+        if not self._is_active(amsg.pickOrPlaceFeedback.MOVING):
+            return
         (success, _, _) \
             = routines.go_to_pose_goal(goal.robot_name,
                                        routines.effector_target_pose(
@@ -90,8 +89,8 @@ class PickOrPlaceAction(object):
         # Approach pick/place pose.
         rospy.loginfo("--- Go to {} pose. ---"
                       .format("pick" if goal.pick else "place"))
-        feedback.state = amsg.pickOrPlaceFeedback.APPROACHING
-        self._server.publish_feedback(feedback)
+        if not self._is_active(amsg.pickOrPlaceFeedback.APPROACHING):
+            return
         target_pose = routines.effector_target_pose(goal.pose,
                                                     (goal.grasp_offset.x,
                                                      goal.grasp_offset.y,
@@ -106,8 +105,8 @@ class PickOrPlaceAction(object):
             return
 
         # Grasp or release
-        feedback.state = amsg.pickOrPlaceFeedback.GRASPING_OR_RELEASING
-        self._server.publish_feedback(feedback)
+        if not self._is_active(amsg.pickOrPlaceFeedback.GRASPING_OR_RELEASING):
+            return
         if goal.pick:
             success = gripper.grasp()
             if success:
@@ -124,8 +123,10 @@ class PickOrPlaceAction(object):
         # Depart from pick/place pose.
         if goal.liftup_after:
             rospy.loginfo("--- Go back to approach pose. ---")
-            feedback.state = amsg.pickOrPlaceFeedback.DEPARTING
-            self._server.publish_feedback(feedback)
+
+            if not self._is_active(amsg.pickOrPlaceFeedback.DEPARTING):
+                return
+
             (success, _, _) \
                 = routines.go_to_pose_goal(goal.robot_name,
                                            routines.effector_target_pose(
@@ -160,3 +161,9 @@ class PickOrPlaceAction(object):
     def _preempt_callback(self):
         self._routines.stop(self._server.current_goal.get_goal().robot_name)
         self._server.set_preempted()
+
+    def _is_active(self, state):
+        if self.is_active():
+            self._server.publish_feedback(amsg.pickOrPlaceFeedback(state=state))
+            return True
+        return False
