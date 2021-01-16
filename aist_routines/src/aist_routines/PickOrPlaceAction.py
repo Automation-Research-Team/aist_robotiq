@@ -83,8 +83,7 @@ class PickOrPlaceAction(object):
 
         # Pregrasp
         if goal.pick:
-            rospy.loginfo("--- Pregrasp. ---")
-            gripper.pregrasp()
+            gripper.pregrasp(False)
 
         # Approach pick/place pose.
         rospy.loginfo("--- Go to {} pose. ---"
@@ -108,6 +107,7 @@ class PickOrPlaceAction(object):
         if not self._is_active(amsg.pickOrPlaceFeedback.GRASPING_OR_RELEASING):
             return
         if goal.pick:
+            gripper_wait()
             success = gripper.grasp()
             if success:
                 rospy.loginfo("--- Pick succeeded. ---")
@@ -126,7 +126,8 @@ class PickOrPlaceAction(object):
 
             if not self._is_active(amsg.pickOrPlaceFeedback.DEPARTING):
                 return
-
+            if goal.pick:
+                gripper.postgrasp(False)
             (success, _, _) \
                 = routines.go_to_pose_goal(goal.robot_name,
                                            routines.effector_target_pose(
@@ -141,10 +142,8 @@ class PickOrPlaceAction(object):
                 result.result = amsg.pickOrPlaceResult.DEPARTURE_FAILURE
                 self._server.set_aborted(result, "Failed to depart from target")
                 return
-
-            if goal.pick and hasattr(gripper, "suctioned"):
-                gripper.postgrasp()
-                success = gripper.suctioned
+            if goal.pick
+                success = gripper.wait()
                 if success:
                     rospy.loginfo("--- Suction succeeded. ---")
                 else:
@@ -159,7 +158,9 @@ class PickOrPlaceAction(object):
             self._server.set_aborted(result, "Failed to grasp")
 
     def _preempt_callback(self):
-        self._routines.stop(self._server.current_goal.get_goal().robot_name)
+        robot_name = self._server.current_goal.get_goal().robot_name
+        self._routines.stop(robot_name)
+        self._routines.gripper(robot_name).cancel()
         self._server.set_preempted()
 
     def _is_active(self, state):
