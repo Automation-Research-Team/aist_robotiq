@@ -63,6 +63,10 @@ class PickOrPlaceAction(object):
         gripper  = routines.gripper(goal.robot_name)
         result   = amsg.pickOrPlaceResult()
 
+        # Pregrasp
+        if goal.pick:
+            gripper.pregrasp(False)
+
         # Move to preparation pose.
         rospy.loginfo("--- Go to approach pose. ---")
         if not self._is_active(amsg.pickOrPlaceFeedback.MOVING):
@@ -80,10 +84,6 @@ class PickOrPlaceAction(object):
             result.result = amsg.pickOrPlaceResult.MOVE_FAILURE
             self._server.set_aborted(result, "Failed to go to approach pose")
             return
-
-        # Pregrasp
-        if goal.pick:
-            gripper.pregrasp(False)
 
         # Approach pick/place pose.
         rospy.loginfo("--- Go to {} pose. ---"
@@ -136,13 +136,12 @@ class PickOrPlaceAction(object):
                                                 goal.approach_offset.y,
                                                 goal.approach_offset.z)),
                                            goal.speed_slow if goal.pick else
-                                           goal.speed_fast,
-                                           move_lin=True)
+                                           goal.speed_fast)
             if not success:
                 result.result = amsg.pickOrPlaceResult.DEPARTURE_FAILURE
                 self._server.set_aborted(result, "Failed to depart from target")
                 return
-            if goal.pick
+            if goal.pick:
                 success = gripper.wait()
                 if success:
                     rospy.loginfo("--- Suction succeeded. ---")

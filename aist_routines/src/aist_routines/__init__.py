@@ -132,8 +132,8 @@ class AISTBaseRoutines(object):
         return success
 
     def go_to_frame(self, robot_name, target_frame, offset=(0, 0, 0),
-                    speed=1.0, high_precision=False, end_effector_link='',
-                    move_lin=True):
+                    speed=1.0, end_effector_link='',
+                    high_precision=False, move_lin=True):
         target_pose = gmsg.PoseStamped()
         target_pose.header.frame_id = target_frame
         target_pose.pose            = gmsg.Pose(gmsg.Point(0, 0, 0),
@@ -141,22 +141,49 @@ class AISTBaseRoutines(object):
         return self.go_to_pose_goal(robot_name,
                                     self.effector_target_pose(target_pose,
                                                               offset),
-                                    speed, high_precision, end_effector_link,
-                                    move_lin)
+                                    speed, end_effector_link,
+                                    high_precision, move_lin)
 
-    def go_to_pose_goal(self, robot_name, target_pose, speed=1.0,
-                        high_precision=False, end_effector_link='',
-                        move_lin=True):
-        # rospy.loginfo('move to ' + self.format_pose(target_pose))
+    def go_to_pose_goal(self, robot_name, target_pose,
+                        speed=1.0, end_effector_link='',
+                        high_precision=False, move_lin=True):
         self.publish_marker(target_pose, 'pose')
 
-        group = self._cmd.get_group(robot_name)
+        if move_lin:
+            return self.go_along_poses(
+                            robot_name,
+                            gmsg.PoseArray(header=target_pose.header,
+                                           poses=[target_pose.pose]),
+                            speed, end_effector_link, high_precision)
 
         if end_effector_link == '':
             end_effector_link = self.gripper(robot_name).tip_link
 
+        group = self._cmd.get_group(robot_name)
         group.set_end_effector_link(end_effector_link)
         group.set_max_velocity_scaling_factor(clip(speed, 0.0, 1.0))
+        group.set_pose_target(target_pose)
+        success      = group.go(wait=True)
+        current_pose = group.get_current_pose()
+        is_all_close = self._all_close(target_pose.pose,
+                                       current_pose.pose, 0.01)
+        return (success, is_all_close, current_pose)
+
+    def go_along_poses(self, robot_name, poses,
+                       speed=1.0, end_effector_link='',
+                       high_precision=False, move_lin=True):
+        if end_effector_link == '':
+            end_effector_link = self.gripper(robot_name).tip_link
+
+        group = self._cmd.get_group(robot_name)
+        group.set_end_effector_link(end_effector_link)
+        group.set_max_velocity_scaling_factor(clip(speed, 0.0, 1.0))
+
+        try:
+            transformed_poses = self.transform_poses_to_target_frame(
+                                    poses, group.get_planning_frame()).poses
+        except Exception as e:
+            return (False, False, group.get_current_pose())
 
         if high_precision:
             goal_tolerance = group.get_goal_tolerance()
@@ -164,50 +191,34 @@ class AISTBaseRoutines(object):
             group.set_goal_tolerance(.000001)
             group.set_planning_time(10)
 
-        if move_lin:
-            try:
-                self._listener.waitForTransform(group.get_planning_frame(),
-                                                target_pose.header.frame_id,
-                                                rospy.Time.now(),
-                                                rospy.Duration(10))
-                pose_world = self._listener.transformPose(
-                                group.get_planning_frame(), target_pose).pose
-            except Exception as e:
-                rospy.logerr('AISTBaseRoutines.go_to_pose_goal(): {}'
-                             .format(e))
-                return (False, False, group.get_current_pose())
-            plan, fraction = group.compute_cartesian_path([pose_world],
-                                                          self._eef_step, 0.0)
-            if fraction < 0.995:
-                rospy.logwarn('Computed only {}% of the total cartesian path.'
-                              .format(fraction*100))
-                group.clear_pose_targets()
-                return (False, False, group.get_current_pose())
-
-            rospy.loginfo('Execute plan with {}% computed cartesian path.'
-                          .format(fraction*100))
-            plan    = group.retime_trajectory(self._cmd.get_current_state(),
-                                              plan, speed)
-            success = group.execute(plan, wait=True)
+        plan, fraction = group.compute_cartesian_path(transformed_poses,
+                                                      self._eef_step, 0.0)
+        if fraction > 0.995:
+            success = group.execute(group.retime_trajectory(
+                                        self._cmd.get_current_state(),
+                                        plan, speed),
+                                    wait=True)
+            group.stop()
+            if success:
+                rospy.loginfo('Succesfully executed plan with %f%% computed cartesian path',
+                              100*fraction)
+            else:
+                rospy.logerr('Failed to execute plan with %f%% computed cartesian path',
+                             100*fraction)
         else:
-            group.set_pose_target(target_pose)
-            success = group.go(wait=True)
+            success = False
+            rospy.logwarn('Computed only %f% of the total cartesian path.',
+                          100*fraction)
 
-        rospy.loginfo('go_to_pose_goal() {}'
-                      .format('succeeded.' if success else 'failed.'))
+        group.clear_pose_targets()
 
         if high_precision:
             group.set_goal_tolerance(goal_tolerance[1])
             group.set_planning_time(planning_time)
 
-        group.stop()
-        # It is always good to clear your targets after planning with poses.
-        # Note: there is no equivalent function for clear_joint_value_targets()
-        group.clear_pose_targets()
-
         current_pose = group.get_current_pose()
-        is_all_close = self._all_close(target_pose, current_pose, 0.01)
-        # rospy.loginfo('reached ' + self.format_pose(current_pose))
+        is_all_close = self._all_close(transformed_poses[-1],
+                                       current_pose.pose, 0.01)
         return (success, is_all_close, current_pose)
 
     def stop(self, robot_name):
@@ -291,7 +302,7 @@ class AISTBaseRoutines(object):
         #  We have to transform the poses to reference frame before moving
         #  because graspability poses are represented w.r.t. camera frame
         #  which will change while moving in the case of "eye on hand".
-        poses = self.transform_poses_to_reference_frame(poses)
+        poses = self.transform_poses_to_target_frame(poses)
         for i, pose in enumerate(poses.poses):
             self.publish_marker(gmsg.PoseStamped(poses.header, pose),
                                 'graspability',
@@ -358,54 +369,51 @@ class AISTBaseRoutines(object):
         return self._pickOrPlaceAction.cancel()
 
     # Utility functions
-    def transform_pose_to_reference_frame(self, pose):
+    def transform_pose_to_target_frame(self, pose, target_frame=''):
+        poses = self.transform_poses_to_target_frame(
+                    gmsg.PoseArray(pose.header, [pose.pose]), target_frame)
+        return gmsg.PoseStamped(poses.header, poses.poses[0])
+
+    def transform_poses_to_target_frame(self, poses, target_frame=''):
+        if target_frame == '':
+            target_frame = self._reference_frame
+        if target_frame == poses.header.frame_id:
+            return poses
         try:
-            # pose.header.stamp = rospy.Time.now()
-            self._listener.waitForTransform(self._reference_frame,
-                                            pose.header.frame_id,
-                                            pose.header.stamp,
-                                            rospy.Duration(10))
-            return self._listener.transformPose(self._reference_frame, pose)
+            mat44 = self._listener.asMatrix(target_frame, poses.header)
         except Exception as e:
-            rospy.logerr('AISTBaseRoutines.transform_pose_to_reference_frame(): {}'.format(e))
+            rospy.logerr('AISTBaseRoutines.transform_poses_to_target_frame(): {}'.format(e))
             raise e
 
-    def transform_poses_to_reference_frame(self, poses):
-        try:
-            mat44 = self._listener.asMatrix(self._reference_frame,
-                                            poses.header)
-            for i, pose in enumerate(poses.poses):
-                m44 = tfs.concatenate_matrices(
-                          mat44,
-                          self._listener.fromTranslationRotation(
-                              (pose.position.x,
-                               pose.position.y,
-                               pose.position.z),
-                              (pose.orientation.x,
-                               pose.orientation.y,
-                               pose.orientation.z,
-                               pose.orientation.w)))
-                poses.poses[i] \
-                    = gmsg.Pose(gmsg.Point(
+        for i, pose in enumerate(poses.poses):
+            m44 = tfs.concatenate_matrices(
+                        mat44,
+                        self._listener.fromTranslationRotation(
+                            (pose.position.x,
+                             pose.position.y,
+                             pose.position.z),
+                            (pose.orientation.x,
+                             pose.orientation.y,
+                             pose.orientation.z,
+                             pose.orientation.w)))
+            poses.poses[i] = gmsg.Pose(
+                                gmsg.Point(
                                     *tuple(tfs.translation_from_matrix(m44))),
                                 gmsg.Quaternion(
                                     *tuple(tfs.quaternion_from_matrix(m44))))
-            poses.header.frame_id = self._reference_frame
-            return poses
-        except Exception as e:
-            rospy.logerr('AISTBaseRoutines.transform_poses_to_reference_frame(): {}'.format(e))
-            raise e
+        poses.header.frame_id = target_frame
+        return poses
 
     def xyz_rpy(self, pose):
-        transformed_pose = self.transform_pose_to_reference_frame(pose).pose
+        transformed_pose = self.transform_pose_to_target_frame(pose).pose
         rpy = tfs.euler_from_quaternion((transformed_pose.orientation.x,
                                          transformed_pose.orientation.y,
                                          transformed_pose.orientation.z,
                                          transformed_pose.orientation.w))
-        return (transformed_pose.position.x,
+        return [transformed_pose.position.x,
                 transformed_pose.position.y,
                 transformed_pose.position.z,
-                rpy[0], rpy[1], rpy[2])
+                rpy[0], rpy[1], rpy[2]]
 
     def format_pose(self, target_pose):
         xyzrpy = self.xyz_rpy(target_pose)
@@ -414,25 +422,31 @@ class AISTBaseRoutines(object):
             degrees(xyzrpy[3]), degrees(xyzrpy[4]), degrees(xyzrpy[5]))
 
     def effector_target_pose(self, target_pose, offset):
-        est_pose = target_pose.pose      #poseStamped
-        #est_pose = target_pose.poses[0] #poseArray
-        T = tfs.concatenate_matrices(
-                self._listener.fromTranslationRotation(
-                    (est_pose.position.x,
-                     est_pose.position.y,
-                     est_pose.position.z),
-                    (est_pose.orientation.x,
-                     est_pose.orientation.y,
-                     est_pose.orientation.z,
-                     est_pose.orientation.w)),
-                self._listener.fromTranslationRotation(
-                    offset,
-                    tfs.quaternion_from_euler(0, radians(90), 0)))
-        pose = gmsg.PoseStamped()
-        pose.header.frame_id = target_pose.header.frame_id
-        pose.pose = gmsg.Pose(gmsg.Point(*tfs.translation_from_matrix(T)),
-                              gmsg.Quaternion(*tfs.quaternion_from_matrix(T)))
-        return pose
+        poses = self.effector_target_poses(
+                    gmsg.PoseArray(target_pose.header, [target_pose.pose]),
+                    [offset])
+        return gmsg.PoseStamped(poses.header, poses.poses[0])
+
+    def effector_target_poses(self, target_poses, offsets):
+        poses = gmsg.PoseArray(target_popses.header, [])
+        for target_pose, offset in zip(target_poses.poses, offsets):
+            T = tfs.concatenate_matrices(
+                    self._listener.fromTranslationRotation(
+                        (target_pose.position.x,
+                         target_pose.position.y,
+                         target_pose.position.z),
+                        (target_pose.orientation.x,
+                         target_pose.orientation.y,
+                         target_pose.orientation.z,
+                         target_pose.orientation.w)),
+                    self._listener.fromTranslationRotation(
+                        offset,
+                        tfs.quaternion_from_euler(0, radians(90), 0)))
+            poses.poses.append(
+                          gmsg.Pose(
+                              gmsg.Point(*tfs.translation_from_matrix(T)),
+                              gmsg.Quaternion(*tfs.quaternion_from_matrix(T))))
+        return poses
 
     # Private functions
     def _create_device(self, type_name, kwargs):
@@ -443,8 +457,8 @@ class AISTBaseRoutines(object):
             return Device.base(**kwargs)
 
     def _all_close(self, goal, actual, tolerance):
-        goal_list   = pose_to_list(goal.pose)
-        actual_list = pose_to_list(actual.pose)
+        goal_list   = pose_to_list(goal)
+        actual_list = pose_to_list(actual)
         for i in range(len(goal_list)):
             if abs(actual_list[i] - goal_list[i]) > tolerance:
                 return False

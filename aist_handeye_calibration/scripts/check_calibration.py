@@ -53,7 +53,7 @@ class CheckCalibrationRoutines(AISTBaseRoutines):
         #  We have to transform the target pose to reference frame before moving
         #  to the approach pose because the marker pose is given w.r.t. camera
         #  frame which will change while moving in the case of "eye on hand".
-        target_pose = self.transform_pose_to_reference_frame(
+        target_pose = self.transform_pose_to_target_frame(
                         self.effector_target_pose(marker_pose, (0, 0, 0)))
         print('  move to ' + self.format_pose(approach_pose))
         (success, _, current_pose) \
