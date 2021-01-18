@@ -150,11 +150,10 @@ class AISTBaseRoutines(object):
         self.publish_marker(target_pose, 'pose')
 
         if move_lin:
-            return self.go_along_poses(
-                            robot_name,
-                            gmsg.PoseArray(header=target_pose.header,
-                                           poses=[target_pose.pose]),
-                            speed, end_effector_link, high_precision)
+            return self.go_along_poses(robot_name,
+                                       gmsg.PoseArray(target_pose.header,
+                                                      [target_pose.pose]),
+                                       speed, end_effector_link, high_precision)
 
         if end_effector_link == '':
             end_effector_link = self.gripper(robot_name).tip_link
@@ -170,8 +169,7 @@ class AISTBaseRoutines(object):
         return (success, is_all_close, current_pose)
 
     def go_along_poses(self, robot_name, poses,
-                       speed=1.0, end_effector_link='',
-                       high_precision=False, move_lin=True):
+                       speed=1.0, end_effector_link='', high_precision=False):
         if end_effector_link == '':
             end_effector_link = self.gripper(robot_name).tip_link
 
@@ -200,14 +198,14 @@ class AISTBaseRoutines(object):
                                     wait=True)
             group.stop()
             if success:
-                rospy.loginfo('Succesfully executed plan with %f%% computed cartesian path',
+                rospy.loginfo('Executed plan with %3.1f%% computed cartesian path.',
                               100*fraction)
             else:
-                rospy.logerr('Failed to execute plan with %f%% computed cartesian path',
+                rospy.logerr('Computed %3.1f%% of cartesian path but failed to execute.',
                              100*fraction)
         else:
             success = False
-            rospy.logwarn('Computed only %f% of the total cartesian path.',
+            rospy.logwarn('Computed only %3.1f%% of the total cartesian path.',
                           100*fraction)
 
         group.clear_pose_targets()
@@ -377,15 +375,17 @@ class AISTBaseRoutines(object):
     def transform_poses_to_target_frame(self, poses, target_frame=''):
         if target_frame == '':
             target_frame = self._reference_frame
-        if target_frame == poses.header.frame_id:
-            return poses
+
         try:
             mat44 = self._listener.asMatrix(target_frame, poses.header)
         except Exception as e:
             rospy.logerr('AISTBaseRoutines.transform_poses_to_target_frame(): {}'.format(e))
             raise e
 
-        for i, pose in enumerate(poses.poses):
+        transformed_poses = gmsg.PoseArray()
+        transformed_poses.header.frame_id = target_frame
+        transformed_poses.header.stamp    = poses.header.stamp
+        for pose in poses.poses:
             m44 = tfs.concatenate_matrices(
                         mat44,
                         self._listener.fromTranslationRotation(
@@ -396,13 +396,11 @@ class AISTBaseRoutines(object):
                              pose.orientation.y,
                              pose.orientation.z,
                              pose.orientation.w)))
-            poses.poses[i] = gmsg.Pose(
-                                gmsg.Point(
-                                    *tuple(tfs.translation_from_matrix(m44))),
-                                gmsg.Quaternion(
-                                    *tuple(tfs.quaternion_from_matrix(m44))))
-        poses.header.frame_id = target_frame
-        return poses
+            transformed_poses.poses.append(
+                gmsg.Pose(gmsg.Point(*tuple(tfs.translation_from_matrix(m44))),
+                          gmsg.Quaternion(
+                              *tuple(tfs.quaternion_from_matrix(m44)))))
+        return transformed_poses
 
     def xyz_rpy(self, pose):
         transformed_pose = self.transform_pose_to_target_frame(pose).pose
@@ -428,7 +426,7 @@ class AISTBaseRoutines(object):
         return gmsg.PoseStamped(poses.header, poses.poses[0])
 
     def effector_target_poses(self, target_poses, offsets):
-        poses = gmsg.PoseArray(target_popses.header, [])
+        poses = gmsg.PoseArray(target_poses.header, [])
         for target_pose, offset in zip(target_poses.poses, offsets):
             T = tfs.concatenate_matrices(
                     self._listener.fromTranslationRotation(

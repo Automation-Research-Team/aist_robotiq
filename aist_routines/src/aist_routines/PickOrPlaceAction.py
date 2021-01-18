@@ -57,17 +57,12 @@ class PickOrPlaceAction(object):
         self._server.__del__()
 
     def _execute_cb(self, goal):
-        rospy.loginfo("*** Do {} ***".format("picking" if goal.pick else
-                                             "placing"))
+        rospy.loginfo("*** Do %s ***", "picking" if goal.pick else "placing")
         routines = self._routines
         gripper  = routines.gripper(goal.robot_name)
         result   = amsg.pickOrPlaceResult()
 
-        # Pregrasp
-        if goal.pick:
-            gripper.pregrasp(False)
-
-        # Move to preparation pose.
+        # Go to approach pose.
         rospy.loginfo("--- Go to approach pose. ---")
         if not self._is_active(amsg.pickOrPlaceFeedback.MOVING):
             return
@@ -86,10 +81,12 @@ class PickOrPlaceAction(object):
             return
 
         # Approach pick/place pose.
-        rospy.loginfo("--- Go to {} pose. ---"
-                      .format("pick" if goal.pick else "place"))
+        rospy.loginfo("--- Go to %s pose. ---",
+                      "pick" if goal.pick else "place")
         if not self._is_active(amsg.pickOrPlaceFeedback.APPROACHING):
             return
+        if goal.pick:
+            gripper.pregrasp(False)             # Pregrasp
         target_pose = routines.effector_target_pose(goal.pose,
                                                     (goal.grasp_offset.x,
                                                      goal.grasp_offset.y,
@@ -103,11 +100,11 @@ class PickOrPlaceAction(object):
             self._server.set_aborted(result, "Failed to approach target")
             return
 
-        # Grasp or release
+        # Grasp/release at pick/place pose.
         if not self._is_active(amsg.pickOrPlaceFeedback.GRASPING_OR_RELEASING):
             return
         if goal.pick:
-            gripper_wait()
+            gripper.wait()                      # Wait for pregrasp completed
             success = gripper.grasp()
             if success:
                 rospy.loginfo("--- Pick succeeded. ---")
@@ -120,7 +117,7 @@ class PickOrPlaceAction(object):
             else:
                 rospy.logwarn("--- Place failed. ---")
 
-        # Depart from pick/place pose.
+        # Go back to approach pose.
         if goal.liftup_after:
             rospy.loginfo("--- Go back to approach pose. ---")
 
@@ -142,11 +139,11 @@ class PickOrPlaceAction(object):
                 self._server.set_aborted(result, "Failed to depart from target")
                 return
             if goal.pick:
-                success = gripper.wait()
+                success = gripper.wait()        # Wait for postgrasp completed
                 if success:
-                    rospy.loginfo("--- Suction succeeded. ---")
+                    rospy.loginfo("--- Postgrasp succeeded. ---")
                 else:
-                    rospy.logwarn("--- Suction failed. ---")
+                    rospy.logwarn("--- Postgrasp failed. ---")
                     gripper.release()
 
         if success:
@@ -163,7 +160,7 @@ class PickOrPlaceAction(object):
         self._server.set_preempted()
 
     def _is_active(self, state):
-        if self.is_active():
+        if self._server.is_active():
             self._server.publish_feedback(amsg.pickOrPlaceFeedback(state=state))
             return True
         return False
