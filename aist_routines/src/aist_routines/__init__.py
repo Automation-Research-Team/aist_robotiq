@@ -377,6 +377,10 @@ class AISTBaseRoutines(object):
             target_frame = self._reference_frame
 
         try:
+            self._listener.waitForTransform(target_frame,
+                                            poses.header.frame_id,
+                                            poses.header.stamp,
+                                            rospy.Duration(10))
             mat44 = self._listener.asMatrix(target_frame, poses.header)
         except Exception as e:
             rospy.logerr('AISTBaseRoutines.transform_poses_to_target_frame(): {}'.format(e))
