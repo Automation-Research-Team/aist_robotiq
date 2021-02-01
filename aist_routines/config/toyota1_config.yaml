@@ -7,12 +7,12 @@ grippers:
     type: MagswitchGripper
     args:
       prefix: ''
-      timeout: 5.0
+      timeout: 2.5
   gripper:
     type: Lecp6Gripper
     args:
       prefix: ''
-      timeout: 5.0
+      timeout: 2.0
 
 cameras:
   camera: PhoXiCamera

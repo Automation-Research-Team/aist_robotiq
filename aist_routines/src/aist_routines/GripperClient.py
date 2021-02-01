@@ -77,7 +77,7 @@ class VoidGripper(GripperClient):
     def __init__(self, name, base_link, timeout=10.0):
         super(VoidGripper, self).__init__(name, 'void',
                                           base_link, base_link, timeout)
-        rospy.loginfo('{} initialized.'.format(self.name))
+        rospy.loginfo('%s initialized.', self.name)
 
     @staticmethod
     def base(name, base_link, timeout):
@@ -105,7 +105,7 @@ class GenericGripper(GripperClient):
                            'grasp_position':   self._min_gap,
                            'release_position': self._max_gap}
 
-        rospy.loginfo('{} initialized.'.format(self.name))
+        rospy.loginfo('%s initialized.', self.name)
 
     @staticmethod
     def base(name, action_ns, base_link, tip_link, timeout,
@@ -509,7 +509,8 @@ class MagswitchGripper(GripperClient):
         return self._send_command(0, True, 1, calibration_select)
 
     def pregrasp(self, wait=True):
-        return self.grasp(wait)
+        return self._send_command(self.parameters['grasp_position'], wait)
+        # return self.grasp(wait)
 
     def grasp(self, wait=True):
         return self._send_command(self.parameters['grasp_position'], wait)
@@ -522,7 +523,7 @@ class MagswitchGripper(GripperClient):
 
     def wait(self):
         if not self._client.wait_for_result(rospy.Duration(self.timeout)):
-            rospy.logerr('Timeout[%f] has expired before goal finished',
+            rospy.logerr('Timeout[%.1f] has expired before goal finished',
                          self.timeout)
             return False
         result = self._client.get_result()

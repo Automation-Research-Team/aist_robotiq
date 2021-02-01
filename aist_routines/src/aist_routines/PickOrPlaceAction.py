@@ -144,7 +144,6 @@ class PickOrPlaceAction(object):
                     rospy.loginfo("--- Postgrasp succeeded. ---")
                 else:
                     rospy.logwarn("--- Postgrasp failed. ---")
-                    gripper.release()
 
         if success:
             result.result = amsg.pickOrPlaceResult.SUCCESS
