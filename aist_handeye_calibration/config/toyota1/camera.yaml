@@ -7,7 +7,7 @@ robot_effector_frame: arm_ee_link
 robot_effector_tip_frame: magnet_link
 camera_frame: calibrated_camera
 marker_id: 26
-marker_size: 0.07
+marker_size: 0.186
 planarity_tolerance: 0.001
 initpose: [0.30,  0.00, 0.75, 90, 0, 0]
 keyposes:
