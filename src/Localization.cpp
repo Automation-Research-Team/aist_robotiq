@@ -6,6 +6,7 @@
 #include <ros/package.h>
 #include <tf/tf.h>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/calib3d.hpp>
 #include "Localization.h"
 
 namespace aist_localization
