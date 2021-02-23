@@ -105,17 +105,9 @@ class PickOrPlaceAction(object):
             return
         if goal.pick:
             gripper.wait()                      # Wait for pregrasp completed
-            success = gripper.grasp()
-            if success:
-                rospy.loginfo("--- Pick succeeded. ---")
-            else:
-                rospy.logwarn("--- Pick failed. ---")
+            gripper.grasp()
         else:
-            success = gripper.release(False)
-            if success:
-                rospy.loginfo("--- Place succeeded. ---")
-            else:
-                rospy.logwarn("--- Place failed. ---")
+            gripper.release(False)
 
         # Go back to approach pose.
         if goal.liftup_after:
@@ -141,9 +133,9 @@ class PickOrPlaceAction(object):
             success = gripper.wait()  # Wait for postgrasp/release completed
             if goal.pick:
                 if success:
-                    rospy.loginfo("--- Postgrasp succeeded. ---")
+                    rospy.loginfo("--- Pick succeeded. ---")
                 else:
-                    rospy.logwarn("--- Postgrasp failed. ---")
+                    rospy.logwarn("--- Pick failed. ---")
 
         if success:
             result.result = amsg.pickOrPlaceResult.SUCCESS
