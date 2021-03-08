@@ -3,7 +3,7 @@
 install_pkg()
 {
     cd /tmp
-    wget http://mirrors.kernel.org/ubuntu/pool/main/$1/$2
+    curl http://mirrors.kernel.org/ubuntu/pool/main/$1/$2
     dpkg -i $2
     rm $2
 }
@@ -11,13 +11,13 @@ install_pkg()
 install_photoneo()
 {
     cd /tmp
-    wget https://photoneo.com/files/installer/$1/$2.tar
+    curl https://photoneo.com/files/installer/$1/$2.tar
     tar xvf $2.tar
     bash ./$2
     rm $2.tar $2
 }
 
-if [ `lsb_release -sc` == "bionic" ]; then
+if [ `lsb_release -sc` != "kinetic" ]; then
     install_pkg libp/libpng libpng12-0_1.2.54-1ubuntu1_amd64.deb
     install_pkg libr/libraw libraw15_0.17.1-1_amd64.deb
     install_pkg j/jasper libjasper1_1.900.1-14ubuntu3.5_amd64.deb
