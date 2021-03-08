@@ -3,7 +3,7 @@
 install_pkg()
 {
     cd /tmp
-    curl http://mirrors.kernel.org/ubuntu/pool/main/$1/$2
+    wget http://mirrors.kernel.org/ubuntu/pool/main/$1/$2
     dpkg -i $2
     rm $2
 }
@@ -11,7 +11,7 @@ install_pkg()
 install_photoneo()
 {
     cd /tmp
-    curl https://photoneo.com/files/installer/$1/$2.tar
+    wget https://photoneo.com/files/installer/$1/$2.tar
     tar xvf $2.tar
     bash ./$2
     rm $2.tar $2
