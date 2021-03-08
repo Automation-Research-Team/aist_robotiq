@@ -273,13 +273,9 @@ class AISTBaseRoutines(object):
                                          text, lifetime)
 
     # Graspability stuffs
-    def create_background_image(self, camera_name):
+    def create_mask_image(self, camera_name, nmasks):
         self.camera(camera_name).trigger_frame()
-        return self._graspabilityClient.create_background_image()
-
-    def create_mask_image(self, camera_name, nbins):
-        self.camera(camera_name).trigger_frame()
-        return self._graspabilityClient.create_mask_image(nbins)
+        return self._graspabilityClient.create_mask_image(nmasks)
 
     def graspability_send_goal(self, robot_name, part_id, mask_id,
                                feedback_cb=None):
