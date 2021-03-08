@@ -17,7 +17,7 @@ install_photoneo()
     rm $2.tar $2
 }
 
-if [ `lsb_release -sc` == "bionic" ]; then
+if [ `lsb_release -sc` != "kinetic" ]; then
     install_pkg libp/libpng libpng12-0_1.2.54-1ubuntu1_amd64.deb
     install_pkg libr/libraw libraw15_0.17.1-1_amd64.deb
     install_pkg j/jasper libjasper1_1.900.1-14ubuntu3.5_amd64.deb
