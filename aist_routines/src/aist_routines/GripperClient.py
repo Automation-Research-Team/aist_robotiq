@@ -497,7 +497,7 @@ class MagswitchGripper(GripperClient):
 
     @staticmethod
     def _initargs(prefix, timeout):
-        return (prefix + 'magnet', 'magnet',
+        return (prefix + 'magnet', 'suction',
                 prefix + 'magnet_base_link',
                 prefix + 'magnet_link', timeout)
 
