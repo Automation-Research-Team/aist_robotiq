@@ -107,7 +107,7 @@ class PickOrPlaceAction(object):
             gripper.wait()                      # Wait for pregrasp completed
             gripper.grasp()
         else:
-            gripper.release(False)
+            gripper.release()
 
         # Go back to approach pose.
         if goal.liftup_after:
@@ -130,8 +130,8 @@ class PickOrPlaceAction(object):
                 result.result = amsg.pickOrPlaceResult.DEPARTURE_FAILURE
                 self._server.set_aborted(result, "Failed to depart from target")
                 return
-            success = gripper.wait()  # Wait for postgrasp/release completed
             if goal.pick:
+                success = gripper.wait()  # Wait for postgrasp completed
                 if success:
                     rospy.loginfo("--- Pick succeeded. ---")
                 else:
