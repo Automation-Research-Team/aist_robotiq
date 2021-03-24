@@ -147,7 +147,8 @@ class AISTBaseRoutines(object):
     def go_to_pose_goal(self, robot_name, target_pose,
                         speed=1.0, end_effector_link='',
                         high_precision=False, move_lin=True):
-        self.publish_marker(target_pose, 'pose')
+        self.add_marker(target_pose, 'pose')
+        self.publish_marker()
 
         if move_lin:
             return self.go_along_poses(robot_name,
@@ -268,9 +269,13 @@ class AISTBaseRoutines(object):
     def delete_all_markers(self):
         self._markerPublisher.delete_all()
 
-    def publish_marker(self, pose_stamped, marker_type, text='', lifetime=15):
-        return self._markerPublisher.add(pose_stamped, marker_type,
-                                         text, lifetime)
+    def add_marker(self, pose_stamped, marker_type,
+                   endpoint=None, text='', lifetime=15):
+        self._markerPublisher.add(pose_stamped, marker_type,
+                                  endpoint, text, lifetime)
+
+    def publish_marker():
+        self._markerPublisher.publish()
 
     # Graspability stuffs
     def create_mask_image(self, camera_name, nmasks):
@@ -290,19 +295,20 @@ class AISTBaseRoutines(object):
 
     def graspability_wait_for_result(self, orientation=None, max_slant=pi/4,
                                      marker_lifetime=0):
-        poses, gscores = self._graspabilityClient.wait_for_result(orientation,
-                                                                  max_slant)
+        poses, gscores, contact_points \
+            = self._graspabilityClient.wait_for_result(orientation, max_slant)
 
         #  We have to transform the poses to reference frame before moving
         #  because graspability poses are represented w.r.t. camera frame
         #  which will change while moving in the case of "eye on hand".
-        poses = self.transform_poses_to_target_frame(poses)
+        poses          = self.transform_poses_to_target_frame(poses)
+        contact_points = self._transform_points_to_reference_frame(
+                                poses.header, contact_points)
         for i, pose in enumerate(poses.poses):
-            self.publish_marker(gmsg.PoseStamped(poses.header, pose),
-                                'graspability',
-                                '{}[{:.3f}]'.format(i, gscores[i]),
-                                lifetime=marker_lifetime)
-            # rospy.loginfo('graspability: {}[{:.3f}]'.format(i, gscores[i]))
+            self.add_marker(gmsg.PoseStamped(poses.header, pose),
+                            'graspability', '{}[{:.3f}]'.format(i, gscores[i]),
+                            contact_points[i], lifetime=marker_lifetime)
+        self.publish_marker()
 
         return poses, gscores
 
@@ -461,3 +467,18 @@ class AISTBaseRoutines(object):
             if abs(actual_list[i] - goal_list[i]) > tolerance:
                 return False
         return True
+
+    def _transform_points_to_reference_frame(self, header, points):
+        try:
+            self._listener.waitForTransform(self._reference_frame,
+                                            header.frame_id,
+                                            header.stamp,
+                                            rospy.Duration(10))
+            mat44 = self._listener.asMatrix(self._reference_frame, header)
+        except Exception as e:
+            rospy.logerr('AISTBaseRoutines._transform_positions_to_target_frame(): {}'.format(e))
+            raise e
+
+        return [ gmsg.Point(*tuple(np.dot(mat44,
+                                          np.array((p.x, p.y, p.z, 1.0)))[:3]))
+                 for p in points ]
