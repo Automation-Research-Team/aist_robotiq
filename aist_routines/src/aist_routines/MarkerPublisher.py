@@ -61,41 +61,44 @@ class MarkerPublisher(object):
             marker.type  = vmsg.Marker.ARROW
             marker.pose  = marker_pose.pose
             marker.scale = gmsg.Vector3(2.5*smax, 0.5*smin, 0.5*smin)
-            marker.color = smsg.ColorRGBA(1.0, 0.0, 0.0, 0.8)  # red
+            marker.color = smsg.ColorRGBA(1.0, 0.0, 0.0, 0.8)    # red
             marker.id    = len(self._markers.markers)
             self._markers.markers.append(copy.deepcopy(marker))  # x-axis
 
             marker.pose  = self._pose_rotated_by_rpy(marker_pose.pose,
                                                      0, 0, pi/2)
-            marker.color = smsg.ColorRGBA(0.0, 1.0, 0.0, 0.8)  # green
+            marker.color = smsg.ColorRGBA(0.0, 1.0, 0.0, 0.8)    # green
             marker.id    = len(self._markers.markers)
             self._markers.markers.append(copy.deepcopy(marker))  # y-axis
 
             marker.pose  = self._pose_rotated_by_rpy(marker_pose.pose,
                                                      0, -pi/2, 0)
-            marker.color = smsg.ColorRGBA(0.0, 0.0, 1.0, 0.8)  # blue
+            marker.color = smsg.ColorRGBA(0.0, 0.0, 1.0, 0.8)    # blue
             marker.id    = len(self._markers.markers)
             self._markers.markers.append(copy.deepcopy(marker))  # z-axis
 
-        marker.type  = vmsg.Marker.SPHERE
-        marker.pose  = marker_pose.pose
-        marker.scale = gmsg.Vector3(*marker_prop.scale)
-        marker.color = smsg.ColorRGBA(*marker_prop.color)
-        marker.id    = len(self._markers.markers)
-        self._markers.markers.append(copy.deepcopy(marker))
-
-        if endpoint is not None:
+        if endpoint is None:
+            marker.type  = vmsg.Marker.SPHERE
+            marker.pose  = marker_pose.pose
+            marker.scale = gmsg.Vector3(*marker_prop.scale)
+            marker.color = smsg.ColorRGBA(*marker_prop.color)
+            marker.id    = len(self._markers.markers)
+            self._markers.markers.append(copy.deepcopy(marker))
+        else:
             marker.type    = vmsg.Marker.LINE_LIST
             marker.pose    = gmsg.Pose(gmsg.Point(0, 0, 0),
                                        gmsg.Quaternion(0, 0, 0, 1))
             marker.points  = [marker_pose.pose.position, endpoint]
             marker.scale.x = 0.1*min(*marker_prop.scale)
+            marker.scale.y = 0
+            marker.scale.z = 0
             marker.color   = smsg.ColorRGBA(*marker_prop.color)
             marker.id      = len(self._markers.markers)
             self._markers.markers.append(copy.deepcopy(marker))
 
             marker.type  = vmsg.Marker.SPHERE
             marker.pose  = gmsg.Pose(endpoint, marker_pose.pose.orientation)
+            del marker.points[:]
             marker.scale = gmsg.Vector3(*marker_prop.scale)
             marker.color = smsg.ColorRGBA(*marker_prop.color)
             marker.id    = len(self._markers.markers)
@@ -104,6 +107,7 @@ class MarkerPublisher(object):
         if text != "":
             marker.scale.x = 0
             marker.scale.y = 0
+            marker.scale.z = min(*marker_prop.scale)
             marker.pose.position.z -= (marker.scale.z + 0.001)
             marker.type  = vmsg.Marker.TEXT_VIEW_FACING
             marker.color = smsg.ColorRGBA(1.0, 1.0, 1.0, 0.8)  # white
