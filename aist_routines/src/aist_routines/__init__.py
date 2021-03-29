@@ -147,7 +147,7 @@ class AISTBaseRoutines(object):
     def go_to_pose_goal(self, robot_name, target_pose,
                         speed=1.0, end_effector_link='',
                         high_precision=False, move_lin=True):
-        self.add_marker(target_pose, 'pose')
+        self.add_marker('pose', target_pose)
         self.publish_marker()
 
         if move_lin:
@@ -269,9 +269,9 @@ class AISTBaseRoutines(object):
     def delete_all_markers(self):
         self._markerPublisher.delete_all()
 
-    def add_marker(self, pose_stamped, marker_type,
-                   endpoint=None, text='', lifetime=15):
-        self._markerPublisher.add(pose_stamped, marker_type,
+    def add_marker(self, marker_type, pose_stamped, endpoint=None,
+                   text='', lifetime=15):
+        self._markerPublisher.add(marker_type, pose_stamped,
                                   endpoint, text, lifetime)
 
     def publish_marker(self):
@@ -305,8 +305,8 @@ class AISTBaseRoutines(object):
                                 poses.header, contact_points)
         poses          = self.transform_poses_to_target_frame(poses)
         for i, pose in enumerate(poses.poses):
-            self.add_marker(gmsg.PoseStamped(poses.header, pose),
-                            'graspability',
+            self.add_marker('graspability',
+                            gmsg.PoseStamped(poses.header, pose),
                             contact_points[i],
                             '{}[{:.3f}]'.format(i, gscores[i]),
                             lifetime=marker_lifetime)

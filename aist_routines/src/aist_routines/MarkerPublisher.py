@@ -43,7 +43,7 @@ class MarkerPublisher(object):
         self.publish()
         del self._markers.markers[:]
 
-    def add(self, marker_pose, marker_type, endpoint=None,
+    def add(self, marker_type, marker_pose, endpoint=None,
             text="", lifetime=15):
         marker_prop = MarkerPublisher._marker_props[marker_type]
 
