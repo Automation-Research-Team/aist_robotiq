@@ -91,8 +91,9 @@ class PickOrPlaceAction(object):
                                                     (goal.grasp_offset.x,
                                                      goal.grasp_offset.y,
                                                      goal.grasp_offset.z))
-        routines.publish_marker(target_pose,
-                                "pick_pose" if goal.pick else "place_pose")
+        routines.add_marker(target_pose,
+                            "pick_pose" if goal.pick else "place_pose")
+        routines.publish_marker()
         (success, _, _) = routines.go_to_pose_goal(goal.robot_name, target_pose,
                                                    goal.speed_slow)
         if not success:
