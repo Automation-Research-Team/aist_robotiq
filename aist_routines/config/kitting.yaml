@@ -104,14 +104,14 @@ part_props:
 picking_parameters:
   04_37D-GEARMOTOR-50-70:
     approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, 0.005]
+    grasp_offset: [0.0, 0.0, 0.001]
     place_offset: [0.0, 0.0, 0.06]
     liftup_after: true
     speed_fast: 1.0
     speed_slow: 0.1
   05_MBRFA30-2-P6:
     approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, 0.004]
+    grasp_offset: [0.0, 0.0, 0.001]
     place_offset: [0.0, 0.0, 0.03]
     liftup_after: true
     speed_fast: 1.0
@@ -125,7 +125,7 @@ picking_parameters:
     speed_slow: 1.0
   07_SBARB6200ZZ_30:
     approach_offset: [0.0, 0.0, 0.15]
-    grasp_offset: [0.0, 0.0, 0.004]
+    grasp_offset: [0.0, 0.0, 0.001]
     place_offset: [0.0, 0.0, 0.05]
     liftup_after: true
     speed_fast: 1.0
