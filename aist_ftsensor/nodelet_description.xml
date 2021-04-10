@@ -1,8 +1,0 @@
-<library path="lib/libaist_ftsensor_nodelet">
-  <class name="aist_ftsensor/ftsensor_nodelet"
-	 type="aist_ftsensor::ftsensor_nodelet"
-	 base_class_type="nodelet::Nodelet">
-    <description>
-    </description>
-  </class>
-</library>
