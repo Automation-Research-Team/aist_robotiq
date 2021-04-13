@@ -29,12 +29,12 @@ part_props:
     name: Geared motor
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
-    destination: tray_1_partition_4
+    destination: tray_1_partition_3
   05_MBRFA30-2-P6:
     name: Pully for round belt
     robot_name: b_bot
     camera_name: a_phoxi_m_camera
-    destination: tray_2_partition_6
+    destination: tray_2_partition_1
   06_MBT4-400:
     name: Polyurethane round belt
     robot_name: b_bot
