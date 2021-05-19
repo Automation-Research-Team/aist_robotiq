@@ -31,4 +31,4 @@ fi
 
 apt-get install -y --no-install-recommends libssh2-1
 
-install_photoneo Localization/1.3.1 PhotoneoLocalizationSDKInstaller-1.3.1+ed614d8-Linux-gcc5.5.0.run
+install_photoneo Localization/1.3.4 PhotoneoLocalizationSDKInstaller-1.3.4+b9c79c4-Linux-gcc5.5.0.run
