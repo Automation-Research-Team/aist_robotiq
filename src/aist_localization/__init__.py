@@ -51,25 +51,15 @@ class LocalizationClient(object):
     def get_settings(self):
         return self._dyn_reconf.get_configuration()
 
-    def send_goal(self, model, nposes=1, pose2d=[]):
+    def send_goal(self, model, nposes=1, poses2d=[]):
         goal = lmsg.LocalizeGoal()
         goal.object_name = model
         goal.in_plane    = model in self._in_plane
         goal.nposes      = nposes
-
-        if len(pose2d) == 3:
-            goal.in_plane = True
-            goal.x        = pose2d[0]
-            goal.y        = pose2d[1]
-            goal.theta    = pose2d[2]
-        else:
-            goal.x        = 0.0
-            goal.y        = 0.0
-            goal.theta    = 0.0
-
-        goal.sideways = False
-        goal.x_offset = 0.0
-        goal_z_offset = 0.0
+        goal.poses2d     = poses2d
+        goal.sideways    = False
+        goal.x_offset    = 0.0
+        goal_z_offset    = 0.0
         if model in self._in_plane_settings:
             in_plane_settings = self._in_plane_settings[model]
             if 'sideways' in in_plane_settings:
