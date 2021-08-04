@@ -1,6 +1,7 @@
 import rospy
 import dynamic_reconfigure.client
 import actionlib
+from geometry_msgs     import msg as gmsg
 from aist_localization import msg as lmsg
 from operator          import itemgetter
 
@@ -57,6 +58,8 @@ class LocalizationClient(object):
         goal.in_plane    = model in self._in_plane
         goal.nposes      = nposes
         goal.poses2d     = poses2d
+        if goal.in_plane and not goal.poses2d:
+            goal.poses2d = [gmsg.Pose2D(x=0.0, y=0.0, theta=0.0)]
         goal.sideways    = False
         goal.x_offset    = 0.0
         goal_z_offset    = 0.0
