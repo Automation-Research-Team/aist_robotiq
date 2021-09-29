@@ -70,7 +70,7 @@ add_executable(
 
 add_dependencies(
   ${PROJECT_NAME}
-  ${PROJECT_NAME}_gencpp
+  ${PROJECT_NAME}_generate_messages_cpp
   ${${PREOJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
@@ -90,7 +90,7 @@ add_library(
 
 add_dependencies(
   ${PROJECT_NAME}_nodelet
-  ${PROJECT_NAME}_gencpp
+  ${PROJECT_NAME}_generate_messages_cpp
   ${${PREOJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
