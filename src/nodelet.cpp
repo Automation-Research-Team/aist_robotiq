@@ -30,9 +30,12 @@
 // LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
+//
+// Author: Toshio Ueshiba
+//
 /*!
  *  \file	nodelet.cpp
- *  \author	Toshio UESHIBA
+ *  \author	Toshio Ueshiba
  */
 #include "Localization.h"
 #include <nodelet/nodelet.h>
