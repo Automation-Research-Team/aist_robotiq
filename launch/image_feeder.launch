@@ -9,8 +9,7 @@
   <!-- Localization parameters -->
   <arg name="nposes"		default="1"/>
   <arg name="timeout"		default="5"/>
-  <arg name="urdf_dir"		default="$(find o2ac_parts_description
-					 )/urdf/generated"/>
+  <arg name="urdf_dir"		default="$(find aist_description)/parts/urdf"/>
 
   <!-- Spawn feeder -->
   <node name="feeder"

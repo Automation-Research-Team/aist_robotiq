@@ -65,7 +65,7 @@ Localization::Localization(const ros::NodeHandle& nh)
     _localize_srv.start();
 
     _nh.param("ply_dir", _ply_dir,
-	      ros::package::getPath("o2ac_parts_description") + "/meshes");
+	      ros::package::getPath("aist_description") + "/parts/meshes");
 
     _sync.registerCallback(&Localization::sync_cb, this);
 

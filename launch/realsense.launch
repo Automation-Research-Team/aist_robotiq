@@ -4,10 +4,10 @@
   <!-- Localization parameters -->
   <arg name="nposes"		default="2"/>
   <arg name="timeout"		default="5"/>
-  <arg name="ply_dir"		default="$(find o2ac_parts_description
-					 )/meshes"/>
-  <arg name="urdf_dir"		default="$(find o2ac_parts_description
-					 )/urdf/generated"/>
+  <arg name="ply_dir"		default="$(find aist_description
+					 )/parts/meshes"/>
+  <arg name="urdf_dir"		default="$(find aist_description
+					 )/parts/urdf"/>
 
   <!-- Camera parameters -->
   <arg name="serial_no"		default=""/>

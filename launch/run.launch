@@ -6,8 +6,8 @@
   <arg name="depth_topic"	default="depth_map"/>
   <arg name="normal_topic"	default="normal_map"/>
   <arg name="manager"		default=""/>
-  <arg name="ply_dir"		default="$(find o2ac_parts_description
-					 )/meshes"/>
+  <arg name="ply_dir"		default="$(find aist_description
+					 )/parts/meshes"/>
 
   <!-- Spawn depth_filter -->
   <include file="$(find aist_depth_filter)/launch/run.launch">

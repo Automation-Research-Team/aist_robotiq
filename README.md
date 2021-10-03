@@ -9,7 +9,7 @@ The node is a ROS wrapper for the [Photoneo Localization SDK](https://www.photon
 
 ## 3D CAD models
 
-The 3D CAD models need to be given in Stanford PLY format. This is due to the requirement incurred by the [Photoneo Localization SDK](https://www.photoneo.com/products/photoneo-3d-localization-c-sdk/). The path to the directory containing models is given by the parameter `~ply_dir` whose default value is `o2ac_parts_description/meshes`.
+The 3D CAD models need to be given in Stanford PLY format. This is due to the requirement incurred by the [Photoneo Localization SDK](https://www.photoneo.com/products/photoneo-3d-localization-c-sdk/). The path to the directory containing models is given by the parameter `~ply_dir` whose default value is `aist_description/parts/meshes`.
 
 ## Subscribed ROS topics
 
