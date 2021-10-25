@@ -1,9 +1,0 @@
-<library path="libaist_robotiq2f85_controller">
-
-  <class name="aist_robotiq2f85_controller/Robotiq85GripperController"
-         type="aist_robotiq2f85_controller::Robotiq85GripperController"
-         base_class_type="robot_controllers::Controller">
-    <description>robotiq 85 gripper</description>
-  </class>
-
-</library>

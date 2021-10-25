@@ -1,8 +1,0 @@
-<?xml version="1.0" ?>
-<robot name="aaa" xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:include filename="$(find aist_ftsensor)/urdf/ft300.urdf.xacro" />
-
-  <link name ="base_link"/>
-
-  <xacro:ft300 prefix="" parent="base_link"/>
-</robot>
