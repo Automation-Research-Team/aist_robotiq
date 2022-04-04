@@ -62,7 +62,8 @@ Localization::Localization(const ros::NodeHandle& nh)
      _settings()
 {
   // Setup Localize action server.
-    _localize_srv.registerPreemptCallback(boost::bind(&preempt_cb, this));
+    _localize_srv.registerPreemptCallback(
+	boost::bind(&Localization::preempt_cb, this));
     _localize_srv.start();
 
     _nh.param("ply_dir", _ply_dir,
@@ -172,7 +173,7 @@ Localization::register_variable(const std::string& name,
 }
 
 void
-Localization::preempt_cb() const
+Localization::preempt_cb()
 {
     _localization->StopAsync();
     _localize_srv.setPreempted();
@@ -300,10 +301,10 @@ Localization::localize_in_plane(const goal_cp& goal)
 	const auto	q = r.cross(n);
 
       // Transformation from gaze point to camera
-	const tf::Transform	transform(tf::Matrix3x3(q(0), r(0), n(0),
-							q(1), r(1), n(1),
-							q(2), r(2), n(2)),
-					  tf::Vector3(x(0), x(1), x(2)));
+	tf::Transform	transform(tf::Matrix3x3(q(0), r(0), n(0),
+						q(1), r(1), n(1),
+						q(2), r(2), n(2)),
+				  tf::Vector3(x(0), x(1), x(2)));
 
 	if (goal->sideways)
 	    transform *= tf::Transform(tf::Matrix3x3(1.0, 0.0, 0.0,

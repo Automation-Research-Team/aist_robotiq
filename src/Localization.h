@@ -129,7 +129,8 @@ class Localization
       //! Get the value from the localizer.
 	virtual void	get_from(const localization_t& localization)
 			{
-			    value = localization.getSetting<T>(path);
+			    value = const_cast<localization_t&>(localization)
+					.getSetting<T>(path);
 
 			    ROS_DEBUG_STREAM('\"' << path
 					     << "\" --> " << value);
@@ -141,7 +142,7 @@ class Localization
   public:
 		Localization(const ros::NodeHandle& nh)			;
 
-    void	run()						  const	;
+    void	run()						const	;
 
   private:
     template <class T>
@@ -152,13 +153,13 @@ class Localization
 				  const std::string& description,
 				  std::initializer_list<
 					  std::string> vals)		;
-    void	preempt_cb()					  const	;
+    void	preempt_cb()						;
     void	sync_cb(const file_info_cp& file_info,
 			const camera_info_cp& camera_info)		;
     void	localize_cb(const goal_cp& goal)			;
     void	localize_full(const goal_cp& goal)			;
     void	localize_in_plane(const goal_cp& goal)			;
-    vector3_t	view_vector(value_t u, value_t v)		  const	;
+    vector3_t	view_vector(value_t u, value_t v)		const	;
 
   private:
     ros::NodeHandle					_nh;
