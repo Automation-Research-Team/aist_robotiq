@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys, socket, rospy
 from aist_robotiq.cmodel_base import RobotiqCModel, ComModbusTcp
