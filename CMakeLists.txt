@@ -65,41 +65,21 @@ catkin_package(
     nodelet
 )
 
-add_executable(
-  ${PROJECT_NAME}
-  src/main.cpp
-  src/Localization.cpp
-)
-
-add_dependencies(
-  ${PROJECT_NAME}
-  ${PROJECT_NAME}_generate_messages_cpp
-  ${${PREOJECT_NAME}_EXPORTED_TARGETS}
-  ${catkin_EXPORTED_TARGETS}
-)
-
-target_link_libraries(
-  ${PROJECT_NAME}
-  ${roscpp_LIBRARIES}
-  ${catkin_LIBRARIES}
-  ${PHOLOCALIZATION_LIBRARIES}
-)
-
 add_library(
-  ${PROJECT_NAME}_nodelet
+  ${PROJECT_NAME}
   src/nodelet.cpp
   src/Localization.cpp
 )
 
 add_dependencies(
-  ${PROJECT_NAME}_nodelet
+  ${PROJECT_NAME}
   ${PROJECT_NAME}_generate_messages_cpp
   ${${PREOJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
 
 target_link_libraries(
-  ${PROJECT_NAME}_nodelet
+  ${PROJECT_NAME}
   ${roscpp_LIBRARIES}
   ${catkin_LIBRARIES}
   ${PHOLOCALIZATION_LIBRARIES}
@@ -111,7 +91,7 @@ target_link_libraries(
 #############
 install(
   TARGETS
-    ${PROJECT_NAME} ${PROJECT_NAME}_nodelet
+    ${PROJECT_NAME}
   ARCHIVE
     DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY
