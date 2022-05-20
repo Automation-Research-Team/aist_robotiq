@@ -9,6 +9,9 @@
   <arg name="ply_dir"		default="$(find aist_description
 					 )/parts/meshes"/>
 
+  <arg if="$(eval manager == '')"	name="command"	value="standalone"/>
+  <arg unless="$(eval manager == '')"	name="command"	value="load"/>
+
   <!-- Spawn depth_filter -->
   <include file="$(find aist_depth_filter)/launch/run.launch">
     <arg name="camera_info_topic"	value="$(arg camera_info_topic)"/>
@@ -18,18 +21,10 @@
     <arg name="manager"			value="$(arg manager)"/>
   </include>
 
-  <!-- Spawn localizer as a node unless manager name is specified -->
-  <node if="$(eval manager == '')"
-	name="localization" pkg="aist_localization" type="aist_localization"
-  	output="screen">
-    <remap from="/file_info"	to="depth_filter/file_info"/>
-    <param name="ply_dir"	value="$(arg ply_dir)"/>
-  </node>
-
   <!-- Spawn localizer as a nodelet if manager name is specified -->
-  <node unless="$(eval manager == '')"
-	name="localization" pkg="nodelet" type="nodelet" output="screen"
-  	args="load aist_localization/aist_localization_nodelet $(arg manager)">
+  <node name="localization" pkg="nodelet" type="nodelet" output="screen"
+  	args="$(arg command) aist_localization/aist_localization
+	      $(arg manager)">
     <remap from="/file_info"	to="depth_filter/file_info"/>
     <param name="ply_dir"	value="$(arg ply_dir)"/>
   </node>
