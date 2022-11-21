@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+#
 # Software License Agreement (BSD License)
 #
 # Copyright (c) 2021, National Institute of Advanced Industrial Science and Technology (AIST)
@@ -34,37 +36,48 @@
 # Author: Toshio Ueshiba
 #
 import rospy
-from numpy            import clip
-from aist_robotiq.msg import CModelStatus, CModelCommand
+from aist_robotiq import EPickGripper
 
-#########################################################################
-#  class CModelBase                                                     #
-#########################################################################
-class CModelBase(object):
-    def __init__(self):
-        super(CModelBase, self).__init__()
+if __name__ == '__main__':
 
-        # Publish device status to the controller.
-        self._pub = rospy.Publisher('/status', CModelStatus, queue_size=3)
+    def is_float(s):
+        try:
+            float(s)
+        except ValueError:
+            return False
+        else:
+            return True
 
-        # Subscribe command form the controller and send it to the device.
-        rospy.Subscriber('/command', CModelCommand, self.put_command)
+    rospy.init_node('test_epick_client')
 
-    def run(self):
-        rate = rospy.Rate(20)
-        while not rospy.is_shutdown():
-            status = self.get_status()  # (defined in derived class)
-            self._pub.publish(status)   # Forward device status to controller
-            rate.sleep()
-        self.disconnect()               # (defined in derived class)
+    prefix             = rospy.get_param('~prefix', 'a_bot_gripper_')
+    advanced_mode      = rospy.get_param('~advanced_mode',      False)
+    grasp_pressure     = rospy.get_param('~grasp_pressure',     -78.0)
+    detection_pressure = rospy.get_param('~detection_pressure', -10.0)
+    release_pressure   = rospy.get_param('~release_pressure',     0.0)
 
-    def _clip_command(self, command):
-        command.rACT = clip(command.rACT, 0, 1)
-        command.rMOD = clip(command.rACT, 0, 3)
-        command.rGTO = clip(command.rGTO, 0, 1)
-        command.rATR = clip(command.rATR, 0, 1)
-        command.rARD = clip(command.rATR, 0, 1)
-        command.rPR  = clip(command.rPR,  0, 255)
-        command.rSP  = clip(command.rSP,  0, 255)
-        command.rFR  = clip(command.rFR,  0, 255)
-        return command
+    gripper = EPickGripper(prefix, advanced_mode, grasp_pressure,
+                           detection_pressure, release_pressure)
+
+    while not rospy.is_shutdown():
+        print('==== Available commands ====')
+        print('  g:         Grasp')
+        print('  r:         Release')
+        print('  <numeric>: Set gripper a specified pressure value')
+        print('  q:         Quit\n')
+
+        key = raw_input('>> ')
+        if key == 'g':
+            result = gripper.grasp()
+        elif key == 'r':
+            result = gripper.release()
+        elif is_float(key):
+            result = gripper.move(float(key))
+        elif key=='q':
+            break
+        else:
+            print('unknown command: %s' % key)
+            continue
+
+        print('---- Result ----')
+        print(result)
