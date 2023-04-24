@@ -101,3 +101,10 @@ install(
   RUNTIME
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
+catkin_install_python(
+  PROGRAMS
+    scripts/test.py scripts/localize.py scripts/image_feeder.py
+  DESTINATION
+    ${CATKIN_PACKAGE_BIN_DESTINATION}
+)

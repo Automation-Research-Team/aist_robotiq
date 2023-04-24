@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 #
 # Copyright (c) 2021, National Institute of Advanced Industrial Science and Technology (AIST)
 # All rights reserved.
