@@ -36,7 +36,8 @@
 # Author: Toshio Ueshiba
 #
 import rospy
-from aist_robotiq import RobotiqGripper
+from aist_robotiq        import RobotiqGripper
+from aist_utility.compat import *
 
 if __name__ == '__main__':
 
@@ -60,7 +61,7 @@ if __name__ == '__main__':
         print('  <numeric>: Open gripper with a specified gap value')
         print('  q:         Quit\n')
 
-        key = input('>> ')
+        key = raw_input('>> ')
         if key == 'g':
             result = gripper.grasp()
         elif key == 'r':

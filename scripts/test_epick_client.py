@@ -36,7 +36,8 @@
 # Author: Toshio Ueshiba
 #
 import rospy
-from aist_robotiq import EPickGripper
+from aist_robotiq        import EPickGripper
+from aist_utility.compat import *
 
 if __name__ == '__main__':
 
