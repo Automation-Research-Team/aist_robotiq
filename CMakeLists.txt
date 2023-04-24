@@ -80,3 +80,15 @@ target_link_libraries(
     ${catkin_LIBRARIES}
     ${roscpp_LIBRARIES}
 )
+
+catkin_install_python(
+  PROGRAMS
+    scripts/cmodel_rtu_driver.py
+    scripts/cmodel_tcp_driver.py
+    scripts/cmodel_urcap_driver.py
+    scripts/cmodel_controller.py
+    scripts/epick_controller.py
+    scripts/test_cmodel_client.py
+    scripts/test_epick_client.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
