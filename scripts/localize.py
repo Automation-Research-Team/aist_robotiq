@@ -34,9 +34,10 @@
 # Author: Toshio Ueshiba
 #
 import rospy, sys, re
-from aist_depth_filter  import DepthFilterClient
-from aist_localization  import LocalizationClient
-from aist_model_spawner import ModelSpawnerClient
+from aist_depth_filter   import DepthFilterClient
+from aist_localization   import LocalizationClient
+from aist_model_spawner  import ModelSpawnerClient
+from aist_utility.compat import *
 
 if __name__ == '__main__':
 

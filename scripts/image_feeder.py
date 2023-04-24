@@ -35,11 +35,12 @@
 # Author: Toshio Ueshiba
 #
 import os, sys, glob, rospy, re, json, pprint, skimage, cv2
-from cv_bridge          import CvBridge
-from sensor_msgs        import msg as smsg
-from aist_depth_filter  import DepthFilterClient
-from aist_localization  import LocalizationClient
-from aist_model_spawner import ModelSpawnerClient
+from cv_bridge           import CvBridge
+from sensor_msgs         import msg as smsg
+from aist_depth_filter   import DepthFilterClient
+from aist_localization   import LocalizationClient
+from aist_model_spawner  import ModelSpawnerClient
+from aist_utility.compat import *
 
 #########################################################################
 #  class ImageFeeder                                                    #
