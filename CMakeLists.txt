@@ -23,6 +23,11 @@ add_message_files(
     CModelCommand.msg CModelStatus.msg EPickCommand.msg
 )
 
+add_service_files(
+  FILES
+    SetVelocity.srv
+)
+
 add_action_files(
   FILES
     EPickCommand.action

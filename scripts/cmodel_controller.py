@@ -41,6 +41,7 @@ from sensor_msgs.msg  import JointState
 from control_msgs.msg import (GripperCommandAction, GripperCommandGoal,
                               GripperCommandResult, GripperCommandFeedback)
 from aist_robotiq.msg import CModelStatus, CModelCommand
+from aist_robotiq.srv import SetVelocity, SetVelocityResponse
 from actionlib        import SimpleActionServer
 
 #########################################################################
@@ -57,9 +58,15 @@ class CModelController(object):
         self._max_position = rospy.get_param('~max_position', 0.085)
         self._min_velocity = rospy.get_param('~min_velocity', 0.013)
         self._max_velocity = rospy.get_param('~max_velocity', 0.1)
-        self._min_effort   = rospy.get_param('~min_effort', 40.0)
-        self._max_effort   = rospy.get_param('~max_effort', 100.0)
-        self._joint_name   = rospy.get_param('~joint_name', 'finger_joint')
+        self._min_effort   = rospy.get_param('~min_effort',   40.0)
+        self._max_effort   = rospy.get_param('~max_effort',   100.0)
+        self._joint_name   = rospy.get_param('~joint_name',   'finger_joint')
+
+        # Velocity parameter set by service server.
+        self._velocity         = 0.5*(self._min_velocity + self._max_velocity)
+        self._set_velocity_srv = rospy.rospy.Service('~set_velocity',
+                                                     SetVelocity,
+                                                     self._set_velocity_cb)
 
         # Status recevied from driver, command sent to driver
         self._status_sub      = rospy.Subscriber('~status', CModelStatus,
@@ -87,6 +94,10 @@ class CModelController(object):
         self._calibrate()
 
         rospy.logdebug('(%s) Started' % self._name)
+
+    def _set_velocity_cb(self, req):
+        self._velocity = req.velocity
+        return SetVelocityResponse(True)
 
     def _status_cb(self, status):
         # Publish the joint_states for the gripper
@@ -154,8 +165,7 @@ class CModelController(object):
             return
 
         self._goal_rPR = self._send_move_command(goal.command.position,
-                                                 (self._min_velocity +
-                                                  self._max_velocity) * 0.5,
+                                                 self._velocity,
                                                  goal.command.max_effort)
 
     def _preempt_cb(self):
