@@ -64,9 +64,8 @@ class CModelController(object):
 
         # Velocity parameter set by service server.
         self._velocity         = 0.5*(self._min_velocity + self._max_velocity)
-        self._set_velocity_srv = rospy.rospy.Service('~set_velocity',
-                                                     SetVelocity,
-                                                     self._set_velocity_cb)
+        self._set_velocity_srv = rospy.Service('~set_velocity', SetVelocity,
+                                               self._set_velocity_cb)
 
         # Status recevied from driver, command sent to driver
         self._status_sub      = rospy.Subscriber('~status', CModelStatus,
