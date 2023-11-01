@@ -2,8 +2,9 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:macro name="robotiq_arg2f_coupling" params="prefix parent *origin">
 
+    <!-- coupling_length = 0.0169 - 2*0.0029 = 0.0111 -->
     <xacro:property name="coupling_radius" value="0.0375"/>
-    <xacro:property name="coupling_length" value="0.0169"/>
+    <xacro:property name="coupling_length" value="0.0111"/>
 
     <link name="${prefix}base_link">
       <inertial>
@@ -26,17 +27,12 @@
         <geometry>
           <cylinder length="${coupling_length}" radius="${coupling_radius}"/>
         </geometry>
-        <!-- <origin xyz="0 0 0" rpy="0 0 0" /> -->
-        <!-- <geometry> -->
-        <!--   <mesh filename="package://aist_robotiq/meshes/collision/robotiq_arg2f_coupling.stl" /> -->
-        <!-- </geometry> -->
       </collision>
     </link>
     <gazebo reference="${prefix}base_link">
       <material>Gazebo/Black</material>
     </gazebo>
 
-    <!-- Add the force sensor in front of the gripper. -->
     <joint name="${prefix}base_joint" type="fixed">
       <parent link="${parent}"/>
       <child  link="${prefix}base_link"/>

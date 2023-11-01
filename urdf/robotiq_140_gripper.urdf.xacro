@@ -264,7 +264,7 @@
     <joint name="${prefix}tip_link_joint" type="fixed">
       <parent link="${prefix}base_link"/>
       <child link="${prefix}tip_link"/>
-      <origin rpy="0.0 0.0 0.0" xyz=".233 0.0 0.0"/>
+      <origin rpy="0.0 0.0 0.0" xyz=".2328 0.0 0.0"/>
     </joint>
     <link name="${prefix}tip_link"/>
 

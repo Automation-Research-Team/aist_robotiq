@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <robot name="ft300" xmlns:xacro="http://wiki.ros.org/xacro">
 
-  <xacro:property name="ft300_radius" value="0.0375"/>
-  <xacro:property name="ft300_length" value="0.0360"/>
-
   <xacro:macro name="ft300" params="prefix parent *origin">
+
+    <xacro:property name="ft300_radius" value="0.0375"/>
+    <xacro:property name="ft300_length" value="0.0375"/>
+
     <link name="${prefix}base_link">
       <visual>
         <origin xyz="${ft300_length} 0 0" rpy="${pi} ${pi/2} 0"/>
@@ -16,15 +17,6 @@
 	  <color rgba="0.2 0.2 0.2 1"/>
 	</material>
       </visual>
-      <!-- <visual> -->
-      <!--   <origin xyz="${ft300_length/2} 0 0" rpy="0 ${pi/2} 0"/> -->
-      <!--   <geometry> -->
-      <!--     <cylinder length="${ft300_length}" radius="0.0375"/> -->
-      <!--   </geometry> -->
-      <!--   <material name="Black"> -->
-      <!--     <color rgba="0.2 0.2 0.2 1.0"/> -->
-      <!--   </material> -->
-      <!-- </visual> -->
       <collision>
         <origin xyz="${ft300_length/2} 0 0" rpy="0 ${pi/2} 0"/>
         <geometry>
@@ -32,6 +24,10 @@
         </geometry>
       </collision>
     </link>
+    <gazebo reference="${prefix}base_link">
+      <material>Gazebo/Black</material>
+    </gazebo>
+
     <!-- Add the force sensor in front of the gripper. -->
     <joint name="${prefix}ft300_joint" type="fixed">
       <parent link="${parent}"/>
@@ -54,4 +50,5 @@
     </joint>
 
   </xacro:macro>
+
 </robot>
